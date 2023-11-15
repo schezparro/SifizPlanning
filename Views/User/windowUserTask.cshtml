@@ -1,0 +1,627 @@
+﻿<input type="hidden" name="fechaLunes" ng-model="fechaLunes" />
+<input type="hidden" name="esteLunes" ng-model="esteLunes" />
+<input type="hidden" name="fechaHoy" ng-model="fechaHoy" />
+
+<div class="task-controles">
+    <div class="left">
+        <button class="btn btn-primary" ng-click="filtrarTareas()"><span class="glyphicon glyphicon-filter Aceptar aria-hidden=" true"></span> Aplicar Filtro</button>
+        <button class="btn btn-primary" ng-click="windowSolicitarTarea()"><span class="glyphicon glyphicon-plus aria-hidden=" true"></span> Solicitud de Tarea</button>
+    </div>
+
+    <div id="control-filtrar">
+        <div class="input-append date left">
+            <input type="text" class="form-control datepicker-filtro left" ng-model="fechaDiaFiltro">
+            <span class="glyphicon glyphicon-th left"></span>
+        </div>
+        <select id="selectSemanas" ng-model="numeroSemanas" ng-change="cambiarSemanas()" class="form-control">
+            <option value="1" selected="selected">1 Semana</option>
+            <option value="2">2 Semanas</option>
+            <option value="3">3 Semanas</option>
+        </select>
+        <button class="btn btn-primary" ng-click="semanaAtras()"><span class="glyphicon glyphicon-chevron-left"></span></button>
+        <button class="btn btn-success" ng-click="diaHoy()"><span class="glyphicon glyphicon-home"></span></button>
+        <button class="btn btn-primary" ng-click="semanaProxima()"><span class="glyphicon glyphicon-chevron-right"></span></button>
+    </div>
+</div>
+
+<div class="clear"></div>
+
+<div id="task-container">
+    <div id="table-user-task">
+        <table class="table table-colaboradores">
+
+            <tr>
+                <td style="opacity: 0.0;">&nbsp;</td>
+                <td class="{{dia.clase}}" ng-repeat="dia in diasCalendar">{{dia.dia}}</td>
+            </tr>
+
+            <tr ng-repeat="trab in trabajadores" ng-init="paso = $index">
+                <td class="td-colaborador">
+                    <div class="colaborador-panel" data-id="{{trab.trab.id}}">
+                        <div>
+                            {{paso+1}}
+                            <span class="{{estiloSegunEstadoCoordinacion(trab.trab.id, paso)[0]}}" ng-click="verCoordinadosPersona(trab.trab.id)" title="{{estiloSegunEstadoCoordinacion(trab.trab.id, paso)[1]}}"></span>
+                        </div>
+                        <div class="img-worker-task">
+                            <img ng-src="Web/images/{{trab.trab.url}}">
+                        </div>
+                        <div class="nombre-trabajador">{{mySplitEmail( trab.trab.email, 0 )}}</div>
+                        <div class="sede-trabajador">{{trab.trab.sede}}</div>
+                    </div>
+                </td>
+
+                <td class="td-tareas {{tareas.claseDia}}" ng-repeat="tareas in trab.tareasPorDia" style="width:{{anchoCeldaTarea}};">
+
+                    <div data-id-tarea="{{tarea.id}}" class="content-tarea {{tarea.clase}}" ng-repeat="tarea in tareas.tareas"
+                         data-container="#task-container" data-toggle="popover" data-placement="right"
+                         data-title="{{tarea.dCliente}}"
+                         ng-init="data = tarea.detalle.indexOf('CORRESPONDIENTE AL TICKET:') !== -1 ? '&lt;span class=&quot;glyphicon glyphicon-envelope btn-mensaje-ticket&quot; title=&quot;Mensaje desarrollo del ticket&quot;&gt;&lt;/span&gt;&nbsp;&nbsp;&lt;span class=&quot;glyphicon glyphicon-wrench btn-info-ticket&quot; title=&quot;Informaci&#243;n resolución de ticket&quot;&gt;&lt;/span&gt;' : ''; "
+                         data-content="{{tarea.tipo === &quot;t&quot; ?
+                                            &quot;Actividad:&quot; + tarea.dActividad + &quot;<br>&quot; +
+                                            &quot;Módulo:&quot; + tarea.dModulo + &quot;<br>&quot; +
+                                            &quot;Desarrollarse en:&quot; + tarea.dLugar + &quot;<br>&quot; +
+                                            (tarea.coordinador != null?&quot;Coordinar con:&quot;+tarea.coordinador+&quot;<br/>&quot;:&quot;&quot;) +
+                                            &quot;Detalles:&quot; + tarea.detalle + &quot;<br>&quot; +
+                                            &quot;Hora Inicio:&quot; + tarea.finicio + &quot;<br>&quot; +
+                                            &quot;Hora Fin:&quot; + tarea.ffin + &quot;<br>&quot; +
+                                            &quot;
+                                                <div class='left estado-tarea' data-id-tarea='&quot; + tarea.id + &quot;'>
+                                                    &quot; + data + &quot;
+                                                </div>
+                                                <div class='right estado-tarea'>
+                                                    <span class='glyphicon glyphicon-cog btn-tarea-desarrollo' data-id-tarea='&quot; + tarea.id + &quot;' title='En desarrollo'></span>
+                                                    &nbsp;
+                                                    <span class='glyphicon glyphicon-pause btn-tarea-pausa' data-id-tarea='&quot; + tarea.id + &quot;' title='En pausa'></span>
+                                                    &nbsp;
+                                                    <span class='glyphicon glyphicon-search btn-tarea-finish' data-id-tarea='&quot; + tarea.id + &quot;' title='Ver actividades'></span>
+                                                </div>
+                                            &quot;
+
+                                        :
+                                            &quot;Motivo:&quot; + tarea.detalle + &quot;<br>&quot; +
+                                            &quot;Hora Inicio:&quot; + tarea.finicio + &quot;<br>&quot; +
+                                            &quot;Hora Fin:&quot; + tarea.ffin + &quot;<br>&quot;
+}}"
+                         data-html="true" data-trigger="manual">
+
+                        <div class="cabecera-tarea">
+                            <div class="nombre-cliente">{{tarea.cliente}}</div>
+                            <div class="lugar-tarea">{{tarea.lugar}}</div>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="body-tarea">
+                            <div>
+                                <div class="codigo-actividad-tarea">{{tarea.tipo === 't'?'('+tarea.actividad+')':''}}</div>
+                                <div class="modulo-actividad-tarea">{{tarea.modulo}}</div>
+                            </div>
+                            <div class="clear"></div>
+                            <div class="detalle-tarea">
+                                {{tarea.sdetalle}}
+                            </div>
+                            <div class="horas-tarea">{{tarea.horas}}</div><div class="clear"></div>
+                        </div>
+                    </div>
+
+                </td>
+
+            </tr>
+        </table>
+    </div>
+</div>
+
+<!-- Filtro de las Tarea -->
+<div class="modal fade" id="modalNewFilter" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog .filter">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">
+                    <span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
+                    <span id="title-filter">Filtrar tareas</span>
+                </h4>
+            </div>
+            <form method="post" id="frm-filter">
+                <div class="modal-body">
+
+                    <div class="filtro-panel">
+                        <div class="left menu-tipo-filtro">
+                            <div class="btn-group-vertical" role="group">
+                                <button class="btn btn-default" ng-click="anadirFiltroColaboradores()">Colaboradores</button>
+                                <button class="btn btn-default" ng-click="anadirFiltroClientes()">Clientes</button>
+                                <button class="btn btn-default" ng-click="anadirFiltroEstadoTarea()">Estado Tarea</button>
+                                <button class="btn btn-default" ng-click="anadirFiltroLugarTarea()">Lugar Tarea</button>
+                                <button class="btn btn-default" ng-click="anadirFiltroModulo()">Módulo</button>
+                                <button class="btn btn-default" ng-click="anadirFiltroSede()">Sede</button>
+                            </div>
+                        </div>
+
+                        <div class="left descripcion-filtro">
+                            <button ng-click="desmarcarTodosValores()" class="btn btn-danger btn-xs right botones-filtro">Desmarcar Todos</button>
+                            <button ng-click="marcarTodosValores()" class="btn btn-primary btn-xs right botones-filtro">Marcar Todos</button>
+
+                            <div class="panel panel-default panel-valores-filtro">
+                                Por favor seleccione un campo de filtrado
+                            </div>
+                            <div class="panel panel-default panel-json-filtro">
+                                Filtro:
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-warning" ng-click="limpiarFiltroTareas()">Limpiar</button>
+                    <button type="button" class="btn btn-success" ng-click="aplicarFiltroTareas()">Filtrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de finalizar la tarea -->
+<div class="modal fade" id="modal-final-tarea" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-final-tarea-label">
+                    <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
+                    <span id="title-filter">Actividades Realizadas</span>
+                </h4>
+            </div>
+
+            <div class="modal-body">
+
+                <form method="post" id="frm-modal-final-tarea" ng-submit="adicionarActividadTarea()">
+                    <div id="new-actividad-tarea" class="fila">
+                        <div class="left">
+                            <label>Tipo de Actividad:</label>
+                            <select class="form-control tipo-actividad-tarea" ng-model="tipoActividadTarea" ng-required="true">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="actividadTarea in actividadesTarea" value="{{actividadTarea.id}}">{{actividadTarea.nombre}}</option>
+                            </select>
+                        </div>
+                        <div class="left" ng-date="">
+                            <label>Fecha:</label>
+                            <select class="form-control dia-actividad-tarea" ng-model="diaActividadTara" ng-required="true">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="dia in diasActividadTarea" value="{{dia}}">{{dia}}</option>
+                            </select>
+                        </div>
+                        <div class="left campos-hora">
+                            <label>Hora Inicio:</label>
+                            <div class="clear">
+                                <div class="form-group">
+                                    <div class='input-group date' id='dtpk-hora-inicio-actividad-tarea'>
+                                        <input type='text' class="form-control" ng-model="horaInicioActividadTarea" ng-required="true" />
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--
+                            <select class="form-control left" ng-model="horaInicioActividadTarea" ng-required="true">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="hInicio in horas" value="{{hInicio}}">{{hInicio}}</option>
+                            </select>
+                            <div class="left dos-puntos">:</div>
+                            <select class="form-control left" ng-model="minutoInicioActividadTarea" ng-required="true">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="mInicio in minutos" value="{{mInicio}}">{{mInicio}}</option>
+                            </select>
+                            -->
+                        </div>
+                        <div class="left campos-hora">
+                            <label>Hora Fin:</label>
+                            <div class="form-group">
+                                <div class='input-group date' id='dtpk-hora-fin-actividad-tarea'>
+                                    <input type='text' class="form-control" ng-model="horaFinActividadTarea" ng-required="true" />
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            <!--
+                            <div>
+                                <select class="form-control left" ng-model="horaFinActividadTarea" ng-required="true">
+                                    <option value="">Seleccione...</option>
+                                    <option ng-repeat="hInicio in horas" value="{{hInicio}}">{{hInicio}}</option>
+                                </select>
+                                <div class="left dos-puntos">:</div>
+                                <select class="form-control left" ng-model="minutoFinActividadTarea" ng-required="true">
+                                    <option value="">Seleccione...</option>
+                                    <option ng-repeat="mInicio in minutos" value="{{mInicio}}">{{mInicio}}</option>
+                                </select>
+                            </div>
+                            -->
+                        </div>
+                        <button type="submit" class="left btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Adicionar</button>
+                        <div class="clear"></div>
+                    </div>
+                    <input type="hidden" ng-model="idTareaTerminar" />
+                </form>
+
+                <!--
+                <label>Tiempo utilizado:</label>
+                <input type="text" ng-model="tiempoUtilizado" class="form-control solo-numero" ng-required="true"/>
+                <div class="clear"></div>
+                -->
+
+                <div id="div-tabla-actividades-tarea">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Tipo de Actividad</th>
+                                <th>Fecha</th>
+                                <th>Hora Inicio</th>
+                                <th>Hora Fin</th>
+                                <th>Horas</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="actividad in actividadesRealizadas">
+                                <td>{{actividad.tipo}}</td>
+                                <td>{{actividad.fecha}}</td>
+                                <td>{{actividad.horaInicio}}</td>
+                                <td>{{actividad.horaFin}}</td>
+                                <td>{{actividad.horas}}</td>
+                                <td><span class="glyphicon glyphicon-edit" title="Editar Horarios" ng-click="editarHoraActividad(actividad.id)"></span></td>
+                                <td><span class="glyphicon glyphicon-comment" title="Comentarios" ng-click="verComentarios(actividad.id)"></span></td>
+                                <td><span class="glyphicon glyphicon-remove" title="Eliminar" ng-click="eliminarActividad(actividad.id)"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <div class="left">Total de Horas: {{tiempoUtilizado}}</div>
+
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" ng-click="finalizarTarea()">Terminar tarea</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal cambios de horarios de las actividades -->
+<div class="modal fade" id="modal-cambio-horario-actividad" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog .filter">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-cambio-horario-actividad-label">
+                    <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
+                    <span id="title-comentario-actividades">Horarios de la actividad</span>
+                </h4>
+            </div>
+            <form method="post" id="frm-actualizar-horas-tarea" ng-submit="actualizarHorasTarea()">
+                <div class="modal-body">
+                    <div class="fila">
+                        <div>
+                            <label>Hora Inicio:</label><br />
+                            <div class='input-group date' id='dtpk-cambio-hora-inicio-actividad-tarea'>
+                                <input type='text' class="form-control" ng-model="cambioHoraInicioActividadTarea" ng-required="true" />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            <label>Hora Fin:</label><br />
+                            <div class='input-group date' id='dtpk-cambio-hora-fin-actividad-tarea'>
+                                <input type='text' class="form-control" ng-model="cambioHoraFinActividadTarea" ng-required="true" />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Aceptar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal comentarios de las actividades -->
+<div class="modal fade" id="modal-comentario-actividad" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog .filter">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-solicitud-tareas-label">
+                    <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
+                    <span id="title-comentario-actividades">Comentarios de Actividad</span>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form method="post" id="frm-solicitud-tarea" ng-submit="adicionarComentario()">
+                    <div class="fila">
+                        <div>
+                            <label>Descripción:</label><br />
+                            <textarea class="form-control descripcion-comentario-actividad" ng-model="descripcionComentario" ng-required="true"></textarea>
+                        </div>
+                        <div class="form-inline" style="text-align: center;">
+                            <span><b>Importancia:</b></span>
+                            <select class="form-control input-xs" ng-model="importanciaActividad" ng-required="true">
+                                <option value="Normal">Normal</option>
+                                <option value="Importante">Importante</option>
+                                <option value="Muy Importante">Muy Importante</option>
+                            </select>
+                            <button type="submit" class="btn btn-info btn-xs add-comment">Añadir Comentario</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="clear"></div>
+                <div id="panel-comentarios" class="panel panel-default">
+                    <div ng-repeat="comentario in comentarios" class="comentario-actividad-{{comentario.importancia}}">
+                        <div><div class="left"><b>{{comentario.usuario | userEmail}}</b> : {{comentario.fecha | strDateToStrTime}}</div> <div class="right"> <span class="glyphicon glyphicon-remove eliminar-comentario" title="Eliminar Comentario" ng-click="eliminarComentario(comentario.id)"></span> </div> <div class="clear"></div></div>
+                        <div>{{comentario.texto}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Solicitud de Tareas-->
+<div class="modal fade" id="modal-solicitud-tareas" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog .filter">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-solicitud-tareas-label">
+                    <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
+                    <span id="title-filter">Solicitud de Tarea</span>
+                </h4>
+            </div>
+            <form method="post">
+                <div class="modal-body">
+                    <div class="fila">
+                        <label>Descripción:</label><br />
+                        <textarea class="form-control descripcion-peticion-tarea" ng-model="descripcionTarea"></textarea>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" ng-click="solicitarTarea()">Solicitar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de envio al cliente de ticket terminado -->
+<div class="modal fade" id="modal-email-fin-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-final-tarea-label">
+                    <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
+                    <span id="title-filter"><span class="glyphicon glyphicon-envelope"></span> Finalización de ticket - Email de información al cliente</span>
+                </h4>
+            </div>
+            <form id="form-enviar-email-fin-ticket" ng-submit="enviarInformacionFinTicket()">
+                <div class="modal-body">
+                    <div>
+                        <label>Requiere Publicación:</label>
+                        <input type="checkbox" ng-model="requierePublicacion" ng-change="cambioRequierePublicacion()" />
+                    </div>
+                    <div>
+                        <label>Texto Email:</label>
+                        <div id="div-texto-finalizacion-ticket">
+                            <textarea class="form-control" ng-model="textoEmail" rows="6" required="required"></textarea>
+                            <div>
+                                <i class="texto-finalizacion-ticket" style="display: none;">
+                                    La presente actividad concluyó la implementación del TICKET y se dispone a pasar el mismo a la actividad <b>PUBLICAR</b>.
+                                </i>
+                                <i class="texto-finalizacion-ticket">
+                                    El presente correo concluye la resolución de este requerimiento, formalmente solicitamos la certificación del mismo o sus
+                                    observaciones. Si dentro de los próximos 5 días laborables no recibimos su respuesta, procederemos a cerrar el ticket.
+                                    En caso de requerir correcciones será necesario que ingrese otro ticket.
+                                </i>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="panel-adjuntos-email-ticket">
+                        <label>Adjuntos:</label><br />
+
+                        <div class="file-adj-contrato">
+                            <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                                <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
+                                <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
+                                <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+                            </div>
+                        </div>
+
+                        <div id="barra-botones-file">
+                            <button id="addInputFileAnterior" ng-click="adicionarFileAnterior()" type="button" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus"></span> Adicionar</button>
+                            <button id="deleteInputFileAnterior" disabled="disabled" ng-click="deleteFileAnterior()" type="button" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-minus"></span> Eliminar</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" ng-click="finalizarTarea()"><span class="glyphicon glyphicon-envelope"></span> Enviar</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="htmlFile" class="invisible">
+            <div class="file-adj-contrato">
+                <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                    <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
+                    <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
+                    <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal comentario de no terminacion de un ticket -->
+<div class="modal fade" id="modal-comentario-no-terminacion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-mensaje-desarrollo-ticket-label">
+                    <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
+                    <span id="title-filter"><span class="glyphicon glyphicon-envelope"></span> Notificación de no terminación de ticket</span>
+                </h4>
+            </div>
+            <form ng-submit="enviarComentarioNoTerminacion()">
+                <div class="modal-body">
+                    <div>
+                        <label>Próxima actividad propuesta:</label>
+                        <select class="form-control" ng-model="actividadNoTerminacion" ng-required="true">
+                            <option ng-repeat="act in proximasActividadesNT" value="{{act.id}}">{{act.nombre}}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Causa de la no terminación:</label>
+                        <select class="form-control" ng-model="causaNoTerminacion" ng-required="true">
+                            <option ng-repeat="causa in causasNoTerminacion" value="{{causa.id}}">{{causa.nombre}}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Comentario:</label>
+                        <textarea class="form-control" ng-model="comentarioNoTerminacion" rows="12" ng-required="true"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Enviar </button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal comentario de no terminacion de una tarea -->
+<div class="modal fade" id="modal-comentario-no-terminacion-tarea-contrato" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-mensaje-desarrollo-ticket-label">
+                    <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
+                    <span id="title-filter"><span class="glyphicon glyphicon-envelope"></span> Notificación de no terminación de tarea</span>
+                </h4>
+            </div>
+            <form ng-submit="enviarComentarioNoTerminacionTarea()">
+                <div class="modal-body">
+                    <div>
+                        <label>Próxima actividad propuesta:</label>
+                        <select class="form-control" ng-model="actividadNoTerminacionTarea" ng-required="true">
+                            <option ng-repeat="act in proximasActividadesNT" value="{{act.id}}">{{act.nombre}}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Causa de la no terminación:</label>
+                        <select class="form-control" ng-model="causaNoTerminacionTarea" ng-required="true">
+                            <option ng-repeat="causa in causasNoTerminacion" value="{{causa.id}}">{{causa.nombre}}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Comentario:</label>
+                        <textarea class="form-control" ng-model="comentarioNoTerminacionTarea" rows="12" ng-required="true"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Enviar </button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal informacion de desarrollo del ticket, muestra la informacion para que el desarrollador pueda ver como desarrollar-->
+<div class="modal fade" id="modal-info-dev-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-info-dev-ticket-label">
+                    <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
+                    <span id="title-filter"><span class="glyphicon glyphicon-envelope"></span> Información de desarrollo de ticket</span>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <div>
+                        <label>Detalle del ticket:</label>
+                        <div class="texto-detalle-ticket">{{detalleTicket}}</div>
+                    </div>
+                    <div>
+                        <label>Resolución del ticket:</label>
+                        <div class="texto-detalle-ticket">{{textoResolucion}}</div>
+                    </div>
+                    <div>
+                        <label>Adjuntos:</label>
+                        <div>
+                            <a class="btn btn-default btn-xs" ng-repeat="adj in adjuntosTicket" target="_blank" href="~/Web{{adj}}"><span></span> Adjunto {{$index+1}} </a>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal mensaje de desarrollo del ticket -->
+<div class="modal fade" id="modal-mensaje-desarrollo-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-mensaje-desarrollo-ticket-label">
+                    <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
+                    <span id="title-filter"><span class="glyphicon glyphicon-envelope"></span> Notificación en resolución de ticket</span>
+                </h4>
+            </div>
+            <form ng-submit="enviarNotificacionTicket()">
+                <div class="modal-body">
+                    <div>
+                        <label>Motivo de la notificación:</label>
+                        <select class="form-control" ng-model="motivoNotificacionDevTicket" ng-required="true">
+                            <option ng-repeat="tipo in tiposNotificacion" value="{{tipo.id}}">{{tipo.name}}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Detalle:</label>
+                        <textarea class="form-control" ng-model="notificacionDevTicket" rows="12" ng-required="true"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Enviar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

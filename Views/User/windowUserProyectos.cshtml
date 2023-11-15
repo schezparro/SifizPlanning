@@ -1,0 +1,92 @@
+﻿<div>
+    <input type="text" ng-keyup="cargarProyectos()" ng-model="filtroProyectos" class="form-control right filtro" placeholder="Filtrar..." />
+    <div class="clear"></div>
+</div>
+
+<div id="div-user-proyectos">
+    <table id="tabla-user-proyectos" class="table table-striped">
+        <thead>
+            <tr>
+                <th>CLIENTE</th>
+                <th>SIGLAS</th>
+                <th>IDE DESARROLLO</th>
+                <th>REPOSITORIO</th>
+                <th>UBICACIÓN</th>
+                <th>TIENE CÓDIGO FUENTE</th>
+                <th>RESPONSABLE OTORGAR ACCESO</th>
+                <th>RESPONSABLE INTEGRAR CÓDIGO</th>
+                <th>RESPONSABLE GENERAR PUBLICACIÓN</th>
+                <th>VERSIÓN BASE DE DATOS</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr ng-repeat="proyecto in proyectos" ng-dblclick="mostrarWindowProyectos(proyecto)">
+                <td>{{proyecto.descripcion | strLimit: 75}}</td>
+                <td>{{proyecto.nombre}}</td>
+                <td>{{proyecto.versionDesarrollo}}</td>
+                <td>{{proyecto.repositorio}}</td>
+                <td>{{proyecto.ubicacion}}</td>
+                <td>{{proyecto.tieneCodigoFuente}}</td>
+                <td>{{proyecto.responsableAcceso}}</td>
+                <td>{{proyecto.responsableCodigo}}</td>
+                <td>{{proyecto.responsablePublicacion}}</td>
+                <td>{{proyecto.versionBaseDatos}}</td>
+            </tr>
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <th colspan="10">
+
+                    <nav>
+                        <ul class="pagination">
+                            <li ng-click="atrazarPagina()">
+                                <a href="#" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
+                            <li ng-click="avanzarPagina()">
+                                <a href="#" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+
+                </th>
+            </tr>
+        </tfoot>
+
+    </table>
+</div>
+
+<!-- Modal de otros datos del proyecto -->
+<div class="modal fade" id="modal-proyectos" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-final-tarea-label"><span class="glyphicon glyphicon-time" aria-hidden="true"></span><span> Datos del Proyecto</span></h4>
+            </div>
+            <div class="modal-body">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="left">
+                            <label class="label-data-proyecto">Lider del Proyecto: </label><span>  {{lider}}</span><br />
+                            <label class="label-data-proyecto">Gestor del Servicio: </label><span>  {{gestor}}</span><br />
+                            <label class="label-data-proyecto">Tiene soluciones proxies: </label><span>  {{tieneSolucionProxies}}</span><br />
+                            <label class="label-data-proyecto">Fecha salida a producción: </label><span>  {{fechaProduccion}}</span><br />
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,439 @@
+﻿<div>
+    <span style="float:left; margin:5px 0px 0px 0px">Numero de Contrato: &nbsp &nbsp </span>
+    <input id="actas-numero-contrato" type="text" class="form-control" ng-model="numeroContrato" ng-enter="filterData(8)" style="float:left; width:300px; text-transform:uppercase;" />
+    <button type="button" class="form-control btn-primary" ng-click="filterData(8)" style="width:150px; float:left; margin:0px 0px 0px 20px"><span class="glyphicon glyphicon-search" aria-hidden="true">&nbsp</span>Buscar</button>
+    <button id="boton-nueva-acta" type="button" class="form-control btn-primary" ng-click="AbrirModalActa()" style="width:220px; float:right; margin:0px 0px 0px 20px"><span class="glyphicon glyphicon-plus" aria-hidden="true">&nbsp</span>Agregar Nueva Acta</button>
+</div>
+
+<span>&nbsp &nbsp </span>
+<div id="div-tabla-actas">
+    <table id="tabla-actas-contratos" class="table table-striped table-hover" style=" width: 100% ">
+        <thead>
+            <tr>
+                <th class="ordenar-columna-actas" ng-click="ordenarColumna(1)">
+                    <div class="left">
+                        Codigo del Acta
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+                <th class="ordenar-columna-actas" ng-click="ordenarColumna(2)">
+                    <div class="left">
+                        Contrato
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+                <th class="ordenar-columna-actas" ng-click="ordenarColumna(3)">
+                    <div class="left">
+                        Cliente
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+                <th class="ordenar-columna-actas" ng-click="ordenarColumna(4)">
+                    <div class="left">
+                        Asunto
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+                <th class="ordenar-columna-actas" ng-click="ordenarColumna(5)">
+                    <div class="left">
+                        Fecha de firma
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+                <th class="ordenar-columna-actas" ng-click="ordenarColumna(6)">
+                    <div class="left">
+                        Colaborador responsable
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+                <th class="ordenar-columna-actas" ng-click="ordenarColumna(7)">
+                    <div class="left">
+                        Tipo de Acta
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+                <th class="ordenar-columna-actas" ng-click="ordenarColumna(8)">
+                    <div class="left">
+                        Estado
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                <th><input type="text" class="form-control invisible" ng-keyup="filterData(1)" /></th>
+                <th><input type="text" class="form-control" ng-model="contrato" ng-keyup="filterData(9)" /></th>
+                <th><input type="text" class="form-control" ng-model="cliente" ng-keyup="filterData(2)" /></th>
+                <th><input type="text" class="form-control" ng-model="asunto" ng-keyup="filterData(3)" /></th>
+                <th><input type="text" class="form-control" ng-model="fechaFirma" ng-keyup="filterData(4)" /></th>
+                <th><input type="text" class="form-control" ng-model="colaborador" ng-keyup="filterData(5)" /></th>
+
+                <th>
+                    <select id="select-tipo-acta" class="form-control">
+                        <option>Seleccione...</option>
+                        <option ng-repeat="tipo in tiposActas">{{tipo.nombre}}</option>
+                    </select>
+                </th>
+                <th>
+                    <select id="select-estado-acta" class="form-control">
+                        <option>Seleccione...</option>
+                        <option ng-repeat="estado in estadosActas">{{estado.nombre}}</option>
+                    </select>
+                </th>
+            </tr>
+
+        </thead>
+        <tfoot>
+            <tr>
+                <th colspan="8">
+                    <div>
+                        <div class="left gestion-lista-ticket form-inline">
+                            <div ng-init="filtroTipo='TODOS'">
+                                <label>Según Tipo: </label>
+                                <select id="select-tipo-contrato" class="form-control sm" ng-model="filtroTipo" ng-change="mostrarPorTipo()">
+                                    <option>TODOS</option>
+                                    <option ng-repeat="tipo in tiposMotivoTrabajo">{{tipo.codigo}}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="clear"></div>
+                    </div>
+                    <div class="padding-lr-10">
+                        <div class="clear"></div>
+                        <div class="left">
+                            <nav>
+                                <ul class="pagination">
+                                    <li ng-click="atrazarPagina()">
+                                        <a href="#" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                    <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
+                                    <li ng-click="avanzarPagina()">
+                                        <a href="#" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+
+                        <div class="left form-inline gestion-lista-ticket" ng-init="cantidadMostrarPorPagina = 10" style="padding: 10px 0px 0px 0px">
+                            <label>Cantidad Por Página:</label>
+                            <select class="form-control" ng-model="cantidadMostrarPorPagina" ng-change="actualizarCantidadMostrar()">
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+
+                        <div class="right gestion-lista-ticket" style="padding: 10px 0px 0px 0px">
+                            <div>
+                                <label>Total de Páginas: </label>{{cantPaginas}}
+                            </div>
+                        </div>
+                        <div class="right gestion-lista-ticket" style="padding: 10px 0px 0px 0px">
+                            <div>
+                                <label>Total de Actas: </label>{{totalActas}}
+                            </div>
+                        </div>
+
+                        <div class="clear"></div>
+                    </div>
+                </th>
+            </tr>
+        </tfoot>
+        <tbody>
+            <tr ng-repeat="acta in datosActas" ng-dblclick="AbrirModalEditarActa(acta.secuencial, acta.numeroContrato)">
+                <td>{{acta.codigo}}</td>
+                <td>{{acta.numeroContrato}}</td>
+                <td>{{acta.cliente}}</td>
+                <td>{{acta.asunto}}</td>
+                <td>{{acta.fechaFirma | strDateToStr }}</td>
+                <td>{{acta.colaborador}}</td>
+                <td>{{acta.tipo}}</td>
+                <td>{{acta.estado}}</td>
+            </tr>
+        </tbody>
+
+    </table>
+
+    <a id="abrir-link-openkm" class="invisible"></a>
+
+</div>
+
+<!-- Modal Nueva Acta-->
+<div class="modal fade" id="modal-nueva-acta" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">
+                    <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+                    <span id="titulo-nueva-acta">Nueva Acta</span>
+                </h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="fila">
+                    <div class="left half half-padding-right">
+                        <label style="margin:8px 0px 0px 0px" id="label-numero-acta-adicionar" class="left">Numero de Acta:</label>
+                        <div class="left half half-padding-left">
+                            <input id="input-codigo-acta-adicionar" style="width:50px" value="{{codigoSiguienteActa}}" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="left half half-padding-left">
+                        <label id="label-cliente-adicionar">Cliente:</label><br />
+                        <span>{{clienteAdicionar}}</span>
+                    </div>
+                </div>
+
+                <div class="clear"></div><br />
+
+                <div class="fila">
+                    <div class="left half half-padding-right">
+                        <label id="label-numero-contrato-adicionar">Contrato:</label><br />
+                        <span>{{contratoAdicionar}}</span>
+                    </div>
+                    <div class="left half half-padding-left">
+                        <label>Entregable: </label><br />
+                        <select ng-model="entregableAdicionar" class="form-control">
+                            <option value="">Seleccione...</option>
+                            <option ng-repeat="e in entregables" value="{{ e.secuencial }}">{{ e.nombre }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="clear"></div><br />
+
+                <div class="fila">
+                    <div class="left">
+                        <label>Asunto:</label><br />
+                        <span>{{asuntoAdicionar}}</span>
+                    </div>
+                </div>
+
+                <div class="clear"></div><br />
+
+                <div class="fila">
+                    <div class="left half half-padding-right">
+                        <label id="label-colaborador-adicionar">Colaborador:</label><br />
+                        <select id="select-colaborador-adicionar" class="form-control" required="required">
+                            <option>Seleccione...</option>
+                            <option ng-repeat="colab in colaboradores">{{colab.nombre}}</option>
+                        </select>
+                    </div>
+                    <div class="left half half-padding-left">
+                        <label id="label-fecha-firma">Fecha de firma:</label><br />
+                        <input id="input-fecha-firma-adicionar" ng-model="fechaFirmaAdicionar" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="clear"></div><br />
+
+                <div class="fila">
+                    <div class="left half half-padding-right">
+                        <label>Tipo de Acta:</label><br />
+                        <select id="select-tipo-adicionar" ng-model="tipoSeleccionado" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option ng-repeat="tipo in tiposActas">{{tipo.nombre}}</option>
+                        </select>
+                    </div>
+                    <div class="left half half-padding-left">
+                        <label>Estado:</label><br />
+                        <select id="select-estado-adicionar" class="form-control" required="required">
+                            <option>Seleccione...</option>
+                            <option ng-repeat="estado in estadosActas">{{estado.nombre}}</option>
+                        </select>
+                    </div>
+
+                    <div class="clear"></div><br />
+
+                    <div class="fila" ng-show="tipoSeleccionado === 'ENTREGA-RECEPCION'">
+                        <div class="left">
+                            <label>Días Facturación:</label><br />
+                            <input type="number" id="input-dias-facturacion-adicionar" ng-model="inputDiasFacturacion" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="clear"></div><br />
+
+                    <div class="fila">
+                        <div class="left">
+                            <label>Link de OpenKM:</label><br />
+                            <input id="input-linkOpenkm-adicionar" ng-model="linkOpenkmAdicionar" style="width: 565px" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary right" ng-click="guardarNuevaActa()">Grabar</button>
+                <button type="button" class="btn btn-danger left" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Editar Acta-->
+<div class="modal fade" id="modal-editar-acta" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">
+                    <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+                    <span id="titulo-editar-acta">Editar Acta</span>
+                </h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="fila">
+                    <div class="left half half-padding-right">
+                        <label id="label-numero-contrato-editar">Acta:</label><br />
+                        <span>{{actaEditar}}</span>
+                    </div>
+                    <div class="left">
+                        <label id="label-cliente-editar">Cliente:</label><br />
+                        <span>{{clienteEditar}}</span>
+                    </div>
+                </div>
+
+                <div class="clear"></div><br />
+
+                <div class="fila">
+                    <div class="left half half-padding-right">
+                        <label id="label-numero-contrato-editar">Contrato:</label><br />
+                        <span>{{contratoEditar}}</span>
+                    </div>
+                    <div class="left half half-padding-left">
+                        <label>Entregable: </label><br />
+                        <select id="select-entregable-editar" ng-model="entregableEditar" class="form-control">
+                            <option value="">Seleccione...</option>
+                            <option ng-repeat="e in entregables" value="{{ e.secuencial }}">{{ e.nombre }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="clear"></div><br />
+
+                <div class="fila">
+                    <div class="left">
+                        <label>Asunto:</label><br />
+                        <span>{{asuntoEditar}}</span>
+                    </div>
+                </div>
+
+                <div class="clear"></div><br />
+
+                <div class="fila">
+                    <div class="left half half-padding-right">
+                        <label id="label-fecha-firma-editar">Fecha de firma:</label><span id="fecha-firma-editar"> &nbsp {{fechaFirmaEditar}}</span><br />
+                        <input id="input-fecha-firma-editar" class="form-control" />
+                    </div>
+
+                    <div class="left half half-padding-left">
+                        <label id="label-colaborador-editar">Colaborador:</label><br />
+                        <select id="select-colaborador-editar" class="form-control" required="required">
+                            <option>Seleccione...</option>
+                            <option ng-repeat="colab in colaboradores">{{colab.nombre}}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="clear"></div><br />
+
+                <div class="fila">
+                    <div class="left half half-padding-right">
+                        <label>Tipo de Acta:</label><br />
+                        <select id="select-tipo-editar"  ng-model="tipoSeleccionadoEdicion" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option ng-repeat="tipo in tiposActas">{{tipo.nombre}}</option>
+                        </select>
+                    </div>
+                    <div class="left half half-padding-left">
+                        <label>Estado:</label><br />
+                        <select id="select-estado-editar" class="form-control" required="required">
+                            <option>Seleccione...</option>
+                            <option ng-repeat="estado in estadosActas">{{estado.nombre}}</option>
+                        </select>
+                    </div>
+
+                    <div class="clear"></div><br />
+
+                    <div class="fila" ng-show="tipoSeleccionadoEdicion === 'ENTREGA-RECEPCION'">
+                        <div class="left">
+                            <label style="margin:10px 0px 0px 0px">Días Facturación:</label>
+                            <input type="number" id="input-diasFacturacion-editar" ng-model="diasFacturacionEditar" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="clear"></div><br />
+
+                    <div class="fila">
+                        <div class="left">
+                            <label style="margin:10px 0px 0px 0px">Link de OpenKM:</label>
+                            <button style="margin:0px 0px 10px 0px" ng-click="AbrirLinkOpenkm()" class="btn btn-primary right">Abrir Link</button><br />
+                            <input id="input-linkOpenkm-editar" ng-model="linkOpenkmEditar" style="width: 565px" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success left" data-dismiss="modal">Cerrar</button>
+                <button type="submit" ng-click="abrirConfirmacionEliminar()" style="margin: 0px 0px 0px 180px" class="btn btn-danger left">Eliminar</button>
+                <button type="submit" ng-click="editarActa()" class="btn btn-primary right">Grabar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Modal Confirmacion Eliminar Acta-->
+<div class="modal fade" id="modal-confirmar-eliminar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">
+                    <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+                    <span id="titulo-editar-acta">Confirmacion</span>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <span id="titulo-editar-acta">¿Esta seguro que desea eliminar el acta {{actaEditar}}?</span>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" style="width:100px" class="btn btn-danger left" data-dismiss="modal">No</button>
+                <button type="submit" style="width:100px" ng-click="eliminarActa()" class="btn btn-primary right">Si</button>
+            </div>
+        </div>
+    </div>
+</div>

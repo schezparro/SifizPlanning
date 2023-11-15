@@ -1,0 +1,86 @@
+﻿<div>
+    <input type="text" id="filtro-colaboradores-tiempo-compensatorio" placeholder="Filtrar..." ng-model="filtroColabTiempoCompensatorio" class="form-control right filtro" />
+</div>
+<div class="clear"></div>
+<table class="table table-striped">
+    <thead id="thead-colaboradores-tiempo">
+        <tr>
+            <th style="width: 6%; text-align: center;">Foto</th>
+            <th style="width: 18%;">Nombre</th>
+            <th style="width: 10%;">Email</th>
+            <th style="width: 12%;">Departamento</th>
+            <th style="width: 12%;">Cargo</th>
+            <th style="width: 10%;">Sede</th>
+            <th style="width: 13%; text-align: center;">Tiempo Compensatorio</th>
+        </tr>
+    </thead>
+
+    <tbody id="tbody-colaboradores-tiempo">
+        <tr class="table-tr" ng-repeat="trab in trabajadoresTiempo | filter: filtroColabTiempoCompensatorio" data-id="{{ trab.id }}" ng-right-click="verPanelOpcionesVacaciones($event, trab.id)">
+            <td style="width: 8%;"><img class="img-worker" ng-src="{{rutaImages}}{{trab.foto}}" /></td>
+            <td style="width: 20%;">{{ trab.nombre }}</td>
+            <td style="width: 15%;">{{ trab.email }}</td>
+            <td style="width: 15%;">{{ trab.departamento }}</td>
+            <td style="width: 14%;">{{ trab.cargo }}</td>
+            <td style="width: 10%;">{{ trab.sede }}</td>
+            <td style="width: 13%; text-align: center;">{{ trab.tiempo }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<!--Menú del Click Derecho -->
+<ul id="menu-opciones-tiempo-compensatorio" class="dropdown-menu">
+    <li ng-click="verTiempoCompensatorioColaborador()"><a href="#"><span class="glyphicon glyphicon-search"></span> Ver Tiempos Compensatorios</a></li>
+</ul>
+
+<!-- Modal Tareas Compensatoras Colaborador -->
+<div class="modal fade" id="modal-ver-tareas-compensatorias" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-ver-tareas-compensatorias-label"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Tareas Compensatorias</h4>
+            </div>
+            
+            <div class="modal-body">
+                <div>
+                    <div class="left"><label>Tiempo Acumulado:</label> {{tiempoCompensatorio}}</div>
+                    <div class="right" style="width: 250px;"><label>Mostrar Todos:</label> <input type="checkbox" ng-model="mostrarTodasTareasCompensatorias" ng-click="actualizarTareasTiempoCompensatorioColaborador()"/></div>                    
+                    <div class="clear"></div>
+                </div>                
+
+                <div id="tareas-compensatorias-colaborador">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Fecha de Tarea</th>                       
+                                <th>Detalle</th>         
+                                <th>Cliente</th>                                
+                                <th>Tiempo</th>
+                                <th>Consumido</th>
+                                <th>Disponible</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="tar in tareasCompensatorias">                                
+                                <td>{{tar.fecha}}</td>
+                                <th>{{tar.desc}}</th>         
+                                <td>{{tar.cliente}}</td>                                
+                                <td>{{tar.tiempo}}</td>
+                                <td>{{tar.consumido}}</td>
+                                <td>{{tar.queda}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>                
+                                
+                <div class="clear"></div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+           
+        </div>
+    </div>
+</div>

@@ -1,0 +1,107 @@
+﻿<div class="full-height overflow-y-auto">
+    <form id="frm-add-new-ticket" ng-submit="adicionarTicket()">
+
+        <div class="fila">
+            <div class="left un-cuarto half-padding-right">
+                <label>Cliente:</label>
+                <select class="form-control" ng-model="clienteNewTicket" ng-required="true" ng-change="seleccionClienteNewTicket()">
+                    <option value="">Seleccione...</option>
+                    <option ng-repeat="cliente in clientes" value="{{cliente.id}}">{{cliente.nombre}}</option>
+                </select>
+            </div>
+            <div class="left un-cuarto half-padding-left half-padding-right">
+                <label>Solicita:</label>
+                <select class="form-control" ng-model="usuarioNewTicket" ng-required="true" ng-change="seleccionUsuarioNewTicket()">
+                    <option value="">Seleccione...</option>
+                    <option ng-repeat="usuario in usuariosCliente" value="{{usuario}}">{{usuario.nombre}}</option>
+                </select>
+            </div>
+            <div class="left un-cuarto half-padding-left half-padding-right">
+                <label>Teléfono: </label>{{ telefonoClienteNewTicket}}
+            </div>
+            <div class="left un-cuarto half-padding-left half-padding-right">
+                <label>Email: </label>{{ emailClienteNewTicket}}
+            </div>
+            <div class="clear"></div>
+        </div>
+
+        <div>
+            <div class="left un-medio half-padding-right">
+                <label>Reportado:</label>
+                <input type="text" class="form-control" ng-model="reportadoPorNewTicket" ng-required="true" />
+            </div>
+            <div class="left un-medio half-padding-left">
+                <label>Teléfono:</label>
+                <input type="text" class="form-control" ng-model="telefonoNewTicket" />
+            </div>
+        </div>
+
+        <div>
+            <label>Asunto:</label>
+            <input type="text" class="form-control" ng-model="asuntoNewTicket" ng-required="true" />
+        </div>
+
+        <div>
+            <label>Detalle:</label>
+            <textarea class="form-control" ng-model="detalleTicket" ng-required="true"></textarea>
+        </div>
+
+        <div>
+            <div class="un-medio left half-padding-right">
+                <label>Prioridad:</label>
+                <select class="form-control" ng-required="true" ng-model="prioridadNewTicket">
+                    <option value="">Seleccione...</option>
+                    <option ng-repeat="p in prioridades" value="{{p.id}}">{{p.name}}</option>
+                </select>
+            </div>
+            <div class="un-medio left half-padding-left">
+                <label>Categoría:</label>
+                <select class="form-control" ng-required="true" ng-model="categoriaNewTicket">
+                    <option value="">Seleccione...</option>
+                    <option ng-repeat="c in categorias" value="{{c.id}}">{{c.name}}</option>
+                </select>
+            </div>
+        </div>
+        <div>
+            <div class="un-medio left half-padding-right">
+                <label>Aplica a: </label>
+                <select class="form-control" id="selectTicketVersionCliente" ng-model="ticketVersionClienteNewTicket" ng-required="true">
+                    <option value="">Seleccione...</option>
+                    <option ng-repeat="ticketVC in ticketVersionClientes | orderBy:'name'" value="{{ticketVC.id}}">{{ticketVC.nombre}}</option>
+                </select>
+            </div>
+            <div class="un-medio left half-padding-left">
+                <label>Adjuntos:</label>
+                <div>
+                    <div class="file-adj-contrato-new-ticket">
+                        <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                            <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
+                            <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
+                            <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+                        </div>
+                    </div>
+                    <div id="barra-botones-file-new-ticket">
+                        <button id="addInputFileAnteriorNewTicket" ng-click="adicionarFileAnteriorNewTicket()" type="button" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus"></span> Adicionar</button>
+                        <button id="deleteInputFileAnteriorNewTicket" disabled="disabled" ng-click="deleteFileAnteriorNewTicket()" type="button" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-minus"></span> Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div>
+            <button type="submit" class="right btn btn-primary"><span class="glyphicon glyphicon-save"></span> Grabar</button>
+        </div>
+    </form>
+
+    <div id="htmlFileNewTicket" class="invisible">
+        <div class="file-adj-contrato-new-ticket">
+            <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
+                <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
+                <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+            </div>
+        </div>
+    </div>
+</div>

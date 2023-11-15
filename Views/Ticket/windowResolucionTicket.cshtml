@@ -1,0 +1,45 @@
+﻿<div>
+    <div class="form-inline">
+        <label>Cantidad de Días Laborables Atrás:</label>
+        <input type="text" class="form-control solo-numero" ng-model="cantDias" ng-enter="buscarTicketResueltos()" />
+        <button class="btn btn-primary" ng-click="buscarTicketResueltos()"><span class="glyphicon glyphicon-search"></span> Buscar</button>
+
+        <input type="text" class="form-control right" placeholder="Filtrar..." id="filtroTicketsResueltos" ng-model="filtroTickets" />
+    </div>
+
+    <div id="div-tabla-gestion-ticket-resueltos">
+        <table class="table table-striped table-condensed table-hover">
+            <thead>
+                <tr>
+                    <td colspan="5">
+                        <input ng-model="todosCheck" ng-click="buscarTotalTicket()" type="checkbox" id="seleccion-todos-gtr" /> <label>: Seleccionar Todos</label>
+                        <label id="totalTicketSeleccionados">{{totalTicketSeleccionados}}</label>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Seleccionar</th>
+                    <th>Número de Ticket</th>
+                    <th>Asunto</th>
+                    <th>Cliente</th>
+                    <th>Se Factura</th>
+                    <th>Fecha de Resuelto</th>
+                    <th>Histórico</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="ticket in ticketsResueltos | filter:filtroTickets as ticketFiltrados">
+                    <td>
+                        <input ng-model="ticket.selected" type="checkbox" ng-click="selectChange(ticket.selected)" value="{{ticket.id}}" />
+                    </td>
+                    <td>{{ticket.id | rellenarIzq:0}}</td>
+                    <td>{{ticket.asunto}}</td>
+                    <td>{{ticket.cliente}}</td>
+                    <td>{{ticket.seFactura}}</td>
+                    <td>{{ticket.fecha | strDateToStr}}</td>
+                    <td ng-click="verHistoricoTicketResuelto(ticket.id)"><b class="text-info">Ver Histórico</b></td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="btn btn-primary" ng-click="cerrarTicketsSeleccionados()"><span class="glyphicon glyphicon-flag"></span> Cerrar los Tickets Seleccionados</button>
+    </div>
+</div>

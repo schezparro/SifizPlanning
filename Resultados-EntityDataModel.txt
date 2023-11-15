@@ -1,0 +1,24 @@
+﻿Archivo de modelo generado: ModelSP.edmx.
+La carga de los metadatos desde la base de datos tardó 00:00:01.2101773.
+La generación del modelo tardó 00:00:03.4813226.
+Archivo de modelo generado: ModelSP.edmx.
+La carga de los metadatos desde la base de datos tardó 00:00:00.5110615.
+La generación del modelo tardó 00:00:03.2409076.
+Archivo de modelo generado: ModelSP.edmx.
+La carga de los metadatos desde la base de datos tardó 00:00:00.4305388.
+La generación del modelo tardó 00:00:02.1357476.
+Archivo de modelo generado: ModelSP.edmx.
+La carga de los metadatos desde la base de datos tardó 00:00:00.4912405.
+La generación del modelo tardó 00:00:01.8279061.
+Archivo de modelo generado: ModelSP.edmx.
+La carga de los metadatos desde la base de datos tardó 00:00:00.4826954.
+La generación del modelo tardó 00:00:01.9858902.
+Archivo de modelo generado: ModelSP.edmx.
+La carga de los metadatos desde la base de datos tardó 00:00:00.4458098.
+La generación del modelo tardó 00:00:02.0336203.
+Archivo de modelo generado: ModelSP.edmx.
+La carga de los metadatos desde la base de datos tardó 00:00:00.4994349.
+La generación del modelo tardó 00:00:01.6520661.
+Archivo de modelo generado: ModelSP.edmx.
+La carga de los metadatos desde la base de datos tardó 00:00:01.1847075.
+La generación del modelo tardó 00:00:02.2666179.

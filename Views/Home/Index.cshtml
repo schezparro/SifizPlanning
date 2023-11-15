@@ -1,0 +1,53 @@
+﻿@{
+    ViewBag.Title = "Bienvenido a SifizPlanning";
+}
+
+<!DOCTYPE html>
+
+<html ng-app="login">
+<head>
+    <!--<meta name="viewport" content="width=device-width" />-->
+    <title>@ViewBag.Title</title>
+    <link href="~/Web/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Web/css/bootstrap-theme.min.css" rel="stylesheet" />
+    <link href="~/Web/css/admin/admin.css" rel="stylesheet" />
+    <link href="~/Web/css/home/home.css" rel="stylesheet" />
+
+    <script type="text/javascript" src="~/Web/js/jquery-2.1.3.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/angular.min.js"></script>
+</head>
+<body ng-controller="loginController">
+
+    <div id="panel-login">
+        <div class="text-center padding-10">
+            <img src="~/Web/images/s_logo.png" />
+        </div>
+        <div ng-enter="autenticar()" class="panel panel-primary">
+            <div class="panel-heading">Autenticarse</div>
+            <div class="panel-body">
+                <div style="text-align: center; color: red; font-weight: bold;">
+                    <span ng-init="msg = ''">{{ msg }}</span>
+                </div>
+                <label>Usuario:</label><input type="text" value="" ng-model="email" class="form-control" />
+                <label>Contraseña:</label><input type="password" ng-model="passw" class="form-control" />
+
+                <div style="text-align: center;">
+                    <button style="margin-top: 10px;" ng-click="autenticar()" class="btn btn-primary">ACEPTAR</button>
+                </div>
+            </div>
+            <div id="loadingDiv">
+                <img src="~/Web/images/ajax-loader.gif" />
+            </div>
+        </div>
+        <div class="text-center texto-repassword">
+            <!--
+                <a href="recordar-contraseña">Olvidé mi contraseña</a>
+            -->
+        </div>
+    </div>         
+    
+    <script type="text/javascript" src="~/Web/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/home/home.js"></script>
+
+</body>
+</html>

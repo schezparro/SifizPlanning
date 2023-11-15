@@ -1,0 +1,384 @@
+﻿@using SifizPlanning.Models;
+
+@{
+    ViewBag.Title = "Bienvenido a SifizPlanning";
+}
+<!DOCTYPE html>
+<html>
+    <head>
+        <!--<meta name="viewport" content="width=device-width" />-->
+        <title> @ViewBag.Title </title>
+        <link href="~/Web/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="~/Web/css/bootstrap-theme.min.css" rel="stylesheet" />
+        <link href="~/Web/css/admin/admin.css" rel="stylesheet" />
+        <link href="~/Web/css/home/home.css" rel="stylesheet" />
+    </head>
+    <body ng-app="menu" ng-controller="menuController">
+        <div id="panel-modulo" class="panel panel-primary">            
+            <div class="panel-heading">
+                <h3 class="left panel-title">@ViewBag.Title</h3>
+                <a href="cerrar/sesion/" class="right btn btn-sm btn-default"><span class="glyphicon glyphicon-off"></span> Cerrar Sesión</a>
+
+                @if (Roles.IsUserInRole("ADMIN"))
+                {
+                    <a href="#" class="right btn btn-sm btn-info margin-right-10" data-target="#modalVerComentarios" ng-click="showModalVerComentarios()"><span class="glyphicon glyphicon-comment"></span> Ver Comentarios</a>
+                }
+                
+                <div class="clear"></div>
+            </div>
+            <div class="panel-body" id="sys-modulos">
+                @foreach (SysMenu item in ViewBag.Modulos)
+                {
+                    <div class="modulo-icon">
+                        <a href="@item.Url"><img title="@item.Descripcion" src="@item.Imagen" /></a>
+                        <div class="text-icono">@item.Descripcion</div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- CODIGO DEL CHAT -->
+        <div id="sifiz-chat" style="display: none;">            
+            <div id="head-sifiz-chat" class="btns-chat">
+                <div class="left nombre-usuario-local"></div>
+                <div class="right"> <i class="glyphicon glyphicon-chevron-down"></i></div>
+                <div class="clear"></div>
+            </div>
+            <div style="padding: 3px;">
+                <input id="filtro-chat" type="text" class="form-control" placeholder="Filtrar..."/>
+            </div>
+            <div id="body-sifiz-chat" style="display: block;">
+                <div id="panel-usuarios-sfz">
+                    
+                </div>
+            </div>
+        </div>
+        <div id="ventanas-activas-chat">
+
+        </div>
+        <div id="div-usuario-chat">
+            <div class="usuario-chat" data-id="">
+                <div class="estado-usuario left active"><i class="glyphicon glyphicon-ok-sign"></i></div>
+                <div class="left nombre-usuario"></div>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div id="ventana-chat-conversacion" style="display: none;">
+            <div class="ventana-chat">
+                <div class="heading-ventana-chat">
+                    <div class="left nombre-contacto">Henry Cruz</div>
+                    <div class="right"><i class="glyphicon glyphicon-remove"></i></div>
+                    <div class="clear"></div>
+                </div>
+                <div class="chat-text-ventana-chat">
+
+                </div>
+                <div class="text-ventana-chat">
+                    <textarea data-id-persona=""></textarea>
+                </div>
+            </div>
+        </div>
+        <audio id="audio-chat" controls="controls">
+            <source src="~/Web/sounds/happy-ending.mp3" type="audio/mpeg" />
+        </audio>
+        <!-- FIN DEL CODIGO DEL CHAT -->
+
+        <!-- Modal Ver Comentarios-->
+        <div class="modal fade" id="modalVerComentarios" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-size">
+                <div class="modal-content modal-size">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
+                            <span id="title-view-comments">Ver Comentarios</span>
+                        </h4>
+                    </div>
+                    <div class="modal-body modal-body-height full-size">
+                        
+                        <div class="fila full-size">
+                            <div class="col-md-6 no-padding-left div-logs-comentario">
+                                <div id="panel-comentario-actividad" class="panel panel-info">
+                                    <div class="panel-heading">
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <div class="panel-title">
+                                                    <label>Tareas</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-10 no-padding-left">
+                                                <select id="importanciaTareaTotales" class="right" ng-model="importTareaTipo" title="Seleccionar importancia" data-toggle="tooltip" data-placement="top">
+                                                    <option ng-repeat="importanciaTarea in importanciasTareas" value="{{importanciaTarea.tipo}}">{{importanciaTarea.nombre}} ({{importanciaTarea.cantidad}})</option>
+                                                </select>
+                                                <a href="#" class="right padding-right-10" ng-click="marcarTodosLeidos('tareas')" title="Marcar Todos Leídos" data-toggle="tooltip" data-placement="top"><span class="glyphicon glyphicon-thumbs-up"></span></a>
+                                                <div class="right control-inline onoffswitch margin-right-10">
+                                                    <input id="tareasMostrarLeidosNoLeidos" type="checkbox" class="onoffswitch-checkbox">
+                                                    <label class="onoffswitch-label" for="tareasMostrarLeidosNoLeidos" ng-click="mostrarTodosLosComentarios('tareas')" title="Leídos y No Leídos" data-toggle="tooltip" data-placement="top">
+                                                        <span class="onoffswitch-inner"></span>
+                                                        <span class="onoffswitch-switch"></span>
+                                                    </label>
+                                                </div>
+                                                <label class="right label-normal padding-right-5">Ver Todos</label>
+                                                <!--
+                                                <input type="text" class="right text-box-filter margin-right-15" ng-model="filtroTextoComentarioTarea" ng-init="filtroTextoComentarioTarea = ' '" title="Filtro de comentarios" data-toggle="tooltip" data-placement="top" />
+                                                <label class="right label-normal padding-right-5">Filtro</label>
+                                                -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body padding-bottom-5">
+                                        <div ng-repeat="comentario in ComentariosNoLeidosTareas | filter:{ tipo: importTareaTipo }" ng-click="mostrarDetalleTicket(comentario.idTicket)" class="alert alert-dismissible alert-{{comentario.importancia}} padding-right-15 padding-top-5 padding-bottom-5 margin-bottom-10">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label>{{comentario.nombreusuario}}</label>
+                                                </div>
+                                                <div class="col-md-6 no-padding-left">
+                                                    <span class="glyphicon glyphicon-ok cursor right" title="Leído" data-toggle="tooltip" data-placement="top" ng-click="MarcarComentarioLeido(comentario.idComentarioGeneral, 'tareas')"></span>
+                                                    <p class="no-margin-bottom margin-right-15 right">{{comentario.fechahora}}</p>
+                                                </div>
+                                            </div>
+                                            <hr class="no-margin-top no-margin-bottom" />
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <p class="margin-top-5 no-margin-bottom" ng-bind-html="comentario.textocomentario | trust"></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 no-padding-left no-padding-right div-logs-comentario">
+                                <div id="panel-comentario-ticket" class="panel panel-warning">
+                                    <div class="panel-heading">
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <div class="panel-title">
+                                                    <label>Tickets</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-10 no-padding-left">
+                                                <select id="importanciaTicketTotales" class="right" ng-model="importTicketTipo" title="Seleccionar importancia" data-toggle="tooltip" data-placement="top">
+                                                    <option ng-repeat="importanciaTicket in importanciasTickets" value="{{importanciaTicket.tipo}}">{{importanciaTicket.nombre}} ({{importanciaTicket.cantidad}})</option>
+                                                </select>
+                                                <a href="#" class="right padding-right-10" ng-click="marcarTodosLeidos('tickets')" title="Marcar Todos Leídos" data-toggle="tooltip" data-placement="top"><span class="glyphicon glyphicon-thumbs-up"></span></a>
+                                                <div class="right control-inline onoffswitch margin-right-10">
+                                                    <input id="ticketsMostrarLeidosNoLeidos" type="checkbox" class="onoffswitch-checkbox">
+                                                    <label class="onoffswitch-label" for="ticketsMostrarLeidosNoLeidos" ng-click="mostrarTodosLosComentarios('tickets')" title="Leídos y No Leídos" data-toggle="tooltip" data-placement="top">
+                                                        <span class="onoffswitch-inner"></span>
+                                                        <span class="onoffswitch-switch"></span>
+                                                    </label>
+                                                </div>
+                                                <label class="right label-normal padding-right-5">Ver Todos</label>
+                                                <!--
+                                                <input type="text" class="right text-box-filter margin-right-15" ng-model="filtroTextoComentarioTicket" ng-init="filtroTextoComentarioTicket = ' '" title="Filtro de comentarios" data-toggle="tooltip" data-placement="top" />
+                                                <label class="right label-normal padding-right-5">Filtro</label>
+                                                -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body padding-bottom-5">
+                                        <div ng-repeat="comentario in ComentariosNoLeidosTickets | filter:{ tipo: importTicketTipo }" ng-click="mostrarDetalleTicket(comentario.idTicket)" class="alert alert-dismissible alert-{{comentario.importancia}} padding-right-15 padding-top-5 padding-bottom-5 margin-bottom-10">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label>{{comentario.nombreusuario}}</label>
+                                                </div>
+                                                <div class="col-md-6 no-padding-left">
+                                                    <span class="glyphicon glyphicon-ok cursor right" title="Leído" data-toggle="tooltip" data-placement="top" ng-click="MarcarComentarioLeido(comentario.idComentarioGeneral, 'tickets')"></span>
+                                                    <p class="no-margin-bottom margin-right-15 right">{{comentario.fechahora}}</p>
+                                                </div>
+                                            </div>
+                                            <hr class="no-margin-top no-margin-bottom" />
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <p class="margin-top-5 no-margin-bottom" ng-bind-html="comentario.textocomentario | trust"></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="clear"></div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Windows Modal Informacion de Tickets -->
+        <div class="modal fade" id="modal-gestion-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="modal-gestion-ticket-label"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Gestión de Ticket</h4>
+                    </div>
+                    <form method="post" id="frm-edit-tickets">
+                        <div class="modal-body">
+                            <div class="panel panel-default panel-superior">
+                                <div class="panel-body" id="panel-info-ticket-general">
+                                    <div class="left info-ticket">
+                                        <label class="label-data-ticket">N° Ticket: </label><span>{{idTicketCliente | rellenarIzq:0}}</span><br />
+                                        <label class="label-data-ticket">Fecha: </label><span>{{fechaTicket | strDateToStr}}</span><br />
+                                        <label class="label-data-ticket">Empresa: </label><span>{{nombreCliente}}</span><br />
+                                        <label class="label-data-ticket">Usuario: </label><span>{{usuarioCliente}}</span><br />
+                                        <label class="label-data-ticket">Reportó: </label><span>{{clienteReporta}}</span><br />
+                                        <label class="label-data-ticket">Teléfono: </label><span>{{usuarioTelefono}} / {{telefonoCliente}}</span><br />
+                                        <label class="label-data-ticket">Asunto: </label><span>{{asuntoTicket}}</span><br />
+                                    </div>
+
+                                    <div class="left info-ticket">
+                                        <div class="div-info-ticket">
+                                            <label class="label-data-ticket">Estado: </label><span style="margin-left: 5px;">{{estadoTicket}}</span>
+                                        </div>
+                                        <div class="div-info-ticket">
+                                            <label class="label-data-ticket">Prioridad: </label><span style="margin-left: 5px;">{{prioridadTicket}}</span>
+                                        </div>
+                                        <div class="div-info-ticket">
+                                            <label class="label-data-ticket">P.Revisada: </label>{{prioridadDescripcion}}
+                                        </div>
+                                        <div class="div-info-ticket">
+                                            <label class="label-data-ticket">Categoría: </label><span style="margin-left: 5px;">{{categoriaTicket}}</span>
+                                        </div>
+                                        <div class="div-info-ticket">
+                                            <label class="label-data-ticket">C.Revisada: </label>{{categoriaDescripcion}}
+                                        </div>
+                                        <div class="div-info-ticket">
+                                            <label class="label-data-ticket">Estimación:</label>{{estimacionTicket}} (horas)
+                                        </div>
+
+                                        <div class="div-info-ticket">
+                                            <label class="label-data-ticket">Recurso:</label>{{tipoRecursoDescripcion}}
+                                        </div>
+                                    </div>
+
+                                    <div id="datos-reputacion" class="left info-ticket">
+                                        <div hidden class="div-info-ticket">
+                                            <label class="label-data-ticket">Teléfono(s): </label><span>{{telefonoCliente}}</span><br />
+                                        </div>
+                                        <div hidden class="div-info-ticket">
+                                            <label class="label-data-ticket">Reportó: </label><span>{{clienteReporta}}</span><br />
+                                        </div>
+                                        <div class="div-info-ticket">
+                                            <label class="label-data-ticket">Se Factura: </label>{{seFactura ? "Si" : "No"}}
+                                        </div>
+                                        <div class="div-info-ticket">
+                                            <label class="label-data-ticket">Facturado:</label>{{facturado ? "Si" : "No"}}
+                                        </div>
+                                        <div class="div-info-ticket">
+                                            <label class="label-data-ticket">Error:</label>{{error ? "Si" : "No"}}
+                                        </div>
+                                        <div class="div-info-ticket">
+                                            <label class="label-data-ticket">Reputación Cliente: </label><span>{{reputacionCliente}}%</span><br />
+                                        </div>
+                                        <div class="div-info-ticket">
+                                            <label class="label-data-ticket">Reputación Ticket: </label>{{reputacionTicket}}
+                                        </div>
+                                        <div hidden class="div-info-ticket">
+                                            <label class="label-data-ticket">Reprocesos: </label>{{reprocesos}}
+                                            @*<input type="text" class="form-control solo-numero" id="reprocesos-ticket" ng-model="reprocesos">*@
+                                        </div>
+                                        <div class="div-info-ticket">
+                                            <label class="label-data-ticket">Ingreso Interno:</label>{{ingresoInterno ? "Si" : "No"}}
+                                        </div>
+                                        <div class="div-info-ticket">
+                                            <label class="label-data-ticket">Actividad Próxima: </label>{{actividadProximaDescripcion}}
+                                        </div>
+                                        <div class="div-info-ticket">
+                                            <label class="label-data-ticket">Requiere Testing: </label>{{requiereTesting ? "Si" : "No"}}
+                                        </div>
+                                    </div>
+                                    <div id="panel-adjuntos-ticket" class="left info-ticket">
+                                        <div ng-repeat="adj in adjuntosTicket" class="left">
+                                            <a href="Web{{adj.Url}}" target="_blank" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-paperclip"></span> Adjunto {{$index+1}}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="panel-funcionalidades-ticket" class="panel panel-default left">
+                                <div class="panel-heading">
+                                    Detalle de Ticket
+                                </div>
+                                <div class="panel-body">
+                                    {{detalleTicket}}
+                                </div>
+                            </div>
+
+                            <div id="panel-funcionalidades-ticket" class="panel panel-default left" style="width:34% !important">
+                                <div class="panel-heading">
+                                    Técnico Sugerido y Resolución
+                                </div>
+                                <div class="panel-body">
+                                    <div class="left">
+                                        <label class="label-data-ticket">Técnico:</label>
+                                        <label class="label-normal">{{tecnicoSugeridoNombre}}</label>
+                                    </div>
+                                    <div class="clear"></div>
+                                    <div style="height: calc(100% - 30px)">
+                                        <label class="label-data-ticket">Resolución:</label>
+                                        <textarea class="form-control" style="width:100% !important; height: calc(100% - 10px)" ng-model="observaciones"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="panel-funcionalidades-ticket" class="panel panel-default left" style="width:34.6% !important">
+                                <div class="panel-heading">
+                                    Asignaciones
+                                </div>
+                                <div class="panel-body">
+                                    <div class="right">
+                                        <label>Total de Horas: </label>{{totalHorasAsignadas}}
+                                    </div>
+                                    <div class="clear"></div>
+                                    <div id="tabla-asignaciones-ticket">
+                                        <table class="table table-striped tabla-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Fecha</th>
+                                                    <th>Colaborador</th>
+                                                    <th>Horas</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="asignacion in asignaciones">
+                                                    <td ng-click="verTareaAsignacion(asignacion.id)">{{asignacion.fecha}}</td>
+                                                    <td ng-click="verTareaAsignacion(asignacion.id)">{{asignacion.colaborador}}</td>
+                                                    <td ng-click="verTareaAsignacion(asignacion.id)">{{asignacion.numeroHoras}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input type="hidden" ng-model="idTicketCliente" />
+                            <input type="hidden" ng-model="verificador" />
+                            <div class="clear"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript" src="~/Web/js/jquery-2.1.3.min.js"></script>
+        <script type="text/javascript" src="~/Web/js/jquery.signalR-2.1.2.min.js"></script>
+        <script type="text/javascript" src="~/Web/js/angular.min.js"></script>
+        <script type="text/javascript" src="~/Web/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="~/signalr/hubs"></script>
+        <script type="text/javascript" src="~/Web/js/chat.js"></script>
+        <script type="text/javascript" src="~/Web/js/home/home.js"></script>
+        <script type="text/javascript" src="~/Web/js/waiting.js"></script>
+    </body>
+
+</html>

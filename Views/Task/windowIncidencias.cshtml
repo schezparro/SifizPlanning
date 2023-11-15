@@ -1,0 +1,103 @@
+﻿<div id="panel-botones-incidencias">
+    <div class="right">
+        <button class="btn btn-primary" ng-click="semanaAlanteIncidencia()"><span class=" glyphicon glyphicon-chevron-right"></span></button>
+    </div>
+    <div class="right">
+        <button class="btn btn-success" ng-click="semanaActualIncidencia()"><span class="glyphicon glyphicon-home"></span></button>
+    </div>
+    <div class="right">
+        <button class="btn btn-primary" ng-click="semanaAtrasIncidencia()"><span class="glyphicon glyphicon-chevron-left"></span></button>
+    </div>
+    <div class="right">
+        <input type="text" class="form-control" placeholder="Filtrar..." ng-model="filtroIncidencia" ng-enter="filtrarIncidencia()" />
+    </div>
+    <div class="clear"></div>
+</div>
+
+<div id="panel-container-incidencias">
+    <div id="div-panel-incidencia">
+
+        <div id="panel-fechas-incidencia" class="right">
+            <div id="panel-meses-fechas-incidencia"></div>
+            <div class="clear"></div>
+            <div class="left semana-incidencia" ng-repeat="semana in $parent.semanasIncidencia">
+                <div class="semana-text">
+                    {{semana.lunes}}-{{semana.domingo}}
+                </div>
+            </div>
+        </div>
+
+        <div id="panel-incidencia-colaboradores" class="left">
+            <div ng-repeat="colab in $parent.colaboradoresIncidencia">
+                <div class="nombre-colaboradores left" data-id-colaborador-inc="{{colab.colab.idColaborador}}"><b>{{colab.colab.email | userEmail}} <span style="color: red;">({{colab.colab.totalPuntos}})</span></b></div>
+
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ver los datos de las incidencias -->
+<div class="modal fade" id="modal-datos-incidencias-colaboradores" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog .filter">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-solicitud-tareas-label">
+                    <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
+                    <span id="title-modal-datos-incidencias-colaboradores">Incidencias del Colaborador</span>
+                </h4>
+            </div>
+            <form method="post" id="frm-modal-datos-incidencias-colaboradores">
+                <div class="modal-body">
+                    <div class="fila">
+                        <div class="left half half-padding-right">
+                            <label>Colaborador:</label> {{nombreColaboradorIncidencia}}
+                        </div>
+                        <div class="left half half-padding-left">
+                            <label>Fecha:</label> {{fechaIncidencia}}
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+
+                    <div id="panel-datos-incidencias-registradas" class="panel panel-default">
+                        <table class="table table-striped tablas-my-striped">
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Tipo Error</th>
+                                    <th>Impacto</th>
+                                    <th>Detalle</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="incid in incidenciasColaborador" ng-click="verHechoFundamentacionIncidencia()">
+                                    <td>{{incid.cliente}}</td>
+                                    <td>{{incid.tipoError}}</td>
+                                    <td>{{incid.implicacion}}</td>
+                                    <td>{{incid.dhecho}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="fila">
+                        <div class="left half half-padding-right">
+                            <label>Detalle de la Incidencia:</label><textarea class="form-control" ng-model="hechoIncidencia" ng-required="true"></textarea>
+                        </div>
+                        <div class="left half half-padding-left">
+                            <label>Detalle del Reporte:</label><textarea class="form-control" ng-model="justificacionIncidencia" ng-required="true"></textarea>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

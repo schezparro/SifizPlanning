@@ -1,0 +1,95 @@
+﻿<div class="panel-body" style="max-height: 490px; overflow-y: auto;">
+    <table id="tabla-ofertas-tickets" class="table table-striped table-hover table-condensed" style=" width: 100% ">
+        <thead>
+            <tr>
+                <th>Fecha Registro</th>
+                <th>Cliente</th>
+                <th>Detalle</th>
+                <th>Horas Estimación</th>
+                <th>Colaborador</th>
+                <th>Fecha Disponibilidad</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <input id="fecha-registro" ng-class="'form-control'" ng-model="nuevaOferta.FechaRegistro">
+                </td>
+                <td>
+                    <select ng-class="'form-control'" ng-model="nuevaOferta.cliente" ng-options="cliente.id as (cliente.nombre | limitTo: 30) for cliente in clientes">
+                        <option value="">Seleccione...</option>
+                    </select>
+                </td>
+                <td>
+                    <input style="min-width: 400px" ng-class="'form-control'" type="text" ng-model="nuevaOferta.Detalle">
+                </td>
+                <td>
+                    <input ng-class="'form-control'" type="number" ng-model="nuevaOferta.HorasEstimacion">
+                </td>
+                <td>
+                    <select ng-class="'form-control'" ng-model="nuevaOferta.colaborador" ng-options="colaborador.id as (colaborador.nombre | limitTo: 30) for colaborador in colaboradores">
+                        <option value="">Seleccione...</option>
+                    </select>
+                </td>
+                <td>
+                    <input id="fecha-disponibilidad" ng-class="'form-control'" ng-model="nuevaOferta.FechaDisponibilidad">
+                </td>
+                <td>
+                    <Button class="form-control btn btn-primary" ng-click="agregarOferta()">Añadir</Button>
+                </td>
+            </tr>
+            <tr ng-repeat="oferta in ofertas">
+                <td hidden>
+                    <input type="text" ng-model="oferta.id">
+                </td>
+                <td>
+                    <span ng-hide="oferta.editable">{{ oferta.FechaRegistro !== null ? (oferta.FechaRegistro | strDateToStr) : ""}}</span>
+                    <input id="fecha-registro-{{$index}}" type="text" ng-class="'form-control'" ng-show="oferta.editable" ng-model="oferta.FechaRegistro">
+                </td>
+                <td>
+                    <span ng-hide="oferta.editable">{{ oferta.cliente.nombre }}</span>
+                    <select ng-class="'form-control'" ng-show="oferta.editable" ng-model="oferta.cliente.id" ng-options="cliente.id as (cliente.nombre | limitTo: 30) for cliente in clientes"></select>
+                </td>
+                <td>
+                    <span ng-hide="oferta.editable">{{ oferta.Detalle }}</span>
+                    <input ng-class="'form-control'" ng-show="oferta.editable" type="text" ng-model="oferta.Detalle">
+                </td>
+                <td>
+                    <span ng-hide="oferta.editable">{{ oferta.HorasEstimacion }}</span>
+                    <input ng-class="'form-control'" ng-show="oferta.editable" type="number" ng-model="oferta.HorasEstimacion">
+                </td>
+                <td>
+                    <span ng-hide="oferta.editable">{{ oferta.colaborador.nombre }}</span>
+                    <select ng-class="'form-control'" ng-show="oferta.editable" ng-model="oferta.colaborador.id" ng-options="colaborador.id as (colaborador.nombre | limitTo: 30) for colaborador in colaboradores"></select>
+                </td>
+                <td ng-if="oferta.semaforo === 'ROJO'">
+                    <span ng-hide="oferta.editable" class="badge" style="background-color:darkred">&nbsp;</span>
+                    <span ng-hide="oferta.editable">&nbsp;{{ oferta.FechaDisponibilidad !== null ? (oferta.FechaDisponibilidad | strDateToStr) : "" }}</span>
+                    <input id="fecha-disponibilidad-{{$index}}" ng-class="'form-control'" ng-show="oferta.editable" ng-model="oferta.FechaDisponibilidad">
+                </td>
+                <td ng-if="oferta.semaforo === 'AMARILLO'">
+                    <span ng-hide="oferta.editable" class="badge" style="background-color:goldenrod">&nbsp;</span>
+                    <span ng-hide="oferta.editable">&nbsp;{{ oferta.FechaDisponibilidad !== null ? (oferta.FechaDisponibilidad | strDateToStr) : "" }}</span>
+                    <input id="fecha-disponibilidad-{{$index}}" ng-class="'form-control'" ng-show="oferta.editable" ng-model="oferta.FechaDisponibilidad">
+                </td>
+                <td ng-if="oferta.semaforo === 'VERDE'">
+                    <span ng-hide="oferta.editable" class="badge" style="background-color:seagreen">&nbsp;</span>
+                    <span ng-hide="oferta.editable">&nbsp;{{ oferta.FechaDisponibilidad !== null ? (oferta.FechaDisponibilidad | strDateToStr) : "" }}</span>
+                    <input id="fecha-disponibilidad-{{$index}}" ng-class="'form-control'" ng-show="oferta.editable" ng-model="oferta.FechaDisponibilidad">
+                </td>
+                <td>
+                    <span style="margin-right: 10px;" ng-click="editarOferta(oferta, $index)" ng-hide="oferta.editable">
+                        <i class="glyphicon glyphicon-pencil"></i>
+                    </span>
+                    <span style="margin-right: 10px;" ng-click="guardarCambios(oferta)" ng-show="oferta.editable">
+                        <i class="glyphicon glyphicon-floppy-disk"></i>
+                    </span>
+                    <span style="margin-right: 10px;" ng-click="eliminarOferta(oferta.id)" ng-hide="oferta.editable">
+                        <i class="glyphicon glyphicon-trash"></i>
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

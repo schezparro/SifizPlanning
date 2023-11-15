@@ -1,0 +1,110 @@
+﻿
+<input type="hidden" name="fechaLunes" ng-model="fechaLunes" />
+<input type="hidden" name="esteLunes" ng-model="esteLunes" />
+<input type="hidden" name="fechaHoy" ng-model="fechaHoy" />
+
+<div class="task-controles">
+    <div id="control-filtrar">
+        <label class="left" style="margin-top:5px">Sede:</label>
+        <select id="selectSede" ng-model="controlTiempoFiltroSede" ng-change="cambiarSede()" class="form-control">
+            <option value="Quito" selected="selected">Quito</option>
+            <option value="Ambato">Ambato</option>
+            <option value="Honduras">Honduras</option>
+        </select>
+        <div class="input-append date left">
+            <input id="filtroFecha" type="text" class="form-control datepicker-filtro left" ng-model="fechaLunes">
+            <span class="glyphicon glyphicon-th"></span>
+        </div>
+        <select id="selectSemanas" ng-model="numeroSemanas" ng-change="cambiarSemanas()" class="form-control">
+            <option value="1" selected="selected">1 Semana</option>
+            <option value="2">2 Semanas</option>
+            <option value="3">3 Semanas</option>
+            <option value="4">4 Semanas</option>
+        </select>
+        <button class="btn btn-primary" ng-click="semanaAtras()"><span class="glyphicon glyphicon-chevron-left"></span></button>
+        <button class="btn btn-success" ng-click="diaHoy()"><span class="glyphicon glyphicon-home"></span></button>
+        <button class="btn btn-primary" ng-click="semanaProxima()"><span class="glyphicon glyphicon-chevron-right"></span></button>
+    </div>
+</div>
+
+<div class="clear"></div>
+ 
+<div id="user-container">
+      <div id="table-user-mark">
+                 <table class="table table-colaboradores">                        
+                     <tr>
+                         <td style="opacity: 0.0;">&nbsp;</td>
+                         <td class="{{dia.clase}}" ng-repeat="dia in diasCalendar">{{dia.dia}}</td>
+                     </tr>                           
+                     <tr ng-repeat="colaborador in colaboradores" ng-init="paso = $index">
+                         <td class="td-colaborador">
+                             <div class="colaborador-panel" data-id="{{colaborador.idColaborador}}">
+                                 <div>
+                                     {{paso + 1}}
+                                 </div>
+                                 <div class="img-worker-task">
+                                     <img ng-src="Web/images/{{colaborador.url}}">
+                                 </div>
+                                 <div class="nombre-trabajador">{{mySplitEmail(colaborador.email,0)}}</div>
+                                 <div class="sede-trabajador">{{colaborador.nombreOficina}}</div>
+                             </div>
+                         </td>
+                         <td class="{{marca.claseTipoImp}}" ng-repeat="marca in colaborador.marcas" style="width:{{anchoCeldaTarea}};">
+                             <div class="td-tareas dia-normal">
+                                 <!--Hora de Entrada-->
+                                 <div class="content-tarea {{marca.claseHoraEntrada}}">
+                                     <div class="cabecera-marca">
+                                         <div class="marca-tipo left">Entrada:</div>
+                                         <div class="right">
+                                             <img ng-src="Web/images/login.png">
+                                         </div>
+                                         <div class="clear"></div>
+                                     </div>
+                                     <div class="body-tarea">
+                                         <div class="clear"></div>
+                                         <div class="marca-hora">
+                                             {{marca.horaEntrada}}
+                                         </div>
+                                     </div>
+                                 </div>
+                                 <!--Hora de Salida-->
+                                 <div class="content-tarea {{marca.claseHoraSalida}}">
+                                     <div class="cabecera-marca">
+                                         <div class="marca-tipo left">Salida:</div>
+                                         <div class="right">
+                                             <img ng-src="Web/images/logout.png">
+                                         </div>
+                                         <div class="clear"></div>
+                                     </div>
+                                     <div class="body-tarea">
+                                         <div class="clear"></div>
+                                         <div class="marca-hora">
+                                             {{marca.horaSalida}}
+                                         </div>
+                                     </div>
+                                 </div>
+
+                                 <!--Horas Trabajadas-->
+                                 <div class="content-tarea {{marca.claseHorasTrab}}">
+                                     <div class="cabecera-marca">
+                                         <div class="marca-tipo left">Horas Trab:</div>
+                                         <div class="right">
+                                             <img ng-src="Web/images/user-work1.png">
+                                         </div>
+                                         <div class="clear"></div>
+                                     </div>
+                                     <div class="body-tarea">
+                                         <div class="clear"></div>
+                                         <div class="marca-hora">
+                                             {{marca.horasTrabajadas}}
+                                         </div>
+                                     </div>
+                                 </div>
+                             </div>
+                         </td>
+                     </tr>
+                  </table>
+                </div>
+            </div>
+
+

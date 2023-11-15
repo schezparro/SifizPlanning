@@ -1,0 +1,141 @@
+﻿<!DOCTYPE html>
+<html ng-app="client">
+<head>
+    <!--<meta name="viewport" content="width=device-width" />-->
+    <title>Devolución de Ticket, Sifizplanning</title>
+    <link href="~/Web/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Web/css/bootstrap-theme.min.css" rel="stylesheet" />
+    <link href="~/Web/css/datepicker.css" rel="stylesheet" />
+    <link href="~/Web/css/jasny-bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Web/css/home/home.css" rel="stylesheet" />
+
+    <script type="text/javascript" src="~/Web/js/jquery-2.1.3.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/jquery.signalR-2.1.2.min.js"></script>
+    <script type="text/javascript" src="~/signalr/hubs"></script>
+    <script type="text/javascript" src="~/Web/js/angular.min.js"></script>
+    <style type="text/css">
+        .textoOk {
+            color: #0094ff;
+        }
+    </style>
+</head>
+<body ng-controller="clientController">
+
+    <div id="content_body" style="padding: 20px;">
+        <div class="text-center padding-10">
+            <img src="~/Web/images/s_logo.png" />
+        </div>
+
+        <h2>Detalles de devolución del ticket.</h2>
+        @ViewBag.estimadoa @ViewBag.nombre : <br />
+        Según su apreciación los requerimientos del ticket @ViewBag.numero <b>no</b> se han cumplido satisfactoriamente.<br />
+        Por favor especifíquenos los inconvenientes detectados en el mismo para solucionarlos en el menor tiempo posible.
+        <div>
+            <form id="form-enviar-email-desacuerdo-ticket" ng-submit="enviarDesacuerdoResolucionTicket()">
+                <div class="modal-body">
+                    <div>
+                        <label>Detalles:</label>
+                        <textarea class="form-control" ng-model="textoDesacuerdo" rows="6" required="required"></textarea>
+                    </div>
+                    <div id="panel-adjuntos-email-ticket">
+                        <label>Adjuntos:</label><br />
+
+                        <div class="file-adj-contrato">
+                            <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                                <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
+                                <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
+                                <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+                            </div>
+                        </div>
+
+                        <div id="barra-botones-file">
+                            <button id="addInputFileAnterior" ng-click="adicionarFileAnterior()" type="button" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus"></span> Adicionar</button>
+                            <button id="deleteInputFileAnterior" disabled="disabled" ng-click="deleteFileAnterior()" type="button" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-minus"></span> Eliminar</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" ng-click="finalizarTarea()"><span class="glyphicon glyphicon-envelope"></span> Enviar</button>
+                </div>
+            </form>
+
+            <div id="div-gracias" class="textoOk" style="display: none;">
+                <h2>Su información ha sido recibida.<br /> Muchas gracias.</h2>
+            </div>
+
+            <div id="htmlFile" class="invisible">
+                <div class="file-adj-contrato">
+                    <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                        <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
+                        <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
+                        <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="~/Web/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/bootstrap-datepicker.js"></script>
+    <script type="text/javascript" src="~/Web/js/jasny-bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/waiting.js"></script>
+
+    <script type="text/javascript">
+    var clientApp = angular.module('client', []);
+    clientApp.controller('clientController', ['$scope', '$http', function ($scope, $http) {
+
+        $scope.adicionarFileAnterior = function () {
+            var jQ = angular.element;
+            jQ(jQ("#htmlFile").html()).insertBefore("#barra-botones-file");
+            var divAdjuntos = jQ("#addInputFileAnterior").parent().parent();
+            var fileAdj = divAdjuntos.find('.file-adj-contrato');
+            if (fileAdj.length > 1) {
+                jQ('#deleteInputFileAnterior').prop('disabled', false);
+            }
+        };
+
+        $scope.deleteFileAnterior = function () {
+            var jQ = angular.element;
+            var divAdjuntos = jQ('#deleteInputFileAnterior').parent().parent();
+            var fileAdj = divAdjuntos.find('.file-adj-contrato');
+            if (fileAdj.length == 2) {
+                jQ('#deleteInputFileAnterior').prop('disabled', true);
+            }
+            if (fileAdj.length > 1) {
+                jQ(jQ('#deleteInputFileAnterior').parent().prev()).remove();
+            }
+        };
+
+        $scope.enviarDesacuerdoResolucionTicket = function (idTarea) {
+
+            var codTicket = '@ViewBag.codTicket';
+
+            waitingDialog.show('Enviando email...', { dialogSize: 'sm', progressType: 'success' });
+            var formData = new FormData();
+            formData.append('cod', codTicket);
+            formData.append('detalle', $scope.textoDesacuerdo);
+
+            angular.element.each(angular.element('#form-enviar-email-desacuerdo-ticket').find('[type="file"]'), function (pos, fileInput) {
+                formData.append('adjuntos', fileInput.files[0]);
+            });
+
+            var informacionDevueltoTicket = $http.post("enviar-email-ticket-devuelto",
+                                                  formData,
+                                                  {
+                                                      headers: { 'Content-Type': undefined }
+                                                  });
+            informacionDevueltoTicket.success(function (data) {
+                waitingDialog.hide();
+                if (data.success === true) {
+                    angular.element('#form-enviar-email-desacuerdo-ticket').hide();
+                    angular.element('#div-gracias').show();
+                }
+                else {
+                    messageDialog.show('Información', data.msg);
+                }
+            });
+        };
+    }]);
+</script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+﻿<div>
+    <div class="form-inline">
+        <label>Cantidad de Días Laborables Atrás:</label>
+        <input type="text" class="form-control solo-numero" ng-model="cantDiasEnAprobacion" ng-enter="buscarTicketEnAprobacion()" />
+        <button class="btn btn-primary" ng-click="buscarTicketEnAprobacion()"><span class="glyphicon glyphicon-search"></span> Buscar</button>
+
+        <input type="text" class="form-control right" placeholder="Filtrar..." id="filtroTicketsEnAprobacion" ng-model="filtroTicketsEnAprobacion" />
+    </div>
+
+    <div id="div-tabla-gestion-ticket-en-aprobacion">
+        <table class="table table-striped table-hover table-condensed table-responsive">
+            <thead>
+                <tr>
+                    <td colspan="5">
+                        <input ng-model="todosEnAprobacionCheck" ng-click="buscarTotalTicketEnAprobacion()" type="checkbox" id="seleccion-todos-gtr-aprobacion" /> <label>: Seleccionar Todos</label>
+                        <label id="totalTicketSeleccionadosEnAprobacion">{{totalTicketSeleccionadosEnAprobacion}}</label>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Seleccionar</th>
+                    <th>Número de Ticket</th>
+                    <th>Asunto</th>
+                    <th>Cliente</th>
+                    <th>Se Factura</th>
+                    <th>Fecha</th>
+                    <th>Histórico</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="ticket in ticketsEnAprobacion | filter:filtroTicketsEnAprobacion as ticketEnAprobacionFiltrados">
+                    <td>
+                        <input ng-model="ticket.selected" type="checkbox" ng-click="selectEnAprobacionChange(ticket.selected)" value="{{ticket.id}}" />
+                    </td>
+                    <td>{{ticket.id | rellenarIzq:0}}</td>
+                    <td>{{ticket.asunto}}</td>
+                    <td>{{ticket.cliente}}</td>
+                    <td>{{ticket.seFactura}}</td>
+                    <td>{{ticket.fecha | strDateToStr}}</td>
+                    <td ng-click="verHistoricoTicketEnAprobacion(ticket.id)"><b class="text-info">Ver Histórico</b></td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="btn btn-primary" ng-click="cerrarTicketsSeleccionadosEnAprobacion()"><span class="glyphicon glyphicon-flag"></span> Cerrar los Tickets Seleccionados</button>
+    </div>
+</div>

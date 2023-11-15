@@ -1,0 +1,2867 @@
+﻿html, body {
+    height: 100%;
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+
+#content_body {
+    width: 98%;
+    margin: 0 auto;  
+    height: 100%;  
+}
+
+.full-size{
+    width: 100%;
+    height: 100%;    
+}
+
+.full-width{
+    width: 100%;
+}
+
+.full-height{
+    height: 100%;
+}
+
+.overflow-y-auto, .scrollable-y{
+    overflow-y: auto;
+}
+
+/*Validadores*/
+.invalid{
+    background: #ffcaca;
+    border: 1px solid #c11414;
+}
+
+.campoRequerido{
+    border: 1px solid #c11414;
+}
+
+#menu-principal {
+    margin-top: 5px;
+}
+
+#panel-principal {
+    margin-top: 5px;
+    /*min-height: 550px;*/
+    height: calc(100% - 55px);
+}
+
+.invisible {
+    display: none;
+}
+
+#funcionalidad {
+    height: 100%;
+    padding: 10px;        
+}
+
+#panel_home{
+    height: calc(100% - 35px); 
+    width: 100%;
+    overflow-y: auto;  
+    overflow-x: no-display;  
+}
+
+#panel_tasks {
+    height: calc(100% - 35px); 
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.form-control.filtro{
+    width: 200px;
+}
+
+#modalNewWorker .form-control {
+    width: 250px;
+}
+
+#modalNewWorker .left{
+    width: 280px;
+}
+
+.left {
+    float: left;
+}
+
+.clear {
+    clear:both;
+}
+
+.hand {
+    cursor: pointer;
+}
+
+.img-worker{
+    width: 55px;
+    height: 80px;   
+    border-radius: 3px;
+    margin-left: 10px;
+}
+
+table td{
+    vertical-align: middle !important;
+    cursor: pointer;
+}
+
+.tr-select{
+    background-color: #dcffc1 !important;
+}
+
+.table-tr:hover{
+    background-color: #dcffc1 !important;
+}
+
+#modalEditUser .modal-dialog{
+    width: 500px;
+}
+
+#frm-editUser .form-control{
+    width: 200px;
+    margin-right: 30px;
+}
+
+#pane-dias{
+    position: relative;
+    left: 125px;
+    margin-top: 5px;
+}
+
+.dia-tarea1 {
+    width: 145px;
+    text-align: center;
+    vertical-align: central;
+}
+
+.dia-tarea2{
+    width: 72px;
+    text-align: center;
+    vertical-align: central;
+    font-size: 10pt;
+}
+
+.dia-tarea3{
+    width: 47.66px;
+    text-align: center;
+    vertical-align: central;
+    font-size: 9pt;
+}
+
+.correr-left, .correr-right{
+    float: left;
+    width: 20px;
+    border: 1px solid #dcffc1;
+    border-radius: 5px;
+    text-align: center;
+    vertical-align: central;
+    font-weight: bold;
+}
+
+.correr-left:hover, .correr-right:hover {
+    background: #9dffc0;
+    cursor: pointer;
+}
+
+#task-container,#user-container{
+    height: calc( 100% - 30px );
+    margin-top: 2px !important;
+}
+
+#control-filtrar .datepicker-filtro{
+    width: 105px !important;
+    padding-left: 15px;
+}
+
+#thead-colaboradores-tareas tr, #thead-colaboradores tr{
+    display: block; 
+}
+
+#thead-colaboradores-tareas tr td, #tbody-colaboradores-tareas tr td{
+    width: 200px;    
+    min-width: 72px;    
+}
+
+#tbody-colaboradores-tareas, #tbody-colaboradores, #tbody-colaboradores-tiempo{
+    display: block;
+    width: 100%;    
+    overflow-y: scroll;
+    overflow-x: hidden;    
+}
+
+#panel-marcas-electronicas {
+    height: 95%;
+    width: 100%;   
+}
+
+#panel-permisos {
+    height: 95%;
+    width: 100%;
+}
+
+.panel-tareas{    
+    margin-top: 1px;
+}
+
+.panel-tareas div{
+    float: left;
+}
+
+.panel-tareas .colaborador-panel{
+    width: 145px;
+    height: 145px;
+    border: 1px solid #808080;
+    border-radius: 3px;
+}
+
+.panel-tareas .descripcion-tarea{
+    width: 145px;
+    min-height: 145px;
+    border: 1px solid #808080;
+    border-radius: 3px;
+    margin-left: 1px;
+}
+
+.descripcion-tarea:hover{
+    background: #f2f8f8;
+}
+
+.colaborador-panel{
+    padding: 5px;    
+}
+
+.img-worker-task, .nombre-trabajador, .sede-trabajador{
+    text-align: center;
+    width: 100%;
+    font-size: 8pt;
+    font-weight: bold;
+}
+
+.img-worker-task img{
+    /*width: 90px;*/
+    height: 90px;
+    text-align: center;
+    border-radius: 5px;
+    margin: 5px;
+}
+
+#control-filtrar{
+    float: right;
+}
+
+#control-filtrar select{
+    float: left;
+}
+
+#control-filtrar > *{
+    margin-right: 5px;
+}
+
+#control-filtrar input{
+    width: 200px;
+    margin-right: 5px;
+}
+
+#control-filtrar select{
+    width: 120px;
+}
+
+#control-filtrar .filtro{
+    width: 120px;
+}
+
+.descripcion-tarea{
+    text-align: center;
+}
+
+.dia-hoy{
+    background: #e4fff4 !important;
+}
+
+.bordear{
+    border: 1px solid #F00 !important; 
+}
+
+.dia-vacaciones{
+    background: #dfdfdf;
+}
+
+.dia-feriado{
+    background: #ff9c00;
+}
+
+.fin-semana, .vacaciones{
+    background: #f6f6f6;
+}
+
+.dia-normal{
+    
+}
+
+.content-tarea.new{
+    background: #ffcaca;
+    font-size: 6pt;
+    width: 93%;
+    padding:3px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.content-tarea.dev{
+    background: #ceecee;
+    font-size: 6pt;
+    width: 93%;
+    padding:3px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.content-tarea.finish{
+    background: #97ff8b;
+    font-size: 6pt;
+    width: 93%;
+    padding:3px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.content-tarea.pause{
+    background: #EEEEEE;
+    font-size: 6pt;
+    width: 93%;
+    padding:3px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.content-tarea.no-concluida{
+    background: #ffa528;
+    font-size: 6pt;
+    width: 93%;
+    padding:3px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.content-tarea.preassigned{
+    background: #FFA;
+    font-size: 6pt;
+    width: 93%;
+    padding:3px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.content-tarea.permiso-solicitado{
+    background: #ffbd75;
+    font-size: 6pt;
+    width: 93%;
+    padding:3px;
+    margin: 5px;
+    border-radius: 5px;    
+}
+
+.content-tarea.permiso-aprobado{
+    background: #cfa0ff;
+    font-size: 6pt;
+    width: 93%;
+    padding:3px;
+    margin: 5px;
+    border-radius: 5px;  
+}
+
+#modal-final-tarea .modal-dialog{
+    width: 815px;    
+}
+
+#modal-final-tarea .modal-body{
+    max-height: 400px;
+    height: 400px;
+}
+
+#modal-cambio-horario-actividad .modal-dialog{
+     width: 300px;
+}
+
+#div-tabla-actividades-tarea{
+    overflow-y: auto;
+    height: 320px;
+}
+
+#frm-modal-final-tarea .campos-hora{
+    width: 140px;
+}
+
+#frm-modal-final-tarea .btn{
+    margin-left: 15px;
+    margin-top: 25px;
+}
+
+#new-actividad-tarea > div{
+    margin-right: 20px;
+}
+
+.dos-puntos{
+    margin: 0px 3px 0px 3px;
+    font-size: 15pt;
+}
+
+.tipo-actividad-tarea{
+    width: 160px;
+}
+
+.dia-actividad-tarea{
+    width: 120px;
+}
+
+.bottonAddTask{
+    width: 20px;
+    height: 20px;
+    text-align: center;    
+    /*background-image: linear-gradient(to bottom, #5cb85c 0px, #419641 100%);*/
+    border-color: #808080;
+    border-radius: 3px;
+    color:#808080;
+    font-weight: bold;
+    display: inline;
+}
+
+.nombre-cliente, .lugar-tarea{
+    font-weight: bold;
+}
+
+.cabecera-tarea{
+    width: 100%;
+    border-bottom: 1px solid #808080;
+}
+
+.compensatoria{    
+    color: #000;
+    font-weight: bold;
+    background: #FFF;
+    padding:2px;
+    border-radius: 3px;
+}
+
+.codigo-actividad-tarea{
+    float: left;
+}
+
+.nombre-cliente{
+    float: left;
+}
+
+.lugar-tarea{
+    float:right !important;
+}
+
+.modulo-actividad-tarea{
+    float: left;
+    margin-left: 5px;
+}
+
+#frm-solicitud-tarea .add-comment{
+    width: 145px;
+    margin-bottom: 5px;
+}
+
+.descripcion-comentario-actividad{
+    height: 60px !important;
+    margin-bottom: 3px;
+}
+
+#panel-comentarios{
+    height: 200px;
+    overflow-y: auto;
+    margin-bottom: 5px;
+}
+
+.comentario-actividad {
+    background: #ceecee;
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid #337ab7;
+    border-radius: 5px;
+}
+
+.comentario-actividad-success {
+    color:#3c763d;
+    background: #dff0d8;
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid #d6e9c6;
+    border-radius: 5px;
+}
+
+.comentario-actividad-warning {
+    color:#8a6d3b;
+    background: #fcf8e3;
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid #faebcc;
+    border-radius: 5px;
+}
+
+.comentario-actividad-danger {
+    color:#a94442;
+    background: #f2dede;
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid #ebccd1;
+    border-radius: 5px;
+}
+
+.eliminar-comentario:hover{
+    cursor: pointer;
+}
+
+.td-tareas{
+    width: 145px;
+}
+
+.td-colaborador{
+    width: 145px;    
+}
+
+.table-colaboradores{
+    border-spacing: 1px;
+    border-collapse: separate;
+    width: 100%;    
+    /*height: 90%;*/
+}
+
+#table-user-task,#table-user-mark {
+    /*display: inline-block;*/
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+ 
+.table-colaboradores td{
+    border: 1px solid #bbbbbb !important;
+    padding: 3px !important;
+    border-radius: 3px;
+    vertical-align: top !important;
+}
+
+.btn-ver-coordinaciones-persona{
+    margin-right: 5px;
+}
+
+.tarea-ensima{
+    background: #f9fbc1 !important;
+}
+
+#modalNewTask .form-control.control-left{
+    width: 193px;
+    margin-right: 10px;
+}
+
+#modalNewTask .form-control.control-right{
+    width: 193px;
+    margin-left: 10px;
+}
+
+.referencia-tarea{
+    width: 100% !important;
+}
+
+#modalNewTask textarea{
+    width: 100% !important;
+}
+
+#modalNewTask .modal-dialog{
+    width: 440px;
+}
+
+#div-tabla-rep-trabajo{
+    height: 330px;
+    overflow-y: auto;
+}
+
+.popover{
+    z-index: 1040 !important;
+}
+
+.popover, .popover button{
+    font-size: 10pt;
+}
+
+#modalNewFilter .modal-dialog{
+    width: 700px;
+}
+
+.filtro-panel{
+    height: 280px;
+}
+
+.menu-tipo-filtro{
+    width: 130px
+}
+
+.descripcion-filtro{
+    width:535px;
+}
+
+.panel-valores-filtro, .panel-json-filtro{
+    height: 155px;
+    width: 100%;
+    padding: 5px;
+    overflow-y: auto;
+}
+
+.divDatosFiltro{
+    width: 50%;
+    float: left;
+}
+
+.panel-valores-funciones{
+    width: 570px;
+    height: 160px;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.right{
+    float: right;
+}
+
+.estado-tarea *{
+    cursor: pointer;
+}
+
+#loadingDiv{
+    position: fixed;
+    display: none;
+    background: #f2f8f8;
+    opacity: 0.8;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    z-index: 100000;
+}
+
+#loadingDiv img{
+    position: relative;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+}
+
+.separarTipoRepetir{
+    margin-top: 5px;
+    margin-right: 60px;
+}
+
+.camposHastaRepetir input{
+    display: none;
+    margin-top: 10px;
+}
+
+#tipoRepetirTarea{
+    display: none;
+}
+
+#charpie-hoy, #charpie-semana{
+    width: 50%;
+    float: left;
+}
+
+#panel_catalogos{
+    width: 100%;
+    height: calc(100% - 32px);
+}
+
+.espaciador-lista-catalogos{
+    float: left;
+    width: 20%;
+}
+
+.espaciador-datos-catalogos{
+    float: left;
+    width: 80%;
+}
+
+#lista-catalogos{
+    margin-top: 5px;
+    padding: 5px;
+    float: left;
+    width: 20%; 
+    height: 100%;  
+}
+
+#lista-tabla-catalogo{
+    height: calc( 100% - 38px );
+    overflow-y: auto;
+}
+
+#lista-tabla-catalogo .panel-body{
+    padding: 5px;
+}
+
+#edicion-catalogos{
+    margin-top: 5px;
+    padding: 5px;
+    float: left;
+    width: 80%;
+    height: 100%;
+}
+
+#edicion-catalogos > .panel{
+    height: calc( 100% - 38px );
+}
+
+#edicion-catalogos > .panel > .panel-body{
+    height: calc(100% - 40px);
+    padding: 3px;
+}
+
+.tabla-catalogo:hover{
+    cursor: pointer;
+    background-image: linear-gradient(to bottom, #f5f5f5 0px, #a8a8a8 100%);
+}
+
+.tabla-catalogo{
+    padding: 5px;
+    border-radius: 3px;
+    background-image: linear-gradient(to bottom, #f5f5f5 0px, #e8e8e8 100%);
+    margin-bottom: 3px;
+}
+
+.tabla-catalogo-select{
+    background-image: linear-gradient(to bottom, #337ab7 0px, #265a88 100%);
+    color: white;
+}
+
+#data-tabla-catalogos tbody tr:hover, #data-tabla-contratos tbody tr:hover, #data-tabla-garantias tbody tr:hover, #tabla-gestion-ticket tbody tr:hover,
+#tabla-estimacion-ticket tbody tr:hover, #colaboradores-estado-estimacion tbody tr:hover, #tabla-solicitud-ticket tbody tr:hover, .tabla-hover tbody tr:hover, .tablas-my-striped tbody tr:hover {
+    background: #93b0ff !important;
+    color: white;
+}
+
+#data-tabla-catalogos {
+    height: 100%;
+    overflow-y: auto;
+    width: 100%;
+}
+
+#data-tabla-catalogos thead tr{
+    /*display: block;*/
+}
+
+#data-tabla-catalogos thead tr th, #data-tabla-catalogos tbody tr td{
+    /*width: 300%;*/
+}
+
+#data-tabla-catalogos tbody{  
+    /*display: block;
+    height: 540px;  
+    overflow: auto;
+    width: 100%;*/
+}
+
+.tuplaSelected{
+    background: #265a88 !important;
+    color: white;
+}
+
+#data-campos-catalogos label{
+    width: 150px;
+}
+
+#modalEditCatalogos .modal-dialog{
+    width: 500px;
+}
+
+#modalEditCatalogos .form-control{
+    width: 300px;
+    display: inline;
+    margin-top: 5px;
+}
+
+#divMsgSuccess, #divMsgDanger{
+    margin: 5px 0px 5px 0px;
+    float: left;
+    width: 100%;
+    display: none;
+}
+
+#divFilterCatalogos{
+    display: inline;
+    float: right;
+}
+
+#divFilterCatalogos *{
+    display: inline;
+}
+
+#campoFiltroCatalogo{
+    width: 200px;
+}
+
+#modalEnvioAsig .modal-dialog{
+    width: 400px;
+}
+
+#div-adicionar-copia-email{
+    margin-top: 10px !important;
+}
+
+#desplegar-cuadro-emails-copia:hover{
+    cursor: pointer;
+}
+
+#adicionar-email-copia{
+    border: solid 0px;
+    width: 250px;
+    color: #444;   
+    float: left;
+}
+
+#cuadro-emails-copia{
+    width: 100%;
+    border: 1px solid #ccc;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.div-email-add{
+    float: left;
+    padding: 3px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    margin: 3px;
+    background: #eee;
+}
+
+.remove-email-copia{
+    font-weight: bolder;
+    color: #a00707;
+    cursor: pointer;
+}
+
+.botones-filtro{
+    margin: 3px;    
+}
+
+.horas-tarea{
+    display: inline;
+    color: #808080;
+    font-size: 10px;
+    float:right;
+}
+
+#frm-newClient .left{
+    width: 200px;
+    margin-right: 15px;
+}
+
+#modalNewClient .modal-content{
+    width: 463px;
+}
+
+#lista-clientes{
+    height: 100%;
+    width: 20%;
+    padding: 0px 5px 0px 0px;
+}
+
+#panel_contratos_clientes{
+    height: 94%;
+}
+
+#lista-contratos-clientes{
+    height: 100%;
+    width: 80%;
+}
+
+#filtro-contratos{
+    width: 200px;
+}
+
+.separar-arriba{
+    margin-top: 3px;
+}
+
+.separar-izquierda{
+    margin-left: 3px;
+}
+
+#lista-clientes .panel{
+    height: 92%;    
+}
+
+#lista-clientes .panel .panel-body{
+    height: 100%;    
+    overflow-y: auto;
+    padding: 5px !important;
+}
+
+#lista-contratos-clientes .panel{
+    height: 92%;
+    overflow-y: auto;
+}
+
+#modalNewContratClient .modal-dialog{
+    width: 895px;
+}
+
+#modalNewContratClient input.form-control, #modalNewContratClient select.form-control{
+    width: 200px;
+    margin-right: 15px;
+}
+
+#contrato-general .fila{
+    margin-top: 3px;
+}
+
+#contrato-general .panel.panel-default{
+    margin-bottom: 3px;
+}
+
+.mitad{
+    width: 50%;
+}
+
+.datos-contrato{
+    height: 180px;
+    overflow-y: auto;
+}
+
+#divNegocioIzq{
+    padding: 5px 5px 0px 0px;
+}
+
+#divNegocioDer{
+    padding: 5px 0px 0px 5px;
+}
+
+#divNegocioIzq .panel, #divNegocioDer .panel{
+    margin-bottom: 5px !important;
+}
+
+#divNegocioIzq .panel .panel-body, #divNegocioDer .panel .panel-body{
+    overflow-y: auto;
+}
+
+#info-segun-contrato{
+    height: 400px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+#panel-adjuntos-contratos{
+    margin-bottom: 10px;
+}
+
+.box-adjunto a{
+    text-decoration: none;
+    color: #FFF;
+}
+
+.box-adjunto{
+    display: inline;
+    background-image: linear-gradient(to bottom, #337ab7 0px, #265a88 100%);
+    background-repeat: repeat-x;
+    border-color: #245580;
+    border-radius: 5px;
+    padding: 5px;
+    margin: 3px;
+}
+
+.cancel-adj{
+    display: inline;
+    color: white;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.fondoAbierto{
+    background: #FFE4EF !important;
+}
+
+.fondoDesarrollo{
+    background: #CCDFFC !important;
+}
+
+.fondoAnulado{
+    background: #FFFFEA !important;
+
+}
+
+.fondoCerrado{
+    background: #B9F6ED !important;
+}
+
+.fondoCliente{
+    background: #EEEEEE !important;
+}
+
+.fondoEsperandoRespuesta{
+    background: #db0000 !important;
+    color: white;
+    font-weight: bold;
+}
+
+.pagSelect{
+    background: #337ab7 !important;
+    color: #fff !important;
+}
+
+/*Paneles de Gestión de Tickets*/
+#panel_cotizacion, #panel_seguimiento, #panel_seguimiento_gestor, #panel_adicion, #panel_resolucion_ticket, #panel_ticket_en_aprobacion, #panel_ticket_en_espera, #panel_biTicket, #panel_resumenTicket, #panel_modulos_clientes, #panel_actas_contratos, #panel_consulta_contratos, #panel_consulta_garantias, #panel_garantia_tickets {
+    width: 100%;
+    height: calc( 100% - 32px );
+    overflow-y: auto;
+}
+
+#panel_biTicket iframe{
+    border: none;
+}
+
+#panel_newTicket, #panel_seguimiento, #panel_seguimiento_gestor, #panel_modulos_clientes, #panel_actas_contratos, #panel_consulta_contratos, #panel_consulta_garantias, #panel_garantia_tickets {
+    width: 100%;
+    height: calc( 100% - 32px );
+    overflow-y: auto;
+}
+
+#div-client-new-ticket{
+    padding: 5px 5px 5px 5px;    
+}
+
+#frm-propuesta-cotizacion .panel{
+    height: 300px;
+    overflow-y: auto;
+}
+
+#modal-gestion-ticket .modal-dialog, #modal-consulta-contratos .modal-dialog, #modal-vista-disponibilidad-recursos .modal-dialog {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#modal-gestion-ticket .modal-content, #modal-consulta-contratoss .modal-content, #modal-vista-disponibilidad-recursos .modal-content {
+    height: calc(100% - 8px);
+    min-height: calc(100% - 8px);
+    width: calc(100%);
+    min-width: calc(100%);
+}
+
+.label-data-ticket{
+    width: 90px;
+    text-align:left;
+}
+
+#datos-reputacion .label-data-ticket{
+    width: 150px !important;
+}
+
+#tabla-gestion-ticket, #tabla-consulta-modulos-clientes, #tabla-consulta-contratos, #tabla-seguimiento-tickets-cliente, #tabla-consulta-garantias, #tabla-actas-contratos, #tabla-garantia-tickets, #tabla-ofertas-tickets, #tabla-add-worker {
+    margin-bottom: 0px;
+}
+
+    #tabla-gestion-ticket .pagination, #tabla-consulta-modulos-clientes .pagination, #tabla-seguimiento-tickets-cliente .pagination, #tabla-consulta-contratos .pagination, #tabla-garantia-tickets .pagination, #tabla-consulta-garantias .pagination, #tabla-actas-contratos .pagination {
+        margin: 10px 0;
+    }
+
+.gestion-lista-ticket .gestion-lista-estimaciones {
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+#panel-info-ticket-general {
+    padding: 5px 15px;
+    height: 10%;
+}
+
+.div-info-ticket input.form-control, .div-info-ticket select.form-control{
+    height: 28px;
+}
+
+.div-info-ticket select.form-control{
+    padding: 4px 8px;
+}
+
+#prioridad-ticket, #categoria-ticket, #tipo-recurso-ticket, #actividad-proxima-ticket, #colaborador-contrato, #prioridad-estado, #ticket-version-cliente {
+    width: 200px;
+    display: inline;
+}
+
+#reprocesos-ticket {
+    width: 60px !important;
+    display: inline;
+}
+
+#datos-reputacion select{
+    width: 150px !important;
+    display: inline;
+}
+
+.info-ticket{
+    width: calc( 25% - 15px);
+    margin-right: 15px;
+}
+
+#frm-edit-tickets{
+    height: calc(100% - 60px);
+}
+
+#frm-edit-tickets .modal-body{
+    padding: 5px;
+    height: calc(100% - 55px);
+}
+
+/*#frm-edit-tickets .modal-body > .panel-superior{
+    height: 230px;
+}*/
+
+#frm-edit-tickets .modal-body > .panel{
+    margin-bottom: 5px !important;
+}
+
+#panel-funcionalidades-ticket, #panel-colaboradores-ticket, #panel-asignaciones-ticket {
+    height: calc( 100%);
+}
+
+#panel-funcionalidades-ticket .panel-body, #panel-colaboradores-ticket .panel-body, #panel-asignaciones-ticket .panel-body{
+    height: calc(100%);
+    overflow: auto;
+}
+
+#panel-funcionalidades-ticket, #panel-colaboradores-ticket{
+    width: 30%;    
+    margin: 3px;
+    /*overflow: auto;*/
+}
+
+#panel-colaboradores-ticket .panel-heading, #colaboradores-estimacion .panel-heading, #panel-colaboradores-cotizacion .panel-heading{
+    padding: 3px;
+}
+
+#panel-colaboradores-ticket .panel-heading .text-heading, #colaboradores-estimacion .panel-heading .text-heading, #panel-colaboradores-cotizacion .panel-heading .text-heading{
+    position: relative;
+    top: 8px;
+    left: 10px;
+}
+
+#panel-asignaciones-ticket{
+    width: 38.5%;    
+    margin: 3px;    
+}
+
+#tabla-asignaciones-ticket{
+    height: auto;
+    overflow: auto;
+}
+
+.detalle-ticket{
+    width: 400px;
+    overflow: auto;
+}
+
+#panel-adjuntos-ticket {
+    height: calc(100%);
+    width: calc(100%);
+    overflow: auto;
+}
+
+#panel-adjuntos-ticket > div{
+    margin: 1px;
+}
+
+#campo-horas-ticket{
+    width: 80px;
+    display: inline;
+}
+
+#panel-asignaciones-ticket input, #panel-asignaciones-ticket select{
+    width: 210px !important;
+    margin-right: 10px;
+}
+
+#panel-asignaciones-ticket textarea{
+    width: 430px !important;
+}
+
+.dias-semana{
+    border-bottom: 1px solid #ceecee;
+    border-top: 1px solid #ceecee;
+}
+
+.dia-semana {
+    width: 78px;      
+}
+
+.dias-semana .dia-semana{
+    text-align: center;
+    margin: 1px !important;
+}
+
+.mes-cambiar:hover{
+    cursor: pointer;
+}
+
+.mes-nombre{
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.semana-asignacion{
+    /*border-bottom: 1px solid #ceecee;*/
+}
+
+.semana-asignacion .dia-semana{
+    border: 1px solid #eee;
+    border-radius: 3px;
+    margin: 0.5px;
+    padding: 1px;
+}
+
+.body-asignacion{
+    min-height: 40px;  
+    height: 40px;  
+    overflow-y: auto;
+}
+
+.body-asignacion > div{
+    width: 90%;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.semana-asignacion{
+    font-size: 8px;
+}
+
+.semana-asignacion .numero-dia{
+    font-size: 10px !important;    
+    font-weight: bold;
+}
+
+.asignacion-new {
+    margin-bottom: 0.8px;
+}
+
+.asignacion-new{
+    background: #ffcaca;
+    border-radius: 3px;
+}
+
+.asignacion-dev{
+    background: #ceecee;
+    border-radius: 3px;
+}
+
+.asignacion-finish{
+    background: #97ff8b;
+    border-radius: 3px;
+}
+
+.asignacion-pause{
+    background: #EEEEEE;
+    border-radius: 3px;
+}
+
+.semana-asignacion .horas-disponibles{
+    width: 100%;
+    vertical-align: bottom;
+    text-align: center;
+    background-color: #2e8b4c;
+    color: #FFF;
+    font-weight: bold;
+    font-size: 10px;
+    border-radius: 3px 3px 0px 0px;
+}
+
+.no-opacar{
+    opacity: 1;
+}
+
+.opacar{
+    opacity: 0;
+}
+
+#fecha-limite-estimacion{
+    display: inline;
+    width: 150px;
+    margin-bottom: 3px;
+}
+
+#colaboradores-estimacion{
+    margin-bottom: 0px;
+}
+
+#colaboradores-estimacion > .panel-body{
+    max-height: 300px;
+    height: 300px;
+    overflow-y: auto;
+}
+
+.semana-asignacion > div.dia-semana.no-opacar:hover, .semana-asignacion > div.dia-semana.fin-semana:hover{
+    background: #fff7a0 !important;
+    cursor: pointer;
+}
+
+#modal-estimacion-dev-ticket .modal-dialog{
+    width: 900px;
+}
+
+#modal-estimacion-dev-ticket .modal-body{
+    height: 400px;
+}
+
+#lista-detalles-tareas{
+    max-height: 360px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#lista-detalles-tareas textarea{
+    margin-bottom: 5px;
+}
+
+#frm-modal-estimar-ticket .un-tercio{
+    padding: 10px;
+}
+
+#frm-modal-estimar-ticket .un-tercio textarea{
+    height: 140px;
+}
+
+#frm-modal-estimar-ticket .dos-tercios textarea{
+    height: 50px;
+    resize: none;
+}
+
+#modal-terminar-estimacion-ticket .modal-dialog{
+    width: 960px;
+}
+
+#panel-detalles-estimacion-colaborador{
+    overflow-y: auto;    
+    width: 600px;
+    height: 224px;
+    margin-right: 5px;
+}
+
+#panel-detalles-estimacion-colaborador textarea{
+    width: 280px;
+    margin-right: 5px;
+}
+
+#panel-detalles-estimacion-colaborador input{
+    width: 60px;
+    margin-right: 5px;
+}
+
+#panel-datos-estimacion-colaborador{
+    margin-right: 5px;
+}
+
+#panel-datos-estimacion-colaborador textarea{
+    width: 280px !important;
+}
+
+.panel-tabla-estimaciones{
+    max-height: 130px;
+    overflow-y: auto;
+}
+
+#total-estimacion-ticket{
+    width: 60px;
+    display: inline;
+}
+
+#label-total-estimacion-ticket{
+    display: inline;
+}
+
+#mostrar-todos-seguimiento-ticket{
+    width: 20px;
+    display: inline;
+    height: 15px;
+    position: relative;
+    top: 3px;
+}
+
+#modal-vista-ticket-user .modal-dialog{
+    width: 800px;
+}
+
+#modal-vista-ticket-user .modal-body{
+    height: 360px;
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+#modal-vista-ticket-user .panel-body{
+    padding: 10px;
+}
+
+#modal-vista-ticket-user .panel{
+    margin-bottom: 5px;
+}
+
+.entero{
+    width: 100%;
+}
+
+.un-medio{
+    width: 50%;
+}
+
+.un-tercio{
+    width: 33%;
+}
+
+.un-cuarto{
+    width: 25%;
+}
+
+.un-quito{
+    width: 20%;
+}
+
+.dos-tercios{
+    width: 66%;
+}
+
+.tres-cuartos{
+    width: 75%;
+}
+
+.datos-contacto-ticket > div{
+    padding: 0px 5px 0px 0px;
+}
+
+#panel-reputacion-ticket{
+    margin-top: 10px;
+}
+
+#reputacion-ticket {
+    border: solid 1px #ccc;
+    width: 40%;
+    float: right;
+    height: 20px;    
+    border-radius: 5px;    
+}
+
+#reputacion-ticket:hover{
+    cursor: pointer;
+}
+
+#reputacion-ticket > div{
+    height: 100%;  
+    border-radius: 5px;
+}
+
+#panel-datos-prioridad-new-ticket{
+    padding: 10px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    background-color: #ecf4fa;
+}
+
+.half{
+    width: 50%;
+}
+
+.margin-top-3{
+    margin-top: 3px;
+}
+
+.margin-top-5{
+    margin-top: 5px;
+}
+
+.margin-top-10{
+    margin-top: 10px;
+}
+
+.padding-10{
+    padding: 10px;
+}
+
+.padding-lr-10{
+    padding: 0px 10px;
+}
+
+.half-padding-right{
+    padding-right: 5px;
+}
+
+.half-padding-left{
+    padding-left: 5px;
+}
+
+#panel-vista-detalle-ticket{
+    margin-bottom: 5px;
+    padding: 10px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+#panel-vista-detalle-ticket .panel.panel-default{
+    padding: 5px;
+}
+
+.descripcion-peticion-tarea{
+    height: 190px !important;
+    resize: none;
+}
+
+.inline{
+    display: inline !important;
+}
+
+#panel_solicitudes input[type="checkbox"]{
+    width: 20px;
+    height: 10px;
+}
+
+#panel_solicitudes{
+    height: calc(100% - 35px);
+}
+
+#panel_solicitudes #div-tabla-solicitud-ticket{
+    width: 100%;
+    height:calc(100% - 35px); 
+    overflow-y: auto;
+}
+
+.descripcion-solicitud-tarea{
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    height: 140px;
+    overflow-y: auto;
+}
+
+#modal-new-task-solicitud .modal-dialog{
+    width: 500px;
+}
+
+#modal-cotizar-ticket .modal-dialog{
+    width: 80%;
+    height: 500px !important;
+}
+
+#modal-cotizar-ticket .modal-body{    
+    height: 445px !important;
+}
+
+#panel-principal-cotizacion{
+    width: 70%; 
+    height: 50px;
+    padding: 10px 2px 0px 0px;
+}
+
+#panel-principal-cotizacion .panel{
+    margin-bottom: 5px;
+}
+
+#panel_estimaciones{
+    height: 94%;
+}
+
+#tabla-user-estimacion{
+    height: 91%;
+    width: 100%;
+    overflow: auto;
+}
+
+#panel-estimaciones-cotizacion{
+    height: 278px;
+    /*display: none;*/
+}
+
+#texto-cotizacion{
+    background: #dddddd;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    display: none;
+}
+
+#editor-texto-cotizacion{
+    overflow: scroll;
+    height: 240px;
+    max-height: 240px;
+    background: #FFFFFF;
+    padding: 10px;
+}
+
+#texto-cotizacion .btn-toolbar a{
+    text-decoration: none;
+    color: #444444;
+}
+
+#panel-totales-cotizacion{
+    height: 78px;
+    padding: 4px;
+}
+
+#panel-totales-cotizacion .form-control{
+    display: inline !important;
+    width: 100px;
+}
+
+#panel-totales-cotizacion label{
+    width: 120px;
+    text-align: right;
+}
+
+#panel-colaboradores-cotizacion{
+    width: 30%;     
+    padding: 10px 0px 0px 2px;
+    height: 50px;
+} 
+
+#panel-colaboradores-cotizacion .panel-body {
+    height: 352px;
+    overflow-y: auto;
+}
+
+.cotizacion-estimacion-colaborador{
+    width: 100%;
+    margin-bottom: 5px;
+    background: #edf4ff;
+    border-radius: 5px;
+    padding: 10px;
+
+}
+
+#panel-estimaciones-cotizacion{
+    overflow-y: auto;
+}
+
+.estimacion-actividades{
+    background: #f4fff3;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.text-estimacion-cotizacion {
+    width: 65%;
+}
+
+.tiempo-estimacion-cotizacion, .nivel-estimacion-cotizacion{
+    width: 80px;
+    height: 30px;
+    padding: 3px;
+    text-align: center;
+    background: #fff;
+    vertical-align: middle; 
+    border-radius: 5px;
+    border: 1px solid #a0a0a0;
+    margin: 0px 0px 0px 20px;
+}
+
+#modal-ticket-no-cerrados .modal-dialog{
+    width: 1000px;    
+}
+
+#modal-cotizaciones-clientes .modal-dialog{
+    width: 1200px;
+}
+
+#modal-ticket-no-cerrados table thead, #modal-cotizaciones-clientes table thead{
+    display: block;
+    width: 100%;
+}
+
+#modal-ticket-no-cerrados table thead th, #modal-ticket-no-cerrados table tbody td,
+#modal-cotizaciones-clientes table thead th, #modal-cotizaciones-clientes table tbody td{
+    width: 200px;
+}
+
+#modal-ticket-no-cerrados table tbody, #modal-cotizaciones-clientes table tbody{
+    width: 100%;
+    display: block;
+    height: 300px;
+    max-height: 300px;
+    overflow: auto;
+}
+
+#div-oferta-renegociable{
+    width: 200px;
+}
+
+#div-oferta-renegociable input{
+    display: inline;
+    margin-top: 3px;
+    width: 5px;
+    height: 5px;
+}
+
+#div-oferta-renegociable label{
+    display: inline;    
+}
+
+/*Histórico del ticket*/
+#modal-historico-ticket .modal-dialog{
+    width: 80%;
+}
+
+#modal-historico-ticket .eventos{
+    width: 30%;    
+    padding: 1px;
+}
+
+#modal-historico-ticket .datos-eventos{
+    width: 70%;
+    height: 100%;
+    padding: 1px;
+}
+
+ #modal-historico-ticket .datos-eventos > .panel-default{
+     background: #EEEEEE;
+     padding: 10px;     
+ }
+
+#modal-historico-ticket .panel{
+    margin-bottom: 5px;
+}
+
+#datos-historico-ticket{
+    height: calc( 100% - 80px );
+    overflow: auto;
+    padding: 10px !important;
+}
+
+#panel-historico-izq{
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: calc( 100% - 40px );
+}
+
+.label-historico-ticket {
+    width: 80px;
+}
+
+#modal-historico-correo-ticket .panel.panel-default{
+    margin-bottom: 0px;
+}
+
+#modal-historico-correo-ticket textarea{
+    height: 200px;
+}
+
+#div-tabla-eventos-historico{    
+    max-height: 260px;
+    width: 300px;
+}
+
+.evento-historico{
+    background: #337ab7 !important;
+    color: white;
+}
+
+.evento-historico-selected {
+    background: #93b0ff !important;
+    color: white;
+}
+
+#panel-adjuntos-historico{
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+#modal-new-task-ticket .modal-dialog{
+    width: 500px;
+}
+
+.datepicker.datepicker-dropdown.dropdown-menu{
+    z-index: 5000 !important;
+}
+
+#div-add-ficheros-cotizacion{
+    max-height: 170px;
+    overflow-y: auto;
+}
+
+#div-ficheros-cotizacion .panel-body{
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+#div-panel-consolidacion{
+     height: 100%;
+}
+
+#div-panel-consolidacion .semana-consolidacion,
+#panel-fechas-disponibilidad .semana-disponibilidad,
+#panel-fechas-incidencia .semana-incidencia{
+    padding: 1px;
+    /*width: 80px;*/
+}
+
+#div-panel-consolidacion .semana-consolidacion .semana-text,
+#panel-fechas-disponibilidad .semana-disponibilidad .semana-text,
+#panel-fechas-incidencia .semana-incidencia .semana-text{
+    width: 100%;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    padding: 5px;
+    text-align: center;
+}
+
+#panel-motivos-trabajo{    
+    width: 100%;        
+    padding: 0px;
+    margin-top: -32px;
+    height: calc( 100% - 32px);
+    /*max-height: 500px;*/
+    overflow-y: scroll;
+    font-size: 12px !important;
+}
+
+#panel-disponibilidad-colaboradores, #panel-incidencia-colaboradores{
+    width: 100%;        
+    padding: 0px;
+    margin-top: 2px;
+    height: calc(100% - 67px);    
+    overflow-y: scroll;
+    font-size: 12px !important;
+}
+
+.nombre-colaboradores{
+    width: 179px;
+}
+
+.asignado, .no-asignado, .asig-vac{    
+    padding: 0.5px;  
+    cursor: pointer;  
+}
+
+.asignado div{
+    width: 100%;
+    height: 100%;
+    background: #bfefFF;
+    border-radius: 3px;
+}
+
+.no-asignado div{
+    width: 100%;
+    height: 100%;
+    background: #e5e5e5;
+    border-radius: 3px;
+}
+
+.asig-vac div{
+    width: 100%;
+    height: 100%;
+    background: #a0a0a0;
+    border-radius: 3px;
+}
+
+#panel-motivos-trabajo .heading{
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;    
+    padding: 4px 0px 4px 5px;
+    width: 180px;
+    margin: 0 0 5px;
+    border-radius: 3px;
+}
+
+.add-motivos-trabajo{
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.mes-consolidacion{
+    border-right: 1px solid #808080;
+    height: 30px;
+    padding: 5px 0px;
+    text-align: center;
+    font-weight: bold; 
+    float: left;   
+}
+
+.mes-consolidacion-ultimo{
+    padding: 5px 0px;
+    text-align: center;
+    font-weight: bold; 
+    float: left;
+}
+
+.pointer{
+    cursor: pointer;
+}
+
+.tipo-motivo-trabajo{    
+    margin-bottom: 2px;
+    border-radius: 3px;
+}
+
+.tipo-motivo-trabajo .heading{
+    background: #337ab7;
+    color: white;
+    padding-left: 5px;    
+}
+
+.tipo-motivo-trabajo .motivos-trabajos{    
+}
+
+.tipo-motivo-trabajo .motivos-trabajos:hover{    
+    /*
+    background: #cffcff;    
+    cursor: pointer;
+    */
+}
+
+.motivos-trabajos-heading:hover{
+    cursor: pointer;
+}
+
+.motivos-trabajos-heading{
+    width: 180px;
+    background: #edffea;
+    padding: 5px 0px 5px 10px;
+}
+
+.nombre-tipo-trabajo{
+    margin-left: 5px;
+    font-weight: bold;
+}
+
+.entregables-motivos-trabajo{           
+    background: #FFF;
+    /*font-weight: bold;*/
+    position: relative;
+    z-index: 0;   
+}
+
+.entregables-motivos-trabajo:hover{
+    /*background: #cffcff;    
+    cursor: pointer;*/
+}
+
+.entregable-trabajo{
+    width: 180px;
+    padding: 5px 0px 5px 25px;    
+}
+
+.entregable-trabajo:hover, .motivos-trabajos-heading:hover, .tipo-motivo-trabajo .heading:hover{
+    background: #666;
+    color: white;
+    border-radius: 3px;
+}
+
+.tarea-consolidada{
+    border-radius: 3px;
+    padding: 2px;
+    float: left;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.contenedor-tarea-consolidada{
+    padding: 1px;
+    float: left;
+    z-index: 100;
+}
+
+.tareas-consolidadas{
+    border: 1px solid #aaa;
+    border-radius: 3px;
+}
+
+.tareas-consolidadas:hover{
+    cursor: pointer;
+    background: #fefbd0;
+}
+
+.separador-left{
+    clear: both;
+}
+
+.absoluto-inicio{
+    position: absolute;
+    top: 0px;
+    left: 180px;
+    z-index: -10;
+}
+
+.absoluto-inicio div{    
+    z-index: -10;
+}
+
+#panel_disponibilidad_recursos{
+    height: calc(100% - 35px);
+}
+
+#panel-container-disponibilidad-recursos{
+    height: calc(100% - 41px);
+}
+
+#panel-botones-consolidacion > div, #panel-botones-incidencias > div{
+    padding: 0px 5px 5px 5px;
+}
+
+#panel-fechas-consolidacion, #panel-fechas-disponibilidad, #panel-fechas-incidencia{
+    position: relative;
+    top: 0;
+    right: 20px;
+    background: white;
+    z-index: 100;
+}
+
+#tabla-horas-dia-task-consolidacion td{
+    padding: 0px 10px 0px 10px;
+    text-align: center;
+}
+
+#modal-proximos-entregables .modal-dialog{
+    width: 95%;
+}
+
+#modal-proximos-entregables .modal-body{
+    height: 450px;
+    overflow-y: auto;
+}
+
+#modal-proximos-entregables #panel-filtro-proximos-entregables > *{
+    float: left;
+    display: inline;
+}
+
+#modal-proximos-entregables #panel-filtro-proximos-entregables .form-control{
+    width: 200px;
+}
+
+#modal-proximos-entregables #panel-filtro-proximos-entregables label{
+    margin: 8px 0px 0px 8px;
+}
+
+#modal-proximos-entregables table{
+    margin-bottom: 0px;
+}
+
+#modal-proximos-entregables table tbody tr:hover{
+    cursor: pointer;
+    background: #337ab7 !important;
+    color: #FFF;
+}
+
+.entregable-normal{
+
+}
+
+.entregable-proximo{
+    background-color: #d33a00 !important;
+    color: white;
+}
+
+.entregable-atrazado{
+    background-color: #7c1515 !important;
+    color: white;
+}
+
+#modal-permiso-colaborador .modal-dialog, #modal-vacaciones-colaborador .modal-dialog{
+    width: 500px;
+}
+
+.text-center{
+    text-align: center;
+}
+
+#modal-ver-vacaciones-colaborador .modal-dialog{
+    width: 800px;
+}
+
+.nombre-mes-vacaciones{
+    font-weight: bold;
+    width: 90px;
+}
+
+.data-meses .diaN, .data-meses .diaV{
+    width: 20px;
+    height: 20px;    
+    border: 1px solid #808080;
+    margin: 0.5px 0.5px;
+    border-radius: 3px;
+}
+
+.data-meses .diaV{    
+    background: #0685ff;    
+}
+
+.data-meses .diaN:hover, .data-meses .diaV:hover{
+    background: #FFFF84;
+    cursor: pointer;
+}
+
+#panel-vacaciones-permisos, #panel-tiempo-compensatorio{
+    height: 94%;
+}
+
+#panel-vacaciones-permisos > table, #panel-tiempo-compensatorio > table{
+    height: 92%;
+}
+
+#panel-vacaciones-permisos #thead-colaboradores, #panel-tiempo-compensatorio #thead-colaboradores-tiempo{
+    display: block;
+}
+
+.nav-vacaciones{
+    cursor: pointer;
+}
+
+#panel_incidencias_colaboradores{
+    height: calc(100% - 35px);  
+}
+
+#panel-container-incidencias{
+    height: calc(100% - 42px);
+}
+
+#div-panel-incidencia{
+    height: 100%;
+}
+
+#modal-incidencias-colaboradores .modal-dialog{
+    width: 800px;
+}
+
+#modal-incidencias-colaboradores #panel-incidencias-registradas{
+    margin-top: 10px;
+    margin-bottom: 0px;
+    height: 160px;
+    overflow-y: auto;
+}
+
+.no-incidencia{
+    border-bottom: 1px solid #EEEEEE;
+}
+
+#panel-datos-incidencias-registradas{
+    height: 200px;
+    overflow-y: scroll;
+} 
+
+#modal-datos-incidencias-colaboradores .modal-dialog{
+    width: 800px;
+}
+
+#modal-asignaciones-entregables .modal-dialog{
+    width: 350px;
+}
+
+#panel_consolidacion_tareas{
+    height: calc(100% - 35px);
+}
+
+#div-panel-disponibilidad {
+    height: 100%;
+}
+
+#panel-container-consolidacion-trabajo, #div-panel-disponibilidad{
+    position: relative;
+}
+
+#panel-container-consolidacion-trabajo{
+   height: calc(100% - 35px);
+}
+
+.dia-referencia {
+    border-left: 1px solid #b00000;
+    height: 100%;
+    width: 0px;
+    position: absolute;
+    top: 0px;
+    left: 180px;
+}
+
+#tabla-nivel-colaborador-modulo{
+    max-height: 300px;
+    overflow-y: scroll;
+}
+
+#tabla-nivel-colaborador-modulo .glyphicon-star, #tabla-nivel-competencias-software .glyphicon-star{
+    color: #0154ff;
+}
+
+#tabla-nivel-colaborador-modulo .glyphicon-star-empty, #tabla-nivel-competencias-software .glyphicon-star-empty{
+    color: #ddd;
+}
+
+#panel_workers, #panel_user_clientes{
+    height: calc( 100% - 32px);
+}
+
+#panel_workers > table{
+    /*height: 91%;*/
+    height: calc( 100% - 35px);
+}
+
+#panel_user_clientes > #div-tabla-clientes{    
+    height: calc( 100% - 40px);
+    overflow-y: scroll;
+    margin-top: 5px;
+}
+
+#modal-edit-competencias-software .modal-dialog{
+    width: 950px;
+}
+
+#modal-edit-competencias-software labe{
+    display: inline;
+}
+
+#tabla-nivel-competencias-software{
+    height: 320px;
+    overflow-y: auto;
+}
+
+#modal-task-nivel-colaboradores .modal-dialog{
+    width: 900px;
+}
+
+#tabla-nivel-conocimientos-colaborador{
+    height: 300px;
+    overflow-y: auto;
+}
+
+#tabla-nivel-conocimientos-colaborador .glyphicon.glyphicon-star{
+    color: #0154ff;
+}
+
+#modal-ver-tareas-compensatorias .modal-dialog{
+    width: 850px;
+}
+
+
+#modal-ver-vacaciones-colaborador .modal-dialog {
+    width: 850px;
+}
+
+#tareas-compensatorias-colaborador{
+    height: 300px;
+    overflow-y: scroll;
+}
+
+.marca-tipo{
+    font-weight: bold;
+    font-size:12px;
+    width:60%
+}
+
+.marca-hora{
+    font-size:12px;
+}
+
+.cabecera-marca{
+    width: 100%;
+    border-bottom: 1px solid #808080;     
+}
+
+.horas-trabajadas{
+    position:relative;
+    top:18px;
+    background: #FFF;
+    border-radius: 5px;
+    font-size: 6pt;
+    margin: 5px;
+    padding: 3px;
+    width: 93%
+}
+
+.ocultar-marcas{
+    display:none
+}
+
+.horas-trab-con-1marca{
+    background: #FFF;
+    position:relative;
+    top:66px;
+    border-radius: 5px;
+    font-size: 6pt;
+    margin: 5px;
+    padding: 3px;
+    width: 93%
+}
+
+.horas-trab-con-2marcas{
+    background: #FFF;
+    position:relative;
+    top:18px;
+    border-radius: 5px;
+    font-size: 6pt;
+    margin: 5px;
+    padding: 3px;
+    width: 93%
+}
+
+.horas-trab-sin-marcas{
+    background: #FFF;
+    position:relative;
+    top:115px;
+    border-radius: 5px;
+    font-size: 6pt;
+    margin: 5px;
+    padding: 3px;
+    width: 93%
+}
+
+.tipo-impunt1 {
+    background: #f2f2ac;
+}
+
+.tipo-impunt2 {
+    background: #ceecee;
+}
+
+.tipo-impunt3 {
+    background: #ccc;
+}
+
+.tipo-impunt-ninguna {
+    background: #FFF;
+}
+
+/*------------- HEADER FIXED ----------------*/
+/*
+table .header-fixed {
+  position: fixed;
+  top: 40px;
+  z-index: 1020; 
+  border-bottom: 1px solid #d5d5d5;
+  -webkit-border-radius: 0;
+     -moz-border-radius: 0;
+          border-radius: 0;
+  -webkit-box-shadow: inset 0 1px 0 #fff, 0 1px 5px rgba(0,0,0,.1);
+     -moz-box-shadow: inset 0 1px 0 #fff, 0 1px 5px rgba(0,0,0,.1);
+          box-shadow: inset 0 1px 0 #fff, 0 1px 5px rgba(0,0,0,.1);
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+}
+*/
+
+.table.header-fixed{
+	width: 100%;
+	height: 100%;
+	display: block;
+}
+
+.table.header-fixed thead{
+	height: 31px;
+	width: 100%;
+	display: block;
+}
+
+.table.header-fixed tbody{
+	display: block;
+	height: calc(100% - 62px);
+	width: 100%;
+	overflow-y: scroll;
+}
+
+.table.header-fixed tfoot{
+	height: 31px;
+	width: 100%;
+	display: block;
+}
+/*--------------- FIN DE HEADER FIXED --------------*/
+
+#panel_gestion-errores-seguimiento{
+    width: 100%;
+    height: 100%;
+}
+
+#panel_gestion-errores-grafico{
+    width: 100%;
+    height: 100%;
+}
+
+#filtro-fecha-general-errores{
+    height: 59px;
+}
+
+#div-tabla-general-errores{
+    height: calc(100% - 100px);
+    margin-top: 5px;
+}
+
+#window-log-data-empresa .modal-dialog{
+    width: 90%;    
+}
+
+#window-log-data-empresa .modal-body{
+    height: 360px;    
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+}
+
+#window-log-data-empresa .pager{
+    margin: 5px !important;
+}
+
+#tabla-errores-empresa{
+    height: 300px;
+    overflow-y: auto;
+}
+
+#tabla-errores-empresa table{
+    margin-bottom: 0px;
+}
+
+#window-log-data-error .modal-dialog{
+    width: 900px;   
+}
+
+#window-log-data-error .modal-body{
+     height: 400px;
+     overflow: auto;
+}
+
+#window-log-data-error .modal-body label{
+    color: #660404;
+}
+
+#div-panel-gerrores-fecha, #div-panel-gcalor-7d{
+    height: calc(100% - 35px);
+}
+
+#div-panel-gerrores-fecha .panel-body, #div-panel-gcalor-7d .panel-body{
+    overflow: auto;
+}
+
+#mapa-graph-calor-7d{
+    width: 95%;
+    height: 90%;
+}
+
+/* GESTION DEL TFS */
+#div-tabla-gestion-ticket-resueltos {
+    height: calc(100% - 60px);
+}
+
+#div-tabla-gestion-ticket-en-aprobacion {
+    height: calc(100% - 60px);
+}
+
+#div-tabla-ticket-mantenimiento {
+    height: calc(100% - 60px);
+}
+
+#panel-consultas-tfs{
+    height: calc( 100% - 35px );
+    width: 100%;
+}
+
+#div-vista-consulta-tfs{
+    height: 100%;
+}
+
+#div-vista-consulta-tfs .form-control {
+    width: 15%;
+}
+
+#div-tabla-gestion-ticket-resueltos table{
+    margin-bottom: 0px !important;
+}
+
+#div-tabla-gestion-ticket-resueltos .pagination{
+    margin: 10px 0px;
+}
+
+#div-tabla-gestion-ticket-en-aprobacion table {
+    margin-bottom: 0px !important;
+}
+
+#div-tabla-gestion-ticket-en-aprobacion .pagination {
+    margin: 10px 0px;
+}
+
+#div-tabla-ticket-mantenimiento table {
+    margin-bottom: 0px !important;
+}
+
+#div-tabla-ticket-mantenimiento .pagination {
+    margin: 10px 0px;
+}
+
+#selectCantidadPaginas{
+    width: auto !important;
+}
+
+.pagin-tfs{
+    background: #337ab7;
+    color: white;     
+}
+
+#panel_resumenTicket .panel-body{
+    padding: 2px 10px 2px 2px;
+}
+
+#panel_resumenTicket table {
+    margin: 5px;
+}
+
+#div-texto-finalizacion-ticket{
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+#div-texto-finalizacion-ticket textarea{
+    border: none;
+    resize: none;
+}
+
+#div-texto-finalizacion-ticket textarea:focus{
+    border: none;
+}
+
+#menu-opciones{
+    z-index: 1000000;
+}
+
+.textos-comentario{
+    min-height: 200px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.texto-comentario, .text-desacuerdo{
+    border-radius: 5px;
+    background: #ceecee;
+    color: #2f2b2b;
+    padding: 10px;
+    border: 1px solid #337ab7;
+    margin-bottom: 3px;
+}
+
+.texto-comentario .right, .text-desacuerdo .left{
+    font-weight: bold;
+}
+
+/*VENTANA DE RRHH PARA VISUALIZACION DE LA DISPONIBILIDAD DE LOS DESARROLLADORES*/
+#modal-vista-disponibilidad-recursos .modal-body{
+    height: calc( 100% - 120px );
+}
+
+.div-rrhh-D{
+    background: #CCD;
+    opacity: 0.6;
+}
+
+.div-rrhh-V{
+    background: #abc0f2;
+}
+
+.div-rrhh-P{
+    background: #d6a2ff;
+}
+
+#id-datos-colaboradores{
+    margin-top: 32px;
+    overflow-y: auto;
+    height: calc(100% - 50px);
+    position: relative;
+    left: 3px;
+    z-index: 101;
+}
+
+#id-datos-colaboradores .div-segmento:hover{
+    border: 1px solid #337ab7;
+    cursor: pointer;
+}
+
+.semana-disponibilidad-colab{
+    font-weight: bold;
+    float: left;
+    height: 500px;
+    text-align: center;
+    border-top: 1px solid #808080;
+    border-right: 1px solid #808080;
+}
+
+.semana-disponibilidad-colab:first-of-type{
+    float: left;
+    height: 500px;
+    text-align: center;
+    border-left: 1px solid #808080;
+}
+
+#div-semanas-disponibilidad{
+    width: 100%;
+    margin-top: 10px;
+    position: fixed;
+    z-index: 100;
+}
+
+/* CHAT SFZ */
+#sifiz-chat{
+    position: fixed;
+    /*top: calc( 100% - 28px );*/
+    top: calc( 100% - 400px );
+    left: calc( 99% - 250px );
+    width: 250px;
+    background-image: linear-gradient(to bottom, #337ab7 0px, #2e6da4 100%);
+    color: white;
+    border: 1px solid #dae2e2;
+    padding: 3px;    
+}
+
+#head-sifiz-chat{
+    cursor: pointer;
+    padding: 3px;
+}
+
+#sifiz-chat .glyphicon-unchecked{
+    cursor: pointer;
+}
+
+#panel-usuarios-sfz{
+    height: 328px;
+    background: white;
+    padding: 5px;
+    overflow-y: auto;
+}
+
+.usuario-chat{
+    color: #3a4d5f;
+    padding: 5px 5px;
+    border-radius: 5px;
+}
+
+.usuario-chat:hover{
+    background: #dcffc1;
+    cursor: pointer;
+}
+
+.estado-usuario{
+    margin-right: 10px;
+}
+
+.estado-usuario.active{
+    color: #49ccc8;
+}
+
+/*VENTANA DE CHAT*/
+.ventana-chat{
+    position: fixed;
+    /*top: calc( 100% - 28px );*/
+    top: calc( 100% - 400px );
+    /*left: calc( 99% - 500px );*/
+    width: 350px;
+    background-image: linear-gradient(to bottom, #337ab7 0px, #2e6da4 100%);
+    color: white;
+    border: 1px solid #dae2e2;
+    padding: 3px;
+}
+
+.ventana-chat.resaltar{
+    background-image: linear-gradient(to bottom, #1bc819 0px, #0c721b 100%);
+}
+
+.heading-ventana-chat{
+    padding: 3px;
+}
+
+.chat-text-ventana-chat{
+    background: white;
+    height: 317px;
+    color: #1f1c1c;
+    overflow-y: auto;
+}
+
+.ventana-chat textarea{
+    color: #1f1c1c;
+    width: 100%;
+    height: 50px;
+    resize: none;
+}
+
+.myChatText{
+    background: #dcffc1;
+    text-align: right;
+    padding: 5px;
+    border-radius: 5px;
+    width: 70%;
+    margin-right: 5px;
+    float: right;
+    margin: 2px 5px;
+}
+
+.toMeChatText{
+    background: #ceecee;
+    text-align: left;
+    padding: 5px;
+    border-radius: 5px;
+    width: 70%;
+    margin-right: 5px;
+    float: left;
+    margin: 2px 5px;
+}
+
+.ventana-chat .glyphicon-remove{
+    cursor: pointer;
+}
+
+.texto-cabecera-chat{
+    font-size: 11px;
+    font-weight: bold;
+}
+/* FIN DE CHAT SFZ */
+
+/**********************************************************************CHECKBOXES***********************************************************************/
+
+.control-inline {
+  display: -moz-inline-stack !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+  zoom: 1 !important;
+  margin-right: 10px;
+}
+
+.onoffswitch {
+  position: relative;
+  width: 50px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+.onoffswitch .onoffswitch-checkbox {
+  display: none;
+}
+.onoffswitch .onoffswitch-label {
+  display: block;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid #E4E4E4;
+  border-radius: 20px;
+  position: relative;
+}
+.onoffswitch .onoffswitch-inner {
+  -moz-transition-property: margin;
+  -o-transition-property: margin;
+  -webkit-transition-property: margin;
+  transition-property: margin;
+  -moz-transition-duration: 0.3s;
+  -o-transition-duration: 0.3s;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -moz-transition-timing-function: ease-in;
+  -o-transition-timing-function: ease-in;
+  -webkit-transition-timing-function: ease-in;
+  transition-timing-function: ease-in;
+  -moz-transition-delay: 0s;
+  -o-transition-delay: 0s;
+  -webkit-transition-delay: 0s;
+  transition-delay: 0s;
+  display: block;
+  width: 200%;
+  margin-left: -100%;
+}
+.onoffswitch .onoffswitch-inner:before, .onoffswitch .onoffswitch-inner:after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  float: left;
+  width: 50%;
+  height: 18px;
+  padding: 0;
+  line-height: 1.8;
+  font-size: 10px;
+  color: #fff;
+}
+.onoffswitch .onoffswitch-inner:before {
+  -moz-border-radius: 20px;
+  -webkit-border-radius: 20px;
+  border-radius: 20px;
+  content: "SI";
+  padding-left: 6px;
+  /*background-color: #53D76A;*/
+  background-color: #2DB200;
+  color: #FFFFFF;
+  text-align: left;
+}
+.onoffswitch .onoffswitch-inner:after {
+  content: "NO";
+  padding-right: 6px;
+  /*background-color: #EEEEEE;*/
+  background-color: #FF0F00;
+  /*color: #999999;*/
+  color: #FFFFFF;
+  text-align: right;
+}
+.onoffswitch .onoffswitch-switch {
+  -moz-border-radius: 15px;
+  -webkit-border-radius: 15px;
+  border-radius: 15px;
+  -moz-transition-property: all;
+  -o-transition-property: all;
+  -webkit-transition-property: all;
+  transition-property: all;
+  -moz-transition-duration: 0.3s;
+  -o-transition-duration: 0.3s;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -moz-transition-timing-function: ease-in;
+  -o-transition-timing-function: ease-in;
+  -webkit-transition-timing-function: ease-in;
+  transition-timing-function: ease-in;
+  -moz-transition-delay: 0s;
+  -o-transition-delay: 0s;
+  -webkit-transition-delay: 0s;
+  transition-delay: 0s;
+  width: 15px;
+  margin: 2px;
+  background: #FFFFFF;
+  border: 2px solid #E4E4E4;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 28px;
+}
+.onoffswitch.onoffswitch-blank .onoffswitch-inner:before, .onoffswitch.onoffswitch-blank .onoffswitch-inner:after {
+  content: "";
+}
+
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+  margin-left: 0;
+}
+
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+  right: 0px;
+}
+
+.widget-header-toolbar .onoffswitch {
+  position: relative;
+  top: 2px;
+}
+
+.label-normal {
+  font-weight:normal;  
+}
+
+.paginationSeguimiento {
+    display: inline-block;
+    padding-left: 0;
+    margin: 0px 0;
+    border-radius: 4px;
+}
+
+.paginationSeguimiento>li>a, .paginationSeguimiento>li>span {
+    position: relative;
+    float: left;
+    padding: 3px 10px;
+    margin-left: -1px;
+    line-height: 1.42857143;
+    color: #337ab7;
+    text-decoration: none;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+
+.paginationSeguimiento>li {
+    display: inline;
+}

@@ -1,0 +1,96 @@
+﻿<div id="lista-catalogos" class="left">
+    <input type="text" ng-keyup="filtrarCatalogos()" ng-model="filtroCatalogos" class="form-control" placeholder="Filtrar catalogos..." />
+    <div id="lista-tabla-catalogo" class="panel panel-default separar-arriba">
+        <div class="panel-body">
+            <div class="tabla-catalogo separar-arriba" ng-click="seleccionarCatalogo()" data-idtabla="{{tabla.id}}" ng-repeat="tabla in tablasCatalogos">
+                {{ tabla.nombre }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="edicion-catalogos">
+    <div id="cabecera-edicion-catalogos">
+        <button class="btn btn-primary" ng-click="adicionarTuplaCatalogo()"><span class="glyphicon glyphicon-plus"></span> Adicionar</button>
+        <button class="btn btn-success" ng-click="editarTuplaCatalogo()"><span class="glyphicon glyphicon-pencil"></span> Editar</button>
+        <button class="btn btn-danger" ng-click="eliminarTuplaCatalogo()"><span class="glyphicon glyphicon-remove"></span> Eliminar</button>
+
+        <div id="divFilterCatalogos">
+            <input type="text" id="campoFiltroCatalogo" ng-keyup="actualizarDataFiltro()" ng-model="campoFiltroCatalogo" class="form-control" placeholder="Filtrar..." />
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="divMsgSuccess" class="alert alert-success" role="alert"></div>
+    <div id="divMsgDanger" class="alert alert-danger" role="alert"></div>
+    <div class="clear"></div>
+    <div class="panel panel-primary separar-arriba">
+        <div class="panel-heading">
+            <h3 class="panel-title">Datos</h3>
+        </div>
+        <div class="panel-body">
+            <div id="data-tabla-catalogos">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th ng-repeat="campo in campos">{{campo.nombre}}</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr data-id="{{data.d1}}" ng-click="seleccionarTuplaTabla()" ng-repeat="data in datosTabla">
+                            <td ng-repeat="(key,value) in data |orderBy:'$index'">{{value}}</td>
+                        </tr>
+                    </tbody>
+
+                </table>
+                <div id="paginadorCatalogos"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@*<div class="espaciador-lista-catalogos">&nbsp;</div>
+    <div class="espaciador-datos-catalogos">
+
+    </div>*@
+
+@*<div class="clear"></div>
+
+    <div id="lista-catalogos" class="panel">
+
+    </div>
+    <div id="edicion-catalogos" class="panel">
+
+    </div>*@
+
+<!-- Windows Modal Gestion de Catálogos -->
+<div class="modal fade" id="modalEditCatalogos" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modalCatalogoLabel"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Gestión Tabla X</h4>
+            </div>
+            <form method="post" id="frm-editCatalogos">
+                <div class="modal-body">
+                    <div id="data-campos-catalogos">
+
+                    </div>
+                    <input type="hidden" name="idTuplaCatalogo" ng-model="idTuplaCatalogo" />
+                    <input type="hidden" name="numVerificadorCatalogo" ng-model="numVerificadorCatalogo" />
+                    <div id="label-actividad" style="padding: 10px 0px 0px 0px">
+
+                    </div>
+                    <div id="data-actividades-realizadas" style="padding:5px 0px 0px 0px;">
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" ng-click="guardarCatalogo()">Grabar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

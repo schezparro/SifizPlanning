@@ -1,0 +1,82 @@
+﻿@{
+    ViewBag.Title = "Administración de SifizPlanning";
+}
+
+<!DOCTYPE html>
+
+<html ng-app="task">
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link href="~/Web/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Web/css/bootstrap-theme.min.css" rel="stylesheet" />
+    <link href="~/Web/css/datepicker.css" rel="stylesheet" />
+    <link href="~/Web/css/jasny-bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Web/css/admin/admin.css" rel="stylesheet" />
+
+    <script type="text/javascript" src="~/Web/js/jquery-2.1.3.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/jquery.signalR-2.1.2.min.js"></script>
+    <script type="text/javascript" src="~/signalr/hubs"></script>
+    <script type="text/javascript" src="~/Web/js/angular.min.js"></script>
+</head>
+<body ng-controller="monitoreoController">
+
+    <div id="content_body">
+        <div id="task-container">    
+            <!--
+                <button ng-click="actualizar()">Enviar</button>
+            -->
+
+            <table id="tabla-monitoreo-invisible" class="table table-colaboradores">
+                <tr>
+                    <td style="opacity: 0.0;">&nbsp;</td>
+                    <td class="{{dia.clase}}" ng-repeat="dia in diasCalendar">{{dia.dia}}</td>
+                </tr>
+
+                <tr ng-repeat="trab in trabajadores">
+                    <td class="td-colaborador">
+                        <div class="colaborador-panel" data-id="{{trab.trab.id}}">
+                            <div class="img-worker-task">
+                                <img src="~/Web/images/{{trab.trab.url}}">
+                            </div>
+                            <div class="nombre-trabajador">{{ mySplitEmail( trab.trab.email, 0 ) }}</div>
+                            <div class="sede-trabajador">{{trab.trab.sede}}</div>
+                        </div>
+                    </td>
+
+                    <td class="td-tareas {{tareas.claseDia}}" ng-repeat="tareas in trab.tareasPorDia" style="width:{{anchoCeldaTarea}};">
+
+                        <div data-id-tarea="{{tarea.id}}" class="content-tarea {{tarea.clase}}" ng-repeat="tarea in tareas.tareas"
+                                data-container="#task-container" data-toggle="popover" data-placement="right"
+                                data-title="{{tarea.dCliente}}"
+                                data-content="Actividad: {{tarea.dActividad}}<br> Módulo: {{tarea.modulo}} <br>Desarrollarse en:{{tarea.lugar}}<br />{{ tarea.coordinador != null?&quot;Coordinar con:&quot;+tarea.coordinador+&quot;<br/>&quot;:&quot;&quot; }}Detalles:{{tarea.detalle}}<br />Hora Inicio:{{tarea.finicio}}<br />Hora Fin:{{tarea.ffin}}<br /> <div> <button class=&quot;btn btn-xs btn-success btn-edittask&quot; data-id-tarea=&quot;{{tarea.id}}&quot;>Editar</button><div class=&quot;right estado-tarea&quot;> <span class=&quot;glyphicon glyphicon-remove btn-anulartask&quot; data-id-tarea=&quot;{{tarea.id}}&quot; title=&quot;Anular&quot;></span> &nbsp; <span class=&quot;glyphicon glyphicon-cog btn-tarea-desarrollo&quot; data-id-tarea=&quot;{{tarea.id}}&quot; title=&quot;En desarrollo&quot;></span> &nbsp; <span class=&quot;glyphicon glyphicon-ok btn-tarea-finish&quot; data-id-tarea=&quot;{{tarea.id}}&quot; title=&quot;Terminada&quot;></span></div> </div>"
+                            data-html="true" data-trigger="manual">
+                            <div class="cabecera-tarea">
+                                <div class="nombre-cliente">{{tarea.cliente}}</div>
+                                <div class="lugar-tarea">{{tarea.lugar}}</div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="body-tarea">
+                                <div>
+                                    <div class="codigo-actividad-tarea">({{tarea.actividad}})</div>
+                                    <div class="modulo-actividad-tarea">{{tarea.modulo}}</div>
+                                </div>
+                                <div class="clear"></div>
+                                <div class="detalle-tarea">
+                                    {{tarea.sdetalle}}
+                                </div>
+                            </div>
+                    </div>
+
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+    </div>
+        
+    <script type="text/javascript" src="~/Web/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/bootstrap-datepicker.js"></script>
+    <script type="text/javascript" src="~/Web/js/task/monitoreoController.js"></script>
+</body>
+</html>

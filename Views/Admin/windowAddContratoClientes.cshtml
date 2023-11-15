@@ -1,0 +1,172 @@
+﻿<div id="lista-clientes" class="left">
+    <input type="text" ng-keyup="filtrarClientes()" ng-model="filtroClientes" class="form-control" placeholder="Filtrar clientes..."/>
+    <div class="panel panel-default separar-arriba">
+        <div class="panel-body">
+            <div class="cliente-nombre tabla-catalogo" data-id="{{client.id}}" ng-click="verContratosClientes()" ng-repeat="client in clientes">{{client.nombre}}</div>
+        </div>
+    </div>
+</div>
+
+<div id="lista-contratos-clientes" class="left">
+    <button class="btn btn-primary left" data-toggle="modal" data-target="#modalNewContratClient">
+        <span class="glyphicon glyphicon-plus"></span> Adicionar Contrato
+    </button>
+    <input type="text" ng-keyup="filtrarContratosClientes()" ng-model="filtroContratosClientes" id="filtro-contratos" class="form-control right" placeholder="Filtrar contratos..." />
+
+    <div class="clear"></div>
+
+    <div class="panel panel-primary separar-arriba">
+        <div class="panel-heading">
+            <h3 class="panel-title">Contratos</h3>
+        </div>
+        <div class="panel-body">
+            
+            <table id="data-tabla-contratos" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Tipo Contrato</th>
+                        <th>Descripción</th>
+                        <th>Fecha Inicio</th>
+                        <th>Fecha Fin</th>
+                        <th>Ver/Editar</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr data-id="{{contrato.id}}" ng-repeat="contrato in contratosClientes" ng-click="seleccionTuplaContrato()">
+                        <td>{{contrato.cliente}}</td>
+                        <td>{{contrato.tipoContrato}}</td>
+                        <td>{{contrato.descripcion}}</td>
+                        <td>{{contrato.finicio | strDateToStr}}</td>
+                        <td>{{contrato.ffin | strDateToStr}}</td>
+                        <td ng-click="verEditarContratoCliente()"><b>Ver/Editar</b></td>
+                    </tr>
+                </tbody>
+            </table>            
+
+        </div>
+    </div>
+</div>
+
+<div class="clear"></div>
+
+<!-- Modal Nuevo Contrato Cliente -->
+<div class="modal fade" id="modalNewContratClient" tabindex="-1" role="dialog" aria-labelledby="myModalLabelClient" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabelClient">
+                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                    <span id="title-new-contract-client">Nuevo Contrato de Cliente</span>
+                </h4>
+            </div>
+            <form method="post" id="frm-newContrat" ng-submit="guardarContratClient()">
+                <div class="modal-body">
+                    <ul id="tab-contrato-cliente" class="nav nav-tabs">
+                        <li role="presentation" class="active" ng-click="vistaDatosGeneral()"><a href="#">Generales</a></li>
+                        <li role="presentation" ng-click="vistaDatosContrato()"><a href="#">Según Contrato</a></li>                       
+                    </ul>
+
+                    <div id="contrato-general">
+                        <div class="fila">
+                            <div class="left">
+                                <label>Cliente:</label><br />
+                                <select ng-model="clientCliente" required="required" class="form-control" ng-required="true">
+                                    <option value="">Seleccione...</option>
+                                    <option ng-repeat="client in clientes" value="{{ client.id }}">{{ client.nombre }}</option>
+                                </select>
+                            </div>
+
+                            <div class="left">
+                                <label>Tipo Contrato:</label><br />
+                                <select ng-model="clientTipoContrato" ng-change="selectTipoContrato()" required="required" class="form-control" ng-required="true">
+                                    <option value="">Seleccione...</option>
+                                    <option ng-repeat="tipoContrato in tiposContratos" value="{{ tipoContrato.id }}">{{ tipoContrato.nombre }}</option>
+                                </select>
+                            </div>
+
+                            <div class="left">
+                                <label>Fecha Inicio:</label><br />
+                                <input type="text" required="required" class="form-control" id="dtpk-fecha_inicio_contrat" ng-model="clientFecha_inicio_contrat" />
+                            </div>
+
+                            <div class="left">
+                                <label>Fecha Fin:</label><br />
+                                <input type="text" required="required" class="form-control" id="dtpk-fecha_fin_contrat" ng-model="clientFecha_fin_contrat" />
+                            </div>
+                        </div>
+
+                        <div class="clear"></div>
+
+                        <div class="fila">
+                            <label>Descripción:</label><br />
+                            <textarea ng-required="true" ng-model="contratoDescripcion" class="form-control"></textarea>
+                        </div>
+
+                        <div class="clear"></div>
+
+                        <div class="fila">
+                            <div class="panel panel-default">
+                                <div class="panel-heading"><label>Adjuntos</label></div>
+                                <div class="datos-contrato panel-body">
+                                    <div id="panel-adjuntos-contratos">
+                                        <div class="box-adjunto" ng-repeat="adj in adjuntos">
+                                            <a target="_blank" href="~/Web/{{adj.url}}">{{adj.desc}}</a>
+                                            <span class="cancel-adj glyphicon glyphicon-remove" ng-click="eliminarAdjunto(adj.idAdj)" title="Eliminar adjunto"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="file-adj-contrato">
+                                        <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                                            <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
+                                            <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
+                                            <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+                                        </div>
+                                    </div>
+                                    <div id="barra-botones-file">
+                                        <button id="addInputFileAnterior" ng-click="adicionarFileAnterior()" type="button" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus"></span> Adicionar</button>
+                                        <button id="deleteInputFileAnterior" disabled="disabled" ng-click="deleteFileAnterior()" type="button" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-minus"></span> Eliminar</button>
+                                    </div>
+                                </div>
+                            </div>                                                       
+
+                        </div>
+
+                    </div>
+
+                    <div id="info-segun-contrato" style="display:none;">
+                        <div id="horas-mantenimiento" style="display:none;">
+                            <label>Horas de Mantenimiento Mensual:</label>
+                            <input type="text" class="form-control solo-numero" ng-model="horasMantenimiento" />
+                        </div>
+                        <div id="funcionalidades-contrato" style="display:none;">
+                            <label>Funcionalidades del contrato:</label>
+                            <div id="div-check-funcionalidades">                                
+                            </div>                      
+                        </div> 
+                    </div>         
+                    
+                    <input type="hidden" ng-model="verificadorContratoCliente" />
+                    <input type="hidden" ng-model="idContratoCliente" />
+                                                       
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Grabar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="htmlFile" class="invisible">
+    <div class="file-adj-contrato">
+        <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+            <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
+            <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
+            <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+        </div>
+    </div>
+</div>

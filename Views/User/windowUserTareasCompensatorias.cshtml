@@ -1,0 +1,30 @@
+﻿<div>
+    <div class="left"><label>Tiempo Acumulado:</label> {{tiempoCompensatorio}} Horas</div>
+    <div class="right" style="width: 250px;"><label>Mostrar Todos:</label> <input type="checkbox" ng-model="mostrarTodasTareasCompensatorias" ng-click="actualizarTareasTiempoCompensatorioColaborador()" /></div>
+    <div class="clear"></div>
+</div>
+
+<div id="tareas-compensatorias-usuario">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Fecha de Tarea</th>
+                <th>Tiempo</th>
+                <th>Consumido</th>
+                <th>Disponible</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="tar in tareasCompensatorias">
+                <td>{{tar.cliente}}</td>
+                <td>{{tar.fecha}}</td>
+                <td>{{tar.tiempo}}</td>
+                <td>{{tar.consumido}}</td>
+                <td>{{tar.queda}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="clear"></div>

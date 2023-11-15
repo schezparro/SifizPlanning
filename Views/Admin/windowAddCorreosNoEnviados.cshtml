@@ -1,0 +1,51 @@
+﻿<div class="fila">
+    <div class="col-md-2 pull-left" style="padding-left:0px;">
+        <label>Fecha Inicio:</label>
+        <div class="form-group">
+            <div class='input-group date'>
+                <span class="input-group-addon" title="Fecha inicio" data-toggle="tooltip" data-placement="top">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+                <input type='text' class="form-control" id='dtpk-fecha-inicio' ng-model="fechaIni" />
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 pull-left">
+        <label>Fecha Fin:</label>
+        <div class="form-group">
+            <div class='input-group date'>
+                <span class="input-group-addon" title="Fecha fin" data-toggle="tooltip" data-placement="top">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+                <input type='text' class="form-control" id='dtpk-fecha-fin' />
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12" ng-model="totalCorreos">
+        <label class="pull-right">Total: {{totalCorreos}}</label>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <thead id="thead-correosNoEnviados">
+        <tr>
+            <th style="width: 12%;">Fecha y Hora</th>
+            <th style="width: 15%;">Envía</th>
+            <th style="width: 25%;">Destinatarios</th>
+            <th style="width: 25%;">Asunto</th>
+            <th style="width: 8%;">Enviar</th>
+            <th style="width: 9%;">Desactivar</th>
+        </tr>
+    </thead>
+    <tbody id="tbody-correosNoEnviados">
+        <tr class="table-tr" ng-repeat="correo in correosNoEnviados" data-id="{{ correo.idcorreo }}">
+            <td style="width: 12%;">{{ correo.fechahora }}</td>
+            <td style="width: 15%;">{{ correo.emailFuente }}</td>
+            <td style="width: 25%;">{{ correo.emailsDestinos }}</td>
+            <td style="width: 25%;">{{ correo.asunto }}</td>
+            @*<td style="width: 8%;"><a class="editar-option" href="#" ng-click="reenviarEmail()"> Enviar </a></td>*@
+            <td style="width: 8%;"><a href="#" class="btn btn-info btn-xs" ng-click="reenviarEmail(correo.idcorreo)" title="Enviar correo" data-toggle="tooltip" data-placement="left"><span class="fa fa-envelope"></span></a></td>
+            <td style="width: 9%;"><a href="#" class="btn btn-info btn-xs" ng-click="desactivarEmail(correo.idcorreo)" title="Desactivar correo" data-toggle="tooltip" data-placement="left"><span class="fa fa-times-circle"></span></a></td>
+        </tr>
+    </tbody>
+</table>

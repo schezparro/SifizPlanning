@@ -1,0 +1,43 @@
+﻿<div id="panel-botones-consolidacion">
+    <div class="right">
+        <button class="btn btn-primary" ng-click="semanaAlanteDisponibilidad()"><span class=" glyphicon glyphicon-chevron-right"></span></button>
+    </div>
+    <div class="right">
+        <button class="btn btn-success" ng-click="semanaActualDisponibilidad()"><span class="glyphicon glyphicon-home"></span></button>
+    </div>
+    <div class="right">
+        <button class="btn btn-primary" ng-click="semanaAtrasDisponibilidad()"><span class="glyphicon glyphicon-chevron-left"></span></button>
+    </div>
+    <div class="right">
+        <input type="text" class="form-control" placeholder="Filtrar..." ng-model="filtroDisponibilidad" ng-enter="filtrarDisponibilidad()" />
+    </div>
+    <div class="clear"></div>
+</div>
+
+<div id="panel-container-disponibilidad-recursos">
+    <div id="div-panel-disponibilidad">
+        
+        <div id="panel-fechas-disponibilidad" class="right">
+            <div id="panel-meses-fechas-disponibilidad"></div>
+            <div class="clear"></div>
+            <div class="left semana-disponibilidad" ng-repeat="semana in $parent.semanasDisponibilidad">
+                <div class="semana-text">
+                    {{semana.lunes}}-{{semana.domingo}}
+                </div>
+            </div>
+        </div>
+
+        <div id="panel-disponibilidad-colaboradores" class="left">
+            <div ng-repeat="colab in $parent.colaboradoresDisponibilidad">
+                <div class="nombre-colaboradores left" data-id-colaborador="{{colab.colab.idColaborador}}"><b>{{colab.colab.email | userEmail}}</b></div>
+
+                <div class="clear"></div>
+            </div>
+        </div>
+
+        <div class="clear"></div>
+        <!-- dia de referencia -->
+        <div id="dia-referencia-disponibilidad-recursos" class="dia-referencia">
+        </div>
+    </div>
+</div>

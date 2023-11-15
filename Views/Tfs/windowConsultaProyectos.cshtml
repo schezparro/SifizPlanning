@@ -1,0 +1,74 @@
+﻿<div>
+    <input type="text" ng-keyup="cargarProyectosTFS()" ng-model="filtroProyectoTFS" class="form-control right filtro" placeholder="Filtrar..." />
+    <div class="clear"></div>
+</div>
+
+<div id="div-tabla-proyectos-tfs" style="height: calc(100% - 35px); overflow-y: auto;">
+    <table id="tabla-proyectos-tfs" class="table table-striped table-condensed table-hover" style="width: 100%">
+        <thead>
+            <tr>
+                <th width="10">Proyecto</th>
+                <th width="10">Colección Servidor TFS</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr ng-repeat="proyectoTfs in proyectosTfs">
+                <td>{{proyectoTfs.area}}</td>
+                <td>{{proyectoTfs.proyecto}}</td>
+            </tr>
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <th>
+                    <div class="form-inline">
+                        <div class="clear"></div>
+                        <div class="left col-md-4">
+                            <nav>
+                                <ul class="pagination">
+                                    <li ng-click="atrazarPagina()">
+                                        <a href="#" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                    <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
+                                    <li ng-click="avanzarPagina()">
+                                        <a href="#" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+
+                        <div style="margin-top: 20px" class="left form-inline col-md-4" ng-init="cantidadMostrarPorPagina = 10">
+                            <label>Cantidad Por Página:</label>
+                            <select class="form-control" ng-model="cantidadMostrarPorPagina" ng-change="actualizarCantidadMostrar()">
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                    </div>
+                </th>
+                <th>
+                    <div class="right col-md-4" style="margin-top: 30px">
+                        <div>
+                            <label>Total de Páginas: </label>{{cantPaginas}}
+                        </div>
+                    </div>
+                    <div class="right" style="margin-top: 30px">
+                        <div>
+                            <label>Total: </label>{{total}}
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+                </th>
+            </tr>
+        </tfoot>
+
+    </table>
+</div>

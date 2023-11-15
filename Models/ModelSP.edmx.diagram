@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="41eaed6327af4b2585e910c8381c19a4" Name="Diagram1" ZoomLevel="86">
+        <EntityTypeShape EntityType="SifizPlanningModel.Rol" Width="1.5" PointX="26.625" PointY="16.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Usuario" Width="1.5" PointX="25.625" PointY="9.25" />
+        <EntityTypeShape EntityType="SifizPlanningModel.UsuarioRol" Width="1.5" PointX="26.625" PointY="13.25" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Actividad" Width="2" PointX="15.875" PointY="20.125" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Cargo" Width="2" PointX="6.75" PointY="9.25" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Cliente" Width="2.25" PointX="5.375" PointY="4.25" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Colaborador" Width="2.625" PointX="14.125" PointY="9" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Colaborador_JefeInmediato" Width="2.5" PointX="8.875" PointY="7.375" />
+        <EntityTypeShape EntityType="SifizPlanningModel.DiaInactivo" Width="2.125" PointX="24.5" PointY="0.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Especialidad" Width="2.875" PointX="14.25" PointY="2.25" />
+        <EntityTypeShape EntityType="SifizPlanningModel.EstadoTarea" Width="2.125" PointX="7.75" PointY="25.875" />
+        <EntityTypeShape EntityType="SifizPlanningModel.FotoColaborador" Width="1.5" PointX="11" PointY="4.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.LugarTarea" Width="1.5" PointX="15.875" PointY="23" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Modulo" Width="2.5" PointX="8.625" PointY="20.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Pais" Width="2.125" PointX="23" PointY="13.5" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Persona" Width="1.5" PointX="23" PointY="9.125" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Sede" Width="2" PointX="7" PointY="12" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Tarea_Coordinador" Width="2.125" PointX="16.625" PointY="16.25" />
+        <AssociationConnector Association="SifizPlanningModel.RefROL11" />
+        <AssociationConnector Association="SifizPlanningModel.RefPERSONA9" />
+        <AssociationConnector Association="SifizPlanningModel.RefUSUARIO12" />
+        <AssociationConnector Association="SifizPlanningModel.RefCARGO33" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR28" ManuallyRouted="false" >
+        </AssociationConnector>
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR29" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR3" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR30" />
+        <AssociationConnector Association="SifizPlanningModel.RefPERSONA2" />
+        <AssociationConnector Association="SifizPlanningModel.RefSEDE32" />
+        <AssociationConnector Association="SifizPlanningModel.RefPAIS10" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ColaboradorEspecialidad" Width="2.625" PointX="14.625" PointY="5.625" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR18" />
+        <AssociationConnector Association="SifizPlanningModel.RefESPECIALIDAD17" />
+        <EntityTypeShape EntityType="SifizPlanningModel.HistoricoTareaEstado" Width="2.125" PointX="11.875" PointY="24.875" />
+        <AssociationConnector Association="SifizPlanningModel.RefUSUARIO37" />
+        <AssociationConnector Association="SifizPlanningModel.RefESTADOTAREA341" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Tarea_TareaRelacionada" Width="2.25" PointX="3.25" PointY="22" />
+        <EntityTypeShape EntityType="SifizPlanningModel.CampoCatalogo" Width="3" PointX="26.5" PointY="3.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.CampoCatalogo_TablaCatalogo" Width="2.875" PointX="22.375" PointY="5.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TablaCatalogo" Width="2.75" PointX="18.5" PointY="3.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TipoCampo" Width="2.375" PointX="32.5" PointY="4" />
+        <AssociationConnector Association="SifizPlanningModel.RefCAMPOCATALOGO44" />
+        <AssociationConnector Association="SifizPlanningModel.RefTABLACATALOGO14" ManuallyRouted="false" >
+        </AssociationConnector>
+        <AssociationConnector Association="SifizPlanningModel.RefTIPOCAMPO43" />
+        <AssociationConnector Association="SifizPlanningModel.RefTABLACATALOGO45" ManuallyRouted="false" >
+        </AssociationConnector>
+        <EntityTypeShape EntityType="SifizPlanningModel.Departamento" Width="1.875" PointX="11.125" PointY="14.125" />
+        <AssociationConnector Association="SifizPlanningModel.RefDEPARTAMENTO46" ManuallyRouted="false" >
+        </AssociationConnector>
+        <EntityTypeShape EntityType="SifizPlanningModel.AdjuntoTicket" Width="1.5" PointX="22.875" PointY="43.875" />
+        <EntityTypeShape EntityType="SifizPlanningModel.CategoriaTicket" Width="1.5" PointX="14.875" PointY="33.5" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ContratoAdjunto" Width="1.5" PointX="25.875" PointY="36.875" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ContratoCliente" Width="1.5" PointX="23.625" PointY="37.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ContratoDesarrollo" Width="1.5" PointX="10.875" PointY="32" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ContratoDesarrolloFunc" Width="1.5" PointX="13.125" PointY="28.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ContratoMantenimiento" Width="1.5" PointX="25.875" PointY="40" />
+        <EntityTypeShape EntityType="SifizPlanningModel.EstadoTicket" Width="1.5" PointX="18.375" PointY="29" />
+        <EntityTypeShape EntityType="SifizPlanningModel.FlujoEstadoTicket" Width="1.5" PointX="20.625" PointY="34.25" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Funcionalidad" Width="1.5" PointX="10.875" PointY="28.5" />
+        <EntityTypeShape EntityType="SifizPlanningModel.HorasConsumidas" Width="1.5" PointX="28.5" PointY="39.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.NivelColaborador" Width="1.5" PointX="23.625" PointY="23.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Persona_Cliente" Width="1.5" PointX="18.375" PointY="36.375" />
+        <EntityTypeShape EntityType="SifizPlanningModel.PrioridadTicket" Width="1.5" PointX="18.375" PointY="25.125" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Ticket" Width="2.125" PointX="20.625" PointY="28.25" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Ticket_ContratoCliente" Width="1.5" PointX="25.875" PointY="29.5" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TicketHistorico" Width="2" PointX="22.875" PointY="28.5" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TipoContratoCliente" Width="1.5" PointX="20.5" PointY="39.75" />
+        <AssociationConnector Association="SifizPlanningModel.RefCLIENTE51" />
+        <AssociationConnector Association="SifizPlanningModel.RefCLIENTE56" />
+        <AssociationConnector Association="SifizPlanningModel.RefMODULO86" />
+        <AssociationConnector Association="SifizPlanningModel.RefPERSONA53" />
+        <AssociationConnector Association="SifizPlanningModel.RefTICKET54" />
+        <AssociationConnector Association="SifizPlanningModel.RefCATEGORIATICKET63" />
+        <AssociationConnector Association="SifizPlanningModel.RefCATEGORIATICKET79" />
+        <AssociationConnector Association="SifizPlanningModel.RefCONTRATOCLIENTE80" />
+        <AssociationConnector Association="SifizPlanningModel.RefCONTRATOCLIENTE82" />
+        <AssociationConnector Association="SifizPlanningModel.RefCONTRATOCLIENTE83" />
+        <AssociationConnector Association="SifizPlanningModel.RefCONTRATOCLIENTE90" />
+        <AssociationConnector Association="SifizPlanningModel.RefTIPOCONTRATOCLIENTE84" />
+        <AssociationConnector Association="SifizPlanningModel.RefCONTRATODESARROLLO87" />
+        <AssociationConnector Association="SifizPlanningModel.RefFUNCIONALIDAD88" />
+        <AssociationConnector Association="SifizPlanningModel.RefCONTRATOMANTENIMIENTO85" />
+        <AssociationConnector Association="SifizPlanningModel.RefESTADOTICKET49" />
+        <AssociationConnector Association="SifizPlanningModel.RefESTADOTICKET71" />
+        <AssociationConnector Association="SifizPlanningModel.RefESTADOTICKET72" />
+        <AssociationConnector Association="SifizPlanningModel.RefESTADOTICKET76" />
+        <AssociationConnector Association="SifizPlanningModel.RefPRIORIDADTICKET64" />
+        <AssociationConnector Association="SifizPlanningModel.RefPRIORIDADTICKET78" />
+        <AssociationConnector Association="SifizPlanningModel.RefTICKET75" />
+        <AssociationConnector Association="SifizPlanningModel.RefTICKET89" />
+        <EntityTypeShape EntityType="SifizPlanningModel.RolSysMenu" Width="1.5" PointX="28.875" PointY="16.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.SysMenu" Width="1.5" PointX="26.625" PointY="24.625" />
+        <AssociationConnector Association="SifizPlanningModel.RefROL93" />
+        <AssociationConnector Association="SifizPlanningModel.RefSYSMENU92" />
+        <EntityTypeShape EntityType="SifizPlanningModel.CategoriaTicketTipoContrClient" Width="2.375" PointX="30.625" PointY="34.125" />
+        <AssociationConnector Association="SifizPlanningModel.RefCATEGORIATICKET96" />
+        <AssociationConnector Association="SifizPlanningModel.RefTIPOCONTRATOCLIENTE97" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TicketFuncionalidad" Width="1.5" PointX="25.875" PointY="32.5" />
+        <AssociationConnector Association="SifizPlanningModel.RefFUNCIONALIDAD102" />
+        <AssociationConnector Association="SifizPlanningModel.RefTICKET101" />
+        <AssociationConnector Association="SifizPlanningModel.RefUSUARIO104" />
+        <EntityTypeShape EntityType="SifizPlanningModel.GrupoEmail" Width="1.5" PointX="27" PointY="42.875" />
+        <EntityTypeShape EntityType="SifizPlanningModel.PersonaGrupoEmail" Width="1.5" PointX="29.25" PointY="9.875" />
+        <AssociationConnector Association="SifizPlanningModel.RefGRUPOEMAIL105" />
+        <AssociationConnector Association="SifizPlanningModel.RefPERSONA106" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TicketTarea" Width="1.5" PointX="28.875" PointY="25" />
+        <AssociationConnector Association="SifizPlanningModel.RefTICKET661" />
+        <EntityTypeShape EntityType="SifizPlanningModel.BotonEstadoTicket" Width="1.5" PointX="20.625" PointY="24.25" />
+        <AssociationConnector Association="SifizPlanningModel.RefESTADOTICKET108" />
+        <EntityTypeShape EntityType="SifizPlanningModel.DetalleEstimacionTicket" Width="2.375" PointX="27.5" PointY="20.625" />
+        <AssociationConnector Association="SifizPlanningModel.RefNIVELCOLABORADOR109" />
+        <EntityTypeShape EntityType="SifizPlanningModel.EstimacionTicket" Width="2.625" PointX="22.875" PointY="19.5" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR73" />
+        <AssociationConnector Association="SifizPlanningModel.RefESTIMACIONTICKET110" />
+        <AssociationConnector Association="SifizPlanningModel.RefTICKET68" />
+        <EntityTypeShape EntityType="SifizPlanningModel.CotizacionTicket" Width="1.5" PointX="30.875" PointY="19.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.OfertaCotizacionTicket" Width="1.5" PointX="33.125" PointY="20.125" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR1121" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOTIZACIONTICKET1111" />
+        <AssociationConnector Association="SifizPlanningModel.RefTICKET1131" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ActividadRealizada" Width="1.5" PointX="29.5" PointY="28.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TareaActividadRealizada" Width="1.5" PointX="31.75" PointY="15.25" />
+        <AssociationConnector Association="SifizPlanningModel.RefUSUARIO117" />
+        <AssociationConnector Association="SifizPlanningModel.RefACTIVIDADREALIZADA116" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Gestion_SolicitudTarea" Width="1.5" PointX="30.875" PointY="6.875" />
+        <EntityTypeShape EntityType="SifizPlanningModel.SolicitudTarea" Width="1.5" PointX="17.5" PointY="10" />
+        <AssociationConnector Association="SifizPlanningModel.RefUSUARIO124" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR118" />
+        <AssociationConnector Association="SifizPlanningModel.RefSOLICITUDTAREA121" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ComentarioTarea" Width="1.5" PointX="34" PointY="12.625" />
+        <AssociationConnector Association="SifizPlanningModel.RefUSUARIO126" />
+        <AssociationConnector Association="SifizPlanningModel.RefTAREAACTIVIDADREALIZADA125" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Renegociacion" Width="1.5" PointX="35.375" PointY="20.875" />
+        <AssociationConnector Association="SifizPlanningModel.RefOFERTACOTIZACIONTICKET127" />
+        <EntityTypeShape EntityType="SifizPlanningModel.EntregableMotivoTrabajo" Width="2" PointX="10.625" PointY="0.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.MotivoTrabajo" Width="1.5" PointX="9" PointY="0.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TipoMotivoTrabajo" Width="2.25" PointX="5" PointY="0.625" />
+        <AssociationConnector Association="SifizPlanningModel.RefCLIENTE131" />
+        <AssociationConnector Association="SifizPlanningModel.RefMOTIVOTRABAJO132" />
+        <AssociationConnector Association="SifizPlanningModel.RefTIPOMOTIVOTRABAJO128" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Tarea" Width="1.5" PointX="37" PointY="11.5" />
+        <AssociationConnector Association="SifizPlanningModel.RefACTIVIDAD22" />
+        <AssociationConnector Association="SifizPlanningModel.RefCLIENTE26" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR4" />
+        <AssociationConnector Association="SifizPlanningModel.RefESTADOTAREA24" />
+        <AssociationConnector Association="SifizPlanningModel.RefTAREA35" />
+        <AssociationConnector Association="SifizPlanningModel.RefLUGARTAREA23" />
+        <AssociationConnector Association="SifizPlanningModel.RefMODULO25" />
+        <AssociationConnector Association="SifizPlanningModel.RefTAREA107" />
+        <AssociationConnector Association="SifizPlanningModel.RefTAREA115" />
+        <AssociationConnector Association="SifizPlanningModel.RefTAREA27" />
+        <AssociationConnector Association="SifizPlanningModel.RefTAREA38" />
+        <AssociationConnector Association="SifizPlanningModel.RefTAREA39" />
+        <AssociationConnector Association="SifizPlanningModel.TAREA_ENTREGABLEMOTIVOTRABAJO" />
+        <AssociationConnector Association="SifizPlanningModel.TAREA_GESTION_SOLICITUDTAREA" />
+        <EntityTypeShape EntityType="SifizPlanningModel.DetalleGestionPermiso" Width="1.5" PointX="34.375" PointY="10.125" />
+        <EntityTypeShape EntityType="SifizPlanningModel.EstadoPermiso" Width="1.5" PointX="0.75" PointY="17.25" />
+        <EntityTypeShape EntityType="SifizPlanningModel.GestionPermiso" Width="1.5" PointX="32.125" PointY="11.375" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Permiso" Width="1.5" PointX="20.875" PointY="13.25" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TipoPermiso" Width="1.5" PointX="18.625" PointY="0.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Vacaciones" Width="1.5" PointX="17.875" PointY="33.625" />
+        <AssociationConnector Association="SifizPlanningModel.RefGESTIONPERMISO1451" />
+        <AssociationConnector Association="SifizPlanningModel.RefESTADOPERMISO1381" />
+        <AssociationConnector Association="SifizPlanningModel.RefESTADOPERMISO1421" />
+        <AssociationConnector Association="SifizPlanningModel.RefESTADOPERMISO1431" />
+        <AssociationConnector Association="SifizPlanningModel.RefPERMISO1411" />
+        <AssociationConnector Association="SifizPlanningModel.RefUSUARIO1441" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR1401" />
+        <AssociationConnector Association="SifizPlanningModel.RefTIPOPERMISO1391" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR1371" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ColaboradorIncidencia" Width="1.5" PointX="35.75" PointY="5.125" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ImplicacionError" Width="1.5" PointX="33.25" PointY="24.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TipoError" Width="1.5" PointX="33.5" PointY="0.75" />
+        <AssociationConnector Association="SifizPlanningModel.RefUSUARIO150" />
+        <AssociationConnector Association="SifizPlanningModel.RefCLIENTE149" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR148" />
+        <AssociationConnector Association="SifizPlanningModel.RefIMPLICACIONERROR147" />
+        <AssociationConnector Association="SifizPlanningModel.RefTIPOERROR146" />
+        <EntityTypeShape EntityType="SifizPlanningModel.EstadoEntregable" Width="1.5" PointX="8.625" PointY="15.875" />
+        <EntityTypeShape EntityType="SifizPlanningModel.NivelColaboradorModulo" Width="1.5" PointX="19.5" PointY="18" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR155" />
+        <AssociationConnector Association="SifizPlanningModel.RefMODULO154" />
+        <EntityTypeShape EntityType="SifizPlanningModel.CategoriaCompetencia" Width="1.5" PointX="0.625" PointY="30.125" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ColaboradorNivelCompetencia" Width="1.5" PointX="20.875" PointY="9.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Competencia" Width="1.5" PointX="5.25" PointY="30" />
+        <EntityTypeShape EntityType="SifizPlanningModel.SubCategoriaCompetencia" Width="1.5" PointX="3" PointY="30" />
+        <AssociationConnector Association="SifizPlanningModel.RefCATEGORIACOMPETENCIA156" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR159" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOMPETENCIA158" />
+        <AssociationConnector Association="SifizPlanningModel.RefSUBCATEGORIACOMPETENCIA157" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TareaCompensatoria" Width="1.5" PointX="39.25" PointY="11.875" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TareaCompensatoriaPermiso" Width="1.5" PointX="43.5" PointY="16.5" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TareaCompensatoriaVacacion" Width="1.5" PointX="42.875" PointY="23.125" />
+        <AssociationConnector Association="SifizPlanningModel.RefPERMISO170" />
+        <AssociationConnector Association="SifizPlanningModel.RefVACACIONES169" />
+        <AssociationConnector Association="SifizPlanningModel.RefUSUARIO162" />
+        <AssociationConnector Association="SifizPlanningModel.RefTAREA163" />
+        <AssociationConnector Association="SifizPlanningModel.RefTAREACOMPENSATORIA166" />
+        <AssociationConnector Association="SifizPlanningModel.RefTAREACOMPENSATORIA167" />
+        <EntityTypeShape EntityType="SifizPlanningModel.FBSLogEquipo" Width="1.5" PointX="0.75" PointY="10.5" />
+        <EntityTypeShape EntityType="SifizPlanningModel.FBSLogError" Width="1.5" PointX="3" PointY="9.125" />
+        <AssociationConnector Association="SifizPlanningModel.RefFBSLOGEQUIPO1" />
+        <EntityTypeShape EntityType="SifizPlanningModel.MarcaElectronica" Width="1.5" PointX="17.5" PointY="39.875" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR172" />
+        <AssociationConnector Association="SifizPlanningModel.RefPERSONA_CLIENTE521" />
+        <AssociationConnector Association="SifizPlanningModel.RefPERSONA_CLIENTE771" />
+        <EntityTypeShape EntityType="SifizPlanningModel.HistoricoAdjunto" Width="1.5" PointX="27.875" PointY="46.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.HistoricoInformacionTicket" Width="1.5" PointX="25.625" PointY="46.375" />
+        <AssociationConnector Association="SifizPlanningModel.RefHISTORICOINFORMACIONTICKET174" />
+        <AssociationConnector Association="SifizPlanningModel.RefTICKETHISTORICO173" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TipoErrorImplicacion" Width="1.5" PointX="39.75" PointY="9" />
+        <AssociationConnector Association="SifizPlanningModel.RefIMPLICACIONERROR175" />
+        <AssociationConnector Association="SifizPlanningModel.RefTIPOERROR176" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ColeccionTFS" Width="1.5" PointX="6.125" PointY="19.125" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ProyectoTFS" Width="1.5" PointX="7.375" PointY="0.5" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ServidorTFS" Width="1.5" PointX="6.125" PointY="22.125" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TicketAsignacionTFS" Width="1.5" PointX="44" PointY="4" />
+        <EntityTypeShape EntityType="SifizPlanningModel.UsuarioTFS" Width="1.5" PointX="17.5" PointY="46.375" />
+        <AssociationConnector Association="SifizPlanningModel.RefCLIENTE178" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR177" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLECCIONTFS179" />
+        <AssociationConnector Association="SifizPlanningModel.RefPROYECTOTFS183" />
+        <AssociationConnector Association="SifizPlanningModel.RefSERVIDORTFS181" />
+        <AssociationConnector Association="SifizPlanningModel.RefTICKETTAREA184" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ProximaActividad" Width="1.5" PointX="18.75" PointY="42.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TipoRecurso" Width="1.5" PointX="1" PointY="1.125" />
+        <AssociationConnector Association="SifizPlanningModel.RefPROXIMAACTIVIDAD186" />
+        <AssociationConnector Association="SifizPlanningModel.RefPROXIMAACTIVIDAD191" />
+        <AssociationConnector Association="SifizPlanningModel.RefTIPORECURSO187" />
+        <AssociationConnector Association="SifizPlanningModel.RefTIPORECURSO190" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Mensaje" Width="1.5" PointX="28.75" PointY="0.75" />
+        <AssociationConnector Association="SifizPlanningModel.RefUSUARIO194" />
+        <AssociationConnector Association="SifizPlanningModel.RefUSUARIO195" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Ticket_Error" Width="1.5" PointX="32.5" PointY="31.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Ticket_PrioridadRevisada" Width="1.5" PointX="28.5" PointY="32.5" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Ticket_Resolucion" Width="1.5" PointX="34.5" PointY="16.375" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Ticket_ResolucionDesacuerdo" Width="1.5" PointX="39.75" PointY="15.75" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR201" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR202" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR206" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR207" />
+        <AssociationConnector Association="SifizPlanningModel.RefPRIORIDADTICKET205" />
+        <AssociationConnector Association="SifizPlanningModel.RefTICKET199" />
+        <AssociationConnector Association="SifizPlanningModel.RefTICKET203" />
+        <AssociationConnector Association="SifizPlanningModel.RefTICKET204" />
+        <AssociationConnector Association="SifizPlanningModel.RefTICKET_RESOLUCION200" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Ticket_CategoriaRevisada" Width="1.5" PointX="35.5" PointY="23.625" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR210" />
+        <AssociationConnector Association="SifizPlanningModel.RefCATEGORIATICKET209" />
+        <AssociationConnector Association="SifizPlanningModel.RefTICKET208" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ComentarioTicket" Width="1.5" PointX="35.5" PointY="27.5" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR211" />
+        <AssociationConnector Association="SifizPlanningModel.RefTICKET212" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Ticket_RequierePublicacion" Width="1.5" PointX="23.5" PointY="16.75" />
+        <AssociationConnector Association="SifizPlanningModel.RefTICKET213" />
+        <EntityTypeShape EntityType="SifizPlanningModel.NotificacionTicket" Width="1.5" PointX="31.5" PointY="37.375" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TipoNotificacionTicket" Width="1.5" PointX="29.25" PointY="43.5" />
+        <AssociationConnector Association="SifizPlanningModel.RefTICKET216" />
+        <AssociationConnector Association="SifizPlanningModel.RefTIPONOTIFICACIONTICKET214" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ActividadPropuesta" Width="1.5" PointX="33.25" PointY="44.5" />
+        <EntityTypeShape EntityType="SifizPlanningModel.CausaNoTerminacion" Width="1.5" PointX="33.25" PointY="41.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.NoTerminacionTicket" Width="1.5" PointX="35.5" PointY="31.5" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR223" />
+        <AssociationConnector Association="SifizPlanningModel.RefACTIVIDADPROPUESTA220" />
+        <AssociationConnector Association="SifizPlanningModel.RefCAUSANOTERMINACION221" />
+        <AssociationConnector Association="SifizPlanningModel.RefTICKET222" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ActividadActividadRealizada" Width="1.5" PointX="37.75" PointY="24.5" />
+        <AssociationConnector Association="SifizPlanningModel.RefACTIVIDAD226" />
+        <AssociationConnector Association="SifizPlanningModel.RefACTIVIDADREALIZADA227" />
+        <EntityTypeShape EntityType="SifizPlanningModel.EstadoTicketProximaActividad" Width="1.5" PointX="21" PointY="46.875" />
+        <AssociationConnector Association="SifizPlanningModel.RefESTADOTICKET229" />
+        <AssociationConnector Association="SifizPlanningModel.RefPROXIMAACTIVIDAD228" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ComentarioGeneral" Width="1.5" PointX="28.75" PointY="49.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.UsuarioLeeComentarioGeneral" Width="1.5" PointX="32" PointY="28.375" />
+        <AssociationConnector Association="SifizPlanningModel.RefUSUARIO218" />
+        <AssociationConnector Association="SifizPlanningModel.RefUSUARIO219" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOMENTARIOGENERAL217" />
+        <EntityTypeShape EntityType="SifizPlanningModel.NoTerminacionTarea" Width="1.5" PointX="39.25" PointY="27.75" />
+        <AssociationConnector Association="SifizPlanningModel.RefACTIVIDADPROPUESTA232" />
+        <AssociationConnector Association="SifizPlanningModel.RefCAUSANOTERMINACION231" />
+        <AssociationConnector Association="SifizPlanningModel.RefTAREA233" />
+        <EntityTypeShape EntityType="SifizPlanningModel.CorreoNoEnviado" Width="1.5" PointX="0.75" PointY="4.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TICKET_COMPLEMENTO" Width="1.5" PointX="23.5" PointY="49.875" />
+        <AssociationConnector Association="SifizPlanningModel.FK_TICKET_ACTIVIDAD_TICKET_ACTIVIDAD" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Reporte" Width="1.5" PointX="3" PointY="0.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.EstadoActa" Width="1.5" PointX="19.25" PointY="56.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TipoActa" Width="1.5" PointX="19.25" PointY="53.875" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Acta" Width="1.5" PointX="22.125" PointY="0.5" />
+        <AssociationConnector Association="SifizPlanningModel.FK_ACTA_CLIENTE" />
+        <AssociationConnector Association="SifizPlanningModel.FK_ACTA_COLABORADOR" />
+        <AssociationConnector Association="SifizPlanningModel.FK_ACTA_CONTRATO" />
+        <AssociationConnector Association="SifizPlanningModel.FK_ACTA_ESTADO" />
+        <AssociationConnector Association="SifizPlanningModel.FK_ACTA_TIPO" />
+        <EntityTypeShape EntityType="SifizPlanningModel.EstadoContrato" Width="1.5" PointX="5.375" PointY="15.625" />
+        <AssociationConnector Association="SifizPlanningModel.FK_ACTA_ENTREGABLE" />
+        <AssociationConnector Association="SifizPlanningModel.FK_ENTREGABLEMOTIVOTRABAJO_COLABORADOR" />
+        <AssociationConnector Association="SifizPlanningModel.RefESTADOCONTRATO133" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Adenda" Width="1.5" PointX="16.5" PointY="45.125" />
+        <EntityTypeShape EntityType="SifizPlanningModel.FaseContrato" Width="1.5" PointX="12" PointY="20" />
+        <EntityTypeShape EntityType="SifizPlanningModel.MotivoTrabajoInformacionAdicional" Width="1.5" PointX="14.25" PointY="0.75" />
+        <AssociationConnector Association="SifizPlanningModel.FK_ADENDA_MOTIVOTRABAJOINFADICIONAL" />
+        <AssociationConnector Association="SifizPlanningModel.FK_MOTIVOTRABAJOINFADICIONAL_FASECONTRATO" />
+        <AssociationConnector Association="SifizPlanningModel.FK_MOTIVOTRABAJOINFADICIONAL_MOTIVOTRABAJO" />
+        <EntityTypeShape EntityType="SifizPlanningModel.MotivoTrabajoSeguimiento" Width="1.5" PointX="16.5" PointY="49.75" />
+        <AssociationConnector Association="SifizPlanningModel.FK_MOTIVOTRABAJOSEGUIMIENTO_MOTIVOTRABAJOINFADICIONAL" />
+        <EntityTypeShape EntityType="SifizPlanningModel.SubModulo" Width="1.5" PointX="11.875" PointY="35.125" />
+        <AssociationConnector Association="SifizPlanningModel.FK_SUBMODULO_MODULO" />
+        <AssociationConnector Association="SifizPlanningModel.FK_MOTIVOTRABAJO_COLABORADOR" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TipoPlazo" Width="1.5" PointX="10.375" PointY="11" />
+        <AssociationConnector Association="SifizPlanningModel.FK_MOTIVOTRABAJO_TIPOPLAZO" />
+        <EntityTypeShape EntityType="SifizPlanningModel.MotivoPrioridadTicket" Width="1.5" PointX="23.5" PointY="53.125" />
+        <EntityTypeShape EntityType="SifizPlanningModel.MotivoTrabajoTicket" Width="1.5" PointX="29.5" PointY="13.5" />
+        <AssociationConnector Association="SifizPlanningModel.FK_MOTIVOTRABAJOTICKET_MOTIVOTRABAJO" />
+        <AssociationConnector Association="SifizPlanningModel.FK_MOTIVOPRIORIDADTICKET_TICKET" />
+        <AssociationConnector Association="SifizPlanningModel.FK_MOTIVOTRABAJOTICKET_TICKET" />
+        <AssociationConnector Association="SifizPlanningModel.FK_TICKETHISTORICO_CATEGORIATICKET" />
+        <AssociationConnector Association="SifizPlanningModel.FK_TICKETHISTORICO_PRIORIDADTICKET" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TicketsMantenimiento" Width="1.5" PointX="23.5" PointY="56.375" />
+        <AssociationConnector Association="SifizPlanningModel.FK_TICKETSMANTENIMIENTO_TICKET" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ProyectoModuloCliente" Width="1.5" PointX="16.125" PointY="26.375" />
+        <AssociationConnector Association="SifizPlanningModel.RefCLIENTE152" />
+        <AssociationConnector Association="SifizPlanningModel.RefESTADOENTREGABLE153" />
+        <AssociationConnector Association="SifizPlanningModel.RefMODULO151" />
+        <AssociationConnector Association="SifizPlanningModel.FK_PROYECTOMODULO_SUBMODULO" />
+        <EntityTypeShape EntityType="SifizPlanningModel.AdjuntoContrato" Width="1.5" PointX="11.25" PointY="39.75" />
+        <AssociationConnector Association="SifizPlanningModel.FK_ADJUNTOCONTRATO_MOTIVOTRABAJO" />
+        <EntityTypeShape EntityType="SifizPlanningModel.GestorServicios" Width="1.5" PointX="17.5" PointY="0.75" />
+        <AssociationConnector Association="SifizPlanningModel.FK_GESTORSERVICIOS_CLIENTE" />
+        <AssociationConnector Association="SifizPlanningModel.FK_GESTORSERVICIOS_COLABORADOR" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TareaMantenimiento" Width="1.5" PointX="39.25" PointY="19.75" />
+        <AssociationConnector Association="SifizPlanningModel.FK_TAREAMANTENIMIENTO_TAREA" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ComentarioMantenimientoTickets" Width="1.5" PointX="3.375" PointY="18.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TareaMantenimientoBorrar" Width="1.5" PointX="39.25" PointY="6" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TicketMantenimientoBorar" Width="1.5" PointX="23.5" PointY="59.5" />
+        <AssociationConnector Association="SifizPlanningModel.FK_TAREAMANTENIMIENTOBORRAR_TAREA" />
+        <AssociationConnector Association="SifizPlanningModel.FK_TICKETMANTENIMIENTOBORAR_TICKET" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TicketMantenimientoAgregar" Width="1.5" PointX="0.75" PointY="20.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ComentarioHorasMantenimiento" Width="1.5" PointX="2.5" PointY="4.375" />
+        <AssociationConnector Association="SifizPlanningModel.FK_COMENTARIOHORASMANTENIMIENTO_CLIENTE" />
+        <AssociationConnector Association="SifizPlanningModel.FK_COMENTARIOHORASMANTENIMIENTO_COMENTARIOMANTENIMIENTOTICKETS" />
+        <EntityTypeShape EntityType="SifizPlanningModel.MotivoDevolucionTicket" Width="2" PointX="1.875" PointY="24.875" />
+        <AssociationConnector Association="SifizPlanningModel.FK_MOTIVOTRABAJOSEGUIMIENTO_USUARIO" />
+        <EntityTypeShape EntityType="SifizPlanningModel.EntregableTicket" Width="1.5" PointX="38.5" PointY="32" />
+        <AssociationConnector Association="SifizPlanningModel.FK_ENTREGABLETICKET_ENTREGABLEMOTIVOTRABAJO" />
+        <AssociationConnector Association="SifizPlanningModel.FK_ENTREGABLETICKET_TICKET" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Repositorio" Width="1.5" PointX="15.25" PointY="58.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.VersionBaseDatos" Width="1.5" PointX="15.25" PointY="43" />
+        <EntityTypeShape EntityType="SifizPlanningModel.VersionDesarrollo" Width="1.5" PointX="15.25" PointY="45.875" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ComentarioTicketCliente" Width="1.5" PointX="41.75" PointY="20.25" />
+        <AssociationConnector Association="SifizPlanningModel.FK_COMENTARIOTICKETCLIENTE_CLIENTE" />
+        <AssociationConnector Association="SifizPlanningModel.FK_COMENTARIOTICKETCLIENTE_COMENTARIOTICKET" />
+        <EntityTypeShape EntityType="SifizPlanningModel.EntregableDetalleEstimacion" Width="1.5" PointX="4.375" PointY="25.875" />
+        <AssociationConnector Association="SifizPlanningModel.FK_DETALLEESTIMACIONTICKET_ENTREGABLEDETALLEESTIMACION" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ClienteAuxiliar" Width="3.125" PointX="31.875" PointY="48.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ResponsableProyectos" Width="2.625" PointX="0.75" PointY="35.5" />
+        <AssociationConnector Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_COLABORADOR" />
+        <AssociationConnector Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_REPOSITORIO" />
+        <AssociationConnector Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS" />
+        <AssociationConnector Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS1" />
+        <AssociationConnector Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS2" />
+        <AssociationConnector Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS3" />
+        <AssociationConnector Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_VERSIONBASEDATOS" />
+        <AssociationConnector Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_VERSIONDESARROLLO" />
+        <AssociationConnector Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_CLIENTE" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TicketVersionCliente" Width="2.125" PointX="7.75" PointY="29.75" />
+        <AssociationConnector Association="SifizPlanningModel.FK_TICKET_TICKETVERSIONCLIENTE" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Semaforo" Width="1.5" PointX="32.375" PointY="55.5" />
+        <EntityTypeShape EntityType="SifizPlanningModel.SemaforoPrioridad" Width="1.5" PointX="34.625" PointY="36.5" />
+        <AssociationConnector Association="SifizPlanningModel.FK_SEMAFOROPRIORIDAD_PRIORIDADTICKET" />
+        <AssociationConnector Association="SifizPlanningModel.FK_SEMAFOROPRIORIDAD_SEMAFORO" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ResolucionSemaforoPrioridad" Width="1.5" PointX="35.625" PointY="40.25" />
+        <AssociationConnector Association="SifizPlanningModel.FK_RESOLUCIONSEMAFOROPRIORIDAD_PRIORIDADTICKET" />
+        <AssociationConnector Association="SifizPlanningModel.FK_RESOLUCIONSEMAFOROPRIORIDAD_SEMAFORO" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Ofertas" Width="1.5" PointX="17.5" PointY="0.75" />
+        <AssociationConnector Association="SifizPlanningModel.FK_OFERTAS_CLIENTE" />
+        <AssociationConnector Association="SifizPlanningModel.FK_OFERTAS_COLABORADOR" />
+        <EntityTypeShape EntityType="SifizPlanningModel.SolicitudVacaciones" Width="1.5" PointX="7.375" PointY="32.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.SolicitudPermisos" Width="1.5" PointX="4.375" PointY="33.75" />
+        </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

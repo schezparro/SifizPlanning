@@ -1,0 +1,253 @@
+﻿@{
+    ViewBag.Title = "Bienvenido a SifizPlanning";
+}
+<!DOCTYPE html>
+
+<html ng-app="desarrolladores">
+<head>
+    <!--<meta name="viewport" content="width=device-width" />-->
+    <title>@ViewBag.Title</title>
+    <link href="~/Web/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Web/css/bootstrap-theme.min.css" rel="stylesheet" />
+    <link href="~/Web/css/datepicker.css" rel="stylesheet" />
+    <link href="~/Web/css/bootstrap-datetimepicker.css" rel="stylesheet" />
+    <link href="~/Web/css/jasny-bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Web/css/admin/admin.css" rel="stylesheet" />
+    <link href="~/Web/css/home/home.css" rel="stylesheet" />
+
+    <script type="text/javascript" src="~/Web/js/jquery-2.1.3.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/jquery.signalR-2.1.2.min.js"></script>
+    <script type="text/javascript" src="~/signalr/hubs"></script>
+    <script type="text/javascript" src="~/Web/js/angular.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/angular-route.min.js"></script>
+</head>
+<body ng-controller="desarrolladoresController">
+
+    <div id="content_body">
+
+        <div id="menu-principal">
+            <ul class="nav nav-pills">
+                <li role="presentation" class="active"><a href="#" ng-click="IrMisTareas()">Tareas</a></li>
+                <li role="presentation"><a href="#" ng-click="IrEstimaciones()">Estimaciones</a></li>
+                <li role="presentation"><a href="#" ng-click="IrPanelTareasCompensatorias()">T-Compensatorias</a></li>
+                @if(Roles.IsUserInRole("ADMINTFS"))
+                {
+                    <li role="presentation"><a href="#" ng-click="IrRegistrarPublicaciones()">Publicaciones</a></li>
+                }
+                <li role="presentation"><a href="#" ng-click="IrPanelTickets()">Tickets</a></li>
+                <li role="presentation"><a href="#" ng-click="IrPanelProyectos()">Proyectos</a></li>
+                @if(Roles.IsUserInRole("ADMIN"))
+                {
+                    <li role="presentation"><a href="#" ng-click="IrPanelSolicitudes()">Permisos</a></li>
+                }
+
+                <a href="cerrar/sesion/" class="right btn btn-danger"><span class="glyphicon glyphicon-off"></span> Cerrar Sesión</a>
+                <a href="main-menu" style="margin-right: 4px;" class="right btn btn-warning"><span class="glyphicon glyphicon-menu-hamburger"></span> Menú Principal</a>
+                <a id="btnChangePassUser" style="margin-right: 4px;" href="#" class="right btn btn-primary" data-toggle="modal" data-target="#modalNewChangePassUser"><span class="glyphicon glyphicon-user"></span> Cambiar Contraseña</a>
+            </ul>
+        </div>
+
+        <div id="panel-principal" class="panel panel-default">
+
+            <div class="panel-heading">
+                <h3 class="panel-title" ng-init="funcionalidad = 'Mis Tareas';">{{funcionalidad}}</h3>
+            </div>
+
+            <div id="funcionalidad">
+                <div id="panel_tasks" ng-controller="taskController">
+                    @{ Html.RenderPartial("windowUserTask"); }
+                </div>
+
+                <div id="panel_estimaciones" ng-controller="estimacionesController" class="invisible">
+                    @{ Html.RenderPartial("windowUserEstimaciones"); }
+                </div>
+
+                <div id="panel_tareas_compensatorias" ng-controller="tareasCompensatoriasController" class="invisible">
+                    @{ Html.RenderPartial("windowUserTareasCompensatorias"); }
+                </div>
+
+                <div id="panel_publicaciones" ng-controller="publicacionesController" class="invisible">
+                    @{ Html.RenderPartial("windowUserPublicaciones"); }
+                </div>
+                <div id="panel_tickets" ng-controller="ticketsController" class="invisible">
+                    @{ Html.RenderPartial("windowUserTickets"); }
+                </div>
+
+                <div id="panel_proyectos" ng-controller="proyectosController" class="invisible">
+                    @{ Html.RenderPartial("windowUserProyectos"); }
+                </div>
+
+                <div id="panel_solicitudes" ng-controller="solicitudesController" class="invisible">
+                    @{ Html.RenderPartial("windowUserSolicitudes"); }
+                </div>
+            </div>
+
+            <!-- Cambiar el Pass del usuario-->
+            <div class="modal fade" id="modalNewChangePassUser" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog .filter">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel">
+                                <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                                <span id="title-filter">Cambiar contraseña</span>
+                            </h4>
+                        </div>
+                        <form method="post" id="frm-changePassUser" ng-submit="cambiarPassUsuario()">
+                            <div class="modal-body">
+
+                                <div class="fila">
+                                    <div class="left">
+                                        <label>Contraseña:</label><br />
+                                        <input type="password" ng-required="true" ng-model="passw" class="form-control" />
+                                    </div>
+                                    <div class="clear"></div>
+                                    <div class="left">
+                                        <label>Nueva Contraseña:</label><br />
+                                        <input type="password" ng-required="true" ng-model="passw1" class="form-control" />
+                                    </div>
+                                    <div class="clear"></div>
+                                    <div class="left">
+                                        <label>Repita la nueva Contraseña:</label><br />
+                                        <input type="password" ng-required="true" ng-model="passw2" class="form-control" />
+                                    </div>
+                                </div>
+
+                                <div class="clear"></div>
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                                <button type="submit" class="btn btn-primary">Grabar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Histórico del ticket -->
+            <div class="modal fade" id="modal-historico-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="modal-historico-ticket-label"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Histórico del Ticket</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="left eventos">
+                                <div class="panel panel-default">
+                                    <input class="form-control" type="text" placeholder="Filtrar..." ng-model="filtroEventoTicket" ng-keyup="cargarEventosTickets()" />
+                                    <div id="panel-historico-izq">
+                                        <div id="div-tabla-eventos-historico">
+                                            <table id="tabla-eventos-historico" class="table table-striped tabla-hover">
+                                                <tbody>
+                                                    <tr ng-repeat="evento in eventosHistorico" ng-click="verDatosEventoTicket(evento.Tipo, evento.SecuencialObjeto)">
+                                                        <td>{{evento.Fecha | strDateToStr}} - {{evento.Descripcion}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="left datos-eventos">
+                                <div class="panel panel-default">
+                                    <div>
+                                        <div class="left half">
+                                            <label>Ticket:</label>{{numeroHistoricoTicket | rellenarIzq : 0}}<br />
+                                            <label>Cliente:</label>{{clienteHistoricoTicket}}
+                                        </div>
+                                        <div class="left half">
+                                            <label>Categoría:</label>{{categoriaHistoricoTicket}}<br />
+                                            <label>Prioridad:</label>{{prioridadHistoricoTicket}}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        Datos:
+                                        <div id="datos-historico-ticket" class="panel panel-default"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loadingDiv">
+                <img src="~/Web/images/ajax-loader.gif" />
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- CODIGO DEL CHAT -->
+    <div id="sifiz-chat" style="display: none;">
+        <div id="head-sifiz-chat" class="btns-chat">
+            <div class="left nombre-usuario-local"></div>
+            <div class="right"> <i class="glyphicon glyphicon-chevron-down"></i></div>
+            <div class="clear"></div>
+        </div>
+        <div style="padding: 3px;">
+            <input id="filtro-chat" type="text" class="form-control" placeholder="Filtrar..." />
+        </div>
+        <div id="body-sifiz-chat" style="display: block;">
+            <div id="panel-usuarios-sfz">
+
+            </div>
+        </div>
+    </div>
+
+    <div id="ventanas-activas-chat">
+
+    </div>
+
+    <div id="div-usuario-chat">
+        <div class="usuario-chat" data-id="">
+            <div class="estado-usuario left active"><i class="glyphicon glyphicon-ok-sign"></i></div>
+            <div class="left nombre-usuario"></div>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <div id="ventana-chat-conversacion" style="display: none;">
+        <div class="ventana-chat">
+            <div class="heading-ventana-chat">
+                <div class="left nombre-contacto">Henry Cruz</div>
+                <div class="right"><i class="glyphicon glyphicon-remove"></i></div>
+                <div class="clear"></div>
+            </div>
+            <div class="chat-text-ventana-chat">
+
+            </div>
+            <div class="text-ventana-chat">
+                <textarea data-id-persona=""></textarea>
+            </div>
+        </div>
+    </div>
+    <audio id="audio-chat" controls="controls">
+        <source src="~/Web/sounds/happy-ending.mp3" type="audio/mpeg" />
+    </audio>
+    <!-- FIN DEL CODIGO DEL CHAT -->
+
+    <script type="text/javascript" src="~/Web/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/moment.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/bootstrap-datepicker.js"></script>
+    <script type="text/javascript" src="~/Web/js/bootstrap-datetimepicker.js"></script>
+    <script type="text/javascript" src="~/Web/js/jasny-bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/chat.js"></script>
+    <script type="text/javascript" src="~/Web/js/waiting.js"></script>
+    <script type="text/javascript" src="~/Web/js/user/sistemaController.js"></script>
+    <script type="text/javascript" src="~/Web/js/user/taskController.js"></script>
+    <script type="text/javascript" src="~/Web/js/user/estimacionesController.js"></script>
+    <script type="text/javascript" src="~/Web/js/user/tareasCompensatoriasController.js"></script>
+    <script type="text/javascript" src="~/Web/js/user/ticketsController.js"></script>
+    <script type="text/javascript" src="~/Web/js/user/proyectosController.js"></script>
+    <script type="text/javascript" src="~/Web/js/user/solicitudesController.js"></script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+﻿<div id="div-modulos-clientes">
+    <table id="tabla-consulta-modulos-clientes" class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th class="ordenar-columna" ng-click="ordenarColumna(1)">
+                    <div class="left">
+                        Cliente
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+                <th class="ordenar-columna" ng-click="ordenarColumna(2)">
+                    <div class="left">
+                        Módulo
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+                <th class="ordenar-columna" ng-click="ordenarColumna(3)">
+                    <div class="left">
+                        SubMódulo
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+                <th class="ordenar-columna" ng-click="ordenarColumna(4)">
+                    <div class="left">
+                        Estado
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                <th><input type="text" class="form-control" ng-model="cliente" ng-keyup="filterData(1)" /></th>
+                <th><input type="text" class="form-control" ng-model="modulo" ng-keyup="filterData(2)" /></th>
+                <th><input type="text" class="form-control" ng-model="subMod" ng-keyup="filterData(3)" /></th>
+
+                <th>
+                    <select id="select-estado-modulo-cliente" class="form-control">
+                        <option>Seleccione...</option>
+                        <option ng-repeat="estado in estados">{{estado.nombre}}</option>
+                    </select>
+                </th>
+            </tr>
+
+        </thead>
+        <tfoot>
+            <tr>
+                <th colspan="5">
+
+                    <div class="padding-lr-10">
+                        <div class="clear"></div>
+                        <div class="left">
+                            <nav>
+                                <ul class="pagination">
+                                    <li ng-click="atrazarPagina()">
+                                        <a href="#" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                    <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
+                                    <li ng-click="avanzarPagina()">
+                                        <a href="#" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+
+                        <div class="left form-inline gestion-lista-ticket" ng-init="cantidadMostrarPorPagina = 10" style="padding: 10px 0px 0px 0px">
+                            <label>Cantidad Por Página:</label>
+                            <select class="form-control" ng-model="cantidadMostrarPorPagina" ng-change="actualizarCantidadMostrar()">
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+
+                        <div class="right gestion-lista-ticket" style="padding: 10px 0px 0px 0px">
+                            <div>
+                                <label>Total de Páginas: </label>{{cantPaginas}}
+                            </div>
+                        </div>
+                        <div class="right gestion-lista-ticket" style="padding: 10px 0px 0px 0px">
+                            <div>
+                                <label>Total de Elementos: </label>{{totalElementos}}
+                            </div>
+                        </div>
+
+                        <div class="clear"></div>
+                    </div>
+                </th>
+            </tr>
+        </tfoot>
+        <tbody>
+            @if (Roles.IsUserInRole("ADMIN"))
+            {
+                <tr ng-repeat="mc in datosModulosClientes" ng-dblclick="AbrirModalEditarMC(mc.secuencial)">
+                    <td>{{mc.cliente}}</td>
+                    <td>{{mc.modulo}}</td>
+                    <td>{{mc.subMod}}</td>
+                    <td>{{mc.estado}}</td>
+                </tr>
+            }
+            else
+            {
+                <tr ng-repeat="mc in datosModulosClientes">
+                    <td>{{mc.cliente}}</td>
+                    <td>{{mc.modulo}}</td>
+                    <td>{{mc.subMod}}</td>
+                    <td>{{mc.estado}}</td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+</div>
+
+
+<!--Modal Editar Elemento-->
+<div class="modal fade" id="modal-editar-modulo-cliente" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">
+                    <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+                    <span id="titulo-editar-acta">Editar Elemento</span>
+                </h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="fila">
+                    <div class="left half half-padding-right">
+                        <label id="label-cliente-editar">Cliente:</label><br />
+                        <span>{{clienteEditar}}</span>
+                    </div>
+                    <div class="left">
+                        <label id="label-numero-contrato-editar">Modulo:</label><br />
+                        <span>{{moduloEditar}}</span>
+                    </div>
+                </div>
+
+                <div class="clear"></div><br />
+
+
+                <div class="fila">
+                    <div class="left half half-padding-right">
+                        <label>Estado:</label><br />
+                        <select id="select-estado-modulo-editar" class="form-control" required="required">
+                            <option>Seleccione...</option>
+                            <option ng-repeat="estado in estados">{{estado.nombre}}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="fila">
+                    <div class="left half half-padding-right">
+                        <label>Submódulo:</label><br />
+                        <select id="select-submodulo-editar" class="form-control" ng-model="subModulo">
+                            <option value="0">Seleccione...</option>
+                            <option ng-selected="smodulo.Secuencial == subModulo" ng-repeat="smodulo in submodulos" value="{{smodulo.Secuencial}}">{{smodulo.Codigo}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="clear"></div><br />
+
+                <div class="fila">
+                    <label style="margin:10px 0px 0px 0px">Funcionalidades: </label>
+                    <input type="button" class="btn btn-primary right" value="Adicionar Funcionalidad" ng-click="AdicionarFuncionalidad()" /><br /><br />
+                    <div id="data-funcionalidades">
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger left" data-dismiss="modal">Cerrar</button>
+                <button type="submit" ng-click="guardarDatosModuloCliente()" class="btn btn-primary right">Grabar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal Agregar Funcionalidad-->
+<div class="modal fade" id="modal-adicionar-funcionalidad" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">
+                    <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+                    <span id="titulo-editar-acta">Adicionar Funcionalidad</span>
+                </h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="fila">
+                    <label>Funcionalidades Extra: </label><br />
+                    <div id="data-adicionar-funcionalidades">
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger left" data-dismiss="modal">Cerrar</button>
+                <button type="submit" ng-click="AumentarFuncionalidades()" class="btn btn-primary right">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+

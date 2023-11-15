@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="e4ee8a7a99bd4bfa8c62e2808db3a6b6" Name="Diagram1" >
+        <EntityTypeShape EntityType="TFSWarehouseModel.C_DimAreaOverlay" Width="1.5" PointX="0.75" PointY="4.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.C_DimIterationOverlay" Width="1.5" PointX="2.75" PointY="4.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.C_DimTestCaseOverlay" Width="1.5" PointX="8.25" PointY="69.5" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.C_WarehouseUpdate" Width="1.5" PointX="4.75" PointY="4.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimArea" Width="1.5" PointX="6.75" PointY="46.125" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimAssembly" Width="1.5" PointX="3" PointY="107.25" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimBuild" Width="1.5" PointX="3" PointY="102.25" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimBuildFlavor" Width="1.5" PointX="11.25" PointY="76.375" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimBuildPlatform" Width="1.5" PointX="11.25" PointY="72.5" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimBuildQuality" Width="1.5" PointX="3" PointY="81.625" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimBuildStatus" Width="1.5" PointX="3" PointY="78.875" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimChangeset" Width="1.5" PointX="3" PointY="55.25" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimCodeElement" Width="1.5" PointX="3" PointY="113.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimConfiguration" Width="1.5" PointX="3" PointY="59.625" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimDate" Width="1.5" PointX="6" PointY="91.375" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimFile" Width="1.5" PointX="3" PointY="117.25" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimIteration" Width="1.5" PointX="6.75" PointY="40.375" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimMachine" Width="1.5" PointX="5.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimPerson" Width="1.5" PointX="6.75" PointY="34" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimTeamProject" Width="1.5" PointX="0.75" PointY="55.625" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimTestPlan" Width="1.5" PointX="9" PointY="51.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimTestResult" Width="1.5" PointX="11.25" PointY="56" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimTestResultAttributes" Width="1.5" PointX="9" PointY="57.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimTestRun" Width="1.5" PointX="9" PointY="63.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimTestSuite" Width="1.5" PointX="3" PointY="62.875" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimToday" Width="1.5" PointX="6.75" PointY="3.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimToolArtifactDisplayUrl" Width="1.5" PointX="3" PointY="110.625" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimWorkItem" Width="1.5" PointX="6" PointY="52.625" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimWorkItemCategory" Width="1.5" PointX="0.75" PointY="0.875" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.DimWorkItemLinkType" Width="1.5" PointX="3" PointY="91.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.FactBuildChangeset" Width="1.5" PointX="8.25" PointY="76.5" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.FactBuildCoverage" Width="1.5" PointX="8.25" PointY="86.5" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.FactBuildDetails" Width="1.5" PointX="5.25" PointY="79" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.FactBuildProject" Width="1.5" PointX="5.25" PointY="85.875" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.FactCodeChurn" Width="1.5" PointX="8.25" PointY="81" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.FactRunCoverage" Width="1.5" PointX="11.25" PointY="80.125" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.FactTestResult" Width="1.5" PointX="13.5" PointY="74.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.FactWorkItemLinkHistory" Width="1.5" PointX="5.25" PointY="73.875" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.FactWorkItemToCategory" Width="1.5" PointX="3" PointY="1" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.tbl_TransactionMark" Width="1.5" PointX="7.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.C_LastUpdatedTime" Width="1.5" PointX="8.75" PointY="2.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.C_WitFields" Width="1.5" PointX="4.75" PointY="8.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.FactCurrentWorkItem" Width="1.5" PointX="14.25" PointY="54.375" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.FactWorkItemChangeset" Width="1.5" PointX="11.25" PointY="52.5" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.FactWorkItemHistory" Width="1.5" PointX="14.25" PointY="62.875" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.FactWorkItemTestResult" Width="1.5" PointX="13.5" PointY="58.625" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.C_WarehouseConfig" Width="1.5" PointX="8.75" PointY="6.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.BuildChangesetView" Width="1.5" PointX="6.75" PointY="9.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.BuildCoverageView" Width="1.5" PointX="8.75" PointY="9.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.BuildDetailsView" Width="1.5" PointX="10.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.BuildProjectView" Width="1.5" PointX="10.75" PointY="10.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.CodeChurnView" Width="1.5" PointX="12.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.CurrentWorkItemView" Width="1.5" PointX="12.75" PointY="10.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.RunCoverageView" Width="1.5" PointX="14.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.TestResultView" Width="1.5" PointX="14.75" PointY="12.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.vDimAreaOverlay" Width="1.5" PointX="0.75" PointY="15.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.vDimChangesetOverlay" Width="1.5" PointX="2.75" PointY="15.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.vDimIterationOverlay" Width="1.5" PointX="16.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.vDimTeamProjectAreaOverlay" Width="1.5" PointX="4.75" PointY="16.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.vDimTeamProjectIterationOverlay" Width="1.5" PointX="16.75" PointY="11.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.vDimTeamProjectOverlay" Width="1.5" PointX="18.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.vDimTestCaseOverlay" Width="1.5" PointX="18.75" PointY="4.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.vDimTestPlanOverlay" Width="1.5" PointX="20.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.vDimTestResultOverlay" Width="1.5" PointX="6.75" PointY="20.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.vDimTestRunOverlay" Width="1.5" PointX="8.75" PointY="20.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.vDimWorkItemOverlay" Width="1.5" PointX="22.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.vDimWorkItemTreeOverlay" Width="1.5" PointX="24.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.vFactLinkedCurrentWorkItem" Width="1.5" PointX="6.75" PointY="25.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.vFactLinkedCurrentWorkItemTestCase" Width="1.5" PointX="8.75" PointY="25.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.vFactTestResultOverlay" Width="1.5" PointX="26.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.vFactWorkItemChangesetOverlay" Width="1.5" PointX="0.75" PointY="26.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.vFactWorkItemTestResultOverlay" Width="1.5" PointX="26.75" PointY="7.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.vFactWorkItemToCategoryOverlay" Width="1.5" PointX="26.75" PointY="10.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.vFactWorkItemToTree" Width="1.5" PointX="26.75" PointY="13.75" />
+        <EntityTypeShape EntityType="TFSWarehouseModel.WorkItemHistoryView" Width="1.5" PointX="26.75" PointY="16.75" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimTestCaseOverlay_WorkItemSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK__DimArea__ParentA__1AD4C8FB" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimArea_DimArea1" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimTestPlan_Area_DimArea_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimTestResult_Area_DimArea_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimWorkItem_AreaSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactTestResult_Area_DimArea_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimAssembly_TeamProjectCollection_DimTeamProject_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildCoverage_Assembly_DimAssembly_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactRunCoverage_Assembly_DimAssembly_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimBuild_TeamProjectCollection_DimTeamProject_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildChangeset_Build_DimBuild_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildCoverage_Build_DimBuild_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildDetails_Build_DimBuild_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildProject_Build_DimBuild_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactRunCoverage_Build_DimBuild_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactTestResult_Build_DimBuild_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildCoverage_BuildFlavor_DimBuildFlavor_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildProject_BuildFlavor_DimBuildFlavor_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactRunCoverage_BuildFlavor_DimBuildFlavor_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactTestResult_BuildFlavor_DimBuildFlavor_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildCoverage_BuildPlatform_DimBuildPlatform_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildProject_BuildPlatform_DimBuildPlatform_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactRunCoverage_BuildPlatform_DimBuildPlatform_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactTestResult_BuildPlatform_DimBuildPlatform_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildDetails_BuildQuality_DimBuildQuality_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildDetails_BuildStatus_DimBuildStatus_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimChangeset_CheckedInBy_DimPerson_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimChangeset_TeamProjectCollection_DimTeamProject_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildChangeset_Changeset_DimChangeset_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactCodeChurn_Changeset_DimChangeset_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactWorkItemChangeset_ChangesetSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimCodeElement_TeamProjectCollection_DimTeamProject_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildCoverage_CodeElement_DimCodeElement_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimConfiguration_TeamProjectCollection_DimTeamProject_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactTestResult_Configuration_DimConfiguration_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildCoverage_Date_DimDate_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildDetails_Date_DimDate_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildProject_Date_DimDate_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactCodeChurn_Date_DimDate_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactRunCoverage_Date_DimDate_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactTestResult_Date_DimDate_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactWorkItemHistory_DateSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK__DimFile__ParentF__151BEFA5" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimFile_TeamProjectCollection_DimTeamProject_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildProject_SourceProject_DimFile_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactCodeChurn_Filename_DimFile_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK__DimIterat__Paren__1DB135A6" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimIteration_DimIteration" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimTestPlan_Iteration_DimIteration_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimTestResult_Iteration_DimIteration_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimWorkItem_IterationSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactTestResult_Iteration_DimIteration_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimTestPlan_PlanOwner_DimPerson_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimTestResult_ExecutedBy_DimPerson_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimTestResult_Owner_DimPerson_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimTestResultAttributes_ExecutedBy_DimPerson_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimTestResultAttributes_Owner_DimPerson_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimTestRun_RunOwner_DimPerson_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimWorkItem_System_AssignedTo__PersonSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimWorkItem_System_ChangedBy__PersonSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimWorkItem_System_CreatedBy__PersonSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildDetails_LastUpdatedBy_DimPerson_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactWorkItemLinkHistory_CreatedByPersonSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactWorkItemLinkHistory_RemovedByPersonSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK__DimTeamPr__Paren__17F85C50" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimTestPlan_TeamProjectCollection_DimTeamProject_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimTestResult_TeamProjectCollection_DimTeamProject_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimTestResultAttributes_TeamProjectCollection_DimTeamProject_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimTestRun_TeamProjectCollection_DimTeamProject_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimTestSuite_TeamProject_DimTeamProject_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimToolArtifactDisplayUrl_TeamProjectCollection_DimTeamProject_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimWorkItem_TeamProjectCollectionSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimWorkItem_TeamProjectSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimWorkItemLinkType_TeamProjectCollectionSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildChangeset_TeamProject_DimTeamProject_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildCoverage_TeamProject_DimTeamProject_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildDetails_TeamProject_DimTeamProject_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactBuildProject_TeamProject_DimTeamProject_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactCodeChurn_TeamProject_DimTeamProject_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactCurrentWorkItem_TeamProjectSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactRunCoverage_TeamProject_DimTeamProject_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactTestResult_TeamProject_DimTeamProject_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactWorkItemChangeset_TeamProjectCollectionSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactWorkItemHistory_TeamProjectSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactWorkItemLinkHistory_TeamProjectCollectionSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactWorkItemTestResult_TeamProjectCollectionSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactTestResult_TestPlan_DimTestPlan_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_DimTestResult_TestResultAttributes_DimTestResultAttributes_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactTestResult_Result_DimTestResult_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactWorkItemTestResult_TestResultSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactTestResult_TestResultAttributes_DimTestResultAttributes_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactRunCoverage_TestRun_DimTestRun_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactTestResult_TestRun_DimTestRun_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK__DimTestSu__Paren__33A076C5" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactTestResult_TestSuite_DimTestSuite_ID" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactCurrentWorkItem_WorkItemSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactTestResult_DimWorkItem" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactWorkItemHistory_WorkItemSK" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactWorkItemToCategory_DimWorkItemCategory" />
+        <AssociationConnector Association="TFSWarehouseModel.FK_FactWorkItemLinkHistory_WorkItemLinkTypeSK" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

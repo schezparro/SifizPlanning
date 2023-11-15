@@ -1,0 +1,326 @@
+﻿<label style="display: inline-block">
+    Mostrar Todas:
+    <input style="vertical-align: -2px;" type="checkbox" ng-click="cargarEstimaciones()" ng-model="mostrarTodasEstimaciones" ng-init="mostrarTodasEstimaciones=false" />
+</label>
+<input type="text" ng-keyup="cargarEstimaciones()" ng-model="filtroEstimaciones" class="form-control right filtro" placeholder="Filtrar..." />
+<div class="clear"></div>
+<div id="tabla-user-estimacion">
+    <table id="tabla-estimacion-ticket" class="table table-striped">
+        <thead>
+            <tr>
+                <th width="5">Número Ticket</th>
+                <th width="10">Cliente</th>
+                <th width="10">Prioridad</th>
+                <th width="35">Detalle</th>
+                <th width="35">Fecha Límite</th>
+                <th width="10">Estado Estimación</th>
+                <th width="20">Adjuntos</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr ng-repeat="estimacion in estimaciones" ng-dblclick="mostrarWindowEstimacion(estimacion.id)">
+                <td>{{estimacion.ticket | rellenarIzq : 0}}</td>
+                <td>{{estimacion.cliente}}</td>
+                <td>{{estimacion.prioridad}}</td>
+                <td>{{estimacion.detalle | strLimit: 25}}</td>
+                <td>{{estimacion.fechaLimite | strDateToStr}}</td>
+                <td>{{estimacion.estado}}</td>
+                <td>
+                    <a class="btn btn-success btn-xs" ng-repeat="adj in estimacion.adjuntos" target="_blank" href="Web{{adj.url}}">
+                        <span class="glyphicon glyphicon-download"></span> Adjunto {{$index+1}}
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <th colspan="6">
+
+                    <nav>
+                        <ul class="pagination">
+                            <li ng-click="atrazarPagina()">
+                                <a href="#" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
+                            <li ng-click="avanzarPagina()">
+                                <a href="#" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </th>
+            </tr>
+        </tfoot>
+
+    </table>
+</div>
+
+<!-- Modal de Estimacion del Ticket -->
+<div class="modal fade" id="modal-estimacion-dev-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-final-tarea-label">
+                    <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+                    <span id="title-filter">Estimar Ticket</span>
+                </h4>
+            </div>
+            <form method="post" id="frm-modal-estimar-ticket" ng-submit="estimarDesarrolloTicket()">
+                <div class="modal-body" style="max-height: 768px; max-width: 1024px; overflow-y: auto">
+                    <button type="button" class="btn btn-success btn-xs" ng-click="adicionarEntregable()">Añadir Entregable</button>
+                    <table id="tabla-estimacion-entregable-ticket" class="table">
+                        <tr>
+                            <th>
+                                <text style="font-weight:bold">Total estimaciones:  {{tiempoTotal}}  </text>
+                            </th>
+                        </tr>
+                        <tbody>
+                            <tr ng-repeat="detalle in detallesEstimacion" ng-dblclick="editarEntregable(detalle.id)">
+                                <td>
+                                    <table class="table table-striped table-responsive table-hover">
+                                        <thead>
+                                            <tr><text style="font-weight:bold">Entregable  {{$index + 1}}:  </text>{{detalle.nombre}} </tr>
+                                            <tr>
+                                                <th>N°</th>
+                                                <th>TAREA PROPUESTA</th>
+                                                <th>TIPO RECURSO</th>
+                                                <th>TIEMPO(H)</th>
+                                                <th>TIEMPO(DES)</th>
+                                                <th>Tiempo(PRU)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="d in detalle.detalles">
+                                                <td>TAR{{$index + 1}}</td>
+                                                <td>{{d.detalle | strLimit: 25}}</td>
+                                                <td>{{d.nivel}}</td>
+                                                <td>{{d.tiempoDesarrollo + d.tiempoPrueba}}</td>
+                                                <td>{{d.tiempoDesarrollo}}</td>
+                                                <td>{{d.tiempoPrueba}}</td>
+                                            </tr>
+                                        </tbody>
+
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                    <div>
+                        <label>Entregables Adicionales:</label>
+                        <textarea class="form-control" ng-model="entregablesAdicionales"></textarea>
+                    </div>
+
+                    <div>
+                        <label>Información Complementaria:</label>
+                        <textarea class="form-control" ng-model="informacionComplementaria"></textarea>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info left" ng-click="verInformacionTicket()">Ver Información del Ticket</button>
+                    <button id="editarEstimacionTicket" type="button" class="btn btn-success" ng-click="editarEstimacion()" ng-show="edicionEstimacion">Editar</button>
+                    <button type="submit" class="btn btn-primary">Finalizar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Actividades del Ticket -->
+<div class="modal fade" id="modal-estimacion-entregable-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-final-tarea-label">
+                    <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+                    <span id="title-filter">Entregable y Actividades</span>
+                </h4>
+            </div>
+            <form method="post" id="frm-modal-entregable-ticket" ng-submit="guardarEntregable()">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label style="display: inline-block">Entregable: </label>
+                            <input class="form-control" style="display:inline-block; width: 30%" ng-model="nombreEntregable" />
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-success btn-xs" ng-click="adicionarDetalle()"><span class="glyphicon glyphicon-plus"></span> Adicionar Actividad</button>
+                            <button type="button" class="btn btn-danger btn-xs" ng-click="eliminarDetalle()"><span class="glyphicon glyphicon-minus"></span> Eliminar Actividad</button>
+                            <br />
+                            <div id="lista-detalles-tareas"></div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Agregar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Actividades del Ticket -->
+<div class="modal fade" id="modal-edicion-entregable-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-final-tarea-label">
+                    <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+                    <span id="title-filter">Entregable y Actividades</span>
+                </h4>
+            </div>
+            <form method="post" ng-submit="guardarEdicionEntregable()">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label style="display: inline-block">Entregable: </label>
+                            <input class="form-control" style="display:inline-block; width: 30%" ng-model="nombreEdicionEntregable" />
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-success btn-xs" ng-click="adicionarDetalleEdicion()"><span class="glyphicon glyphicon-plus"></span> Adicionar Actividad</button>
+                            <button type="button" class="btn btn-danger btn-xs" ng-click="eliminarDetalleEdicion()"><span class="glyphicon glyphicon-minus"></span> Eliminar Actividad</button>
+                            <br />
+                            <div id="edicion-lista-detalles-tareas"></div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" ng-click="eliminarEntregable()" class="btn btn-warning">Eliminar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="add-informacion-estimacion-inicial" class="invisible">
+    <div class="row">
+        <div class="col-md-5">
+            <label>Detalle:</label>
+            <textarea class="form-control" ng-required="true"></textarea>
+        </div>
+
+        <div class="col-md-1">
+            <label>Tiempo<br>(DES)</label>
+            <input type="text" class="solo-numero form-control" ng-required="true" />
+        </div>
+
+        <div class="col-md-1">
+            <label>Tiempo<br>(PRU)</label>
+            <input type="text" class="solo-numero form-control" ng-required="true" />
+        </div>
+
+        <div class="col-md-3">
+            <label>Tipo<br>Recurso:</label>
+            <select class="form-control" ng-required="true">
+                <option value="">Seleccione...</option>
+                <option ng-repeat="nivel in niveles" value="{{nivel.id}}">{{nivel.name}}</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div id="add-informacion-estimacion" class="invisible">
+    <div class="row">
+        <div class="col-md-5">
+            <textarea class="form-control" ng-required="true"></textarea>
+        </div>
+
+        <div class="col-md-1">
+            <br>
+            <input type="text" class="solo-numero form-control" ng-required="true" />
+        </div>
+
+        <div class="col-md-1">
+            <br>
+            <input type="text" class="solo-numero form-control" ng-required="true" />
+        </div>
+
+        <div class="col-md-3">
+            <br>
+            <select class="form-control" ng-required="true">
+                <option value="">Seleccione...</option>
+                <option ng-repeat="nivel in niveles" value="{{nivel.id}}">{{nivel.name}}</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- Windows Modal Vista de Tickets -->
+<div class="modal fade" id="modal-vista-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-vista-ticket-label"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Datos del Ticket</h4>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" ng-model="idTicketCliente" />
+                <input type="hidden" ng-model="verificador" />
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="left half">
+                            <label class="label-data-ticket">Fecha: </label><span>{{fechaTicket | strDateToStr}}</span><br />
+                            <label class="label-data-ticket">Empresa: </label><span>{{nombreCliente}}</span><br />
+                            <label class="label-data-ticket">Usuario: </label><span>{{usuarioCliente}}</span><br />
+                            <label class="label-data-ticket">Teléfono: </label><span>{{usuarioTelefono}}</span><br />
+                            <label class="label-data-ticket">Estado: </label><span>{{estadoTicket}}</span><br />
+                        </div>
+
+                        <div class="left half">
+                            <label class="label-data-ticket">Prioridad: </label><span>{{prioridadTicket}}</span><br />
+                            <label class="label-data-ticket">Categoría: </label><span>{{categoriaTicket}}</span><br />
+                            <label class="label-data-ticket">Teléfono(s): </label><span>{{telefonoCliente}}</span><br />
+                            <label class="label-data-ticket">Reportó: </label><span>{{clienteReporta}}</span><br />
+                            <label class="label-data-ticket">Reputación: </label><span>{{reputacionCliente}}%</span><br />
+                        </div>
+                    </div>
+                </div>
+
+                <div id="panel-vista-detalle-ticket" class="panel panel-default">
+                    <div class="left half half-padding-right">
+                        <div><label>Detalle del ticket:</label></div>
+                        <div class="panel panel-default">
+                            {{detalleTicket}}
+                        </div>
+                    </div>
+
+                    <div id="panel-vista-adjuntos-ticket" class="left info-ticket">
+                        <div ng-repeat="adj in adjuntosTicket" class="left">
+                            <a href="Web{{adj}}" target="_blank" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-download"></span> Adjunto {{$index+1}}</a>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" ng-click="$parent.verHistoricoTicket()">Histórico</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+
+        </div>
+    </div>
+</div>

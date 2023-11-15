@@ -1,0 +1,329 @@
+﻿<div>
+    <input type="text" id="filtro-permisos" placeholder="Filtrar..." ng-model="filtroPermisos" class="form-control right filtro" />
+</div>
+<div class="left">
+    <div style="display: flex; align-items: center">
+        <strong>Vacaciones/Permisos</strong>
+        <input type="checkbox" style="transform: scale(1); margin-left: 5px; margin-bottom: 2px" ng-model="esVacaciones" ng-init="esVacaciones=true">
+    </div>
+</div>
+<div class="clear"></div>
+<div ng-show="esVacaciones" style="height: calc(100vh - 175px); width: 100%; overflow-y: auto; overflow-x: no-display;">
+    <table class="table table-striped table-condensed">
+        <thead>
+            <tr>
+                <th hidden>ID</th>
+                <th></th>
+                <th>Acciones</th>
+                <th>Estado</th>
+                <th>Apellidos Nombres</th>
+                <th>Cargo</th>
+                <th>Cédula</th>
+                <th>Fecha Ingreso Solicitud</th>
+                <th>Empresa</th>
+                <th>Fecha Ingreso Institucion</th>
+                <th>Años Servicio</th>
+                <th>Dias Corresponden</th>
+                <th>Dias Disfrutar</th>
+                <th>Dias Pendientes</th>
+                <th>Del Año</th>
+                <th>Al Año</th>
+                <th>Fecha Inicio Vacaciones</th>
+                <th>Fecha Fin Vacaciones</th>
+                <th>Fecha Presentarse Trabajar</th>
+                <th>Observaciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr ng-repeat="solicitudVac in vacaciones">
+                <td hidden>{{solicitudVac.ID}}</td>
+                <td> <button type="button" class="btn btn-link" ng-click="showVacDetail(solicitudVac)">Ver</button> </td>
+                <td>
+                    <div style="display: flex; align-items: center">
+                        <button class="btn btn-link" ng-click="aceptarVacaciones(solicitudVac)">
+                            <span class="glyphicon glyphicon-ok" style="color: seagreen"></span>
+                        </button>
+                        <button class="btn btn-link" ng-click="rechazarVacaciones(solicitudVac)">
+                            <span class="glyphicon glyphicon-remove" style="color: darkred"></span>
+                        </button>
+                    </div>
+                </td>
+                <td ng-if="solicitudVac.Estado === 'PENDIENTE'">
+                    <div style="display: flex; align-items: center">
+                        <span class="badge" style="background-color: goldenrod;">&nbsp;</span>&nbsp;{{solicitudVac.Estado}}
+                    </div>
+                </td>
+                <td ng-if="solicitudVac.Estado === 'APROBADA'">
+                    <div style="display: flex; align-items: center">
+                        <span class="badge" style="background-color:seagreen">&nbsp;</span>&nbsp;{{solicitudVac.Estado}}
+                    </div>
+                </td>
+                <td ng-if="solicitudVac.Estado === 'RECHAZADA'">
+                    <div style="display: flex; align-items: center">
+                        <span class="badge" style="background-color:darkred">&nbsp;</span>&nbsp;{{solicitudVac.Estado}}
+                    </div>
+                </td>
+                <td>{{solicitudVac.ApellidosNombres}}</td>
+                <td>{{solicitudVac.Cargo}}</td>
+                <td>{{solicitudVac.Cedula}}</td>
+                <td>{{solicitudVac.FechaIngresoSolicitud | strDateToStr}}</td>
+                <td>{{solicitudVac.Empresa}}</td>
+                <td>{{solicitudVac.FechaIngresoInstitucion | strDateToStr}}</td>
+                <td>{{solicitudVac.AniosServicio}}</td>
+                <td>{{solicitudVac.DiasCorresponden}}</td>
+                <td>{{solicitudVac.DiasDisfrutar}}</td>
+                <td>{{solicitudVac.DiasPendientes}}</td>
+                <td>{{solicitudVac.DelAnio}}</td>
+                <td>{{solicitudVac.AlAnio}}</td>
+                <td>{{solicitudVac.FechaInicioVacaciones | strDateToStr}}</td>
+                <td>{{solicitudVac.FechaFinVacaciones | strDateToStr}}</td>
+                <td>{{solicitudVac.FechaPresentarseTrabajar | strDateToStr}}</td>
+                <td>{{solicitudVac.Observaciones}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div ng-show="!esVacaciones" style="height: calc(100vh - 175px); width: 100%; overflow-y: auto; overflow-x: no-display;">
+    <table class="table table-striped table-condensed">
+        <thead>
+            <tr>
+                <th hidden>ID</th>
+                <th></th>
+                <th>Acciones</th>
+                <th>Estado</th>
+                <th>Apellidos Nombres</th>
+                <th>Area</th>
+                <th>Cargo</th>
+                <th>Cedula</th>
+                <th>Empresa</th>
+                <th>Fecha Ingreso Solicitud</th>
+                <th>Fecha Desde</th>
+                <th>Fecha Hasta</th>
+                <th>Hora Retorno</th>
+                <th>Hora Salida</th>
+                <th>Motivo</th>
+                <th>Personal</th>
+                <th>Calamidad</th>
+                <th>Jefe</th>
+                <th>Matrimonio</th>
+                <th>Paternidad</th>
+                <th>Otros</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr ng-repeat="solicitudPer in permisos">
+                <td hidden>{{solicitudPer.ID}}</td>
+                <td> <button type="button" class="btn btn-link" ng-click="showPerDetail(solicitudPer)">Ver</button> </td>
+                <td>
+                    <div style="display: flex; align-items: center">
+                        <button class="btn btn-link" ng-click="aceptarPermiso(solicitudPer)">
+                            <span class="glyphicon glyphicon-ok" style="color: seagreen"></span>
+                        </button>
+                        <button class="btn btn-link" ng-click="rechazarPermiso(solicitudPer)">
+                            <span class="glyphicon glyphicon-remove" style="color: darkred"></span>
+                        </button>
+                    </div>
+                </td>
+                <td ng-if="solicitudPer.Estado === 'PENDIENTE'">
+                    <div style="display: flex; align-items: center">
+                        <span class="badge" style="background-color: goldenrod;">&nbsp;</span>&nbsp;{{solicitudPer.Estado}}
+                    </div>
+                </td>
+                <td ng-if="solicitudPer.Estado === 'APROBADA'">
+                    <div style="display: flex; align-items: center">
+                        <span class="badge" style="background-color:seagreen">&nbsp;</span>&nbsp;{{solicitudPer.Estado}}
+                    </div>
+                </td>
+                <td ng-if="solicitudPer.Estado === 'RECHAZADA'">
+                    <div style="display: flex; align-items: center">
+                        <span class="badge" style="background-color:darkred">&nbsp;</span>&nbsp;{{solicitudPer.Estado}}
+                    </div>
+                </td>
+                <td>{{solicitudPer.ApellidosNombres}}</td>
+                <td>{{solicitudPer.Area}}</td>
+                <td>{{solicitudPer.Cargo}}</td>
+                <td>{{solicitudPer.Cedula}}</td>
+                <td>{{solicitudPer.Empresa}}</td>
+                <td>{{solicitudPer.FechaIngresoSolicitud | strDateToStr}}</td>
+                <td>{{solicitudPer.FechaDesde | strDateToStr}}</td>
+                <td>{{solicitudPer.FechaHasta | strDateToStr}}</td>
+                <td>{{solicitudPer.HoraRetorno}}</td>
+                <td>{{solicitudPer.HoraSalida}}</td>
+                <td>{{solicitudPer.Motivo}}</td>
+                <td>{{solicitudPer.Personal}}</td>
+                <td>{{solicitudPer.Comida}}</td>
+                <td>{{solicitudPer.Jefe}}</td>
+                <td>{{solicitudPer.Matrimonio}}</td>
+                <td>{{solicitudPer.Paternidad}}</td>
+                <td>{{solicitudPer.Otros}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal -->
+<div id="modal-show-vacaciones" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Detalles</h4>
+            </div>
+            <div class="modal-body" style="column-count: 3">
+                <div>
+                    <strong>Apellidos y Nombres:</strong>
+                    <span>{{solicitudVacacionesUsuario.ApellidosNombres}}</span>
+                </div>
+                <div>
+                    <strong>Cargo:</strong>
+                    <span>{{solicitudVacacionesUsuario.Cargo}}</span>
+                </div>
+                <div>
+                    <strong>Cédula:</strong>
+                    <span>{{solicitudVacacionesUsuario.Cedula}}</span>
+                </div>
+                <div>
+                    <strong>Fecha de Ingreso de la Solicitud:</strong>
+                    <span>{{solicitudVacacionesUsuario.FechaIngresoSolicitud | strDateToStr}}</span>
+                </div>
+                <div>
+                    <strong>Empresa:</strong>
+                    <span>{{solicitudVacacionesUsuario.Empresa}}</span>
+                </div>
+                <div>
+                    <strong>Fecha de Ingreso a la Institución:</strong>
+                    <span>{{solicitudVacacionesUsuario.FechaIngresoInstitucion | strDateToStr}}</span>
+                </div>
+                <div>
+                    <strong>Años de Servicio:</strong>
+                    <span>{{solicitudVacacionesUsuario.AniosServicio}}</span>
+                </div>
+                <div>
+                    <strong>Días Corresponden:</strong>
+                    <span>{{solicitudVacacionesUsuario.DiasCorresponden}}</span>
+                </div>
+                <div>
+                    <strong>Días a Disfrutar:</strong>
+                    <span>{{solicitudVacacionesUsuario.DiasDisfrutar}}</span>
+                </div>
+                <div>
+                    <strong>Días Pendientes:</strong>
+                    <span>{{solicitudVacacionesUsuario.DiasPendientes}}</span>
+                </div>
+                <div>
+                    <strong>Del Año:</strong>
+                    <span>{{solicitudVacacionesUsuario.DelAnio}}</span>
+                </div>
+                <div>
+                    <strong>Al Año:</strong>
+                    <span>{{solicitudVacacionesUsuario.AlAnio}}</span>
+                </div>
+                <div>
+                    <strong>Fecha de Inicio de Vacaciones:</strong>
+                    <span>{{solicitudVacacionesUsuario.FechaInicioVacaciones | strDateToStr}}</span>
+                </div>
+                <div>
+                    <strong>Fecha de Fin de Vacaciones:</strong>
+                    <span>{{solicitudVacacionesUsuario.FechaFinVacaciones | strDateToStr}}</span>
+                </div>
+                <div>
+                    <strong>Fecha de Presentarse a Trabajar:</strong>
+                    <span>{{solicitudVacacionesUsuario.FechaPresentarseTrabajar | strDateToStr}}</span>
+                </div>
+                <div>
+                    <strong>Observaciones:</strong>
+                    <span>{{solicitudVacacionesUsuario.Observaciones}}</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal-show-solicitud" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Detalles</h4>
+            </div>
+            <div class="modal-body" style="column-count: 3">
+                <div>
+                    <strong>Apellidos y Nombres:</strong>
+                    <span>{{solicitudPerUsuario.ApellidosNombres}}</span>
+                </div>
+                <div>
+                    <strong>Área:</strong>
+                    <span>{{solicitudPerUsuario.Area}}</span>
+                </div>
+                <div>
+                    <strong>Cargo:</strong>
+                    <span>{{solicitudPerUsuario.Cargo}}</span>
+                </div>
+                <div>
+                    <strong>Cédula:</strong>
+                    <span>{{solicitudPerUsuario.Cedula}}</span>
+                </div>
+                <div>
+                    <strong>Empresa:</strong>
+                    <span>{{solicitudPerUsuario.Empresa}}</span>
+                </div>
+                <div>
+                    <strong>Fecha de Ingreso de la Solicitud:</strong>
+                    <span>{{solicitudPerUsuario.FechaIngresoSolicitud | strDateToStr}}</span>
+                </div>
+                <div>
+                    <strong>Fecha Desde:</strong>
+                    <span>{{solicitudPerUsuario.FechaDesde | strDateToStr}}</span>
+                </div>
+                <div>
+                    <strong>Fecha Hasta:</strong>
+                    <span>{{solicitudPerUsuario.FechaHasta | strDateToStr}}</span>
+                </div>
+                <div>
+                    <strong>Hora de Retorno:</strong>
+                    <span>{{solicitudPerUsuario.HoraRetorno}}</span>
+                </div>
+                <div>
+                    <strong>Hora de Salida:</strong>
+                    <span>{{solicitudPerUsuario.HoraSalida}}</span>
+                </div>
+                <div>
+                    <strong>Motivo:</strong>
+                    <span>{{solicitudPerUsuario.Motivo}}</span>
+                </div>
+                <div>
+                    <strong>Personal:</strong>
+                    <span>{{solicitudPerUsuario.Personal}}</span>
+                </div>
+                <div>
+                    <strong>Comida:</strong>
+                    <span>{{solicitudPerUsuario.Comida}}</span>
+                </div>
+                <div>
+                    <strong>Jefe:</strong>
+                    <span>{{solicitudPerUsuario.Jefe}}</span>
+                </div>
+                <div>
+                    <strong>Matrimonio:</strong>
+                    <span>{{solicitudPerUsuario.Matrimonio}}</span>
+                </div>
+                <div>
+                    <strong>Paternidad:</strong>
+                    <span>{{solicitudPerUsuario.Paternidad}}</span>
+                </div>
+                <div>
+                    <strong>Otros:</strong>
+                    <span>{{solicitudPerUsuario.Otros}}</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

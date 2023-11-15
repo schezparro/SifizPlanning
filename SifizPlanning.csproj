@@ -1,0 +1,1759 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E047D652-2D3F-48A8-86B3-7FD2AF85D8E4}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SifizPlanning</RootNamespace>
+    <AssemblyName>SifizPlanning</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <NuGetPackageImportStamp>51995c53</NuGetPackageImportStamp>
+    <UseGlobalApplicationHostFile />
+    <Use64BitIISExpress />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <FilesToIncludeForPublish>AllFilesInProjectFolder</FilesToIncludeForPublish>
+    <IncludeIisSettings>false</IncludeIisSettings>
+    <ExcludeGeneratedDebugSymbol>false</ExcludeGeneratedDebugSymbol>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Antlr3.Runtime, Version=3.3.1.7705, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\WebGrease.1.3.0\lib\Antlr3.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.10.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
+      <HintPath>packages\Portable.BouncyCastle.1.8.10\lib\net40\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Hangfire.AspNet, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Hangfire.AspNet.0.2.0\lib\net45\Hangfire.AspNet.dll</HintPath>
+    </Reference>
+    <Reference Include="Hangfire.Core, Version=1.7.25.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Hangfire.Core.1.7.25\lib\net45\Hangfire.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Hangfire.SqlServer, Version=1.7.25.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Hangfire.SqlServer.1.7.25\lib\net45\Hangfire.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="MailKit, Version=2.15.0.0, Culture=neutral, PublicKeyToken=4e064fe7c44a8f1b, processorArchitecture=MSIL">
+      <HintPath>packages\MailKit.2.15.0\lib\net45\MailKit.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.4.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.AspNet.SignalR.Core.2.4.2\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.4.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.AspNet.SignalR.SystemWeb.2.4.2\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Data.Edm, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Data.Edm.5.2.0\lib\net40\Microsoft.Data.Edm.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.OData, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Data.OData.5.2.0\lib\net40\Microsoft.Data.OData.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory">
+      <HintPath>packages\Microsoft.IdentityModel.Clients.ActiveDirectory.2.16.204221202\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsForms">
+      <HintPath>packages\Microsoft.IdentityModel.Clients.ActiveDirectory.2.16.204221202\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.Owin.Host.SystemWeb.3.0.1\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.Common, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.ReportingServices.ReportViewerControl.WebForms.140.1000.523\lib\net40\Microsoft.ReportViewer.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.DataVisualization, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.ReportingServices.ReportViewerControl.WebForms.140.1000.523\lib\net40\Microsoft.ReportViewer.DataVisualization.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.Design, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.ReportingServices.ReportViewerControl.WebForms.140.1000.523\lib\net40\Microsoft.ReportViewer.Design.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.ProcessingObjectModel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.ReportingServices.ReportViewerControl.WebForms.140.1000.523\lib\net40\Microsoft.ReportViewer.ProcessingObjectModel.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.WebDesign, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.ReportingServices.ReportViewerControl.WebForms.140.1000.523\lib\net40\Microsoft.ReportViewer.WebDesign.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.WebForms, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.ReportingServices.ReportViewerControl.WebForms.140.1000.523\lib\net40\Microsoft.ReportViewer.WebForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.WinForms, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.ReportingServices.ReportViewerControl.WebForms.140.1000.523\lib\net40\Microsoft.ReportViewer.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ServiceBus">
+      <HintPath>packages\WindowsAzure.ServiceBus.2.5.1.0\lib\net40-full\Microsoft.ServiceBus.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.Types, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.SqlServer.Types.14.0.314.76\lib\net40\Microsoft.SqlServer.Types.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Build.Client, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.Build.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Build.Common, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.Build.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Build2.WebApi">
+      <HintPath>packages\Microsoft.TeamFoundationServer.Client.14.95.3\lib\net45\Microsoft.TeamFoundation.Build2.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Chat.WebApi, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.Client.14.95.3\lib\net45\Microsoft.TeamFoundation.Chat.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Client, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Common, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.VisualStudio.Services.Client.14.95.3\lib\net45\Microsoft.TeamFoundation.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Core.WebApi, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.Client.14.95.3\lib\net45\Microsoft.TeamFoundation.Core.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.DeleteTeamProject, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.DeleteTeamProject.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Diff, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.Diff.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Discussion.Client, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.Discussion.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Git.Client, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.Git.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Lab.Client, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.Lab.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Lab.Common, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.Lab.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Lab.TestIntegration.Client, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.Lab.TestIntegration.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Lab.WorkflowIntegration.Client, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.Lab.WorkflowIntegration.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Policy.WebApi">
+      <HintPath>packages\Microsoft.TeamFoundationServer.Client.14.95.3\lib\net45\Microsoft.TeamFoundation.Policy.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.ProjectManagement, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.ProjectManagement.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.SharePointReporting.Integration, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.SharePointReporting.Integration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.SourceControl.WebApi, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.Client.14.95.3\lib\net45\Microsoft.TeamFoundation.SourceControl.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Test.WebApi">
+      <HintPath>packages\Microsoft.TeamFoundationServer.Client.14.95.3\lib\net45\Microsoft.TeamFoundation.Test.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.TestImpact.Client, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.TestImpact.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.TestManagement.Client, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.TestManagement.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.TestManagement.Common, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.TestManagement.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.TestManagement.WebApi, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.Client.14.95.3\lib\net45\Microsoft.TeamFoundation.TestManagement.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.VersionControl.Client, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.VersionControl.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.VersionControl.Common, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.VersionControl.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.VersionControl.Common.Integration, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.VersionControl.Common.Integration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Work.WebApi">
+      <HintPath>packages\Microsoft.TeamFoundationServer.Client.14.95.3\lib\net45\Microsoft.TeamFoundation.Work.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Client, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.WorkItemTracking.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Client.DataStoreLoader, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.WorkItemTracking.Client.DataStoreLoader.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Client.QueryLanguage, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.WorkItemTracking.Client.QueryLanguage.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Common, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.WorkItemTracking.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Proxy, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\lib\net45\Microsoft.TeamFoundation.WorkItemTracking.Proxy.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.WebApi">
+      <HintPath>packages\Microsoft.TeamFoundationServer.Client.14.95.3\lib\net45\Microsoft.TeamFoundation.WorkItemTracking.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Services.Client, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.VisualStudio.Services.InteractiveClient.14.95.3\lib\net45\Microsoft.VisualStudio.Services.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Services.Common, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.VisualStudio.Services.Client.14.95.3\lib\net45\Microsoft.VisualStudio.Services.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Services.WebApi, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.VisualStudio.Services.Client.14.95.3\lib\net45\Microsoft.VisualStudio.Services.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure">
+      <HintPath>packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.Configuration">
+      <HintPath>packages\Microsoft.WindowsAzure.ConfigurationManager.3.2.1\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="MimeKit, Version=2.15.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
+      <HintPath>packages\MimeKit.2.15.0\lib\net45\MimeKit.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="QRCoder">
+      <HintPath>packages\QRCoder.1.2.2\lib\net40\QRCoder.dll</HintPath>
+    </Reference>
+    <Reference Include="ReportViewerForMvc, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\ReportViewerForMvc14.140.1000.523\lib\net45\ReportViewerForMvc.dll</HintPath>
+    </Reference>
+    <Reference Include="SpreadsheetLight, Version=3.4.7.0, Culture=neutral, PublicKeyToken=32fbb46dc1730c57, processorArchitecture=MSIL">
+      <HintPath>packages\SpreadsheetLight.3.4.7\lib\SpreadsheetLight.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Buffers.4.5.1\lib\netstandard1.1\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IdentityModel.Tokens.Jwt">
+      <HintPath>packages\System.IdentityModel.Tokens.Jwt.4.0.0\lib\net45\System.IdentityModel.Tokens.Jwt.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Spatial, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\System.Spatial.5.2.0\lib\net40\System.Spatial.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.OData, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.AspNet.WebApi.OData.4.0.30506\lib\net40\System.Web.Http.OData.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.Tracing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.AspNet.WebApi.Tracing.4.0.30506\lib\net40\System.Web.Http.Tracing.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Optimization, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.AspNet.Web.Optimization.1.0.0\lib\net40\System.Web.Optimization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Providers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.AspNet.Providers.Core.1.2\lib\net40\System.Web.Providers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.AspNet.Razor.3.2.4\lib\net45\System.Web.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="UnityEngine">
+      <HintPath>packages\QRCoder.1.2.2\lib\net40\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="WebGrease, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\WebGrease.1.3.0\lib\WebGrease.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App_Start\Hangfire.cs" />
+    <Compile Include="Areas\HelpPage\ApiDescriptionExtensions.cs" />
+    <Compile Include="Areas\HelpPage\App_Start\HelpPageConfig.cs" />
+    <Compile Include="Areas\HelpPage\Controllers\HelpController.cs" />
+    <Compile Include="Areas\HelpPage\HelpPageAreaRegistration.cs" />
+    <Compile Include="Areas\HelpPage\HelpPageConfigurationExtensions.cs" />
+    <Compile Include="Areas\HelpPage\Models\HelpPageApiModel.cs" />
+    <Compile Include="Areas\HelpPage\SampleGeneration\HelpPageSampleGenerator.cs" />
+    <Compile Include="Areas\HelpPage\SampleGeneration\HelpPageSampleKey.cs" />
+    <Compile Include="Areas\HelpPage\SampleGeneration\ImageSample.cs" />
+    <Compile Include="Areas\HelpPage\SampleGeneration\InvalidSample.cs" />
+    <Compile Include="Areas\HelpPage\SampleGeneration\ObjectGenerator.cs" />
+    <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
+    <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
+    <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\ClientController.cs" />
+    <Compile Include="Controllers\ConsultasController.cs" />
+    <Compile Include="Controllers\GestionErroresController.cs" />
+    <Compile Include="Controllers\HangfireController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ReportController.cs" />
+    <Compile Include="Controllers\RrhhController.cs" />
+    <Compile Include="Controllers\ServiciosController.cs" />
+    <Compile Include="Controllers\TaskController.cs" />
+    <Compile Include="Controllers\TfsController.cs" />
+    <Compile Include="Controllers\TicketController.cs" />
+    <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Acta.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Actividad.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ActividadActividadRealizada.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ActividadPropuesta.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ActividadRealizada.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Adenda.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\AdjuntoContrato.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\AdjuntoTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\BotonEstadoTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\CampoCatalogo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\CampoCatalogo_TablaCatalogo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Cargo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\CategoriaCompetencia.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\CategoriaTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\CategoriaTicketTipoContrClient.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\CausaNoTerminacion.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Cliente.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ClienteAuxiliar.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Colaborador.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ColaboradorEspecialidad.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ColaboradorIncidencia.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ColaboradorNivelCompetencia.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Colaborador_JefeInmediato.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ColeccionTFS.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ComentarioGeneral.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ComentarioHorasMantenimiento.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ComentarioMantenimientoTickets.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ComentarioTarea.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ComentarioTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ComentarioTicketCliente.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Competencia.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ContratoAdjunto.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ContratoCliente.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ContratoDesarrollo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ContratoDesarrolloFunc.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ContratoMantenimiento.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\CorreoNoEnviado.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\CotizacionTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Departamento.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DetalleEstimacionTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DetalleGestionPermiso.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DiaInactivo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\EntregableDetalleEstimacion.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\EntregableMotivoTrabajo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\EntregableTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Especialidad.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\EstadoActa.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\EstadoContrato.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\EstadoEntregable.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\EstadoPermiso.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\EstadoTarea.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\EstadoTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\EstadoTicketProximaActividad.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\EstimacionTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\FaseContrato.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\FBSLogEquipo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\FBSLogError.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\FlujoEstadoTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\FotoColaborador.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Funcionalidad.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\FuncionalidadCliente.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GestionPermiso.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Gestion_SolicitudTarea.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GestorServicios.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GrupoEmail.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\HistoricoAdjunto.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\HistoricoInformacionTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\HistoricoTareaEstado.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\HorasConsumidas.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ImplicacionError.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\LugarTarea.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\MarcaElectronica.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Mensaje.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ModelSP.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ModelSP.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ModelSP.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ModelSP.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ModelSP.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Modulo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\MotivoDevolucionTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\MotivoPrioridadTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\MotivoTrabajo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\MotivoTrabajoInformacionAdicional.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\MotivoTrabajoSeguimiento.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\MotivoTrabajoTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\NivelColaborador.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\NivelColaboradorModulo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\NoTerminacionTarea.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\NoTerminacionTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\NotificacionTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\OfertaCotizacionTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Ofertas.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Pais.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Permiso.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Persona.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\PersonaGrupoEmail.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Persona_Cliente.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\PrioridadTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ProximaActividad.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ProyectoModuloCliente.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ProyectoTFS.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Renegociacion.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Reporte.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repositorio.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ResolucionSemaforoPrioridad.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ResponsableProyectos.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Rol.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\RolSysMenu.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Sede.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Semaforo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SemaforoPrioridad.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ServidorTFS.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SolicitudPermisos.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SolicitudTarea.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SolicitudVacaciones.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SubCategoriaCompetencia.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SubModulo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SysMenu.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TablaCatalogo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Tarea.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TareaActividadRealizada.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TareaCompensatoria.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TareaCompensatoriaPermiso.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TareaCompensatoriaVacacion.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TareaMantenimiento.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TareaMantenimientoBorrar.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Tarea_Coordinador.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Tarea_TareaRelacionada.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Ticket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TicketAsignacionTFS.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TicketFuncionalidad.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TicketHistorico.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TicketMantenimientoAgregar.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TicketMantenimientoBorar.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TicketsMantenimiento.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TicketTarea.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TicketVersionCliente.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Ticket_CategoriaRevisada.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TICKET_COMPLEMENTO.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Ticket_ContratoCliente.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Ticket_Error.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Ticket_PrioridadRevisada.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Ticket_RequierePublicacion.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Ticket_Resolucion.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Ticket_ResolucionDesacuerdo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TipoActa.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TipoCampo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TipoContratoCliente.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TipoError.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TipoErrorImplicacion.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TipoModulo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TipoMotivoTrabajo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TipoNotificacionTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TipoPermiso.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TipoPlazo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TipoRecurso.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Usuario.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\UsuarioLeeComentarioGeneral.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\UsuarioRol.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\UsuarioTFS.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Vacaciones.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\VersionBaseDatos.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\VersionDesarrollo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ViewModel\SolicitudPermisosDTO.cs" />
+    <Compile Include="Models\ViewModel\SolicitudVacacionesDTO.cs" />
+    <Compile Include="Util\ClientTfs.cs" />
+    <Compile Include="Util\DataTarea.cs" />
+    <Compile Include="Util\DiaColaborador.cs" />
+    <Compile Include="Util\EventoTicket.cs" />
+    <Compile Include="Util\ReportServerCredentials.cs" />
+    <Compile Include="Websocket.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Security\Checksum.cs" />
+    <Compile Include="Security\DbCnx.cs" />
+    <Compile Include="Security\MyRoleProvider.cs" />
+    <Compile Include="Startup.cs" />
+    <Compile Include="Util\Utiles.cs" />
+    <Content Include="Areas\HelpPage\HelpPage.css" />
+    <Content Include="Content\bootstrap-grid.css" />
+    <Content Include="Content\bootstrap-grid.min.css" />
+    <Content Include="Content\bootstrap-reboot.css" />
+    <Content Include="Content\bootstrap-reboot.min.css" />
+    <Content Include="Content\bootstrap-responsive.css" />
+    <Content Include="Content\bootstrap-responsive.min.css" />
+    <Content Include="Content\bootstrap-theme.css" />
+    <Content Include="Content\bootstrap-theme.min.css" />
+    <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\Site.css" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="Content\themes\base\images\ui-icons_222222_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_454545_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_888888_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Content\themes\base\jquery-ui.css" />
+    <Content Include="Content\themes\base\jquery.ui.accordion.css" />
+    <Content Include="Content\themes\base\jquery.ui.all.css" />
+    <Content Include="Content\themes\base\jquery.ui.autocomplete.css" />
+    <Content Include="Content\themes\base\jquery.ui.base.css" />
+    <Content Include="Content\themes\base\jquery.ui.button.css" />
+    <Content Include="Content\themes\base\jquery.ui.core.css" />
+    <Content Include="Content\themes\base\jquery.ui.datepicker.css" />
+    <Content Include="Content\themes\base\jquery.ui.dialog.css" />
+    <Content Include="Content\themes\base\jquery.ui.progressbar.css" />
+    <Content Include="Content\themes\base\jquery.ui.resizable.css" />
+    <Content Include="Content\themes\base\jquery.ui.selectable.css" />
+    <Content Include="Content\themes\base\jquery.ui.slider.css" />
+    <Content Include="Content\themes\base\jquery.ui.tabs.css" />
+    <Content Include="Content\themes\base\jquery.ui.theme.css" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="Content\themes\base\minified\images\ui-icons_222222_256x240.png" />
+    <Content Include="Content\themes\base\minified\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Content\themes\base\minified\images\ui-icons_454545_256x240.png" />
+    <Content Include="Content\themes\base\minified\images\ui-icons_888888_256x240.png" />
+    <Content Include="Content\themes\base\minified\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Content\themes\base\minified\jquery-ui.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.accordion.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.autocomplete.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.button.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.core.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.datepicker.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.dialog.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.progressbar.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.resizable.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.selectable.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.slider.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.tabs.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
+    <Content Include="favicon.ico" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="img\glyphicons-halflings-white.png" />
+    <Content Include="img\glyphicons-halflings.png" />
+    <Content Include="packages\EntityFramework.6.1.3\lib\net40\EntityFramework.dll" />
+    <Content Include="packages\EntityFramework.6.1.3\lib\net40\EntityFramework.SqlServer.dll" />
+    <Content Include="packages\EntityFramework.6.1.3\lib\net40\EntityFramework.SqlServer.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="packages\EntityFramework.6.1.3\lib\net40\EntityFramework.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll" />
+    <Content Include="packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll" />
+    <Content Include="packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.xml" />
+    <Content Include="packages\EntityFramework.6.1.3\lib\net45\EntityFramework.xml" />
+    <Content Include="packages\EntityFramework.6.1.3\tools\about_EntityFramework.help.txt" />
+    <Content Include="packages\EntityFramework.6.1.3\tools\EntityFramework.PowerShell.dll" />
+    <Content Include="packages\EntityFramework.6.1.3\tools\EntityFramework.PowerShell.Utility.dll" />
+    <Content Include="packages\EntityFramework.6.1.3\tools\migrate.exe" />
+    <Content Include="ReportViewerWebForm.aspx" />
+    <Content Include="Content\bootstrap-grid.css.map" />
+    <Content Include="Content\bootstrap-grid.min.css.map" />
+    <Content Include="Content\bootstrap-reboot.css.map" />
+    <Content Include="Content\bootstrap-reboot.min.css.map" />
+    <Content Include="Content\bootstrap.css.map" />
+    <Content Include="Content\bootstrap.min.css.map" />
+    <Content Include="Areas\HelpPage\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Web.config" />
+    <Content Include="Areas\HelpPage\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\Index.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\TextSample.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\Samples.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\Parameters.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\InvalidSample.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\ImageSample.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\HelpPageApiModel.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\ApiGroup.cshtml" />
+    <Content Include="Areas\HelpPage\Views\Help\Api.cshtml" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
+    <None Include="Scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="Scripts\jquery-1.10.2.js" />
+    <Content Include="Scripts\jquery-1.10.2.min.js" />
+    <Content Include="Scripts\jquery-1.10.2.min.map" />
+    <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
+    <Content Include="Scripts\jquery-1.6.4.js" />
+    <Content Include="Scripts\jquery-1.6.4.min.js" />
+    <None Include="Scripts\jquery-3.4.1.intellisense.js" />
+    <None Include="Scripts\jquery-1.8.2.intellisense.js" />
+    <Content Include="Scripts\jquery-1.8.2.js" />
+    <Content Include="Scripts\jquery-1.8.2.min.js" />
+    <Content Include="Scripts\jquery-3.4.1.js" />
+    <Content Include="Scripts\jquery-3.4.1.min.js" />
+    <Content Include="Scripts\jquery-3.4.1.slim.js" />
+    <Content Include="Scripts\jquery-3.4.1.slim.min.js" />
+    <Content Include="Scripts\jquery-ui-1.8.24.js" />
+    <Content Include="Scripts\jquery-ui-1.8.24.min.js" />
+    <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.validate.js" />
+    <Content Include="Scripts\jquery.validate.min.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\knockout-2.2.0.debug.js" />
+    <Content Include="Scripts\knockout-2.2.0.js" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Scripts\jquery-3.4.1.slim.min.map" />
+    <Content Include="Scripts\jquery-3.4.1.min.map" />
+    <Content Include="Views\Consultas\windowActasContratos.cshtml" />
+    <Content Include="Views\Consultas\Index.cshtml" />
+    <Content Include="Views\Consultas\modulosClientes.cshtml" />
+    <Content Include="Views\Consultas\windowConsultaContratos.cshtml" />
+    <Content Include="Views\Consultas\windowGarantias.cshtml" />
+    <Content Include="Views\Ticket\windowTicketEnAprobacion.cshtml" />
+    <Content Include="Views\Consultas\windowGarantiaTickets.cshtml" />
+    <Content Include="Views\Ticket\windowReporteTicket.cshtml" />
+    <Content Include="Views\User\windowUserTickets.cshtml" />
+    <Content Include="Views\Tfs\windowConsultaProyectos.cshtml" />
+    <Content Include="Views\User\windowUserProyectos.cshtml" />
+    <Content Include="Views\Ticket\windowGestionEstimaciones.cshtml" />
+    <Content Include="Views\Consultas\windowOfertaTickets.cshtml" />
+    <Content Include="Views\User\windowUserSolicitudes.cshtml" />
+    <Content Include="Views\Rrhh\windowControlVacaciones.cshtml" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <Content Include="Web\css\font-awesome.css" />
+    <Content Include="Web\images\menu\icon-reportes.png" />
+    <Content Include="Web\images\Reports-icon.png" />
+    <Content Include="Web\js\admin\correosNoEnviadosController.js" />
+    <Content Include="Web\js\angular-bootstrap-multiselect.js" />
+    <Content Include="Web\js\client\clientNewTicket.js" />
+    <Content Include="Web\js\client\clientSeguimiento.js" />
+    <Content Include="Web\js\consultas\ofertaTickets.js" />
+    <Content Include="Web\js\consultas\garantiaTickets.js" />
+    <Content Include="Web\js\consultas\consultaGarantias.js" />
+    <Content Include="Web\js\consultas\consultaContratos.js" />
+    <Content Include="Web\js\consultas\consultas.js" />
+    <Content Include="Web\js\consultas\modulosClientes.js" />
+    <Content Include="Web\js\highcharts-more.js" />
+    <Content Include="Web\js\rrhh\solicitudesController.js" />
+    <Content Include="Web\js\solid-gauge.js" />
+    <Content Include="Web\js\consultas\actasContratos.js" />
+    <Content Include="Web\js\tfs\consultaCambios.js" />
+    <Content Include="Web\js\tfs\consultaProyectos.js" />
+    <Content Include="Web\js\user\proyectosController.js" />
+    <Content Include="Web\js\user\solicitudesController.js" />
+    <Content Include="Web\js\user\ticketsController.js" />
+    <Content Include="Web\sounds\capisci.mp3" />
+    <Content Include="Web\sounds\happy-ending.mp3" />
+    <None Include="packages\jQuery.1.10.2\Content\Scripts\jquery-1.10.2-vsdoc.js" />
+    <Content Include="packages\jQuery.1.10.2\Content\Scripts\jquery-1.10.2.js" />
+    <Content Include="packages\jQuery.1.10.2\Content\Scripts\jquery-1.10.2.min.js" />
+    <None Include="packages\jQuery.1.10.2\Tools\jquery-1.10.2.intellisense.js" />
+    <None Include="packages\jQuery.1.6.4\Content\Scripts\jquery-1.6.4-vsdoc.js" />
+    <Content Include="packages\jQuery.1.6.4\Content\Scripts\jquery-1.6.4.js" />
+    <Content Include="packages\jQuery.1.6.4\Content\Scripts\jquery-1.6.4.min.js" />
+    <Content Include="packages\jQuery.1.6.4\Tools\jquery-1.6.4-vsdoc-para.js" />
+    <None Include="packages\jQuery.1.8.2\Content\Scripts\jquery-1.8.2-vsdoc.js" />
+    <Content Include="packages\jQuery.1.8.2\Content\Scripts\jquery-1.8.2.js" />
+    <Content Include="packages\jQuery.1.8.2\Content\Scripts\jquery-1.8.2.min.js" />
+    <None Include="packages\jQuery.1.8.2\Tools\jquery-1.8.2.intellisense.js" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\images\ui-icons_222222_256x240.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\images\ui-icons_454545_256x240.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\images\ui-icons_888888_256x240.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\jquery-ui.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\jquery.ui.accordion.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\jquery.ui.all.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\jquery.ui.autocomplete.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\jquery.ui.base.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\jquery.ui.button.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\jquery.ui.core.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\jquery.ui.datepicker.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\jquery.ui.dialog.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\jquery.ui.progressbar.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\jquery.ui.resizable.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\jquery.ui.selectable.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\jquery.ui.slider.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\jquery.ui.tabs.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\jquery.ui.theme.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\images\ui-icons_222222_256x240.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\images\ui-icons_454545_256x240.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\images\ui-icons_888888_256x240.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\jquery-ui.min.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\jquery.ui.accordion.min.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\jquery.ui.autocomplete.min.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\jquery.ui.button.min.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\jquery.ui.core.min.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\jquery.ui.datepicker.min.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\jquery.ui.dialog.min.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\jquery.ui.progressbar.min.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\jquery.ui.resizable.min.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\jquery.ui.selectable.min.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\jquery.ui.slider.min.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\jquery.ui.tabs.min.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Content\themes\base\minified\jquery.ui.theme.min.css" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Scripts\jquery-ui-1.8.24.js" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Content\Scripts\jquery-ui-1.8.24.min.js" />
+    <None Include="packages\jQuery.Validation.1.10.0\Content\Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="packages\jQuery.Validation.1.10.0\Content\Scripts\jquery.validate.js" />
+    <Content Include="packages\jQuery.Validation.1.10.0\Content\Scripts\jquery.validate.min.js" />
+    <Content Include="packages\knockoutjs.2.2.0\Content\Scripts\knockout-2.2.0.debug.js" />
+    <Content Include="packages\knockoutjs.2.2.0\Content\Scripts\knockout-2.2.0.js" />
+    <Content Include="packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll" />
+    <Content Include="packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.xml" />
+    <Content Include="packages\Microsoft.AspNet.Mvc.es.4.0.30506.0\lib\net40\es\System.Web.Mvc.xml" />
+    <Content Include="packages\Microsoft.AspNet.Mvc.FixedDisplayModes.1.0.0\lib\net40\Microsoft.Web.Mvc.FixedDisplayModes.dll" />
+    <Content Include="packages\Microsoft.AspNet.Mvc.FixedDisplayModes.5.0.0\readme.txt" />
+    <Content Include="packages\Microsoft.AspNet.Providers.Core.1.2\lib\net40\es\System.Web.Providers.resources.dll" />
+    <Content Include="packages\Microsoft.AspNet.Providers.Core.1.2\lib\net40\System.Web.Providers.dll" />
+    <Content Include="packages\Microsoft.AspNet.Providers.Core.1.2\readme.html" />
+    <Content Include="packages\Microsoft.AspNet.Providers.Core.es.1.2\lib\net40\es\System.Web.Providers.resources.dll" />
+    <Content Include="packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll" />
+    <Content Include="packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.xml" />
+    <Content Include="packages\Microsoft.AspNet.SignalR.2.2.0\readme.txt" />
+    <Content Include="packages\Microsoft.AspNet.SignalR.Core.es.2.1.2\lib\net45\es\Microsoft.AspNet.SignalR.Core.xml" />
+    <Content Include="packages\Microsoft.AspNet.SignalR.JS.2.2.0\content\Scripts\jquery.signalR-2.2.0.js" />
+    <Content Include="packages\Microsoft.AspNet.SignalR.JS.2.2.0\content\Scripts\jquery.signalR-2.2.0.min.js" />
+    <Content Include="packages\Microsoft.AspNet.SignalR.SystemWeb.2.2.0\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll" />
+    <Content Include="packages\Microsoft.AspNet.SignalR.SystemWeb.2.2.0\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.XML" />
+    <Content Include="packages\Microsoft.AspNet.Web.Optimization.1.0.0\lib\net40\es\System.Web.Optimization.resources.dll" />
+    <Content Include="packages\Microsoft.AspNet.Web.Optimization.1.0.0\lib\net40\System.Web.Optimization.dll" />
+    <Content Include="packages\Microsoft.AspNet.Web.Optimization.es.1.0.0\lib\net40\es\System.Web.Optimization.resources.dll" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.xml" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\portable-wp8+netcore45+net45+wp81+wpa81\System.Net.Http.Formatting.dll" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\portable-wp8+netcore45+net45+wp81+wpa81\System.Net.Http.Formatting.xml" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.xml" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.OData.4.0.30506\lib\net40\es\System.Web.Http.OData.resources.dll" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.OData.4.0.30506\lib\net40\es\System.Web.Http.OData.xml" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.OData.4.0.30506\lib\net40\System.Web.Http.OData.dll" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.OData.4.0.30506\lib\net40\System.Web.Http.Odata.xml" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.OData.es.4.0.30506\lib\net40\es\System.Web.Http.OData.resources.dll" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.OData.es.4.0.30506\lib\net40\es\System.Web.Http.OData.xml" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.Tracing.4.0.30506\lib\net40\es\System.Web.Http.Tracing.resources.dll" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.Tracing.4.0.30506\lib\net40\es\System.Web.Http.Tracing.xml" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.Tracing.4.0.30506\lib\net40\System.Web.Http.Tracing.dll" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.Tracing.4.0.30506\lib\net40\System.Web.Http.Tracing.xml" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.Tracing.4.0.30506\ReadMe.txt" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.Tracing.es.4.0.30506\lib\net40\es\System.Web.Http.Tracing.resources.dll" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.Tracing.es.4.0.30506\lib\net40\es\System.Web.Http.Tracing.xml" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.xml" />
+    <Content Include="packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll" />
+    <Content Include="packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.xml" />
+    <Content Include="packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll" />
+    <Content Include="packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.xml" />
+    <Content Include="packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll" />
+    <Content Include="packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll" />
+    <Content Include="packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.xml" />
+    <Content Include="packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.xml" />
+    <Content Include="packages\Microsoft.AspNet.WebPages.es.2.0.30506.0\lib\net40\es\system.web.helpers.xml" />
+    <Content Include="packages\Microsoft.AspNet.WebPages.es.2.0.30506.0\lib\net40\es\system.web.webpages.deployment.xml" />
+    <Content Include="packages\Microsoft.AspNet.WebPages.es.2.0.30506.0\lib\net40\es\system.web.webpages.razor.xml" />
+    <Content Include="packages\Microsoft.AspNet.WebPages.es.2.0.30506.0\lib\net40\es\system.web.webpages.xml" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\net40\de\Microsoft.Data.Edm.resources.dll" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\net40\es\Microsoft.Data.Edm.resources.dll" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\net40\fr\Microsoft.Data.Edm.resources.dll" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\net40\it\Microsoft.Data.Edm.resources.dll" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\net40\ja\Microsoft.Data.Edm.resources.dll" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\net40\ko\Microsoft.Data.Edm.resources.dll" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\net40\Microsoft.Data.Edm.dll" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\net40\Microsoft.Data.Edm.xml" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\net40\ru\Microsoft.Data.Edm.resources.dll" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\net40\zh-Hans\Microsoft.Data.Edm.resources.dll" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\net40\zh-Hant\Microsoft.Data.Edm.resources.dll" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\sl4\de\Microsoft.Data.Edm.SL.resources.dll" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\sl4\es\Microsoft.Data.Edm.SL.resources.dll" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\sl4\fr\Microsoft.Data.Edm.SL.resources.dll" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\sl4\it\Microsoft.Data.Edm.SL.resources.dll" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\sl4\ja\Microsoft.Data.Edm.SL.resources.dll" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\sl4\ko\Microsoft.Data.Edm.SL.resources.dll" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\sl4\Microsoft.Data.Edm.SL.dll" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\sl4\Microsoft.Data.Edm.SL.xml" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\sl4\ru\Microsoft.Data.Edm.SL.resources.dll" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\sl4\zh-Hans\Microsoft.Data.Edm.SL.resources.dll" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\lib\sl4\zh-Hant\Microsoft.Data.Edm.SL.resources.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\net40\de\Microsoft.Data.OData.resources.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\net40\es\Microsoft.Data.OData.resources.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\net40\fr\Microsoft.Data.OData.resources.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\net40\it\Microsoft.Data.OData.resources.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\net40\ja\Microsoft.Data.OData.resources.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\net40\ko\Microsoft.Data.OData.resources.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\net40\Microsoft.Data.OData.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\net40\Microsoft.Data.OData.xml" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\net40\ru\Microsoft.Data.OData.resources.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\net40\zh-Hans\Microsoft.Data.OData.resources.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\net40\zh-Hant\Microsoft.Data.OData.resources.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\sl4\de\Microsoft.Data.OData.SL.resources.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\sl4\es\Microsoft.Data.OData.SL.resources.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\sl4\fr\Microsoft.Data.OData.SL.resources.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\sl4\it\Microsoft.Data.OData.SL.resources.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\sl4\ja\Microsoft.Data.OData.SL.resources.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\sl4\ko\Microsoft.Data.OData.SL.resources.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\sl4\Microsoft.Data.OData.SL.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\sl4\Microsoft.Data.OData.SL.xml" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\sl4\ru\Microsoft.Data.OData.SL.resources.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\sl4\zh-Hans\Microsoft.Data.OData.SL.resources.dll" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\lib\sl4\zh-Hant\Microsoft.Data.OData.SL.resources.dll" />
+    <Content Include="packages\Microsoft.jQuery.Unobtrusive.Ajax.2.0.30506.0\Content\Scripts\jquery.unobtrusive-ajax.js" />
+    <Content Include="packages\Microsoft.jQuery.Unobtrusive.Ajax.2.0.30506.0\Content\Scripts\jquery.unobtrusive-ajax.min.js" />
+    <Content Include="packages\Microsoft.jQuery.Unobtrusive.Validation.2.0.30506.0\Content\Scripts\jquery.validate.unobtrusive.js" />
+    <Content Include="packages\Microsoft.jQuery.Unobtrusive.Validation.2.0.30506.0\Content\Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="packages\Microsoft.Net.Http.2.0.20710.0\lib\net40\es\System.Net.Http.WebRequest.xml" />
+    <Content Include="packages\Microsoft.Net.Http.2.0.20710.0\lib\net40\es\System.Net.Http.xml" />
+    <Content Include="packages\Microsoft.Net.Http.2.0.20710.0\lib\net40\System.Net.Http.dll" />
+    <Content Include="packages\Microsoft.Net.Http.2.0.20710.0\lib\net40\System.Net.Http.WebRequest.dll" />
+    <Content Include="packages\Microsoft.Net.Http.2.0.20710.0\lib\net40\System.Net.Http.WebRequest.xml" />
+    <Content Include="packages\Microsoft.Net.Http.2.0.20710.0\lib\net40\System.Net.Http.xml" />
+    <Content Include="packages\Microsoft.Net.Http.es.2.0.20710.0\lib\net40\es\System.Net.Http.resources.dll" />
+    <Content Include="packages\Microsoft.Net.Http.es.2.0.20710.0\lib\net40\es\System.Net.Http.WebRequest.resources.dll" />
+    <Content Include="packages\Microsoft.Net.Http.es.2.0.20710.0\lib\net40\es\System.Net.Http.WebRequest.xml" />
+    <Content Include="packages\Microsoft.Net.Http.es.2.0.20710.0\lib\net40\es\System.Net.Http.xml" />
+    <Content Include="packages\Microsoft.Owin.Security.2.1.0\lib\net45\Microsoft.Owin.Security.dll" />
+    <Content Include="packages\Microsoft.Owin.Security.2.1.0\lib\net45\Microsoft.Owin.Security.XML" />
+    <Content Include="packages\Modernizr.2.6.2\Content\Scripts\modernizr-2.6.2.js" />
+    <Content Include="packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll" />
+    <Content Include="packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.xml" />
+    <Content Include="packages\Owin.1.0\lib\net40\Owin.dll" />
+    <Content Include="packages\SpreadsheetLight.3.4.4\lib\SpreadsheetLight.dll" />
+    <Content Include="packages\SpreadsheetLight.3.4.4\lib\SpreadsheetLight.xml" />
+    <Content Include="packages\SpreadsheetLight.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\net40\de\System.Spatial.resources.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\net40\es\System.Spatial.resources.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\net40\fr\System.Spatial.resources.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\net40\it\System.Spatial.resources.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\net40\ja\System.Spatial.resources.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\net40\ko\System.Spatial.resources.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\net40\ru\System.Spatial.resources.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\net40\System.Spatial.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\net40\System.Spatial.xml" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\net40\zh-Hans\System.Spatial.resources.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\net40\zh-Hant\System.Spatial.resources.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\sl4\de\System.Spatial.SL.resources.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\sl4\es\System.Spatial.SL.resources.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\sl4\fr\System.Spatial.SL.resources.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\sl4\it\System.Spatial.SL.resources.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\sl4\ja\System.Spatial.SL.resources.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\sl4\ko\System.Spatial.SL.resources.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\sl4\ru\System.Spatial.SL.resources.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\sl4\System.Spatial.SL.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\sl4\System.Spatial.SL.xml" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\sl4\zh-Hans\System.Spatial.SL.resources.dll" />
+    <Content Include="packages\System.Spatial.5.2.0\lib\sl4\zh-Hant\System.Spatial.SL.resources.dll" />
+    <Content Include="packages\WebGrease.1.3.0\lib\Antlr3.Runtime.dll" />
+    <Content Include="packages\WebGrease.1.3.0\lib\WebGrease.dll" />
+    <Content Include="packages\WebGrease.1.3.0\tools\WG.exe" />
+    <Content Include="Web\css\admin\admin.css" />
+    <Content Include="Web\css\bootstrap-datetimepicker.css" />
+    <Content Include="Web\css\bootstrap-editable.css" />
+    <Content Include="Web\css\bootstrap-select.min.css" />
+    <Content Include="Web\css\jquery.bonsai.css" />
+    <Content Include="Web\images\clear.png" />
+    <Content Include="Web\images\email\efqm.jpg" />
+    <Content Include="Web\images\email\fb.jpg" />
+    <Content Include="Web\images\email\linkedin.jpg" />
+    <Content Include="Web\images\email\openkm.jpg" />
+    <Content Include="Web\images\email\sifizsoft.jpg" />
+    <Content Include="Web\images\email\tw.jpg" />
+    <Content Include="Web\images\loading.gif" />
+    <Content Include="Web\images\login.png" />
+    <Content Include="Web\images\logout.png" />
+    <Content Include="Web\images\menu\icon-bug.png" />
+    <Content Include="Web\images\menu\icon-admin.jpg" />
+    <Content Include="Web\images\menu\icon-admin.png" />
+    <Content Include="Web\images\menu\icon-cliente.png" />
+    <Content Include="Web\images\menu\icon-planing.png" />
+    <Content Include="Web\images\menu\icon-planning.jpg" />
+    <Content Include="Web\images\menu\icon-planning.png" />
+    <Content Include="Web\images\menu\icon-rrhh.png" />
+    <Content Include="Web\images\menu\icon-ticket.png" />
+    <Content Include="Web\images\menu\icon-users.jpg" />
+    <Content Include="Web\images\menu\icon-users.png" />
+    <Content Include="Web\images\menu\icon-tfs.png" />
+    <Content Include="Web\images\n_logo.png" />
+    <Content Include="Web\images\s_logo.png" />
+    <Content Include="Web\images\user-work1.png" />
+    <Content Include="Web\images\user-work2.png" />
+    <Content Include="Web\js\admin\catalogosController.js" />
+    <Content Include="Web\js\admin\clientController.js" />
+    <Content Include="Web\js\angular-dragdrop.min.js" />
+    <Content Include="Web\js\angular-route.min.js" />
+    <Content Include="Web\js\bootstrap-datetimepicker.js" />
+    <Content Include="Web\js\bootstrap-editable.min.js" />
+    <Content Include="Web\js\bootstrap-select.min.js" />
+    <Content Include="Web\js\bootstrap-wysiwyg.js" />
+    <Content Include="Web\js\chat.js" />
+    <Content Include="Web\js\client\client.js" />
+    <Content Include="Web\js\exporting.js" />
+    <Content Include="Web\js\gestionErrores\gestionErrores.js" />
+    <Content Include="Web\js\heatmap.js" />
+    <Content Include="Web\js\highstock.js" />
+    <Content Include="Web\js\i18n\defaults-ar_AR.js" />
+    <Content Include="Web\js\i18n\defaults-ar_AR.min.js" />
+    <Content Include="Web\js\i18n\defaults-bg_BG.js" />
+    <Content Include="Web\js\i18n\defaults-bg_BG.min.js" />
+    <Content Include="Web\js\i18n\defaults-cro_CRO.js" />
+    <Content Include="Web\js\i18n\defaults-cro_CRO.min.js" />
+    <Content Include="Web\js\i18n\defaults-cs_CZ.js" />
+    <Content Include="Web\js\i18n\defaults-cs_CZ.min.js" />
+    <Content Include="Web\js\i18n\defaults-da_DK.js" />
+    <Content Include="Web\js\i18n\defaults-da_DK.min.js" />
+    <Content Include="Web\js\i18n\defaults-de_DE.js" />
+    <Content Include="Web\js\i18n\defaults-de_DE.min.js" />
+    <Content Include="Web\js\i18n\defaults-en_US.js" />
+    <Content Include="Web\js\i18n\defaults-en_US.min.js" />
+    <Content Include="Web\js\i18n\defaults-es_CL.js" />
+    <Content Include="Web\js\i18n\defaults-es_CL.min.js" />
+    <Content Include="Web\js\i18n\defaults-eu.js" />
+    <Content Include="Web\js\i18n\defaults-eu.min.js" />
+    <Content Include="Web\js\i18n\defaults-fa_IR.js" />
+    <Content Include="Web\js\i18n\defaults-fa_IR.min.js" />
+    <Content Include="Web\js\i18n\defaults-fi_FI.js" />
+    <Content Include="Web\js\i18n\defaults-fi_FI.min.js" />
+    <Content Include="Web\js\i18n\defaults-fr_FR.js" />
+    <Content Include="Web\js\i18n\defaults-fr_FR.min.js" />
+    <Content Include="Web\js\i18n\defaults-hu_HU.js" />
+    <Content Include="Web\js\i18n\defaults-hu_HU.min.js" />
+    <Content Include="Web\js\i18n\defaults-id_ID.js" />
+    <Content Include="Web\js\i18n\defaults-id_ID.min.js" />
+    <Content Include="Web\js\i18n\defaults-it_IT.js" />
+    <Content Include="Web\js\i18n\defaults-it_IT.min.js" />
+    <Content Include="Web\js\i18n\defaults-ko_KR.js" />
+    <Content Include="Web\js\i18n\defaults-ko_KR.min.js" />
+    <Content Include="Web\js\i18n\defaults-lt_LT.js" />
+    <Content Include="Web\js\i18n\defaults-lt_LT.min.js" />
+    <Content Include="Web\js\i18n\defaults-nb_NO.js" />
+    <Content Include="Web\js\i18n\defaults-nb_NO.min.js" />
+    <Content Include="Web\js\i18n\defaults-nl_NL.js" />
+    <Content Include="Web\js\i18n\defaults-nl_NL.min.js" />
+    <Content Include="Web\js\i18n\defaults-pl_PL.js" />
+    <Content Include="Web\js\i18n\defaults-pl_PL.min.js" />
+    <Content Include="Web\js\i18n\defaults-pt_BR.js" />
+    <Content Include="Web\js\i18n\defaults-pt_BR.min.js" />
+    <Content Include="Web\js\i18n\defaults-pt_PT.js" />
+    <Content Include="Web\js\i18n\defaults-pt_PT.min.js" />
+    <Content Include="Web\js\i18n\defaults-ro_RO.js" />
+    <Content Include="Web\js\i18n\defaults-ro_RO.min.js" />
+    <Content Include="Web\js\i18n\defaults-ru_RU.js" />
+    <Content Include="Web\js\i18n\defaults-ru_RU.min.js" />
+    <Content Include="Web\js\i18n\defaults-sk_SK.js" />
+    <Content Include="Web\js\i18n\defaults-sk_SK.min.js" />
+    <Content Include="Web\js\i18n\defaults-sl_SI.js" />
+    <Content Include="Web\js\i18n\defaults-sl_SI.min.js" />
+    <Content Include="Web\js\i18n\defaults-sv_SE.js" />
+    <Content Include="Web\js\i18n\defaults-sv_SE.min.js" />
+    <Content Include="Web\js\i18n\defaults-tr_TR.js" />
+    <Content Include="Web\js\i18n\defaults-tr_TR.min.js" />
+    <Content Include="Web\js\i18n\defaults-ua_UA.js" />
+    <Content Include="Web\js\i18n\defaults-ua_UA.min.js" />
+    <Content Include="Web\js\i18n\defaults-zh_CN.js" />
+    <Content Include="Web\js\i18n\defaults-zh_CN.min.js" />
+    <Content Include="Web\js\i18n\defaults-zh_TW.js" />
+    <Content Include="Web\js\i18n\defaults-zh_TW.min.js" />
+    <Content Include="Web\js\jquery-ui.min.js" />
+    <Content Include="Web\js\jquery.bonsai.js" />
+    <Content Include="Web\js\jquery.hotkeys.js" />
+    <Content Include="Web\js\jquery.json-list.js" />
+    <Content Include="Web\js\jquery.qubit.js" />
+    <Content Include="Web\js\jquery.signalR-2.1.2.min.js" />
+    <Content Include="Web\css\datepicker.css" />
+    <Content Include="Web\css\jasny-bootstrap.min.css" />
+    <Content Include="Web\images\ajax-loader.gif" />
+    <Content Include="Web\images\workers\no-foto.jpg" />
+    <Content Include="Web\images\workers\TWDMFMMLPG.png" />
+    <Content Include="Web\js\admin\admin.js" />
+    <Content Include="Web\js\moment.min.js" />
+    <Content Include="Web\js\rrhh\rrhh.js" />
+    <Content Include="Web\js\table-fixed-header.js" />
+    <Content Include="Web\js\task\consolidacionTareas.js" />
+    <Content Include="Web\js\task\disponibilidadRecursos.js" />
+    <Content Include="Web\js\task\incidenciasColaboradores.js" />
+    <Content Include="Web\js\task\solicitudesTarea.js" />
+    <Content Include="Web\js\task\monitoreoController.js" />
+    <Content Include="Web\js\task\taskController.js" />
+    <Content Include="Web\js\admin\workerController.js" />
+    <Content Include="Web\js\highcharts.js" />
+    <Content Include="Web\js\tfs\tfs.js" />
+    <Content Include="Web\js\ticket\ticket.js" />
+    <Content Include="Web\js\user\estimacionesController.js" />
+    <Content Include="Web\js\user\sistemaController.js" />
+    <Content Include="Web\js\task\task.js" />
+    <Content Include="Web\js\user\tareasCompensatoriasController.js" />
+    <Content Include="Web\js\user\taskController.js" />
+    <Content Include="Web\js\waiting.js" />
+    <Content Include="Views\Task\MonitoreoTareas.cshtml" />
+    <Content Include="Views\Rrhh\windowMarcasElectronicas.cshtml" />
+    <Content Include="Views\Ticket\windowTicketEnEspera.cshtml" />
+    <Content Include="Views\Ticket\windowBITicket.cshtml" />
+    <Content Include="Views\Ticket\windowResumenTicket.cshtml" />
+    <Content Include="Web\css\bootstrap-select.css.map" />
+    <Content Include="Web\js\bootstrap-select.js.map" />
+    <Content Include="Views\Home\Error.cshtml" />
+    <Content Include="Views\Client\RespuestaResolucion.cshtml" />
+    <Content Include="Views\Client\TicketDevuelto.cshtml" />
+    <Content Include="Views\User\windowUserPublicaciones.cshtml" />
+    <Content Include="Views\Admin\windowAddCorreosNoEnviados.cshtml" />
+    <Content Include="Web\fonts\fontawesome-webfont.eot" />
+    <Content Include="Web\fonts\fontawesome-webfont.svg" />
+    <Content Include="Web\fonts\fontawesome-webfont.ttf" />
+    <Content Include="Web\fonts\fontawesome-webfont.woff" />
+    <Content Include="Web\fonts\fontawesome-webfont.woff2" />
+    <Content Include="Web\fonts\FontAwesome.otf" />
+    <Content Include="Views\Ticket\inicioTicket.cshtml" />
+    <Content Include="Views\Report\Index.cshtml" />
+    <Content Include="Views\Report\VerReporte.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="App_Start\WebApiConfig.cs" />
+    <Content Include="Global.asax" />
+    <Content Include="Views\Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Web\css\bootstrap-theme.min.css" />
+    <Content Include="Web\css\bootstrap.min.css" />
+    <Content Include="Web\css\home\home.css" />
+    <Content Include="Web\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Web\js\angular.min.js" />
+    <Content Include="Web\js\bootstrap-datepicker.js" />
+    <Content Include="Web\js\bootstrap.min.js" />
+    <Content Include="Web\js\home\home.js" />
+    <Content Include="Web\js\jasny-bootstrap.min.js" />
+    <Content Include="Web\js\jquery-2.1.3.min.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+    <Folder Include="Web\files\asignaciones\" />
+    <Folder Include="Web\images\chat\" />
+    <Folder Include="Web\images\logFBSError\" />
+    <Folder Include="Web\resources\contracts\" />
+    <Folder Include="Web\resources\tasks\" />
+    <Folder Include="Web\resources\tickets\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="packages.config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Home\Index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Web\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Web\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="Web\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="Web\fonts\glyphicons-halflings-regular.woff2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\User\Sistema.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Admin\Index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Admin\windowAddWorker.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EntityDeploy Include="Models\ModelSP.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>ModelSP.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EntityDeploy>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Models\ModelSP.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ModelSP.edmx</DependentUpon>
+      <LastGenOutput>ModelSP.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\ModelSP.edmx.diagram">
+      <DependentUpon>ModelSP.edmx</DependentUpon>
+    </Content>
+    <Content Include="Models\ModelSP.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ModelSP.edmx</DependentUpon>
+      <LastGenOutput>ModelSP.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Task\windowTask.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="packages\EntityFramework.6.1.3\content\App.config.transform" />
+    <Content Include="packages\EntityFramework.6.1.3\content\Web.config.transform" />
+    <Content Include="packages\EntityFramework.6.1.3\EntityFramework.6.1.3.nupkg" />
+    <Content Include="packages\EntityFramework.6.1.3\tools\EntityFramework.psd1" />
+    <Content Include="packages\EntityFramework.6.1.3\tools\EntityFramework.psm1" />
+    <Content Include="packages\EntityFramework.6.1.3\tools\init.ps1" />
+    <Content Include="packages\EntityFramework.6.1.3\tools\install.ps1" />
+    <Content Include="packages\jQuery.1.10.2\Content\Scripts\jquery-1.10.2.min.map" />
+    <Content Include="packages\jQuery.1.10.2\jQuery.1.10.2.nupkg" />
+    <Content Include="packages\jQuery.1.10.2\Tools\common.ps1" />
+    <Content Include="packages\jQuery.1.10.2\Tools\install.ps1" />
+    <Content Include="packages\jQuery.1.10.2\Tools\uninstall.ps1" />
+    <Content Include="packages\jQuery.1.6.4\jQuery.1.6.4.nupkg" />
+    <Content Include="packages\jQuery.1.6.4\Tools\install.ps1" />
+    <Content Include="packages\jQuery.1.6.4\Tools\uninstall.ps1" />
+    <Content Include="packages\jQuery.1.8.2\jQuery.1.8.2.nupkg" />
+    <Content Include="packages\jQuery.1.8.2\Tools\common.ps1" />
+    <Content Include="packages\jQuery.1.8.2\Tools\install.ps1" />
+    <Content Include="packages\jQuery.1.8.2\Tools\uninstall.ps1" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\jQuery.UI.Combined.1.8.24.nupkg" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Tools\common.ps1" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Tools\install.ps1" />
+    <Content Include="packages\jQuery.UI.Combined.1.8.24\Tools\uninstall.ps1" />
+    <Content Include="packages\jQuery.Validation.1.10.0\jQuery.Validation.1.10.0.nupkg" />
+    <Content Include="packages\knockoutjs.2.2.0\knockoutjs.2.2.0.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.Mvc.5.2.3\Content\Web.config.install.xdt" />
+    <Content Include="packages\Microsoft.AspNet.Mvc.5.2.3\Content\Web.config.uninstall.xdt" />
+    <Content Include="packages\Microsoft.AspNet.Mvc.5.2.3\Microsoft.AspNet.Mvc.5.2.3.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.Mvc.es.4.0.30506.0\Microsoft.AspNet.Mvc.es.4.0.30506.0.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.Mvc.FixedDisplayModes.1.0.0\Microsoft.AspNet.Mvc.FixedDisplayModes.1.0.0.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.Mvc.FixedDisplayModes.5.0.0\Microsoft.AspNet.Mvc.FixedDisplayModes.5.0.0.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.Providers.Core.1.2\Microsoft.AspNet.Providers.Core.1.2.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.Providers.Core.es.1.2\Microsoft.AspNet.Providers.Core.es.1.2.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.Providers.LocalDB.1.1\content\web.config.transform" />
+    <Content Include="packages\Microsoft.AspNet.Providers.LocalDB.1.1\Microsoft.AspNet.Providers.LocalDB.1.1.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.Providers.LocalDB.1.1\tools\Install.ps1" />
+    <Content Include="packages\Microsoft.AspNet.Razor.3.2.3\Microsoft.AspNet.Razor.3.2.3.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.SignalR.2.2.0\Microsoft.AspNet.SignalR.2.2.0.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.SignalR.Core.es.2.1.2\Microsoft.AspNet.SignalR.Core.es.2.1.2.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.SignalR.es.2.1.2\Microsoft.AspNet.SignalR.es.2.1.2.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.SignalR.JS.2.2.0\Microsoft.AspNet.SignalR.JS.2.2.0.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.SignalR.SystemWeb.2.2.0\Microsoft.AspNet.SignalR.SystemWeb.2.2.0.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.Web.Optimization.1.0.0\Microsoft.AspNet.Web.Optimization.1.0.0.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.Web.Optimization.es.1.0.0\Microsoft.AspNet.Web.Optimization.es.1.0.0.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.5.2.3\Microsoft.AspNet.WebApi.5.2.3.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.Client.5.2.3\Microsoft.AspNet.WebApi.Client.5.2.3.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.Core.5.2.3\Content\web.config.transform" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.Core.5.2.3\Microsoft.AspNet.WebApi.Core.5.2.3.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\ApiDescriptionExtensions.cs.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\App_Start\HelpPageConfig.cs.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\Controllers\HelpController.cs.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\HelpPage.css.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\HelpPageAreaRegistration.cs.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\HelpPageConfigurationExtensions.cs.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\Models\HelpPageApiModel.cs.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\SampleGeneration\HelpPageSampleGenerator.cs.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\SampleGeneration\HelpPageSampleKey.cs.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\SampleGeneration\ImageSample.cs.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\SampleGeneration\InvalidSample.cs.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\SampleGeneration\ObjectGenerator.cs.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\SampleGeneration\SampleDirection.cs.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\SampleGeneration\TextSample.cs.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\Views\Help\Api.cshtml.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\Views\Help\DisplayTemplates\ApiGroup.cshtml.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\Views\Help\DisplayTemplates\HelpPageApiModel.cshtml.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\Views\Help\DisplayTemplates\ImageSample.cshtml.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\Views\Help\DisplayTemplates\InvalidSample.cshtml.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\Views\Help\DisplayTemplates\Parameters.cshtml.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\Views\Help\DisplayTemplates\Samples.cshtml.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\Views\Help\DisplayTemplates\TextSample.cshtml.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\Views\Help\Index.cshtml.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\Views\Shared\_Layout.cshtml.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\Views\Web.config" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\Views\_ViewStart.cshtml.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\content\Areas\HelpPage\XmlDocumentationProvider.cs.pp" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.HelpPage.4.0.30506\Microsoft.AspNet.WebApi.HelpPage.4.0.30506.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.OData.4.0.30506\Microsoft.AspNet.WebApi.OData.4.0.30506.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.OData.es.4.0.30506\Microsoft.AspNet.WebApi.OData.es.4.0.30506.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.Tracing.4.0.30506\Microsoft.AspNet.WebApi.Tracing.4.0.30506.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.Tracing.es.4.0.30506\Microsoft.AspNet.WebApi.Tracing.es.4.0.30506.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\Microsoft.AspNet.WebApi.WebHost.5.2.3.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.WebPages.3.2.3\Content\Web.config.install.xdt" />
+    <Content Include="packages\Microsoft.AspNet.WebPages.3.2.3\Content\Web.config.uninstall.xdt" />
+    <Content Include="packages\Microsoft.AspNet.WebPages.3.2.3\Microsoft.AspNet.WebPages.3.2.3.nupkg" />
+    <Content Include="packages\Microsoft.AspNet.WebPages.es.2.0.30506.0\Microsoft.AspNet.WebPages.es.2.0.30506.0.nupkg" />
+    <Content Include="packages\Microsoft.Data.Edm.5.2.0\Microsoft.Data.Edm.5.2.0.nupkg" />
+    <Content Include="packages\Microsoft.Data.OData.5.2.0\Microsoft.Data.OData.5.2.0.nupkg" />
+    <Content Include="packages\Microsoft.jQuery.Unobtrusive.Ajax.2.0.30506.0\Microsoft.jQuery.Unobtrusive.Ajax.2.0.30506.0.nupkg" />
+    <Content Include="packages\Microsoft.jQuery.Unobtrusive.Validation.2.0.30506.0\Microsoft.jQuery.Unobtrusive.Validation.2.0.30506.0.nupkg" />
+    <Content Include="packages\Microsoft.Net.Http.2.0.20710.0\lib\net45\_._" />
+    <Content Include="packages\Microsoft.Net.Http.2.0.20710.0\Microsoft.Net.Http.2.0.20710.0.nupkg" />
+    <Content Include="packages\Microsoft.Net.Http.es.2.0.20710.0\Microsoft.Net.Http.es.2.0.20710.0.nupkg" />
+    <Content Include="packages\Microsoft.Owin.Security.2.1.0\Microsoft.Owin.Security.2.1.0.nupkg" />
+    <Content Include="packages\Microsoft.Web.Infrastructure.1.0.0.0\Microsoft.Web.Infrastructure.1.0.0.0.nupkg" />
+    <Content Include="packages\Modernizr.2.6.2\Modernizr.2.6.2.nupkg" />
+    <Content Include="packages\Modernizr.2.6.2\Tools\common.ps1" />
+    <Content Include="packages\Modernizr.2.6.2\Tools\install.ps1" />
+    <Content Include="packages\Modernizr.2.6.2\Tools\uninstall.ps1" />
+    <Content Include="packages\Newtonsoft.Json.7.0.1\Newtonsoft.Json.7.0.1.nupkg" />
+    <Content Include="packages\Newtonsoft.Json.7.0.1\tools\install.ps1" />
+    <Content Include="packages\Owin.1.0\Owin.1.0.nupkg" />
+    <Content Include="packages\repositories.config" />
+    <Content Include="packages\SpreadsheetLight.3.4.4\SpreadsheetLight.3.4.4.nupkg" />
+    <Content Include="packages\System.Spatial.5.2.0\System.Spatial.5.2.0.nupkg" />
+    <Content Include="packages\WebGrease.1.3.0\WebGrease.1.3.0.nupkg" />
+    <Content Include="Views\User\windowUserTask.cshtml" />
+    <Content Include="Views\Task\inicioTask.cshtml" />
+    <Content Include="Views\Admin\windowAddCatalogos.cshtml" />
+    <Content Include="Views\Task\Index.cshtml" />
+    <Content Include="Views\Client\Index.cshtml" />
+    <Content Include="Views\Ticket\Index.cshtml" />
+    <Content Include="Views\Home\MenuPrincipal.cshtml" />
+    <Content Include="Views\Admin\windowAddAdminClientes.cshtml" />
+    <Content Include="Views\Client\windowClientSeguimiento.cshtml" />
+    <Content Include="Views\Client\windowClientNewTicket.cshtml" />
+    <Content Include="Views\Admin\windowAddContratoClientes.cshtml" />
+    <Content Include="Views\Ticket\windowGestionTicket.cshtml" />
+    <Content Include="Views\User\windowUserEstimaciones.cshtml" />
+    <Content Include="Views\Ticket\windowCotizarTicket.cshtml" />
+    <Content Include="Views\Task\windowSolicitudes.cshtml" />
+    <Content Include="Views\Task\windowConsolidacionTareas.cshtml" />
+    <Content Include="Views\Rrhh\Index.cshtml" />
+    <Content Include="Views\Rrhh\windowVacacionesPermisos.cshtml" />
+    <Content Include="Views\Task\windowDisponibilidadRecursos.cshtml" />
+    <Content Include="Views\Task\windowIncidencias.cshtml" />
+    <Content Include="Views\Rrhh\windowTiemposCompensatorios.cshtml" />
+    <Content Include="Views\User\windowUserTareasCompensatorias.cshtml" />
+    <Content Include="Views\GestionErrores\index.cshtml" />
+    <Content Include="Views\GestionErrores\windowGestionErrorSeguimiento.cshtml" />
+    <Content Include="Views\GestionErrores\windowGestionErrorGraficos.cshtml" />
+    <Content Include="Views\Ticket\windowAdicionTicket.cshtml" />
+    <Content Include="Views\Ticket\windowResolucionTicket.cshtml" />
+    <Content Include="Views\Tfs\Index.cshtml" />
+    <Content Include="Views\Tfs\windowConsultasCambios.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>9038</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:1555/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <Import Project="packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\build\Microsoft.TeamFoundationServer.ExtendedClient.targets" Condition="Exists('packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\build\Microsoft.TeamFoundationServer.ExtendedClient.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Este proyecto hace referencia a los paquetes NuGet que faltan en este equipo. Habilite la restauración del paquete NuGet para descargarlos. Para obtener más información, consulte http://go.microsoft.com/fwlink/?LinkID=322105. El archivo que falta es {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\build\Microsoft.TeamFoundationServer.ExtendedClient.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.TeamFoundationServer.ExtendedClient.14.95.3\build\Microsoft.TeamFoundationServer.ExtendedClient.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target> -->
+</Project>

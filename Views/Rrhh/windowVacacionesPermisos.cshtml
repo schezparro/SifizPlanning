@@ -1,0 +1,296 @@
+﻿<div>
+    <button type="button" class="btn btn-primary" ng-click="modalEstablecerVacaciones()">
+        <span class="glyphicon glyphicon-time" aria-hidden="true"></span> Establecer Vacaciones
+    </button>
+    <button type="button" class="btn btn-primary" ng-click="modalEstablecerPermisos()">
+        <span class="glyphicon glyphicon-time" aria-hidden="true"></span> Establecer Permiso
+    </button>
+    <button type="button" class="btn btn-primary" ng-click="modalDisponibilidad()">
+        <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Ver Disponibilidad
+    </button>
+
+    <input type="text" id="filtro-colaboradores-vacaciones" placeholder="Filtrar..." ng-model="filtroColaboradoresVacaciones" class="form-control right filtro" ng-keyup="filtrarColaboradoresVacaciones()"/>
+</div>
+
+<table class="table table-striped">
+
+    <thead id="thead-colaboradores">
+        <tr>
+            <th>Foto</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Departamento</th>
+            <th>Cargo</th>
+            <th>Sede</th>
+            <th>Usuario Activo</th>            
+        </tr>
+    </thead>
+
+    <tbody id="tbody-colaboradores">
+        <tr class="table-tr" ng-repeat="trab in trabajadores" data-id="{{ trab.idtrabajador }}" ng-click="selectTrabajador()" ng-right-click="verPanelOpcionesVacaciones($event, trab.idtrabajador)">
+            <td class="col-md-1"><img class="img-worker" ng-src="{{rutaImages}}{{trab.url}}" /></td>
+            <td class="col-md-2">{{ trab.nombre }}</td>
+            <td class="col-md-2">{{ trab.email }}</td>
+            <td class="col-md-2">{{ trab.departamento }}</td>
+            <td class="col-md-2">{{ trab.cargo }}</td>
+            <td class="col-md-1">{{ trab.sede }}</td>
+            <td class="col-md-2">{{ trab.userAct }}</td>
+        </tr>
+    </tbody>
+
+</table>
+
+<!-- Modal Vacaciones -->
+<div class="modal fade" id="modal-vacaciones-colaborador" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">
+                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                    <span id="title-modal-vacaciones-colaborador">Vacaciones</span>
+                </h4>
+            </div>
+            <form method="post" id="frm-modal-vacaciones-colaborador" ng-submit="guardarVacaciones()">
+                <div class="modal-body">
+
+                    <div class="fila">
+                        <div class="left">
+                            <label>Colaborador: </label>&nbsp;{{nombreTrabajador}}
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <div class="left half half-padding-right">
+                            <label>Desde:</label>
+                            <div class="form-group">
+                                <div class='input-group date' id='dtpk-fecha-desde-vacaciones'>
+                                    <input type='text' class="form-control" ng-model="fechaDesdeVacaciones" ng-required="true" />
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>                            
+                        </div>
+                        <div class="left half half-padding-left">
+                            <label>Hasta:</label>
+                            <div class="form-group">
+                                <div class='input-group date' id='dtpk-fecha-hasta-vacaciones'>
+                                    <input type='text' class="form-control" ng-model="fechaHastaVacaciones" ng-required="true" />
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Grabar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Permisos -->
+<div class="modal fade" id="modal-permiso-colaborador" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-permiso-colaborador-label"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Permiso</h4>
+            </div>
+            <form method="post" id="frm-modal-permiso-colaborador" ng-submit="guardarPermisoColaborador()">
+                <div class="modal-body">
+                    <div class="fila">
+                        <div class="left">
+                            <label>Colaborador:</label> {{nombreTrabajador}}
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <div class="left half-padding-right">
+                            <label>Tipo de Permiso:</label>
+                            <select class="form-control" ng-required="true" ng-model="tipoPermiso">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="tipoPermiso in tiposPermisos" value="{{tipoPermiso.id}}">{{tipoPermiso.nombre}}</option>                                
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <div class="left half half-padding-right">
+                            <label>Desde:</label>
+                            <div class="form-group">
+                                <div class='input-group date' id='dtpk-fecha-desde-permiso'>
+                                    <input type='text' class="form-control" ng-model="fechaDesdePermiso" ng-required="true"/>
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>                                                     
+                        </div>
+                        <div class="left half half-padding-left">
+                            <label>Hasta:</label>
+                            <div class="form-group">
+                                <div class="input-group date" id="dtpk-fecha-hasta-permiso">
+                                    <input type='text' class="form-control" ng-model="fechaHastaPermiso" ng-required="true"/>
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>                             
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <div class="left entero">
+                            <label>Motivo:</label>
+                            <textarea required="required" class="form-control" ng-model="motivoPermiso"></textarea>
+                        </div>                        
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Grabar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--Menú del Click Derecho -->
+<ul id="menu-opciones" class="dropdown-menu">
+    <li ng-click="verVacacionesColaborador()"><a href="#"><span class="glyphicon glyphicon-search"></span> Ver Vacaciones</a></li>    
+    <li ng-click="eliminarDiaVacaciones()"><a href="#"><span class="glyphicon glyphicon-remove"></span> Eliminar Día Vacación</a></li>
+</ul>
+
+<!-- Modal Vacaciones -->
+<div class="modal fade" id="modal-ver-vacaciones-colaborador" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-permiso-colaborador-label"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Vacaciones</h4>
+            </div>
+            <form method="post" id="frm-modal-ver-vacaciones-colaborador">
+                <div class="modal-body">
+                    <div class="fila">
+                        <div class="nav-vacaciones left" ng-click="disminuirAnios()"><span class="glyphicon glyphicon-chevron-left"></span></div>                        
+                        <div class="nav-vacaciones right" ng-click="aumentarAnios()"><span class="glyphicon glyphicon-chevron-right"></span></div>
+                        <div class="text-center"><b>{{yearVacaciones}}</b></div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <div class="left">
+                            <label>Colaborador:</label> {{nombreTrabajador}}
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <div class="data-meses" ng-repeat="datoMes in dataMeses">
+                            <div class="nombre-mes-vacaciones left">{{datoMes.mes}}:</div>
+                            <div ng-repeat="dia in datoMes.dias" class="{{dia.clase}} left" title="{{dia.dia}}" data-id="{{dia.id}}" ng-right-click="panelDiaVacaciones($event, dia.id)"></div>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>                    
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Disponibilidad de Recursos -->
+<div class="modal fade" id="modal-vista-disponibilidad-recursos" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-permiso-colaborador-label"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Disponibilidad de Recursos</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-inline">
+                    <div class="left">
+                        <label>Departamento:</label>
+                        <select class="form-control" ng-model="departamentoDisponibilidad" ng-change="actualizarGraficoDisponibilidad()">
+                            <option value="">Seleccione</option>
+                            <option ng-repeat="dep in departamentosDisponibilidad" value="{{dep}}">{{dep}}</option>
+                        </select>
+                        <label>Sede:</label>
+                        <select class="form-control" ng-model="sedeDisponibilidad" ng-change="actualizarGraficoDisponibilidad()">
+                            <option value="">Seleccione</option>
+                            <option ng-repeat="sede in sedesDisponibilidad" value="{{sede}}">{{sede}}</option>
+                        </select>
+                        <input class="form-control" ng-model="filterDisponibilidad" placeholder="filtrar..." ng-change="actualizarGraficoDisponibilidad()" />
+                    </div>
+                    <div class="right">
+                        <div class="form-group">
+                            <div class='input-group date' id='dtpk-fecha-desde-disponibilidad'>
+                                <input type='text' class="form-control" ng-model="fechaDesdeDisponibilidad" ng-required="true" ng-change="actualizarFechaDisponibilidad()" />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" ng-click="atrazarSemanaDisponibilidad()"><span class="glyphicon glyphicon-chevron-left"></span></button>
+                        <button class="btn btn-primary" ng-click="adelantarSemanaDisponibilidad()"><span class="glyphicon glyphicon-chevron-right"></span></button>
+                        <select class="form-control" ng-model="cantSemanasDisponibilidad" ng-change="actualizarSemanasDisponibilidad()">
+                            <option value="8">8 SEMANAS</option>
+                            <option value="9">9 SEMANAS</option>
+                            <option value="10">10 SEMANAS</option>
+                            <option value="11">11 SEMANAS</option>
+                            <option value="12">12 SEMANAS</option>
+                        </select>
+                    </div>                    
+                    <div class="clear"></div>
+                </div>
+                <div id="div-semanas-disponibilidad">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-10">
+                        <div class="semana-disponibilidad-colab" ng-repeat="sem in semanasDisponibilidad">{{sem.ini}}-{{sem.fin}}</div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div id="id-datos-colaboradores">
+                    <div class="datos-colaborador-disponibilidad" ng-repeat="datosColab in datosDisponibilidad | filtroDisponibilidad: departamentoDisponibilidad: sedeDisponibilidad: filterDisponibilidad">
+                        <div class="col-md-2">{{datosColab.colaborador.nombre}}</div>
+                        <div class="col-md-10 div-tabla-disponibilidad">
+                            <div class="div-segmento left {{segmento.clase}}" data-length="{{segmento.tamanio}}" ng-repeat="segmento in datosColab.segmentos" style="height: 30px;" data-toggle="tooltip" data-placement="left" title="{{segmento.toolTip}}"></div>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+                </div>                
+                <div class="clear"></div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,637 @@
+﻿<div id="panel-botones-consolidacion">
+    <div class="left">
+        <button class="btn btn-default" ng-click=verProximosEntregables()>Próximos Entregables</button>
+    </div>
+    <div class="right">
+        <button class="btn btn-primary" ng-click="semanaAlanteConsolidacion()"><span class=" glyphicon glyphicon-chevron-right"></span></button>
+    </div>
+    <div class="right">
+        <button class="btn btn-success" ng-click="semanaActualConsolidacion()"><span class="glyphicon glyphicon-home"></span></button>
+    </div>
+    <div class="right">
+        <button class="btn btn-primary" ng-click="semanaAtrasConsolidacion()"><span class="glyphicon glyphicon-chevron-left"></span></button>
+    </div>
+    <div class="right">
+        <input type="text" class="form-control" placeholder="Filtrar..." ng-model="filtroConsolidacion" ng-enter="filtrarConsolidacion()" />
+    </div>
+</div>
+
+<div class="clear"></div>
+
+<div id="panel-container-consolidacion-trabajo">
+
+    <div id="div-panel-consolidacion">
+        <div id="panel-fechas-consolidacion" class="right">
+            <div id="panel-meses-fechas-consolidacion"></div>
+            <div class="clear"></div>
+            <div class="left semana-consolidacion" ng-repeat="semana in $parent.semanasConsolidacion">
+                <div class="semana-text">
+                    {{semana.lunes}}-{{semana.domingo}}
+                </div>
+            </div>
+        </div>
+
+        <div id="panel-motivos-trabajo" class="left">
+            <div id="panel-tt-{{tipoTrab.id}}" class="tipo-motivo-trabajo" ng-repeat="tipoTrab in $parent.tiposTrabajo">
+                <div class="heading pointer" data-tipo-trabajo-id="{{tipoTrab.id}}" data-tipo="{{tipoTrab.nombre}}">
+                    <div class="left view-motivos-trabajo">
+                        <span class="glyphicon glyphicon-minus pointer expandir-motivos" title="Expandir"></span>
+                    </div>
+                    {{tipoTrab.nombre}}
+                </div>
+                <div id="trabajos-tmt-{{tipoTrab.id}}">
+                    <div ng-repeat="trab in tipoTrab.trabajos">
+                        <div id="motivo-trabajo-{{trab.id}}" class="motivos-trabajos" data-codigo-motivo-trabajo="{{trab.codigo}}" data-id-motivo-trabajo="{{trab.id}}" data-nombre-motivo-trabajo="{{trab.nombre}}">
+                            <div class="left motivos-trabajos-heading">
+                                <div class="left view-motivos-entregables">
+                                    <span class="glyphicon glyphicon-minus pointer expandir-trabajo" title="Expandir"></span>
+                                </div>
+                                <div class="nombre-tipo-trabajo left" data-toggle="tooltip" data-placement="top"
+                                     data-html="true"
+                                     title="{{ &quot;Codigo: &quot; + trab.codigo + &quot;<br>&quot; + trab.desc }}">
+                                    {{trab.nombre | strLimit: 13}}
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                        <div id="entregables-mt-{{trab.id}}">
+                            <div id="entregable-{{entregable.id}}" class="entregables-motivos-trabajo" ng-repeat="entregable in trab.entregables">
+                                <div class="entregable-trabajo left pointer" data-id-entregable="{{entregable.id}}" data-nombre-entregable="{{entregable.nombre}}"
+                                     data-toggle="tooltip" data-placement="top"
+                                     data-html="true"
+                                     title="{{ entregable.desc }}">
+                                    {{entregable.nombre}}
+                                </div>
+                                <div class="clear"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="clear"></div>
+
+    <!-- dia de referencia -->
+    <div id="dia-referencia-consolidacion" class="dia-referencia">
+    </div>
+
+</div>
+
+<!-- Modal Adicion Trabajos -->
+<div class="modal fade" id="modal-add-trabajos" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">
+                    <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+                    <span id="title-modal-add-trabajos">Nuevo Trabajo</span>
+                </h4>
+            </div>
+            <form method="post" id="frm-new-motivo-trabajo" ng-submit="guardarMotivoTrabajo()">
+                <div class="modal-body">
+                    <input type="hidden" ng-model="idMotivoTrabajo" />
+                    <input type="hidden" ng-model="verificadorMotivoTrabajo" />
+
+                    <input type="hidden" ng-model="idTipoMotivoTrabajo" />
+                    <div class="fila">
+                        <label>{{nombreTipoMotivoTrabajo}}</label>
+                    </div>
+
+                    <div class="fila">
+                        <div class="left half half-padding-right">
+                            <label>Código:</label><br />
+                            <input type="text" id="codigo-motivo-trabajo" ng-model="codigoMotivoTrabajo" required="required" class="form-control" ng-required="true" />
+                        </div>
+                        <div class="left half half-padding-left">
+                            <label>Cliente:</label><br />
+                            <select ng-model="clienteMotivoTrabajo" required="required" class="form-control" ng-required="true">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="client in clientes" value="{{ client.id }}">{{ client.nombre }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <div class="left half half-padding-right">
+                            <label>Estado Contrato:</label><br />
+                            <select ng-model="estadoContratoMotivoTrabajo" class="form-control" ng-required="false">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="estado in estadosContrato" value="{{ estado.id }}">{{ estado.nombre }}</option>
+                            </select>
+                        </div>
+                        <div class="left half half-padding-left">
+                            <label>Técnico Responsable:</label>
+                            <select class="form-control" ng-model="colaboradorContrato" ng-required="false">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="trab in trabajadores" value="{{ trab.trab.id }}">{{ trab.trab.nombre }}, {{trab.trab.sede}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <label>Nombre:</label>
+                        <input type="text" id="nombre-motivo-trabajo" ng-model="nombreMotivoTrabajo" required="required" class="form-control" />
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <div class="left half half-padding-right">
+                            <label>Tipo de Plazo:</label>
+                            <select class="form-control" ng-model="tipoPlazo" ng-required="false">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="tipo in tiposPlazo" value="{{ tipo.id }}">{{ tipo.nombre }}</option>
+                            </select>
+                        </div>
+                        <div class="left half half-padding-left">
+                            <label>Plazo en Días:</label>
+                            <input type="number" id="dias-plazo" ng-model="diasPlazo" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <div class="left half half-padding-right">
+                            <label>Fecha Inicio:</label>
+                            <input id="fecha-inicio-motivo-trabajo" ng-model="fechaInicioMotivoTrabajo" class="form-control" ng-required="true" />
+                        </div>
+                        <div class="left half half-padding-left">
+                            <label>Fecha Fin:</label>
+                            <input id="fecha-fin-motivo-trabajo" ng-model="fechaFinMotivoTrabajo" class="form-control" ng-required="true" />
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila" ng-hide="nombreTipoMotivoTrabajo != 'SOPORTE Y MANTENIMIENTO'">
+                        <div class="left half half-padding-right">
+                            <label>Horas Mensuales:</label>
+                            <input type="number" min="0" ng-model="horasMes" ng-required="nombreTipoMotivoTrabajo == 'SOPORTE Y MANTENIMIENTO'" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+                    <div class="fila">
+                        <label>Detalle:</label>
+                        <textarea ng-model="detalleMotivoTrabajo" required="required" class="form-control"></textarea>
+                    </div>
+
+                    <br>
+                    <div class="fila">
+                        <div class="panel panel-default">
+                            <div class="panel-heading"><label>Adjuntos</label></div>
+                            <div class="datos-contrato panel-body">
+                                <div id="panel-adjuntos-contratos">
+                                    <div class="box-adjunto" ng-repeat="adj in adjuntos">
+                                        <a target="_blank" href="~/Web/{{adj.url}}">{{adj.desc}}</a>
+                                        <span class="cancel-adj glyphicon glyphicon-remove" ng-click="eliminarAdjunto(adj.idAdj)" title="Eliminar adjunto"></span>
+                                    </div>
+                                </div>
+
+                                <div class="file-adj-contrato">
+                                    <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                                        <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
+                                        <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
+                                        <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+                                    </div>
+                                </div>
+                                <div id="barra-botones-file">
+                                    <button id="addInputFileAnterior" ng-click="adicionarFileAnterior()" type="button" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus"></span> Adicionar</button>
+                                    <button id="deleteInputFileAnterior" disabled="disabled" ng-click="deleteFileAnterior()" type="button" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-minus"></span> Eliminar</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="clear"></div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Grabar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Adicion Entregables Trabajos -->
+<div class="modal fade" id="modal-add-entregables-trabajos" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">
+                    <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+                    <span id="title-modal-add-entregables-trabajos">Nuevo Entregable</span>
+                </h4>
+            </div>
+            <form method="post" id="frm-new-entregable-trabajo" ng-submit="guardarEntregableMotivoTrabajo()">
+                <div class="modal-body">
+                    <input type="hidden" ng-model="idEntregableMotivoTrabajo" />
+                    <input type="hidden" ng-model="verificadorEntregableMotivoTrabajo" />
+
+                    <input type="hidden" ng-model="idMotivoTrabajoEntregable" />
+                    <div class="fila">
+                        <label>{{nombreMotivoTrabajo}}</label>
+                    </div>
+
+                    <div class="fila">
+                        <label>Nombre:</label>
+                        <input ng-model="nombreEntregableMotivoTrabajo" required="required" class="form-control" />
+                    </div>
+
+                    <div class="fila">
+                        <div class="left half half-padding-right">
+                            <label>Técnico Responsable:</label>
+                            <select class="form-control" ng-model="colaboradorMotivoTrabajo" ng-required="false">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="trab in trabajadores" value="{{ trab.trab.id }}">{{ trab.trab.nombre }}, {{trab.trab.sede}}</option>
+                            </select>
+                        </div>
+                        <div class="left half half-padding-left">
+                            <label>Fecha Producción:</label>
+                            <input id="fecha-produccion-entregable" ng-model="fechaProduccionEntregable" class="form-control" autocomplete="off" />
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <label>Detalle:</label>
+                        <textarea ng-model="detalleEntregableMotivoTrabajo" required="required" class="form-control"></textarea>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <div class="left half half-padding-right">
+                            <label>Fecha Inicio:</label>
+                            <input id="fecha-inicio-entregable-motivo-tarea" ng-model="fechaInicioEntregableMotivoTrabajo" class="form-control" ng-required="true" />
+                        </div>
+                        <div class="left half half-padding-left">
+                            <label>Fecha Fin:</label>
+                            <input id="fecha-fin-entregable-motivo-tarea" ng-model="fechaFinEntregableMotivoTrabajo" class="form-control" ng-required="true" />
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <div class="left half half-padding-right">
+                            <label>Porcentaje de Avance</label>
+                            <select class="form-control" ng-model="avanceEntregableMotivoTrabajo">
+                                <option ng-repeat="n in porciento" value="{{n}}">{{n}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Grabar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Crear Tareas -->
+<div class="modal fade" id="modal-add-task-consolidacion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">
+                    <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+                    <span id="title-modal-add-task-consolidacion">Adicionar Tareas</span>
+                </h4>
+            </div>
+            <form method="post" id="frm-new-task-consolidacion" ng-submit="guardarTareaConsolidacion()">
+                <div class="modal-body">
+                    <input type="hidden" ng-model="idEntregableTaskConsolidacion" />
+                    <input type="hidden" ng-model="lunesSemanaTaskConsolidacion" />
+
+                    <div class="fila">
+                        <label>{{clienteTaskConsolidacion}}/{{entregableTaskConsolidacion}}</label>
+                    </div>
+                    <div class="fila">
+                        <label>Semana: {{lunesSemanaTaskConsolidacion}} - {{domingoSemanaTaskConsolidacion}}</label>
+                    </div>
+
+                    <div class="fila">
+                        <div class="left half half-padding-right">
+                            <label>Colaborador:</label>
+                            <select class="form-control" ng-model="colaboradorTaskConsolidacion" ng-required="true" ng-change="seleccionarSedePorColaborador()">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="trab in trabajadores" value="{{ trab.trab.id }}">{{ trab.trab.nombre }}, {{trab.trab.sede}}</option>
+                            </select>
+                        </div>
+                        <div class="left half half-padding-left">
+                            <label>Ubicación:</label>
+                            <select class="form-control" ng-model="ubicacionTaskConsolidacion" ng-required="true">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="lugar in lugares" value="{{ lugar.id }}">{{ lugar.nombre }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <div class="left half half-padding-right">
+                            <label>Actividad:</label>
+                            <select class="form-control" ng-model="actividadTaskConsolidacion" ng-required="true">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="act in actividades" value="{{ act.id }}">{{ act.nombre }}</option>
+                            </select>
+                        </div>
+                        <div class="left half half-padding-left">
+                            <label>Módulo:</label>
+                            <select class="form-control" ng-model="moduloTaskConsolidacion" ng-required="true">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="mod in modulos" value="{{ mod.id }}">{{ mod.nombre }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <div class="left half half-padding-right">
+                            <label>Coordinador:</label>
+                            <select class="form-control" ng-model="coordinadorTaskConsolidacion">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="cord in coordinadores" value="{{ cord.id }}">{{ cord.nombre }}</option>
+                            </select>
+                        </div>
+                        <div class="left half half-padding-left">
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <label>Detalle:</label>
+                        <textarea ng-model="detalleTaskConsolidacion" required="required" class="form-control"></textarea>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <table id="tabla-horas-dia-task-consolidacion">
+                            <tr>
+                                <td><label>Lun</label></td>
+                                <td><label>Mar</label></td>
+                                <td><label>Mié</label></td>
+                                <td><label>Jue</label></td>
+                                <td><label>Vie</label></td>
+                                <td><label>Sáb</label></td>
+                                <td><label>Dom</label></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <select ng-model="horasLunesTaskConsolidacion" class="form-control horas-dia-task-consolidacion">
+                                        <option value="0">0</option>
+                                        <option value="{{hora}}" ng-repeat="hora in horasTrabajo">{{hora}}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select ng-model="horasMartesTaskConsolidacion" class="form-control horas-dia-task-consolidacion">
+                                        <option value="0">0</option>
+                                        <option value="{{hora}}" ng-repeat="hora in horasTrabajo">{{hora}}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select ng-model="horasMiercolesTaskConsolidacion" class="form-control horas-dia-task-consolidacion">
+                                        <option value="0">0</option>
+                                        <option value="{{hora}}" ng-repeat="hora in horasTrabajo">{{hora}}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select ng-model="horasJuevesTaskConsolidacion" class="form-control horas-dia-task-consolidacion">
+                                        <option value="0">0</option>
+                                        <option value="{{hora}}" ng-repeat="hora in horasTrabajo">{{hora}}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select ng-model="horasViernesTaskConsolidacion" class="form-control horas-dia-task-consolidacion">
+                                        <option value="0">0</option>
+                                        <option value="{{hora}}" ng-repeat="hora in horasTrabajo">{{hora}}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select ng-model="horasSabadoTaskConsolidacion" class="form-control horas-dia-task-consolidacion">
+                                        <option value="0">0</option>
+                                        <option value="{{hora}}" ng-repeat="hora in horasTrabajo">{{hora}}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select ng-model="horasDomingoTaskConsolidacion" class="form-control horas-dia-task-consolidacion">
+                                        <option value="0">0</option>
+                                        <option value="{{hora}}" ng-repeat="hora in horasTrabajo">{{hora}}</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Grabar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--Menú del Click Derecho -->
+<ul id="menu-opciones" class="dropdown-menu">
+    <li ng-click="adicionarMotivoTrabajo()"><a href="#"><span class="glyphicon glyphicon-plus"></span> Adicionar</a></li>
+
+    <li ng-click="adicionarEntregable()"><a href="#"><span class="glyphicon glyphicon-plus"></span> Adicionar Entregable</a></li>
+    @*@if (Roles.IsUserInRole("ACTAS"))
+        {
+        }*@
+    <li><a href="" target="_blank" ng-click="adicionarActa()"><span class="glyphicon glyphicon-plus"></span> Adicionar Acta</a></li>
+
+    <li ng-click="editarMotivoTrabajo()"><a href="#"><span class="glyphicon glyphicon-edit"></span> Editar</a></li>
+    <li ng-click="eliminarMotivoTrabajo()"><a href="#"><span class="glyphicon glyphicon-remove"></span> Eliminar</a></li>
+
+    <li ng-click="editarEntregable()"><a href="#"><span class="glyphicon glyphicon-edit"></span> Editar</a></li>
+    <li ng-click="eliminarEntregable()"><a href="#"><span class="glyphicon glyphicon-remove"></span> Eliminar</a></li>
+
+    <li ng-click="adicionarTareas()"><a href="#"><span class="glyphicon glyphicon-plus"></span> Adicionar Tareas</a></li>
+
+    <li ng-click="adicionarEntregables()"><a href="#"><span class="glyphicon glyphicon-plus"></span> Adicionar Entregables</a></li>
+</ul>
+
+<!-- Modal Proximos Entregables Trabajos -->
+<div class="modal fade" id="modal-proximos-entregables" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">
+                    <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+                    <span id="title-modal-proximos-entregables">Proximos Entregables</span>
+                </h4>
+            </div>
+
+            <div class="modal-body">
+                <div id="panel-filtro-proximos-entregables">
+                    <label>Desde:</label><input class="form-control" ng-model="fechaDesdeProximoEntregable" id="fecha-desde-proximo-entregable" type="text" ng-change="cargarPagina()" />
+                    <label>Hasta:</label><input class="form-control" ng-model="fechaHastaProximoEntregable" id="fecha-hasta-proximo-entregable" type="text" ng-change="cargarPagina()" />
+                    <label>Cliente:</label>
+                    <select class="form-control" ng-model="clienteProximoEntregable" ng-change="cargarPagina()">
+                        <option value="">Seleccione...</option>
+                        <option ng-repeat="client in clientes" value="{{ client.id }}">{{ client.nombre }}</option>
+                    </select>
+                </div>
+                <div class="clear"></div>
+                <div>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Trabajo</th>
+                                <th>Entregable</th>
+                                <th>Colaborador(es)</th>
+                                <th>Fecha de Inicio</th>
+                                <th>Fecha de Entrega</th>
+                                <th>Termina En</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="pEntregable in proximosEntregables" class="{{pEntregable.clase}}">
+                                <td>{{pEntregable.trabajo}}</td>
+                                <td>{{pEntregable.entregable}}</td>
+                                <td>{{pEntregable.colaboradores}}</td>
+                                <td>{{pEntregable.fechaInicio}}</td>
+                                <td>{{pEntregable.fechaFin}}</td>
+                                <td>{{pEntregable.terminaEn}}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="6">
+                                    <nav>
+                                        <ul class="pagination">
+                                            <li ng-click="atrazarPagina()">
+                                                <a href="#" aria-label="Previous">
+                                                    <span aria-hidden="true">&laquo;</span>
+                                                </a>
+                                            </li>
+                                            <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
+                                            <li ng-click="avanzarPagina()">
+                                                <a href="#" aria-label="Next">
+                                                    <span aria-hidden="true">&raquo;</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="clear"></div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Asignaciones de entregables -->
+<div class="modal fade" id="modal-asignaciones-entregables" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+
+                <div>
+                    <div style="text-align: center;"><b>{{usuarioColaborador}}</b></div>
+                </div>
+                <div class="clear"></div>
+                <div>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Modulo</th>
+                                <th>Actividad</th>
+                                <th>Horas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="act in actividades">
+                                <td>{{act.fecha}}</td>
+                                <td>{{act.modulo}}</td>
+                                <td>{{act.actividad}}</td>
+                                <td>{{act.horas}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-adicionar-entregables-modulo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">
+                    <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+                    <span id="title-modal-proximos-entregables">Adicionar entregables</span>
+                </h4>
+            </div>
+
+            <form method="post" ng-submit="guardarListaEntregables()">
+                <div class="modal-body">
+                    <div class="col-md-8">
+                        <div><b>Módulos: </b></div>
+                        <multiselect ng-required="true" required="required" ng-model="modulosEntregables" options="listaModulos" show-search="true" search-limit="1000" id-prop="id" display-prop="nombre" placeholder="Seleccione" labels="{'search': 'Buscar'}">
+                        </multiselect>
+                    </div>
+                    <div class="col-md-4">
+                        <div><b>Contrato: </b></div>
+                        {{codigoMotivoTrabajo}} - {{nombreMotivoTrabajo}}
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Grabar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="htmlFile" class="invisible">
+    <div class="file-adj-contrato">
+        <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+            <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
+            <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
+            <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+        </div>
+    </div>
+</div>

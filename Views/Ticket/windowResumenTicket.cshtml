@@ -1,0 +1,141 @@
+﻿<div class="full-size scrollable-y">
+    <div class="form-inline" style="margin-bottom: 5px;">
+        <label>Fecha de la semana: </label>
+        <div class='input-group date' id='dtp-fecha-semana-resumen'>
+            <input type='text' class="form-control" />
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+        </div>
+        <button class="btn btn-info" ng-click="buscarDatos()"><span class="glyphicon glyphicon-search"></span> Buscar</button>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Ingresados en la semana
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped"> 
+                <thead>
+                    <tr>
+                        <th>Ingresados</th>
+                        <th>Abiertos</th>
+                        <th>Asignados</th>
+                        <th>En Desarrollo</th>
+                        <th>Resueltos</th>
+                        <th>Cerrados</th>
+                        <th>Anulados</th>
+                        <th>Facturable</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{semana.ingresados}}</td>
+                        <td>{{semana.abiertos}}</td>
+                        <td>{{semana.asignados}}</td>
+                        <td>{{semana.desarrollos}}</td>
+                        <td>{{semana.resueltos}}</td>
+                        <td>{{semana.cerrados}}</td>
+                        <td>{{semana.anulados}}</td>
+                        <td>{{semana.facturable}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Ingresados en fechas anteriores
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Ingresados</th>
+                        <th>Abiertos</th>
+                        <th>Asignados</th>
+                        <th>En Desarrollo</th>
+                        <th>Resueltos</th>
+                        <th>Cerrados</th>
+                        <th>Anulados</th>
+                        <th>Facturable</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{anteriores.ingresados}}</td>
+                        <td>{{anteriores.abiertos}}</td>
+                        <td>{{anteriores.asignados}}</td>
+                        <td>{{anteriores.desarrollos}}</td>
+                        <td>{{anteriores.resueltos}}</td>
+                        <td>{{anteriores.cerrados}}</td>
+                        <td>{{anteriores.anulados}}</td>
+                        <td>{{anteriores.facturable}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div>
+        <fieldset>
+            <legend>Cerrados en la semana:</legend>
+        </fieldset>
+        <div class="half left half-padding-right">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    Resumen de tickets por clientes
+                </div>
+                <div class="panel-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Clientes</th>
+                                <th>Cantidad de Tickets</th>
+                                <th>Tiempo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="dato in ticketsClientes">
+                                <td>{{dato.cliente}}</td>
+                                <td>{{dato.cantidad}}</td>
+                                <td>{{dato.horasAsignadas}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="half left half-padding-left">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    Resumen de tickets por técnicos
+                </div>
+                <div class="panel-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Técnico</th>
+                                <th>Cantidad de Tickets</th>
+                                <th>Tiempo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="dato in ticketsTecnicos">
+                                <td>{{dato.tecnico}}</td>
+                                <td>{{dato.cantidad}}</td>
+                                <td>{{dato.horasAsignadas}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="clear"></div>
+    </div>
+    
+</div>

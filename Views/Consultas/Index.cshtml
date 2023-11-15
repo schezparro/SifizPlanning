@@ -1,0 +1,160 @@
+﻿
+@{
+    ViewBag.Title = "Bienvenido al modulo de Consultas de SifizPlanning";
+}
+
+<!DOCTYPE html>
+
+<html ng-app="consultas">
+<head>
+    <!--<meta name="viewport" content="width=device-width" />-->
+    <title>@ViewBag.Title</title>
+    <link href="~/Web/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Web/css/bootstrap-theme.min.css" rel="stylesheet" />
+    <link href="~/Web/css/datepicker.css" rel="stylesheet" />
+    <link href="~/Web/css/bootstrap-datetimepicker.css" rel="stylesheet" />
+    <link href="~/Web/css/jasny-bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Web/css/bootstrap-datetimepicker.css" rel="stylesheet" />
+    <link href="~/Web/css/bootstrap-select.min.css" rel="stylesheet" />
+    <link href="~/Web/css/admin/admin.css" rel="stylesheet" />
+    <link href="~/Web/css/home/home.css" rel="stylesheet" />
+
+    <script type="text/javascript" src="~/Web/js/jquery-2.1.3.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/jquery.signalR-2.1.2.min.js"></script>
+    <script type="text/javascript" src="~/signalr/hubs"></script>
+    <script type="text/javascript" src="~/Web/js/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/angular.min.js"></script>
+</head>
+<body ng-controller="mainConsultasController">
+
+    <div id="content_body">
+
+        <div id="menu-principal">
+            <ul class="nav nav-pills left">
+                <li role="presentation" id="li-ir-modulos-clientes"><a id="a-ir-modulos-clientes" href="#" ng-click="IrModulosClientes()">Modulos por Cliente</a></li>
+                @if (Roles.IsUserInRole("ACTAS") || Roles.IsUserInRole("GESTOR"))
+                {
+                    <li role="presentation" id="li-ir-actas"><a ng-href="#actas" ng-click="IrActasContratos()">Consulta de Actas</a></li>
+                }
+                <li role="presentation"><a id="a-ir-consulta-contratos" href="#" ng-click="IrConsultaContratos()">Consulta de Contratos</a></li>
+                <li role="presentation"><a id="a-ir-consulta-garantias" href="#" ng-click="IrConsultaGarantias()">Garantía de Contratos</a></li>
+                <li role="presentation"><a id="a-ir-garantia-tickets" href="#" ng-click="IrGarantiaTickets()">Garantía de Tickets</a></li>
+                <li role="presentation"><a id="a-ir-oferta-tickets" href="#" ng-click="IrOfertaTickets()">Ver Ofertas</a></li>
+            </ul>
+
+            <div class="right">
+                <a href="cerrar/sesion/" class="right btn btn-danger"><span class="glyphicon glyphicon-off"></span> Cerrar Sesión</a>
+                <a href="main-menu" style="margin-right: 4px;" class="right btn btn-warning"><span class="glyphicon glyphicon-menu-hamburger"></span> Menú Principal</a>
+            </div>
+            <div class="clear"></div>
+        </div>
+
+        <div id="panel-principal" class="panel panel-default" @*ng-init="funcionalidad = 'MODULOS POR CLIENTE'"*@>
+            <div class="panel-heading">
+                <h3 id="titulo-panel" class="panel-title">{{ funcionalidad }}</h3>
+            </div>
+
+            <div id="funcionalidad">
+
+                <div id="panel_modulos_clientes" ng-controller="modulosClientesController">
+                    @{Html.RenderPartial("modulosClientes");}
+                </div>
+
+                <div id="panel_actas_contratos" class="invisible" ng-controller="actasController">
+                    @{Html.RenderPartial("windowActasContratos");}
+                </div>
+
+                <div id="panel_consulta_contratos" class="invisible" ng-controller="contratosController">
+                    @{Html.RenderPartial("windowConsultaContratos");}
+                </div>
+
+                <div id="panel_consulta_garantias" class="invisible" ng-controller="garantiasController">
+                    @{Html.RenderPartial("windowGarantias");}
+                </div>
+
+                <div id="panel_garantia_tickets" class="invisible" ng-controller="garantiaTicketsController">
+                    @{Html.RenderPartial("windowGarantiaTickets");}
+                </div>
+
+                <div id="panel_oferta_tickets" class="invisible" ng-controller="ofertaTicketsController">
+                    @{Html.RenderPartial("windowOfertaTickets");}
+                </div>
+
+                <div id="loadingDiv">
+                    <img src="~/Web/images/ajax-loader.gif" />
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- CODIGO DEL CHAT -->
+    <div id="sifiz-chat" style="display: none;">
+        <div id="head-sifiz-chat" class="btns-chat">
+            <div class="left nombre-usuario-local"></div>
+            <div class="right"> <i class="glyphicon glyphicon-chevron-down"></i></div>
+            <div class="clear"></div>
+        </div>
+        <div style="padding: 3px;">
+            <input id="filtro-chat" type="text" class="form-control" placeholder="Filtrar..." />
+        </div>
+        <div id="body-sifiz-chat" style="display: block;">
+            <div id="panel-usuarios-sfz">
+
+            </div>
+        </div>
+    </div>
+
+    <div id="ventanas-activas-chat">
+
+    </div>
+
+    <div id="div-usuario-chat">
+        <div class="usuario-chat" data-id="">
+            <div class="estado-usuario left active"><i class="glyphicon glyphicon-ok-sign"></i></div>
+            <div class="left nombre-usuario"></div>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <div id="ventana-chat-conversacion" style="display: none;">
+        <div class="ventana-chat">
+            <div class="heading-ventana-chat">
+                <div class="left nombre-contacto">Henry Cruz</div>
+                <div class="right"><i class="glyphicon glyphicon-remove"></i></div>
+                <div class="clear"></div>
+            </div>
+            <div class="chat-text-ventana-chat">
+
+            </div>
+            <div class="text-ventana-chat">
+                <textarea data-id-persona=""></textarea>
+            </div>
+        </div>
+    </div>
+    <audio id="audio-chat" controls="controls">
+        <source src="~/Web/sounds/happy-ending.mp3" type="audio/mpeg" />
+    </audio>
+    <!-- FIN DEL CODIGO DEL CHAT -->
+
+    <script type="text/javascript" src="~/Web/js/angular-dragdrop.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/angular-route.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/moment.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/bootstrap-datepicker.js"></script>
+    <script type="text/javascript" src="~/Web/js/bootstrap-datetimepicker.js"></script>
+    <script type="text/javascript" src="~/Web/js/jasny-bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/highcharts.js"></script>
+    <script type="text/javascript" src="~/Web/js/chat.js"></script>
+    <script type="text/javascript" src="~/Web/js/waiting.js"></script>
+    <script type="text/javascript" src="~/Web/js/consultas/consultas.js"></script>
+    <script type="text/javascript" src="~/Web/js/consultas/modulosClientes.js"></script>
+    <script type="text/javascript" src="~/Web/js/consultas/actasContratos.js"></script>
+    <script type="text/javascript" src="~/Web/js/consultas/consultaContratos.js"></script>
+    <script type="text/javascript" src="~/Web/js/consultas/consultaGarantias.js"></script>
+    <script type="text/javascript" src="~/Web/js/consultas/garantiaTickets.js"></script>
+    <script type="text/javascript" src="~/Web/js/consultas/ofertaTickets.js"></script>
+</body>
+</html>
+

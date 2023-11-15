@@ -1,0 +1,221 @@
+﻿<div>
+    <div class="form-inline" style="margin-bottom: 5px;">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-3">
+                    <label>Cliente:</label>
+                    <select id="clienteMantenimiento" class="form-control" style="max-width: 225px" ng-model="clienteReporteTicket" ng-required="true">
+                        <option value="">Seleccione...</option>
+                        <option ng-repeat="cliente in clientes" value="{{cliente.id}}">{{cliente.nombre}}</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label>F.Inicio: </label>
+                    <div class='input-group date' id='dtp-fecha-inicio-reporte'>
+                        <input type='text' class="form-control" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label>F.Fin: </label>
+                    <div class='input-group date' id='dtp-fecha-fin-reporte'>
+                        <input type='text' class="form-control" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <button ng-click="buscarTicteksReporte()" class="btn btn-info"><span class="glyphicon glyphicon-search"></span> Buscar</button>
+                    <button ng-click="panelEmail(cliente.nombre)" class="btn btn-success"><span class="glyphicon glyphicon-envelope"></span> Enviar</button>
+                    @*<button ng-click="acumuladoTicket()" class="btn btn-light"><span class="glyphicon glyphicon-edit"></span> Comentar</button>*@
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <p ng-show="reporteTicketFiltrados.length > 0" style="display: inline-block; margin-left: 10px; margin-top: 4px">Total Ticket: <span ng-bind="reporteTicketFiltrados.length"></span></p>
+        <p ng-show="tickets.length > 0" style="display: inline-block; margin-left: 10px">Suma Tiempos: <span>{{ sumarTiempos() }}</span></p>
+        <input style="display: inline-block;" type="text" class="form-control right filtro" placeholder="Filtrar..." id="filtroReporteTickets" ng-model="filtroReporteTickets" />
+    </div>
+    <div class="clear"></div>
+    <div style="height:10px"></div>
+    <div class="panel panel-default">
+        <div class="panel-body" style="max-height: 568px; overflow-y: auto;">
+            <table class="table table-hover table-striped table-condensed" style="width: 100%">
+                <thead>
+                    <tr>
+                        <th>No.Ticket</th>
+                        <th>Detalle</th>
+                        <th hidden>Reportado_Por</th>
+                        <th>Técnico_Asignado</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th>Categoria</th>
+                        <th>Categoria Revisada</th>
+                        <th>Tiempo</th>
+                        <th style="margin-left: 10px;">
+                            <button aria-hidden="true" ng-click="mostrarInputAdd=true" type="button" class="btn btn-success btn-xs" aria-label="Left Align">
+                                <span aria-hidden="true" class="glyphicon glyphicon-plus"></span>
+                            </button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-show="mostrarInputAdd">
+                        <td>
+                            <input type="number" ng-style="{'width': '65px'}" min="0" ng-model="noReporteTicket" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="text" ng-model="detalleReporteTicket" class="form-control" />
+                        </td>
+                        <td>
+                            <select id="select-tecnico-reporte" class="form-control">
+                                <option value="0">Seleccione...</option>
+                                <option ng-repeat="tecnico in asignados" value="{{tecnico.id}}">{{tecnico.nombre}}</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input id="dtp-fecha-add-reporte" ng-model="fechaAddTicket" class="form-control" autocomplete="off" />
+                        </td>
+                        <td>
+                            <select id="select-estado-reporte" class="form-control">
+                                <option value="0">Seleccione...</option>
+                                <option ng-repeat="estado in estadosTicket" value="{{estado.id}}">{{estado.nombre}}</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" ng-model="reportadoReporteTicket" class="form-control" />
+                        </td>
+                        <td></td>
+                        <td>
+                            <input type="number" ng-style="{'width': '65px'}" min="0" ng-model="tiempoReporteTicket" class="form-control" />
+                        </td>
+                        <td>
+                            <button aria-hidden="true" ng-click="mostrarInputAdd=false; agregarTicketTarea()" type="button" class="btn btn-primary btn-xs" aria-label="Left Align">
+                                <span aria-hidden="true" class="glyphicon glyphicon-ok"></span>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr ng-repeat="ticket in tickets | filter:filtroReporteTickets as reporteTicketFiltrados">
+                        <td>{{ticket.numero}}</td>
+                        <td>{{ticket.detalle}}</td>
+                        <td hidden>{{ticket.reportado}}</td>
+                        <td>{{ticket.asignado}}</td>
+                        <td>{{ticket.fecha}}</td>
+                        <td>{{ticket.estado}}</td>
+                        <td>{{ticket.categoria != "" ? ticket.categoria : ticket.reportado }}</td>
+                        <td>{{ticket.categoriaRevisada}}</td>
+                        <td>
+                            <span ng-hide="mostrarInput">{{ticket.tiempo}}</span>
+                            <input ng-show="mostrarInput" type="number" ng-style="{'width': '65px'}" min="0" ng-model="ticket.tiempo" class="form-control" />
+                        </td>
+                        <td>
+                            <button aria-hidden="true" ng-show="mostrarInput" ng-click="mostrarInput=false; editarTiempo($index)" type="button" class="btn btn-primary btn-xs" aria-label="Left Align">
+                                <span aria-hidden="true" class="glyphicon glyphicon-ok"></span>
+                            </button>
+                            <button aria-hidden="true" ng-hide="mostrarInput" ng-click="mostrarInput=true" type="button" class="btn btn-primary btn-xs" aria-label="Left Align">
+                                <span aria-hidden="true" class="glyphicon glyphicon-pencil"></span>
+                            </button>
+                            <button aria-hidden="true" ng-click="eliminarTicketTarea($index)" type="button" class="btn btn-danger btn-xs" aria-label="Left Align">
+                                <span aria-hidden="true" class="glyphicon glyphicon-remove"></span>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="text-md-center" ng-show="totalTicketMantenimiento > 0">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <b class="right" style='color:#000 !important;'>
+                                TOTAL
+                            </b> <br>
+                            <b class="right" style='color:#000 !important;'>
+                                HORAS_CONTRATADAS
+                            </b> <br>
+                            <b class="right" style='color:#000 !important;'>
+                                HORAS_RESTANTES
+                            </b>
+                        </td>
+                        <td>
+                            <b>
+                                {{totalHoras}}
+                            </b> <br>
+                            <b>
+                                {{horasMes}}
+                            </b> <br>
+                            <b>
+                                {{horasRestantes}}
+                            </b>
+                        </td>
+                        <td>
+                            <select id="selectHorasMantenimiento" ng-change="agregarComentarioHoras()" class="form-control" style="max-width: 120px" ng-model="comentarioReporte" ng-required="true">
+                                <option value="0">Seleccione...</option>
+                                <option ng-repeat="catalogo in catalogoComentario" value="{{catalogo.id}}">{{catalogo.nombre}}</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+<!-- Ventana email de un ticket -->
+<div class="modal fade" id="modal-email-mantenimiento-tickets" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-comentarios-ticket-label"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Enviar por Email </h4>
+            </div>
+
+            <div class="modal-body">
+                <form>
+                    Para:
+                    <input class="form-control" ng-model="destinatariosEmailTicket">
+                </form>
+                <form>
+                    Asunto:
+                    <input class="form-control" ng-model="asuntoEmailTicket">
+                </form>
+                <textarea class="form-control panel panel-default margin-top-5" ng-model="comentarioEmailTicket">
+                    </textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" ng-click="enviarPorEmail()" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Enviar</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- edit -->
+<div class="modal fade" id="modal-acumulado-mantenimiento-tickets" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-acumulado-ticket-label"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span>Comentario Se acumula/factura</h4>
+            </div>
+
+            <div class="modal-body">
+                <form class="form-inline">
+                    <label>Cliente:  <span>{{acumuladoCliente}}</span></label>
+                    <label class="right" style="margin-right: 5px">Fecha:  {{acumuladoFecha}}</label>
+                </form>
+                <textarea class="form-control panel panel-default margin-top-5" ng-model="acumuladoMantenimientoTicket">
+                    </textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" ng-click="GuardarAcumulado()" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Guardar</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

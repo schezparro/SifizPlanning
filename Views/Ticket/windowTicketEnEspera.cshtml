@@ -1,0 +1,40 @@
+﻿<div>
+    <div class="form-inline">
+        <label>Cantidad de Días Laborables Atrás:</label>
+        <input type="text" class="form-control solo-numero" ng-model="cantDias" ng-enter="buscarTicketEnEspera()" />
+        <button class="btn btn-primary" ng-click="buscarTicketEnEspera()"><span class="glyphicon glyphicon-search"></span> Buscar</button>
+    </div>
+
+    <div id="div-tabla-gestion-ticket-en-espera">
+        <table class="table table-striped table-condensed table-hover">
+            <thead>
+                <tr>
+                    <th>Seleccionar</th>
+                    <th>Número de Ticket</th>
+                    <th>Asunto</th>
+                    <th>Fecha de Esperando Respuesta</th>
+                    <th>Histórico</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="ticket in ticketsEnEspera">
+                    <td>
+                        <input type="checkbox" value="{{ticket.id}}" />
+                    </td>
+                    <td>{{ticket.id | rellenarIzq:0}}</td>
+                    <td>{{ticket.asunto}}</td>
+                    <td>{{ticket.fecha | strDateToStr}}</td>
+                    <td ng-click="verHistoricoTicketResuelto(ticket.id)"><b class="text-info">Ver Histórico</b></td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5">
+                        <input type="checkbox" id="seleccion-todos-gtr" /> <label>: Seleccionar Todos</label>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+        <button class="btn btn-primary" ng-click="cerrarTicketsSeleccionados()"><span class="glyphicon glyphicon-flag"></span> Cerrar los Tickets Seleccionados</button>
+    </div>
+</div>

@@ -1,0 +1,136 @@
+﻿<div id="div-vista-consulta-tfs">
+    <div class="form-inline">
+        <label>Proyecto:</label>
+        <select id="selectProyecto" class="form-control" ng-model="proyecto">
+            <option value="">Seleccione...</option>
+            <option ng-repeat="p in proyectos" value="{{p.id}}">{{p.nombre + ' __ ' + p.path}}</option>
+        </select>
+        <label style="margin-left:10px">Usuario:</label>
+        <select id="selectUsuario" class="form-control" ng-model="usuario">
+            <option value="">Seleccione...</option>
+            <option ng-repeat="u in usuarios" value="{{u.nombre}}">{{u.nombre}}</option>
+        </select>
+        <label style="margin-top:5px; margin-left:10px">Fecha Inicio:</label>
+        <input id="fechaInicio" type="text" class="form-control datepicker-filtro" ng-model="fechaInicio">
+        <label style="margin-top:5px; margin-left:10px">Fecha Fin:</label>
+        <input id="fechaFin" type="text" class="form-control datepicker-filtro" ng-model="fechaFin">
+        <button style="margin-left:10px" class="btn btn-primary" ng-click="filtrarCambios()"><span class="glyphicon glyphicon-search"></span> Filtrar</button>
+    </div>
+    <div>
+        <input type="checkbox" ng-model="mostrarComentariosErrores" ng-change="filtrarComentariosErrores()" /> <label>Mostrar Comentarios con Formato Incorrecto</label>
+    </div>
+    <div style="height: calc(100% - 50px); overflow-y: auto;">
+        <table class="table table-striped table-condensed table-hover" style="margin-top:10px; width: 100%">
+            <thead>
+                <tr>
+                    <th>Proyecto</th>
+                    <th>Usuario</th>
+                    <th>Fecha</th>
+                    <th>Cantidad</th>
+                    <th>Comentario</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="cambio in cambios" ng-click="selectConjuntoCambios(cambio.Proyecto,cambio.Financial,cambio.Usuario, cambio.Fecha, cambio.ConjuntoCambiosID)">
+                    <td>{{cambio.Proyecto}}</td>
+                    <td>{{cambio.Usuario}}</td>
+                    <td>{{cambio.Fecha}}</td>
+                    <td style="text-align:center">{{cambio.CantidadCambios}}</td>
+                    <td>{{cambio.Comentario}}</td>
+                    <td style="display:none">{{cambio.ConjuntoCambiosID}}</td>
+                    <td style="display:none">{{cambio.Financial}}</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="12">
+                        <div class="form-inline">
+                            <div class="form-inline left col-md-3">
+                                <nav>
+                                    <ul class="pagination">
+                                        <li ng-click="atrazarPagina()">
+                                            <a href="#" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                        <li class="pagin-tfs" ng-repeat="pagina in paginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
+                                        <li ng-click="avanzarPagina()">
+                                            <a href="#" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                            <div class="col-md-7" style="margin-top: 20px">
+                                <label>{{pagina}}/{{cantPaginas}}</label>
+                                <label>Cantidad Por Página:</label>
+                                <select id="selectCantidadPaginas" class="form-control" ng-model="cantidadMostrarPorPagina" ng-change="actualizarCantidadMostrar()">
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                            <div class="right col-md-2" style="margin-top: 30px">
+                                <div>
+                                    <label>Total de Conjunto de Cambios: </label>{{totalCambios}}
+                                </div>
+                            </div>
+                        </div>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+
+<!--Conjunto de cambios-->
+<div class="modal fade" id="modal-edit-competencias-software" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="label-modal-edit-competencias-software"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>Conjunto de Cambios</h4>
+            </div>
+            <form method="post" id="frm-edit-competencias-software">
+                <div class="modal-body">
+                    <div>
+                        <label>Proyecto:</label> {{proyectoCambio}} &nbsp;&nbsp;&nbsp;
+                        <label>Usuario:</label> {{usuarioCambio}} &nbsp;&nbsp;&nbsp;
+                        <label>Fecha:</label> {{fechaCambio}} &nbsp;&nbsp;&nbsp;
+                    </div>
+
+                    <div class="fila">
+                        <div id="tabla-nivel-competencias-software">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Archivo</th>
+                                        <th>Path del Archivo</th>
+                                        <th>Operación</th>
+                                        <th>Link Tfs</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="cambio in conjuntoCambios">
+                                        <td>{{cambio.Archivo}}</td>
+                                        <td>{{cambio.CaminoArchivo}}</td>
+                                        <td>{{cambio.Comando}}</td>
+                                        <td> <a target="_blank" href="{{cambio.CaminoTfs}}" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-search"></span> Ver en TFS</a> </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

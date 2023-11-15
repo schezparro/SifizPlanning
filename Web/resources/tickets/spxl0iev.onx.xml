@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<episodedetails>
+  <plot><![CDATA[Si el siglo 13 vio el surgimiento de las catedrales, el 14 se verá el de las universidades. La Guerra de los Cien Años es un conflicto dinástico entre Francia e Inglaterra que tiene lugar entre 1337 y 1453.]]></plot>
+  <outline />
+  <lockdata>false</lockdata>
+  <dateadded>2012-06-07 12:20:11</dateadded>
+  <title>La guerra de los cien años</title>
+  <director>Daniel Sackheim</director>
+  <rating>8.3</rating>
+  <year>1979</year>
+  <imdbid>tt5646866</imdbid>
+  <tvdbid>323197</tvdbid>
+  <runtime>26</runtime>
+  <episode>13</episode>
+  <season>1</season>
+  <aired>1979-06-22</aired>
+  <fileinfo>
+    <streamdetails>
+      <video>
+        <codec>xvid</codec>
+        <micodec>xvid</micodec>
+        <bitrate>1001852</bitrate>
+        <width>576</width>
+        <height>320</height>
+        <aspect>9:5</aspect>
+        <aspectratio>9:5</aspectratio>
+        <framerate>25</framerate>
+        <scantype>progressive</scantype>
+        <default>False</default>
+        <forced>False</forced>
+        <duration>25</duration>
+        <durationinseconds>1549</durationinseconds>
+      </video>
+      <audio>
+        <codec>mp3</codec>
+        <micodec>mp3</micodec>
+        <bitrate>96000</bitrate>
+        <scantype>progressive</scantype>
+        <channels>2</channels>
+        <samplingrate>44100</samplingrate>
+        <default>False</default>
+        <forced>False</forced>
+      </audio>
+    </streamdetails>
+  </fileinfo>
+</episodedetails>

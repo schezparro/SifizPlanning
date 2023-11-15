@@ -1,0 +1,159 @@
+﻿
+<div id="filtro-fecha-general-errores">
+    <div class="left half half-padding-right">
+        <label>Fecha Desde:</label>
+        <div id="dpk-fecha-desde" class="input-group date">
+            <input class="form-control ng-pristine ng-untouched ng-valid" type="text" ng-model="fechaDesde">
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+        </div>
+    </div>
+    <div class="left half half-padding-left">
+        <label>Fecha Desde:</label>
+        <div id="dpk-fecha-hasta" class="input-group date">
+            <input class="form-control ng-pristine ng-untouched ng-valid" type="text" ng-model="fechaHasta">
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>
+        
+<div id="div-tabla-general-errores" class="panel panel-default">
+    <table id="tabla-general-errores" class="table table-striped table-condensed table-hover header-fixed">
+        <thead>
+            <tr>
+                <th data-width="40">Cliente</th>
+                <th data-width="15">Oficinas</th>
+                <th data-width="15">Módulos</th>
+                <th data-width="15">Usuarios</th>
+                <th data-width="15">Cant. Errores</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="error in resumenErrores" ng-click="mostrarErroresEmpresa(error.cliente)">
+                <td>{{error.cliente}}</td>
+                <td>{{error.oficinas}}</td>
+                <td>{{error.modulos}}</td>
+                <td>{{error.usuarios}}</td>
+                <td>{{error.errores}}</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="5">
+                    Total de Errores: {{totalErrores}}
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+</div> 
+
+<!--Los div de los windows-->
+<div class="modal fade" id="window-log-data-empresa" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="window-data-oficina-label">Errores del Cliente: {{empresaSeleccionada}}</h4>
+            </div>
+            <div class="modal-body">
+                <div id="tabla-errores-empresa">
+                    <table class="table table-striped table-hover table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Oficina</th>
+                                <th>Usuario</th>
+                                <th>Hora</th>
+                                <th>Módulo</th>
+                                <th>IP Máquina</th>
+                                <th>Publicación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="error in erroresEmpresa" ng-click="mostrarDetalleError(error.id)" class="{{error.clase}}">
+                                <td>{{error.oficina}}</td>
+                                <td>{{error.usuario}}</td>
+                                <td>{{error.hora}}</td>
+                                <td>{{error.modulo}}</td>
+                                <td>{{error.ip}}</td>
+                                <td>{{error.publicacion}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div>
+                    <nav>
+                        <ul class="pager">
+                            <li ng-click="paginacionAnterior()"><a href="#">Anterior</a></li>
+                            <li ng-click="paginacionSiguiente()"><a href="#">Siguiente</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="left">
+                    Mostrado errores del {{inicioListaErrores}} al {{finalListaErrores}} de {{cantRegistrosEmpresaErrores}}
+                </div>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- window de información del error -->
+<div class="modal fade" id="window-log-data-error" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="window-data-error-label">Datos del Error</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-inline" id="div-errores-data-error">
+                    <div>
+                        <label>Mensaje de Error:</label><span class="mensaje-error"> {{dataError.mensaje}}</span>
+                    </div>
+                    <div>
+                        <label>Hora de Error:</label><span> {{dataError.hora}}</span>
+                    </div>
+                    <div>
+                        <label>Usuario:</label><span> {{dataError.user}}</span>
+                    </div>
+                    <div>
+                        <label>Computadora:</label><span> {{dataError.maquina}}</span>
+                    </div>
+                    <div>
+                        <label>Módulo:</label><span> {{dataError.modulo}}</span>
+                    </div>
+                    <div>
+                        <label>Fichero:</label><span> {{dataError.fichero}}</span>
+                    </div>
+                    <div>
+                        <label>Clase:</label><span> {{dataError.clase}}</span>
+                    </div>
+                    <div>
+                        <label>Método:</label><span> {{dataError.metodo}}</span>
+                    </div>
+                    <div>
+                        <label>Linea:</label><span> {{dataError.linea}}</span>
+                    </div>
+                    <div>
+                        <label>Columna:</label><span> {{dataError.columna}}</span>
+                    </div>
+                    <div>
+                        <label>Pila de Traceo:</label>
+                        <div>{{dataError.stackTrace}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+     

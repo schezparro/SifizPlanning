@@ -1,0 +1,120 @@
+﻿<div id="div-client-new-ticket">
+    <form id="form-new-ticket-request" method="post" ng-submit="enviarSolicitudTicket()" enctype="multipart/form-data">
+        <div>
+            <div class="un-cuarto left"> <label>Empresa:&nbsp;</label><span>@ViewBag.cliente</span><br /> </div>
+            <div class="un-cuarto left"> <label>Solicita:&nbsp;</label><span>@ViewBag.nameUser</span><br />  </div>
+            <div class="un-cuarto left"> <label>Teléfono:&nbsp;</label><span>@ViewBag.telefono</span><br /> </div>
+            <div class="un-cuarto left"> <label>Email:&nbsp;</label><span>@ViewBag.emailUser</span><br /> </div>
+            <div class="clear"></div>
+        </div>
+
+        <div class="datos-contacto-ticket">
+            <div class="un-medio left"><label>Reportado Por: </label><input type="text" ng-model="reportoTicket" maxlength="50" class="form-control" ng-required="true" /></div>
+            <div class="un-medio left"><label>Teléfono: </label><input type="text" ng-model="telefonoTicket" maxlength="30" class="form-control solo-numero" /></div>
+            <div class="clear"></div>
+        </div>
+
+        <div>
+            <label>Asunto: </label>
+            <input type="text" ng-model="asuntoRequerimiento" maxlength="180" class="form-control" ng-required="true" />
+        </div>
+
+        <div>
+            <label>Detalle del Requerimiento: </label><textarea ng-model="detalleRequerimiento" class="form-control" ng-required="true"></textarea>
+        </div>
+
+        <div id="panel-datos-prioridad-new-ticket" class="panel panel-default">
+            <div id="panel-reputacion-ticket">
+                <div id="reputacion-ticket" data-toggle="popover" data-container="body" data-placement="top"
+                     data-content="La reputación se gana por parte del cliente y se elabora en base a la cantidad que tickets que  se insertan con datos correctos. Su reputación actual es {{ reputacion }}%." data-trigger="click hover">
+                    <div id="valor-reputacion-ticket"></div>
+                </div>
+                <div class="right"><label>Reputación:</label></div>
+                <div class="clear"></div>
+            </div>
+
+            <div>
+                <label>Prioridad: </label>
+                <select ng-model="prioridadTicket" class="form-control" ng-required="true" ng-change="SelectPrioridadChange(prioridadTicket)">
+                    <option value="">Seleccione...</option>
+                    <option ng-repeat="prioridad in prioridades" value="{{prioridad.id}}">{{prioridad.nombre}}</option>
+                </select>
+                <div>
+                    *Los tickets con prioridad URGENTE, no se empezarán a gestionar hasta que usted se comunique con el departamento de coordinación y explique el problema.<br />
+                    (Teléfonos: 02-351-7729, 02-351-8919, 02-450-4616, 02-450-4727) (Teléfono de emergencia: 098-603-7821)
+                </div>
+                <div id="motivo-prioridad" ng-hide=!isUrgente>
+                    <label>Justificación Prioridad: </label>
+                    <input type="text" ng-model="motivoPrioridad" maxlength="180" class="form-control" ng-required=isUrgente />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Categoría: </label>
+                    <select ng-model="categoriaTicket" class="form-control" ng-required="true" ng-change="motivoTrabajo='';SelectCategoria(categoriaTicket, @Json.Encode((dynamic)ViewData["garantias"]), @Json.Encode((dynamic)ViewData["contratos"]))">
+                        <option value="">Seleccione...</option>
+                        @foreach (var categoria in (dynamic)ViewData["categorias"])
+                        {
+                            <option value="@categoria.GetType().GetProperty("codigo").GetValue(categoria, null)">
+                                @categoria.GetType().GetProperty("nombre").GetValue(categoria, null)
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6" ng-show="esContratoMantenimiento || esGarantia">
+                    <label>Contrato: </label>
+                    <select id="selectContrato" ng-required="esContratoMantenimiento || esGarantia" ng-model="motivoTrabajo" ng-change="entregableGarantia=''; SelectContrato(motivoTrabajo,@Json.Encode((dynamic)ViewData["garantias"]))" class="form-control">
+                        <option value="">Seleccione...</option>
+                        <option ng-repeat="motivo in motivosTrabajo" value="{{motivo.id}}">{{motivo.descripcion}}</option>
+                    </select>
+                </div>
+                <div class="col-md-6" ng-show="esGarantia && contratoSeleccionado">
+                    <label>Entregable: </label>
+                    <select ng-init="" ng-model="entregableGarantia" class="form-control">
+                        <option value="">Seleccione...</option>
+                        <option ng-repeat="entregable in entregablesGarantia" value="{{entregable.id}}">Fecha Vencimiento GT: {{entregable.FechaVencimiento | strDateToStr}}__{{entregable.descripcion}}</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <div class="un-medio left half-padding-right">
+                    <label>Aplica a: </label>
+                    <select class="form-control" id="selectTicketVersionCliente" ng-model="ticketVersionCliente" ng-required="true">
+                        <option value="">Seleccione...</option>
+                        <option ng-repeat="ticketVC in ticketVersionClientes | orderBy:'name'" value="{{ticketVC.id}}">{{ticketVC.nombre}}</option>
+                    </select>
+                </div>
+
+                <div class="un-medio left half-padding-left">
+                    <label>Adjuntos: </label>
+                    <div class="file-adj-contrato">
+                        <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                            <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
+                            <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
+                            <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+                        </div>
+                    </div>
+
+                    <div id="barra-botones-file">
+                        <button id="addInputFileAnterior" ng-click="adicionarFileAnterior()" type="button" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus"></span> Adicionar</button>
+                        <button id="deleteInputFileAnterior" disabled="disabled" ng-click="deleteFileAnterior()" type="button" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-minus"></span> Eliminar</button>
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" class="btn btn-primary right"> Grabar</button>
+                </div>
+                <div class="clear"></div>
+            </div>
+</form>
+</div>
+
+<div id="htmlFile" class="invisible">
+    <div class="file-adj-contrato">
+        <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+            <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
+            <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
+            <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,466 @@
+﻿<table id="tabla-seguimiento-tickets-cliente" class="table table-striped tabla-hover" style="width: 100%">
+    <thead>
+        <tr>
+            <th class="ordenar-columna-seguimientos" ng-click="ordenarColumna(1)">
+                <div class="left">
+                    Número
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+            <th class="ordenar-columna-seguimientos" ng-click="ordenarColumna(2)">
+                <div class="left">
+                    Solicita
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+            <th class="ordenar-columna-seguimientos" ng-click="ordenarColumna(3)">
+                <div class="left">
+                    Fecha
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+            <th class="ordenar-columna-seguimientos" ng-click="ordenarColumna(4)">
+                <div class="left">
+                    Fecha Garantía
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+            <th class="ordenar-columna-seguimientos" ng-click="ordenarColumna(5)">
+                <div class="left">
+                    Prioridad
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+            <th class="ordenar-columna-seguimientos" ng-click="ordenarColumna(6)">
+                <div class="left">
+                    Categoría
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+            <th class="ordenar-columna-seguimientos" ng-click="ordenarColumna(7)">
+                <div class="left">
+                    Asunto
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+            <th class="ordenar-columna-seguimientos" ng-click="ordenarColumna(8)">
+                <div class="left">
+                    Responsable
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+            <th class="ordenar-columna-seguimientos" ng-click="ordenarColumna(9)">
+                <div class="left">
+                    Estado
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+            <th>
+                <div class="left">
+                    Fecha Asignado
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+            <th></th>
+        </tr>
+        <tr>
+            <th><input type="text" class="form-control" ng-model="numero" ng-keyup="filterData(1)" /></th>
+            <th><input type="text" class="form-control" ng-model="clienteSolicitud" ng-keyup="filterData(2)" /></th>
+            <th><input type="text" class="form-control" ng-model="fecha" ng-keyup="filterData(3)" /></th>
+            <th><input type="text" class="form-control" ng-model="fechaVencimiento" ng-keyup="filterData(4)" /></th>
+            <th>
+                <select id="select-prioridad" class="form-control">
+                    <option>Seleccione...</option>
+                    <option ng-repeat="prioridad in prioridades">{{prioridad.codigo}}</option>
+                </select>
+            </th>
+            <th>
+                <select id="select-categoria" class="form-control">
+                    <option>Seleccione...</option>
+                    <option ng-repeat="categoria in categorias">{{categoria.codigo}}</option>
+                </select>
+            </th>
+            <th><input type="text" class="form-control" ng-model="asunto" ng-keyup="filterData(7)" /></th>
+            <th>
+                <select id="select-responsable" class="form-control">
+                    <option>Seleccione...</option>
+                    <option>NO ASIGNADO</option>
+                    <option ng-repeat="responsable in colaboradores">{{responsable.nombre}}</option>
+                </select>
+            </th>
+            <th>
+                <select id="select-estado" class="form-control">
+                    <option>Seleccione...</option>
+                    <option ng-repeat="estado in estados">{{estado.codigo}}</option>
+                </select>
+            </th>
+            <th><input type="text" class="form-control" ng-model="fasig" ng-keyup="filterData(8)" /></th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr class="{{ticket.clase}}" ng-repeat="ticket in tickets">
+            <td ng-click="mostrarOfertaCotizacion(ticket.id)">{{ticket.id | rellenarIzq : 0 : 6 }}</td>
+            <td ng-click="mostrarOfertaCotizacion(ticket.id)">{{ticket.persona}}</td>
+            <td ng-click="mostrarOfertaCotizacion(ticket.id)">{{ticket.fecha | strDateToStr}}</td>
+            <td ng-click="mostrarOfertaCotizacion(ticket.id)">{{ticket.fechaVencimiento | strDateToStr | dateNoNull}}</td>
+            <td ng-click="mostrarOfertaCotizacion(ticket.id)">{{ticket.prioridad}}</td>
+            <td ng-click="mostrarOfertaCotizacion(ticket.id)">{{ticket.categoria}}</td>
+            <td ng-click="mostrarOfertaCotizacion(ticket.id)">{{ticket.asunto}}</td>
+            <td ng-click="mostrarOfertaCotizacion(ticket.id)">{{ticket.asignado}}</td>
+            <td ng-click="mostrarOfertaCotizacion(ticket.id)">{{ticket.estado}}</td>
+            <td ng-click="mostrarOfertaCotizacion(ticket.id)">{{ticket.fechaAsignado}}</td>
+            <td ng-click="verDatosTicketCliente(ticket.id)"><a href="#"><b>Ver</b></a></td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="8">
+                <div>
+                    <div class="left gestion-lista-ticket">
+                        <div class="margin-top-3">
+                            <label>Mostrar Todos:</label>
+                            <input type="checkbox" ng-click="mostrarTodosLosTickets()" ng-model="mostrarTodos" />
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="padding-lr-10">
+                    <div class="clear"></div>
+                    <div class="left">
+                        <nav>
+                            <ul class="pagination">
+                                <li ng-click="atrazarPagina()">
+                                    <a href="#" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
+                                <li ng-click="avanzarPagina()">
+                                    <a href="#" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+
+                    <div class="left form-inline gestion-lista-ticket" ng-init="cantidadMostrarPorPagina = 10" style="padding: 10px 0px 0px 0px">
+                        <label>Cantidad Por Página:</label>
+                        <select class="form-control" ng-model="cantidadMostrarPorPagina" ng-change="actualizarCantidadMostrar()">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+
+                    <div class="right gestion-lista-ticket" style="padding: 10px 0px 0px 0px">
+                        <div>
+                            <label>Total de Páginas: </label>{{cantPaginas}}
+                        </div>
+                    </div>
+                    <div class="right gestion-lista-ticket" style="padding: 10px 0px 0px 0px">
+                        <div>
+                            <label>Total de Tickets: </label>{{totalTickets}}
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+                </div>
+            </th>
+        </tr>
+    </tfoot>
+</table>
+
+<!-- Propuesta de Cotización-->
+<div class="modal fade" id="modal-propuesta-cotizacion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog .filter">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-propuesta-cotizacion-label">
+                    <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
+                    <span id="title-filter">Propuesta de Cotización</span>
+                </h4>
+            </div>
+            <form method="post" id="frm-propuesta-cotizacion">
+                <div class="modal-body">
+                    <div class="fila">
+                        <label>Detalle de Cotización:</label><br />
+                        <div id="detalleCotizacion" class="panel panel-default"></div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <input type="hidden" />
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger left" ng-click="rechazarCotizacion()">Rechazar Cotización</button>
+                    <button type="button" class="btn btn-info" ng-click="renegociarCotizacion()">Renegociar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-success" ng-click="aceptarCotizacion()">Aceptar Cotización</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Renegociar Cotización-->
+<div class="modal fade" id="modal-regenociar-cotizacion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog .filter">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-regenociar-cotizacion-label">
+                    <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
+                    <span id="title-filter">Renegociar Cotización</span>
+                </h4>
+            </div>
+            <form method="post" id="frm-renegociar-cotizacion" ng-submit="enviarRenegociacion()">
+                <div class="modal-body">
+                    <div class="fila">
+                        <label>Detalle de Renegociación:</label><br />
+                        <textarea class="form-control" ng-model="detalleRenegociacion" ng-required="true"></textarea>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-success">Enviar Renegociación</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Windows Modal Vista de Tickets -->
+<div class="modal fade" id="modal-vista-ticket-user" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-vista-ticket-label"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Datos del Ticket</h4>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" ng-model="idTicketCliente" />
+                <input type="hidden" ng-model="verificador" />
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="left un-tercio">
+                            <label class="label-data-ticket">Fecha: </label><span>{{fechaTicket | strDateToStr}}</span><br />
+                            <label class="label-data-ticket">Empresa: </label><span>{{nombreCliente}}</span><br />
+                            <label class="label-data-ticket">Usuario: </label><span>{{usuarioCliente}}</span><br />
+                            <label class="label-data-ticket">Teléfono: </label><span>{{usuarioTelefono}}</span><br />
+                            <label class="label-data-ticket">Estado: </label><span>{{estadoTicket}}</span><br />
+                        </div>
+
+                        <div class="left un-tercio">
+                            <label class="label-data-ticket">Asunto: </label>
+                            <textarea rows="2" style="width: 92%;" class="panel panel-default form-control" ng-readonly="estadoTicket != 'ABIERTO'" ng-model="asuntoTicket"></textarea>
+                            <label class="label-data-ticket">Prioridad: </label><span>{{prioridadTicket}}</span><br />
+                            <label class="label-data-ticket">Categoría: </label><span>{{categoriaTicket}}</span><br />
+                        </div>
+
+                        <div class="left un-tercio">
+                            <label class="label-data-ticket">Teléfono(s): </label><span>{{telefonoCliente}}</span><br />
+                            <label class="label-data-ticket">Reportó: </label><span>{{clienteReporta}}</span><br />
+                            <label class="label-data-ticket">Reputación: </label><span>{{reputacionTicket}}/5</span><br />
+                            <div ng-show="ticketVersionCliente != 'NO ASIGNADO'">
+                                <label class="label-data-ticket">Aplica a: </label><span>{{ticketVersionCliente}}</span><br />
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <div id="panel-vista-detalle-ticket" class="panel panel-default">
+                    <div class="left half half-padding-right">
+                        <div><label>Detalle del ticket:</label></div>
+                        <textarea  rows="3" class="panel panel-default form-control" ng-readonly="estadoTicket != 'ABIERTO'"  ng-model="detalleTicket"></textarea>
+                    </div>
+
+                    <div id="panel-vista-adjuntos-ticket" class="left">
+                        <div ng-repeat="adj in adjuntosTicket" class="left separar-izquierda">
+                            <a href="Web{{adj}}" target="_blank" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-paperclip"></span> Adjunto {{$index+1}}</a>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div>
+                    <div id="panel-add-adjuntos-ticket"></div>
+                    <button id="add-adj-ticket" class="btn btn-success btn-xs" ng-click="adicionarAdjuntoTicket()"><span class="glyphicon glyphicon-plus"></span> Adicionar Adjunto</button>
+                    <button id="eliminar-adj-ticket" class="btn btn-danger btn-xs" ng-click="eliminarAdjuntoTicket()"><span class="glyphicon glyphicon-minus"></span> Eliminar Adjunto</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning left" ng-click="verComentarioTicket()"><span class="glyphicon glyphicon-comment"></span> Comentarios</button>
+                <button ng-hide="estadoTicket != 'ABIERTO' && estadoTicket != 'ASIGNADO' && estadoTicket != 'PENDIENTE' && estadoTicket != 'EN DESARROLLO' && estadoTicket != 'INCONCLUSO' && estadoTicket != 'RESUELTO'" type="button" class="btn btn-primary" ng-click="cerrarTicket()"> <span class="glyphicon glyphicon-flag"></span> Aceptar</button>
+                <button ng-hide="estadoTicket != 'ABIERTO' && estadoTicket != 'ASIGNADO' && estadoTicket != 'PENDIENTE' && estadoTicket != 'EN DESARROLLO' && estadoTicket != 'INCONCLUSO' && estadoTicket != 'RESUELTO'" type="button" class="btn btn-danger" ng-click="abrirModalRechazar()"> <span class="glyphicon glyphicon-remove"></span> Devolver</button>
+                <button ng-hide="estadoTicket != 'ABIERTO' && estadoTicket != 'ASIGNADO' && estadoTicket != 'PENDIENTE' && estadoTicket != 'EN DESARROLLO' && estadoTicket != 'INCONCLUSO' && estadoTicket != 'RESUELTO'" type="button" class="btn btn-warning" ng-click="abrirModalAnular()"> <span class="glyphicon glyphicon-trash"></span> Anular</button>
+                <button type="button" class="btn btn-primary" ng-click="grabarAdjuntosTicket()">Grabar</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Ventana comentario de un ticket -->
+<div class="modal fade" id="modal-comentarios-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-comentarios-ticket-label"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Comentarios </h4>
+            </div>
+
+            <div class="modal-body">
+                <form ng-submit="guardarComentario()">
+                    Comentario:
+                    <textarea class="form-control" ng-model="comentarioTicket"></textarea>
+                    <div class="text-center margin-top-3">
+                        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Adicionar</button>
+                    </div>
+                </form>
+                <div class="panel panel-default margin-top-5 textos-comentario">
+                    <div class="textos-desacuerdo-information">
+                        <div class="text-desacuerdo" ng-repeat="text in comentarios">
+                            <div class="left">{{text.colaborador}}:</div>
+                            <div class="right">{{text.fechaHora | strDateToStrTime}}</div>
+                            <div class="clear"></div>
+                            <span style="cursor:pointer;" ng-click="panelEmail(text.colaborador, text.fechaHora, text.detalle)" class="glyphicon glyphicon-envelope right"></span>
+                            <div>{{text.detalle}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ventana email de un ticket -->
+<div class="modal fade" id="modal-email-comentarios" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-comentarios-ticket-label"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Enviar por Email </h4>
+            </div>
+
+            <div class="modal-body">
+                <form>
+                    Para:
+                    <input class="form-control" ng-model="destinatariosEmailTicket">
+                </form>
+                <form>
+                    Asunto:
+                    <input class="form-control" ng-model="asuntoEmailTicket">
+                </form>
+                <textarea class="form-control panel panel-default margin-top-5 textos-comentario" ng-model="comentarioEmailTicket">
+                </textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" ng-click="enviarEmail()" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Enviar</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Ventana comentario anular ticket -->
+<div class="modal fade" id="modal-comentario-ticket-anulado" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Anular Ticket </h4>
+            </div>
+            <form ng-submit="anularTicket()">
+                <div class="modal-body">
+                    Comentario:
+                    <textarea class="form-control" ng-model="comentarioTicketAnulado" rows="8" ng-required="true"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-warning"><span class="glyphicon glyphicon-trash"></span> Anular</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Ventana comentario rechazar ticket -->
+<div class="modal fade" id="modal-comentario-ticket-rechazado" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"> <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Detalles de devolución del ticket.</h4>
+                <br />
+                Según su apreciación los requerimientos del ticket {{idTicket}} <b>no</b> se han cumplido satisfactoriamente.<br />
+                Por favor especifíquenos los inconvenientes detectados en el mismo para solucionarlos en el menor tiempo posible.
+            </div>
+            <div>
+                <form id="form-enviar-email-desacuerdo-ticket" ng-submit="enviarDesacuerdoResolucionTicketCliente()">
+                    <div class="modal-body">
+                        <div>
+                            <label>Detalles:</label>
+                            <textarea class="form-control" ng-model="textoDesacuerdo" rows="6" required="required"></textarea>
+                        </div>
+                        <div id="panel-adjuntos-email-ticket">
+                            <label>Adjuntos:</label><br />
+
+                            <div id="barra-botones-file-cliente">
+                                <button id="addInputFileAnteriorCliente" ng-click="adicionarFileAnterior()" type="button" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus"></span> Adicionar</button>
+                                <button id="deleteInputFileAnteriorCliente" disabled="disabled" ng-click="deleteFileAnterior()" type="button" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-minus"></span> Eliminar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Enviar</button>
+                    </div>
+                </form>
+
+                <div id="div-gracias" class="textoOk" style="display: none;">
+                    <h2>Su información ha sido recibida.<br /> Muchas gracias.</h2>
+                </div>
+
+                <div id="htmlFileCliente" class="invisible">
+                    <div class="file-adj-contrato">
+                        <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                            <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
+                            <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
+                            <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

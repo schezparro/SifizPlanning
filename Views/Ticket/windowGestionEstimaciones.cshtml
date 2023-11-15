@@ -1,0 +1,245 @@
+﻿<div style="height: 100%; overflow: auto">
+    <div>
+        <div class="left gestion-lista-ticket">
+            <div class="margin-top-3">
+                <label>Mostrar Todas:</label>
+                <input type="checkbox" ng-click="mostrarTodasLasEstimaciones()" ng-model="mostrarTodos" />
+            </div>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <table id="tabla-gestion-estimaciones" class="table table-striped table-condensed">
+        <thead>
+            <tr>
+                <th class="ordenar-columna" ng-click="ordenarColumna(1)">
+                    <div class="left">
+                        No. Ticket
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+                <th class="ordenar-columna" ng-click="ordenarColumna(2)">
+                    <div class="left">
+                        Colaborador
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+                <th class="ordenar-columna" ng-click="ordenarColumna(3)">
+                    <div class="left">
+                        Cliente
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+                <th class="ordenar-columna" ng-click="ordenarColumna(4)">
+                    <div class="left">
+                        Prioridad
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+                <th class="ordenar-columna" ng-click="ordenarColumna(5)">
+                    <div class="left">
+                        Detalle
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+                <th class="ordenar-columna" ng-click="ordenarColumna(6)">
+                    <div class="left">
+                        Fecha Límite
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+                <th class="ordenar-columna" ng-click="ordenarColumna(7)">
+                    <div class="left">
+                        Estado Estimación
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+                <th class="ordenar-columna" ng-click="ordenarColumna(8)">
+                    <div class="left">
+                        Adjuntos
+                    </div>
+                    <div class="right">
+                        <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                <th><input type="text" class="form-control" ng-model="numero" ng-keyup="filterData(1)" /></th>
+                <th><input type="text" class="form-control" ng-model="colaborador" ng-keyup="filterData(2)" /></th>
+                <th><input type="text" class="form-control" ng-model="cliente" ng-keyup="filterData(3)" /></th>
+                <th>
+                    <select class="form-control" id="select-prioridad-estimacion" ng-keyup="filterData(4)">
+                        <option value="">SELECCIONE...</option>
+                        <option ng-repeat="prio in prioridades | orderBy:'name'" value="{{prio.name}}">{{prio.name}}</option>
+                    </select>
+                </th>
+                <th><input type="text" class="form-control" ng-model="detalle" ng-keyup="filterData(5)" /></th>
+                <th><input type="text" class="form-control" ng-model="fechaLimite" ng-keyup="filterData(6)" /></th>
+                <th>
+                    <select class="form-control" id="select-estado-estimacion" ng-keyup="filterData(7)">
+                        <option value="">SELECCIONE...</option>
+                        <option value="POR ESTIMAR">POR ESTIMAR</option>
+                        <option value="ESTIMADO">ESTIMADO</option>
+                        <option value="VALIDANDO">VALIDANDO</option>
+                    </select>
+                </th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th colspan="8">
+                    <div class="padding-lr-10">
+                        <div class="clear"></div>
+                        <div class="left">
+                            <nav>
+                                <ul class="pagination">
+                                    <li ng-click="atrazarPagina()">
+                                        <a href="#" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                    <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
+                                    <li ng-click="avanzarPagina()">
+                                        <a href="#" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+
+                        <div class="left form-inline gestion-lista-ticket" ng-init="cantidadMostrarPorPagina = 10" style="padding: 20px 0px 0px 15px">
+                            <label>Cantidad Por Página:</label>
+                            <select class="form-control" ng-model="cantidadMostrarPorPagina" ng-change="actualizarCantidadMostrar()">
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+
+                        <div class="right gestion-lista-ticket" style="padding: 10px 0px 0px 0px">
+                            <div>
+                                <label>Total de Páginas: </label>{{cantPaginas}}
+                            </div>
+                        </div>
+                        <div class="right gestion-lista-ticket" style="padding: 10px 0px 0px 0px">
+                            <div>
+                                <label>Total de Estimaciones: </label>{{totalEstimaciones}}
+                            </div>
+                        </div>
+
+                        <div class="clear"></div>
+                    </div>
+                </th>
+
+            </tr>
+        </tfoot>
+        <tbody>
+            <tr class="{{estimacion.clase}}" ng-repeat="estimacion in estimaciones" ng-dblclick="mostrarDetalleEstimacionTicket(estimacion.numero, estimacion.id, estimacion.estado)">
+                <td>{{ estimacion.numero | rellenarIzq:0 }}</td>
+                <td>{{ estimacion.colaborador }}</td>
+                <td>{{ estimacion.cliente }}</td>
+                <td>{{ estimacion.prioridad}}</td>
+                <td>{{ estimacion.detalle | strLimit:100 }}</td>
+                <td>{{ estimacion.fechaLimite != null ? (estimacion.fechaLimite | strDateToStr) : estimacion.fechaLimite}}</td>
+                <td>{{ estimacion.estado }}</td>
+                <td>
+                    <a class="btn btn-success btn-xs" ng-repeat="adj in estimacion.adjuntos" target="_blank" href="Web{{adj.url}}">
+                        <span class="glyphicon glyphicon-download"></span> Adjunto {{$index+1}}
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Ventana Detalle Estimacion -->
+<div class="modal fade" id="modal-detalle-estimacion-gestion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-comentarios-ticket-label"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Detalle Estimación Ticket </h4>
+            </div>
+            <div class="modal-body" style="height: 480px; overflow-y: auto;">
+                <table class="table" style="width: 100%">
+                    <tr>Total estimaciones: <mark>{{tiempoTotal}}</mark></tr>
+                    <tr ng-repeat="est in detallesEstimaciones">
+                        <td>
+                            <p>Colaborador: <mark>{{est.colaborador}}  </mark>  Total de Horas: <mark>{{est.colaboradorHoras}}</mark></p>
+                            <table class="table">
+                                <tr ng-repeat="entregable in est.entregables">
+                                    <td>
+                                        <p>
+                                            Entregable: <mark>{{entregable.nombre}}</mark>
+                                        </p>
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Detalle</th>
+                                                    <th>Recurso</th>
+                                                    <th style="text-align: center">Tiempo (H)</th>
+                                                    <th style="text-align: center">Tiempo (DES)</th>
+                                                    <th style="text-align: center">Tiempo (PRU)</th>
+                                                </tr>
+                                            </thead>
+                                            <tr ng-repeat="detalle in entregable.detalles">
+                                                <td>{{detalle.detalle}}</td>
+                                                <td>{{detalle.nivel}}</td>
+                                                <td align="center">{{detalle.tiempoDesarrollo + detalle.tiempoPrueba + detalle.tiempoEstimacion}}</td>
+                                                <td align="center">{{detalle.tiempoDesarrollo}}</td>
+                                                <td align="center">{{detalle.tiempoPrueba}}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="aceptarEstimacion" class="btn btn-info" ng-click="aceptarEstimacionTicket()" ng-hide=!permitirValidar> Aceptar</button>
+                <button type="button" id="rechazarEstimacion" class="btn btn-danger" ng-click="rechazarEstimacionTicket()" ng-hide=!permitirValidar> Rechazar</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ventana comentario de un ticket -->
+<div class="modal fade" id="modal-comentarios-rechazar-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-comentarios-rechazar-ticket-label"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Comentario </h4>
+            </div>
+
+            <div class="modal-body">
+                <form>
+                    Comentario:
+                    <textarea class="form-control" ng-model="comentarioTicket" rows="10" ng-required="true"></textarea>
+                </form>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" ng-click="enviarCorreoRechazarEstimacionTicket(comentarioTicket)"> Enviar </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

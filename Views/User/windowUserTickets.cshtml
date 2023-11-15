@@ -1,0 +1,195 @@
+﻿<label style="display: inline-block">
+    Mostrar Todos:
+    <input style="vertical-align: -2px;" type="checkbox" ng-click="mostrarTodosSeguimientos()" ng-model="mostrarTodosSeguimientoTicket" />
+</label>
+<input class="form-control right filtro" type="text" placeholder="Filtrar..." ng-model="filtroSeguimientoTicket" ng-keyup="filtrarSeguimientosTickets()" />
+<div class="clear"></div>
+<div style="height: calc(100vh - 175px); width: 100%; overflow-y: auto; overflow-x: no-display;">
+    <table class="table table-striped table-condensed">
+        <thead>
+            <tr>
+                <th>Número</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Prioridad</th>
+                <th>Categoría</th>
+                <th>Asunto</th>
+                <th>Estado</th>
+                <th>Próxima Actividad</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr class="{{ticket.clase}}" ng-repeat="ticket in tickets">
+                <td>{{ticket.numero | rellenarIzq:0 }}</td>
+                <td>{{ticket.cliente}}</td>
+                <td>{{ticket.fecha | strDateToStr}}</td>
+                <td>{{ticket.prioridad}}</td>
+                <td>{{ticket.categoria}}</td>
+                <td>{{ticket.asunto}}</td>
+                <td>{{ticket.estado}}</td>
+                <td>{{ticket.proximaActividad}}</td>
+                <td ng-click="verDatosTicketCliente(ticket.numero)"><a href="#"><b>Ver</b></a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Windows Modal Vista de Tickets -->
+<div class="modal fade" id="modal-vista-ticket-user" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-vista-ticket-label"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Datos del Ticket</h4>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" ng-model="idTicketCliente" />
+                <input type="hidden" ng-model="verificador" />
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="left un-tercio">
+                            <label class="label-data-ticket">Fecha: </label><span>{{fechaTicket | strDateToStr}}</span><br />
+                            <label class="label-data-ticket">Empresa: </label><span>{{nombreCliente}}</span><br />
+                            <label class="label-data-ticket">Usuario: </label><span>{{usuarioCliente}}</span><br />
+                            <label class="label-data-ticket">Teléfono: </label><span>{{usuarioTelefono}}</span><br />
+
+                        </div>
+
+                        <div class="left un-tercio">
+                            <label class="label-data-ticket">Estado: </label><span>{{estadoTicket}}</span><br />
+                            <label class="label-data-ticket">Asunto: </label><span>{{asuntoTicket}}</span><br />
+                            <label class="label-data-ticket">Prioridad: </label><span>{{prioridadTicket}}</span><br />
+                            <label class="label-data-ticket">Categoría: </label><span>{{categoriaTicket}}</span><br />
+                        </div>
+
+                        <div class="left un-tercio">
+                            <label class="label-data-ticket">Teléfono(s): </label><span>{{telefonoCliente}}</span><br />
+                            <label class="label-data-ticket">Reportó: </label><span>{{clienteReporta}}</span><br />
+                            <label class="label-data-ticket">Reputación: </label><span>{{reputacionTicket}}/5</span><br />
+                        </div>
+                    </div>
+                </div>
+
+                <div id="panel-vista-detalle-ticket" class="panel panel-default">
+                    <div class="left half half-padding-right">
+                        <div><label>Detalle del ticket:</label></div>
+                        <div class="panel panel-default">
+                            {{detalleTicket}}
+                        </div>
+                    </div>
+
+                    <div id="panel-vista-adjuntos-ticket" class="left">
+                        <div ng-repeat="adj in adjuntosTicket" class="left separar-izquierda">
+                            <a href="Web{{adj}}" target="_blank" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-paperclip"></span> Adjunto {{$index+1}}</a>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning left" ng-click="verComentarioTicket()"><span class="glyphicon glyphicon-comment"></span> Comentarios</button>
+                <button ng-show="estadoTicket == 'DEVUELTO'" type="button" class="btn btn-primary" ng-click="motivoDevolucion()"> <span class="glyphicon glyphicon-flag"></span>Argumentar Devolución</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Ventana comentario de un ticket -->
+<div class="modal fade" id="modal-comentarios-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-comentarios-ticket-label"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Comentarios </h4>
+            </div>
+
+            <div class="modal-body">
+                <form ng-submit="guardarComentario()">
+                    Comentario:
+                    <textarea class="form-control" ng-model="comentarioTicket"></textarea>
+                    <div class="text-center margin-top-3">
+                        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Adicionar</button>
+                    </div>
+                </form>
+                <div class="panel panel-default margin-top-5 textos-comentario">
+                    <div class="textos-desacuerdo-information">
+                        <div class="text-desacuerdo" ng-repeat="text in comentarios">
+                            <div class="left">{{text.colaborador}}:</div>
+                            <div class="right">{{text.fechaHora | strDateToStrTime}}</div>
+                            <div class="clear"></div>
+                            <span style="cursor:pointer;" ng-click="panelEmail(text.colaborador, text.fechaHora, text.detalle)" class="glyphicon glyphicon-envelope right"></span>
+                            <div>{{text.detalle}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ventana email de un ticket -->
+<div class="modal fade" id="modal-email-comentarios" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-comentarios-ticket-label"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Enviar por Email </h4>
+            </div>
+
+            <div class="modal-body">
+                <form>
+                    Para:
+                    <input class="form-control" ng-model="destinatariosEmailTicket">
+                </form>
+                <form>
+                    Asunto:
+                    <input class="form-control" ng-model="asuntoEmailTicket">
+                </form>
+                <textarea class="form-control panel panel-default margin-top-5 textos-comentario" ng-model="comentarioEmailTicket">
+                </textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" ng-click="enviarEmail()" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Enviar</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ventana comentario devolucion ticket -->
+<div class="modal fade" id="modal-comentario-ticket-devuelto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Justificación Devolución de Ticket </h4>
+            </div>
+            <form ng-submit="argumentarDevolucionTicket()">
+                <div class="modal-body">
+                    <label>Motivo Devolución: </label>
+                    <select class="form-control" id="prioridad-ticket" ng-required="true" ng-model="motivoDevolucionTicket">
+                        <option value="">Seleccione...</option>
+                        <option ng-repeat="motivo in motivos" value="{{motivo.nombre}}">{{motivo.descripcion}}</option>
+                    </select>
+                    <br />
+                    <label> Comentario:</label>
+                    <textarea class="form-control" ng-model="comentarioTicketDevuelto" rows="3" ng-required="true"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-warning"><span class="glyphicon glyphicon-trash"></span> Argumentar</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

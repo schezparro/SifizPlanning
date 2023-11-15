@@ -1,0 +1,168 @@
+﻿body
+{    
+}
+
+#panel-login {
+    width: 400px; 
+    position: absolute;     
+    left: 50%; 
+    margin-left: -200px; 
+    margin-top: 50px;
+}
+
+.texto-repassword{
+    font-size: 10px;
+    text-decoration: none;
+}
+
+#modalNewChangePassUser .form-control{
+    width: 300px !important;
+}
+
+#modalNewChangePassUser .modal-dialog{
+    width: 335px;
+}
+
+#sys-modulos .modulo-icon{
+    float: left;
+    width: 140px;
+    height: 140px;
+    /*border-radius: 5px;*/
+    /*border: 2px solid #808080;*/
+    margin: 10px;
+}
+
+#sys-modulos img{
+    border: 2px solid #808080;
+    border-radius: 5px;
+    width: 130px;
+    height: 130px;
+    margin: 0px 0px 0px 6px;
+}
+
+#sys-modulos img:hover{
+    border-radius: 5px;
+    cursor: pointer;
+    background: #e0f6ff;
+    border: 2px solid #00ff21;
+}
+
+#panel-modulo{
+    margin: 0 auto;
+    margin-top: 10px;
+    width: 98%;
+    height: 97%;
+}
+
+.text-icono{
+    text-align: center;
+}
+
+.modal-size {
+    width: 100%;
+    height:100%;
+    margin:0px; 
+    padding:0px;
+}
+
+.modal-body-height {
+    height: calc(100% - 120px);
+}
+
+.no-padding-left {
+    padding-left: 0px;
+}
+
+.no-padding-right {
+    padding-right:0px;
+}
+
+.no-margin-left {
+    margin-left: 0px;
+}
+
+.no-margin-right {
+    margin-right: 0px;
+}
+
+.margin-right-5 {
+    margin-right: 5px;
+}
+
+.margin-right-10 {
+    margin-right: 10px;
+}
+
+.margin-right-15 {
+    margin-right: 15px;
+}
+
+.margin-bottom-10 {
+    margin-bottom: 10px;
+}
+
+.no-margin-top {
+    margin-top: 0px;
+}
+
+.no-margin-bottom {
+    margin-bottom: 0px;
+}
+
+.margin-top-5 {
+    margin-top: 5px;
+}
+
+.padding-right-5 {
+    padding-right: 5px;
+}
+
+.padding-right-10 {
+    padding-right: 10px;
+}
+
+.padding-right-15 {
+    padding-right: 15px;
+}
+
+.padding-top-5 {
+    padding-top: 5px;
+}
+
+.padding-bottom-5 {
+    padding-bottom: 5px;
+}
+
+.cursor{
+    cursor: pointer;
+}
+
+.div-logs-comentario, .div-logs-comentario .panel{
+    height: 100%;
+}
+
+.div-logs-comentario .panel-body{
+    height: calc( 100% - 50px );
+    overflow-y: auto;
+}
+
+.input-xs {
+  height: 22px;
+  padding: 2px 5px;
+  font-size: 12px;
+  line-height: 1.5; /* If Placeholder of the input is moved up, rem/modify this. */
+  border-radius: 3px;
+}
+
+.image-padding {
+  padding:12px 12px 12px 0px;
+}
+
+.label-normal {
+  font-weight:normal;
+}
+
+.text-box-filter {
+  width:130px;
+  height:20px;  
+}

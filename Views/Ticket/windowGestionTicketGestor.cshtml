@@ -1,0 +1,1186 @@
+﻿<table id="tabla-gestion-ticket" class="table table-striped table-condensed">
+    <thead>
+        <tr>
+            <th class="ordenar-columna" ng-click="ordenarColumna(1)">
+                <div class="left">
+                    No. Ticket
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+            <th class="ordenar-columna" ng-click="ordenarColumna(2)">
+                <div class="left">
+                    Cliente
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+            <th class="ordenar-columna" ng-click="ordenarColumna(3)">
+                <div class="left">
+                    Fecha
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+            <th class="ordenar-columna" ng-click="ordenarColumna(4)">
+                <div class="left">
+                    Asunto
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+            <th class="ordenar-columna" ng-click="ordenarColumna(5)">
+                <div class="left">
+                    Asignado A
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+            <th class="ordenar-columna" ng-click="ordenarColumna(6)">
+                <div class="left">
+                    Prioridad
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+            <th class="ordenar-columna" ng-click="ordenarColumna(7)">
+                <div class="left">
+                    Categoría
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+            <th class="ordenar-columna" ng-click="ordenarColumna(8)">
+                <div class="left">
+                    Estado
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+            <th class="ordenar-columna" ng-click="ordenarColumna(9)">
+                <div class="left">
+                    Próxima Actividad
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+            <th class="ordenar-columna" ng-click="ordenarColumna(10)">
+                <div class="left">
+                    Aplica A
+                </div>
+                <div class="right">
+                    <i class="icon-sort-table glyphicon glyphicon-chevron-up invisible"></i>
+                </div>
+            </th>
+        </tr>
+        <tr>
+            <th><input type="text" class="form-control" ng-model="numero" ng-keyup="filterData(1)" /></th>
+            <th><input type="text" class="form-control" ng-model="cliente" ng-keyup="filterData(2)" /></th>
+            <th><input type="text" class="form-control" ng-model="fecha" ng-keyup="filterData(3)" /></th>
+            <th><input type="text" class="form-control" ng-model="asunto" ng-keyup="filterData(4)" /></th>
+            <th><input type="text" class="form-control" ng-model="asignado" ng-keyup="filterData(5)" /></th>
+            <th>
+                <!--<input type="text" class="form-control" ng-model="prioridad" ng-keyup="filterData(6)" />-->
+                <select id="select-prioridad-ticket" class="selectpicker" multiple>
+                    <option ng-repeat="prio in prioridades | orderBy:'name'" value="{{prio.name}}">{{prio.name}}</option>
+                </select>
+            </th>
+            <th>
+                <!--<input type="text" class="form-control" ng-model="categoria" ng-keyup="filterData(7)" />-->
+                <select id="select-categoria-ticket" class="selectpicker" multiple>
+                    <option ng-repeat="cat in categorias | orderBy:'name'" value="{{cat.name}}">{{cat.name}}</option>
+                </select>
+            </th>
+            <th>
+                <!--<input type="text" class="form-control" ng-model="estado" ng-keyup="filterData(8)" />-->
+                <select id="select-estado-ticket" class="selectpicker" multiple>
+                    <option ng-repeat="estado in estadosTickets | orderBy:'nombre'" value="{{estado.nombre}}">{{estado.nombre}}</option>
+                </select>
+            </th>
+            <th>
+                <!--<input type="text" class="form-control" ng-model="estado" ng-keyup="filterData(9)" />-->
+                <select id="select-proxima-actividad" class="selectpicker" multiple>
+                    <option ng-repeat="proximaActividadFilter in proximasActividadesFilter" value="{{proximaActividadFilter}}">{{proximaActividadFilter}}</option>
+                </select>
+            </th>
+
+            <th>
+                <!--<input type="text" class="form-control" ng-model="ticketVersionCliente" ng-keyup="filterData(10)" />-->
+                <select id="select-ticketVersionCliente" class="selectpicker" multiple>
+                    <option value="NO ASIGNADO">NO ASIGNADO</option>
+                    <option ng-repeat="ticketVersionCliente in ticketVersionClientes" value="{{ticketVersionCliente.nombre}}">{{ticketVersionCliente.nombre}}</option>
+                </select>
+            </th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th colspan="8">
+                <div>
+                    <div class="left gestion-lista-ticket">
+                        <div class="margin-top-3">
+                            <label>Mostrar Todos:</label>
+                            <input type="checkbox" ng-click="mostrarTodosLosTickets()" ng-model="mostrarTodos" />
+                        </div>
+                    </div>
+                    <div class="left gestion-lista-ticket form-inline">
+                        <div ng-init="filtroFacturacion='t'">
+                            <label>Según Facturación: </label>
+                            <select class="form-control sm" ng-model="filtroFacturacion" ng-change="mostrarPorFacturados()">
+                                <option value="t">TODOS</option>
+                                <option value="F">FACTURABLES</option>
+                                <option value="FF">FACTURABLES - FACTURADOS</option>
+                                <option value="FNF">FACTURABLES - NO FACTURADOS</option>
+                                <option value="SF">SIN FACTURABLES</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="padding-lr-10">
+                    <div class="clear"></div>
+                    <div class="left">
+                        <nav>
+                            <ul class="pagination">
+                                <li ng-click="atrazarPagina()">
+                                    <a href="#" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
+                                <li ng-click="avanzarPagina()">
+                                    <a href="#" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+
+                    <div class="left form-inline gestion-lista-ticket" ng-init="cantidadMostrarPorPagina = 10">
+                        <label>Cantidad Por Página:</label>
+                        <select class="form-control" ng-model="cantidadMostrarPorPagina" ng-change="actualizarCantidadMostrar()">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+
+                    <div class="right gestion-lista-ticket">
+                        <div>
+                            <label>Total de Páginas: </label>{{cantPaginas}}
+                        </div>
+                    </div>
+                    <div class="right gestion-lista-ticket">
+                        <div>
+                            <label>Total de Ticket: </label>{{totalTickets}}
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+                </div>
+
+            </th>
+
+        </tr>
+    </tfoot>
+    <tbody>
+        <tr class="{{ticket.clase}}" ng-repeat="ticket in tickets" ng-dblclick="mostrarDetalleTicket(ticket.numero)" ng-click="mostrarInformacionTicket(ticket.numero)">
+            <td>{{ ticket.numero | rellenarIzq:0 }}</td>
+            <td>{{ ticket.cliente }}</td>
+            <td>{{ ticket.fecha | strDateToStr }} ({{ticket.dias}})</td>
+            <td>{{ ticket.asunto }}</td>
+            <td>{{ ticket.asignado }}</td>
+            <td>{{ ticket.prioridad }}</td>
+            <td>{{ ticket.categoria }}</td>
+            <td>{{ ticket.estado }}</td>
+            <td>{{ ticket.proximaActividad }}</td>
+            <td>{{ ticket.ticketVersionCliente }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Windows Modal Gestion de Tickets -->
+<div class="modal fade" id="modal-gestion-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-gestion-ticket-label"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Gestión de Ticket</h4>
+            </div>
+            <form method="post" id="frm-edit-tickets" ng-submit="guardarTicket()">
+                <div class="modal-body">
+                    <div class="panel panel-default panel-superior">
+                        <div class="panel-body" id="panel-info-ticket-general">
+                            <div class="left info-ticket">
+                                <label class="label-data-ticket">N° Ticket: </label><span>{{idTicketCliente | rellenarIzq:0}}</span><br />
+                                <label class="label-data-ticket">Fecha: </label><span>{{fechaTicket | strDateToStr}}</span><br />
+                                <label class="label-data-ticket">Empresa: </label><span>{{nombreCliente}}</span><br />
+                                <label class="label-data-ticket">Usuario: </label><span>{{usuarioCliente}}</span><br />
+                                <label class="label-data-ticket">Reportó: </label><span>{{clienteReporta}}</span><br />
+                                <label class="label-data-ticket">Teléfono: </label><span>{{usuarioTelefono}} / {{telefonoCliente}}</span><br />
+                                <label class="label-data-ticket">Asunto: </label><span>{{asuntoTicket}}</span><br />
+                                <label class="label-data-ticket">Estado: </label><span>{{estadoTicket}}</span>
+                            </div>
+
+                            <div class="left info-ticket">
+                                <div class="div-info-ticket">
+                                    <label class="label-data-ticket">Prioridad: </label><span style="margin-left: 5px;">{{prioridadTicket}}</span>
+                                </div>
+                                <div class="div-info-ticket form-inline" style="vertical-align: middle;" ng-hide="justificacionPrioridad == ''">
+                                    <label style="vertical-align: middle;" class="label-data-ticket">Justificación Prioridad: </label><textarea class="form-control" style="margin-left: 5px; height: 50px; width: 66%; margin-bottom: 2px; resize: none" readonly>{{justificacionPrioridad}}</textarea>
+                                </div>
+                                <div class="div-info-ticket">
+                                    <label class="label-data-ticket">P.Revisada: </label>
+                                    <select class="form-control" id="prioridad-ticket" ng-model="prioridad">
+                                        <option ng-repeat="priori in prioridades" value="{{priori.id}}">{{priori.name}}</option>
+                                    </select>
+                                </div>
+                                <div class="div-info-ticket">
+                                    <label class="label-data-ticket">Categoría: </label><span style="margin-left: 5px;">{{categoriaTicket}}</span>
+                                </div>
+                                <div class="div-info-ticket">
+                                    <label class="label-data-ticket">C.Revisada: </label>
+                                    <select class="form-control" id="categoria-ticket" ng-required="true" ng-model="categoria">
+                                        <option value=""></option>
+                                        <option ng-repeat="categ in categorias" value="{{categ.id}}">{{categ.name}}</option>
+                                    </select>
+                                </div>
+                                <div class="div-info-ticket">
+                                    <label class="label-data-ticket">Estimación:</label>
+                                    <input id="campo-horas-ticket" class="form-control solo-numero" ng-model="estimacionTicket" /> (horas)
+                                </div>
+
+                                <div class="div-info-ticket">
+                                    <label class="label-data-ticket">Recurso:</label>
+                                    <select class="form-control" id="tipo-recurso-ticket" ng-model="tipoRecurso">
+                                        <option ng-repeat="tipo in tiposRecursos" value="{{tipo.id}}">{{tipo.nombre}}</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="label-data-ticket">Aplica A: </label>
+                                    <select class="form-control" id="ticket-version-cliente" ng-model="ticketVC" ng-required="true">
+                                        <option ng-repeat="ticketVC in ticketVersionClientes" value="{{ticketVC.id}}">{{ticketVC.nombre}}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="datos-reputacion" class="left info-ticket">
+                                <div hidden class="div-info-ticket">
+                                    <label class="label-data-ticket">Teléfono(s): </label><span>{{telefonoCliente}}</span><br />
+                                </div>
+                                <div hidden class="div-info-ticket">
+                                    <label class="label-data-ticket">Reportó: </label><span>{{clienteReporta}}</span><br />
+                                </div>
+                                <div class="div-info-ticket">
+                                    <label class="label-data-ticket">Se Factura:</label>
+                                    <input type="checkbox" ng-model="seFactura" />
+                                </div>
+                                <div class="div-info-ticket">
+                                    <label class="label-data-ticket">Facturado:</label>
+                                    <input type="checkbox" ng-model="facturado" />
+                                </div>
+                                <div class="div-info-ticket">
+                                    <label class="label-data-ticket">Error:</label>
+                                    <input type="checkbox" ng-model="error" />
+                                </div>
+                                <div class="div-info-ticket">
+                                    <label class="label-data-ticket">Reputación Cliente: </label><span>{{reputacionCliente}}%</span><br />
+                                </div>
+                                <div class="div-info-ticket">
+                                    <label class="label-data-ticket">Reputación Ticket: </label>
+                                    <select ng-model="reputacionTicket" class="form-control">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </select>
+                                </div>
+                                <div hidden class="div-info-ticket">
+                                    <label class="label-data-ticket">Reprocesos: </label>
+                                    <input type="text" class="form-control solo-numero" id="reprocesos-ticket" ng-model="reprocesos">
+                                </div>
+                                <div class="div-info-ticket">
+                                    <label class="label-data-ticket">Ingreso Interno:</label>
+                                    <input type="checkbox" ng-model="ingresoInterno" />
+                                </div>
+                                <div class="div-info-ticket">
+                                    <label class="label-data-ticket">Actividad Próxima:</label>
+                                    <select class="form-control" id="actividad-proxima-ticket" ng-model="actividadProxima">
+                                        <option ng-repeat="actividad in proximasActividades" value="{{actividad.id}}">{{actividad.nombre}}</option>
+                                    </select>
+                                </div>
+                                <div class="div-info-ticket">
+                                    <label class="label-data-ticket">Requiere Testing:</label>
+                                    <input type="checkbox" ng-model="requiereTesting" />
+                                </div>
+                            </div>
+                            <div id="datos-reputacion" class="left info-ticket" ng-hide="categoriaTicket != 'MANTENIMIENTO'">
+                                <div class="div-info-ticket">
+                                    <button type="button" class="btn btn-warning btn-xs" ng-click="validarContratos()"><span class="glyphicon glyphicon-alert"></span>Validar Mantenimiento</button>
+                                </div>
+                            </div>
+                            <div id="datos-reputacion" class="left info-ticket">
+                                <div class="div-info-ticket">
+                                    <label class="label-data-ticket">Fecha Revisado:</label>
+                                    <input id="fechaRevisado" name="fechaRevisado" ng-model="fechaRevisado" class="form-control inline" style="width: 40%" autocomplete="off" />
+                                </div>
+                            </div>
+                            <div class="div-info-ticket" ng-show="motivoTrabajo != null">
+                                <label class="label-data-ticket">M.Trabajo: </label><span>{{motivoTrabajo.codigo}} - {{motivoTrabajo.descripcion}}.</span>
+                            </div>
+                            <div id="panel-adjuntos-ticket" class="left info-ticket">
+                                <div ng-repeat="adj in adjuntosTicket" class="left">
+                                    <a href="Web{{adj.Url}}" target="_blank" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-paperclip"></span> Adjunto {{$index+1}}</a>
+                                </div>
+                            </div>
+                            @*<input id="adjuntoAddTicket" class="form-control" type="file">*@
+                        </div>
+                    </div>
+
+                    <div id="panel-funcionalidades-ticket" class="panel panel-default left">
+                        <div class="panel-heading">
+                            Detalle de Ticket
+                        </div>
+                        <div class="panel-body">
+                            {{detalleTicket}}
+                        </div>
+                    </div>
+
+                    <div id="panel-colaboradores-ticket" class="panel panel-default left">
+                        <div class="panel-heading">
+                            <span class="text-heading">Colaboradores</span>
+                            <input type="text" class="form-control un-medio right" ng-model="filtroColaborador" placeholder="Filtrar..." />
+                            <div class="clear"></div>
+                        </div>
+
+                        <div class="panel-body">
+                            <table class="table table-striped">
+                                <tr ng-repeat="colab in colaboradores | filter:filtroColaborador">
+                                    <td>{{colab.nombre}}</td>
+                                    <td><a ng-click="verAsignacionesColaborador(colab.id, colab.sede)" href="#">Asignaciones</a></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="panel-asignaciones-ticket" class="left">
+                        <div class="panel panel-default left" style="width:100%!important; height:50%!important; margin-bottom: 2px !important">
+                            <div class="panel-heading">
+                                Técnico Sugerido y Resolución
+                            </div>
+
+                            <div class="panel-body">
+                                <div>
+                                    <div class="left">
+                                        <label class="label-data-ticket">Técnico:</label>
+                                        <select class="form-control" id="tecnico-sugerido" ng-model="tecnicoSugerido">
+                                            <option ng-repeat="colab in colaboradores" value="{{colab.id}}">{{colab.nombre}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="right margin-top-10">
+                                        <button type="button" class="btn btn-danger" ng-click="mostrarPantallaDesacuerdo()"><span class="glyphicon glyphicon-thumbs-down"></span> Desacuerdo</button>
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                                <div class="">
+                                    <label class="label-data-ticket">Resolución:</label>
+                                    <textarea class="form-control" style="width:560px!important;height:50px!important" ng-model="observaciones"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clear"></div>
+                        <div class="panel panel-default left" style="width:100%!important; height:50%!important">
+                            <div class="panel-heading">
+                                Asignaciones
+                            </div>
+
+                            <div class="panel-body">
+                                <button type="button" class="btn btn-primary btn-xs" ng-click="adicionarTareaAsignacion()"><span class="glyphicon glyphicon-plus"></span> Adicionar</button>
+                                <div class="right">
+                                    <label>Total de Horas: </label>{{totalHorasAsignadas}}
+                                </div>
+
+                                <div class="clear"></div>
+
+                                <div id="tabla-asignaciones-ticket">
+                                    <table class="table table-striped tabla-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha</th>
+                                                <th>Colaborador</th>
+                                                <th>Horas</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="asignacion in asignaciones">
+                                                <td ng-click="verTareaAsignacion(asignacion.id)">{{asignacion.fecha}}</td>
+                                                <td ng-click="verTareaAsignacion(asignacion.id)">{{asignacion.colaborador}}</td>
+                                                <td ng-click="verTareaAsignacion(asignacion.id)">{{asignacion.numeroHoras}}</td>
+                                                <td ng-click="eliminarTareaAsignacion(asignacion.id)"><span class="glyphicon glyphicon-remove"></span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" ng-model="idTicketCliente" />
+                    <input type="hidden" ng-model="verificador" />
+                    <div class="clear"></div>
+                </div>
+                <div class="modal-footer">
+                    <input type="file" onchange="angular.element(this).scope().resetearAdjunto()" id="selectedFile" style="display: none;" />
+                    <button ng-init="botones = [];" ng-repeat="boton in botones" type="button" data-id-btn="{{boton.funcion}}" class="btn {{boton.clase}} left"><span class="glyphicon {{boton.icono}}"></span> {{boton.texto}}</button>
+                    <!--<button type="button" class="btn btn-success left" data-dismiss="modal"><span class="glyphicon glyphicon-usd"></span> Cotizar</button>
+                    <button type="button" class="btn btn-warning left" data-dismiss="modal"><span class="glyphicon glyphicon-trash"></span> Anular</button>-->
+                    <button type="submit" class="btn btn-primary left"><span class="glyphicon glyphicon-save"></span> Grabar</button>
+                    <button type="button" class="btn btn-info left" ng-click="$parent.verHistoricoTicket()"><span class="glyphicon glyphicon-calendar"></span> Histórico</button>
+                    <button type="button" class="btn btn-warning left" ng-click="verComentarioTicket()"><span class="glyphicon glyphicon-comment"></span> Comentarios</button>
+                    <button type="button" id="buttonAdjunto" class="btn btn-success left" onclick="document.getElementById('selectedFile').click();"><span class="glyphicon glyphicon-paperclip"></span> Adjuntar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Windows Modal Contratos por Cliente-->
+<div class="modal fade" id="modal-contratos-cliente" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 50%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-gestion-ticket-label"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Validar Mantenimiento</h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading center">
+                        <span class="text-heading">Contrato</span>
+
+                        <div style="width: 20%" class='input-group date right' id='fechaMantenimiento'>
+                            <input type='text' class="form-control" ng-model="fechaMantenimiento" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+
+                    <div class="panel-body">
+                        <table class="table table-striped table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <div class="left">
+                                            Código Contrato
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="left">
+                                            Fecha Corte
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="left">
+                                            Fecha Vencimiento
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="left">
+                                            Horas Mensuales
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="left">
+                                            Horas Consumidas
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="left">
+                                            Horas Disponibles
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="contrato in contratosMantenimiento">
+                                    <td>{{contrato.Codigo}}</td>
+                                    <td>{{contrato.FechaInicio}}</td>
+                                    <td>{{contrato.FechaVencimiento}}</td>
+                                    <td>{{contrato.HorasMensuales}}</td>
+                                    <td>{{contrato.HorasConsumidas}}</td>
+                                    <td>{{contrato.HorasDisponibles}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Windows Modal Asignaciones de Colaboradores -->
+<div class="modal fade" id="modal-asignacion-colaboradores" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+
+                <div class="mes-popup">
+                    <div class="cabecera-mes-popup">
+                        <div class="mes-cambiar left" ng-click="irMesAtras()"><span class="glyphicon glyphicon-chevron-left"></span></div>
+                        <div class="mes-cambiar right" ng-click="irMesAlante()"><span class="glyphicon glyphicon-chevron-right"></span></div>
+                        <div class="mes-nombre center">{{mesCalendar}}</div>
+                        <div class="clear"></div>
+                    </div>
+
+                    <div class="dias-semana">
+                        <div class="dia-semana left">Lunes</div>
+                        <div class="dia-semana left">Martes</div>
+                        <div class="dia-semana left">Miércoles</div>
+                        <div class="dia-semana left">Jueves</div>
+                        <div class="dia-semana left">Viernes</div>
+                        <div class="dia-semana left">Sábado</div>
+                        <div class="dia-semana left">Domingo</div>
+                        <div class="clear"></div>
+                    </div>
+
+                    <div class="semana-asignacion" ng-repeat="semana in semanasAsignaciones">
+                        <div class="dia-semana left {{dia.mostrar}}" ng-repeat="dia in semana" ng-click="crearAsignacionDia(dia.fecha)">
+                            <div class="dia-cabecera">
+                                <div class="numero-dia left">{{dia.dia}}</div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="body-asignacion">
+                                <div ng-repeat="asig in dia.asignaciones">
+                                    <div class="asignacion-{{asig.clase}}">
+                                        {{asig.cliente}} - {{asig.horas}} (h)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="horas-disponibles">
+                                {{dia.horasDisponibles}}
+                            </div>
+                        </div>
+
+                        <div class="clear"></div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Windows Modal Pedir Estimación -->
+<div class="modal fade" id="modal-estimacion-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-estimacion-ticket-label"><span class="glyphicon glyphicon-time" aria-hidden="true"></span> Estimación de Ticket</h4>
+            </div>
+            <form method="post" ng-submit="estimarTicket()">
+                <div class="modal-body">
+                    <div>
+                        Por favor seleccione la fecha límite de estimación y los colaboradores que estimarán el ticket:
+                    </div>
+                    <div>
+                        <label>Fecha Límite de Estimación:</label>
+                        <input class="form-control" type="text" id="fecha-limite-estimacion" ng-model="fechaLimiteEstimacion" ng-required="true" />
+                    </div>
+                    <div id="colaboradores-estimacion" class="panel panel-default">
+                        <div class="panel-heading">
+                            <span class="text-heading">Colaboradores</span>
+                            <input type="text" class="form-control un-tercio right" placeholder="Filtrar..." ng-model="filtroColaboradorAsignacion" />
+                            <div class="clear"></div>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-striped">
+                                <tr ng-repeat="colab in colaboradores | filterSelected:filtroColaboradorAsignacion">
+                                    <td><input type="checkbox" value="{{colab.id}}" /></td>
+                                    <td>{{colab.nombre}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Estimar Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Windows Modal Terminar Estimación -->
+<div class="modal fade" id="modal-terminar-estimacion-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-terminar-estimacion-ticket-label"><span class="glyphicon glyphicon-time" aria-hidden="true"></span> Terminar Estimación de Ticket</h4>
+            </div>
+            <div class="modal-body">
+                <div id="colaboradores-estado-estimacion" class="panel panel-default">
+                    <div class="panel-heading panel-xs">
+                        Estimaciones de Colaboradores
+                    </div>
+                    <div class="panel-body panel-tabla-estimaciones">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Colaborador</th>
+                                    <th>Estimación Realizada</th>
+                                    <th>Tiempo Estimado</th>
+                                    <th>Catalogada</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="estimacion in colaboradoresEstimacion" ng-click="verDatosEstimacionTicket(estimacion.id)">
+                                    <td>{{estimacion.colaborador}}</td>
+                                    <td>{{estimacion.terminada}}</td>
+                                    <td>{{estimacion.tiempo}}</td>
+                                    <td>{{estimacion.catalogada}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="panel-datos-estimacion-colaborador">
+                    <div id="panel-detalles-estimacion-colaborador" class="left panel panel-default">
+                        <div id="lista-detalles-tareas" class="panel-body">
+                            <div>
+                                <div class="left">
+                                    <label>Detalle:</label>
+                                    <textarea class="form-control" ng-required="true" required="required"></textarea>
+                                </div>
+                                <div class="left">
+                                    <label>Tiempo:</label>
+                                    <input class="solo-numero form-control" type="text" ng-required="true" required="required">
+                                </div>
+                                <div class="left">
+                                    <label>Nivel de Colaborador:</label>
+                                    <select class="form-control" ng-required="true">
+                                        <option ng-repeat="nivel in niveles" value="{{nivel.id}}">{{nivel.name}}</option>
+                                    </select>
+                                </div>
+                                <div class="clear"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="panel-datos-estimacion-colaborador" class="left panel panel-default">
+                        <div class="panel-body">
+                            <div>
+                                <label>Entregables Adicionales:</label>
+                                <textarea class="form-control" ng-model="entregablesAdicionales"></textarea>
+                            </div>
+                            <div>
+                                <label>Información Complementaria:</label>
+                                <textarea class="form-control" ng-model="informacionComplementaria"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div>
+                    <button class="btn btn-primary btn-xs" ng-click="catalogarEstimacion(1)">Optimista</button>
+                    <button class="btn btn-success btn-xs" ng-click="catalogarEstimacion(4)">Probable</button>
+                    <button class="btn btn-danger btn-xs" ng-click="catalogarEstimacion(-1)">Pesimista</button>
+
+                    <div class="right">
+                        <label id="label-total-estimacion-ticket">Total:</label><input class="form-control" id="total-estimacion-ticket" ng-model="totalEstimacionTicket" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" ng-click="terminarEstimacionTicket()">Terminar Estimación Ticket</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="add-informacion-estimacion-inicial" class="invisible">
+    <div>
+        <div class="left">
+            <label>Detalle:</label>
+            <textarea class="form-control" ng-required="true"></textarea>
+        </div>
+
+        <div class="left">
+            <label>Tiempo:</label>
+            <input type="text" class="solo-numero form-control" ng-required="true" />
+        </div>
+
+        <div class="left">
+            <label>Nivel de Colaborador:</label>
+            <select class="form-control" ng-required="true">
+                <option ng-repeat="nivel in niveles" value="{{nivel.id}}">{{nivel.name}}</option>
+            </select>
+        </div>
+
+        <div class="clear"></div>
+    </div>
+</div>
+
+<div id="add-informacion-estimacion" class="invisible">
+    <div>
+        <div class="left">
+            <textarea class="form-control" ng-required="true"></textarea>
+        </div>
+
+        <div class="left">
+            <input type="text" class="solo-numero form-control" ng-required="true" />
+        </div>
+
+        <div class="left">
+            <select class="form-control" ng-required="true">
+                <option ng-repeat="nivel in niveles" value="{{nivel.id}}">{{nivel.name}}</option>
+            </select>
+        </div>
+
+        <div class="clear"></div>
+    </div>
+</div>
+
+<!-- Windows Modal Pedir Cotización -->
+<div class="modal fade" id="modal-pedir-cotizacion-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-pedir-cotizacion-ticket-label"><span class="glyphicon glyphicon-usd" aria-hidden="true"></span> Cotización de Ticket</h4>
+            </div>
+            <form method="post" id="frm-pedir-cotización-ticket" ng-submit="pedirCotizarTicket()">
+                <div class="modal-body">
+                    <div>
+                        Por favor seleccione el cotizador de este ticket:
+                    </div>
+                    <div>
+                        <label>Cotizador:</label>
+                        <select class="form-control" ng-model="cotizadorTicket" ng-required="true">
+                            <option value="">Seleccione...</option>
+                            <option ng-repeat="cotizador in cotizadores" value="{{cotizador.idColaborador}}">{{cotizador.nombre}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Cotizar Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Windows Modal Asignacion Tarea Por Ticket -->
+<div class="modal fade" id="modal-new-task-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">
+                    <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+                    <span id="title-modal-new-task-ticket">Nueva Tarea Por Ticket</span>
+                </h4>
+            </div>
+            <form method="post" id="frm-new-task-ticket" ng-submit="guardarTareaPorTicket()">
+                <div class="modal-body">
+
+                    <div class="fila">
+                        <div class="left half half-padding-right">
+                            <label>Colaborador:</label>
+                            <select ng-model="colaboradorAsignacion" required="required" class="form-control" ng-required="true">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="colab in colaboradores" value="{{ colab.id }}">{{ colab.nombre }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <div class="left half half-padding-right">
+                            <label>Fecha:</label>
+                            <input id="fecha-asignacion-tarea-ticket" ng-model="fechaAsignacion" class="form-control" ng-required="true" />
+                        </div>
+
+                        <div class="left half half-padding-left">
+                            <label>Ubicación:</label><br />
+                            <select ng-model="ubicacionAsignacion" required="required" class="form-control" ng-required="true">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="lugar in lugares" value="{{ lugar.id }}">{{ lugar.nombre }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <div class="left half half-padding-right">
+                            <label>Actividad:</label><br />
+                            <select ng-model="actividadAsignacion" required="required" class="form-control" ng-required="true">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="act in actividades" value="{{ act.id }}">{{ act.nombre }}</option>
+                            </select>
+                        </div>
+
+                        <div class="left half half-padding-left">
+                            <label>Módulo:</label><br />
+                            <select ng-model="moduloAsignacion" required="required" class="form-control" ng-required="true">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="mod in modulos" value="{{ mod.id }}">{{ mod.nombre }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <div class="left half half-padding-right">
+                            <label>Número Horas:</label>
+                            <select ng-model="numeroHorasAsignacion" required="required" class="form-control" ng-required="true" ng-change="calcularRepetir()">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="h in [1,2,3,4,5,6,7,8]" value="{{ h }}">{{ h }}</option>
+                            </select>
+                        </div>
+                        <div class="left half half-padding-left">
+                            <label>Coordinador:</label>
+                            <select ng-model="coordinadorAsignacion" class="form-control">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="cord in coordinadores" value="{{ cord.id }}">{{ cord.nombre }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <label>Detalle:</label>
+                        <textarea ng-model="detalleAsignacion" required="required" class="form-control"></textarea>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <div class="left half half-padding-right" ng-init="vecesRepetirAsignacion = 1">
+                            <label>Repetir:</label>
+                            <input type="text" ng-model="vecesRepetirAsignacion" class="form-control solo-numero" value="1" ng-keyup="calcularRepetir()" />
+                        </div>
+                        <div class="left half half-padding-left">
+                            <label>Total de Horas:</label>
+                            <div>
+                                {{totalHorasAsignacion}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Grabar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Ventana para adicionar información al Esperando Respuesta de ticket -->
+<div class="modal fade" id="modal-historico-informacion-er-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-historico-informacion-er-ticket-label"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Cambiar Estado a Esperando Respuesta</h4>
+            </div>
+            <form id="form-grabar-informacion-er-ticket" ng-submit="esperarRespuestaTicket()">
+                <div class="modal-body">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div>
+                                <label>Texto: </label>
+                                <textarea class="form-control" ng-model="textoInformacionER" required="required"></textarea>
+                            </div>
+                            <div id="panel-adjuntos-historico">
+                                <label>Adjuntos: </label>
+                                <div class="file-adj-contrato">
+                                    <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                                        <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
+                                        <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
+                                        <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+                                    </div>
+                                </div>
+
+                                <div id="barra-botones-file-er">
+                                    <button id="addInputFileAnteriorER" ng-click="adicionarFileAnteriorER()" type="button" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus"></span> Adicionar</button>
+                                    <button id="deleteInputFileAnteriorER" disabled="disabled" ng-click="deleteFileAnteriorER()" type="button" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-minus"></span> Eliminar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span> Grabar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Ventana para escoger el proyecto de TFS -->
+<div class="modal fade" id="modal-comprobacion-workitem-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-comprobacion-workitem-ticket-label"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Proyecto TFS</h4>
+            </div>
+            <form ng-submit="asignarTicketProyectoTfs()">
+                <div class="modal-body">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div ng-init="proyectosTFS = [];">
+                                <label>Proyecto TFS: </label>
+                                <select class="form-control" ng-model="idProyectoTFS" required="required">
+                                    <option value="">Seleccione...</option>
+                                    <option ng-repeat="proyecto in proyectosTFS" value="{{proyecto.id}}">{{proyecto.nombre}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-cog"></span> Asignar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Ventana desacuerdo de una resolución -->
+<div class="modal fade" id="modal-desacuerdo-resolucion-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-comprobacion-workitem-ticket-label"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> Desacuerdo en Resolución</h4>
+            </div>
+
+            <div class="modal-body">
+                <form ng-submit="guardarDesacuerdo()">
+                    Detalle del desacuerdo:
+                    <textarea class="form-control" ng-model="desacuerdoTicket"></textarea>
+                    <div class="text-center margin-top-3">
+                        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Adicionar</button>
+                    </div>
+                </form>
+                <div class="panel panel-default margin-top-5 textos-comentario">
+                    <div class="textos-desacuerdo-informacion">
+                        <div class="text-desacuerdo" ng-repeat="text in desacuerdos">
+                            <div class="left">{{text.colaborador}}:</div>
+                            <div class="right">{{text.fechaHora | strDateToStr}}</div>
+                            <div class="clear"></div>
+                            <div>{{text.detalle}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ventana comentario de un ticket -->
+<div class="modal fade" id="modal-comentarios-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-comentarios-ticket-label"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Comentarios </h4>
+            </div>
+
+            <div class="modal-body">
+                <form ng-submit="guardarComentario()">
+                    Comentario:
+                    <textarea class="form-control" ng-model="comentarioTicket"></textarea>
+                    <div class="text-center margin-top-3">
+                        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Adicionar</button>
+                        <input type="checkbox" ng-model="mostrarComentario" ng-init="mostrarComentario=false">
+                        <label>ver todos</label>
+                    </div>
+                </form>
+                <div class="panel panel-default margin-top-5 textos-comentario">
+                    <div class="textos-desacuerdo-information">
+                        <div class="text-desacuerdo" ng-repeat="text in comentarios">
+                            <div class="left">{{text.colaborador}}:</div>
+                            <div class="right">{{text.fechaHora | strDateToStr}}</div>
+                            <div class="clear"></div>
+                            <span style="cursor:pointer;" ng-click="panelEmail(text.colaborador, text.fechaHora, text.detalle)" class="glyphicon glyphicon-envelope right"></span>
+                            <div>{{text.detalle}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ventana email de un ticket -->
+<div class="modal fade" id="modal-email-comentarios" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-comentarios-ticket-label"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Enviar por Email </h4>
+            </div>
+
+            <div class="modal-body">
+                <form>
+                    Para:
+                    <input class="form-control" ng-model="destinatariosEmailTicket">
+                </form>
+                <form>
+                    Asunto:
+                    <input class="form-control" ng-model="asuntoEmailTicket">
+                </form>
+                <textarea class="form-control panel panel-default margin-top-5 textos-comentario" ng-model="comentarioEmailTicket">
+                </textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" ng-click="enviarEmail()" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Enviar</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Ventana comentario anular ticket -->
+<div class="modal fade" id="modal-comentario-ticket-anulado" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Anular Ticket </h4>
+            </div>
+            <form ng-submit="anularTicket()">
+                <div class="modal-body">
+                    Comentario:
+                    <textarea class="form-control" ng-model="comentarioTicketAnulado" rows="8" ng-required="true"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-warning"><span class="glyphicon glyphicon-trash"></span> Anular</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Ventana comentario rechazar ticket -->
+<div class="modal fade" id="modal-comentario-ticket-rechazado" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-comentarios-ticket-label"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Comentario </h4>
+            </div>
+            <form ng-submit="rechazarTicket()">
+                <div class="modal-body">
+                    Comentario:
+                    <textarea class="form-control" ng-model="comentarioTicketRechazado" rows="8" ng-required="true"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Rechazar Ticket</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Ventana comentario pendiente ticket -->
+<div class="modal fade" id="modal-comentario-ticket-pendiente" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-comentarios-ticket-label"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Comentario </h4>
+            </div>
+            <form ng-submit="pendienteTicket()">
+                <div class="modal-body">
+                    Comentario:
+                    <textarea class="form-control" ng-model="comentarioTicketPendiente" rows="8" ng-required="true"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Pendiente Ticket</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Ventana cambio de proxima actividad ticket -->
+<div class="modal fade" id="modal-cambio-proxima-actividad" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-comentarios-ticket-label"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Se debe cambiar la próxima actividad </h4>
+            </div>
+            <form ng-submit="cambiarProximaActividadTicket()">
+                <div class="modal-body">
+                    <div>
+                        {{mensajeNoConcuerda}}
+                    </div>
+                    <label>Próxima Actividad:</label>
+                    <select class="form-control" ng-model="changeProximaActividad">
+                        <option ng-repeat="actividad in proximasActividadesChange" value="{{actividad.id}}">{{actividad.nombre}}</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-ok"></span> Cambiar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

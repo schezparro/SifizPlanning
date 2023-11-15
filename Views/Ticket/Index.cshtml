@@ -1,0 +1,318 @@
+﻿@{
+    ViewBag.Title = "Bienvenidos a la Gestión de Tickets de SifizPlanning";
+}
+
+<!DOCTYPE html>
+
+<html ng-app="ticket">
+<head>
+    <!--<meta name="viewport" content="width=device-width" />-->
+    <title>@ViewBag.Title</title>
+    <link href="~/Web/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Web/css/bootstrap-theme.min.css" rel="stylesheet" />
+    <link href="~/Web/css/datepicker.css" rel="stylesheet" />
+    <link href="~/Web/css/jasny-bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Web/css/bootstrap-datetimepicker.css" rel="stylesheet" />
+    <link href="~/Web/css/bootstrap-select.min.css" rel="stylesheet" />
+    <link href="~/Web/css/admin/admin.css" rel="stylesheet" />
+    <link href="~/Web/css/home/home.css" rel="stylesheet" />
+    <link href="~/Web/css/jquery.bonsai.css" rel="stylesheet" />
+    <script type="text/javascript" src="~/Web/js/jquery-2.1.3.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/jquery.signalR-2.1.2.min.js"></script>
+    <script type="text/javascript" src="~/signalr/hubs"></script>
+    <script type="text/javascript" src="~/Web/js/angular.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/jquery.bonsai.js"></script>
+    <script type="text/javascript" src="~/Web/js/jquery.qubit.js"></script>
+    <script type="text/javascript" src="~/Web/js/jquery.json-list.js"></script>
+</head>
+<body ng-controller="ticketController">
+    <div id="content_body">
+        <div id="menu-principal">
+            <ul class="nav nav-pills">
+                @if (Roles.IsUserInRole("ADMIN") || !Roles.IsUserInRole("GESTOR"))
+                {
+                    <li role="presentation" class="active"><a href="#" ng-click="IrInicio()">Inicio</a></li>
+
+                    <li role="presentation"><a href="#" ng-click="IrGestionarTickets()">Tickets</a></li>
+
+                    <li role="presentation"><a href="#" ng-click="IrGestionarEstimaciones()">Estimaciones</a></li>
+
+                    <li role="presentation"><a href="#" ng-click="IrAdicionarTickets()">Adición Tickets</a></li>
+
+                    <li role="presentation"><a href="#" ng-click="IrGestionTicketsResueltos()">Resueltos</a></li>
+
+                    <li role="presentation"><a href="#" ng-click="IrGestionTicketsEnAprobacion()">En Aprobación</a></li>
+
+                    @*<li role="presentation"><a href="#" ng-click="IrGestionTicketsEnEspera()">En Espera</a></li>*@
+
+                    if (Roles.IsUserInRole("COTIZADOR"))
+                    {
+                        <li role="presentation"><a href="#" ng-click="IrCotizarTickets()">Cotizar Tickets</a></li>
+                    }
+
+                    <li role="presentation"><a href="#" ng-click="IrResumenTicket()">Resumen Tickets</a></li>
+
+                    <li role="presentation"><a href="#" ng-click="IrReporteTicket()">Horas Mantenimiento</a></li>
+
+                    <li role="presentation"><a href="#" ng-click="IrBI()">Cuadros Mando</a></li>
+                }
+                else
+                {
+                    <li role="presentation" class="active"><a href="#" ng-click="IrInicio()">Inicio</a></li>
+                    <li role="presentation"><a href="#" ng-click="IrGestionarTickets()">Tickets</a></li>
+                    <li role="presentation"><a href="#" ng-click="IrReporteTicket()">Horas Mantenimiento</a></li>
+                }
+                <a href="cerrar/sesion/" class="right btn btn-danger"><span class="glyphicon glyphicon-off"></span> Cerrar Sesión</a>
+                <a href="main-menu" style="margin-right: 4px;" class="right btn btn-warning"><span class="glyphicon glyphicon-menu-hamburger"></span> Menú Principal</a>
+            </ul>
+        </div>
+
+        <div id="panel-principal" class="panel panel-default" ng-init="funcionalidad = 'INICIO'">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{ funcionalidad }}</h3>
+            </div>
+
+            <div id="funcionalidad">
+                @if (Roles.IsUserInRole("ADMIN") || !Roles.IsUserInRole("GESTOR"))
+                {
+                    <div id="panel_home">
+                        @{Html.RenderPartial("inicioTicket");}
+                    </div>
+
+                    <div id="panel_seguimiento" ng-controller="gestionTicketController">
+                        @{Html.RenderPartial("windowGestionTicket");}
+                    </div>
+					
+					<div id="panel_estimaciones" ng-controller="gestionEstimacionesController">
+                        @{Html.RenderPartial("windowGestionEstimaciones");}
+                    </div>
+
+                    <div id="panel_adicion" class="invisible" ng-controller="adicionTicketController">
+                        @{Html.RenderPartial("windowAdicionTicket");}
+                    </div>
+
+                    <div id="panel_resolucion_ticket" class="invisible" ng-controller="ticketsResueltosController">
+                        @{Html.RenderPartial("windowResolucionTicket");}
+                    </div>
+
+                    <div id="panel_ticket_en_aprobacion" class="invisible" ng-controller="ticketsEnAprobacionController">
+                        @{Html.RenderPartial("windowTicketEnAprobacion");}
+                    </div>
+
+                    <div id="panel_cotizacion" class="invisible" ng-controller="cotizacionTicketController">
+                        @{Html.RenderPartial("windowCotizarTicket");}
+                    </div>
+
+                    <div id="panel_resumenTicket" class="invisible" ng-controller="resumenTicketController">
+                        @{Html.RenderPartial("windowResumenTicket");}
+                    </div>
+
+                    <div id="panel_reporteTicket" class="invisible" ng-controller="reporteTicketController">
+                        @{Html.RenderPartial("windowReporteTicket");}
+                    </div>
+
+                    <div id="panel_biTicket" class="invisible" ng-controller="BITicketController">
+                        @{Html.RenderPartial("windowBITicket");}
+                    </div>
+                }
+                else
+                {
+                    <div id="panel_home">
+                        @{Html.RenderPartial("inicioTicket");}
+                    </div>
+
+                    <div id="panel_seguimiento" ng-controller="gestionTicketController">
+                        @{Html.RenderPartial("windowGestionTicket");}
+                    </div>
+
+                    <div id="panel_reporteTicket" class="invisible" ng-controller="reporteTicketController">
+                        @{Html.RenderPartial("windowReporteTicket");}
+                    </div>
+                }
+                <!-- Histórico del ticket -->
+                <div class="modal fade" id="modal-historico-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" style="width: 80%; height:80%;">
+                        <div class="modal-content" style="width: 100%; height:100%;">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="modal-historico-ticket-label"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Histórico del Ticket</h4>
+                            </div>
+                            <div class="modal-body" style="height: calc( 100% - 120px);">
+                                <div class="left eventos full-height">
+                                    <div class="panel panel-default full-height">
+                                        <input class="form-control" type="text" placeholder="Filtrar..." ng-model="filtroEventoTicket" ng-keyup="cargarEventosTickets()" />
+                                        <div id="panel-historico-izq">
+                                            <div id="div-tabla-eventos-historico">
+                                                <table id="tabla-eventos-historico" class="table table-striped tabla-hover">
+                                                    <tbody>
+                                                        <tr ng-repeat="evento in eventosHistorico" id="evento{{evento.SecuencialObjeto}}" ng-click="verDatosEventoTicket(evento.Tipo, evento.SecuencialObjeto)" class="{{evento.Tipo === 1?'evento-historico':'datos-eventos'}}">
+                                                            <td>{{evento.Fecha | strDateToStr}} - {{evento.Descripcion}}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="left datos-eventos">
+                                    <div class="panel panel-default full-height">
+                                        <div>
+                                            <div class="left half">
+                                                <label class="label-historico-ticket">Ticket:</label>{{numeroHistoricoTicket | rellenarIzq : 0}}<br />
+                                                <label class="label-historico-ticket">Cliente:</label>{{clienteHistoricoTicket}}
+                                            </div>
+                                            <div class="left half">
+                                                <label class="label-historico-ticket">Categoría:</label>{{categoriaHistoricoTicket}}<br />
+                                                <label class="label-historico-ticket">Prioridad:</label>{{prioridadHistoricoTicket}}
+                                            </div>
+                                            <div class="left full-height">
+                                                <label class="label-historico-ticket">Asunto:</label>{{asuntoHistoricoTicket}}<br />
+                                            </div>
+                                            <div class="clear"></div>
+                                        </div>
+                                        <div class="full-height">
+                                            <label>Datos:</label>
+                                            <div id="datos-historico-ticket" class="panel panel-default"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="clear"></div>
+                                <div class=" modal-footer">
+                                    <button type="button" class="right btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                                    <button type="button" class="left btn btn-info" ng-click="adicionarEmailHistorico()"><span class="glyphicon glyphicon-calendar"></span> Adicionar Información a Histórico</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ventana para adicionar información Histórica al ticket -->
+            <div class="modal fade" id="modal-historico-informacion-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="modal-historico-informacion-ticket-label"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Adicionar Información al Histórico del Ticket</h4>
+                        </div>
+                        <form id="form-grabar-historico" ng-submit="grabarInformacionHistorico()">
+                            <div class="modal-body">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <div>
+                                            <label>Texto: </label>
+                                            <textarea class="form-control" ng-model="textoInformacionHistorico" required="required"></textarea>
+                                        </div>
+                                        <div id="panel-adjuntos-historico">
+                                            <label>Adjuntos: </label>
+                                            <div class="file-adj-contrato">
+                                                <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                                                    <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
+                                                    <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
+                                                    <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+                                                </div>
+                                            </div>
+
+                                            <div id="barra-botones-file">
+                                                <button id="addInputFileAnterior" ng-click="adicionarFileAnterior()" type="button" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus"></span> Adicionar</button>
+                                                <button id="deleteInputFileAnterior" disabled="disabled" ng-click="deleteFileAnterior()" type="button" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-minus"></span> Eliminar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="clear"></div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                                <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span> Grabar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="htmlFile" class="invisible">
+                <div class="file-adj-contrato">
+                    <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                        <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
+                        <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
+                        <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loadingDiv">
+                <img src="~/Web/images/ajax-loader.gif" />
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CODIGO DEL CHAT -->
+    <div id="sifiz-chat" style="display: none;">
+        <div id="head-sifiz-chat" class="btns-chat">
+            <div class="left nombre-usuario-local"></div>
+            <div class="right"> <i class="glyphicon glyphicon-chevron-down"></i></div>
+            <div class="clear"></div>
+        </div>
+        <div style="padding: 3px;">
+            <input id="filtro-chat" type="text" class="form-control" placeholder="Filtrar..." />
+        </div>
+        <div id="body-sifiz-chat" style="display: block;">
+            <div id="panel-usuarios-sfz">
+
+            </div>
+        </div>
+    </div>
+
+    <div id="ventanas-activas-chat">
+
+    </div>
+
+    <div id="div-usuario-chat">
+        <div class="usuario-chat" data-id="">
+            <div class="estado-usuario left active"><i class="glyphicon glyphicon-ok-sign"></i></div>
+            <div class="left nombre-usuario"></div>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <div id="ventana-chat-conversacion" style="display: none;">
+        <div class="ventana-chat">
+            <div class="heading-ventana-chat">
+                <div class="left nombre-contacto">Henry Cruz</div>
+                <div class="right"><i class="glyphicon glyphicon-remove"></i></div>
+                <div class="clear"></div>
+            </div>
+            <div class="chat-text-ventana-chat">
+
+            </div>
+            <div class="text-ventana-chat">
+                <textarea data-id-persona=""></textarea>
+            </div>
+        </div>
+    </div>
+    <audio id="audio-chat" controls="controls">
+        <source src="~/Web/sounds/happy-ending.mp3" type="audio/mpeg" />
+    </audio>
+    <!-- FIN DEL CODIGO DEL CHAT -->
+
+    <script type="text/javascript" src="~/Web/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/moment.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/bootstrap-datepicker.js"></script>
+    <script type="text/javascript" src="~/Web/js/bootstrap-datetimepicker.js"></script>
+    <script type="text/javascript" src="~/Web/js/jasny-bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/highcharts.js"></script>
+    <script type="text/javascript" src="~/Web/js/highcharts-more.js"></script>
+    <script type="text/javascript" src="~/Web/js/solid-gauge.js"></script>
+    <script type="text/javascript" src="~/Web/js/jquery.hotkeys.js"></script>
+    <script type="text/javascript" src="~/Web/js/bootstrap-wysiwyg.js"></script>
+    <script type="text/javascript" src="~/Web/js/chat.js"></script>
+    <script type="text/javascript" src="~/Web/js/bootstrap-select.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/waiting.js"></script>
+    <script type="text/javascript" src="~/Web/js/ticket/ticket.js"></script>
+    @*<script type="text/javascript" src="~/Web/js/ticket/ticketsGestores.js"></script>*@
+</body>
+</html>
