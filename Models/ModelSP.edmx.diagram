@@ -384,6 +384,7 @@
         <AssociationConnector Association="SifizPlanningModel.FK_OFERTAS_COLABORADOR" />
         <EntityTypeShape EntityType="SifizPlanningModel.SolicitudVacaciones" Width="1.5" PointX="7.375" PointY="32.75" />
         <EntityTypeShape EntityType="SifizPlanningModel.SolicitudPermisos" Width="1.5" PointX="4.375" PointY="33.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.InfoTickets" Width="1.5" PointX="6.375" PointY="38.75" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

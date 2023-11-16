@@ -1404,6 +1404,33 @@
           <Property Name="ANIO" Type="numeric" Precision="4" Scale="0" Nullable="false" />
           <Property Name="HORASCONSUMIDAS" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="INFOTICKETS">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" />
+          <Property Name="CLIENTE" Type="varchar" MaxLength="255" />
+          <Property Name="PRIORIDAD" Type="varchar" MaxLength="50" />
+          <Property Name="TIPO" Type="varchar" MaxLength="100" />
+          <Property Name="USUARIO" Type="varchar" MaxLength="100" />
+          <Property Name="FECHAINGRESO" Type="datetime" />
+          <Property Name="FECHARESPUESTA" Type="datetime" />
+          <Property Name="FECHAASIGNACION" Type="datetime" />
+          <Property Name="FECHAENTREGA" Type="datetime" />
+          <Property Name="FECHACIERRE" Type="datetime" />
+          <Property Name="NUMEROREPROCESOS" Type="int" />
+          <Property Name="ESTIMADOPOR" Type="varchar" MaxLength="100" />
+          <Property Name="ASIGNADOA" Type="varchar" MaxLength="100" />
+          <Property Name="APROBADOPOR" Type="varchar" MaxLength="100" />
+          <Property Name="ENTREGADOPOR" Type="varchar" MaxLength="100" />
+          <Property Name="HORASESTIMADAS" Type="time" Precision="0" />
+          <Property Name="HORASASIGNADAS" Type="time" Precision="0" />
+          <Property Name="HORASEMPLEADAS" Type="time" Precision="0" />
+          <Property Name="HORASPRUEBA" Type="time" Precision="0" />
+          <Property Name="HORASENTREGA" Type="time" Precision="0" />
+          <Property Name="ESTADO" Type="varchar" MaxLength="50" />
+          <Property Name="APLICAA" Type="varchar" MaxLength="50" />
+        </EntityType>
         <EntityType Name="MOTIVODEVOLUCIONTICKET">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
@@ -4589,6 +4616,7 @@
           <EntitySet Name="HISTORICOADJUNTO" EntityType="Self.HISTORICOADJUNTO" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="HISTORICOINFORMACIONTICKET" EntityType="Self.HISTORICOINFORMACIONTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="HORASCONSUMIDAS" EntityType="Self.HORASCONSUMIDAS" Schema="TICKET" store:Type="Tables" />
+          <EntitySet Name="INFOTICKETS" EntityType="Self.INFOTICKETS" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="MOTIVODEVOLUCIONTICKET" EntityType="Self.MOTIVODEVOLUCIONTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="MOTIVOPRIORIDADTICKET" EntityType="Self.MOTIVOPRIORIDADTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="MOTIVOTRABAJOTICKET" EntityType="Self.MOTIVOTRABAJOTICKET" Schema="TICKET" store:Type="Tables" />
@@ -6567,6 +6595,7 @@
           </AssociationSet>
           <EntitySet Name="SolicitudVacaciones" EntityType="SifizPlanningModel.SolicitudVacaciones" />
           <EntitySet Name="SolicitudPermisos" EntityType="SifizPlanningModel.SolicitudPermisos" />
+          <EntitySet Name="InfoTickets" EntityType="SifizPlanningModel.InfoTickets" />
           </EntityContainer>
         <EntityType Name="Rol">
           <Key>
@@ -11427,6 +11456,33 @@
           <Property Name="Jefe" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Estado" Type="Decimal" Precision="1" Scale="0" />
         </EntityType>
+        <EntityType Name="InfoTickets">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="Secuencial" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Prioridad" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Tipo" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Usuario" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="FechaIngreso" Type="DateTime" Precision="3" />
+          <Property Name="FechaRespuesta" Type="DateTime" Precision="3" />
+          <Property Name="FechaAsignacion" Type="DateTime" Precision="3" />
+          <Property Name="FechaEntrega" Type="DateTime" Precision="3" />
+          <Property Name="FechaCierre" Type="DateTime" Precision="3" />
+          <Property Name="NumeroReprocesos" Type="Int32" />
+          <Property Name="EstimadoPor" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="AsignadoA" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="AprobadoPor" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="EntregadoPor" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="HorasEstimadas" Type="Time" Precision="0" />
+          <Property Name="HorasAsignadas" Type="Time" Precision="0" />
+          <Property Name="HorasEmpleadas" Type="Time" Precision="0" />
+          <Property Name="HorasPrueba" Type="Time" Precision="0" />
+          <Property Name="HorasEntrega" Type="Time" Precision="0" />
+          <Property Name="Estado" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="AplicaA" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -13370,6 +13426,34 @@
                 <ScalarProperty Name="Cedula" ColumnName="CEDULA" />
                 <ScalarProperty Name="ApellidosNombres" ColumnName="APELLIDOSNOMBRES" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="InfoTickets">
+            <EntityTypeMapping TypeName="SifizPlanningModel.InfoTickets">
+              <MappingFragment StoreEntitySet="INFOTICKETS">
+                <ScalarProperty Name="AplicaA" ColumnName="APLICAA" />
+                <ScalarProperty Name="Estado" ColumnName="ESTADO" />
+                <ScalarProperty Name="HorasEntrega" ColumnName="HORASENTREGA" />
+                <ScalarProperty Name="HorasPrueba" ColumnName="HORASPRUEBA" />
+                <ScalarProperty Name="HorasEmpleadas" ColumnName="HORASEMPLEADAS" />
+                <ScalarProperty Name="HorasAsignadas" ColumnName="HORASASIGNADAS" />
+                <ScalarProperty Name="HorasEstimadas" ColumnName="HORASESTIMADAS" />
+                <ScalarProperty Name="EntregadoPor" ColumnName="ENTREGADOPOR" />
+                <ScalarProperty Name="AprobadoPor" ColumnName="APROBADOPOR" />
+                <ScalarProperty Name="AsignadoA" ColumnName="ASIGNADOA" />
+                <ScalarProperty Name="EstimadoPor" ColumnName="ESTIMADOPOR" />
+                <ScalarProperty Name="NumeroReprocesos" ColumnName="NUMEROREPROCESOS" />
+                <ScalarProperty Name="FechaCierre" ColumnName="FECHACIERRE" />
+                <ScalarProperty Name="FechaEntrega" ColumnName="FECHAENTREGA" />
+                <ScalarProperty Name="FechaAsignacion" ColumnName="FECHAASIGNACION" />
+                <ScalarProperty Name="FechaRespuesta" ColumnName="FECHARESPUESTA" />
+                <ScalarProperty Name="FechaIngreso" ColumnName="FECHAINGRESO" />
+                <ScalarProperty Name="Usuario" ColumnName="USUARIO" />
+                <ScalarProperty Name="Tipo" ColumnName="TIPO" />
+                <ScalarProperty Name="Prioridad" ColumnName="PRIORIDAD" />
+                <ScalarProperty Name="Secuencial" ColumnName="CLIENTE" />
+                <ScalarProperty Name="Id" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
