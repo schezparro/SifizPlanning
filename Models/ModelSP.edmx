@@ -1423,11 +1423,11 @@
           <Property Name="ASIGNADOA" Type="varchar" MaxLength="100" />
           <Property Name="APROBADOPOR" Type="varchar" MaxLength="100" />
           <Property Name="ENTREGADOPOR" Type="varchar" MaxLength="100" />
-          <Property Name="HORASESTIMADAS" Type="time" Precision="0" />
-          <Property Name="HORASASIGNADAS" Type="time" Precision="0" />
-          <Property Name="HORASEMPLEADAS" Type="time" Precision="0" />
-          <Property Name="HORASPRUEBA" Type="time" Precision="0" />
-          <Property Name="HORASENTREGA" Type="time" Precision="0" />
+          <Property Name="HORASESTIMADAS" Type="datetime2" Precision="7" />
+          <Property Name="HORASASIGNADAS" Type="datetime2" Precision="7" />
+          <Property Name="HORASEMPLEADAS" Type="datetime2" Precision="7" />
+          <Property Name="HORASPRUEBA" Type="datetime2" Precision="7" />
+          <Property Name="HORASENTREGA" Type="datetime2" Precision="7" />
           <Property Name="ESTADO" Type="varchar" MaxLength="50" />
           <Property Name="APLICAA" Type="varchar" MaxLength="50" />
         </EntityType>
@@ -11461,7 +11461,7 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" />
-          <Property Name="Secuencial" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Cliente" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="Prioridad" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Tipo" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="Usuario" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
@@ -11473,13 +11473,13 @@
           <Property Name="NumeroReprocesos" Type="Int32" />
           <Property Name="EstimadoPor" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="AsignadoA" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="AprobadoPor" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ProbadoPor" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="EntregadoPor" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="HorasEstimadas" Type="Time" Precision="0" />
-          <Property Name="HorasAsignadas" Type="Time" Precision="0" />
-          <Property Name="HorasEmpleadas" Type="Time" Precision="0" />
-          <Property Name="HorasPrueba" Type="Time" Precision="0" />
-          <Property Name="HorasEntrega" Type="Time" Precision="0" />
+          <Property Name="HorasEstimadas" Type="DateTime" Precision="7" />
+          <Property Name="HorasAsignadas" Type="DateTime" Precision="7" />
+          <Property Name="HorasEmpleadas" Type="DateTime" Precision="7" />
+          <Property Name="HorasPrueba" Type="DateTime" Precision="7" />
+          <Property Name="HorasEntrega" Type="DateTime" Precision="7" />
           <Property Name="Estado" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="AplicaA" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
@@ -13440,7 +13440,7 @@
                 <ScalarProperty Name="HorasAsignadas" ColumnName="HORASASIGNADAS" />
                 <ScalarProperty Name="HorasEstimadas" ColumnName="HORASESTIMADAS" />
                 <ScalarProperty Name="EntregadoPor" ColumnName="ENTREGADOPOR" />
-                <ScalarProperty Name="AprobadoPor" ColumnName="APROBADOPOR" />
+                <ScalarProperty Name="ProbadoPor" ColumnName="APROBADOPOR" />
                 <ScalarProperty Name="AsignadoA" ColumnName="ASIGNADOA" />
                 <ScalarProperty Name="EstimadoPor" ColumnName="ESTIMADOPOR" />
                 <ScalarProperty Name="NumeroReprocesos" ColumnName="NUMEROREPROCESOS" />
@@ -13452,7 +13452,7 @@
                 <ScalarProperty Name="Usuario" ColumnName="USUARIO" />
                 <ScalarProperty Name="Tipo" ColumnName="TIPO" />
                 <ScalarProperty Name="Prioridad" ColumnName="PRIORIDAD" />
-                <ScalarProperty Name="Secuencial" ColumnName="CLIENTE" />
+                <ScalarProperty Name="Cliente" ColumnName="CLIENTE" />
                 <ScalarProperty Name="Id" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>

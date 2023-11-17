@@ -15,7 +15,7 @@ namespace SifizPlanning.Models
     public partial class InfoTickets
     {
         public int Id { get; set; }
-        public string Secuencial { get; set; }
+        public string Cliente { get; set; }
         public string Prioridad { get; set; }
         public string Tipo { get; set; }
         public string Usuario { get; set; }
@@ -27,13 +27,13 @@ namespace SifizPlanning.Models
         public Nullable<int> NumeroReprocesos { get; set; }
         public string EstimadoPor { get; set; }
         public string AsignadoA { get; set; }
-        public string AprobadoPor { get; set; }
+        public string ProbadoPor { get; set; }
         public string EntregadoPor { get; set; }
-        public Nullable<System.TimeSpan> HorasEstimadas { get; set; }
-        public Nullable<System.TimeSpan> HorasAsignadas { get; set; }
-        public Nullable<System.TimeSpan> HorasEmpleadas { get; set; }
-        public Nullable<System.TimeSpan> HorasPrueba { get; set; }
-        public Nullable<System.TimeSpan> HorasEntrega { get; set; }
+        public Nullable<System.DateTime> HorasEstimadas { get; set; }
+        public Nullable<System.DateTime> HorasAsignadas { get; set; }
+        public Nullable<System.DateTime> HorasEmpleadas { get; set; }
+        public Nullable<System.DateTime> HorasPrueba { get; set; }
+        public Nullable<System.DateTime> HorasEntrega { get; set; }
         public string Estado { get; set; }
         public string AplicaA { get; set; }
     }

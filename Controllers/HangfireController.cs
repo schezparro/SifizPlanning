@@ -1916,16 +1916,41 @@ namespace SifizPlanning.Controllers
 		{
 			try
 			{
-				var tickets = db.Ticket
-					.AsNoTracking()
-					.OrderByDescending(s=>s.Secuencial)
-					.ToList();
+				var entities = db.InfoTickets.ToList();
+				db.InfoTickets.RemoveRange(entities);
+				db.SaveChanges();
+
+				var tickets = db.Ticket.OrderByDescending(s => s.Secuencial).ToList();
 
 				foreach(var item in tickets)
 				{
 					InfoTickets InfoTicket = new InfoTickets();
-					InfoTicket.AplicaA = item.ticketVersionClliente?.Descripcion;
-					//InfoTicket.AprobadoPor = item.ticketHistorico?.OrderByDescending(s=>s.Version).Where(s=> s.estadoTicket?.Codigo == "" ).First().;
+					InfoTicket.Id = item.Secuencial;
+					InfoTicket.Cliente = item.persona_cliente.cliente.Descripcion;
+					InfoTicket.Prioridad = item.prioridadTicket.Codigo;
+					InfoTicket.Tipo = item.categoriaTicket.Codigo;
+					InfoTicket.Usuario = item.persona_cliente.persona.Nombre1 + " " + item.persona_cliente.persona.Apellido1;
+					InfoTicket.ProbadoPor = "";
+					InfoTicket.FechaIngreso = item.FechaCreado;
+					InfoTicket.FechaRespuesta = item.FechaCreado;
+					InfoTicket.FechaAsignacion = item.ticketHistorico?
+													.Where(s => s.estadoTicket?.Codigo == "ASIGNADO")
+													.OrderBy(s => s.Version)
+													.FirstOrDefault()?.FechaOperacion;
+					InfoTicket.FechaEntrega = item.ticketHistorico?
+											.OrderByDescending(h => h.Version)
+											.Zip(item.ticketHistorico?
+												.OrderByDescending(h => h.Version)
+												.Skip(1), (h1, h2) => new { h1, h2 })
+											.Where(pair => pair.h1.estadoTicket?.Codigo == "RESUELTO" && pair.h2.estadoTicket?.Codigo != "RESUELTO")
+											.Select(pair => pair.h1?.FechaOperacion)?
+											.FirstOrDefault();
+					InfoTicket.FechaCierre = item.ticketHistorico?
+													.Where(s => s.estadoTicket?.Codigo == "CERRADO")
+													.OrderBy(s => s.Version)
+													.FirstOrDefault()?.FechaOperacion;
+					InfoTicket.NumeroReprocesos = int.Parse(item.ticketHistorico?.OrderByDescending(s => s.Version).First().Reprocesos.ToString());
+					InfoTicket.EstimadoPor = "";
 					InfoTicket.AsignadoA = (
 								  db.TicketTarea.Where(x => x.SecuencialTicket == item.Secuencial && x.EstaActiva == 1).Count() > 0
 								 ) ?
@@ -1936,42 +1961,64 @@ namespace SifizPlanning.Controllers
 									  where ttar.SecuencialTicket == item.Secuencial
 									  select p.Nombre1 + " " + p.Apellido1).FirstOrDefault()
 								   : "NO ASIGNADO";
-					//InfoTicket.EntregadoPor = item.ticketHistorico?.OrderByDescending(s => s.Version).Where(s => s.estadoTicket?.Codigo == "RESUELTO").First().;
-					InfoTicket.Estado = item.estadoTicket.Descripcion;
-					InfoTicket.EstimadoPor = item.ticketHistorico.Where(s=>s.Estimacion > 0).OrderBy(s=>s.Version).Select(s=> s.usuario.persona.Nombre1 + " " + s.usuario.persona.Apellido1).First();
-					InfoTicket.FechaAsignacion = item.ticketHistorico
-													.AsEnumerable()
-													.Where(s => s.estadoTicket.Codigo == "ASIGNADO")
-													.OrderByDescending(s => s.FechaOperacion)
-													.SkipWhile((t, i) => i > 0 && item.ticketHistorico
-													.ToList()[i - 1].estadoTicket.Codigo == "ASIGNADO")
-													.FirstOrDefault().FechaOperacion;
-					InfoTicket.FechaCierre = item.ticketHistorico
-													.AsEnumerable()
-													.Where(s => s.estadoTicket.Codigo == "CERRADO")
-													.OrderByDescending(s => s.FechaOperacion)
-													.SkipWhile((t, i) => i > 0 && item.ticketHistorico
-													.ToList()[i - 1].estadoTicket.Codigo == "CERRADO")
-													.FirstOrDefault().FechaOperacion;
-					InfoTicket.FechaEntrega = item.ticketHistorico
-													.AsEnumerable()
-													.Where(s => s.estadoTicket.Codigo == "RESUELTO")
-													.OrderByDescending(s => s.FechaOperacion)
-													.SkipWhile((t, i) => i > 0 && item.ticketHistorico
-													.ToList()[i - 1].estadoTicket.Codigo == "RESUELTO")
-													.FirstOrDefault().FechaOperacion;
-					InfoTicket.FechaIngreso = item.FechaCreado;
-					InfoTicket.FechaRespuesta = item.FechaRevisado;
-					InfoTicket.Id = item.Secuencial;
-					InfoTicket.NumeroReprocesos = int.Parse( item.ticketHistorico.OrderByDescending(s => s.FechaOperacion).First().Reprocesos.ToString());
-					InfoTicket.Prioridad = item.prioridadTicket.Descripcion;
-					InfoTicket.Secuencial = item.persona_cliente.cliente.Descripcion;
-					InfoTicket.Tipo = item.categoriaTicket.Descripcion;
-					InfoTicket.Usuario = item.persona_cliente.persona.Nombre1 + " " + item.persona_cliente.persona.Apellido1;
+					InfoTicket.EntregadoPor = "";
+
+					TimeSpan TotalAsignado = TimeSpan.Zero;
+					TimeSpan TotalUtilizado = TimeSpan.Zero;
+
+					var ticketsTareas = db.TicketTarea.Where(s=>s.SecuencialTicket ==item.Secuencial && s.EstaActiva == 1).ToList();
+					foreach(var ta in ticketsTareas)
+					{
+						TimeSpan tiempoAsignado = ta.tarea.FechaFin - ta.tarea.FechaInicio;
+						TimeSpan tiempoUtilizado = TimeSpan.FromMinutes(
+							Math.Round(60 * (double)(ta.tarea.HorasUtilizadas)));
+
+						if(ta.tarea.FechaInicio.Hour < 13 && ta.tarea.FechaFin.Hour > 13)
+						{
+							tiempoAsignado.Subtract(TimeSpan.FromHours(1));
+						}
+
+						TotalAsignado.Add(tiempoAsignado);
+						TotalUtilizado.Add(tiempoUtilizado);
+					}
+
+					InfoTicket.HorasAsignadas = DateTime.MinValue + TotalAsignado;
+					InfoTicket.HorasEmpleadas = DateTime.MinValue + TotalUtilizado;
+
+
+					TimeSpan TotalEstimado = new TimeSpan(item.Estimacion, 0, 0);
+					InfoTicket.HorasEstimadas = DateTime.MinValue + TotalEstimado;
+
+					InfoTicket.HorasEntrega = DateTime.MinValue + TimeSpan.Zero;
+					InfoTicket.HorasPrueba = DateTime.MinValue + TimeSpan.Zero;
+					InfoTicket.Estado = item.estadoTicket?.Codigo;
+					InfoTicket.AplicaA = item.ticketVersionClliente?.Descripcion;
+					//InfoTicket.FechaEntrega = item.ticketHistorico
+					//								.Where(h => h.estadoTicket.Codigo == "RESUELTO")
+					//								.Select((h, index) => new {
+					//									h.FechaOperacion,
+					//									h.estadoTicket.Codigo,
+					//									PrevEstado = item.ticketHistorico
+					//									.Where(h2 => h2.FechaOperacion < h.FechaOperacion)
+					//									.OrderByDescending(h2 => h2.FechaOperacion)
+					//									.Select(h2 => h2.Estado)
+					//									.FirstOrDefault()
+					//								})
+					//								.Where(h => h.PrevEstado != "RESUELTO")
+					//								.OrderByDescending(h => h.FechaOperacion)
+					//								.Select(h => h.FechaOperacion)
+					//								.FirstOrDefault();
+					//InfoTicket.FechaCierre = item.ticketHistorico
+					//								.AsEnumerable()
+					//								.Where(s => s.estadoTicket.Codigo == "CERRADO")
+					//								.OrderByDescending(s => s.FechaOperacion)
+					//								.SkipWhile((t, i) => i > 0 && item.ticketHistorico
+					//								.ToList()[i - 1].estadoTicket.Codigo == "CERRADO")
+					//								.FirstOrDefault().FechaOperacion;
 
 					db.InfoTickets.Add(InfoTicket);
+					db.SaveChanges();
 				}
-				db.SaveChanges();
 
 				var resp = new
 				{
