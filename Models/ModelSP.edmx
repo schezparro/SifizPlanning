@@ -1620,6 +1620,7 @@
           <Property Name="DIASGARANTIA" Type="int" />
           <Property Name="HORASCREADO" Type="int" />
           <Property Name="HORASRESOLUCION" Type="int" />
+          <Property Name="PENDIENTEAPAGO" Type="bit" />
         </EntityType>
         <EntityType Name="TICKET_CATEGORIAREVISADA">
           <Key>
@@ -7424,6 +7425,7 @@
           <Property Name="DiasGarantia" Type="Int32" />
           <Property Name="HorasCreado" Type="Int32" />
           <Property Name="HorasResolucion" Type="Int32" />
+          <Property Name="PendienteAPago" Type="Boolean" />
         </EntityType>
         <EntityType Name="Ticket_ContratoCliente">
           <Key>
@@ -11916,6 +11918,7 @@
           <EntitySetMapping Name="Ticket">
             <EntityTypeMapping TypeName="SifizPlanningModel.Ticket">
               <MappingFragment StoreEntitySet="TICKET">
+                <ScalarProperty Name="PendienteAPago" ColumnName="PENDIENTEAPAGO" />
                 <ScalarProperty Name="HorasResolucion" ColumnName="HORASRESOLUCION" />
                 <ScalarProperty Name="HorasCreado" ColumnName="HORASCREADO" />
                 <ScalarProperty Name="DiasGarantia" ColumnName="DIASGARANTIA" />

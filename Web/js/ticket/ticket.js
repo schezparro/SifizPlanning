@@ -952,6 +952,7 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
                                     $scope.ticketVersionCliente = data.datosTicket.ticketVersionCliente;
                                     $scope.ticketVC = data.datosTicket.ticketVersionClienteId;
                                     $scope.diasGarantia = data.datosTicket.diasGarantia;
+                                    $scope.pendienteAPago = data.datosTicket.pendienteAPago;
 
                                     $scope.actividadProxima = data.datosTicket.actividadProxima;
                                     $scope.actividadProximaDelTicket = false;
@@ -1226,6 +1227,7 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
         formData.append('observaciones', $scope.observaciones);
         formData.append('error', $scope.error);
         formData.append('requiereTesting', $scope.requiereTesting);
+        formData.append('pendienteAPago', $scope.pendienteAPago);
         formData.append('adjuntos', document.getElementById('selectedFile').files[0]);
         formData.append('esEstimacion', $scope.esEstimacion);
         formData.append('diasGarantia', $scope.diasGarantia);
@@ -1554,7 +1556,7 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
             });
         }
     });
-    
+
 
     $scope.crearAsignacionDia = function (fecha) {
         if (fecha !== '-') {

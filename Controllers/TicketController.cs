@@ -152,7 +152,8 @@ namespace SifizPlanning.Controllers
                                       semaforos = db.SemaforoPrioridad.Where(w => w.SecuencialPrioridad == pr.Secuencial).ToList(),
                                       horasCreado = t.HorasCreado,
                                       semaforosResolucion = db.ResolucionSemaforoPrioridad.Where(w => w.SecuencialPrioridad == pr.Secuencial).ToList(),
-                                      horasResolucion = t.HorasResolucion
+                                      horasResolucion = t.HorasResolucion,
+                                      pendienteAPago = t.PendienteAPago
                                   }).ToList();
 
             if (User.IsInRole("GESTOR") && !User.IsInRole("ADMIN"))
@@ -209,7 +210,8 @@ namespace SifizPlanning.Controllers
                                semaforos = t.semaforos,
                                horasCreado = t.horasCreado,
                                semaforosResolucion = t.semaforosResolucion,
-                               horasResolucion = t.horasResolucion
+                               horasResolucion = t.horasResolucion,
+                               pendienteAPago = t.pendienteAPago
 
                            }).ToList();
 
@@ -261,7 +263,8 @@ namespace SifizPlanning.Controllers
                                semaforos = db.SemaforoPrioridad.Where(w => w.SecuencialPrioridad == pr.Secuencial).ToList(),
                                horasCreado = t.HorasCreado,
                                semaforosResolucion = db.ResolucionSemaforoPrioridad.Where(w => w.SecuencialPrioridad == pr.Secuencial).ToList(),
-                               horasResolucion = t.HorasResolucion
+                               horasResolucion = t.HorasResolucion,
+                               pendienteAPago = t.PendienteAPago
                            }).ToList();
 
                 if (User.IsInRole("GESTOR") && !User.IsInRole("ADMIN"))
@@ -288,6 +291,10 @@ namespace SifizPlanning.Controllers
                 else if (tipoFacturable == "FNF")//Facturables No Facturados
                 {
                     tickets = tickets.Where(x => x.seFactura == true && x.facturado == false).ToList();
+                }
+                else if (tipoFacturable == "PAP")
+                {
+                    tickets = tickets.Where(x => x.pendienteAPago == true).ToList();
                 }
                 else if (tipoFacturable == "SF")
                 {
@@ -1160,6 +1167,7 @@ namespace SifizPlanning.Controllers
                                            tipoRecurso = t.SecuencialTipoRecurso,
                                            tipoRecursoDesc = t.tipoRecurso.Codigo,
                                            requiereTesting = t.RequiereTesting,
+                                           pendienteAPago = t.PendienteAPago,
                                            entregableGarantia = (from e in db.EntregableMotivoTrabajo
                                                                  join et in db.ENTREGABLETICKET on e.Secuencial equals et.SecuencialEntregable
                                                                  where et.SecuencialTicket == idTicket && e.EstaActivo == 1
@@ -1310,6 +1318,7 @@ namespace SifizPlanning.Controllers
                     tipoRecurso = datosTicketTemp.tipoRecurso,
                     tipoRecursoDesc = datosTicketTemp.tipoRecursoDesc,
                     requiereTesting = datosTicketTemp.requiereTesting,
+                    pendienteAPago = datosTicketTemp.pendienteAPago,
                     entregableGarantia = datosTicketTemp.entregableGarantia,
                     adjuntos = datosTicketTemp.adjuntos,
                     botones = datosTicketTemp.botones,
@@ -1903,7 +1912,11 @@ namespace SifizPlanning.Controllers
         //GUARDAR INFORMACION GENERAL DEL TICKET
         [Authorize(Roles = "COORDINADOR, ADMIN, TICKET, GESTOR")]
         [HttpPost]
-        public ActionResult GuardarTicket(int idTicket, int prioridad, int categoria, int actividadProxima, int tipoRecurso, int ticketVC, int reputacion, int estimacion, bool seFactura, bool facturado, int reprocesos, bool ingresoInterno, string fechaRevisado, int colaborador = 0, string observaciones = "", bool error = false, bool requiereTesting = false, HttpPostedFileBase[] adjuntos = null, bool esEstimacion = false, int diasGarantia = 30)
+        public ActionResult GuardarTicket(int idTicket, int prioridad, int categoria, int actividadProxima,
+            int tipoRecurso, int ticketVC, int reputacion, int estimacion, bool seFactura, bool facturado,
+            int reprocesos, bool ingresoInterno, string fechaRevisado, int colaborador = 0, string observaciones = "",
+            bool error = false, bool requiereTesting = false, bool pendienteAPago = false,
+            HttpPostedFileBase[] adjuntos = null, bool esEstimacion = false, int diasGarantia = 30)
         {
             try
             {
@@ -1925,6 +1938,7 @@ namespace SifizPlanning.Controllers
                 ticket.SeFactura = seFactura;
                 ticket.Facturado = facturado;
                 ticket.DiasGarantia = diasGarantia;
+                ticket.PendienteAPago = pendienteAPago;
                 ticket.RequiereTesting = requiereTesting;
                 if (fechaRevisado != "")
                 {

@@ -58,6 +58,7 @@ namespace SifizPlanning.Models
         public Nullable<int> DiasGarantia { get; set; }
         public Nullable<int> HorasCreado { get; set; }
         public Nullable<int> HorasResolucion { get; set; }
+        public Nullable<bool> PendienteAPago { get; set; }
     
         public virtual ICollection<AdjuntoTicket> adjuntoTicket { get; set; }
         public virtual CategoriaTicket categoriaTicket { get; set; }
