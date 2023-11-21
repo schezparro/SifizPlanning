@@ -1916,11 +1916,92 @@ namespace SifizPlanning.Controllers
 		{
 			try
 			{
-				var entities = db.InfoTickets.ToList();
-				db.InfoTickets.RemoveRange(entities);
+				db.InfoTickets.RemoveRange(db.InfoTickets);
 				db.SaveChanges();
 
-				var tickets = db.Ticket.OrderByDescending(s => s.Secuencial).ToList();
+				var tickets = db.Ticket
+								.AsNoTracking()
+								.ToList();
+
+				//var infoTickets = new List<InfoTickets>();
+
+				//foreach(var item in tickets)
+				//{
+				//	var infoTicket = new InfoTickets
+				//	{
+				//		Id = item.Secuencial,
+				//		Cliente = item.persona_cliente.cliente.Descripcion,
+				//		Prioridad = item.prioridadTicket.Codigo,
+				//		Tipo = item.categoriaTicket.Codigo,
+				//		Usuario = item.persona_cliente.persona.Nombre1 + " " + item.persona_cliente.persona.Apellido1,
+				//		ProbadoPor = "",
+				//		FechaIngreso = item.FechaCreado,
+				//		FechaRespuesta = item.FechaCreado,
+				//		FechaAsignacion = item.ticketHistorico?
+				//			.Where(s => s.estadoTicket?.Codigo == "ASIGNADO")
+				//			.OrderBy(s => s.Version)
+				//			.FirstOrDefault()?.FechaOperacion,
+				//		FechaEntrega = item.ticketHistorico?
+				//			.OrderByDescending(h => h.Version)
+				//			.Zip(item.ticketHistorico?.OrderByDescending(h => h.Version).Skip(1),
+				//				(h1, h2) => new { h1, h2 })
+				//			.Where(pair => pair.h1.estadoTicket?.Codigo == "RESUELTO" && pair.h2.estadoTicket?.Codigo != "RESUELTO")
+				//			.Select(pair => pair.h1?.FechaOperacion)
+				//			.FirstOrDefault(),
+				//		FechaCierre = item.ticketHistorico?
+				//			.Where(s => s.estadoTicket?.Codigo == "CERRADO")
+				//			.OrderBy(s => s.Version)
+				//			.FirstOrDefault()?.FechaOperacion,
+				//		NumeroReprocesos = int.Parse(item.ticketHistorico?.OrderByDescending(s => s.Version).First().Reprocesos.ToString()),
+				//		EstimadoPor = "",
+				//		AsignadoA = (
+				//			db.TicketTarea.Count(x => x.SecuencialTicket == item.Secuencial && x.EstaActiva == 1) > 0
+				//		) ?
+				//			(from p in db.Persona
+				//			 join c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
+				//			 join tar in db.Tarea on c.Secuencial equals tar.SecuencialColaborador
+				//			 join ttar in db.TicketTarea on tar.Secuencial equals ttar.SecuencialTarea
+				//			 where ttar.SecuencialTicket == item.Secuencial
+				//			 select p.Nombre1 + " " + p.Apellido1).FirstOrDefault()
+				//		: "NO ASIGNADO",
+				//		EntregadoPor = ""
+				//	};
+
+				//	var ticketsTareas = db.TicketTarea
+				//		.Where(s => s.SecuencialTicket == item.Secuencial && s.EstaActiva == 1)
+				//		.ToList();
+
+				//	var totalAsignado = ticketsTareas.Sum(ta =>
+				//	{
+				//		TimeSpan tiempoAsignado = ta.tarea.FechaFin - ta.tarea.FechaInicio;
+				//		if(ta.tarea.FechaInicio.Hour < 13 && ta.tarea.FechaFin.Hour > 13)
+				//		{
+				//			tiempoAsignado -= TimeSpan.FromHours(1);
+				//		}
+				//		return tiempoAsignado.TotalMinutes;
+				//	});
+
+				//	var totalUtilizado = ticketsTareas.Sum(ta =>
+				//	{
+				//		return TimeSpan.FromMinutes(Math.Round(60 * (double)(ta.tarea.HorasUtilizadas))).TotalMinutes;
+				//	});
+
+				//	infoTicket.HorasAsignadas = DateTime.MinValue + TimeSpan.FromMinutes(totalAsignado);
+				//	infoTicket.HorasEmpleadas = DateTime.MinValue + TimeSpan.FromMinutes(totalUtilizado);
+
+				//	var totalEstimado = new TimeSpan(item.Estimacion, 0, 0);
+				//	infoTicket.HorasEstimadas = DateTime.MinValue + totalEstimado;
+
+				//	infoTicket.HorasEntrega = DateTime.MinValue + TimeSpan.Zero;
+				//	infoTicket.HorasPrueba = DateTime.MinValue + TimeSpan.Zero;
+				//	infoTicket.Estado = item.estadoTicket?.Codigo;
+				//	infoTicket.AplicaA = item.ticketVersionClliente?.Descripcion;
+
+				//	infoTickets.Add(infoTicket);
+				//}
+
+
+				var infoTickets = new List<InfoTickets>();
 
 				foreach(var item in tickets)
 				{
@@ -1966,7 +2047,10 @@ namespace SifizPlanning.Controllers
 					TimeSpan TotalAsignado = TimeSpan.Zero;
 					TimeSpan TotalUtilizado = TimeSpan.Zero;
 
-					var ticketsTareas = db.TicketTarea.Where(s=>s.SecuencialTicket ==item.Secuencial && s.EstaActiva == 1).ToList();
+					var ticketsTareas = db.TicketTarea
+											.Where(s => s.SecuencialTicket == item.Secuencial && s.EstaActiva == 1)
+											.ToList();
+
 					foreach(var ta in ticketsTareas)
 					{
 						TimeSpan tiempoAsignado = ta.tarea.FechaFin - ta.tarea.FechaInicio;
@@ -1975,11 +2059,11 @@ namespace SifizPlanning.Controllers
 
 						if(ta.tarea.FechaInicio.Hour < 13 && ta.tarea.FechaFin.Hour > 13)
 						{
-							tiempoAsignado.Subtract(TimeSpan.FromHours(1));
+							tiempoAsignado -= TimeSpan.FromHours(1);
 						}
 
-						TotalAsignado.Add(tiempoAsignado);
-						TotalUtilizado.Add(tiempoUtilizado);
+						TotalAsignado += tiempoAsignado;
+						TotalUtilizado += tiempoUtilizado;
 					}
 
 					InfoTicket.HorasAsignadas = DateTime.MinValue + TotalAsignado;
@@ -1993,32 +2077,18 @@ namespace SifizPlanning.Controllers
 					InfoTicket.HorasPrueba = DateTime.MinValue + TimeSpan.Zero;
 					InfoTicket.Estado = item.estadoTicket?.Codigo;
 					InfoTicket.AplicaA = item.ticketVersionClliente?.Descripcion;
-					//InfoTicket.FechaEntrega = item.ticketHistorico
-					//								.Where(h => h.estadoTicket.Codigo == "RESUELTO")
-					//								.Select((h, index) => new {
-					//									h.FechaOperacion,
-					//									h.estadoTicket.Codigo,
-					//									PrevEstado = item.ticketHistorico
-					//									.Where(h2 => h2.FechaOperacion < h.FechaOperacion)
-					//									.OrderByDescending(h2 => h2.FechaOperacion)
-					//									.Select(h2 => h2.Estado)
-					//									.FirstOrDefault()
-					//								})
-					//								.Where(h => h.PrevEstado != "RESUELTO")
-					//								.OrderByDescending(h => h.FechaOperacion)
-					//								.Select(h => h.FechaOperacion)
-					//								.FirstOrDefault();
-					//InfoTicket.FechaCierre = item.ticketHistorico
-					//								.AsEnumerable()
-					//								.Where(s => s.estadoTicket.Codigo == "CERRADO")
-					//								.OrderByDescending(s => s.FechaOperacion)
-					//								.SkipWhile((t, i) => i > 0 && item.ticketHistorico
-					//								.ToList()[i - 1].estadoTicket.Codigo == "CERRADO")
-					//								.FirstOrDefault().FechaOperacion;
 
-					db.InfoTickets.Add(InfoTicket);
-					db.SaveChanges();
+					infoTickets.Add(InfoTicket);
 				}
+
+				//using(SifizPlanningEntidades db = DbCnx.getCnx())
+				//{
+				//	db.Database.CommandTimeout = 30000; // Establecer un tiempo de espera de 5 minutos (en segundos)
+
+				//}
+
+				db.InfoTickets.AddRange(infoTickets);
+				db.SaveChanges();
 
 				var resp = new
 				{
@@ -2032,6 +2102,7 @@ namespace SifizPlanning.Controllers
 					success = false,
 					msg = e.Message
 				};
+				throw;
 			}
 		}
 

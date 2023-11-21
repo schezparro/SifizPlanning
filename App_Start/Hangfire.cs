@@ -23,8 +23,8 @@ namespace SifizPlanning
 			RecurringJob.AddOrUpdate("CalcularSemaforoTciket", () => hangfireController.CalcularSemaforoTciket(), "0 * * * *", TimeZoneInfo.Local);
 			RecurringJob.AddOrUpdate("CalcularResolucionSemaforoTciket", () => hangfireController.CalcularResolucionSemaforoTciket(), "5 * * * *", TimeZoneInfo.Local);
 			//RecurringJob.AddOrUpdate("SetDataInfoTickets", () => hangfireController.SetDataInfoTickets(), Cron.Daily(), TimeZoneInfo.Local);
-			//RecurringJob.AddOrUpdate("SetDataInfoTickets", () => hangfireController.SetDataInfoTickets(), "30 3 * * *", TimeZoneInfo.Local);
-			BackgroundJob.Enqueue(() => hangfireController.SetDataInfoTickets());
+			RecurringJob.AddOrUpdate("SetDataInfoTickets", () => hangfireController.SetDataInfoTickets(), "30 3 * * *", TimeZoneInfo.Local);
+			//BackgroundJob.Enqueue(() => hangfireController.SetDataInfoTickets());
 			//using (var connection = JobStorage.Current.GetConnection())
 			//{
 			//    foreach (var recurringJob in connection.GetRecurringJobs())
