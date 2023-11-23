@@ -24,6 +24,9 @@
     <script type="text/javascript" src="~/Web/js/jquery.bonsai.js"></script>
     <script type="text/javascript" src="~/Web/js/jquery.qubit.js"></script>
     <script type="text/javascript" src="~/Web/js/jquery.json-list.js"></script>
+    <script type="text/javascript" src="~/Web/js/jspdf.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/jspdf.debug.js"></script>
+
 </head>
 <body ng-controller="rrhhController">
     <div id="content_body">
@@ -33,7 +36,7 @@
                 <li role="presentation"><a href="#" ng-click="IrTiempoCompensatorio()">Tiempo Compensatorio</a></li>
                 <!--Agregando funcionalidad para cargar vista de marcas electronicas -->
                 <li role="presentation"><a href="#" ng-click="IrMarcasElectronicas()">Control de Tiempo</a></li>
-                @if(Roles.IsUserInRole("ADMIN"))
+                @if (Roles.IsUserInRole("ADMIN"))
                 {
                     <li role="presentation"><a href="#" ng-click="IrPermisos()">Gestión de Solicitudes</a></li>
                 }
@@ -135,5 +138,8 @@
     <script type="text/javascript" src="~/Web/js/waiting.js"></script>
     <script type="text/javascript" src="~/Web/js/rrhh/rrhh.js"></script>
     <script type="text/javascript" src="~/Web/js/rrhh/solicitudesController.js"></script>
+    <script type="text/javascript" src="~/Web/js/jspdf.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/jspdf.debug.js"></script>
+
 </body>
 </html>

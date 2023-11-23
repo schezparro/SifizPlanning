@@ -125,6 +125,31 @@
         angular.element("#modal-show-solicitud").modal('show');
     };
 
+
+
+    /*$scope.generarPermisoPDF = function () {
+        var doc = new window.jsPDF('p', 'pt', 'a4');
+        var tableElement = document.getElementById('modal-show-solicitud').querySelector('.modal-body table');
+        var tableHTML = tableElement.outerHTML;
+        doc.fromHTML(tableHTML, 15, 15, {
+            'width': 170,
+        });
+        doc.save('table.pdf');
+    };
+
+    $scope.printTable = function () {
+        var table = document.getElementById("table-show-vacaciones");
+        var newWin = window.open("");
+        newWin.document.write("<html><head><title>Print Page</title></head><body>");
+        newWin.document.write("<h1>My Table</h1>");
+        newWin.document.write(table.outerHTML);
+        newWin.document.write("</body></html>");
+        newWin.print();
+        newWin.close();
+
+    };*/
+
+
 }]);
 
 rrhhApp.filter("strDateToStr", function () {

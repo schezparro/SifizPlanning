@@ -1,4 +1,6 @@
-﻿<div>
+﻿<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<div>
     <input type="text" id="filtro-permisos" placeholder="Filtrar..." ng-model="filtroPermisos" class="form-control right filtro" />
 </div>
 <div class="left">
@@ -168,11 +170,183 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
+
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Detalles</h4>
+
             </div>
-            <div class="modal-body" style="column-count: 3">
-                <div>
+            <div class="modal-body">
+
+                <table id="table-show-vacaciones" class="table table-sm table-bordered">
+                    <tbody style="font-weight: bold; color: #000">
+
+                        <tr>
+                            <td colspan="4"></td>
+                            <td colspan="4" style="text-align: center;">
+                                <h4 class="modal-title">SOLICITUD Y AUTORIZACION DE VACACIONES</h4>
+                            </td>
+                            <td colspan="4">
+                                <div class="d-flex flex-column">
+                                    <div>Código:</div>
+                                    <div>Fecha de Elaboración:</div>
+                                    <div>Fecha de Aprobación:</div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="12">
+                                <strong>Apellidos y Nombres:</strong>
+                                <span>{{solicitudVacacionesUsuario.ApellidosNombres}}</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="6">
+                                <strong>Cargo:</strong>
+                                <span>{{solicitudVacacionesUsuario.Cargo}}</span>
+                            </td>
+
+                            <td colspan="6">
+                                <strong>Cédula:</strong>
+                                <span>{{solicitudVacacionesUsuario.Cedula}}</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="6">
+                                <strong>Fecha de Ingreso de la Solicitud:</strong>
+                                <span>{{solicitudVacacionesUsuario.FechaIngresoSolicitud | strDateToStr}}</span>
+                            </td>
+
+                            <td colspan="6">
+                                <strong>Empresa:</strong>
+                                <span>{{solicitudVacacionesUsuario.Empresa}}</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="6">
+                                <strong>Fecha de Ingreso a la Institución:</strong>
+                                <span>{{solicitudVacacionesUsuario.FechaIngresoInstitucion | strDateToStr}}</span>
+                            </td>
+
+                            <td colspan="6">
+                                <strong>Años de Servicio:</strong>
+                                <span>{{solicitudVacacionesUsuario.AniosServicio}}</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4">
+                                <strong>Días Corresponden:</strong>
+                                <span>{{solicitudVacacionesUsuario.DiasCorresponden}}</span>
+                            </td>
+
+                            <td colspan="4">
+                                <strong>Días a Disfrutar:</strong>
+                                <span>{{solicitudVacacionesUsuario.DiasDisfrutar}}</span>
+                            </td>
+
+                            <td colspan="4">
+                                <strong>Días Pendientes:</strong>
+                                <span>{{solicitudVacacionesUsuario.DiasPendientes}}</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4">
+                                <strong>PERIODO A DISFRUTAR:</strong>
+                                <span></span>
+                            </td>
+
+                            <td colspan="4">
+                                <strong>Del Año:</strong>
+                                <span>{{solicitudVacacionesUsuario.DelAnio}}</span>
+                            </td>
+
+                            <td colspan="4">
+                                <strong>Al Año:</strong>
+                                <span>{{solicitudVacacionesUsuario.AlAnio}}</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="12">
+                                <strong>DÍAS QUE INICIAN SUS VACACIONES</strong>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="12">
+                                <strong>Fecha  desde (dd/mm/aaaa):</strong>
+                                <span>{{solicitudVacacionesUsuario.FechaInicioVacaciones | strDateToStr}}</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="12">
+                                <strong>Fecha  hasta (dd/mm/aaaa):</strong>
+                                <span>{{solicitudVacacionesUsuario.FechaFinVacaciones | strDateToStr}}</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="12">
+                                <strong>FECHA QUE DEBERÁ PRESENTARSE A TRABAJAR (dd/mm/aaaa):</strong>
+                                <span>{{solicitudVacacionesUsuario.FechaPresentarseTrabajar | strDateToStr}}</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4">
+                                <strong>OBSERVACIONES:</strong>
+                                <span>{{solicitudVacacionesUsuario.Observaciones}}</span>
+                            </td>
+                            <td colspan="8">
+                                <span>{{solicitudVacacionesUsuario.Observaciones}}</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="12">
+                                <strong>Nota: El recibir esta solicitud no implica que está aprobada, su jefe inmediato le comunicará por escrito si su solicitud ha sido aprobada o no.</strong>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="12">
+                                <strong>POR EL PRESENTE EXPRESO MI CONFORMIDAD DE SOLICITAR Y GOZAR MIS VACACIONES DE ACUERDO A LO QUE ESTABLECE EL ARTICULO 69 DEL CODIGO DE TRABAJO.</strong>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4">
+                                <div style="text-align:center" class="d-flex flex-column">
+                                    <div>___________________________________</div>
+                                    <div>Firma del Funcionario</div>
+                                </div>
+                            </td>
+
+                            <td colspan="4">
+                                <div style="text-align:center" class="d-flex flex-column">
+                                    <div>___________________________________</div>
+                                    <div>Firma Inmediato Superior</div>
+                                </div>
+                            </td>
+
+                            <td colspan="4">
+                                <div style="text-align:center" class="d-flex flex-column">
+                                    <div>___________________________________</div>
+                                    <div>Firma de Talento Humano</div>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+
+                <!--<div>
                     <strong>Apellidos y Nombres:</strong>
                     <span>{{solicitudVacacionesUsuario.ApellidosNombres}}</span>
                 </div>
@@ -236,8 +410,10 @@
                     <strong>Observaciones:</strong>
                     <span>{{solicitudVacacionesUsuario.Observaciones}}</span>
                 </div>
+                -->
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" <!--ng-click="printTable()"-->>Exportar a PDF</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
@@ -248,11 +424,223 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
+
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Detalles</h4>
+
+
             </div>
-            <div class="modal-body" style="column-count: 3">
-                <div>
+            <div class="modal-body">
+
+                <table id="table-show-solicitud" class="table table-sm table-bordered">
+                    <tbody style="font-weight: bold; color: #000">
+
+                        <tr>
+                            <td colspan="4"></td>
+                            <td colspan="4" style="text-align: center;">
+                                <h4 class="modal-title">SOLICITUD DE PERMISOS</h4>
+                            </td>
+                            <td colspan="4">
+                                <div class="d-flex flex-column">
+                                    <div>Código:</div>
+                                    <div>Fecha de Elaboración:</div>
+                                    <div>Fecha de Aprobación:</div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="6">
+                                <strong>Apellidos y Nombres:</strong>
+                                <span>{{solicitudVacacionesUsuario.ApellidosNombres}}</span>
+                            </td>
+
+                            <td colspan="6">
+                                <strong>Cédula:</strong>
+                                <span>{{solicitudPerUsuario.Cedula}}</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="6">
+                                <strong>Cargo:</strong>
+                                <span>{{solicitudVacacionesUsuario.Cargo}}</span>
+                            </td>
+
+                            <td colspan="6">
+                                <strong>Área:</strong>
+                                <span>{{solicitudPerUsuario.Area}}</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="6">
+                                <strong>Fecha de Ingreso de la Solicitud:</strong>
+                                <span>{{solicitudVacacionesUsuario.FechaIngresoSolicitud | strDateToStr}}</span>
+                            </td>
+
+                            <td colspan="6">
+                                <strong>Empresa:</strong>
+                                <span>{{solicitudVacacionesUsuario.Empresa}}</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="background-color: LightSteelBlue;" colspan="12">
+                                <strong>PERMISO CON CARGO A VACACIONES:</strong>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="6">
+                                <strong>ASUNTO:</strong>
+                                <span></span>
+                            </td>
+
+                            <td colspan="6">
+                                <strong>PERSONALES:</strong>
+                                <span>{{solicitudPerUsuario.Personal}}</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="background-color: LightSteelBlue;" colspan="12">
+                                <strong>PERMISO SIN CARGO A VACACIONES:</strong>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4">
+                                <strong>ASUNTO:</strong>
+                                <span></span>
+                            </td>
+
+                            <td colspan="4">
+                                <div style="text-align:center" class="d-flex flex-column">
+                                    <div>
+                                        <strong>MATRIMONIO:</strong>
+                                        <span>{{solicitudPerUsuario.Matrimonio}}</span>
+                                    </div>
+                                    <div>
+                                        <strong>CALAMIDAD DOMESTICA:</strong>
+                                        <span>{{solicitudPerUsuario.Comida}}</span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td colspan="4">
+                                <div style="text-align:center" class="d-flex flex-column">
+                                    <div>
+                                        <strong>MATERNIDAD Y/O PATERNIDAD:</strong>
+                                        <span>{{solicitudPerUsuario.Paternidad}}</span>
+                                    </div>
+                                    <div>
+                                        <strong>OTROS:</strong>
+                                        <span>{{solicitudPerUsuario.Otros}}</span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="background-color: LightSteelBlue; text-align: center;" colspan="12">
+                                <strong>AUSENCIA APROXIMADA DE:</strong>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4">
+                                <div class="d-flex flex-column">
+                                    <div>
+                                        <strong>Fecha Desde:</strong>
+                                        <span>{{solicitudPerUsuario.FechaDesde | strDateToStr}}</span>
+                                    </div>
+                                    <div>
+                                        <strong>Hora de Salida:</strong>
+                                        <span>{{solicitudPerUsuario.HoraSalida}}</span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td colspan="4">
+                                <div class="d-flex flex-column">
+                                    <div>
+                                        <strong>Fecha Hasta:</strong>
+                                        <span>{{solicitudPerUsuario.FechaHasta | strDateToStr}}</span>
+                                    </div>
+                                    <div>
+                                        <strong>Hora de Retorno:</strong>
+                                        <span>{{solicitudPerUsuario.HoraRetorno}}</span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td colspan="4">
+                                <strong>TOTAL, DE HORAS:</strong>
+                                <span></span>
+                            </td>
+
+                        </tr>
+
+                        <tr>
+                            <td style="background-color: LightSteelBlue; text-align: center;" colspan="12">
+                                <strong>MOTIVO</strong>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="12">
+                                <div class="d-flex flex-column">
+                                    <div>
+                                        <span>{{solicitudPerUsuario.Motivo}}</span>
+                                    </div>
+                                    <div style="text-align: start">
+                                        <span>NOTA: anexar justificativo </span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="12">
+                                <strong>Nota: El recibir esta solicitud no implica que está aprobada, su jefe inmediato le comunicará por escrito si su solicitud ha sido aprobada o no.</strong>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="12">
+                                <strong>APELLIDOS Y NOMBRES JEFE (A) INMEDIATO:</strong>
+                                <span>{{solicitudPerUsuario.Jefe}}</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4">
+                                <div style="text-align:center" class="d-flex flex-column">
+                                    <div>___________________________________</div>
+                                    <div>Firma del Funcionario</div>
+                                </div>
+                            </td>
+
+                            <td colspan="4">
+                                <div style="text-align:center" class="d-flex flex-column">
+                                    <div>___________________________________</div>
+                                    <div>Firma Inmediato Superior</div>
+                                </div>
+                            </td>
+
+                            <td colspan="4">
+                                <div style="text-align:center" class="d-flex flex-column">
+                                    <div>___________________________________</div>
+                                    <div>Firma de Talento Humano</div>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+
+                <!--<div>
                     <strong>Apellidos y Nombres:</strong>
                     <span>{{solicitudPerUsuario.ApellidosNombres}}</span>
                 </div>
@@ -319,9 +707,11 @@
                 <div>
                     <strong>Otros:</strong>
                     <span>{{solicitudPerUsuario.Otros}}</span>
-                </div>
+                </div>-->
             </div>
+
             <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" <!--ng-click="generarPermisoPDF()"-->>Exportar a PDF</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
             </div>
         </div>

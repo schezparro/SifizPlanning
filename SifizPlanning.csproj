@@ -1109,6 +1109,8 @@
     <Content Include="Web\js\consultas\consultas.js" />
     <Content Include="Web\js\consultas\modulosClientes.js" />
     <Content Include="Web\js\highcharts-more.js" />
+    <Content Include="Web\js\jspdf.debug.js" />
+    <Content Include="Web\js\jspdf.min.js" />
     <Content Include="Web\js\rrhh\solicitudesController.js" />
     <Content Include="Web\js\solid-gauge.js" />
     <Content Include="Web\js\consultas\actasContratos.js" />

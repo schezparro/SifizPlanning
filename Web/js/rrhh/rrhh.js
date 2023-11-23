@@ -47,7 +47,7 @@ rrhhApp.controller('rrhhController', ['$scope', '$http', function ($scope, $http
         angular.element('[role="presentation"]').removeClass('active');
         angular.element(this).addClass('active');
     });
-    
+
     function ocultar() {
         angular.element("#panel-vacaciones-permisos").addClass('invisible');
         angular.element("#panel-tiempo-compensatorio").addClass('invisible');
@@ -111,32 +111,32 @@ rrhhApp.controller('rrhhController', ['$scope', '$http', function ($scope, $http
             angular.element("#loadingDiv").hide();
         };
     };
-    
+
     $scope.loading = new $scope.loadingAjax();
-    
+
 }]);
 
 //controler de vacaciones y permisos
 rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $http) {
     $scope.idTrabajador = 0;//Id del trabajador para la edicion
-    
-    angular.element('#dtpk-fecha-desde-vacaciones').datetimepicker({        
+
+    angular.element('#dtpk-fecha-desde-vacaciones').datetimepicker({
         format: 'DD/MM/YYYY',
         locale: 'es'
     });
 
-    angular.element('#dtpk-fecha-hasta-vacaciones').datetimepicker({       
+    angular.element('#dtpk-fecha-hasta-vacaciones').datetimepicker({
         format: 'DD/MM/YYYY',
         locale: 'es'
     });
 
     //Los DatetimePicker
-    angular.element('#dtpk-fecha-desde-permiso').datetimepicker({        
+    angular.element('#dtpk-fecha-desde-permiso').datetimepicker({
         format: 'DD/MM/YYYY HH:mm',
         locale: 'es'
     });
 
-    angular.element('#dtpk-fecha-hasta-permiso').datetimepicker({        
+    angular.element('#dtpk-fecha-hasta-permiso').datetimepicker({
         format: 'DD/MM/YYYY HH:mm',
         locale: 'es'
     });
@@ -148,10 +148,10 @@ rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $
         $scope.buscarDatosDisponibilidad();
     });
 
-    
+
     //Cargando los tipos de permisos    
     var ajaxTiposPermisos = $http.post("rrhh/tipos-permisos/", {});
-    ajaxTiposPermisos.success(function (data) {        
+    ajaxTiposPermisos.success(function (data) {
         if (data.success === true) {
             $scope.tiposPermisos = data.tiposPermisos;
         }
@@ -159,7 +159,7 @@ rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $
             messageDialog.show('Información', "Error en el acceso a los datos.");
         }
     });
-    
+
     //Funciones de carga de datos
     $scope.cargarTrabajadores = function (start, limit, filtro) {
         $scope.loading.show();
@@ -169,7 +169,7 @@ rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $
             limit: limit,
             filtro: filtro
         });
-        ajaxTrabajadores.success(function (data) {            
+        ajaxTrabajadores.success(function (data) {
             if (data.success === true) {
                 $scope.trabajadores = data.trabajadores;
                 setTimeout(function () {
@@ -188,7 +188,7 @@ rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $
         });
     };
     $scope.cargarTrabajadores(0, 0);
-    
+
     //Seleccion de trabajadores
     angular.element("#panel-vacaciones-permisos").on('click', '.table-tr', function () {
         angular.element('.table-tr').removeClass('tr-select');
@@ -196,7 +196,7 @@ rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $
         $scope.idTrabajador = angular.element(this).attr('data-id');
         var childrens = angular.element(this).children();
         $scope.nombreTrabajador = angular.element(childrens[1]).html();
-        $scope.usuarioActivo = angular.element(childrens[6]).html() === "SI" ? 1 : 0;        
+        $scope.usuarioActivo = angular.element(childrens[6]).html() === "SI" ? 1 : 0;
     });
 
     //Establecer Vacaciones
@@ -255,9 +255,9 @@ rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $
     $scope.filtrarColaboradoresVacaciones = function () {
         $scope.cargarTrabajadores(0, 0, $scope.filtroColaboradoresVacaciones);
     };
-    
+
     //Guardando un permiso
-    $scope.guardarPermisoColaborador = function () {        
+    $scope.guardarPermisoColaborador = function () {
         waitingDialog.show('Guardando el permiso...', { dialogSize: 'sm', progressType: 'success' });
         var ajaxPermisos = $http.post("rrhh/guardar-permiso/", {
             idColaborador: $scope.idTrabajador,
@@ -266,7 +266,7 @@ rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $
             hasta: angular.element('[ng-model="fechaHastaPermiso"]').val(),
             motivo: $scope.motivoPermiso
         });
-        ajaxPermisos.success(function (data) {            
+        ajaxPermisos.success(function (data) {
             if (data.success === true) {
                 $scope.aprobarPermisoColaborador(data.idPermiso);
             }
@@ -274,10 +274,10 @@ rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $
                 waitingDialog.hide();
                 messageDialog.show('Información', data.msg);
             }
-        });        
+        });
     };
     //Aprovando un permiso
-    $scope.aprobarPermisoColaborador = function (idPermiso) {        
+    $scope.aprobarPermisoColaborador = function (idPermiso) {
         var ajaxAprobarPermiso = $http.post("task/aprobar-permiso/", {
             idPermiso: idPermiso
         });
@@ -315,7 +315,7 @@ rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $
         angular.element("#menu-opciones").css({ 'display': 'block', 'left': e.pageX, 'top': e.pageY });
         return false;
     };
-        
+
     //Ocultar con scape
     //cuando hagamos click, el menú desaparecerá
     $(document).click(function (e) {
@@ -347,12 +347,12 @@ rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $
                 $scope.dataMeses = data.datos;
                 $scope.nombreTrabajador = data.nombreColaborador;
                 $scope.yearVacaciones = data.year;
-                angular.element("#modal-ver-vacaciones-colaborador").modal('show');                
+                angular.element("#modal-ver-vacaciones-colaborador").modal('show');
             }
             else {
                 messageDialog.show('Información', data.msg);
             }
-        });        
+        });
     };
     $scope.disminuirAnios = function () {
         $scope.anioVacaciones--;
@@ -362,7 +362,7 @@ rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $
         $scope.anioVacaciones++;
         $scope.verVacacionesColaborador($scope.anioVacaciones);
     };
-        
+
     //Eliminar las vacaciones
     $scope.idDiaEliminar = 0;
     $scope.panelDiaVacaciones = function (e, idDia) {
@@ -377,7 +377,7 @@ rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $
             angular.element("#menu-opciones").css({ 'display': 'block', 'left': e.pageX, 'top': e.pageY });
             return false;
         }
-        else{
+        else {
             $scope.idDiaEliminar = 0;
         }
     };
@@ -398,7 +398,7 @@ rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $
             });
         }
     };
-    
+
     angular.element('[data-toggle="tooltip"]').tooltip({ container: 'body' });
     $scope.semanaDisponibilidad = 0;
     $scope.buscarDatosDisponibilidad = function () {
@@ -462,7 +462,7 @@ rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $
     $scope.actualizarSemanasDisponibilidad = function () {
         $scope.buscarDatosDisponibilidad();
     };
-    $scope.actualizarGraficoDisponibilidad = function () {        
+    $scope.actualizarGraficoDisponibilidad = function () {
         setTimeout(function () {
             var ancho = angular.element(angular.element('.div-tabla-disponibilidad')[0]).width();
             var anchoDiv = (ancho - 10) / $scope.cantDias;
@@ -477,7 +477,7 @@ rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $
 }]);
 
 rrhhApp.controller('tiemposCompensatorios', ['$scope', '$http', function ($scope, $http) {
-    
+
     $scope.idColaboradorTiempoCompensatorio = 0;
 
     //Menu de click derecho sobre las filas de los tiempos compensatorios
@@ -488,7 +488,7 @@ rrhhApp.controller('tiemposCompensatorios', ['$scope', '$http', function ($scope
         var opcionesMenu = angular.element("#menu-opciones-tiempo-compensatorio li");
         angular.element(opcionesMenu).show();
         angular.element("#menu-opciones-tiempo-compensatorio").css({ 'display': 'block', 'left': e.pageX, 'top': e.pageY });
-        return false;        
+        return false;
     };
     //Ocultar con scape
     //cuando hagamos click, el menú desaparecerá
@@ -506,18 +506,18 @@ rrhhApp.controller('tiemposCompensatorios', ['$scope', '$http', function ($scope
 
     //Muestra el Window de las tareas compensatorias de los colaboradores
     $scope.verTiempoCompensatorioColaborador = function () {
-        tareasColaboradorTiempoCompensatorio($scope.idColaboradorTiempoCompensatorio, 
-                                             $scope.mostrarTodasTareasCompensatorias,
-                                             function () {
-                                                 angular.element("#modal-ver-tareas-compensatorias").modal("show");
-                                             });
+        tareasColaboradorTiempoCompensatorio($scope.idColaboradorTiempoCompensatorio,
+            $scope.mostrarTodasTareasCompensatorias,
+            function () {
+                angular.element("#modal-ver-tareas-compensatorias").modal("show");
+            });
     };
 
     $scope.actualizarTareasTiempoCompensatorioColaborador = function () {
         tareasColaboradorTiempoCompensatorio($scope.idColaboradorTiempoCompensatorio, $scope.mostrarTodasTareasCompensatorias, function () { });
     };
 
-    function tareasColaboradorTiempoCompensatorio( idColaborador, todos, cf ){
+    function tareasColaboradorTiempoCompensatorio(idColaborador, todos, cf) {
         //Cargando los tiempos compensatorios del colaborador    
         var ajaxColaboradorTareasCompensatorias = $http.post("rrhh/colaborador-tareas-compensatorias/", {
             idColaborador: idColaborador,
@@ -532,7 +532,7 @@ rrhhApp.controller('tiemposCompensatorios', ['$scope', '$http', function ($scope
             else {
                 messageDialog.show('Información', "Error en el acceso a los datos.");
                 return false
-            }            
+            }
         });
     }
 
@@ -540,7 +540,7 @@ rrhhApp.controller('tiemposCompensatorios', ['$scope', '$http', function ($scope
 
 //Controlador para mostrar marcas electronicas
 rrhhApp.controller('marcasElectronicas', ['$scope', '$http', function ($scope, $http) {
-   
+
     $scope.numeroSemanas = 1;
     $scope.controlTiempoFiltroSede = "Quito";
     $scope.fechaLunes = null;
@@ -556,20 +556,18 @@ rrhhApp.controller('marcasElectronicas', ['$scope', '$http', function ($scope, $
     };
 
     sumaFecha = function (d, fecha) {
-        if(fecha === null )
+        if (fecha === null)
             fecha = new Date();
         var aFecha = null;
         var sep = null;
-        if (typeof fecha === "string")
-        {
+        if (typeof fecha === "string") {
             sep = fecha.indexOf('/') != -1 ? '/' : '-';
             aFecha = fecha.split(sep);
         }
-        else
-        {
+        else {
             var sFecha = fecha.getDate() + "/" + (fecha.getMonth() + 1) + "/" + fecha.getFullYear();
             sep = sFecha.indexOf('/') != -1 ? '/' : '-';
-            aFecha = sFecha.split(sep);            
+            aFecha = sFecha.split(sep);
         }
         var fechaTmp = aFecha[2] + '/' + aFecha[1] + '/' + aFecha[0];
         fecha = new Date(fechaTmp);
@@ -641,8 +639,8 @@ rrhhApp.controller('marcasElectronicas', ['$scope', '$http', function ($scope, $
     });
 
     angular.element('#filtroFecha.datepicker-filtro').datepicker({
-            format: 'dd/mm/yyyy'
-        })
+        format: 'dd/mm/yyyy'
+    })
         .on('changeDate', function (e) {
             var sFecha = angular.element('#filtroFecha.datepicker-filtro').val();
             var aFecha = sFecha.split('/');
@@ -656,20 +654,20 @@ rrhhApp.controller('marcasElectronicas', ['$scope', '$http', function ($scope, $
 
             if (!aplicarFiltro)
                 actualizarDatos($scope.fechaLunes);
-    });
-        
+        });
+
     //Actualizar datos
     actualizarDatos = function (fechaLunes, jsonFiltro) {
         $scope.colaboradores = [];
         $scope.actualizarListaDias(fechaLunes, $scope.fechaHoy);
         if (jsonFiltro === undefined)
             jsonFiltro = "";
-        
+
         $scope.loading.show();
         //Cargando las marcas de los colaboradores        
         var numeroSemanas = $scope.numeroSemanas;
         var sedeFiltro = $scope.controlTiempoFiltroSede;
-        var fechaHasta = sumaFecha(7 * numeroSemanas , fechaLunes);
+        var fechaHasta = sumaFecha(7 * numeroSemanas, fechaLunes);
 
         ////Quitando los popuovers
         angular.element('[data-toggle="popover"]').popover('hide');
@@ -686,13 +684,13 @@ rrhhApp.controller('marcasElectronicas', ['$scope', '$http', function ($scope, $
             else {
                 messageDialog.show('Información', data.msg);
             }
-        });         
+        });
     };
 
     //Funcion que actualiza la fecha de los dias de la semana en el calendario de las tareas
     $scope.actualizarListaDias = function (fechaLunes, fechaHoy) {
         $scope.diasCalendar = [];
-       
+
         var dias = ['Lun ', 'Mar ', 'Mie ', 'Jue ', 'Vie ', 'Sab ', 'Dom '];
         var clases = ['dia-tarea1', 'dia-tarea2', 'dia-tarea3', 'dia-tarea3'];
         var numeroSemanas = angular.element("#selectSemanas").val();
@@ -723,7 +721,7 @@ rrhhApp.controller('marcasElectronicas', ['$scope', '$http', function ($scope, $
         $scope.anchoCeldaTarea = ancho;
         angular.element(".td-tareas").css({ width: ancho });
     };
-    
+
     //Cargando el ultimo lunes
     var ajaxUltimoLunes = $http.post("user/ultimo-lunes", {});
     ajaxUltimoLunes.success(function (data) {
@@ -738,7 +736,7 @@ rrhhApp.controller('marcasElectronicas', ['$scope', '$http', function ($scope, $
             //alert("Error en la obtención de la fecha.")
         }
     });
-    
+
 }]);
 
 //Directivas y Filtros
