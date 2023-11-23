@@ -125,18 +125,36 @@
         angular.element("#modal-show-solicitud").modal('show');
     };
 
-
-
-    /*$scope.generarPermisoPDF = function () {
-        var doc = new window.jsPDF('p', 'pt', 'a4');
-        var tableElement = document.getElementById('modal-show-solicitud').querySelector('.modal-body table');
-        var tableHTML = tableElement.outerHTML;
-        doc.fromHTML(tableHTML, 15, 15, {
-            'width': 170,
-        });
-        doc.save('table.pdf');
+    $scope.generarVacacionesPDF = function () {
+        var table = document.getElementById("table-show-vacaciones");
+        var newWin = window.open("");
+        newWin.document.write("<html><head><style>");
+        newWin.document.write(".table {width: 100%;margin-bottom: 1rem;color: #212529;background-color: transparent;border-collapse: collapse;}");
+        newWin.document.write(".table-sm th, .table-sm td {padding: .3rem;border: 1px solid black;}");
+        newWin.document.write("</style></head><body>");
+        newWin.document.write(table.outerHTML);
+        newWin.document.write("</body></html>");
+        newWin.print();
+        newWin.close();
     };
 
+    $scope.generarPermisoPDF = function () {
+        var table = document.getElementById("table-show-permiso");
+        var newWin = window.open("");
+        newWin.document.write("<html><head><style>");
+        newWin.document.write(".table {width: 100%;margin-bottom: 1rem;color: #212529;background-color: transparent;border-collapse: collapse;}");
+        newWin.document.write(".table-sm th, .table-sm td {padding: .3rem;border: 1px solid black;}");
+        newWin.document.write("</style></head><body>");
+        newWin.document.write(table.outerHTML);
+        newWin.document.write("</body></html>");
+        newWin.print();
+        newWin.close();
+    };
+
+
+
+
+    /*
     $scope.printTable = function () {
         var table = document.getElementById("table-show-vacaciones");
         var newWin = window.open("");
