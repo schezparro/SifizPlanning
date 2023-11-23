@@ -34,10 +34,10 @@ devApp.config(function ($provide, $httpProvider) {
 
     // Add the interceptor to the $httpProvider.
     $httpProvider.interceptors.push('MyHttpInterceptor');
-        
+
 });
 
-devApp.controller('desarrolladoresController', ['$scope', '$http', function ($scope, $http){
+devApp.controller('desarrolladoresController', ['$scope', '$http', function ($scope, $http) {
     //FUNCIONES DEL MENU
     //Para la clase de la seleccion
     angular.element('#menu-principal').on('click', '[role="presentation"]', function () {
@@ -53,6 +53,7 @@ devApp.controller('desarrolladoresController', ['$scope', '$http', function ($sc
         angular.element("#panel_tickets").addClass('invisible');
         angular.element("#panel_proyectos").addClass('invisible');
         angular.element("#panel_solicitudes").addClass('invisible');
+        angular.element("#panel_pdf").addClass('invisible');
     };
 
     $scope.IrMisTareas = function () {
@@ -87,7 +88,7 @@ devApp.controller('desarrolladoresController', ['$scope', '$http', function ($sc
         $scope.funcionalidad = "Tickets";
     };
 
-    $scope.IrPanelProyectos= function () {
+    $scope.IrPanelProyectos = function () {
         ocultar();
         angular.element("#panel_proyectos").removeClass('invisible');
         $scope.funcionalidad = "Proyectos";
@@ -97,6 +98,12 @@ devApp.controller('desarrolladoresController', ['$scope', '$http', function ($sc
         ocultar();
         angular.element("#panel_solicitudes").removeClass('invisible');
         $scope.funcionalidad = "Permisos";
+    };
+
+    $scope.IrPanelPDF = function () {
+        ocultar();
+        angular.element("#panel_pdf").removeClass('invisible');
+        $scope.funcionalidad = "PDF";
     };
 
     $scope.buscarTicketPorPublicar = function () {
@@ -194,13 +201,13 @@ devApp.controller('desarrolladoresController', ['$scope', '$http', function ($sc
     $scope.cambiarPassUsuario = function () {
         waitingDialog.show('Cambiando la contraseña del usuario...', { dialogSize: 'sm', progressType: 'success' });
         var anular = $http.post("cambiar/user-password",
-                                    {
-                                        p: $scope.passw,
-                                        p1: $scope.passw1,
-                                        p2: $scope.passw2
-                                    });
+            {
+                p: $scope.passw,
+                p1: $scope.passw1,
+                p2: $scope.passw2
+            });
         anular.success(function (data) {
-            waitingDialog.hide();            
+            waitingDialog.hide();
             if (data.success === true) {
                 angular.element("#modalNewChangePassUser").modal('hide');
                 messageDialog.show('Información', data.msg);
@@ -298,7 +305,7 @@ devApp.controller('publicacionesController', ['$scope', '$http', function ($scop
         else {
             jQ(this).addClass("selected");
             $scope.idPublicacionLote.push(idTicket);
-            
+
         }
 
         console.log($scope.idPublicacionLote);

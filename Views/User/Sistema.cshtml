@@ -20,6 +20,8 @@
     <script type="text/javascript" src="~/signalr/hubs"></script>
     <script type="text/javascript" src="~/Web/js/angular.min.js"></script>
     <script type="text/javascript" src="~/Web/js/angular-route.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/pdf.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/pdf.worker.min.js"></script>
 </head>
 <body ng-controller="desarrolladoresController">
 
@@ -30,16 +32,17 @@
                 <li role="presentation" class="active"><a href="#" ng-click="IrMisTareas()">Tareas</a></li>
                 <li role="presentation"><a href="#" ng-click="IrEstimaciones()">Estimaciones</a></li>
                 <li role="presentation"><a href="#" ng-click="IrPanelTareasCompensatorias()">T-Compensatorias</a></li>
-                @if(Roles.IsUserInRole("ADMINTFS"))
+                @if (Roles.IsUserInRole("ADMINTFS"))
                 {
                     <li role="presentation"><a href="#" ng-click="IrRegistrarPublicaciones()">Publicaciones</a></li>
                 }
                 <li role="presentation"><a href="#" ng-click="IrPanelTickets()">Tickets</a></li>
                 <li role="presentation"><a href="#" ng-click="IrPanelProyectos()">Proyectos</a></li>
-                @if(Roles.IsUserInRole("ADMIN"))
+                @if (Roles.IsUserInRole("ADMIN"))
                 {
                     <li role="presentation"><a href="#" ng-click="IrPanelSolicitudes()">Permisos</a></li>
                 }
+                <li role="presentation"><a href="#" ng-click="IrPanelPDF()">PDF</a></li>
 
                 <a href="cerrar/sesion/" class="right btn btn-danger"><span class="glyphicon glyphicon-off"></span> Cerrar Sesión</a>
                 <a href="main-menu" style="margin-right: 4px;" class="right btn btn-warning"><span class="glyphicon glyphicon-menu-hamburger"></span> Menú Principal</a>
@@ -79,6 +82,10 @@
 
                 <div id="panel_solicitudes" ng-controller="solicitudesController" class="invisible">
                     @{ Html.RenderPartial("windowUserSolicitudes"); }
+                </div>
+
+                <div id="panel_pdf" ng-controller="pdfController" class="invisible">
+                    @{ Html.RenderPartial("windowUserPDF"); }
                 </div>
             </div>
 
@@ -249,5 +256,8 @@
     <script type="text/javascript" src="~/Web/js/user/ticketsController.js"></script>
     <script type="text/javascript" src="~/Web/js/user/proyectosController.js"></script>
     <script type="text/javascript" src="~/Web/js/user/solicitudesController.js"></script>
+    <script type="text/javascript" src="~/Web/js/user/pdfController.js"></script>
+    <script type="text/javascript" src="~/Web/js/pdf.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/pdf.worker.min.js"></script>
 </body>
 </html>

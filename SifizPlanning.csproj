@@ -1089,6 +1089,9 @@
     <Content Include="Views\Consultas\windowOfertaTickets.cshtml" />
     <Content Include="Views\User\windowUserSolicitudes.cshtml" />
     <Content Include="Views\Rrhh\windowControlVacaciones.cshtml" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\User\windowUserPDF.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1111,11 +1114,14 @@
     <Content Include="Web\js\highcharts-more.js" />
     <Content Include="Web\js\jspdf.debug.js" />
     <Content Include="Web\js\jspdf.min.js" />
+    <Content Include="Web\js\pdf.min.js" />
+    <Content Include="Web\js\pdf.worker.min.js" />
     <Content Include="Web\js\rrhh\solicitudesController.js" />
     <Content Include="Web\js\solid-gauge.js" />
     <Content Include="Web\js\consultas\actasContratos.js" />
     <Content Include="Web\js\tfs\consultaCambios.js" />
     <Content Include="Web\js\tfs\consultaProyectos.js" />
+    <Content Include="Web\js\user\pdfController.js" />
     <Content Include="Web\js\user\proyectosController.js" />
     <Content Include="Web\js\user\solicitudesController.js" />
     <Content Include="Web\js\user\ticketsController.js" />
@@ -1498,6 +1504,7 @@
     <Content Include="Views\Ticket\inicioTicket.cshtml" />
     <Content Include="Views\Report\Index.cshtml" />
     <Content Include="Views\Report\VerReporte.cshtml" />
+    <Content Include="wwwroot\pdf\download.pdf" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
@@ -1520,6 +1527,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\pdf\" />
     <Folder Include="Web\files\asignaciones\" />
     <Folder Include="Web\images\chat\" />
     <Folder Include="Web\images\logFBSError\" />
