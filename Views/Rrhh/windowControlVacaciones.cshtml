@@ -170,20 +170,16 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Detalles</h4>
-
+                <h5 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Detalles</h5>
             </div>
             <div class="modal-body">
-
-                <table id="table-show-vacaciones" class="table table-sm table-bordered">
-                    <tbody style="font-weight: bold; color: #000">
-
+                <table id="table-show-vacaciones" class="table table-sm table-bordered table-sm table-striped">
+                    <tbody>
                         <tr>
                             <td colspan="4"></td>
                             <td colspan="4" style="text-align: center;">
-                                <h4 class="modal-title">SOLICITUD Y AUTORIZACION DE VACACIONES</h4>
+                                <h5 class="modal-title">SOLICITUD Y AUTORIZACION DE VACACIONES</h5>
                             </td>
                             <td colspan="4">
                                 <div class="d-flex flex-column">
@@ -193,14 +189,12 @@
                                 </div>
                             </td>
                         </tr>
-
                         <tr>
                             <td colspan="12">
                                 <strong>Apellidos y Nombres:</strong>
                                 <span>{{solicitudVacacionesUsuario.ApellidosNombres}}</span>
                             </td>
                         </tr>
-
                         <tr>
                             <td colspan="6">
                                 <strong>Cargo:</strong>
@@ -212,7 +206,6 @@
                                 <span>{{solicitudVacacionesUsuario.Cedula}}</span>
                             </td>
                         </tr>
-
                         <tr>
                             <td colspan="6">
                                 <strong>Fecha de Ingreso de la Solicitud:</strong>
@@ -224,30 +217,25 @@
                                 <span>{{solicitudVacacionesUsuario.Empresa}}</span>
                             </td>
                         </tr>
-
                         <tr>
                             <td colspan="6">
                                 <strong>Fecha de Ingreso a la Institución:</strong>
                                 <span>{{solicitudVacacionesUsuario.FechaIngresoInstitucion | strDateToStr}}</span>
                             </td>
-
                             <td colspan="6">
                                 <strong>Años de Servicio:</strong>
                                 <span>{{solicitudVacacionesUsuario.AniosServicio}}</span>
                             </td>
                         </tr>
-
                         <tr>
                             <td colspan="4">
                                 <strong>Días Corresponden:</strong>
                                 <span>{{solicitudVacacionesUsuario.DiasCorresponden}}</span>
                             </td>
-
                             <td colspan="4">
                                 <strong>Días a Disfrutar:</strong>
                                 <span>{{solicitudVacacionesUsuario.DiasDisfrutar}}</span>
                             </td>
-
                             <td colspan="4">
                                 <strong>Días Pendientes:</strong>
                                 <span>{{solicitudVacacionesUsuario.DiasPendientes}}</span>
@@ -426,19 +414,18 @@
             <div class="modal-header">
 
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Detalles</h4>
+                <h5 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Detalles</h5>
 
 
             </div>
             <div class="modal-body">
 
-                <table id="table-show-permiso" class="table table-sm table-bordered">
-                    <tbody style="font-weight: bold; color: #000">
-
+                <table id="table-show-solicitud" class="table table-sm table-bordered table-sm table-striped">
+                    <tbody>
                         <tr>
                             <td colspan="4"></td>
                             <td colspan="4" style="text-align: center;">
-                                <h4 class="modal-title">SOLICITUD DE PERMISOS</h4>
+                                <h5 class="modal-title">SOLICITUD DE PERMISOS</h5>
                             </td>
                             <td colspan="4">
                                 <div class="d-flex flex-column">
@@ -486,7 +473,7 @@
                         </tr>
 
                         <tr>
-                            <td style="background-color: LightSteelBlue;" colspan="12">
+                            <td colspan="12">
                                 <strong>PERMISO CON CARGO A VACACIONES:</strong>
                             </td>
                         </tr>
@@ -504,7 +491,7 @@
                         </tr>
 
                         <tr>
-                            <td style="background-color: LightSteelBlue;" colspan="12">
+                            <td colspan="12">
                                 <strong>PERMISO SIN CARGO A VACACIONES:</strong>
                             </td>
                         </tr>
@@ -543,7 +530,7 @@
                         </tr>
 
                         <tr>
-                            <td style="background-color: LightSteelBlue; text-align: center;" colspan="12">
+                            <td text-align: center;" colspan="12">
                                 <strong>AUSENCIA APROXIMADA DE:</strong>
                             </td>
                         </tr>
@@ -583,7 +570,7 @@
                         </tr>
 
                         <tr>
-                            <td style="background-color: LightSteelBlue; text-align: center;" colspan="12">
+                            <td text-align: center;" colspan="12">
                                 <strong>MOTIVO</strong>
                             </td>
                         </tr>
@@ -717,3 +704,11 @@
         </div>
     </div>
 </div>
+<style>
+    .table > tbody > tr > td {
+        padding: 5px;
+    }
+    table tr {
+        height: 20px;
+    }
+    </style>
