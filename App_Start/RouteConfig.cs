@@ -1215,6 +1215,13 @@ namespace SifizPlanning
                 defaults: new { controller = "User", action = "Sistema", id = UrlParameter.Optional }
             );
 
+            //Url para obtener el PDF
+            routes.MapRoute(
+                name: "DarPDF",
+                url: "user/{fileName}",
+                defaults: new { controller = "User", action = "DarPDF", id = UrlParameter.Optional }
+            );
+
             //---------------------  RUTAS DE LOS CLIENTES ----------------
             routes.MapRoute(
                 name: "DarCategoriasTicketSegunContratosClientes",
