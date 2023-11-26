@@ -4046,6 +4046,28 @@ r in db.Rol on ur.rol equals r
             }
         }
 
+        //Funcion para dar el PDF
+        [HttpPost]
+        [Authorize(Roles = "ADMINTFS, ADMIN")]
+        public ActionResult DarPDF(string fileName)
+        {
+            try
+            {
+                string filePath = Server.MapPath("~/Web/resources/pdf/" + fileName);
+                byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
+                return File(fileBytes, "application/pdf", fileName);
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+            
+        }
+
         [HttpPost]
         [Authorize(Roles = "ADMINTFS, ADMIN")]
         public ActionResult TicketPublicado(int id, string publicacionClienteServidor, string publicacionPruebasProd, string dirFTP, string usuarioFTP, string claveFTP, string pathFTP, bool publicarEnUno, int[] idPublicacionLote)

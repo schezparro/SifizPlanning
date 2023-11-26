@@ -1044,7 +1044,6 @@
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
-    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -1089,8 +1088,6 @@
     <Content Include="Views\Consultas\windowOfertaTickets.cshtml" />
     <Content Include="Views\User\windowUserSolicitudes.cshtml" />
     <Content Include="Views\Rrhh\windowControlVacaciones.cshtml" />
-    <Content Include="Views\_ViewStart.cshtml" />
-    <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\User\windowUserPDF.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -1504,7 +1501,7 @@
     <Content Include="Views\Ticket\inicioTicket.cshtml" />
     <Content Include="Views\Report\Index.cshtml" />
     <Content Include="Views\Report\VerReporte.cshtml" />
-    <Content Include="wwwroot\pdf\download.pdf" />
+    <Content Include="Web\resources\pdf\colaboradores.pdf" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
@@ -1527,6 +1524,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Properties\PublishProfiles\" />
+    <Folder Include="Views\Shared\" />
     <Folder Include="Web\files\asignaciones\" />
     <Folder Include="Web\images\chat\" />
     <Folder Include="Web\images\logFBSError\" />

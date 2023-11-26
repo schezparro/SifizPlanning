@@ -1,3 +1,17 @@
-<div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
-    <canvas id="pdfCanvas"></canvas>
+<div style="position: fixed; top: 100px; right: 50px;">
+    <label>Escala: x{{scale}}</label>
+    <div style="display: flex; justify-content: space-between;">
+        <button class="btn btn-primary" ng-click="zoomIn()">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
+        <button class="btn btn-primary" ng-if="scale != 1" ng-click="resetScale()">
+            <span class="glyphicon glyphicon-refresh"></span>
+        </button>
+        <button class="btn btn-primary" ng-click="zoomOut()">
+            <span class="glyphicon glyphicon-minus"></span>
+        </button>
+    </div>
+</div>
+<div style="display: flex; justify-content: center; align-items: center; max-height: 100vh; overflow: auto;">
+    <div id="pdfContainer" style="height: 100vh;"></div>
 </div>
