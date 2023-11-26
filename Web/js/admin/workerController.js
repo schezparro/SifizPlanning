@@ -11,6 +11,7 @@
         departamento: '',
         cargo: '',
         sede: '',
+        publicacionesDosCinco: '',
         usuario: ''
     };
 
@@ -69,6 +70,15 @@
                 }
                 $scope.FiltroNumero = false;
                 break;
+            case 7:
+                var publicacionesDosCincoFiltro = angular.element('#select-publicaciones-doscinco').val();
+                if (publicacionesDosCincoFiltro === "Seleccione...") {
+                    filterWorkers.publicacionesDosCinco = "";
+                } else {
+                    filterWorkers.publicacionesDosCinco = publicacionesDosCincoFiltro;
+                }
+                $scope.FiltroNumero = false;
+                break;
         }
 
         $scope.cargarTrabajadores(0, 0, '', $scope.filterWorkers);
@@ -76,6 +86,10 @@
 
     angular.element('#select-usuario-activo').on('change', function (e) {
         $scope.filterData(6);
+    });
+
+    angular.element('#select-publicaciones-doscinco').on('change', function (e) {
+        $scope.filterData(7);
     });
 
     //Funciones de carga de datos
@@ -94,6 +108,8 @@
                 filterWorkers.cargo = '';
             if (filterWorkers.sede === undefined)
                 filterWorkers.sede = '';
+            if (filterWorkers.publicacionesDosCinco === undefined)
+                filterWorkers.publicacionesDosCinco = '';
             if (filterWorkers.usuario === undefined)
                 filterWorkers.usuario = '';
 
@@ -157,6 +173,7 @@
         $scope.email = "";
         $scope.cargo = "";
         $scope.sede = "";
+        //$scope.publicacionesDosCinco = "";
         $scope.departamento = "";
 
         angular.element("#button-borrar-foto").click();
@@ -187,6 +204,7 @@
         formData.append('email', $scope.email);
         formData.append('cargo', $scope.cargo);
         formData.append('sede', $scope.sede);
+        formData.append('publicacionesDosCinco', $scope.publicacionesDosCinco);
         formData.append('departamento', $scope.departamento);
         formData.append('idTrabajador', $scope.idTrabajadorEdit);
         
@@ -324,6 +342,7 @@
                 $scope.fecha_nac = data.fechaNac;
                 $scope.nacionalidad = data.trabajador.nacionalidad;
                 $scope.sede = data.trabajador.sede;
+                $scope.publicacionesDosCinco = data.trabajador.publicacionesDosCinco;
                 $scope.cargo = data.trabajador.cargo;
                 $scope.email = data.trabajador.email;
                 $scope.departamento = data.trabajador.departamento;

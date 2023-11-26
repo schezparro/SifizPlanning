@@ -325,6 +325,7 @@
           <Property Name="SECUENCIALCARGO" Type="int" Nullable="false" />
           <Property Name="SECUENCIALDEPARTAMENTO" Type="int" Nullable="false" />
           <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
+          <Property Name="publicacionesDosCinco" Type="bit" />
         </EntityType>
         <EntityType Name="COLABORADOR_JEFEINMEDIATO">
           <Key>
@@ -6737,6 +6738,7 @@
           <NavigationProperty Name="gestorServicios" Relationship="SifizPlanningModel.FK_GESTORSERVICIOS_COLABORADOR" FromRole="Colaborador" ToRole="GESTORSERVICIOS" />
           <NavigationProperty Name="clientesLider" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_COLABORADOR" FromRole="Colaborador" ToRole="CLIENTEAUXILIAR" />
           <NavigationProperty Name="ofertas" Relationship="SifizPlanningModel.FK_OFERTAS_COLABORADOR" FromRole="Colaborador" ToRole="OFERTAS" />
+          <Property Name="PublicacionesDosCinco" Type="Boolean" />
           </EntityType>
         <EntityType Name="Colaborador_JefeInmediato">
           <Key>
@@ -11560,6 +11562,7 @@
           <EntitySetMapping Name="Colaborador">
             <EntityTypeMapping TypeName="SifizPlanningModel.Colaborador">
               <MappingFragment StoreEntitySet="COLABORADOR">
+                <ScalarProperty Name="PublicacionesDosCinco" ColumnName="publicacionesDosCinco" />
                 <ScalarProperty Name="SecuencialDepartamento" ColumnName="SECUENCIALDEPARTAMENTO" />
                 <ScalarProperty Name="NumeroVerificador" ColumnName="NUMEROVERIFICADOR" />
                 <ScalarProperty Name="SecuencialCargo" ColumnName="SECUENCIALCARGO" />
