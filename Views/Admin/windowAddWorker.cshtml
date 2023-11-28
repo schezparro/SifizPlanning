@@ -15,7 +15,7 @@
         <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Competencias Generales
     </button>
     <div class="right">
-        <input class="form-control" ng-model="filtroColaboradores" ng-keyup="filtrarColaboradores()" placeholder="Filtrar..." />
+        <input class="form-control form-control-sm" ng-model="filtroColaboradores" ng-keyup="filtrarColaboradores()" placeholder="Filtrar..." />
     </div>
 </div>
 
@@ -29,19 +29,27 @@
                 <th>Departamento</th>
                 <th>Cargo</th>
                 <th>Sede</th>
+                <th>Publicaciones DosCinco</th>
                 <th style="text-align: center;">Usuario Activo</th>
                 <th>Editar</th>
                 <th>Eliminar</th>
             </tr>
             <tr>
                 <th></th>
-                <th><input ng-model-options='{ debounce: 1000 }' type="text" class="form-control" ng-model="nombreFiltro" ng-change="filterData(1)" /></th>
-                <th><input ng-model-options='{ debounce: 1000 }' type="text" class="form-control" ng-model="emailFiltro" ng-change="filterData(2)" /></th>
-                <th><input ng-model-options='{ debounce: 1000 }' type="text" class="form-control" ng-model="departamentoFiltro" ng-change="filterData(3)" /></th>
-                <th><input ng-model-options='{ debounce: 1000 }' type="text" class="form-control" ng-model="cargoFiltro" ng-change="filterData(4)" /></th>
-                <th><input ng-model-options='{ debounce: 1000 }' type="text" class="form-control" ng-model="sedeFiltro" ng-change="filterData(5)" /></th>
+                <th><input ng-model-options='{ debounce: 1000 }' type="text" class="form-control form-control-sm" ng-model="nombreFiltro" ng-change="filterData(1)" /></th>
+                <th><input ng-model-options='{ debounce: 1000 }' type="text" class="form-control form-control-sm" ng-model="emailFiltro" ng-change="filterData(2)" /></th>
+                <th><input ng-model-options='{ debounce: 1000 }' type="text" class="form-control form-control-sm" ng-model="departamentoFiltro" ng-change="filterData(3)" /></th>
+                <th><input ng-model-options='{ debounce: 1000 }' type="text" class="form-control form-control-sm" ng-model="cargoFiltro" ng-change="filterData(4)" /></th>
+                <th><input ng-model-options='{ debounce: 1000 }' type="text" class="form-control form-control-sm" ng-model="sedeFiltro" ng-change="filterData(5)" /></th>
                 <th>
-                    <select id="select-usuario-activo" class="form-control">
+                    <select id="select-publicaciones-doscinco" class="form-control form-control-sm">
+                        <option>Seleccione...</option>
+                        <option>SI</option>
+                        <option>NO</option>
+                    </select>
+                </th>
+                <th>
+                    <select id="select-usuario-activo" class="form-control form-control-sm">
                         <option>Seleccione...</option>
                         <option>SI</option>
                         <option>NO</option>
@@ -59,6 +67,7 @@
                 <td>{{ trab.departamento }}</td>
                 <td>{{ trab.cargo }}</td>
                 <td>{{ trab.sede }}</td>
+                <td style="text-align: center;">{{ trab.publicacionesDosCinco }}</td>
                 <td style="text-align: center;">{{ trab.userAct }}</td>
                 <td> <a class="editar-option" href="#" ng-click="editarTrabajador()"> Editar </a> </td>
                 <td> <a class="eliminar-option" href="#"> Eliminar </a> </td>
@@ -84,12 +93,12 @@
                     <div class="fila">
                         <div class="left">
                             <label>Primer Nombre:</label><br />
-                            <input type="text" required="required" ng-model="nombre1" class="form-control" />
+                            <input type="text" required="required" ng-model="nombre1" class="form-control form-control-sm" />
                         </div>
 
                         <div class="left">
                             <label>Segundo Nombre:</label><br />
-                            <input type="text" ng-model="nombre2" class="form-control" />
+                            <input type="text" ng-model="nombre2" class="form-control form-control-sm" />
                         </div>
                     </div>
 
@@ -98,11 +107,11 @@
                     <div class="fila">
                         <div class="left">
                             <label>Primer Apellido:</label><br />
-                            <input type="text" required="required" ng-model="apellido1" class="form-control" />
+                            <input type="text" required="required" ng-model="apellido1" class="form-control form-control-sm" />
                         </div>
                         <div class="left">
                             <label>Segundo Apellido:</label><br />
-                            <input type="text" ng-model="apellido2" class="form-control" />
+                            <input type="text" ng-model="apellido2" class="form-control form-control-sm" />
                         </div>
                     </div>
 
@@ -111,7 +120,7 @@
                     <div class="fila">
                         <div class="left">
                             <label>Sexo:</label>
-                            <select required="required" ng-model="sexo" class="form-control">
+                            <select required="required" ng-model="sexo" class="form-control form-control-sm">
                                 <option value="">Seleccione...</option>
                                 <option value="M">Masculio</option>
                                 <option value="F">Femenino</option>
@@ -119,7 +128,7 @@
                         </div>
                         <div class="left">
                             <label>Fecha Nacimiento:</label>
-                            <input type="text" required="required" class="form-control" id="dtpk-fecha_nac" ng-model="fecha_nac" />
+                            <input type="text" required="required" class="form-control form-control-sm" id="dtpk-fecha_nac" ng-model="fecha_nac" />
                         </div>
                     </div>
 
@@ -128,14 +137,14 @@
                     <div class="fila">
                         <div class="left">
                             <label>Nacionalidad:</label>
-                            <select ng-model="nacionalidad" required="required" class="form-control" ng-required="true">
+                            <select ng-model="nacionalidad" required="required" class="form-control form-control-sm" ng-required="true">
                                 <option value="">Seleccione...</option>
                                 <option ng-repeat="pais in paises" value="{{ pais.id }}">{{ pais.nombre }}</option>
                             </select>
                         </div>
                         <div class="left">
                             <label>Correo Electrónico:</label><br />
-                            <input type="email" required="required" ng-model="email" class="form-control" />
+                            <input type="email" required="required" ng-model="email" class="form-control form-control-sm" />
                         </div>
                     </div>
 
@@ -144,14 +153,14 @@
                     <div class="fila">
                         <div class="left">
                             <label>Cargo:</label>
-                            <select ng-model="cargo" required="required" class="form-control" ng-required="true">
+                            <select ng-model="cargo" required="required" class="form-control form-control-sm" ng-required="true">
                                 <option value="">Seleccione...</option>
                                 <option ng-repeat="cargo in cargos" value="{{ cargo.id }}">{{ cargo.nombre }}</option>
                             </select>
                         </div>
                         <div class="left">
                             <label>Sede:</label>
-                            <select ng-model="sede" required="required" class="form-control" ng-required="true">
+                            <select ng-model="sede" required="required" class="form-control form-control-sm" ng-required="true">
                                 <option value="">Seleccione...</option>
                                 <option ng-repeat="sede in sedes" value="{{ sede.id }}">{{ sede.nombre }}</option>
                             </select>
@@ -173,10 +182,14 @@
                         </div>
                         <div class="left">
                             <label>Departamento:</label>
-                            <select ng-model="departamento" required="required" class="form-control" ng-required="true">
+                            <select ng-model="departamento" required="required" class="form-control form-control-sm" ng-required="true">
                                 <option value="">Seleccione...</option>
                                 <option ng-repeat="dep in departamentos" value="{{ dep.id }}">{{ dep.nombre }}</option>
                             </select>
+                        </div>
+                        <div style="vertical-align: middle; justify-content: space-between">
+                            <label>Publicaciones Dos-Cinco:</label>
+                            <input ng-model="publicacionesDosCinco" type="checkbox" />
                         </div>
                     </div>
 
@@ -208,12 +221,12 @@
                     <div class="fila">
                         <div class="left">
                             <label>Contraseña:</label><br />
-                            <input type="password" ng-model="passw1" class="form-control" />
+                            <input type="password" ng-model="passw1" class="form-control form-control-sm" />
                         </div>
 
                         <div class="left">
                             <label>Repita la Contraseña:</label><br />
-                            <input type="password" ng-model="passw2" class="form-control" />
+                            <input type="password" ng-model="passw2" class="form-control form-control-sm" />
                         </div>
                     </div>
 
@@ -222,7 +235,7 @@
                     <div class="fila">
                         <div class="left">
                             <label>Activado:</label>
-                            <select required="required" ng-model="usuarioActivo" class="form-control">
+                            <select required="required" ng-model="usuarioActivo" class="form-control form-control-sm">
                                 <option value="">Seleccione...</option>
                                 <option value="1">SI</option>
                                 <option value="0">NO</option>
@@ -231,7 +244,7 @@
 
                         <div class="left">
                             <label>Usuario TFS:</label>
-                            <input type="text" class="form-control" ng-model="usuarioTFS" />
+                            <input type="text" class="form-control form-control-sm" ng-model="usuarioTFS" />
                         </div>
 
                         <div class="clear"></div>
@@ -275,7 +288,7 @@
                     <div class="fila">
                         <div class="left">
                             <label>Jefe Inmediato:</label><br />
-                            <select id="selectJefeInmediato" ng-model="jefeInmediato" class="form-control">
+                            <select id="selectJefeInmediato" ng-model="jefeInmediato" class="form-control form-control-sm">
                                 <option value="">Seleccione...</option>
                                 <option ng-repeat="colab in colaboradores" value="{{ colab.id }}">{{ colab.nombre }}</option>
                             </select>
@@ -374,14 +387,14 @@
                     <div class="fila">
                         <div class="left un-tercio half-padding-right">
                             <label>Categoría:</label>
-                            <select class="form-control" ng-model="categoriaSoftware" ng-change="modalCompetenciasGenerales(1)">
+                            <select class="form-control form-control-sm" ng-model="categoriaSoftware" ng-change="modalCompetenciasGenerales(1)">
                                 <option value="">Todos...</option>
                                 <option ng-repeat="categ in categoriasSoft" value="{{categ.id}}">{{categ.codigo}}</option>
                             </select>
                         </div>
                         <div class="left un-tercio half-padding-left">
                             <label>Sub-Categoría:</label>
-                            <select class="form-control" ng-model="subCategoriaSoftware" ng-change="modalCompetenciasGenerales()">
+                            <select class="form-control form-control-sm" ng-model="subCategoriaSoftware" ng-change="modalCompetenciasGenerales()">
                                 <option value="">Todos...</option>
                                 <option ng-repeat="subCateg in subCategoriasSoft" value="{{subCateg.id}}">{{subCateg.codigo}}</option>
                             </select>
