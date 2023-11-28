@@ -2,6 +2,7 @@
     $scope.contratoSelectTicket = "";
     $scope.motivosTrabajoGarantia = "";
     $scope.telefonoTicket = "";
+    $scope.modulosTicket = "";
 
     //Adicionar un campo de fichero
     $scope.adicionarFileAnterior = function () {
@@ -48,6 +49,25 @@
         }
     });
 
+    //Cargando los modulos
+    var ajaxModulosSistema = $http.post("catalogos/modulos", {});
+    var options = '<option value="">' + 'Seleccione...' + '</option> \ ';
+
+    ajaxModulosSistema.success(function (data) {
+        if (data.success === true) {
+            for (var i = 0; i < data.modulos.length; i++) {
+                var modulo = data.modulos[i];
+
+                options += '<option value="' + modulo.id + '">' + modulo.nombre + '</option> \ '
+            }
+
+            angular.element("#selectModulo").html(options);
+        }
+        else {
+            messageDialog.show('Información', "Error en el acceso a los datos.");
+        }
+    });
+
     //Limpiando la solicitud de los tickets
     $scope.limpiarFormularioSolicitud = function () {
         $scope.telefonoTicket = "";
@@ -64,6 +84,7 @@
         $scope.contratoSeleccionado = false;
         $scope.isRequired = true;
         $scope.ticketVersionCliente = "";
+        $scope.moduloTicket = "";
 
         angular.element(".file-adj-contrato:visible").remove();
         $scope.adicionarFileAnterior();
@@ -91,6 +112,7 @@
         formData.append('entregableGarantia', ($scope.entregableGarantia != undefined && $scope.entregableGarantia != "") ? $scope.entregableGarantia : "0");
         formData.append('esUrgente', $scope.isUrgente ? 1 : 0);
         formData.append('ticketVersionCliente', $scope.ticketVersionCliente != undefined ? $scope.ticketVersionCliente : "");
+        formData.append('moduloSecuencial', $scope.moduloTicket);
 
         console.log($scope.ticketVersionClientes);
         var nuevaSolicitudTicket = $http.post("clientes/nuevo-ticket",

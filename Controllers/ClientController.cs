@@ -253,7 +253,7 @@ namespace SifizPlanning.Controllers
         }
 
         [Authorize(Roles = "ADMIN, CLIENTE")]
-        public async Task<JsonResult> GuardarPeticionDeTicket(string reportadoPor, int prioridad, string categoriaTicket, string asunto, string detalle, string motivoPrioridad, string motivoTrabajo, string entregableGarantia, int esUrgente, int ticketVersionCliente, string telefono = "", HttpPostedFileBase[] adjuntos = null)
+        public async Task<JsonResult> GuardarPeticionDeTicket(string reportadoPor, int prioridad, string categoriaTicket, string asunto, string detalle, string motivoPrioridad, string motivoTrabajo, string entregableGarantia, int esUrgente, int ticketVersionCliente, int moduloSecuencial, string telefono = "", HttpPostedFileBase[] adjuntos = null)
         {
             try
             {
@@ -291,7 +291,8 @@ namespace SifizPlanning.Controllers
                     Reputacion = 5, //Es el máximo
                     Estimacion = 0,
                     NumeroVerificador = 1,
-                    Fecha = ahora
+                    Fecha = ahora,
+                    SecuencialModulo = moduloSecuencial
                 };
 
                 db.Ticket.Add(nuevoTicket);

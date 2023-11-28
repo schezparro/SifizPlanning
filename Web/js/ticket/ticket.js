@@ -975,6 +975,7 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
                                     $scope.semaforo = data.datosTicket.semaforo;
                                     $scope.semaforoResolucion = data.datosTicket.semaforoResolucion;
                                     $scope.categoriaTicket = data.datosTicket.categoriaDesc;
+                                    $scope.moduloTicket = data.datosTicket.modulo;
                                     $scope.adjuntosTicket = data.datosTicket.adjuntos;
                                     $scope.estimacionTicket = data.datosTicket.estimacion;
                                     $scope.detalleTicket = data.datosTicket.detalle;

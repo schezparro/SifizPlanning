@@ -281,6 +281,8 @@
                                                 <option ng-repeat="categ in categorias" value="{{categ.id}}">{{categ.name}}</option>
                                             </select>
                                         </div>
+                                        <label style="display: inline-block; width: 30%;">Módulo: </label>
+                                        <span>{{moduloTicket}}</span><br>
                                         <label style="display: inline-block; width: 30%;">Estimación:</label>
                                         <input id="campo-horas-ticket" class="form-control solo-numero" ng-model="estimacionTicket" />(horas)
                                         <button ng-if=esCotizar type="button" ng-click="mostrarDetalleEstimacion()" style="border: none; background-color: transparent;"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button><br>

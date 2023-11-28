@@ -1200,7 +1200,8 @@ namespace SifizPlanning.Controllers
                                            semaforo = "",
                                            semaforosResolucion = db.ResolucionSemaforoPrioridad.Where(w => w.SecuencialPrioridad == ptk.Secuencial).Select(e => new { horas = e.Horas, value = e.semaforo.Codigo }).ToList(),
                                            horasResolucion = t.HorasResolucion,
-                                           semaforoResolucion = ""
+                                           semaforoResolucion = "",
+                                           modulo = db.Modulo.Where(m => m.Secuencial == t.SecuencialModulo).FirstOrDefault().Descripcion ?? "No asignado",
                                        }).FirstOrDefault();
 
                 //Calculando la reputación
@@ -1322,6 +1323,7 @@ namespace SifizPlanning.Controllers
                     entregableGarantia = datosTicketTemp.entregableGarantia,
                     adjuntos = datosTicketTemp.adjuntos,
                     botones = datosTicketTemp.botones,
+                    modulo = datosTicketTemp.modulo,
                     verificador = datosTicketTemp.verificador,
                     semaforo = datosTicketTemp.semaforos != null ? datosTicketTemp.semaforos.Where(w => w.horas <= datosTicketTemp.horasCreado).OrderByDescending(d => d.horas).FirstOrDefault()?.value ?? "VERDE" : "VERDE",
                     semaforoResolucion = datosTicketTemp.semaforosResolucion != null ? datosTicketTemp.semaforosResolucion.Where(w => w.horas <= datosTicketTemp.horasResolucion).OrderByDescending(d => d.horas).FirstOrDefault()?.value ?? "VERDE" : "VERDE",

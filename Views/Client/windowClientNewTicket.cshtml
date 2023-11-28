@@ -75,6 +75,13 @@
                         <option ng-repeat="entregable in entregablesGarantia" value="{{entregable.id}}">Fecha Vencimiento GT: {{entregable.FechaVencimiento | strDateToStr}}__{{entregable.descripcion}}</option>
                     </select>
                 </div>
+
+                <div class="un-medio left half-padding-right">
+                    <label>Modulos: </label>
+                    <select class="form-control" id="selectModulo" ng-model="moduloTicket" ng-required="true">
+                    </select>
+                </div>
+
             </div>
             <div>
                 <div class="un-medio left half-padding-right">
@@ -106,7 +113,7 @@
                 </div>
                 <div class="clear"></div>
             </div>
-</form>
+    </form>
 </div>
 
 <div id="htmlFile" class="invisible">
