@@ -903,10 +903,6 @@
             <div class="modal-body">
                 <div class="fila">
                     <div class="left un-cuarto half-padding-right">
-                        <label>Filtro: </label>
-                        <input class="form-control" placeholder="Filtro..." ng-model="filtroNivelColaborador" ng-enter="filtrarConocimientosColaboradores()" />
-                    </div>
-                    <div class="left un-cuarto half-padding-right">
                         <label>Módulo: </label>
                         <select class="form-control" ng-model="moduloNivelColaborador" ng-change="filtrarConocimientosColaboradores()">
                             <option value="">Seleccione...</option>
@@ -914,17 +910,17 @@
                         </select>
                     </div>
                     <div class="left un-cuarto half-padding-right">
-                        <label>Competencia: </label>
-                        <select class="form-control" ng-model="competenciaNivelColaborador" ng-change="filtrarConocimientosColaboradores()">
+                        <label>Tecnología: </label>
+                        <select class="form-control" ng-model="tecnologiaNivelColaborador" ng-change="filtrarConocimientosColaboradores()">
                             <option value="">Seleccione...</option>
-                            <option ng-repeat="competencia in competencias" value="{{ competencia.id }}">{{ competencia.nombre }}</option>
+                            <option ng-repeat="tec in tecnologias" value="{{ tec.id }}">{{ tec.descripcion }}</option>
                         </select>
                     </div>
                     <div class="left un-cuarto">
                         <label>Nivel: </label>
                         <select class="form-control" ng-model="nivelNivelCompetencia" ng-change="filtrarConocimientosColaboradores()">
                             <option value="">Seleccione...</option>
-                            <option ng-repeat="s in [1,2,3,4,5]" value="{{s}}">Nivel {{s}}</option>
+                            <option ng-repeat="s in [1,2,3]" value="{{s}}">Nivel {{s}}</option>
                         </select>
                     </div>
                     <div class="clear"></div>
@@ -933,7 +929,7 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Módulo/Competencia</th>
+                                <th>Módulo/Tecnología</th>
                                 <th>Colaborador</th>
                                 <th>Nivel</th>
                             </tr>

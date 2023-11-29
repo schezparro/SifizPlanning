@@ -2191,6 +2191,19 @@ table td{
     color: #ddd;
 }
 
+#tabla-nivel-colaborador-tecnologia{
+    max-height: 300px;
+    overflow-y: scroll;
+}
+
+#tabla-nivel-colaborador-tecnologia .glyphicon-star, #tabla-nivel-competencias-software .glyphicon-star {
+    color: #0154ff;
+}
+
+#tabla-nivel-colaborador-tecnologia .glyphicon-star-empty, #tabla-nivel-competencias-software .glyphicon-star-empty {
+    color: #ddd;
+}
+
 #panel_workers, #panel_user_clientes{
     height: calc( 100% - 32px);
 }

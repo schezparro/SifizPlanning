@@ -675,6 +675,16 @@
           <Property Name="NIVEL" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="NIVELCOLABORADORTECNOLOGIA">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SECUENCIALTECNOLOGIA" Type="int" Nullable="false" />
+          <Property Name="SECUENCIALCOLABORADOR" Type="int" Nullable="false" />
+          <Property Name="NIVEL" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="NOTERMINACIONTAREA">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
@@ -969,6 +979,16 @@
           <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="SECUENCIALTAREA" Type="int" Nullable="false" />
           <Property Name="FECHA" Type="date" Nullable="false" />
+        </EntityType>
+        <EntityType Name="TECNOLOGIASYPROCESOS">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CODIGO" Type="varchar" MaxLength="30" Nullable="false" />
+          <Property Name="DESCRIPCION" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="TipoActa">
           <Key>
@@ -2282,6 +2302,30 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_NIVELCOLABORADORTECNOLOGIA_COLABORADOR">
+          <End Role="COLABORADOR" Type="Self.COLABORADOR" Multiplicity="1" />
+          <End Role="NIVELCOLABORADORTECNOLOGIA" Type="Self.NIVELCOLABORADORTECNOLOGIA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="COLABORADOR">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="NIVELCOLABORADORTECNOLOGIA">
+              <PropertyRef Name="SECUENCIALCOLABORADOR" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_NIVELCOLABORADORTECNOLOGIA_TECNOLOGIASYPROCESOS">
+          <End Role="TECNOLOGIASYPROCESOS" Type="Self.TECNOLOGIASYPROCESOS" Multiplicity="1" />
+          <End Role="NIVELCOLABORADORTECNOLOGIA" Type="Self.NIVELCOLABORADORTECNOLOGIA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TECNOLOGIASYPROCESOS">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="NIVELCOLABORADORTECNOLOGIA">
+              <PropertyRef Name="SECUENCIALTECNOLOGIA" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_OFERTAS_CLIENTE">
           <End Role="CLIENTE" Type="Self.CLIENTE" Multiplicity="1" />
           <End Role="OFERTAS" Type="Self.OFERTAS" Multiplicity="*" />
@@ -2411,6 +2455,18 @@
             </Principal>
             <Dependent Role="TICKET_COMPLEMENTO">
               <PropertyRef Name="SECUENCIALTICKET" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TICKET_MODULO">
+          <End Role="MODULO" Type="Self.MODULO" Multiplicity="0..1" />
+          <End Role="TICKET" Type="Self.TICKET" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MODULO">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="TICKET">
+              <PropertyRef Name="SECUENCIALMODULO" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -4551,6 +4607,7 @@
           <EntitySet Name="MOTIVOTRABAJOINFADICIONAL" EntityType="Self.MOTIVOTRABAJOINFADICIONAL" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="MOTIVOTRABAJOSEGUIMIENTO" EntityType="Self.MOTIVOTRABAJOSEGUIMIENTO" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="NIVELCOLABORADORMODULO" EntityType="Self.NIVELCOLABORADORMODULO" Schema="TAREAS" store:Type="Tables" />
+          <EntitySet Name="NIVELCOLABORADORTECNOLOGIA" EntityType="Self.NIVELCOLABORADORTECNOLOGIA" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="NOTERMINACIONTAREA" EntityType="Self.NOTERMINACIONTAREA" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="PAIS" EntityType="Self.PAIS" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="PERSONA" EntityType="Self.PERSONA" Schema="TAREAS" store:Type="Tables" />
@@ -4576,6 +4633,7 @@
           <EntitySet Name="TAREACOMPENSATORIAVACACION" EntityType="Self.TAREACOMPENSATORIAVACACION" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="TAREAMANTENIMIENTO" EntityType="Self.TAREAMANTENIMIENTO" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="TAREAMANTENIMIENTOBORRAR" EntityType="Self.TAREAMANTENIMIENTOBORRAR" Schema="TAREAS" store:Type="Tables" />
+          <EntitySet Name="TECNOLOGIASYPROCESOS" EntityType="Self.TECNOLOGIASYPROCESOS" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="TipoActa" EntityType="Self.TipoActa" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="TIPOCAMPO" EntityType="Self.TIPOCAMPO" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="TIPOERROR" EntityType="Self.TIPOERROR" Schema="TAREAS" store:Type="Tables" />
@@ -4810,6 +4868,14 @@
             <End Role="TICKET" EntitySet="TICKET" />
             <End Role="MOTIVOTRABAJOTICKET" EntitySet="MOTIVOTRABAJOTICKET" />
           </AssociationSet>
+          <AssociationSet Name="FK_NIVELCOLABORADORTECNOLOGIA_COLABORADOR" Association="Self.FK_NIVELCOLABORADORTECNOLOGIA_COLABORADOR">
+            <End Role="COLABORADOR" EntitySet="COLABORADOR" />
+            <End Role="NIVELCOLABORADORTECNOLOGIA" EntitySet="NIVELCOLABORADORTECNOLOGIA" />
+          </AssociationSet>
+          <AssociationSet Name="FK_NIVELCOLABORADORTECNOLOGIA_TECNOLOGIASYPROCESOS" Association="Self.FK_NIVELCOLABORADORTECNOLOGIA_TECNOLOGIASYPROCESOS">
+            <End Role="TECNOLOGIASYPROCESOS" EntitySet="TECNOLOGIASYPROCESOS" />
+            <End Role="NIVELCOLABORADORTECNOLOGIA" EntitySet="NIVELCOLABORADORTECNOLOGIA" />
+          </AssociationSet>
           <AssociationSet Name="FK_OFERTAS_CLIENTE" Association="Self.FK_OFERTAS_CLIENTE">
             <End Role="CLIENTE" EntitySet="CLIENTE" />
             <End Role="OFERTAS" EntitySet="OFERTAS" />
@@ -4853,6 +4919,10 @@
           <AssociationSet Name="FK_TICKET_ACTIVIDAD_TICKET_ACTIVIDAD" Association="Self.FK_TICKET_ACTIVIDAD_TICKET_ACTIVIDAD">
             <End Role="TICKET" EntitySet="TICKET" />
             <End Role="TICKET_COMPLEMENTO" EntitySet="TICKET_COMPLEMENTO" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TICKET_MODULO" Association="Self.FK_TICKET_MODULO">
+            <End Role="MODULO" EntitySet="MODULO" />
+            <End Role="TICKET" EntitySet="TICKET" />
           </AssociationSet>
           <AssociationSet Name="FK_TICKET_TICKETVERSIONCLIENTE" Association="Self.FK_TICKET_TICKETVERSIONCLIENTE">
             <End Role="TICKETVERSIONCLIENTE" EntitySet="TICKETVERSIONCLIENTE" />
@@ -6599,6 +6669,20 @@
           <EntitySet Name="SolicitudVacaciones" EntityType="SifizPlanningModel.SolicitudVacaciones" />
           <EntitySet Name="SolicitudPermisos" EntityType="SifizPlanningModel.SolicitudPermisos" />
           <EntitySet Name="InfoTickets" EntityType="SifizPlanningModel.InfoTickets" />
+          <EntitySet Name="TecnologiasYProcesos" EntityType="SifizPlanningModel.TecnologiasYProcesos" />
+          <AssociationSet Name="FK_TICKET_MODULO" Association="SifizPlanningModel.FK_TICKET_MODULO">
+            <End Role="Modulo" EntitySet="Modulo" />
+            <End Role="Ticket" EntitySet="Ticket" />
+          </AssociationSet>
+          <EntitySet Name="NivelColaboradorTecnologia" EntityType="SifizPlanningModel.NivelColaboradorTecnologia" />
+          <AssociationSet Name="FK_NIVELCOLABORADORTECNOLOGIA_COLABORADOR" Association="SifizPlanningModel.FK_NIVELCOLABORADORTECNOLOGIA_COLABORADOR">
+            <End Role="Colaborador" EntitySet="Colaborador" />
+            <End Role="NIVELCOLABORADORTECNOLOGIA" EntitySet="NivelColaboradorTecnologia" />
+          </AssociationSet>
+          <AssociationSet Name="FK_NIVELCOLABORADORTECNOLOGIA_TECNOLOGIASYPROCESOS" Association="SifizPlanningModel.FK_NIVELCOLABORADORTECNOLOGIA_TECNOLOGIASYPROCESOS">
+            <End Role="TecnologiasYProcesos" EntitySet="TecnologiasYProcesos" />
+            <End Role="NIVELCOLABORADORTECNOLOGIA" EntitySet="NivelColaboradorTecnologia" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="Rol">
           <Key>
@@ -6740,6 +6824,7 @@
           <NavigationProperty Name="clientesLider" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_COLABORADOR" FromRole="Colaborador" ToRole="CLIENTEAUXILIAR" />
           <NavigationProperty Name="ofertas" Relationship="SifizPlanningModel.FK_OFERTAS_COLABORADOR" FromRole="Colaborador" ToRole="OFERTAS" />
           <Property Name="PublicacionesDosCinco" Type="Boolean" />
+          <NavigationProperty Name="NIVELCOLABORADORTECNOLOGIA" Relationship="SifizPlanningModel.FK_NIVELCOLABORADORTECNOLOGIA_COLABORADOR" FromRole="Colaborador" ToRole="NIVELCOLABORADORTECNOLOGIA" />
           </EntityType>
         <EntityType Name="Colaborador_JefeInmediato">
           <Key>
@@ -7430,6 +7515,7 @@
           <Property Name="HorasResolucion" Type="Int32" />
           <Property Name="PendienteAPago" Type="Boolean" />
           <Property Name="SecuencialModulo" Type="Int32" />
+          <NavigationProperty Name="MODULO" Relationship="SifizPlanningModel.FK_TICKET_MODULO" FromRole="Ticket" ToRole="Modulo" />
         </EntityType>
         <EntityType Name="Ticket_ContratoCliente">
           <Key>
@@ -10361,6 +10447,7 @@
           <NavigationProperty Name="funcionalidad" Relationship="SifizPlanningModel.RefMODULO86" FromRole="MODULO" ToRole="Funcionalidad" />
           <NavigationProperty Name="subModulo" Relationship="SifizPlanningModel.FK_SUBMODULO_MODULO" FromRole="Modulo" ToRole="SubModulo" />
           <NavigationProperty Name="proyectoModuloCliente" Relationship="SifizPlanningModel.RefMODULO151" FromRole="Modulo" ToRole="PROYECTOMODULOCLIENTE" />
+          <NavigationProperty Name="TICKET" Relationship="SifizPlanningModel.FK_TICKET_MODULO" FromRole="Modulo" ToRole="Ticket" />
         </EntityType>
         <Association Name="FK_MODULO_TIPO">
           <End Type="SifizPlanningModel.TipoModulo" Role="TipoModulo" Multiplicity="0..1" />
@@ -11489,6 +11576,65 @@
           <Property Name="Estado" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="AplicaA" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
+        <EntityType Name="TecnologiasYProcesos">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Codigo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Descripcion" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <Property Name="NumeroVerificador" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="NIVELCOLABORADORTECNOLOGIA" Relationship="SifizPlanningModel.FK_NIVELCOLABORADORTECNOLOGIA_TECNOLOGIASYPROCESOS" FromRole="TecnologiasYProcesos" ToRole="NIVELCOLABORADORTECNOLOGIA" />
+        </EntityType>
+        <Association Name="FK_TICKET_MODULO">
+          <End Type="SifizPlanningModel.Modulo" Role="Modulo" Multiplicity="0..1" />
+          <End Type="SifizPlanningModel.Ticket" Role="Ticket" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Modulo">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="Ticket">
+              <PropertyRef Name="SecuencialModulo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="NivelColaboradorTecnologia">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SecuencialTecnologia" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialColaborador" Type="Int32" Nullable="false" />
+          <Property Name="Nivel" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <Property Name="NumeroVerificador" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Colaborador" Relationship="SifizPlanningModel.FK_NIVELCOLABORADORTECNOLOGIA_COLABORADOR" FromRole="NIVELCOLABORADORTECNOLOGIA" ToRole="Colaborador" />
+          <NavigationProperty Name="TECNOLOGIASYPROCESOS" Relationship="SifizPlanningModel.FK_NIVELCOLABORADORTECNOLOGIA_TECNOLOGIASYPROCESOS" FromRole="NIVELCOLABORADORTECNOLOGIA" ToRole="TecnologiasYProcesos" />
+        </EntityType>
+        <Association Name="FK_NIVELCOLABORADORTECNOLOGIA_COLABORADOR">
+          <End Type="SifizPlanningModel.Colaborador" Role="Colaborador" Multiplicity="1" />
+          <End Type="SifizPlanningModel.NivelColaboradorTecnologia" Role="NIVELCOLABORADORTECNOLOGIA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Colaborador">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="NIVELCOLABORADORTECNOLOGIA">
+              <PropertyRef Name="SecuencialColaborador" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_NIVELCOLABORADORTECNOLOGIA_TECNOLOGIASYPROCESOS">
+          <End Type="SifizPlanningModel.TecnologiasYProcesos" Role="TecnologiasYProcesos" Multiplicity="1" />
+          <End Type="SifizPlanningModel.NivelColaboradorTecnologia" Role="NIVELCOLABORADORTECNOLOGIA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TecnologiasYProcesos">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="NIVELCOLABORADORTECNOLOGIA">
+              <PropertyRef Name="SecuencialTecnologia" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -13463,6 +13609,28 @@
                 <ScalarProperty Name="Prioridad" ColumnName="PRIORIDAD" />
                 <ScalarProperty Name="Cliente" ColumnName="CLIENTE" />
                 <ScalarProperty Name="Id" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TecnologiasYProcesos">
+            <EntityTypeMapping TypeName="SifizPlanningModel.TecnologiasYProcesos">
+              <MappingFragment StoreEntitySet="TECNOLOGIASYPROCESOS">
+                <ScalarProperty Name="NumeroVerificador" ColumnName="NUMEROVERIFICADOR" />
+                <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
+                <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
+                <ScalarProperty Name="Codigo" ColumnName="CODIGO" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="NivelColaboradorTecnologia">
+            <EntityTypeMapping TypeName="SifizPlanningModel.NivelColaboradorTecnologia">
+              <MappingFragment StoreEntitySet="NIVELCOLABORADORTECNOLOGIA">
+                <ScalarProperty Name="NumeroVerificador" ColumnName="NUMEROVERIFICADOR" />
+                <ScalarProperty Name="Nivel" ColumnName="NIVEL" />
+                <ScalarProperty Name="SecuencialColaborador" ColumnName="SECUENCIALCOLABORADOR" />
+                <ScalarProperty Name="SecuencialTecnologia" ColumnName="SECUENCIALTECNOLOGIA" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

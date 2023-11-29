@@ -385,6 +385,11 @@
         <EntityTypeShape EntityType="SifizPlanningModel.SolicitudVacaciones" Width="1.5" PointX="7.375" PointY="32.75" />
         <EntityTypeShape EntityType="SifizPlanningModel.SolicitudPermisos" Width="1.5" PointX="4.375" PointY="33.75" />
         <EntityTypeShape EntityType="SifizPlanningModel.InfoTickets" Width="1.5" PointX="6.375" PointY="38.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TecnologiasYProcesos" Width="1.5" PointX="15.375" PointY="30.75" />
+        <AssociationConnector Association="SifizPlanningModel.FK_TICKET_MODULO" />
+        <EntityTypeShape EntityType="SifizPlanningModel.NivelColaboradorTecnologia" Width="1.5" PointX="36.625" PointY="1.75" />
+        <AssociationConnector Association="SifizPlanningModel.FK_NIVELCOLABORADORTECNOLOGIA_COLABORADOR" />
+        <AssociationConnector Association="SifizPlanningModel.FK_NIVELCOLABORADORTECNOLOGIA_TECNOLOGIASYPROCESOS" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

@@ -116,6 +116,18 @@ namespace SifizPlanning
                 defaults: new { controller = "Admin", action = "EstablecerNivelCompetenciaColaborador", id = UrlParameter.Optional }
             );
 
+            routes.MapRoute(
+                name: "DarNivelesTecnologiaColaborador",
+                url: "admin/niveles-tecnologia-trabajador/{id}",
+                defaults: new { controller = "Admin", action = "DarNivelesTecnologiaColaborador", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "EstablecerNivelTecnologiaColaborador",
+                url: "admin/establecer-nivel-tecnologia-trabajador/{id}",
+                defaults: new { controller = "Admin", action = "EstablecerNivelTecnologiaColaborador", id = UrlParameter.Optional }
+            );
+
             /*----- Gestion de los Usuarios Clientes ----- */
             routes.MapRoute(
                 name: "DarUsuariosClientes",
@@ -267,6 +279,12 @@ namespace SifizPlanning
                 name: "DarModulos",
                 url: "catalogos/modulos/{id}",
                 defaults: new { controller = "Admin", action = "DarModulos", id = UrlParameter.Optional }
+            );
+            
+            routes.MapRoute(
+                name: "DarTecnologias",
+                url: "catalogos/tecnologias/{id}",
+                defaults: new { controller = "Admin", action = "DarTecnologias", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(

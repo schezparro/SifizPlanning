@@ -694,6 +694,9 @@
     <Compile Include="Models\NivelColaboradorModulo.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\NivelColaboradorTecnologia.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\NoTerminacionTarea.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
@@ -815,6 +818,9 @@
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Tarea_TareaRelacionada.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TecnologiasYProcesos.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Ticket.cs">
@@ -1047,6 +1053,8 @@
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="SCRIPTSDATABASE\28-11-2023\TICKET1.sql" />
     <Content Include="SCRIPTSDATABASE\28-11-2023\TICKET2.sql" />
+    <Content Include="SCRIPTSDATABASE\29-11-2023\1-TECNOLOGIASYPROCESOS.sql" />
+    <Content Include="SCRIPTSDATABASE\29-11-2023\2-NIVELCOLABORADORTECNOLOGIA.sql" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />

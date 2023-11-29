@@ -184,5 +184,7 @@ namespace SifizPlanning.Models
         public virtual DbSet<SolicitudVacaciones> SolicitudVacaciones { get; set; }
         public virtual DbSet<SolicitudPermisos> SolicitudPermisos { get; set; }
         public virtual DbSet<InfoTickets> InfoTickets { get; set; }
+        public virtual DbSet<TecnologiasYProcesos> TecnologiasYProcesos { get; set; }
+        public virtual DbSet<NivelColaboradorTecnologia> NivelColaboradorTecnologia { get; set; }
     }
 }

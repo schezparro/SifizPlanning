@@ -5290,7 +5290,7 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
-        public ActionResult DarConocimientosNivelColaboradores(string filtro = "", int modulo = 0, int competencia = 0, int nivel = 0)
+        public ActionResult DarConocimientosNivelColaboradores(int modulo = 0, int tecnologia = 0, int nivel = 0)
         {
             try
             {
@@ -5307,37 +5307,24 @@ p in db.Persona on c.persona equals p
                                         colaborador = p.Nombre1 + " " + p.Apellido1,
                                         nivel = ncm.Nivel,
                                         idModulo = ncm.SecuencialModulo,
-                                        idCompetencia = 0
+                                        idTecnologia = 0
                                     }
                                    ).ToList();
 
-                var competenciasColaborador = (
-                                                from cnc in db.ColaboradorNivelCompetencia
-                                                join
-            c in db.Colaborador on cnc.colaborador equals c
-                                                join
-                                                    p in db.Persona on c.persona equals p
-                                                where p.usuario.FirstOrDefault().EstaActivo == 1 &&
-                                                   cnc.Nivel > 0
-                                                select new
-                                                {
-                                                    competencia = cnc.competencia.Codigo,
-                                                    colaborador = p.Nombre1 + " " + p.Apellido1,
-                                                    nivel = cnc.Nivel,
-                                                    idModulo = 0,
-                                                    idCompetencia = cnc.SecuencialCompetencia
-                                                }
-                                               ).ToList();
+                var tecnologias = (from cnt in db.NivelColaboradorTecnologia
+                                   join c in db.Colaborador on cnt.Colaborador equals c
+                                   join p in db.Persona on c.persona equals p
+                                   where p.usuario.FirstOrDefault().EstaActivo == 1 && cnt.Nivel > 0
+                                   select new
+                                   {
+                                       competencia = cnt.TECNOLOGIASYPROCESOS.Codigo,
+                                       colaborador = p.Nombre1 + " " + p.Apellido1,
+                                       nivel = cnt.Nivel,
+                                       idModulo = 0,
+                                       idTecnologia = cnt.SecuencialTecnologia
+                                   }).ToList();
 
-                competencias.AddRange(competenciasColaborador);
-
-                if (filtro != "")
-                {
-                    competencias = (from c in competencias
-                                    where c.competencia.ToLower().Contains(filtro.ToLower()) ||
-                                          c.colaborador.ToLower().Contains(filtro.ToLower())
-                                    select c).ToList();
-                }
+                competencias.AddRange(tecnologias);
 
                 if (modulo != 0)
                 {
@@ -5346,10 +5333,10 @@ p in db.Persona on c.persona equals p
                                     select c).ToList();
                 }
 
-                if (competencia != 0)
+                if (tecnologia != 0)
                 {
                     competencias = (from c in competencias
-                                    where c.idCompetencia == competencia
+                                    where c.idTecnologia == tecnologia
                                     select c).ToList();
                 }
 

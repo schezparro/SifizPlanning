@@ -1898,18 +1898,35 @@
         });
     };
 
+    $scope.cargarTecnologias = function () {
+        var ajaxTecnologias = $http.post("catalogos/tecnologias/")
+
+        ajaxTecnologias.success(function (data) {
+            if (data.success === true) {
+                setTimeout(function () {
+                    $scope.tecnologias = data.tecnologias;
+                }, 200);
+            } else {
+                messageDialog.show('Información', data.msg);
+                return false
+            }
+        });
+    };
+
+
     //VISTA DE NIVEL DE COLABORADOR EN LOS MODULOS
     $scope.modalNivelConocimientoColaboradores = function () {
         $scope.cargarConocimientosColaboradores(function () {
+
+            $scope.cargarTecnologias();
             angular.element("#modal-task-nivel-colaboradores").modal("show");
         });
     };
     $scope.cargarConocimientosColaboradores = function (fn) {
         var cargarConocimientos = $http.post("task/dar-conocimientos-colaboradores",
             {
-                filtro: $scope.filtroNivelColaborador,
                 modulo: $scope.moduloNivelColaborador,
-                competencia: $scope.competenciaNivelColaborador,
+                tecnologia: $scope.tecnologiaNivelColaborador,
                 nivel: $scope.nivelNivelCompetencia
             });
         cargarConocimientos.success(function (data) {
@@ -1920,6 +1937,11 @@
                     var tdEstrellas = angular.element(".competencias-nivel-star");
                     angular.forEach(tdEstrellas, function (value, key) {
                         var cantEstrellas = angular.element(value).attr('data-nivel');
+
+                        if (cantEstrellas > 3) {
+                            cantEstrellas = 3
+                        }
+
                         for (var i = 0; i < cantEstrellas; i++) {
                             angular.element(value).append('<span class="glyphicon glyphicon-star"></span>');
                         }
@@ -1938,9 +1960,8 @@
     $scope.filtrarConocimientosColaboradores = function () {
         var cargarConocimientos = $http.post("task/dar-conocimientos-colaboradores",
             {
-                filtro: $scope.filtroNivelColaborador,
                 modulo: $scope.moduloNivelColaborador,
-                competencia: $scope.competenciaNivelColaborador,
+                tecnologia: $scope.tecnologiaNivelColaborador,
                 nivel: $scope.nivelNivelCompetencia
             });
         cargarConocimientos.success(function (data) {
@@ -1951,6 +1972,11 @@
                     var tdEstrellas = angular.element(".competencias-nivel-star");
                     angular.forEach(tdEstrellas, function (value, key) {
                         var cantEstrellas = angular.element(value).attr('data-nivel');
+
+                        if (cantEstrellas > 3) {
+                            cantEstrellas = 3
+                        }
+
                         for (var i = 0; i < cantEstrellas; i++) {
                             angular.element(value).append('<span class="glyphicon glyphicon-star"></span>');
                         }

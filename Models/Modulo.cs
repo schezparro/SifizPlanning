@@ -21,6 +21,7 @@ namespace SifizPlanning.Models
             this.funcionalidad = new HashSet<Funcionalidad>();
             this.subModulo = new HashSet<SubModulo>();
             this.proyectoModuloCliente = new HashSet<ProyectoModuloCliente>();
+            this.TICKET = new HashSet<Ticket>();
         }
     
         public int Secuencial { get; set; }
@@ -37,5 +38,6 @@ namespace SifizPlanning.Models
         public virtual ICollection<Funcionalidad> funcionalidad { get; set; }
         public virtual ICollection<SubModulo> subModulo { get; set; }
         public virtual ICollection<ProyectoModuloCliente> proyectoModuloCliente { get; set; }
+        public virtual ICollection<Ticket> TICKET { get; set; }
     }
 }

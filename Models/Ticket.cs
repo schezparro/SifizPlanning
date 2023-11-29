@@ -89,5 +89,6 @@ namespace SifizPlanning.Models
         public virtual ICollection<TicketMantenimientoBorar> TICKETMANTENIMIENTOBORAR { get; set; }
         public virtual ICollection<EntregableTicket> ENTREGABLETICKET { get; set; }
         public virtual TicketVersionCliente ticketVersionClliente { get; set; }
+        public virtual Modulo MODULO { get; set; }
     }
 }
