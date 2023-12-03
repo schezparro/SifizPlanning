@@ -1,9 +1,11 @@
 ﻿consultasApp.controller('ofertaTicketsController', ['$scope', '$http', '$sce', function ($scope, $http, $sce) {
 
-    $scope.nuevaOferta = { FechaRegistro: '', FechaDisponibilidad: '', Detalle: '', HorasEstimacion: '', cliente: '', colaborador: '' };
+    $scope.nuevaOferta = { FechaRegistro: '', FechaProduccion: '', FechaDisponibilidad: '', Detalle: '', HorasEstimacion: '', cliente: '', colaborador: '' };
 
     $scope.editarOferta = function (oferta, index) {
+        oferta.editable = true;
         oferta.FechaRegistro = '';
+        oferta.FechaProduccion = '';
         oferta.FechaDisponibilidad = '';
 
         angular.element('#fecha-registro-' + index).datepicker({
@@ -11,20 +13,24 @@
             language: 'es'
         });
 
+        angular.element(`#fecha-produccion-` + index).datepicker({
+            format: 'dd/mm/yyyy',
+            language: 'es'
+
+        })
+
         angular.element('#fecha-disponibilidad-' + index).datepicker({
             format: 'dd/mm/yyyy',
             language: 'es'
         });
 
-
-        oferta.editable = true;
     };
-
     $scope.guardarCambios = function (oferta) {
-        if (oferta.id !== "" && oferta.FechaRegistro !== "" && oferta.FechaDisponibilidad !== "" &&
-            oferta.Detalle !== "" && oferta.HorasEstimacion !== "" && oferta.cliente.id !== "" &&
+        if (oferta.id !== "" && oferta.FechaRegistro !== "" && oferta.FechaProduccion !== "" &&
+            oferta.FechaDisponibilidad !== "" && oferta.Detalle !== "" && oferta.HorasEstimacion !== "" && oferta.cliente.id !== "" &&
             oferta.colaborador.id !== "") {
             angular.element('#fecha-registro-' + oferta.id).datepicker('destroy');
+            angular.element('#fecha-produccion-' + oferta.id).datepicker('destroy');
             angular.element('#fecha-disponibilidad-' + oferta.id).datepicker('destroy');
 
             oferta.editable = false;
@@ -32,6 +38,7 @@
             var ajaxOfertas = $http.post("consultas/editar-ofertas-tickets", {
                 ID: oferta.id,
                 FechaRegistro: new Date(...oferta.FechaRegistro.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)),
+                FechaProduccion: new Date(...oferta.FechaProduccion.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)),
                 FechaDisponibilidad: new Date(...oferta.FechaDisponibilidad.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)),
                 Detalle: oferta.Detalle,
                 HorasEstimacion: oferta.HorasEstimacion,
@@ -67,6 +74,9 @@
                 FechaRegistro: $scope.nuevaOferta.FechaRegistro ?
                     new Date(...$scope.nuevaOferta.FechaRegistro.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)) :
                     null,
+                FechaProduccion: $scope.nuevaOferta.FechaProduccion ?
+                    new Date(...$scope.nuevaOferta.FechaProduccion.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)) :
+                    null,
                 FechaDisponibilidad: $scope.nuevaOferta.FechaDisponibilidad ?
                     new Date(...$scope.nuevaOferta.FechaDisponibilidad.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)) :
                     null,
@@ -79,6 +89,7 @@
 
             var ajaxOfertas = $http.post("consultas/agregar-ofertas-tickets", {
                 fechaRegistro: nuevaOferta.FechaRegistro,
+                FechaProduccion: nuevaOferta.FechaProduccion,
                 fechaDisponibilidad: nuevaOferta.FechaDisponibilidad,
                 detalle: nuevaOferta.Detalle,
                 horasEstimacion: nuevaOferta.HorasEstimacion,

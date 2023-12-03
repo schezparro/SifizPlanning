@@ -1540,6 +1540,7 @@
           <Property Name="FECHADISPONIBILIDAD" Type="date" Nullable="false" />
           <Property Name="DETALLE" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="HORASESTIMACION" Type="int" Nullable="false" />
+          <Property Name="FECHAPRODUCCION" Type="date" />
         </EntityType>
         <EntityType Name="PERSONA_CLIENTE">
           <Key>
@@ -2455,18 +2456,6 @@
             </Principal>
             <Dependent Role="TICKET_COMPLEMENTO">
               <PropertyRef Name="SECUENCIALTICKET" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_TICKET_MODULO">
-          <End Role="MODULO" Type="Self.MODULO" Multiplicity="0..1" />
-          <End Role="TICKET" Type="Self.TICKET" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MODULO">
-              <PropertyRef Name="SECUENCIAL" />
-            </Principal>
-            <Dependent Role="TICKET">
-              <PropertyRef Name="SECUENCIALMODULO" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -4919,10 +4908,6 @@
           <AssociationSet Name="FK_TICKET_ACTIVIDAD_TICKET_ACTIVIDAD" Association="Self.FK_TICKET_ACTIVIDAD_TICKET_ACTIVIDAD">
             <End Role="TICKET" EntitySet="TICKET" />
             <End Role="TICKET_COMPLEMENTO" EntitySet="TICKET_COMPLEMENTO" />
-          </AssociationSet>
-          <AssociationSet Name="FK_TICKET_MODULO" Association="Self.FK_TICKET_MODULO">
-            <End Role="MODULO" EntitySet="MODULO" />
-            <End Role="TICKET" EntitySet="TICKET" />
           </AssociationSet>
           <AssociationSet Name="FK_TICKET_TICKETVERSIONCLIENTE" Association="Self.FK_TICKET_TICKETVERSIONCLIENTE">
             <End Role="TICKETVERSIONCLIENTE" EntitySet="TICKETVERSIONCLIENTE" />
@@ -11477,6 +11462,7 @@
           <Property Name="HorasEstimacion" Type="Int32" Nullable="false" />
           <NavigationProperty Name="cliente" Relationship="SifizPlanningModel.FK_OFERTAS_CLIENTE" FromRole="OFERTAS" ToRole="Cliente" />
           <NavigationProperty Name="colaborador" Relationship="SifizPlanningModel.FK_OFERTAS_COLABORADOR" FromRole="OFERTAS" ToRole="Colaborador" />
+          <Property Name="FechaProduccion" Type="DateTime" Precision="0" />
         </EntityType>
         <Association Name="FK_OFERTAS_CLIENTE">
           <End Type="SifizPlanningModel.Cliente" Role="Cliente" Multiplicity="1" />
@@ -13525,6 +13511,7 @@
           <EntitySetMapping Name="Ofertas">
             <EntityTypeMapping TypeName="SifizPlanningModel.Ofertas">
               <MappingFragment StoreEntitySet="OFERTAS">
+                <ScalarProperty Name="FechaProduccion" ColumnName="FECHAPRODUCCION" />
                 <ScalarProperty Name="HorasEstimacion" ColumnName="HORASESTIMACION" />
                 <ScalarProperty Name="Detalle" ColumnName="DETALLE" />
                 <ScalarProperty Name="FechaDisponibilidad" ColumnName="FECHADISPONIBILIDAD" />

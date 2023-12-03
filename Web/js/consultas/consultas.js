@@ -611,6 +611,11 @@ consultasApp.controller('mainConsultasController', ['$scope', '$http', function 
         language: 'es'
     });
 
+    angular.element('#fecha-produccion').datepicker({
+        format: 'dd/mm/yyyy',
+        language: 'es'
+    });
+
     angular.element('#fecha-disponibilidad').datepicker({
         format: 'dd/mm/yyyy',
         language: 'es'

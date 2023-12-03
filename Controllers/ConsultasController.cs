@@ -729,6 +729,7 @@ namespace SifizPlanning.Controllers
 							   {
 								   id = o.Secuencial,
 								   FechaRegistro = o.FechaRegistro.Year != 1 ? o.FechaRegistro : (DateTime?)null,
+								   FechaProduccion = o.FechaProduccion.HasValue ? o.FechaProduccion.Value : (DateTime?)null,
 								   FechaDisponibilidad = o.FechaDisponibilidad.Year != 1 ? o.FechaDisponibilidad : (DateTime?)null,
 								   Detalle = o.Detalle,
 								   semaforo = o.FechaDisponibilidad < fechaHoy ? "ROJO" : o.FechaDisponibilidad <= fechaPermisible ? "AMARILLO" : "VERDE",
@@ -765,12 +766,13 @@ namespace SifizPlanning.Controllers
 
 		[HttpPost]
 		[Authorize(Roles = "ADMIN, GESTOR")]
-		public ActionResult AgregarOfertaTickets(string fechaRegistro, string fechaDisponibilidad, string detalle, int horasEstimacion, int cliente, int colaborador)
+		public ActionResult AgregarOfertaTickets(string fechaRegistro, string fechaProduccion, string fechaDisponibilidad, string detalle, int horasEstimacion, int cliente, int colaborador)
 		{
 			try
 			{
 				Ofertas oferta = new Ofertas();
 				oferta.FechaRegistro = fechaRegistro != null ? DateTime.Parse(fechaRegistro) : new DateTime(0001 / 01 / 01);
+				oferta.FechaProduccion = fechaProduccion != null ? DateTime.Parse(fechaProduccion) : new DateTime(0001 / 01 / 01);
 				oferta.FechaDisponibilidad = fechaDisponibilidad != null ? DateTime.Parse(fechaDisponibilidad) : new DateTime(0001 / 01 / 01);
 				oferta.Detalle = detalle;
 				oferta.HorasEstimacion = horasEstimacion;
@@ -798,7 +800,7 @@ namespace SifizPlanning.Controllers
 
 		[HttpPost]
 		[Authorize(Roles = "ADMIN, GESTOR")]
-		public ActionResult EditarOfertaTickets(int ID, string FechaRegistro, string FechaDisponibilidad, string Detalle, int HorasEstimacion, int cliente, int colaborador)
+		public ActionResult EditarOfertaTickets(int ID, string FechaRegistro, string FechaProduccion, string FechaDisponibilidad, string Detalle, int HorasEstimacion, int cliente, int colaborador)
 		{
 			try
 			{
@@ -806,6 +808,16 @@ namespace SifizPlanning.Controllers
 				if(oferta != null)
 				{
 					oferta.FechaRegistro = DateTime.Parse(FechaRegistro);
+
+					DateTime fechaProduccion;
+					if(DateTime.TryParse(FechaProduccion, out fechaProduccion))
+					{
+						oferta.FechaProduccion = fechaProduccion;
+					}
+					else
+					{
+						oferta.FechaProduccion = null;
+					}
 					oferta.FechaDisponibilidad = DateTime.Parse(FechaDisponibilidad);
 					oferta.Detalle = Detalle;
 					oferta.HorasEstimacion = HorasEstimacion;

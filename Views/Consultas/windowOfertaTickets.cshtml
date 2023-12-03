@@ -3,6 +3,7 @@
         <thead>
             <tr>
                 <th>Fecha Registro</th>
+                <th>Fecha Producción</th>
                 <th>Cliente</th>
                 <th>Detalle</th>
                 <th>Horas Estimación</th>
@@ -15,6 +16,9 @@
             <tr>
                 <td>
                     <input id="fecha-registro" ng-class="'form-control'" ng-model="nuevaOferta.FechaRegistro">
+                </td>
+                <td>
+                    <input id="fecha-produccion" ng-class="'form-control'" ng-model="nuevaOferta.FechaProduccion">
                 </td>
                 <td>
                     <select ng-class="'form-control'" ng-model="nuevaOferta.cliente" ng-options="cliente.id as (cliente.nombre | limitTo: 30) for cliente in clientes">
@@ -46,6 +50,10 @@
                 <td>
                     <span ng-hide="oferta.editable">{{ oferta.FechaRegistro !== null ? (oferta.FechaRegistro | strDateToStr) : ""}}</span>
                     <input id="fecha-registro-{{$index}}" type="text" ng-class="'form-control'" ng-show="oferta.editable" ng-model="oferta.FechaRegistro">
+                </td>
+                <td>
+                    <span ng-hide="oferta.editable">{{ oferta.FechaProduccion !== null ? (oferta.FechaProduccion | strDateToStr) : ""}}</span>
+                    <input id="fecha-produccion-{{$index}}" type="text" ng-class="'form-control'" ng-show="oferta.editable" ng-model="oferta.FechaProduccion">
                 </td>
                 <td>
                     <span ng-hide="oferta.editable">{{ oferta.cliente.nombre }}</span>

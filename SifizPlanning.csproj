@@ -1055,6 +1055,7 @@
     <Content Include="SCRIPTSDATABASE\28-11-2023\TICKET2.sql" />
     <Content Include="SCRIPTSDATABASE\29-11-2023\1-TECNOLOGIASYPROCESOS.sql" />
     <Content Include="SCRIPTSDATABASE\29-11-2023\2-NIVELCOLABORADORTECNOLOGIA.sql" />
+    <Content Include="SCRIPTSDATABASE\03-12-2023\OFERTAS1.sql" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />

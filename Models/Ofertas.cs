@@ -21,6 +21,7 @@ namespace SifizPlanning.Models
         public System.DateTime FechaDisponibilidad { get; set; }
         public string Detalle { get; set; }
         public int HorasEstimacion { get; set; }
+        public Nullable<System.DateTime> FechaProduccion { get; set; }
     
         public virtual Cliente cliente { get; set; }
         public virtual Colaborador colaborador { get; set; }
