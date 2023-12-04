@@ -19,6 +19,7 @@
 
         })
 
+
         angular.element('#fecha-disponibilidad-' + index).datepicker({
             format: 'dd/mm/yyyy',
             language: 'es'
