@@ -53,6 +53,7 @@ rrhhApp.controller('rrhhController', ['$scope', '$http', function ($scope, $http
         angular.element("#panel-tiempo-compensatorio").addClass('invisible');
         angular.element("#panel-marcas-electronicas").addClass('invisible');
         angular.element("#panel-permisos").addClass('invisible');
+        angular.element("#panel-feriados").addClass('invisible');
     };
 
     $scope.IrVacacionesPermisos = function () {
@@ -101,6 +102,12 @@ rrhhApp.controller('rrhhController', ['$scope', '$http', function ($scope, $http
         ocultar();
         angular.element("#panel-permisos").removeClass('invisible');
         $scope.funcionalidad = 'GESTIÓN DE SOLICITUDES';
+    };
+
+    $scope.IrFeriados = function () {
+        ocultar();
+        angular.element("#panel-feriados").removeClass('invisible');
+        $scope.funcionalidad = 'GESTIÓN DE FERIADOS';
     };
 
     $scope.loadingAjax = function () {

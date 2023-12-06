@@ -1,0 +1,53 @@
+<div class="row">
+    <div class="col-md-6">
+        <form method="post" id="frm-modal-agregar-feriado" ng-submit="guardarFeriado()">
+            <div class="form-group">
+                <label for="year">Año:</label>
+                <input type="range" min="{{minYear}}" max="{{maxYear}}" ng-model="selectedYear" />
+                <span>Año seleccionado: {{selectedYear}}</span>
+            </div>
+            <div class="form-group">
+                <label>Mes:</label>
+                <div class="month-radio" style="display: inline-block; margin-right: 10px;" ng-repeat="month in months">
+                    <label><input type="radio" ng-model="$parent.selectedMonth" ng-value="month">{{month}}</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Día:</label>
+                <div class="row" ng-repeat="week in days">
+                    <div class="col-xs-1" ng-repeat="day in week">
+                        <button type="button" class="btn btn-default day-button" style="width: 40px; padding: 5px 0;" ng-click="selectDay(day)">{{day}}</button>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Grabar</button>
+        </form>
+    </div>
+    <div class="col-md-6">
+
+        <div style="overflow-y:auto; height: 500px;">
+            <table class="table table-striped">
+                <thead id="thead-feriados">
+                    <tr>
+                        <th>Día</th>
+                        <th>Mes</th>
+                        <th>Año</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-feriados">
+                    <tr class="table-tr" ng-repeat="feriado in feriados" data-id="{{ feriado.id }}">
+                        <td class="col-md-2">{{ feriado.dia }}</td>
+                        <td class="col-md-2">{{ feriado.mes }}</td>
+                        <td class="col-md-2">{{ feriado.ano }}</td>
+                        <td class="col-md-2">
+                            <button class="btn btn-danger" ng-click="eliminarFeriado(feriado.id)">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>

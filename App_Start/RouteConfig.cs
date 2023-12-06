@@ -1762,6 +1762,24 @@ namespace SifizPlanning
 
             //------------------ RUTAS DEL MODULO DE RRHH -------------------
             routes.MapRoute(
+                name: "GuardarFeriado",
+                url: "rrhh/guardar-feriado/{id}",
+                defaults: new { controller = "Rrhh", action = "GuardarFeriado", id = UrlParameter.Optional }
+            );
+            
+            routes.MapRoute(
+                name: "DarFeriados",
+                url: "rrhh/dar-feriado/{id}",
+                defaults: new { controller = "Rrhh", action = "DarFeriados", id = UrlParameter.Optional }
+            );
+            
+            routes.MapRoute(
+                name: "EliminarFeriado",
+                url: "rrhh/eliminar-feriado/{id}",
+                defaults: new { controller = "Rrhh", action = "EliminarFeriado", id = UrlParameter.Optional }
+            );
+            
+            routes.MapRoute(
                 name: "GuardarVacaciones",
                 url: "rrhh/guardar-vacaciones/{id}",
                 defaults: new { controller = "Rrhh", action = "GuardarVacaciones", id = UrlParameter.Optional }

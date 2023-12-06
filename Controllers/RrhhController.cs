@@ -20,9 +20,9 @@ namespace SifizPlanning.Controllers
         SifizPlanningEntidades db = DbCnx.getCnx();
 
         //Compara los componentes de la fecha de dos datetime
-        private bool FechasIguales(DateTime fecha1, DateTime fecha2) 
+        private bool FechasIguales(DateTime fecha1, DateTime fecha2)
         {
-           return (fecha1.Day == fecha2.Day && fecha1.Month == fecha2.Month && fecha1.Year == fecha2.Year);
+            return (fecha1.Day == fecha2.Day && fecha1.Month == fecha2.Month && fecha1.Year == fecha2.Year);
         }
 
         //
@@ -31,6 +31,110 @@ namespace SifizPlanning.Controllers
         public ActionResult Index()
         {
             return View();
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, RRHH")]
+        public ActionResult GuardarFeriado(DateTime fecha)
+        {
+            try
+            {
+                // Verificar si ya existe un feriado con la misma fecha
+                bool existe = db.Feriados.Any(f => f.Fecha == fecha);
+
+                // Si ya existe un feriado con la misma fecha, devolver un error
+                if (existe)
+                {
+                    var resp = new
+                    {
+                        success = false,
+                        msg = "Ya existe un feriado con la misma fecha."
+                    };
+                    return Json(resp);
+                }
+                else
+                {
+                    // Si no existe un feriado con la misma fecha, agregar el nuevo feriado
+                    var feriado = new Feriados(fecha);
+                    db.Feriados.Add(feriado);
+                    db.SaveChanges();
+
+                    var resp = new
+                    {
+                        success = true,
+                        msg = "Nuevo feriado agregado."
+                    };
+                    return Json(resp);
+                }
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, RRHH")]
+        public ActionResult EliminarFeriado(int id)
+        {
+            try
+            {
+                var feriado = db.Feriados.Find(id);
+                db.Feriados.Remove(feriado);
+                db.SaveChanges();
+
+                var resp = new
+                {
+                    success = true,
+                    msg = "Feriado eliminado.",
+                };
+                return Json(resp);
+            }
+            catch (TargetInvocationException e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.InnerException?.Message ?? e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+
+
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, RRHH")]
+        public ActionResult DarFeriados()
+        {
+            try
+            {
+                var feriados = db.Feriados
+                       .Select(f => new { id = f.Secuencial, fecha = f.Fecha })
+                       .ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    feriados = feriados
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
         }
 
         [HttpPost]
@@ -43,7 +147,7 @@ namespace SifizPlanning.Controllers
 
                 List<SolicitudVacacionesDTO> solicitudesVacacionesDTO = new List<SolicitudVacacionesDTO>();
 
-                foreach(var solicitud in solicitudes)
+                foreach (var solicitud in solicitudes)
                 {
                     SolicitudVacacionesDTO solVacaciones = new SolicitudVacacionesDTO();
                     solVacaciones.ID = solicitud.Secuencial;
@@ -74,7 +178,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(result);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var result = new
                 {
@@ -97,7 +201,7 @@ namespace SifizPlanning.Controllers
 
                 List<SolicitudPermisosDTO> solicitudesPermisosDTO = new List<SolicitudPermisosDTO>();
 
-                foreach(var solicitud in solicitudes)
+                foreach (var solicitud in solicitudes)
                 {
                     SolicitudPermisosDTO solPermisos = new SolicitudPermisosDTO();
                     solPermisos.ID = solicitud.Secuencial;
@@ -129,7 +233,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(result);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var result = new
                 {
@@ -200,17 +304,19 @@ namespace SifizPlanning.Controllers
                                 Esperamos disfrute sus vacaciones junto a su familia y amigos...";
 
                 Utiles.EnviarEmailSistema(emails, email, "Vacaciones aprobadas");
-            
+
                 var resp = new { success = true };
                 return Json(resp);
             }
-            catch(Exception e){
-                var resp = new {
+            catch (Exception e)
+            {
+                var resp = new
+                {
                     success = false,
                     msg = e.Message
                 };
                 return Json(resp);
-            }            
+            }
         }
 
         [HttpPost]
@@ -218,7 +324,7 @@ namespace SifizPlanning.Controllers
         public ActionResult GuardarPermiso(int idColaborador, int tipoPermiso, string desde, string hasta, string motivo)
         {
             try
-            {                
+            {
                 string[] datosFechaDesde = desde.Split(new Char[] { ' ' });
                 string[] fechas = datosFechaDesde[0].Split(new Char[] { '/' });
                 int dia = Int32.Parse(fechas[0]);
@@ -228,7 +334,7 @@ namespace SifizPlanning.Controllers
                 string[] horas = datosFechaDesde[1].Split(new Char[] { ':' });
                 int hora = Int32.Parse(horas[0]);
                 int minutos = Int32.Parse(horas[1]);
-                fechaDesde = fechaDesde.AddMinutes( hora*60 + minutos );
+                fechaDesde = fechaDesde.AddMinutes(hora * 60 + minutos);
 
                 string[] datosFechaHasta = hasta.Split(new Char[] { ' ' });
                 fechas = datosFechaHasta[0].Split(new Char[] { '/' });
@@ -239,7 +345,7 @@ namespace SifizPlanning.Controllers
                 horas = datosFechaHasta[1].Split(new Char[] { ':' });
                 hora = Int32.Parse(horas[0]);
                 minutos = Int32.Parse(horas[1]);
-                fechaHasta = fechaHasta.AddMinutes( hora*60 + minutos );
+                fechaHasta = fechaHasta.AddMinutes(hora * 60 + minutos);
 
                 if (fechaHasta <= fechaDesde)
                 {
@@ -247,21 +353,22 @@ namespace SifizPlanning.Controllers
                 }
 
                 //Buscando no se solapen los permisos
-                int cant = ( from p in db.Permiso
-                             where 
-                                    (( p.FechaInicio <= fechaDesde && p.FechaFin > fechaDesde ) ||
-                                    ( p.FechaInicio < fechaHasta && p.FechaFin > fechaHasta ) ||
-                                    ( p.FechaInicio >= fechaDesde && p.FechaFin <= fechaHasta )) &&
-                                    p.SecuencialEstadoPermiso != 3 &&
-                                    p.SecuencialColaborador == idColaborador
-                             select p).Count();
+                int cant = (from p in db.Permiso
+                            where
+                                   ((p.FechaInicio <= fechaDesde && p.FechaFin > fechaDesde) ||
+                                   (p.FechaInicio < fechaHasta && p.FechaFin > fechaHasta) ||
+                                   (p.FechaInicio >= fechaDesde && p.FechaFin <= fechaHasta)) &&
+                                   p.SecuencialEstadoPermiso != 3 &&
+                                   p.SecuencialColaborador == idColaborador
+                            select p).Count();
 
                 if (cant > 1)
                 {
                     throw new Exception("Error, las fechas de este permiso se solapan con las de otro");
                 }
 
-                Permiso permiso = new Permiso{
+                Permiso permiso = new Permiso
+                {
                     SecuencialTipoPermiso = tipoPermiso,
                     SecuencialEstadoPermiso = 1,//Solicitado
                     SecuencialColaborador = idColaborador,
@@ -270,7 +377,7 @@ namespace SifizPlanning.Controllers
                     Motivo = motivo
                 };
 
-                db.Permiso.Add( permiso );
+                db.Permiso.Add(permiso);
                 db.SaveChanges();
 
                 var resp = new
@@ -280,13 +387,14 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch(Exception e){
+            catch (Exception e)
+            {
                 var resp = new
                 {
                     success = false,
                     msg = e.Message
                 };
-                return Json( resp );
+                return Json(resp);
             }
         }
 
@@ -296,11 +404,12 @@ namespace SifizPlanning.Controllers
         {
             try
             {
-                Colaborador colaborador = db.Colaborador.Find( idColaborador );
-                if( colaborador == null ){
+                Colaborador colaborador = db.Colaborador.Find(idColaborador);
+                if (colaborador == null)
+                {
                     throw new Exception("Error, no se encontró el colaborador");
                 }
-                
+
                 int year = DateTime.Today.AddYears(difYear).Year;
                 DateTime diaInicial = new DateTime(year, 1, 1);
                 DateTime diaFinal = diaInicial.AddYears(1);
@@ -313,7 +422,7 @@ namespace SifizPlanning.Controllers
                     DateTime fechaMes = diaInicial.AddMonths(i);
                     DateTime fechaDia = fechaMes;
                     int mes = fechaMes.Month;
-                    string textMes = Utiles.PrimeraMayuscula( fechaMes.ToString("MMMM") );
+                    string textMes = Utiles.PrimeraMayuscula(fechaMes.ToString("MMMM"));
 
                     List<object> diasVacacionesMes = new List<object>();
                     while (mes == fechaDia.Month)
@@ -329,7 +438,7 @@ namespace SifizPlanning.Controllers
                         fechaDia = fechaDia.AddDays(1);
                     }
 
-                    mesesVacaciones.Add( 
+                    mesesVacaciones.Add(
                                         new { mes = textMes, dias = diasVacacionesMes }
                                        );
                 }
@@ -353,7 +462,7 @@ namespace SifizPlanning.Controllers
                 return Json(resp);
             }
         }
-        
+
         [HttpPost]
         [Authorize(Roles = "ADMIN, RRHH")]
         public ActionResult EliminarDiaVacacion(int id)
@@ -371,7 +480,7 @@ namespace SifizPlanning.Controllers
                 return Json(resp);
             }
             catch (Exception e)
-            {                
+            {
                 var resp = new
                 {
                     success = false,
@@ -387,37 +496,39 @@ namespace SifizPlanning.Controllers
         {
             try
             {
-                var trabajadores = ( from c in db.Colaborador join 
-                                     p in db.Persona on c.persona equals p join
+                var trabajadores = (from c in db.Colaborador
+                                    join
+                                     p in db.Persona on c.persona equals p
+                                    join
                                      u in db.Usuario on p.Secuencial equals u.SecuencialPersona
-                                     where u.EstaActivo == 1
-                                     orderby u.Email
-                                     select new
-                                     {
-                                         id = c.Secuencial,
-                                         foto = c.fotoColaborador.FirstOrDefault().Url,
-                                         nombre = p.Nombre1 + " " + p.Apellido1,
-                                         email = u.Email,
-                                         departamento = c.departamento.Descripcion,
-                                         cargo = c.cargo.Descripcion,
-                                         sede = c.sede.Descripcion
-                                     }
+                                    where u.EstaActivo == 1
+                                    orderby u.Email
+                                    select new
+                                    {
+                                        id = c.Secuencial,
+                                        foto = c.fotoColaborador.FirstOrDefault().Url,
+                                        nombre = p.Nombre1 + " " + p.Apellido1,
+                                        email = u.Email,
+                                        departamento = c.departamento.Descripcion,
+                                        cargo = c.cargo.Descripcion,
+                                        sede = c.sede.Descripcion
+                                    }
                                    );
 
                 List<object> trabajadoresTiempo = new List<object>();
                 foreach (var trab in trabajadores)
                 {
                     int tiempo = 0;
-                        
-                    int cantTareas = ( 
+
+                    int cantTareas = (
                                         from tc in db.TareaCompensatoria
                                         where tc.EstaActiva == 1 && tc.tarea.SecuencialEstadoTarea == 3 &&
                                               tc.tarea.SecuencialColaborador == trab.id &&
                                               tc.TiempoMinutos > tc.TiempoConsumido
                                         select (tc.Secuencial)
                                     ).Count();
-                    if( cantTareas > 0 )
-                        tiempo = ( 
+                    if (cantTareas > 0)
+                        tiempo = (
                             from tc in db.TareaCompensatoria
                             where tc.EstaActiva == 1 && tc.tarea.SecuencialEstadoTarea == 3 &&
                                   tc.tarea.SecuencialColaborador == trab.id &&
@@ -430,10 +541,11 @@ namespace SifizPlanning.Controllers
                     int minutos = tiempo % 60;
 
                     string strMinutos = minutos.ToString();
-                    if( minutos < 10 )
+                    if (minutos < 10)
                         strMinutos = "0" + strMinutos;
 
-                    trabajadoresTiempo.Add(new {
+                    trabajadoresTiempo.Add(new
+                    {
                         id = trab.id,
                         foto = trab.foto,
                         nombre = trab.nombre,
@@ -469,8 +581,9 @@ namespace SifizPlanning.Controllers
         {
             try
             {
-                var tareasCompensatorias = (  
-                        from tc in db.TareaCompensatoria join
+                var tareasCompensatorias = (
+                        from tc in db.TareaCompensatoria
+                        join
                               t in db.Tarea on tc.tarea equals t
                         where t.SecuencialEstadoTarea == 3 && t.SecuencialColaborador == idColaborador &&
                               tc.EstaActiva == 1
@@ -482,7 +595,7 @@ namespace SifizPlanning.Controllers
                             cliente = t.cliente.Descripcion,
                             fecha = t.FechaInicio,
                             tiempo = tc.TiempoMinutos,
-                            consumido = tc.TiempoConsumido                            
+                            consumido = tc.TiempoConsumido
                         }
                     ).ToList();
 
@@ -495,19 +608,21 @@ namespace SifizPlanning.Controllers
 
                 int totalTiempo = 0;
                 int totalConsumido = 0;
-                foreach( var tarComp in tareasCompensatorias ){
+                foreach (var tarComp in tareasCompensatorias)
+                {
                     totalTiempo += tarComp.tiempo;
                     totalConsumido += tarComp.consumido;
                     listaTareasCompensatorias.Add(
-                        new {
+                        new
+                        {
                             id = tarComp.id,
                             desc = tarComp.desc,
                             cliente = tarComp.cliente,
                             fecha = tarComp.fecha.ToString("dd/MM/yyyy"),
-                            tiempo = Utiles.DarHorasMinutosPorMinutos( tarComp.tiempo ),
-                            consumido = Utiles.DarHorasMinutosPorMinutos( tarComp.consumido ),
-                            queda = Utiles.DarHorasMinutosPorMinutos( tarComp.tiempo - tarComp.consumido)
-                    });
+                            tiempo = Utiles.DarHorasMinutosPorMinutos(tarComp.tiempo),
+                            consumido = Utiles.DarHorasMinutosPorMinutos(tarComp.consumido),
+                            queda = Utiles.DarHorasMinutosPorMinutos(tarComp.tiempo - tarComp.consumido)
+                        });
                 }
 
                 string tiempoCompensatorio = Utiles.DarHorasMinutosPorMinutos(totalTiempo - totalConsumido);
@@ -539,26 +654,26 @@ namespace SifizPlanning.Controllers
             try
             {
                 var listaColaboradores = new List<object>();
-                if(fechaDesde != string.Empty && fechaHasta != string.Empty)
+                if (fechaDesde != string.Empty && fechaHasta != string.Empty)
                 {
                     //Buscando los colaboradores
                     var listaColaboradoresTmp = (from c in db.Colaborador
-                                                  join f in db.FotoColaborador on c.Secuencial equals f.SecuencialColaborador
-                                                  join s in db.Sede on c.sede equals s
-                                                  join p in db.Persona on c.persona equals p
-                                                  join u in db.Usuario on p equals u.persona
-                                                  orderby p.Nombre1
-                                                  where s.Descripcion == sede
-                                                  select new
-                                                  {
-                                                      idColaborador = c.Secuencial,
-                                                      nombreColaborador = p.Nombre1 + " " + p.Apellido1,
-                                                      url = f.Url,
-                                                      email = u.Email.ToUpper(),
-                                                      idOficina = s.Secuencial,
-                                                      nombreOficina = s.Descripcion,
-                                                  }).ToList<object>();
-                    
+                                                 join f in db.FotoColaborador on c.Secuencial equals f.SecuencialColaborador
+                                                 join s in db.Sede on c.sede equals s
+                                                 join p in db.Persona on c.persona equals p
+                                                 join u in db.Usuario on p equals u.persona
+                                                 orderby p.Nombre1
+                                                 where s.Descripcion == sede
+                                                 select new
+                                                 {
+                                                     idColaborador = c.Secuencial,
+                                                     nombreColaborador = p.Nombre1 + " " + p.Apellido1,
+                                                     url = f.Url,
+                                                     email = u.Email.ToUpper(),
+                                                     idOficina = s.Secuencial,
+                                                     nombreOficina = s.Descripcion,
+                                                 }).ToList<object>();
+
                     //Buscando las marcas de los colaboradores
                     CultureInfo provider = CultureInfo.InvariantCulture;
                     DateTime fechaHoraDesde = DateTime.ParseExact(fechaDesde, "dd/MM/yyyy", provider);
@@ -570,23 +685,23 @@ namespace SifizPlanning.Controllers
                         var marcasElectronicas = new List<object>();
                         //Buscando por cada dia las marcas del colaborador
                         //La primera marca es de entrada y la ultima es la salida 
-                        Func<TimeSpan, string> TimetoString = (x => (x.Hours < 10 ? "0" + x.Hours.ToString() : x.Hours.ToString()) + ":" + 
-                                                                    (x.Minutes < 10 ? "0" + x.Minutes.ToString() : x.Minutes.ToString()) + ":" + 
+                        Func<TimeSpan, string> TimetoString = (x => (x.Hours < 10 ? "0" + x.Hours.ToString() : x.Hours.ToString()) + ":" +
+                                                                    (x.Minutes < 10 ? "0" + x.Minutes.ToString() : x.Minutes.ToString()) + ":" +
                                                                     (x.Seconds < 10 ? "0" + x.Seconds.ToString() : x.Seconds.ToString()));
                         while (fechaHoraDesdeTmp < fechaHoraHasta)
                         {
-                            var marcas =(from me in db.MarcaElectronica
-                                              where me.SecuencialColaborador == id &&
-                                              me.Fecha.Day == fechaHoraDesdeTmp.Day &&
-                                              me.Fecha.Month == fechaHoraDesdeTmp.Month &&
-                                              me.Fecha.Year == fechaHoraDesdeTmp.Year 
-                                              group me by me.Fecha into g
-                                              select new
-                                              {
-                                                  fecha = g.Key,
-                                                  horaEntrada = g.Min(m => m.Hora),
-                                                  horaSalida = g.Max(m => m.Hora) 
-                                           }).ToList();
+                            var marcas = (from me in db.MarcaElectronica
+                                          where me.SecuencialColaborador == id &&
+                                          me.Fecha.Day == fechaHoraDesdeTmp.Day &&
+                                          me.Fecha.Month == fechaHoraDesdeTmp.Month &&
+                                          me.Fecha.Year == fechaHoraDesdeTmp.Year
+                                          group me by me.Fecha into g
+                                          select new
+                                          {
+                                              fecha = g.Key,
+                                              horaEntrada = g.Min(m => m.Hora),
+                                              horaSalida = g.Max(m => m.Hora)
+                                          }).ToList();
                             //Si no tiene marca en el día genero una marca vacia
                             object marca = null;
                             string claseHoraEntrada = string.Empty;
@@ -600,7 +715,7 @@ namespace SifizPlanning.Controllers
                             {
                                 claseHoraEntrada = "ocultar-marcas";
                                 claseHoraSalida = "ocultar-marcas";
-                                claseHorasTrab = "ocultar-marcas";                                
+                                claseHorasTrab = "ocultar-marcas";
                             }
                             else
                             {
@@ -631,7 +746,7 @@ namespace SifizPlanning.Controllers
                                     if (claseHorasTrab != "ocultar-marcas")
                                     {
                                         claseHorasTrab = "horas-trab-con-1marca";
-                                        claseHoraSalida = "ocultar-marcas";                                         
+                                        claseHoraSalida = "ocultar-marcas";
                                     }
                                     object marcaTmp = new { fecha = ((DateTime)((dynamic)marca).fecha).ToShortDateString(), horaEntrada = TimetoString(((dynamic)marca).horaEntrada), horaSalida = "", horasTrabajadas = "00:00:00", claseHoraEntrada = claseHoraEntrada, claseHoraSalida = claseHoraSalida, claseHorasTrab = claseHorasTrab, claseTipoImp = claseTipoImp };
                                     marca = marcaTmp;
@@ -647,7 +762,7 @@ namespace SifizPlanning.Controllers
                                     if (((dynamic)marca).horaEntrada > horaEntradaEmpresa.TimeOfDay)
                                     {
                                         TimeSpan impuntualidad = ((dynamic)marca).horaEntrada - horaEntradaEmpresa.TimeOfDay;
-                                        if(impuntualidad.Hours == 0 && impuntualidad.Minutes <= 12)
+                                        if (impuntualidad.Hours == 0 && impuntualidad.Minutes <= 12)
                                             claseTipoImp = "tipo-impunt1";
                                         else if (impuntualidad.Hours == 0 && impuntualidad.Minutes >= 13 && impuntualidad.Minutes <= 30)
                                             claseTipoImp = "tipo-impunt2";
@@ -657,9 +772,9 @@ namespace SifizPlanning.Controllers
                                     object marcaTmp = new { fecha = ((DateTime)((dynamic)marca).fecha).ToShortDateString(), horaEntrada = TimetoString(((dynamic)marca).horaEntrada), horaSalida = TimetoString(((dynamic)marca).horaSalida), horasTrabajadas = TimetoString(horasTrabajadas), claseHoraEntrada = claseHoraEntrada, claseHoraSalida = claseHoraSalida, claseHorasTrab = claseHorasTrab, claseTipoImp = claseTipoImp };
                                     marca = marcaTmp;
                                 }
-                            }                            
+                            }
                             marcasElectronicas.Add(marca);
-                            fechaHoraDesdeTmp = fechaHoraDesdeTmp.AddDays(1);                        
+                            fechaHoraDesdeTmp = fechaHoraDesdeTmp.AddDays(1);
                         }
                         //Guardando los colaboradores y sus marcas
                         listaColaboradores.Add(new
@@ -672,7 +787,7 @@ namespace SifizPlanning.Controllers
                             nombreOficina = ((dynamic)colaborador).nombreOficina,
                             marcas = marcasElectronicas
                         });
-                    }                    
+                    }
                 }
                 var resp = new
                 {
@@ -695,9 +810,10 @@ namespace SifizPlanning.Controllers
         //Funcion de disponibilidad de recursos
         [HttpPost]
         [Authorize(Roles = "ADMIN, RRHH")]
-        public ActionResult DisponibilidadRecursosFechas( int semana = 0, int cantSemanas = 8, string fechaSemanaInicio = "" )
+        public ActionResult DisponibilidadRecursosFechas(int semana = 0, int cantSemanas = 8, string fechaSemanaInicio = "")
         {
-            try{
+            try
+            {
                 DateTime fechaDesde = DateTime.Today;
 
                 if (fechaSemanaInicio != string.Empty)
@@ -714,9 +830,9 @@ namespace SifizPlanning.Controllers
                 }
                 else
                 {
-                    fechaDesde = fechaDesde.AddDays( (diaSemana - 1) * -1 );
+                    fechaDesde = fechaDesde.AddDays((diaSemana - 1) * -1);
                 }
-                DateTime fechaHasta = fechaDesde.AddDays( cantSemanas * 7 );
+                DateTime fechaHasta = fechaDesde.AddDays(cantSemanas * 7);
 
                 var colaboradores = (
                                       from c in db.Colaborador
@@ -726,9 +842,10 @@ namespace SifizPlanning.Controllers
                                           s in db.Sede on c.SecuencialSede equals s.Secuencial
                                       join
                                           d in db.Departamento on c.SecuencialDepartamento equals d.Secuencial
-                                      join 
+                                      join
                                           u in db.Usuario on p.Secuencial equals u.SecuencialPersona
-                                      where u.EstaActivo == 1 orderby p.Apellido1, p.Nombre1 descending
+                                      where u.EstaActivo == 1
+                                      orderby p.Apellido1, p.Nombre1 descending
                                       select new
                                       {
                                           idColaborador = c.Secuencial,
@@ -743,11 +860,11 @@ namespace SifizPlanning.Controllers
 
                 var vacaciones = db.Vacaciones.Where(x => x.Fecha >= fechaDesde && x.Fecha < fechaHasta).ToList();
                 var permisos = db.Permiso.Where(x => x.FechaInicio >= fechaDesde && x.FechaFin < fechaHasta).ToList();
-                
+
                 var datosColaboradores = new List<object>();
                 foreach (var colab in colaboradores)
                 {
-                    var listaSegmento = new List<object>();                    
+                    var listaSegmento = new List<object>();
                     string tipo = "", tipoAux = "";
                     int tamanioSegmento = 0;
                     DateTime fechaDesdeAux = fechaDesde;
@@ -757,7 +874,8 @@ namespace SifizPlanning.Controllers
                     while (fechaDesdeAux < fechaHasta)
                     {
                         bool tieneVacaciones = vacaciones.Where(x => x.SecuencialColaborador == colab.idColaborador && x.Fecha.Date == fechaDesdeAux).Count() > 0;
-                        if( tieneVacaciones ){
+                        if (tieneVacaciones)
+                        {
                             if (tipo == "" || tipo == "V")
                             {
                                 tamanioSegmento++;
@@ -788,11 +906,11 @@ namespace SifizPlanning.Controllers
                             }
                         }
 
-                        if (tipo != tipoAux || tipoAux == "P" )//Aquí hay un cambio, los permisos siempre son cambios
-                        {                            
+                        if (tipo != tipoAux || tipoAux == "P")//Aquí hay un cambio, los permisos siempre son cambios
+                        {
                             if (tipo == "") //La primera vez es vacío por eso es que no se guarda
-                            { 
-                                tipo = tipoAux; 
+                            {
+                                tipo = tipoAux;
                             }
                             else
                             {
@@ -879,11 +997,12 @@ namespace SifizPlanning.Controllers
 
                 List<object> semanasDisponibilidad = new List<object>();
                 DateTime fechaDesdeInicio = fechaDesde;
-                while (fechaDesdeInicio < fechaHasta )
+                while (fechaDesdeInicio < fechaHasta)
                 {
                     DateTime fechaDomingo = fechaDesdeInicio.AddDays(6);
 
-                    semanasDisponibilidad.Add(new{
+                    semanasDisponibilidad.Add(new
+                    {
                         ini = fechaDesdeInicio.ToString("dd/MM"),
                         fin = fechaDomingo.ToString("dd/MM/yy")
                     });
@@ -891,23 +1010,26 @@ namespace SifizPlanning.Controllers
                     fechaDesdeInicio = fechaDesdeInicio.AddDays(7);
                 }
 
-                var resp = new {
-                                success = true,
-                                cantDias = cantSemanas * 7,
-                                datos = datosColaboradores,
-                                intervalo = fechaDesde.ToString("dd/MM") + " - " + fechaHasta.ToString("dd/MM"),
-                                departamentos = colaboradores.Select(x => x.departamento).Distinct().ToList(),
-                                sedes = colaboradores.Select(x => x.sede).Distinct().ToList(),
-                                semanasDisponibilidad = semanasDisponibilidad
-                           };
+                var resp = new
+                {
+                    success = true,
+                    cantDias = cantSemanas * 7,
+                    datos = datosColaboradores,
+                    intervalo = fechaDesde.ToString("dd/MM") + " - " + fechaHasta.ToString("dd/MM"),
+                    departamentos = colaboradores.Select(x => x.departamento).Distinct().ToList(),
+                    sedes = colaboradores.Select(x => x.sede).Distinct().ToList(),
+                    semanasDisponibilidad = semanasDisponibilidad
+                };
                 return Json(resp);
             }
-            catch( Exception e ){
-                var resp = new {
+            catch (Exception e)
+            {
+                var resp = new
+                {
                     success = false,
-                    msg = e.Message                    
+                    msg = e.Message
                 };
-                return Json( resp );
+                return Json(resp);
             }
         }
 
@@ -922,10 +1044,11 @@ namespace SifizPlanning.Controllers
                                      where tp.EstaActivo == 1
                                      select new
                                      {
-                                        id = tp.Secuencial,
-                                        nombre = tp.Codigo
+                                         id = tp.Secuencial,
+                                         nombre = tp.Codigo
                                      }).ToList();
-                var resp = new { 
+                var resp = new
+                {
                     success = true,
                     tiposPermisos = tiposPermisos
                 };
@@ -941,6 +1064,5 @@ namespace SifizPlanning.Controllers
                 return Json(resp);
             }
         }
-        
     }
 }

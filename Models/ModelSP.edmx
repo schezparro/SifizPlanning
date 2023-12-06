@@ -62,6 +62,13 @@
           <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="FERIADOS">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FECHA" Type="date" Nullable="false" />
+        </EntityType>
         <EntityType Name="GESTIONPERMISO">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
@@ -2459,6 +2466,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_TICKET_MODULO">
+          <End Role="MODULO" Type="Self.MODULO" Multiplicity="0..1" />
+          <End Role="TICKET" Type="Self.TICKET" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MODULO">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="TICKET">
+              <PropertyRef Name="SECUENCIALMODULO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_TICKET_TICKETVERSIONCLIENTE">
           <End Role="TICKETVERSIONCLIENTE" Type="Self.TICKETVERSIONCLIENTE" Multiplicity="0..1" />
           <End Role="TICKET" Type="Self.TICKET" Multiplicity="*" />
@@ -4542,6 +4561,7 @@
           <EntitySet Name="FBSLOGERROR" EntityType="Self.FBSLOGERROR" Schema="FBSLOG" store:Type="Tables" />
           <EntitySet Name="DETALLEGESTIONPERMISO" EntityType="Self.DETALLEGESTIONPERMISO" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="ESTADOPERMISO" EntityType="Self.ESTADOPERMISO" Schema="RRHH" store:Type="Tables" />
+          <EntitySet Name="FERIADOS" EntityType="Self.FERIADOS" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="GESTIONPERMISO" EntityType="Self.GESTIONPERMISO" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="MARCAELECTRONICA" EntityType="Self.MARCAELECTRONICA" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="PERMISO" EntityType="Self.PERMISO" Schema="RRHH" store:Type="Tables" />
@@ -4908,6 +4928,10 @@
           <AssociationSet Name="FK_TICKET_ACTIVIDAD_TICKET_ACTIVIDAD" Association="Self.FK_TICKET_ACTIVIDAD_TICKET_ACTIVIDAD">
             <End Role="TICKET" EntitySet="TICKET" />
             <End Role="TICKET_COMPLEMENTO" EntitySet="TICKET_COMPLEMENTO" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TICKET_MODULO" Association="Self.FK_TICKET_MODULO">
+            <End Role="MODULO" EntitySet="MODULO" />
+            <End Role="TICKET" EntitySet="TICKET" />
           </AssociationSet>
           <AssociationSet Name="FK_TICKET_TICKETVERSIONCLIENTE" Association="Self.FK_TICKET_TICKETVERSIONCLIENTE">
             <End Role="TICKETVERSIONCLIENTE" EntitySet="TICKETVERSIONCLIENTE" />
@@ -6668,6 +6692,7 @@
             <End Role="TecnologiasYProcesos" EntitySet="TecnologiasYProcesos" />
             <End Role="NIVELCOLABORADORTECNOLOGIA" EntitySet="NivelColaboradorTecnologia" />
           </AssociationSet>
+          <EntitySet Name="Feriados" EntityType="SifizPlanningModel.Feriados" />
           </EntityContainer>
         <EntityType Name="Rol">
           <Key>
@@ -11621,6 +11646,13 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="Feriados">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -13617,6 +13649,14 @@
                 <ScalarProperty Name="Nivel" ColumnName="NIVEL" />
                 <ScalarProperty Name="SecuencialColaborador" ColumnName="SECUENCIALCOLABORADOR" />
                 <ScalarProperty Name="SecuencialTecnologia" ColumnName="SECUENCIALTECNOLOGIA" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Feriados">
+            <EntityTypeMapping TypeName="SifizPlanningModel.Feriados">
+              <MappingFragment StoreEntitySet="FERIADOS">
+                <ScalarProperty Name="Fecha" ColumnName="FECHA" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
               </MappingFragment>
             </EntityTypeMapping>

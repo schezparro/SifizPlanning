@@ -390,6 +390,7 @@
         <EntityTypeShape EntityType="SifizPlanningModel.NivelColaboradorTecnologia" Width="1.5" PointX="36.625" PointY="1.75" />
         <AssociationConnector Association="SifizPlanningModel.FK_NIVELCOLABORADORTECNOLOGIA_COLABORADOR" />
         <AssociationConnector Association="SifizPlanningModel.FK_NIVELCOLABORADORTECNOLOGIA_TECNOLOGIASYPROCESOS" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Feriados" Width="1.5" PointX="11.375" PointY="17.75" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
