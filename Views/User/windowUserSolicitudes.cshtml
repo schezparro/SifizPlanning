@@ -182,9 +182,11 @@
                                 <div style="column-count: 2">
                                     DÍAS QUE INICIAN SUS VACACIONES
                                     <br>Fecha desde (dd/mm/aaaa):
-                                    <input type="date" class="form-control" ng-model="solVacaciones.fechaInicioVacaciones" ng-required="true">
+                                    <p class="bg-danger" id="alert-coincide-inicio-vacaciones" style="display: none">Coincide con un día feriado.</p>
+                                    <input type="date" class="form-control" ng-change="fechaInicioVacacionesChange(solVacaciones.fechaInicioVacaciones)" ng-model="solVacaciones.fechaInicioVacaciones" ng-required="true">
                                     <br>Fecha hasta (dd/mm/aaaa):
-                                    <input type="date" class="form-control" ng-model="solVacaciones.fechaFinVacaciones" ng-required="true">
+                                    <p class="bg-danger" id="alert-coincide-fin-vacaciones" style="display: none">Coincide con un día feriado.</p>
+                                    <input type="date" class="form-control" ng-change="fechaFinVacacionesChange(solVacaciones.fechaFinVacaciones)" ng-model="solVacaciones.fechaFinVacaciones" ng-required="true">
                                 </div>
                             </td>
                         </tr>
@@ -197,13 +199,15 @@
                         <tr>
                             <td colspan="5">Nota: El recibir esta solicitud no implica que está aprobada, su jefe inmediato le comunicará por escrito si su solicitud ha sido aprobada o no.</td>
                         </tr>
+                        <tr id="feriados-medio-vacaciones" style="display: none">
+                        </tr>
                         <tr>
                             <td colspan="5">POR EL PRESENTE EXPRESO MI CONFORMIDAD DE SOLICITAR Y GOZAR MIS VACACIONES DE ACUERDO A LO QUE ESTABLECE EL ARTICULO 69 DEL CODIGO DE TRABAJO.</td>
                         </tr>
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Enviar</button>
+                    <button type="submit" id="enviar-solicitud-vacaciones-btn" class="btn btn-primary">Enviar</button>
                     <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </form>
@@ -297,11 +301,15 @@
                             <td colspan="5">
                                 <div style="display: flow; column-count: 2; align-items: center">
                                     FECHA DESDE:
-                                    <br><input type="date" class="form-control" ng-model="solicitudPer.fechaDesde" ng-required="true">
+                                    <br>
+                                    <p class="bg-danger" id="alert-coincide-inicio-permiso" style="display: none">Coincide con un día feriado.</p>
+                                    <input type="date" class="form-control" ng-change="fechaInicioPermisoChange(solicitudPer.fechaDesde)" ng-model="solicitudPer.fechaDesde" ng-required="true">
                                     HORA DE SALIDA:
                                     <br><input type="text" class="timepicker form-control" ng-model="solicitudPer.horaSalida" ng-required="true">
                                     FECHA HASTA:
-                                    <br><input type="date" class="form-control" ng-model="solicitudPer.fechaHasta" ng-required="true">
+                                    <br>
+                                    <p class="bg-danger" id="alert-coincide-fin-permiso" style="display: none">Coincide con un día feriado.</p>
+                                    <input type="date" class="form-control" ng-change="fechaFinPermisoChange(solicitudPer.fechaHasta)" ng-model="solicitudPer.fechaHasta" ng-required="true">
                                     HORA DE RETORNO:
                                     <br><input width="20" type="text" class="timepicker form-control" ng-model="solicitudPer.horaRetorno" ng-required="true">
                                 </div>
@@ -313,6 +321,8 @@
                         <tr>
                             <td colspan="5">Nota: El recibir esta solicitud no implica que está aprobada, su jefe inmediato le comunicará por escrito si su solicitud ha sido aprobada o no.</td>
                         </tr>
+                        <tr id="feriados-medio-permiso" style="display: none">
+                        </tr>
                         <tr>
                             <td colspan="5">
                                 APELLIDOS Y NOMBRES JEFE (A) INMEDIATO:
@@ -322,7 +332,7 @@
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Enviar</button>
+                    <button type="submit" id="enviar-solicitud-permiso-btn" class="btn btn-primary">Enviar</button>
                     <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </form>

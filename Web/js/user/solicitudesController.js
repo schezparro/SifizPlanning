@@ -27,6 +27,31 @@
     }
     $scope.recargarPermisos();
 
+    $scope.recargarFeriados = function () {
+        var ajaxFeriados = $http.post("rrhh/dar-feriado/", {});
+
+        ajaxFeriados.success(function (data) {
+            if (data.success) {
+                var jsonFeriados = data.feriados;
+                $scope.feriados = jsonFeriados.map(f => {
+
+                    var fechaMilisegundos = f.fecha.match(/\d+/)[0];
+
+                    var fecha = new Date(parseInt(fechaMilisegundos));
+
+                    return {
+                        id: f.id,
+                        fecha: fecha
+                    };
+                });
+
+            } else {
+                alert("No se pudieron cargar los datos");
+            }
+        });
+    };
+    $scope.recargarFeriados();
+
 
     //Para la solicitud de vacaciones
     $scope.windowSolicitarVacaciones = function () {
@@ -35,6 +60,7 @@
 
     $scope.enviarSolicitudVacaciones = function () {
         waitingDialog.show('Solicitando vacaciones...', { dialogSize: 'sm', progressType: 'success' });
+
         var solicitudVacaciones = $http.post("user/solicitar-vacaciones",
             {
                 solicitud: $scope.solVacaciones
@@ -51,6 +77,77 @@
             }
         });
     };
+
+    $scope.fechaInicioVacacionesChange = function (fechaInicioVacaciones) {
+        var coincide = $scope.feriados.some(f => f.fecha.getTime() === fechaInicioVacaciones.getTime());
+        $scope.hayFechaInicioVacaciones = true;
+
+        if (coincide) {
+            angular.element("#enviar-solicitud-vacaciones-btn").prop("disabled", coincide);
+            angular.element("#alert-coincide-inicio-vacaciones").css("display", "block");
+        } else {
+            angular.element("#enviar-solicitud-vacaciones-btn").prop("disabled", coincide);
+            angular.element("#alert-coincide-inicio-vacaciones").css("display", "none");
+        }
+
+        if ($scope.hayFechaInicioVacaciones && $scope.hayFechaFinVacaciones) {
+
+            var fechaInicioVaciones = $scope.solVacaciones.fechaInicioVacaciones
+            var fechaFinVacaciones = $scope.solVacaciones.fechaFinVacaciones
+
+            var feriadosFiltrados = $scope.feriados.filter(f => f.fecha.getTime() >= fechaInicioVaciones.getTime() && f.fecha.getTime() <= fechaFinVacaciones.getTime());
+            var feriadosEnMedio = feriadosFiltrados.map(f => {
+                var fecha = new Date(f.fecha);
+                var dia = ("0" + fecha.getDate()).slice(-2);
+                var mes = ("0" + (fecha.getMonth() + 1)).slice(-2);
+                var anio = fecha.getFullYear();
+                return dia + "/" + mes + "/" + anio;
+            });
+
+            if (feriadosEnMedio.length > 0) {
+                angular.element("#feriados-medio-vacaciones").css("display", "block");
+                angular.element("#feriados-medio-vacaciones").html('<td colspan="5"><p style="background-color: #ffc107;">Día feriados entre las vacaciones: ' + feriadosEnMedio.join(', ') + '</p></td>');
+            } else {
+                angular.element("#feriados-medio-vacaciones").css("display", "none");
+            }
+        }
+    };
+
+    $scope.fechaFinVacacionesChange = function (fechaFinVacaciones) {
+        var coincide = $scope.feriados.some(f => f.fecha.getTime() === fechaFinVacaciones.getTime());
+        $scope.hayFechaFinVacaciones = true;
+
+        if (coincide) {
+            angular.element("#enviar-solicitud-vacaciones-btn").prop("disabled", coincide);
+            angular.element("#alert-coincide-fin-vacaciones").css("display", "block");
+        } else {
+            angular.element("#enviar-solicitud-vacaciones-btn").prop("disabled", coincide);
+            angular.element("#alert-coincide-fin-vacaciones").css("display", "none");
+        }
+
+        if ($scope.hayFechaInicioVacaciones && $scope.hayFechaFinVacaciones) {
+
+            var fechaInicioVaciones = $scope.solVacaciones.fechaInicioVacaciones
+            var fechaFinVacaciones = $scope.solVacaciones.fechaFinVacaciones
+
+            var feriadosFiltrados = $scope.feriados.filter(f => f.fecha.getTime() >= fechaInicioVaciones.getTime() && f.fecha.getTime() <= fechaFinVacaciones.getTime());
+            var feriadosEnMedio = feriadosFiltrados.map(f => {
+                var fecha = new Date(f.fecha);
+                var dia = ("0" + fecha.getDate()).slice(-2);
+                var mes = ("0" + (fecha.getMonth() + 1)).slice(-2);
+                var anio = fecha.getFullYear();
+                return dia + "/" + mes + "/" + anio;
+            });
+
+            if (feriadosEnMedio.length > 0) {
+                angular.element("#feriados-medio-vacaciones").css("display", "block");
+                angular.element("#feriados-medio-vacaciones").html('<td colspan="5"><p style="background-color: #ffc107;">Día feriados entre las vacaciones: ' + feriadosEnMedio.join(', ') + '</p></td>');
+            } else {
+                angular.element("#feriados-medio-vacaciones").css("display", "none");
+            }
+        }
+    };
+
     //Para la solicitud de permisos
     $scope.windowSolicitarPermiso = function () {
         angular.element("#modal-solicitud-permisos").modal("show");
@@ -74,6 +171,77 @@
             }
         });
     };
+
+    $scope.fechaInicioPermisoChange = function (fechaInicioPermiso) {
+        var coincide = $scope.feriados.some(f => f.fecha.getTime() === fechaInicioPermiso.getTime());
+        $scope.hayFechaInicioPermiso = true;
+
+        if (coincide) {
+            angular.element("#enviar-solicitud-permiso-btn").prop("disabled", coincide);
+            angular.element("#alert-coincide-inicio-permiso").css("display", "block");
+        } else {
+            angular.element("#enviar-solicitud-permiso-btn").prop("disabled", coincide);
+            angular.element("#alert-coincide-inicio-permiso").css("display", "none");
+        }
+
+        if ($scope.hayFechaInicioPermiso && $scope.hayFechaFinPermiso) {
+
+            var fechaInicioPermiso = $scope.solicitudPer.fechaDesde
+            var fechaFinPermiso = $scope.solicitudPer.fechaHasta
+
+            var feriadosFiltrados = $scope.feriados.filter(f => f.fecha.getTime() >= fechaInicioPermiso.getTime() && f.fecha.getTime() <= fechaFinPermiso.getTime());
+            var feriadosEnMedio = feriadosFiltrados.map(f => {
+                var fecha = new Date(f.fecha);
+                var dia = ("0" + fecha.getDate()).slice(-2);
+                var mes = ("0" + (fecha.getMonth() + 1)).slice(-2);
+                var anio = fecha.getFullYear();
+                return dia + "/" + mes + "/" + anio;
+            });
+
+            if (feriadosEnMedio.length > 0) {
+                angular.element("#feriados-medio-permiso").css("display", "block");
+                angular.element("#feriados-medio-permiso").html('<td colspan="5"><p style="background-color: #ffc107;">Día feriados entre los días de permiso: ' + feriadosEnMedio.join(', ') + '</p></td>');
+            } else {
+                angular.element("#feriados-medio-permiso").css("display", "none");
+            }
+        }
+    };
+
+    $scope.fechaFinPermisoChange = function (fechaFinPermiso) {
+        var coincide = $scope.feriados.some(f => f.fecha.getTime() === fechaFinPermiso.getTime());
+        $scope.hayFechaFinPermiso = true;
+
+        if (coincide) {
+            angular.element("#enviar-solicitud-permiso-btn").prop("disabled", coincide);
+            angular.element("#alert-coincide-inicio-permiso").css("display", "block");
+        } else {
+            angular.element("#enviar-solicitud-permiso-btn").prop("disabled", coincide);
+            angular.element("#alert-coincide-inicio-permiso").css("display", "none");
+        }
+
+        if ($scope.hayFechaInicioPermiso && $scope.hayFechaFinPermiso) {
+
+            var fechaInicioPermiso = $scope.solicitudPer.fechaDesde
+            var fechaFinPermiso = $scope.solicitudPer.fechaHasta
+
+            var feriadosFiltrados = $scope.feriados.filter(f => f.fecha.getTime() >= fechaInicioPermiso.getTime() && f.fecha.getTime() <= fechaFinPermiso.getTime());
+            var feriadosEnMedio = feriadosFiltrados.map(f => {
+                var fecha = new Date(f.fecha);
+                var dia = ("0" + fecha.getDate()).slice(-2);
+                var mes = ("0" + (fecha.getMonth() + 1)).slice(-2);
+                var anio = fecha.getFullYear();
+                return dia + "/" + mes + "/" + anio;
+            });
+
+            if (feriadosEnMedio.length > 0) {
+                angular.element("#feriados-medio-permiso").css("display", "block");
+                angular.element("#feriados-medio-permiso").html('<td colspan="5"><p style="background-color: #ffc107;">Día feriados entre los días de permiso: ' + feriadosEnMedio.join(', ') + '</p></td>');
+            } else {
+                angular.element("#feriados-medio-permiso").css("display", "none");
+            }
+        }
+    };
+
 }]);
 
 devApp.filter("strDateToStr", function () {
