@@ -1542,6 +1542,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Properties\PublishProfiles\" />
+    <Folder Include="SCRIPTSDATABASE\01\" />
     <Folder Include="Views\Shared\" />
     <Folder Include="Web\files\asignaciones\" />
     <Folder Include="Web\images\chat\" />
