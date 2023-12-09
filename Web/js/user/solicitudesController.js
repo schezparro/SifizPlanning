@@ -52,9 +52,35 @@
     };
     $scope.recargarFeriados();
 
+    $scope.obtenerDatosUsuario = function () {
+        var ajaxUsuario = $http.post("user/dar-datos-usuario/", {});
+
+        ajaxUsuario.success(function (data) {
+            if (data.success) {
+                $scope.datosUsuario = data.datosUsuario;
+                console.log(data.datosUsuario);
+            }
+        });
+    };
+    $scope.obtenerDatosUsuario();
+
 
     //Para la solicitud de vacaciones
     $scope.windowSolicitarVacaciones = function () {
+        $scope.solVacaciones.apellidosNombres = $scope.datosUsuario.nombre;
+        $scope.solVacaciones.cargo = $scope.datosUsuario.cargo;
+        $scope.isEmpresaVacacionesSelectEditable = false;
+
+        if ($scope.datosUsuario.empresa === "SIFIZSOFT") {
+            $scope.solVacaciones.empresa = "SIFIZSOFT";
+            $scope.isEmpresaVacacionesSelectEditable = true;
+        } else if ($scope.datosUsuario.empresa === "INTECSOFT") {
+            $scope.solVacaciones.empresa = "INTECSOFT";
+            $scope.isEmpresaVacacionesSelectEditable = true;
+        } else {
+            $scope.isEmpresaVacacionesSelectEditable = false;
+        }
+
         angular.element("#modal-solicitud-vacaciones").modal("show");
     };
 
@@ -150,6 +176,21 @@
 
     //Para la solicitud de permisos
     $scope.windowSolicitarPermiso = function () {
+        $scope.solicitudPer.apellidosNombres = $scope.datosUsuario.nombre;
+        $scope.solicitudPer.cargo = $scope.datosUsuario.cargo;
+        $scope.solicitudPer.area = $scope.datosUsuario.departamento;
+        $scope.isEmpresaPermisoSelectEditable = false;
+
+        if ($scope.datosUsuario.empresa === "SIFIZSOFT") {
+            $scope.solicitudPer.empresa = "SIFIZSOFT";
+            $scope.isEmpresaPermisoSelectEditable = true;
+        } else if ($scope.datosUsuario.empresa === "INTECSOFT") {
+            $scope.solicitudPer.empresa = "INTECSOFT";
+            $scope.isEmpresaPermisoSelectEditable = true;
+        } else {
+            $scope.isEmpresaPermisoSelectEditable = false;
+        }
+
         angular.element("#modal-solicitud-permisos").modal("show");
     };
 

@@ -1156,6 +1156,12 @@ namespace SifizPlanning
 
             //RUTAS DEL CHAT DE LOS USUARIOS
             routes.MapRoute(
+                name: "DarDatosUsuario",
+                url: "user/dar-datos-usuario/{id}",
+                defaults: new { controller = "User", action = "DarDatosUsuario", id = UrlParameter.Optional }
+            );
+            
+            routes.MapRoute(
                 name: "DarUsersActivos",
                 url: "user/usuarios-activos-chat/{id}",
                 defaults: new { controller = "User", action = "DarUsersActivos", id = UrlParameter.Optional }

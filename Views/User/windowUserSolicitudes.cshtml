@@ -118,14 +118,14 @@
                         <tr>
                             <td colspan="5">
                                 NOMBRE Y APELLIDOS:
-                                <input type="text" class="form-control" ng-model="solVacaciones.apellidosNombres" ng-required="true">
+                                <input type="text" class="form-control" ng-model="solVacaciones.apellidosNombres" ng-required="true" ng-readonly="true">
                             </td>
                         </tr>
                         <tr>
                             <td colspan="5">
                                 <div style="column-count: 2">
                                     CARGO:
-                                    <input type="text" class="form-control" ng-model="solVacaciones.cargo" ng-required="true">
+                                    <input type="text" class="form-control" ng-model="solVacaciones.cargo" ng-required="true" ng-readonly="true">
                                     CEDULA:
                                     <input type="text" class="form-control" ng-model="solVacaciones.cedula" ng-required="true">
                                 </div>
@@ -137,9 +137,9 @@
                                     FECHA INGRESO DE LA SOLICITUD:
                                     <input type="date" class="form-control" ng-model="solVacaciones.fechaIngresoSolicitud" ng-required="true">
                                     EMPRESA:
-                                    <select ng-init="solVacaciones.empresa='SIFIZSOFT'" class="form-control" ng-model="solVacaciones.empresa" ng-required="true">
+                                    <select ng-init="solVacaciones.empresa='SIFIZSOFT'" class="form-control" ng-model="solVacaciones.empresa" ng-required="true" ng-readonly="isEmpresaVacacionesSelectEditable">
                                         <option value="SIFIZSOFT">SIFIZSOFT</option>
-                                        <option value="INTERSOFT">INTERSOFT</option>
+                                        <option value="INTECSOFT">INTECSOFT</option>
                                     </select>
                                 </div>
                             </td>
@@ -229,7 +229,7 @@
                             <td colspan="5">
                                 <div style="column-count: 2">
                                     NOMBRE Y APELLIDOS:
-                                    <input type="text" class="form-control" ng-model="solicitudPer.apellidosNombres" ng-required="true">
+                                    <input type="text" class="form-control" ng-model="solicitudPer.apellidosNombres" ng-required="true" ng-readonly="true">
                                     CEDULA:
                                     <input type="text" class="form-control" ng-model="solicitudPer.cedula" ng-required="true">
                                 </div>
@@ -239,9 +239,9 @@
                             <td colspan="5">
                                 <div style="column-count: 2">
                                     CARGO:
-                                    <input type="text" class="form-control" ng-model="solicitudPer.cargo" ng-required="true">
+                                    <input type="text" class="form-control" ng-model="solicitudPer.cargo" ng-required="true" ng-readonly="true">
                                     AREA:
-                                    <input type="text" class="form-control" ng-model="solicitudPer.area" ng-required="true">
+                                    <input type="text" class="form-control" ng-model="solicitudPer.area" ng-required="true" ng-readonly="true">
                                 </div>
                             </td>
                         </tr>
@@ -251,9 +251,9 @@
                                     FECHA INGRESO DE LA SOLICITUD:
                                     <input type="date" class="form-control" ng-model="solicitudPer.fechaIngresoSolicitud" ng-required="true">
                                     EMPRESA:
-                                    <select ng-init="solicitudPer.empresa='SIFIZSOFT'" class="form-control" ng-model="solicitudPer.empresa" ng-required="true">
+                                    <select ng-init="solicitudPer.empresa='SIFIZSOFT'" class="form-control" ng-model="solicitudPer.empresa" ng-required="true" ng-readonly="isEmpresaPermisoSelectEditable">
                                         <option value="SIFIZSOFT">SIFIZSOFT</option>
-                                        <option value="INTERSOFT">INTERSOFT</option>
+                                        <option value="INTECSOFT">INTECSOFT</option>
                                     </select>
                                 </div>
                             </td>

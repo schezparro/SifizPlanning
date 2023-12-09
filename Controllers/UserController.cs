@@ -17,6 +17,8 @@ using SpreadsheetLight;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Web.Hosting;
 using SifizPlanning.Models.ViewModel;
+using DocumentFormat.OpenXml.Bibliography;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 
 namespace SifizPlanning.Controllers
 {
@@ -45,7 +47,7 @@ namespace SifizPlanning.Controllers
             DateTime hoy = DateTime.Today;
             DayOfWeek diaSemana = hoy.DayOfWeek;
             DateTime lunes = hoy;
-            if((int)diaSemana == 0)//Domingo
+            if ((int)diaSemana == 0)//Domingo
             {
                 lunes = hoy.AddDays(-6);
             }
@@ -71,7 +73,7 @@ namespace SifizPlanning.Controllers
         public ActionResult DarTareasUsuario(string fechaLunes = "", int semanas = 1, string json = "", bool coordinados = false)
         {
             DateTime lunes = DateTime.Today;
-            if(fechaLunes != "")
+            if (fechaLunes != "")
             {
                 string[] fechas = fechaLunes.Split(new Char[] { '/' });
                 int dia = Int32.Parse(fechas[0]);
@@ -83,7 +85,7 @@ namespace SifizPlanning.Controllers
             {
                 DateTime hoy = DateTime.Today;
                 DayOfWeek diaSemana = hoy.DayOfWeek;
-                if((int)diaSemana == 0)//Domingo
+                if ((int)diaSemana == 0)//Domingo
                 {
                     lunes = hoy.AddDays(-6);
                 }
@@ -102,31 +104,31 @@ namespace SifizPlanning.Controllers
             List<int> idLugares = new List<int>();
             List<int> idModulos = new List<int>();
             List<int> idSedes = new List<int>();
-            if(json != "")
+            if (json != "")
             {
                 var s = new JavaScriptSerializer();
                 var jsonObj = s.Deserialize<dynamic>(json);
-                for(int i = 0; i < jsonObj["colaboradores"].Length; i++)
+                for (int i = 0; i < jsonObj["colaboradores"].Length; i++)
                 {
                     idColaboradores.Add(int.Parse(jsonObj["colaboradores"][i]["id"]));
                 }
-                for(int i = 0; i < jsonObj["clientes"].Length; i++)
+                for (int i = 0; i < jsonObj["clientes"].Length; i++)
                 {
                     idClientes.Add(int.Parse(jsonObj["clientes"][i]["id"]));
                 }
-                for(int i = 0; i < jsonObj["estadoTarea"].Length; i++)
+                for (int i = 0; i < jsonObj["estadoTarea"].Length; i++)
                 {
                     idEstados.Add(int.Parse(jsonObj["estadoTarea"][i]["id"]));
                 }
-                for(int i = 0; i < jsonObj["lugarTarea"].Length; i++)
+                for (int i = 0; i < jsonObj["lugarTarea"].Length; i++)
                 {
                     idLugares.Add(int.Parse(jsonObj["lugarTarea"][i]["id"]));
                 }
-                for(int i = 0; i < jsonObj["modulo"].Length; i++)
+                for (int i = 0; i < jsonObj["modulo"].Length; i++)
                 {
                     idModulos.Add(int.Parse(jsonObj["modulo"][i]["id"]));
                 }
-                for(int i = 0; i < jsonObj["sede"].Length; i++)
+                for (int i = 0; i < jsonObj["sede"].Length; i++)
                 {
                     idSedes.Add(int.Parse(jsonObj["sede"][i]["id"]));
                 }
@@ -139,7 +141,7 @@ namespace SifizPlanning.Controllers
 
             //Buscando los que se van a mostrar en cada caso
             List<int> colabSubordinados = new List<int>();
-            if(coordinados == false)
+            if (coordinados == false)
             {
                 colabSubordinados = (from cji in db.Colaborador_JefeInmediato
                                      where cji.SecuencialJefeInmediato == colaborador.Secuencial
@@ -242,12 +244,12 @@ namespace SifizPlanning.Controllers
                                     dSede = s.Descripcion.ToUpper(),
                                     url = f.Url
                                 }).ToList();
-            if(idSedes.Count() > 0)
+            if (idSedes.Count() > 0)
             {
                 trabajadores = trabajadores.Where(x => idSedes.Contains(x.idSede)).ToList();
             }
 
-            if(idColaboradores.Count() > 0)
+            if (idColaboradores.Count() > 0)
             {
                 trabajadores = trabajadores.Where(x => idColaboradores.Contains(x.id)).ToList();
                 datos = datos.Where(x => idColaboradores.Contains(x.idColaborador)).ToList();
@@ -286,17 +288,17 @@ namespace SifizPlanning.Controllers
             List<Object> tareasProgramadores = new List<Object>();
             Object trabUser = null;
             int cant = trabajadores.Count();
-            for(int i = 0; i < cant; i++)
+            for (int i = 0; i < cant; i++)
             {
                 int idTrabajador = trabajadores[i].id;
                 List<Object> tareasPorDia = new List<Object>();
                 int countTareas = 0;
-                for(int j = 0; j < 7 * semanas; j++)//son 7 Días los de la semana
+                for (int j = 0; j < 7 * semanas; j++)//son 7 Días los de la semana
                 {
                     DateTime fecha = lunes.AddDays(j);
                     DateTime fechaDespues = lunes.AddDays(j + 1);
 
-                    if(coordinados == false)
+                    if (coordinados == false)
                     {
                         List<DataTarea> tareas = new List<DataTarea>();
                         tareas = (from d in datos
@@ -362,19 +364,19 @@ namespace SifizPlanning.Controllers
                                      }).ToList<DataTarea>();
                         tareas.AddRange(lPermisos);
 
-                        if(idClientes.Count() > 0)
+                        if (idClientes.Count() > 0)
                         {
                             tareas = tareas.Where(x => idClientes.Contains(x.idCliente)).ToList();
                         }
-                        if(idEstados.Count() > 0)
+                        if (idEstados.Count() > 0)
                         {
                             tareas = tareas.Where(x => idEstados.Contains(x.idEstado)).ToList();
                         }
-                        if(idLugares.Count() > 0)
+                        if (idLugares.Count() > 0)
                         {
                             tareas = tareas.Where(x => idLugares.Contains(x.idLugar)).ToList();
                         }
-                        if(idModulos.Count() > 0)
+                        if (idModulos.Count() > 0)
                         {
                             tareas = tareas.Where(x => idModulos.Contains(x.idModulo)).ToList();
                         }
@@ -387,19 +389,19 @@ namespace SifizPlanning.Controllers
                         long diaSemana = (int)fecha.DayOfWeek;
                         int hayVacaciones = vacaciones.Where(x => x.idColaborador == idTrabajador &&
                                                         x.fecha == fecha).Count();
-                        if(hayVacaciones > 0)
+                        if (hayVacaciones > 0)
                         {
                             claseDia = "dia-vacaciones";
                         }
-                        else if(diasFeriados.Contains(fecha.Date))
+                        else if (diasFeriados.Contains(fecha.Date))
                         {
                             claseDia = "dia-feriado";
                         }
-                        else if(fecha == DateTime.Today)
+                        else if (fecha == DateTime.Today)
                         {
                             claseDia = "dia-hoy";
                         }
-                        else if(diaSemana == 0 || diaSemana == 6)
+                        else if (diaSemana == 0 || diaSemana == 6)
                         {
                             claseDia = "fin-semana";
                         }
@@ -479,19 +481,19 @@ namespace SifizPlanning.Controllers
                                      }).ToList<DataTarea>();
                         tareas.AddRange(lPermisos);
 
-                        if(idClientes.Count() > 0)
+                        if (idClientes.Count() > 0)
                         {
                             tareas = tareas.Where(x => idClientes.Contains(x.idCliente)).ToList();
                         }
-                        if(idEstados.Count() > 0)
+                        if (idEstados.Count() > 0)
                         {
                             tareas = tareas.Where(x => idEstados.Contains(x.idEstado)).ToList();
                         }
-                        if(idLugares.Count() > 0)
+                        if (idLugares.Count() > 0)
                         {
                             tareas = tareas.Where(x => idLugares.Contains(x.idLugar)).ToList();
                         }
-                        if(idModulos.Count() > 0)
+                        if (idModulos.Count() > 0)
                         {
                             tareas = tareas.Where(x => idModulos.Contains(x.idModulo)).ToList();
                         }
@@ -504,19 +506,19 @@ namespace SifizPlanning.Controllers
                         long diaSemana = (int)fecha.DayOfWeek;
                         int hayVacaciones = vacaciones.Where(x => x.idColaborador == idTrabajador &&
                                                         x.fecha == fecha).Count();
-                        if(hayVacaciones > 0)
+                        if (hayVacaciones > 0)
                         {
                             claseDia = "dia-vacaciones";
                         }
-                        else if(diasFeriados.Contains(fecha.Date))
+                        else if (diasFeriados.Contains(fecha.Date))
                         {
                             claseDia = "dia-feriado";
                         }
-                        else if(fecha == DateTime.Today)
+                        else if (fecha == DateTime.Today)
                         {
                             claseDia = "dia-hoy";
                         }
-                        else if(diaSemana == 0 || diaSemana == 6)
+                        else if (diaSemana == 0 || diaSemana == 6)
                         {
                             claseDia = "fin-semana";
                         }
@@ -531,7 +533,7 @@ namespace SifizPlanning.Controllers
                     }
                 }
 
-                if(json == "" || countTareas > 0 || idColaboradores.Contains(idTrabajador) || idSedes.Contains(trabajadores[i].idSede))
+                if (json == "" || countTareas > 0 || idColaboradores.Contains(idTrabajador) || idSedes.Contains(trabajadores[i].idSede))
                 {
                     var trab = new
                     {
@@ -539,7 +541,7 @@ namespace SifizPlanning.Controllers
                         tareasPorDia = tareasPorDia
                     };
 
-                    if(trab.trab.id == colaborador.Secuencial)//Es el usuario
+                    if (trab.trab.id == colaborador.Secuencial)//Es el usuario
                     {
                         trabUser = trab;
                     }
@@ -550,7 +552,7 @@ namespace SifizPlanning.Controllers
                 }
             }
 
-            if(trabUser != null)
+            if (trabUser != null)
                 tareasProgramadores.Insert(0, trabUser);//Se pone el colaborador de primero
 
             var resp = new
@@ -572,27 +574,27 @@ namespace SifizPlanning.Controllers
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 Tarea tarea = db.Tarea.FirstOrDefault(x => x.Secuencial == idTarea);
-                if(tarea == null)
+                if (tarea == null)
                 {
                     throw new Exception("No se encontró la tarea, contacte a soporte del sitio");
                 }
                 DateTime diaTarea = new System.DateTime(tarea.FechaInicio.Year, tarea.FechaInicio.Month, tarea.FechaInicio.Day);
                 DateTime fechaInicioTareas = diaTarea.AddMinutes(30 + (8 * 60));
 
-                if(tarea.FechaInicio.Date != DateTime.Now.Date)
+                if (tarea.FechaInicio.Date != DateTime.Now.Date)
                 {
-                    if(tarea.FechaInicio >= fechaInicioTareas)
+                    if (tarea.FechaInicio >= fechaInicioTareas)
                     {
                         throw new Exception("No puede modificar la tarea, no corresponde al día de hoy.");
                     }
                 }
 
-                if(estado == 3 && tarea.tareaActividadRealizada.Count() == 0)//Terminada
+                if (estado == 3 && tarea.tareaActividadRealizada.Count() == 0)//Terminada
                 {
                     throw new Exception("La tarea no se puede terminar puesto que no contiene actividades realizadas.");
                 }
                 Colaborador colab = user.persona.colaborador.FirstOrDefault();
-                if(tarea.SecuencialColaborador != colab.Secuencial)
+                if (tarea.SecuencialColaborador != colab.Secuencial)
                 {
                     throw new Exception("No puede actualizar tareas de otro colaborador");
                 }
@@ -610,11 +612,11 @@ namespace SifizPlanning.Controllers
 
                 db.SaveChanges();
 
-                if(estado == 3)//Terminado
+                if (estado == 3)//Terminado
                 {
                     /*Verificando si la tarea está relacionada a un ticket y si es la última de las tareas por terminar*/
                     TicketTarea ticketTarea = tarea.ticketTarea.FirstOrDefault();
-                    if(ticketTarea != null)//Aqui la tarea está asociada a un ticket
+                    if (ticketTarea != null)//Aqui la tarea está asociada a un ticket
                     {
                         int idTicket = ticketTarea.SecuencialTicket;
 
@@ -626,15 +628,15 @@ namespace SifizPlanning.Controllers
                                                   select (t.Secuencial)
                                                ).ToList().Count();
 
-                        if(cantNoTerminados == 0)//Todas las asignaciones están terminadas
+                        if (cantNoTerminados == 0)//Todas las asignaciones están terminadas
                         {
                             Ticket ticket = db.Ticket.Find(idTicket);
                             //Pasando el ticket de estado a Resuelto
 
-                            if(ticket.SecuencialEstadoTicket != 10)
+                            if (ticket.SecuencialEstadoTicket != 10)
                             {
                                 ticket.SecuencialEstadoTicket = 10;//EL TICKET ESTA RESUELTO
-                                if(!publicar)//Si se publica se queda el mismo estado del ticket
+                                if (!publicar)//Si se publica se queda el mismo estado del ticket
                                 {
                                     //Cambiando el estado del ticket                                    
                                     ticket.SecuencialProximaActividad = 17;//CERTIFICAR
@@ -714,17 +716,17 @@ namespace SifizPlanning.Controllers
                         }
                     }
                 }
-                else if(estado == 2)//Desarrollo
+                else if (estado == 2)//Desarrollo
                 {
                     /*Verificando si la tarea está relacionada a un ticket*/
                     TicketTarea ticketTarea = tarea.ticketTarea.FirstOrDefault();
-                    if(ticketTarea != null)//Aqui la tarea está asociada a un ticket
+                    if (ticketTarea != null)//Aqui la tarea está asociada a un ticket
                     {
                         int idTicket = ticketTarea.SecuencialTicket;
 
                         Ticket ticket = db.Ticket.Find(idTicket);
                         //Pasando el ticket de estado a EN DESARROLLO
-                        if(ticket.SecuencialEstadoTicket == 2)//SI ES IGUAL A ASIGNADO LO PASO A EN DESARROLLO
+                        if (ticket.SecuencialEstadoTicket == 2)//SI ES IGUAL A ASIGNADO LO PASO A EN DESARROLLO
                         {
                             //Cambiando el estado del ticket
                             ticket.SecuencialEstadoTicket = 9;//EL TICKET ESTA EN DESARROLLO
@@ -785,7 +787,7 @@ namespace SifizPlanning.Controllers
 
                             destinatarioCorreos.Insert(0, emailCliente);//Borrar aqui                
                             idColaboradoresTicket = idColaboradoresTicket.Distinct().ToList();
-                            foreach(int idColab in idColaboradoresTicket)
+                            foreach (int idColab in idColaboradoresTicket)
                             {
                                 Persona personaColaborador = db.Colaborador.Find(idColab).persona;
                                 string email = personaColaborador.usuario.FirstOrDefault().Email;
@@ -794,20 +796,20 @@ namespace SifizPlanning.Controllers
                             }
 
                             string textoEmail = "<div class=\"textoCuerpo\">Estimado: ";
-                            if(personaCliente.Sexo == "F")
+                            if (personaCliente.Sexo == "F")
                                 textoEmail = "<div class=\"textoCuerpo\">Estimada: ";
                             textoEmail += personaCliente.Nombre1 + " " + personaCliente.Apellido1 + ",<br/>";
 
                             string textoIngenieros = String.Join(", Ing. ", nombresColaboradores);
 
                             string articulo = "el";
-                            if(nombresColaboradores.Count > 1)
+                            if (nombresColaboradores.Count > 1)
                                 articulo = "los";
                             string pronombreRelativo = "quien";
-                            if(nombresColaboradores.Count > 1)
+                            if (nombresColaboradores.Count > 1)
                                 pronombreRelativo = "quienes";
                             string verboRelativo = "atenderá";
-                            if(nombresColaboradores.Count > 1)
+                            if (nombresColaboradores.Count > 1)
                                 verboRelativo = "atenderán";
 
                             textoEmail += @"Su requerimiento <b>" + string.Format("{0:000000}", ticket.Secuencial) + "</b> se está desarrollando por " + articulo + " Ing. " + textoIngenieros + ", " + pronombreRelativo + @" <br/>
@@ -838,17 +840,17 @@ namespace SifizPlanning.Controllers
                         }
                     }
                 }
-                else if(estado == 5)//EN PAUSA
+                else if (estado == 5)//EN PAUSA
                 {
                     /*Verificando si la tarea está relacionada a un ticket*/
                     TicketTarea ticketTarea = tarea.ticketTarea.FirstOrDefault();
-                    if(ticketTarea != null)//Aqui la tarea está asociada a un ticket
+                    if (ticketTarea != null)//Aqui la tarea está asociada a un ticket
                     {
                         int idTicket = ticketTarea.SecuencialTicket;
 
                         Ticket ticket = db.Ticket.Find(idTicket);
                         //Pasando el ticket de estado a SUSPENDIDO
-                        if(ticket.SecuencialEstadoTicket != 20)//SI EL TICKET NO ESTA SUSPENDIDO
+                        if (ticket.SecuencialEstadoTicket != 20)//SI EL TICKET NO ESTA SUSPENDIDO
                         {
                             //Cambiando el estado del ticket
                             ticket.SecuencialEstadoTicket = 20;//EL TICKET ESTA EN SUSPENDIDO
@@ -899,7 +901,7 @@ namespace SifizPlanning.Controllers
                                                          ).Distinct().ToList();
 
                             idColaboradoresTicket = idColaboradoresTicket.Distinct().ToList();
-                            foreach(int idColab in idColaboradoresTicket)
+                            foreach (int idColab in idColaboradoresTicket)
                             {
                                 Persona personaColaborador = db.Colaborador.Find(idColab).persona;
                                 string email = personaColaborador.usuario.FirstOrDefault().Email;
@@ -911,7 +913,7 @@ namespace SifizPlanning.Controllers
                             string textoIngenieros = String.Join(", Ing. ", nombresColaboradores);
 
                             string articulo = "el";
-                            if(nombresColaboradores.Count > 1)
+                            if (nombresColaboradores.Count > 1)
                                 articulo = "los";
 
                             textoEmail += @"El requerimiento <b>" + string.Format("{0:000000}", ticket.Secuencial) + "</b> que se estaba desarrollando por " + articulo + " Ing. " + textoIngenieros + @". <br/>
@@ -950,7 +952,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(result);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var result = new
                 {
@@ -971,30 +973,30 @@ namespace SifizPlanning.Controllers
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 Tarea tarea = db.Tarea.FirstOrDefault(x => x.Secuencial == idTarea);
-                if(tarea == null)
+                if (tarea == null)
                 {
                     throw new Exception("No se encontró la tarea, contacte a soporte del sitio");
                 }
                 DateTime diaTarea = new System.DateTime(tarea.FechaInicio.Year, tarea.FechaInicio.Month, tarea.FechaInicio.Day);
                 DateTime fechaInicioTareas = diaTarea.AddMinutes(30 + (8 * 60));
-                if(tarea.FechaInicio.Date != DateTime.Today)
+                if (tarea.FechaInicio.Date != DateTime.Today)
                 {
-                    if(tarea.FechaInicio >= fechaInicioTareas)
+                    if (tarea.FechaInicio >= fechaInicioTareas)
                         throw new Exception("La tarea no se puede cambiar de estado, no es del día de hoy.");
                 }
-                if(estado == 3 && tarea.tareaActividadRealizada.Count() == 0)//Terminada
+                if (estado == 3 && tarea.tareaActividadRealizada.Count() == 0)//Terminada
                 {
                     throw new Exception("La tarea no se puede terminar puesto que no contiene actividades realizadas.");
                 }
                 Colaborador colab = user.persona.colaborador.FirstOrDefault();
-                if(tarea.SecuencialColaborador != colab.Secuencial)
+                if (tarea.SecuencialColaborador != colab.Secuencial)
                 {
                     throw new Exception("No puede actualizar tareas de otro colaborador");
                 }
 
                 /*Verificando si la tarea está relacionada a un ticket y si es la última de las tareas por terminar*/
                 TicketTarea ticketTarea = tarea.ticketTarea.FirstOrDefault();
-                if(ticketTarea != null)//Aqui la tarea está asociada a un ticket
+                if (ticketTarea != null)//Aqui la tarea está asociada a un ticket
                 {
                     int idTicket = ticketTarea.SecuencialTicket;
 
@@ -1007,7 +1009,7 @@ namespace SifizPlanning.Controllers
                                             select (t.Secuencial)
                                             ).ToList().Count();
 
-                    if(cantNoTerminados == 1)//Todas las asignaciones están terminadas excepto esta
+                    if (cantNoTerminados == 1)//Todas las asignaciones están terminadas excepto esta
                     {
                         var result = new
                         {
@@ -1018,7 +1020,7 @@ namespace SifizPlanning.Controllers
                         return Json(result);
                     }
                 }
-                else if(tarea.entregableMotivoTrabajo != null)
+                else if (tarea.entregableMotivoTrabajo != null)
                 {/*VERIFICANDO SI LA TAREA PERTENECE A UN CONJUNTO DE MOTIVO DE TRABAJO*/
 
                     int secuencialEntregableMotivoTrabajo = tarea.entregableMotivoTrabajo.Secuencial;
@@ -1029,7 +1031,7 @@ namespace SifizPlanning.Controllers
                                                   t.FechaInicio >= fechaHoy
                                             select (t.Secuencial)
                                             ).ToList().Count();
-                    if(cantNoTerminados == 1)//Todas las asignaciones están terminadas excepto esta
+                    if (cantNoTerminados == 1)//Todas las asignaciones están terminadas excepto esta
                     {
                         var result = new
                         {
@@ -1048,7 +1050,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(result1);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var result = new
                 {
@@ -1073,23 +1075,23 @@ namespace SifizPlanning.Controllers
 
                 Tarea tarea = db.Tarea.Find(idTarea);
                 Ticket ticket = tarea.ticketTarea.FirstOrDefault().ticket;
-                if(ticket == null)
+                if (ticket == null)
                 {
                     throw new Exception("Error, no se encontró el ticket");
                 }
                 int idTicket = ticket.Secuencial;
                 TicketHistorico ticketHistorico = db.TicketHistorico.Where(x => x.SecuencialTicket == idTicket)
                                                     .OrderByDescending(x => x.Version).FirstOrDefault();
-                if(ticketHistorico == null)
+                if (ticketHistorico == null)
                 {
                     throw new Exception("Error, no se encontró el ticket histórico");
                 }
 
                 //Por los ficheros adjuntos
-                if(adjuntos != null)
-                    foreach(HttpPostedFileBase adj in adjuntos)
+                if (adjuntos != null)
+                    foreach (HttpPostedFileBase adj in adjuntos)
                     {
-                        if(adj != null)
+                        if (adj != null)
                         {
                             string extFile = Path.GetExtension(adj.FileName);
                             string newNameFile = "tec_" + System.IO.Path.GetRandomFileName() + extFile;
@@ -1109,10 +1111,10 @@ namespace SifizPlanning.Controllers
                         }
                     }
 
-                if(publicar)
+                if (publicar)
                 {
                     Ticket_RequierePublicacion ticketRQ = db.Ticket_RequierePublicacion.Find(ticket.Secuencial);
-                    if(ticketRQ == null)
+                    if (ticketRQ == null)
                     {
                         ticketRQ = new Ticket_RequierePublicacion
                         {
@@ -1122,7 +1124,7 @@ namespace SifizPlanning.Controllers
                     }
 
                     bool financial25 = false;
-                    if(ticket.SecuencialTicketVersionCliente != null)
+                    if (ticket.SecuencialTicketVersionCliente != null)
                     {
                         financial25 = db.TicketVersionCliente.Find(ticket.SecuencialTicketVersionCliente).Codigo == "FBS 2.5";
                     }
@@ -1141,7 +1143,7 @@ namespace SifizPlanning.Controllers
                     List<string> correosDestinos = new List<string>();
                     correosDestinos.Add(emailCliente);
                     correosDestinos.Add(emailUser);
-                    if(financial25)
+                    if (financial25)
                     {
                         correosDestinos.Add("publicacionesdoscinco@sifizsoft.com");
                     }
@@ -1181,7 +1183,7 @@ namespace SifizPlanning.Controllers
                     db.SaveChanges();
 
                     //Adicionando los adjuntos
-                    foreach(string url in listaFicheros)
+                    foreach (string url in listaFicheros)
                     {
                         HistoricoAdjunto historicoAdjunto = new HistoricoAdjunto();
                         historicoAdjunto.historicoInformacionTicket = historicoCorreoTicket;
@@ -1193,7 +1195,7 @@ namespace SifizPlanning.Controllers
                 else
                 {
                     Ticket_RequierePublicacion ticketRQ = db.Ticket_RequierePublicacion.Find(ticket.Secuencial);
-                    if(ticketRQ != null)
+                    if (ticketRQ != null)
                     {
                         db.Ticket_RequierePublicacion.Remove(ticketRQ);
                     }
@@ -1271,7 +1273,7 @@ namespace SifizPlanning.Controllers
                     db.SaveChanges();
 
                     //Adicionando los adjuntos
-                    foreach(string url in listaFicheros)
+                    foreach (string url in listaFicheros)
                     {
                         HistoricoAdjunto historicoAdjunto = new HistoricoAdjunto();
                         historicoAdjunto.historicoInformacionTicket = historicoCorreoTicket;
@@ -1287,7 +1289,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(result);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var result = new
                 {
@@ -1308,7 +1310,7 @@ namespace SifizPlanning.Controllers
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 Tarea tarea = db.Tarea.Find(idTarea);
-                if(tarea == null)
+                if (tarea == null)
                 {
                     throw new Exception("No se encontró la tarea");
                 }
@@ -1329,7 +1331,7 @@ namespace SifizPlanning.Controllers
                 {
                     ticket = tarea.ticketTarea.FirstOrDefault().ticket;
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     throw new Exception("No se encontró el ticket, asociado a la tarea.");
                 }
@@ -1397,7 +1399,7 @@ namespace SifizPlanning.Controllers
                                              ).Distinct().ToList();
 
                 idColaboradoresTicket = idColaboradoresTicket.Distinct().ToList();
-                foreach(int idColab in idColaboradoresTicket)
+                foreach (int idColab in idColaboradoresTicket)
                 {
                     Persona personaColaborador = db.Colaborador.Find(idColab).persona;
                     string email = personaColaborador.usuario.FirstOrDefault().Email;
@@ -1411,10 +1413,10 @@ namespace SifizPlanning.Controllers
                 string textoIngenieros = String.Join(", ", nombresColaboradores);
 
                 string articulo = "El desarrollador ( ";
-                if(nombresColaboradores.Count > 1)
+                if (nombresColaboradores.Count > 1)
                     articulo = "Los desarrolladores ( ";
                 string pronombreRelativo = "expone";
-                if(nombresColaboradores.Count > 1)
+                if (nombresColaboradores.Count > 1)
                     pronombreRelativo = "exponen";
 
                 textoEmail += articulo + textoIngenieros + " ) " + pronombreRelativo + " lo siguiente: <br/>";
@@ -1448,7 +1450,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -1467,13 +1469,13 @@ namespace SifizPlanning.Controllers
             try
             {
                 Tarea tarea = db.Tarea.Find(idTarea);
-                if(tarea == null)
+                if (tarea == null)
                     throw new Exception("No se encontró la tarea");
 
                 bool edicion = true;
-                if(!User.IsInRole("ADMIN"))
+                if (!User.IsInRole("ADMIN"))
                 {
-                    if(tarea.FechaInicio.Date != DateTime.Now.Date)
+                    if (tarea.FechaInicio.Date != DateTime.Now.Date)
                         edicion = false;
                     //throw new Exception("No puede modificar la tarea, no corresponde al día de hoy.");
                 }
@@ -1497,7 +1499,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -1518,7 +1520,7 @@ namespace SifizPlanning.Controllers
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 Tarea tarea = db.Tarea.Find(idTarea);
-                if(tarea == null)
+                if (tarea == null)
                 {
                     throw new Exception("No se encontró la tarea");
                 }
@@ -1554,7 +1556,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -1572,16 +1574,16 @@ namespace SifizPlanning.Controllers
             try
             {
                 Tarea tar = db.Tarea.Find(idTarea);
-                if(tar == null)
+                if (tar == null)
                 {
                     throw new Exception("No se encontró la tarea, contacte el admin del sistema");
                 }
 
                 DateTime diaTarea = new System.DateTime(tar.FechaInicio.Year, tar.FechaInicio.Month, tar.FechaInicio.Day);
                 DateTime fechaInicioTareas = diaTarea.AddMinutes(30 + (8 * 60));
-                if(tar.FechaInicio.Date != DateTime.Today)
+                if (tar.FechaInicio.Date != DateTime.Today)
                 {
-                    if(tar.FechaInicio >= fechaInicioTareas)
+                    if (tar.FechaInicio >= fechaInicioTareas)
                         throw new Exception("No puede ingresar actividades porque la tarea no es del día de hoy.");
                 }
 
@@ -1602,16 +1604,16 @@ namespace SifizPlanning.Controllers
 
                 //Verificaciones de 2 dias
                 int cantDias = 1;
-                if((int)tar.FechaInicio.Date.DayOfWeek == 1)//Si es lunes dejar hasta el viernes
+                if ((int)tar.FechaInicio.Date.DayOfWeek == 1)//Si es lunes dejar hasta el viernes
                 {
                     cantDias = 3;
                 }
                 DateTime diaAnterior = tar.FechaInicio.Date.AddDays(-1 * cantDias);
-                if(fechaActividad < diaAnterior)
+                if (fechaActividad < diaAnterior)
                 {
                     throw new Exception("La actividad no se puede entrar al sistema, la fecha es anterior a " + cantDias + " días atrás.");
                 }
-                if(horaFinActividad < horaInicioActividad)
+                if (horaFinActividad < horaInicioActividad)
                 {
                     throw new Exception("La actividad no se puede entrar al sistema, la hora final es menor que la hora inicial.");
                 }
@@ -1619,9 +1621,9 @@ namespace SifizPlanning.Controllers
                 //Verificando que las horas ya hayan ocurrido, si es del mismo usuario
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
-                if(tar.colaborador.Secuencial == user.persona.colaborador.FirstOrDefault().Secuencial)
+                if (tar.colaborador.Secuencial == user.persona.colaborador.FirstOrDefault().Secuencial)
                 {
-                    if(horaFinActividad > DateTime.Now || horaInicioActividad > DateTime.Now)
+                    if (horaFinActividad > DateTime.Now || horaInicioActividad > DateTime.Now)
                     {
                         throw new Exception("La actividad no se puede entrar al sistema, las horas de inicio y final son mayores que la hora actual.");
                     }
@@ -1636,7 +1638,7 @@ namespace SifizPlanning.Controllers
                                     (act.HoraInicio <= horaInicioActividad && act.HoraFin >= horaFinActividad)
                                   )
                             select act.Secuencial).Count();
-                if(cant > 0)
+                if (cant > 0)
                 {
                     throw new Exception("No puede adicionar la actividad, ya que las horas de esta se solapan con las de otra actividad.");
                 }
@@ -1656,7 +1658,7 @@ namespace SifizPlanning.Controllers
 
                 int minutosUtilizados = 0;
                 var actividadesRealizadas = tar.tareaActividadRealizada.ToList();
-                foreach(var actividad in actividadesRealizadas)
+                foreach (var actividad in actividadesRealizadas)
                 {
                     TimeSpan tiempo = actividad.HoraFin - actividad.HoraInicio;
                     minutosUtilizados += (int)tiempo.TotalMinutes;
@@ -1678,12 +1680,12 @@ namespace SifizPlanning.Controllers
                                         }).ToList();
 
                 List<object> actividadesListTarea = new List<object>();
-                foreach(var act in actividadesTarea)
+                foreach (var act in actividadesTarea)
                 {
                     int horas = (int)(act.horaFin - act.horaInicio).Hours;
                     int minutos = (int)(act.horaFin - act.horaInicio).Minutes;
                     string strMin = minutos.ToString();
-                    if(minutos < 10)
+                    if (minutos < 10)
                         strMin = "0" + strMin;
                     string time = horas + ":" + strMin;
 
@@ -1704,7 +1706,7 @@ namespace SifizPlanning.Controllers
                 int horasTarea = minutosTarea / 60;
                 int minutosRestaTarea = minutosTarea % 60;
                 string strMinutosRestaTarea = minutosRestaTarea.ToString();
-                if(minutosRestaTarea < 10)
+                if (minutosRestaTarea < 10)
                     strMinutosRestaTarea = "0" + strMinutosRestaTarea;
 
                 var resp = new
@@ -1715,7 +1717,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -1733,7 +1735,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 var actividadTarea = db.TareaActividadRealizada.Find(idActividadTarea);
-                if(actividadTarea == null)
+                if (actividadTarea == null)
                     throw new Exception("No se encontró la actividad");
                 Tarea tar = actividadTarea.tarea;
 
@@ -1745,16 +1747,16 @@ namespace SifizPlanning.Controllers
 
                 //Verificaciones de 2 dias
                 int cantDias = 1;
-                if((int)DateTime.Today.DayOfWeek == 1)//Si es lunes dejar hasta el viernes
+                if ((int)DateTime.Today.DayOfWeek == 1)//Si es lunes dejar hasta el viernes
                 {
                     cantDias = 3;
                 }
                 DateTime diaAnterior = DateTime.Today.AddDays(-1 * cantDias);
-                if(diaActividad < diaAnterior)
+                if (diaActividad < diaAnterior)
                 {
                     throw new Exception("La actividad no se puede entrar al sistema, la fecha es anterior a " + cantDias + " días atrás.");
                 }
-                if(dateHoraFin < dateHoraInicio)
+                if (dateHoraFin < dateHoraInicio)
                 {
                     throw new Exception("La actividad no se puede entrar al sistema, la hora final es menor que la hora inicial.");
                 }
@@ -1762,9 +1764,9 @@ namespace SifizPlanning.Controllers
                 //Verificando que las horas ya hayan ocurrido, si es del mismo usuario
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
-                if(tar.colaborador.Secuencial == user.persona.colaborador.FirstOrDefault().Secuencial)
+                if (tar.colaborador.Secuencial == user.persona.colaborador.FirstOrDefault().Secuencial)
                 {
-                    if(dateHoraFin > DateTime.Now || dateHoraInicio > DateTime.Now)
+                    if (dateHoraFin > DateTime.Now || dateHoraInicio > DateTime.Now)
                     {
                         throw new Exception("La actividad no se puede entrar al sistema, las horas de inicio y final son mayores que la hora actual.");
                     }
@@ -1780,7 +1782,7 @@ namespace SifizPlanning.Controllers
                                     (act.HoraInicio <= dateHoraInicio && act.HoraFin >= dateHoraFin)
                                   )
                             select act.Secuencial).Count();
-                if(cant > 0)
+                if (cant > 0)
                 {
                     throw new Exception("No puede adicionar la actividad, ya que las horas de esta se solapan con las de otra actividad.");
                 }
@@ -1793,7 +1795,7 @@ namespace SifizPlanning.Controllers
                 int minutosUtilizados = 0;
 
                 var actividadesRealizadas = tar.tareaActividadRealizada.ToList();
-                foreach(var actividad in actividadesRealizadas)
+                foreach (var actividad in actividadesRealizadas)
                 {
                     TimeSpan tiempo = actividad.HoraFin - actividad.HoraInicio;
                     minutosUtilizados += (int)tiempo.TotalMinutes;
@@ -1815,12 +1817,12 @@ namespace SifizPlanning.Controllers
                                         }).ToList();
 
                 List<object> actividadesListTarea = new List<object>();
-                foreach(var act in actividadesTarea)
+                foreach (var act in actividadesTarea)
                 {
                     int horas = (int)(act.horaFin - act.horaInicio).Hours;
                     int minutos = (int)(act.horaFin - act.horaInicio).Minutes;
                     string strMin = minutos.ToString();
-                    if(minutos < 10)
+                    if (minutos < 10)
                         strMin = "0" + strMin;
                     string time = horas + ":" + strMin;
 
@@ -1841,7 +1843,7 @@ namespace SifizPlanning.Controllers
                 int horasTarea = minutosTarea / 60;
                 int minutosRestaTarea = minutosTarea % 60;
                 string strMinutosRestaTarea = minutosRestaTarea.ToString();
-                if(minutosRestaTarea < 10)
+                if (minutosRestaTarea < 10)
                     strMinutosRestaTarea = "0" + strMinutosRestaTarea;
 
                 var resp = new
@@ -1853,7 +1855,7 @@ namespace SifizPlanning.Controllers
 
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -1875,7 +1877,7 @@ namespace SifizPlanning.Controllers
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
                 bool tareaPropia = false;//Para saber si la tarea es propia o de un subordinado o coordinado
-                if(tar.colaborador.Secuencial == user.persona.colaborador.FirstOrDefault().Secuencial)
+                if (tar.colaborador.Secuencial == user.persona.colaborador.FirstOrDefault().Secuencial)
                 {
                     tareaPropia = true;
                 }
@@ -1893,12 +1895,12 @@ namespace SifizPlanning.Controllers
                                         }).ToList();
 
                 List<object> actividadesListTarea = new List<object>();
-                foreach(var act in actividadesTarea)
+                foreach (var act in actividadesTarea)
                 {
                     int horas = (int)(act.horaFin - act.horaInicio).Hours;
                     int minutos = (int)(act.horaFin - act.horaInicio).Minutes;
                     string strMin = minutos.ToString();
-                    if(minutos < 10)
+                    if (minutos < 10)
                         strMin = "0" + strMin;
                     string time = horas + ":" + strMin;
 
@@ -1919,7 +1921,7 @@ namespace SifizPlanning.Controllers
                 int horasTarea = minutosTarea / 60;
                 int minutosRestaTarea = minutosTarea % 60;
                 string strMinutosRestaTarea = minutosRestaTarea.ToString();
-                if(minutosRestaTarea < 10)
+                if (minutosRestaTarea < 10)
                     strMinutosRestaTarea = "0" + strMinutosRestaTarea;
 
                 var resp = new
@@ -1931,7 +1933,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -1949,7 +1951,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 TareaActividadRealizada tarActividadRealizada = db.TareaActividadRealizada.Find(idActividadTarea);
-                if(tarActividadRealizada == null)
+                if (tarActividadRealizada == null)
                 {
                     throw new Exception("No se encontré la actividad en la Tarea");
                 }
@@ -1959,7 +1961,7 @@ namespace SifizPlanning.Controllers
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
                 Persona persona = user.persona;
 
-                if(tarActividadRealizada.SecuencialUsuario != user.Secuencial)
+                if (tarActividadRealizada.SecuencialUsuario != user.Secuencial)
                 {
                     Persona personaActividadRealizada = tarActividadRealizada.usuario.persona;
                     string mensaje = "Solo el usuario " + personaActividadRealizada.Nombre1 + " " + personaActividadRealizada.Apellido1 + " puede eliminar la actividad, porque fue quien la creó.";
@@ -1970,11 +1972,11 @@ namespace SifizPlanning.Controllers
                 var cant = (from c in comentarios
                             where c.SecuencialUsuario != user.Secuencial
                             select c).Count();
-                if(cant > 0)
+                if (cant > 0)
                 {
                     throw new Exception("No puede eliminar la tarea porque tiene comentarios no realizados por usted.");
                 }
-                foreach(ComentarioTarea c in comentarios)
+                foreach (ComentarioTarea c in comentarios)
                 {
                     db.ComentarioTarea.Remove(c);
                 }
@@ -1984,7 +1986,7 @@ namespace SifizPlanning.Controllers
 
                 int minutosUtilizados = 0;
                 var actividadesRealizadas = tar.tareaActividadRealizada.ToList();
-                foreach(var actividad in actividadesRealizadas)
+                foreach (var actividad in actividadesRealizadas)
                 {
                     TimeSpan tiempo = actividad.HoraFin - actividad.HoraInicio;
                     minutosUtilizados += (int)tiempo.TotalMinutes;
@@ -1998,7 +2000,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -2016,7 +2018,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 DateTime lunes = DateTime.Today;
-                if(fechaLunes != "")
+                if (fechaLunes != "")
                 {
                     string[] fechas = fechaLunes.Split(new Char[] { '/' });
                     int dia = Int32.Parse(fechas[0]);
@@ -2028,7 +2030,7 @@ namespace SifizPlanning.Controllers
                 {
                     DateTime hoy = DateTime.Today;
                     DayOfWeek diaSemana = hoy.DayOfWeek;
-                    if((int)diaSemana == 0)//Domingo
+                    if ((int)diaSemana == 0)//Domingo
                     {
                         lunes = hoy.AddDays(-6);
                     }
@@ -2080,7 +2082,7 @@ namespace SifizPlanning.Controllers
                                    }).FirstOrDefault();
 
                 List<object> datosFormateados = new List<object>();
-                foreach(var dato in datos)
+                foreach (var dato in datos)
                 {
                     string[] arrayString = dato.email.Split(new Char[] { '@' });
                     string login = arrayString[0];
@@ -2111,7 +2113,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -2171,7 +2173,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -2194,7 +2196,7 @@ r in db.Rol on ur.rol equals r
                 Colaborador colaborador = db.Colaborador.FirstOrDefault(x => x.persona.Secuencial == persona.Secuencial);
 
                 SolicitudVacaciones solVacaciones = new SolicitudVacaciones();
-                if(solicitud.ID == null)
+                if (solicitud.ID == null)
                 {
                     solVacaciones.AlAnio = solicitud.AlAnio;
                     solVacaciones.FechaInicioVacaciones = solicitud.FechaInicioVacaciones;
@@ -2218,13 +2220,13 @@ r in db.Rol on ur.rol equals r
                     solVacaciones = db.SolicitudVacaciones.Find(solicitud.ID);
                 }
 
-                if(solicitud.Estado != null)
+                if (solicitud.Estado != null)
                 {
                     solVacaciones.Estado = solicitud.Estado == "APROBADA" ? 1 : 0;
                 }
 
                 List<string> emails = new List<string>();
-                if(solicitud.ID == null)
+                if (solicitud.ID == null)
                 {
                     db.SolicitudVacaciones.Add(solVacaciones);
                     //emails.AddRange(Utiles.CorreoPorGrupoEmail("RRHH"));
@@ -2244,14 +2246,14 @@ r in db.Rol on ur.rol equals r
 
                     DateTime fechaDesde = solVacaciones.FechaInicioVacaciones;
                     DateTime fechaHasta = solVacaciones.FechaFinVacaciones;
-                    if(solicitud.Estado == "APROBADA")
+                    if (solicitud.Estado == "APROBADA")
                     {
-                        if(fechaDesde > fechaHasta)
+                        if (fechaDesde > fechaHasta)
                         {
                             throw new Exception("Error, la fecha de fin no debe ser menor a la fecha de inicio.");
                         }
 
-                        while(fechaDesde <= fechaHasta)
+                        while (fechaDesde <= fechaHasta)
                         {
                             Vacaciones diaVacaciones = new Vacaciones
                             {
@@ -2276,24 +2278,24 @@ r in db.Rol on ur.rol equals r
 
                         Utiles.EnviarEmailSistema(emails.ToArray(), textoHtml, "Vacaciones Aprobadas");
                     }
-                    else if(solicitud.Estado == "RECHAZADA")
+                    else if (solicitud.Estado == "RECHAZADA")
                     {
-                        if(fechaDesde > fechaHasta)
+                        if (fechaDesde > fechaHasta)
                         {
                             throw new Exception("Error, la fecha de fin no debe ser menor a la fecha de inicio.");
                         }
 
-                        while(fechaDesde <= fechaHasta)
+                        while (fechaDesde <= fechaHasta)
                         {
                             Vacaciones vaca = db.Vacaciones.Where(x => x.SecuencialColaborador == col.Secuencial && x.Fecha == fechaDesde).FirstOrDefault();
                             db.Vacaciones.Remove(vaca);
                             fechaDesde = fechaDesde.AddDays(1);
                         }
 
-						//emails.AddRange(Utiles.CorreoPorGrupoEmail("RRHH"));
-						//emails.Add(emailUser);
-						emails.Add(per.usuario.First().Email);
-						emails.Add("galvarez@sifizsoft.com"); emails.Add("asistenterrhh@sifizsoft.com");
+                        //emails.AddRange(Utiles.CorreoPorGrupoEmail("RRHH"));
+                        //emails.Add(emailUser);
+                        emails.Add(per.usuario.First().Email);
+                        emails.Add("galvarez@sifizsoft.com"); emails.Add("asistenterrhh@sifizsoft.com");
 
                         string textoHtml = "<div class=\"textoCuerpo\">Se ha rechazado la solicitud de vacaciones.<br/>";
                         textoHtml += "Solicitada por: <b>" + solVacaciones.ApellidosNombres + "</b><br/>";
@@ -2312,7 +2314,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -2335,7 +2337,7 @@ r in db.Rol on ur.rol equals r
                 Colaborador colaborador = db.Colaborador.FirstOrDefault(x => x.persona.Secuencial == persona.Secuencial);
 
                 SolicitudPermisos solPermisos = new SolicitudPermisos();
-                if(solicitud.ID == null)
+                if (solicitud.ID == null)
                 {
                     solPermisos.ApellidosNombres = persona.Nombre1 + " " + persona.Apellido1;
                     solPermisos.Area = solicitud.Area;
@@ -2360,13 +2362,13 @@ r in db.Rol on ur.rol equals r
                     solPermisos = db.SolicitudPermisos.Find(solicitud.ID);
                 }
 
-                if(solicitud.Estado != null)
+                if (solicitud.Estado != null)
                 {
                     solPermisos.Estado = solicitud.Estado == "APROBADA" ? 1 : 0;
                 }
 
                 List<string> emails = new List<string>();
-                if(solicitud.ID == null)
+                if (solicitud.ID == null)
                 {
                     db.SolicitudPermisos.Add(solPermisos);
                     //emails.AddRange(Utiles.CorreoPorGrupoEmail("RRHH"));
@@ -2389,9 +2391,9 @@ r in db.Rol on ur.rol equals r
                     fechaDesde = fechaDesde.AddMinutes(solPermisos.HoraSalida.TotalMinutes);
                     fechaHasta = fechaHasta.AddMinutes(solPermisos.HoraRetorno.TotalMinutes);
 
-                    if(solicitud.Estado == "APROBADA")
+                    if (solicitud.Estado == "APROBADA")
                     {
-                        if(fechaHasta <= fechaDesde)
+                        if (fechaHasta <= fechaDesde)
                         {
                             throw new Exception("Error, la fecha de inicio del permiso debe ser menor que la fecha fin del permiso");
                         }
@@ -2406,7 +2408,7 @@ r in db.Rol on ur.rol equals r
                                            p.SecuencialColaborador == col.Secuencial
                                     select p).Count();
 
-                        if(cant > 1)
+                        if (cant > 1)
                         {
                             throw new Exception("Error, las fechas de este permiso se solapan con las de otro");
                         }
@@ -2425,10 +2427,10 @@ r in db.Rol on ur.rol equals r
                         db.Permiso.Add(permiso);
                         db.SaveChanges();
 
-						//emails.AddRange(Utiles.CorreoPorGrupoEmail("RRHH"));
-						//emails.Add(emailUser);
-						emails.Add(per.usuario.First().Email);
-						emails.Add("galvarez@sifizsoft.com"); emails.Add("asistenterrhh@sifizsoft.com");
+                        //emails.AddRange(Utiles.CorreoPorGrupoEmail("RRHH"));
+                        //emails.Add(emailUser);
+                        emails.Add(per.usuario.First().Email);
+                        emails.Add("galvarez@sifizsoft.com"); emails.Add("asistenterrhh@sifizsoft.com");
 
                         string textoHtml = "<div class=\"textoCuerpo\">Se ha aprobado la solicitud de permiso.<br/>";
                         textoHtml += "Solicitada por: <b>" + solPermisos.ApellidosNombres + "</b><br/>";
@@ -2436,9 +2438,9 @@ r in db.Rol on ur.rol equals r
 
                         Utiles.EnviarEmailSistema(emails.ToArray(), textoHtml, "Permiso Aprobado");
                     }
-                    else if(solicitud.Estado == "RECHAZADA")
+                    else if (solicitud.Estado == "RECHAZADA")
                     {
-                        if(fechaHasta <= fechaDesde)
+                        if (fechaHasta <= fechaDesde)
                         {
                             throw new Exception("Error, la fecha de inicio del permiso debe ser menor que la fecha fin del permiso");
                         }
@@ -2453,16 +2455,16 @@ r in db.Rol on ur.rol equals r
                             s.Motivo == solPermisos.Motivo
                         ).First();
 
-                        if(permiso != null)
+                        if (permiso != null)
                         {
                             db.Permiso.Remove(permiso);
                             db.SaveChanges();
                         }
 
-						//emails.AddRange(Utiles.CorreoPorGrupoEmail("RRHH"));
-						//emails.Add(emailUser);
-						emails.Add(per.usuario.First().Email);
-						emails.Add("galvarez@sifizsoft.com"); emails.Add("asistenterrhh@sifizsoft.com");
+                        //emails.AddRange(Utiles.CorreoPorGrupoEmail("RRHH"));
+                        //emails.Add(emailUser);
+                        emails.Add(per.usuario.First().Email);
+                        emails.Add("galvarez@sifizsoft.com"); emails.Add("asistenterrhh@sifizsoft.com");
 
                         string textoHtml = "<div class=\"textoCuerpo\">Se ha rechazado la solicitud de permiso.<br/>";
                         textoHtml += "Solicitada por: <b>" + solPermisos.ApellidosNombres + "</b><br/>";
@@ -2482,7 +2484,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -2500,7 +2502,7 @@ r in db.Rol on ur.rol equals r
             try
             {
                 TareaActividadRealizada tareaActividad = db.TareaActividadRealizada.Find(idActividad);
-                if(tareaActividad == null)
+                if (tareaActividad == null)
                 {
                     throw new Exception("Actividad no encontrada.");
                 }
@@ -2525,7 +2527,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -2543,16 +2545,16 @@ r in db.Rol on ur.rol equals r
             try
             {
                 TareaActividadRealizada tareaActividad = db.TareaActividadRealizada.Find(idActividad);
-                if(tareaActividad == null)
+                if (tareaActividad == null)
                 {
                     throw new Exception("No se encontró la actividad.");
                 }
 
                 DateTime diaTarea = new System.DateTime(tareaActividad.tarea.FechaInicio.Year, tareaActividad.tarea.FechaInicio.Month, tareaActividad.tarea.FechaInicio.Day);
                 DateTime fechaInicioTareas = diaTarea.AddMinutes(30 + (8 * 60));
-                if(tareaActividad.tarea.FechaInicio.Date != DateTime.Today)
+                if (tareaActividad.tarea.FechaInicio.Date != DateTime.Today)
                 {
-                    if(tareaActividad.tarea.FechaInicio.Date >= fechaInicioTareas)
+                    if (tareaActividad.tarea.FechaInicio.Date >= fechaInicioTareas)
                         throw new Exception("La tarea no pertenece al día de hoy, no puede adicionar comentarios.");
                 }
 
@@ -2572,12 +2574,12 @@ r in db.Rol on ur.rol equals r
 
                 string textoComentarioGeneral = "<b>TAREA</b>-Cliente: <b>" + tareaActividad.tarea.cliente.Descripcion + "</b>, Actividad: <b>" + tareaActividad.actividadRealizada.Descripcion + "</b>, ";
 
-                if(tareaActividad.tarea.ticketTarea.Count > 0)
+                if (tareaActividad.tarea.ticketTarea.Count > 0)
                 {
                     textoComentarioGeneral += "Ticket: <b>" + string.Format("{0:000000}", tareaActividad.tarea.ticketTarea.First().ticket.Secuencial) + "</b>, ";
                 }
 
-                if(tareaActividad.tarea.entregableMotivoTrabajo != null)
+                if (tareaActividad.tarea.entregableMotivoTrabajo != null)
                 {
                     textoComentarioGeneral += "Motivo de Trabajo: ";
                     textoComentarioGeneral += "<b>" + tareaActividad.tarea.entregableMotivoTrabajo.motivoTrabajo.Descripcion + "</b>, ";
@@ -2597,7 +2599,7 @@ r in db.Rol on ur.rol equals r
 
                 //Llamar el signalR
                 Websocket.getInstance().NuevosComentarios();
-                if(importancia.ToLower() == "muy importante")
+                if (importancia.ToLower() == "muy importante")
                     Websocket.getInstance().NuevoComentarioMuyImportante();
 
                 List<object> comentarios = (from c in db.ComentarioTarea
@@ -2621,7 +2623,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -2639,7 +2641,7 @@ r in db.Rol on ur.rol equals r
             try
             {
                 ComentarioTarea comentario = db.ComentarioTarea.Find(idComentario);
-                if(comentario == null)
+                if (comentario == null)
                 {
                     throw new Exception("No se encontró el comentario.");
                 }
@@ -2649,7 +2651,7 @@ r in db.Rol on ur.rol equals r
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 //Comprovando que el usuario es el mismo que entró el comentario
-                if(user.Secuencial != comentario.SecuencialUsuario)
+                if (user.Secuencial != comentario.SecuencialUsuario)
                 {
                     throw new Exception("Solo el usuario que creó el comentario puede eliminarlo.");
                 }
@@ -2678,7 +2680,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -2696,12 +2698,12 @@ r in db.Rol on ur.rol equals r
             try
             {
                 Tarea tarea = db.Tarea.Find(idTarea);
-                if(tarea == null)
+                if (tarea == null)
                 {
                     throw new Exception("La tarea no existe.");
                 }
                 Ticket ticket = tarea.ticketTarea.Where(x => x.EstaActiva == 1).FirstOrDefault().ticket;
-                if(ticket == null)
+                if (ticket == null)
                 {
                     throw new Exception("No existe el ticket asociado a la tarea.");
                 }
@@ -2716,7 +2718,7 @@ r in db.Rol on ur.rol equals r
 
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -2740,7 +2742,7 @@ r in db.Rol on ur.rol equals r
                 Persona persona = user.persona;
                 Colaborador colab = persona.colaborador.FirstOrDefault();
 
-                if(colab == null)
+                if (colab == null)
                 {
                     throw new Exception("No se encontró el colaborador, por favor contacte el administrador del sistema.");
                 }
@@ -2767,12 +2769,12 @@ r in db.Rol on ur.rol equals r
                                                            }).ToList()
                                            }).ToList();
 
-                if(!todos)
+                if (!todos)
                 {
                     estimacionesUsuario = estimacionesUsuario.Where(s => s.estado == "POR ESTIMAR").ToList();
                 }
 
-                if(filtro != "")
+                if (filtro != "")
                 {
                     estimacionesUsuario = estimacionesUsuario.Where(x =>
                                                                     x.ticket.ToString().Contains(filtro) ||
@@ -2795,7 +2797,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(result);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var result = new
                 {
@@ -2819,7 +2821,7 @@ r in db.Rol on ur.rol equals r
                 Persona persona = user.persona;
                 Colaborador colab = persona.colaborador.FirstOrDefault();
 
-                if(colab == null)
+                if (colab == null)
                 {
                     throw new Exception("No se encontró el colaborador, por favor contacte el administrador del sistema.");
                 }
@@ -2868,7 +2870,7 @@ r in db.Rol on ur.rol equals r
                     fechaProduccion = c.fechaProduccion.ToString("dd/MM/yyy")
                 }).ToList();
 
-                if(filtro != "")
+                if (filtro != "")
                 {
                     proyectos = proyectos.Where(x =>
                       x.nombre.ToString().ToLower().Contains(filtro.ToLower()) ||
@@ -2895,7 +2897,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(result);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var result = new
                 {
@@ -2954,7 +2956,7 @@ r in db.Rol on ur.rol equals r
 
                 var tickets = ticketsParcial;
 
-                if(todos == false)
+                if (todos == false)
                 {
                     tickets = tickets.Where(x => x.estado != "CERRADO" && x.estado != "ANULADO" && x.estado != "RECHAZADO").ToList();
                 }
@@ -2981,7 +2983,7 @@ r in db.Rol on ur.rol equals r
                                   orderby t.fecha descending
                                   select t).ToList();
 
-                if(filtro != "")
+                if (filtro != "")
                 {
                     ticketsAsg = ticketsAsg.Where(x =>
                                                x.numero.ToString().ToLower().Contains(filtro.ToLower()) ||
@@ -3002,7 +3004,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var result = new
                 {
@@ -3025,7 +3027,7 @@ r in db.Rol on ur.rol equals r
                 Persona persona = user.persona;
                 Colaborador colab = persona.colaborador.FirstOrDefault();
 
-                if(colab == null)
+                if (colab == null)
                 {
                     throw new Exception("No se encontró el colaborador, por favor contacte el administrador del sistema.");
                 }
@@ -3036,7 +3038,7 @@ r in db.Rol on ur.rol equals r
 
                 List<SolicitudVacacionesDTO> solicitudesVacacionesDTO = new List<SolicitudVacacionesDTO>();
 
-                foreach(var solicitud in solicitudes)
+                foreach (var solicitud in solicitudes)
                 {
                     SolicitudVacacionesDTO solVacaciones = new SolicitudVacacionesDTO();
                     solVacaciones.ID = solicitud.Secuencial;
@@ -3067,7 +3069,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(result);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var result = new
                 {
@@ -3090,7 +3092,7 @@ r in db.Rol on ur.rol equals r
                 Persona persona = user.persona;
                 Colaborador colab = persona.colaborador.FirstOrDefault();
 
-                if(colab == null)
+                if (colab == null)
                 {
                     throw new Exception("No se encontró el colaborador, por favor contacte el administrador del sistema.");
                 }
@@ -3101,7 +3103,7 @@ r in db.Rol on ur.rol equals r
 
                 List<SolicitudPermisosDTO> solicitudesPermisosDTO = new List<SolicitudPermisosDTO>();
 
-                foreach(var solicitud in solicitudes)
+                foreach (var solicitud in solicitudes)
                 {
                     SolicitudPermisosDTO solPermisos = new SolicitudPermisosDTO();
                     solPermisos.ID = solicitud.Secuencial;
@@ -3133,7 +3135,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(result);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var result = new
                 {
@@ -3151,7 +3153,7 @@ r in db.Rol on ur.rol equals r
             try
             {
                 EstimacionTicket estimacionTicket = db.EstimacionTicket.Find(idEstimacion);
-                if(estimacionTicket != null)
+                if (estimacionTicket != null)
                 {
                     var detallesEstimacion = (from de in db.DetalleEstimacionTicket
                                               join et in db.EntregableDetalleEstimacion on de.SecuencialEntregableEstimacion equals et.Secuencial
@@ -3202,7 +3204,7 @@ r in db.Rol on ur.rol equals r
                     return Json(resp);
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -3239,7 +3241,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -3257,12 +3259,12 @@ r in db.Rol on ur.rol equals r
             try
             {
                 EstimacionTicket estimacionTicket = db.EstimacionTicket.Find(idEstimacion);
-                if(estimacionTicket == null)
+                if (estimacionTicket == null)
                 {
                     throw new Exception("No se encontró la estimación del usuario");
                 }
 
-                if(estimacionTicket.EstimacionTerminada == 1)
+                if (estimacionTicket.EstimacionTerminada == 1)
                 {
                     estimacionTicket.EntregablesAdicionales = entregables.Trim();
                     estimacionTicket.InformacionComplementaria = informacionComplementaria.Trim();
@@ -3275,7 +3277,7 @@ r in db.Rol on ur.rol equals r
                                                                et.Secuencial
                                                            }).Count();
 
-                    if(cantidadEstimacionesSinTerminar == 0)
+                    if (cantidadEstimacionesSinTerminar == 0)
                     {
                         Ticket ticket = estimacionTicket.ticket;
                         ticket.Estimacion = ticket.estimacionTicket.Sum(s => s.detalleEstimacionTicket.Sum(e => e.TiempoDesarrollo + e.TiempoPrueba).Value);
@@ -3283,7 +3285,7 @@ r in db.Rol on ur.rol equals r
                         int numeroVersion = db.TicketHistorico.Where(x => x.SecuencialTicket == ticket.Secuencial).Count();
                         numeroVersion--;
                         TicketHistorico ticketHistorico = db.TicketHistorico.Where(x => x.SecuencialTicket == ticket.Secuencial && x.Version == numeroVersion).FirstOrDefault();
-                        if(ticketHistorico == null)
+                        if (ticketHistorico == null)
                         {
                             throw new Exception("No se encontró el versionamiento del ticket.");
                         }
@@ -3322,7 +3324,7 @@ r in db.Rol on ur.rol equals r
                         Persona personaEmail = usuarioEmail.persona;
                         List<string> destinatarios = Utiles.CorreoPorGrupoEmail("COORD");
                         var gestores = ticket.persona_cliente.cliente.gestorServicios.ToList();
-                        foreach(var g in gestores)
+                        foreach (var g in gestores)
                         {
                             destinatarios.Add(g.colaborador.persona.usuario.FirstOrDefault().Email);
                         }
@@ -3337,7 +3339,7 @@ r in db.Rol on ur.rol equals r
 
 
                         string htmlMail = "<div class=\"textoCuerpo\">Estimado " + Utiles.UpperCamelCase(personaEmail.Nombre1.ToLower()) + " " + Utiles.UpperCamelCase(personaEmail.Apellido1.ToLower()) + ":<br>";
-                        if(personaEmail.Sexo == "F")
+                        if (personaEmail.Sexo == "F")
                         {
                             htmlMail = "<div class=\"textoCuerpo\">Estimada " + Utiles.UpperCamelCase(personaEmail.Nombre1.ToLower()) + " " + Utiles.UpperCamelCase(personaEmail.Apellido1.ToLower()) + ":<br>";
                         }
@@ -3383,7 +3385,7 @@ r in db.Rol on ur.rol equals r
                                                                et.Secuencial
                                                            }).Count();
 
-                    if(cantidadEstimacionesSinTerminar == 1)//Esta es la última que queda
+                    if (cantidadEstimacionesSinTerminar == 1)//Esta es la última que queda
                     {   //Enviar email al que mandó a estimar para decirle que el ticket esta estimado
                         Ticket ticket = estimacionTicket.ticket;
                         ticket.Estimacion = ticket.estimacionTicket.Sum(s => s.detalleEstimacionTicket.Sum(e => e.TiempoDesarrollo + e.TiempoPrueba).Value);
@@ -3395,7 +3397,7 @@ r in db.Rol on ur.rol equals r
                         int numeroVersion = db.TicketHistorico.Where(x => x.SecuencialTicket == ticket.Secuencial).Count();
                         numeroVersion--;
                         TicketHistorico ticketHistorico = db.TicketHistorico.Where(x => x.SecuencialTicket == ticket.Secuencial && x.Version == numeroVersion).FirstOrDefault();
-                        if(ticketHistorico == null)
+                        if (ticketHistorico == null)
                         {
                             throw new Exception("No se encontró el versionamiento del ticket.");
                         }
@@ -3439,7 +3441,7 @@ r in db.Rol on ur.rol equals r
                         string asunto = ticket.persona_cliente.cliente.Codigo + " HESO " + String.Format("{0:000000}", ticket.Secuencial) + " - VALIDAR ESTIMACION (" + ticket.Asunto + ")";
 
                         string htmlMail = "<div class=\"textoCuerpo\">Estimado " + Utiles.UpperCamelCase(personaEmail.Nombre1.ToLower()) + " " + Utiles.UpperCamelCase(personaEmail.Apellido1.ToLower()) + ":<br>";
-                        if(personaEmail.Sexo == "F")
+                        if (personaEmail.Sexo == "F")
                         {
                             htmlMail = "<div class=\"textoCuerpo\">Estimada " + Utiles.UpperCamelCase(personaEmail.Nombre1.ToLower()) + " " + Utiles.UpperCamelCase(personaEmail.Apellido1.ToLower()) + ":<br>";
                         }
@@ -3473,7 +3475,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -3491,7 +3493,7 @@ r in db.Rol on ur.rol equals r
             try
             {
                 EstimacionTicket estimacionTicket = db.EstimacionTicket.Find(idEstimacion);
-                if(estimacionTicket == null)
+                if (estimacionTicket == null)
                 {
                     throw new Exception("No se encontró la estimación del usuario");
                 }
@@ -3501,7 +3503,7 @@ r in db.Rol on ur.rol equals r
 
                 var s = new JavaScriptSerializer();
                 var jsonDetallesObj = s.Deserialize<dynamic>(jsonDetalles);
-                for(int i = 0; i < jsonDetallesObj.Length; i++)
+                for (int i = 0; i < jsonDetallesObj.Length; i++)
                 {
                     var obj = jsonDetallesObj[i];
                     string detalle = (string)obj["detalle"];
@@ -3533,7 +3535,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -3551,14 +3553,14 @@ r in db.Rol on ur.rol equals r
             try
             {
                 EstimacionTicket estimacionTicket = db.EstimacionTicket.Find(idEstimacion);
-                if(estimacionTicket == null)
+                if (estimacionTicket == null)
                 {
                     throw new Exception("No se encontró la estimación del usuario");
                 }
                 EntregableDetalleEstimacion entregableDetalleEstimacion = db.EntregableDetalleEstimacion.Find(idEntregable);
                 entregableDetalleEstimacion.Nombre = nombreEntregable;
 
-                foreach(DetalleEstimacionTicket detalle in db.DetalleEstimacionTicket.Where(d => d.SecuencialEntregableEstimacion == idEntregable).ToList())
+                foreach (DetalleEstimacionTicket detalle in db.DetalleEstimacionTicket.Where(d => d.SecuencialEntregableEstimacion == idEntregable).ToList())
                 {
                     db.DetalleEstimacionTicket.Remove(detalle);
                 }
@@ -3566,7 +3568,7 @@ r in db.Rol on ur.rol equals r
                 int totalHoras = 0;
                 var s = new JavaScriptSerializer();
                 var jsonDetallesObj = s.Deserialize<dynamic>(jsonDetalles);
-                for(int i = 0; i < jsonDetallesObj.Length; i++)
+                for (int i = 0; i < jsonDetallesObj.Length; i++)
                 {
                     var obj = jsonDetallesObj[i];
                     string detalle = (string)obj["detalle"];
@@ -3600,7 +3602,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -3618,13 +3620,13 @@ r in db.Rol on ur.rol equals r
             try
             {
                 EstimacionTicket estimacionTicket = db.EstimacionTicket.Find(idEstimacion);
-                if(estimacionTicket == null)
+                if (estimacionTicket == null)
                 {
                     throw new Exception("No se encontró la estimación del usuario");
                 }
                 EntregableDetalleEstimacion entregableDetalleEstimacion = db.EntregableDetalleEstimacion.Find(idEntregable);
 
-                foreach(DetalleEstimacionTicket detalle in db.DetalleEstimacionTicket.Where(d => d.SecuencialEntregableEstimacion == idEntregable).ToList())
+                foreach (DetalleEstimacionTicket detalle in db.DetalleEstimacionTicket.Where(d => d.SecuencialEntregableEstimacion == idEntregable).ToList())
                 {
                     db.DetalleEstimacionTicket.Remove(detalle);
                 }
@@ -3638,7 +3640,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -3673,7 +3675,7 @@ r in db.Rol on ur.rol equals r
 
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -3691,7 +3693,7 @@ r in db.Rol on ur.rol equals r
             try
             {
                 Ticket t = db.Ticket.Find(idTicket);
-                if(t == null)
+                if (t == null)
                 {
                     throw new Exception("Error, no puede insertar un comentario porque no se encontró el ticket.");
                 }
@@ -3732,7 +3734,7 @@ r in db.Rol on ur.rol equals r
 
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -3750,7 +3752,7 @@ r in db.Rol on ur.rol equals r
             try
             {
                 Ticket t = db.Ticket.Find(idTicket);
-                if(t == null)
+                if (t == null)
                 {
                     throw new Exception("Error, no puede insertar un comentario porque no se encontró el ticket.");
                 }
@@ -3764,17 +3766,17 @@ r in db.Rol on ur.rol equals r
 
                 List<string> usuariosDestinos = new List<string>();
                 Regex rgx = new Regex(@"^(([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)(\s*;\s*|\s*$))*$");
-                if(!rgx.IsMatch(destinatariosEmailTicket))
+                if (!rgx.IsMatch(destinatariosEmailTicket))
                 {
                     throw new Exception("Debe ingresar una lista de correos válida separados por punto y coma(;)");
                 };
                 string[] emails = destinatariosEmailTicket.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
-                foreach(var email in emails)
+                foreach (var email in emails)
                 {
                     usuariosDestinos.Add(email);
                 }
                 var gestores = t.persona_cliente.cliente.gestorServicios.ToList();
-                foreach(var g in gestores)
+                foreach (var g in gestores)
                 {
                     usuariosDestinos.Add(g.colaborador.persona.usuario.FirstOrDefault().Email);
                 }
@@ -3789,7 +3791,7 @@ r in db.Rol on ur.rol equals r
 
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -3808,7 +3810,7 @@ r in db.Rol on ur.rol equals r
             try
             {
                 EstimacionTicket estimacion = db.EstimacionTicket.Find(idEstimacion);
-                if(estimacion == null)
+                if (estimacion == null)
                 {
                     throw new Exception("No se encontró la estimación.");
                 }
@@ -3859,7 +3861,7 @@ r in db.Rol on ur.rol equals r
 
                 int cant = 5;
                 int total = 5;
-                foreach(var tc in ticketsCliente)
+                foreach (var tc in ticketsCliente)
                 {
                     cant += 5;//5 es el valor máximo
                     total += (int)tc.reputacion;
@@ -3876,7 +3878,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -3945,7 +3947,7 @@ r in db.Rol on ur.rol equals r
                         }
                     ).ToList();
 
-                if(!todas)
+                if (!todas)
                 {
                     tareasCompensatorias = tareasCompensatorias.Where(x => x.tiempo > x.consumido).ToList();
                 }
@@ -3954,7 +3956,7 @@ r in db.Rol on ur.rol equals r
 
                 int totalTiempo = 0;
                 int totalConsumido = 0;
-                foreach(var tarComp in tareasCompensatorias)
+                foreach (var tarComp in tareasCompensatorias)
                 {
                     totalTiempo += tarComp.tiempo;
                     totalConsumido += tarComp.consumido;
@@ -3981,7 +3983,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -4035,7 +4037,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -4065,7 +4067,7 @@ r in db.Rol on ur.rol equals r
                     msg = e.Message
                 });
             }
-            
+
         }
 
         [HttpPost]
@@ -4077,31 +4079,31 @@ r in db.Rol on ur.rol equals r
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
-                if(publicarEnUno)
+                if (publicarEnUno)
                 {
                     int secuencialCliente = 0;
-                    foreach(int idTicket in idPublicacionLote)
+                    foreach (int idTicket in idPublicacionLote)
                     {
                         Ticket ticket = db.Ticket.Find(idTicket);
-                        if(ticket == null)
+                        if (ticket == null)
                         {
                             throw new Exception("No se encontró el ticket");
                         }
 
                         int pSecuencialCliente = ticket.persona_cliente.SecuencialCliente;
-                        if(secuencialCliente != 0 && secuencialCliente != pSecuencialCliente)
+                        if (secuencialCliente != 0 && secuencialCliente != pSecuencialCliente)
                         {
                             throw new Exception("Los tickets deben pertenecer al mismo cliente.");
                         }
                         secuencialCliente = pSecuencialCliente;
                     }
 
-                    foreach(int idTicket in idPublicacionLote)
+                    foreach (int idTicket in idPublicacionLote)
                     {
                         Ticket ticket = db.Ticket.Find(idTicket);
 
                         bool financial25 = false;
-                        if(ticket.SecuencialTicketVersionCliente != null)
+                        if (ticket.SecuencialTicketVersionCliente != null)
                         {
                             financial25 = db.TicketVersionCliente.Find(ticket.SecuencialTicketVersionCliente).Codigo == "FBS 2.5";
                         }
@@ -4191,7 +4193,7 @@ r in db.Rol on ur.rol equals r
 
                         List<string> correosDestinos = new List<string>();
                         correosDestinos.Add(emailUser);
-                        if(financial25)
+                        if (financial25)
                         {
                             correosDestinos.Add("publicacionesdoscinco@sifizsoft.com");
                         }
@@ -4221,13 +4223,13 @@ r in db.Rol on ur.rol equals r
                 else
                 {
                     Ticket ticket = db.Ticket.Find(id);
-                    if(ticket == null)
+                    if (ticket == null)
                     {
                         throw new Exception("No se encontró el ticket");
                     }
 
                     bool financial25 = false;
-                    if(ticket.SecuencialTicketVersionCliente != null)
+                    if (ticket.SecuencialTicketVersionCliente != null)
                     {
                         financial25 = db.TicketVersionCliente.Find(ticket.SecuencialTicketVersionCliente).Codigo == "FBS 2.5";
                     }
@@ -4270,7 +4272,7 @@ r in db.Rol on ur.rol equals r
 
                     //Enviando los emails
                     string texto = "Estimado:<br/>";
-                    if(user.persona.Sexo == "F")
+                    if (user.persona.Sexo == "F")
                         texto = "Estimada:<br/>";
                     texto += "El motivo de este correo es para hacerle llegar la publicación de " + publicacionClienteServidor + " de " + publicacionPruebasProd + " solicitada.<br/>";
                     texto += "La publicación se encuentra almacenada en el ftp, a continuación se especifica el <b>link</b>, <b>usuario</b>, <b>clave</b> y <b>path</b>.<br/><br/>";
@@ -4318,7 +4320,7 @@ r in db.Rol on ur.rol equals r
 
                     List<string> correosDestinos = new List<string>();
                     correosDestinos.Add(emailUser);
-                    if(financial25)
+                    if (financial25)
                     {
                         correosDestinos.Add("publicacionesdoscinco@sifizsoft.com");
                     }
@@ -4351,7 +4353,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -4385,7 +4387,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -4418,7 +4420,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -4440,13 +4442,13 @@ r in db.Rol on ur.rol equals r
                 string nombreColaborador = user.persona.Nombre1 + " " + user.persona.Apellido1;
 
                 Tarea tarea = db.Tarea.Find(idTarea);
-                if(tarea == null)
+                if (tarea == null)
                 {
                     throw new Exception("Error, no se econtró la tarea.");
                 }
 
                 Ticket ticket = tarea.ticketTarea.FirstOrDefault().ticket;
-                if(ticket == null)
+                if (ticket == null)
                 {
                     throw new Exception("Error, la tarea no está asociada a un ticket.");
                 }
@@ -4529,7 +4531,61 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize]
+        public ActionResult DarDatosUsuario()
+        {
+            try
+            {
+                string emailUser = User.Identity.Name;
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+                Persona persona = user.persona;
+                Colaborador colab = persona.colaborador.FirstOrDefault();
+
+                string nombre = persona.Nombre1 + " " + persona.Apellido1;
+                string cargo = colab.cargo.Descripcion;
+                string departamento = colab.departamento.Descripcion;
+                string empresa = "null";
+
+                if (emailUser.Contains("sifizsoft"))
+                {
+                    empresa = "SIFIZSOFT";
+                }else if (emailUser.Contains("intecsoft"))
+                {
+                    empresa = "INTECSOFT";
+                }
+                else
+                {
+                    empresa = "null";
+                }
+
+                var datosUsuario = new
+                {
+                    nombre = nombre,
+                    cargo = cargo,
+                    departamento = departamento,
+                    empresa = empresa,
+                };
+
+                var resp = new
+                {
+                    success = true,
+                    datosUsuario = datosUsuario,
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -4550,7 +4606,7 @@ r in db.Rol on ur.rol equals r
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 Colaborador colab = user.persona.colaborador.FirstOrDefault();
-                if(colab == null)
+                if (colab == null)
                 {
                     var resp1 = new
                     {
@@ -4583,7 +4639,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -4627,7 +4683,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -4670,7 +4726,7 @@ r in db.Rol on ur.rol equals r
                 var mensajesEnviados = (from m in db.Mensaje
                                         where m.SecuencialUsuarioRecibe == user.Secuencial && m.Enviado == false
                                         select m).ToList();
-                foreach(Mensaje m in mensajesEnviados)
+                foreach (Mensaje m in mensajesEnviados)
                 {
                     m.Enviado = true;
                 }
@@ -4683,7 +4739,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -4703,7 +4759,7 @@ r in db.Rol on ur.rol equals r
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
-                if(idAnterior == 0)
+                if (idAnterior == 0)
                 {
                     idAnterior = (from m in db.Mensaje
                                   where (m.SecuencialUsuarioEnvia == user.Secuencial && m.SecuencialUsuarioRecibe == idUsuario) ||
@@ -4713,7 +4769,7 @@ r in db.Rol on ur.rol equals r
                 }
 
                 var mensajesUser = new List<object>();
-                if(ultimo)
+                if (ultimo)
                 {
                     mensajesUser = (from m in db.Mensaje
                                     where ((m.SecuencialUsuarioEnvia == user.Secuencial && m.SecuencialUsuarioRecibe == idUsuario) ||
@@ -4750,11 +4806,11 @@ r in db.Rol on ur.rol equals r
                 Stack<object> pilaElementos = new Stack<object>();
                 List<object> mensajes = new List<object>();
 
-                foreach(var msg in mensajesUser)
+                foreach (var msg in mensajesUser)
                 {
                     pilaElementos.Push(msg);
                 }
-                while(pilaElementos.Count > 0)
+                while (pilaElementos.Count > 0)
                 {
                     mensajes.Add(pilaElementos.Pop());
                 }
@@ -4766,7 +4822,7 @@ r in db.Rol on ur.rol equals r
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var resp = new
                 {
@@ -4779,7 +4835,7 @@ r in db.Rol on ur.rol equals r
 
         public string GenerarExcelEstimaciones(int id)
         {
-            using(SLDocument sl = new SLDocument())
+            using (SLDocument sl = new SLDocument())
             {
                 var estimacion = db.EstimacionTicket.Find(id);
 
@@ -4838,7 +4894,7 @@ r in db.Rol on ur.rol equals r
                 sl.SetCellValue("B5", estimacion.ticket.Detalle);
                 sl.SetCellStyle(5, 2, style8);
                 sl.SetCellValue("F2", "Fecha Sol.:");
-                if(estimacion.ticket.Fecha.HasValue)
+                if (estimacion.ticket.Fecha.HasValue)
                 {
                     sl.SetCellValue("G2", estimacion.ticket.Fecha.Value.ToString("dd/MM/yyyy"));
                 }
@@ -4899,7 +4955,7 @@ r in db.Rol on ur.rol equals r
                                    }).ToList();
                 int sum = 0;
                 int tiempoTotal = 0;
-                foreach(var item in entregables.Select((value, index) => new { value, index }))
+                foreach (var item in entregables.Select((value, index) => new { value, index }))
                 {
                     tiempoTotal += (int)item.value.detalles.Sum(s => s.tiempoHoras);
                     int cantidad = item.value.detalles.Count;
@@ -4924,7 +4980,7 @@ r in db.Rol on ur.rol equals r
                     sl.SetCellValue("F" + (6 + 2 * (index + 1) + 1 * index - 1 + sum), "TIEMPO DES");
                     sl.SetCellValue("G" + (6 + 2 * (index + 1) + 1 * index - 1 + sum), "TIEMPO PRU");
 
-                    foreach(var it in item.value.detalles.Select((v, i) => new { v, i }))
+                    foreach (var it in item.value.detalles.Select((v, i) => new { v, i }))
                     {
                         sl.SetCellValue("A" + (6 + 2 * (index + 1) + 1 * index + sum + it.i), "TAR" + (it.i + 1));
                         sl.SetCellValue("B" + (6 + 2 * (index + 1) + 1 * index + sum + it.i), it.v.detalle);
