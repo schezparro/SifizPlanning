@@ -110,7 +110,7 @@ namespace SifizPlanning.Controllers
 
 
         [HttpPost]
-        [Authorize(Roles = "ADMIN, RRHH")]
+        [Authorize(Roles = "ADMIN, RRHH, USER")]
         public ActionResult DarFeriados()
         {
             try
