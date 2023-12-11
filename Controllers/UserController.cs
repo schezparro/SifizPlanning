@@ -4543,8 +4543,8 @@ r in db.Rol on ur.rol equals r
         }
 
         [HttpPost]
-        [Authorize]
-        public ActionResult DarDatosUsuario()
+		[Authorize(Roles = "USER, ADMIN")]
+		public ActionResult DarDatosUsuario()
         {
             try
             {
