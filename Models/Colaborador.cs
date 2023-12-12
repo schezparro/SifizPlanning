@@ -54,6 +54,7 @@ namespace SifizPlanning.Models
         public int NumeroVerificador { get; set; }
         public int SecuencialDepartamento { get; set; }
         public Nullable<bool> PublicacionesDosCinco { get; set; }
+        public Nullable<System.DateTime> FechaIngreso { get; set; }
     
         public virtual Cargo cargo { get; set; }
         public virtual ICollection<Tarea_Coordinador> tarea_coordinador { get; set; }

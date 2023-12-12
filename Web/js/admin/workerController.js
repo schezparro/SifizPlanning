@@ -169,6 +169,7 @@
         $scope.apellido2 = "";
         $scope.sexo = "";
         $scope.fecha_nac = "";
+        $scope.fechaIngreso = "";
         $scope.nacionalidad = "";
         $scope.email = "";
         $scope.cargo = "";
@@ -206,6 +207,8 @@
         formData.append('sede', $scope.sede);
         formData.append('publicacionesDosCinco', $scope.publicacionesDosCinco);
         formData.append('departamento', $scope.departamento);
+        formData.append('fechaIngreso', angular.element('#dtpk-fecha_ing').val());
+        console.log(angular.element('#dtpk-fecha_ing').val());
         formData.append('idTrabajador', $scope.idTrabajadorEdit);
 
         var newWorker = $http.post("admin/nuevo-trabajador",
@@ -346,6 +349,7 @@
                 $scope.cargo = data.trabajador.cargo;
                 $scope.email = data.trabajador.email;
                 $scope.departamento = data.trabajador.departamento;
+                $scope.fechaIngreso = data.fechaIngreso;
 
                 var foto = angular.element(".fileinput-preview")[0];
                 $(foto).html('<img src="Web/images/' + data.trabajador.foto + '">');

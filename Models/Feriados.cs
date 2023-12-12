@@ -11,14 +11,9 @@ namespace SifizPlanning.Models
 {
     using System;
     using System.Collections.Generic;
-
+    
     public partial class Feriados
     {
-
-        public Feriados()
-        {
-        }
-
         public Feriados(DateTime fecha)
         {
             Fecha = fecha;

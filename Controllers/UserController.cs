@@ -4576,6 +4576,7 @@ r in db.Rol on ur.rol equals r
                     cargo = cargo,
                     departamento = departamento,
                     empresa = empresa,
+                    fechaIngreso = colab.FechaIngreso.HasValue ? colab.FechaIngreso.Value.ToString("dd/MM/yyyy") : "N/A"
                 };
 
                 var resp = new

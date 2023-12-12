@@ -190,6 +190,10 @@
                                 <option ng-repeat="dep in departamentos" value="{{ dep.id }}">{{ dep.nombre }}</option>
                             </select>
                         </div>
+                        <div class="left">
+                            <label>Fecha de Ingreso:</label>
+                            <input type="text" required="required" class="form-control form-control-sm" id="dtpk-fecha_ing" ng-model="fechaIngreso" />
+                        </div>
                         <div style="vertical-align: middle; justify-content: space-between">
                             <label>Publicaciones Dos-Cinco:</label>
                             <input ng-model="publicacionesDosCinco" type="checkbox" />

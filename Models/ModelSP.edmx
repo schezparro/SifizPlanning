@@ -333,6 +333,7 @@
           <Property Name="SECUENCIALDEPARTAMENTO" Type="int" Nullable="false" />
           <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
           <Property Name="publicacionesDosCinco" Type="bit" />
+          <Property Name="FECHAINGRESO" Type="date" />
         </EntityType>
         <EntityType Name="COLABORADOR_JEFEINMEDIATO">
           <Key>
@@ -6835,6 +6836,7 @@
           <NavigationProperty Name="ofertas" Relationship="SifizPlanningModel.FK_OFERTAS_COLABORADOR" FromRole="Colaborador" ToRole="OFERTAS" />
           <Property Name="PublicacionesDosCinco" Type="Boolean" />
           <NavigationProperty Name="NIVELCOLABORADORTECNOLOGIA" Relationship="SifizPlanningModel.FK_NIVELCOLABORADORTECNOLOGIA_COLABORADOR" FromRole="Colaborador" ToRole="NIVELCOLABORADORTECNOLOGIA" />
+          <Property Name="FechaIngreso" Type="DateTime" Precision="0" />
           </EntityType>
         <EntityType Name="Colaborador_JefeInmediato">
           <Key>
@@ -11728,6 +11730,7 @@
           <EntitySetMapping Name="Colaborador">
             <EntityTypeMapping TypeName="SifizPlanningModel.Colaborador">
               <MappingFragment StoreEntitySet="COLABORADOR">
+                <ScalarProperty Name="FechaIngreso" ColumnName="FECHAINGRESO" />
                 <ScalarProperty Name="PublicacionesDosCinco" ColumnName="publicacionesDosCinco" />
                 <ScalarProperty Name="SecuencialDepartamento" ColumnName="SECUENCIALDEPARTAMENTO" />
                 <ScalarProperty Name="NumeroVerificador" ColumnName="NUMEROVERIFICADOR" />

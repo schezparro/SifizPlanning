@@ -378,7 +378,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
-        public ActionResult NuevoTrabajador(string nombre1, string apellido1, string sexo, string fechaNac, int nacionalidad, string email, int cargo, int sede, bool? publicacionesDosCinco, int departamento, HttpPostedFileBase foto = null, string nombre2 = "", string apellido2 = "", int idTrabajador = 0)
+        public ActionResult NuevoTrabajador(string nombre1, string apellido1, string sexo, string fechaNac, int nacionalidad, string email, int cargo, int sede, bool? publicacionesDosCinco, int departamento, string fechaIngreso, HttpPostedFileBase foto = null, string nombre2 = "", string apellido2 = "", int idTrabajador = 0)
         {
             try
             {
@@ -386,6 +386,11 @@ namespace SifizPlanning.Controllers
                 int dia = Int32.Parse(fechas[0]);
                 int mes = Int32.Parse(fechas[1]);
                 int anno = Int32.Parse(fechas[2]);
+
+                string[] fechasIngreso = fechaIngreso.Split(new Char[] { '/' });
+                int diaIngreso = Int32.Parse(fechasIngreso[0]);
+                int mesIngreso = Int32.Parse(fechasIngreso[1]);
+                int annoIngreso = Int32.Parse(fechasIngreso[2]);
 
                 if (idTrabajador > 0)//Editando la persona
                 {
@@ -411,6 +416,7 @@ namespace SifizPlanning.Controllers
                     trab.SecuencialSede = sede;
                     trab.SecuencialDepartamento = departamento;
                     trab.PublicacionesDosCinco = publicacionesDosCinco == true ? true : false;
+                    trab.FechaIngreso = new DateTime(annoIngreso, mesIngreso, diaIngreso);
 
                     per.Nombre1 = nombre1.ToUpper();
                     per.Nombre2 = nombre2.ToUpper();
@@ -487,7 +493,8 @@ namespace SifizPlanning.Controllers
                         SecuencialSede = sede,
                         SecuencialDepartamento = departamento,
                         PublicacionesDosCinco = publicacionesDosCinco,
-                        NumeroVerificador = 1
+                        NumeroVerificador = 1,
+                        FechaIngreso = new DateTime(annoIngreso, mesIngreso, diaIngreso)
                     };
                     db.Colaborador.Add(trab);
 
@@ -801,6 +808,7 @@ f in db.FotoColaborador on t equals f.colaborador
                                   cargo = t.SecuencialCargo,
                                   email = u.Email,
                                   departamento = t.SecuencialDepartamento,
+                                  fi = t.FechaIngreso,
                                   foto = f.Url
                               }).FirstOrDefault();
 
@@ -808,7 +816,8 @@ f in db.FotoColaborador on t equals f.colaborador
             {
                 success = true,
                 trabajador = trabajador,
-                fechaNac = trabajador.fn.ToString("dd/MM/yyyy")
+                fechaNac = trabajador.fn.ToString("dd/MM/yyyy"),
+                fechaIngreso = trabajador.fi.HasValue ? trabajador.fi.Value.ToString("dd/MM/yyyy") : ""
             };
             return Json(resp);
         }
@@ -2961,20 +2970,20 @@ f in db.FotoColaborador on t equals f.colaborador
             };
             return Json(resp);
         }
-        
+
         [HttpPost]
         [Authorize]
         public ActionResult DarTecnologias()
         {
             var tecnologias = (from tec in db.TecnologiasYProcesos
-                           where tec.EstaActivo == 1
-                           orderby tec.Codigo, tec.Descripcion
-                           select new
-                           {
-                               id = tec.Secuencial,
-                               nombre = tec.Codigo.ToUpper() + "-" + tec.Descripcion.ToUpper(),
-                               descripcion = tec.Descripcion.ToUpper(),
-                           }
+                               where tec.EstaActivo == 1
+                               orderby tec.Codigo, tec.Descripcion
+                               select new
+                               {
+                                   id = tec.Secuencial,
+                                   nombre = tec.Codigo.ToUpper() + "-" + tec.Descripcion.ToUpper(),
+                                   descripcion = tec.Descripcion.ToUpper(),
+                               }
                           ).ToList();
             var resp = new
             {

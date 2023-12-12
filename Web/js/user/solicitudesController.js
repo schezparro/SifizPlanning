@@ -58,7 +58,6 @@
         ajaxUsuario.success(function (data) {
             if (data.success) {
                 $scope.datosUsuario = data.datosUsuario;
-                console.log(data.datosUsuario);
             }
         });
     };
