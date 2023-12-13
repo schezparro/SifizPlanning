@@ -42,7 +42,7 @@
                 {
                     <li role="presentation"><a href="#" ng-click="IrPanelSolicitudes()">Permisos</a></li>
                 }
-                <li role="presentation"><a href="#" ng-click="IrPanelPDF()">PDF</a></li>
+                <li role="presentation"><a href="#" ng-click="IrPanelFTP()">FTP</a></li>
 
                 <a href="cerrar/sesion/" class="right btn btn-danger"><span class="glyphicon glyphicon-off"></span> Cerrar Sesión</a>
                 <a href="main-menu" style="margin-right: 4px;" class="right btn btn-warning"><span class="glyphicon glyphicon-menu-hamburger"></span> Menú Principal</a>
@@ -84,8 +84,8 @@
                     @{ Html.RenderPartial("windowUserSolicitudes"); }
                 </div>
 
-                <div id="panel_pdf" ng-controller="pdfController" class="invisible">
-                    @{ Html.RenderPartial("windowUserPDF"); }
+                <div id="panel_ftp" ng-controller="ftpController" class="invisible">
+                    @{ Html.RenderPartial("windowUserFTP"); }
                 </div>
             </div>
 
@@ -256,7 +256,7 @@
     <script type="text/javascript" src="~/Web/js/user/ticketsController.js"></script>
     <script type="text/javascript" src="~/Web/js/user/proyectosController.js"></script>
     <script type="text/javascript" src="~/Web/js/user/solicitudesController.js"></script>
-    <script type="text/javascript" src="~/Web/js/user/pdfController.js"></script>
+    <script type="text/javascript" src="~/Web/js/user/ftpController.js"></script>
     <script type="text/javascript" src="~/Web/js/pdf.min.js"></script>
     <script type="text/javascript" src="~/Web/js/pdf.worker.min.js"></script>
 </body>

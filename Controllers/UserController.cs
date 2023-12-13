@@ -4048,28 +4048,6 @@ r in db.Rol on ur.rol equals r
             }
         }
 
-        //Funcion para dar el PDF
-        [HttpPost]
-        [Authorize(Roles = "ADMINTFS, ADMIN")]
-        public ActionResult DarPDF(string fileName)
-        {
-            try
-            {
-                string filePath = Server.MapPath("~/Web/resources/pdf/" + fileName);
-                byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
-                return File(fileBytes, "application/pdf", fileName);
-            }
-            catch (Exception e)
-            {
-                return Json(new
-                {
-                    success = false,
-                    msg = e.Message
-                });
-            }
-
-        }
-
         [HttpPost]
         [Authorize(Roles = "ADMINTFS, ADMIN")]
         public ActionResult TicketPublicado(int id, string publicacionClienteServidor, string publicacionPruebasProd, string dirFTP, string usuarioFTP, string claveFTP, string pathFTP, bool publicarEnUno, int[] idPublicacionLote)
@@ -4585,6 +4563,120 @@ r in db.Rol on ur.rol equals r
                     datosUsuario = datosUsuario,
                 };
                 return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult DarFTP()
+        {
+            try
+            {
+                string rootdir = Server.MapPath("~/Web/resources/FTP");
+
+                string[] files = Directory.GetFiles(rootdir);
+                var fileList = files.Select(file => new
+                {
+                    fullname = Path.GetFileName(file),
+                    name = Path.GetFileNameWithoutExtension(file),
+                    ext = Path.GetExtension(file).Split('.')[1],
+                    path = file,
+                    size = (new FileInfo(file).Length / 1024.0 / 1024.0).ToString("F2"),
+                    lastModified = System.IO.File.GetLastWriteTime(file)
+                }).ToList();
+
+                string[] dirs = Directory.GetDirectories(rootdir);
+                var dirList = dirs.Select(dir => new
+                {
+                    name = Path.GetFileName(dir),
+                    path = dir,
+                    size = 0.0,
+                    lastModified = Directory.GetLastWriteTime(dir)
+                }).ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    rootdir = rootdir,
+                    files = fileList,
+                    dirs = dirList,
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+        
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult NavegarFTP(string path)
+        {
+            try
+            {
+                string[] files = Directory.GetFiles(path);
+                var fileList = files.Select(file => new
+                {
+                    fullname = Path.GetFileName(file),
+                    name = Path.GetFileNameWithoutExtension(file),
+                    ext = Path.GetExtension(file).Split('.')[1],
+                    path = file,
+                    size = (new FileInfo(file).Length / 1024.0 / 1024.0).ToString("F2"),
+                    lastModified = System.IO.File.GetLastWriteTime(file)
+                }).ToList();
+
+                string[] dirs = Directory.GetDirectories(path);
+                var dirList = dirs.Select(dir => new
+                {
+                    name = Path.GetFileName(dir),
+                    path = dir,
+                    size = 0.0,
+                    lastModified = Directory.GetLastWriteTime(dir)
+                }).ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    rootdir = path,
+                    files = fileList,
+                    dirs = dirList,
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult DescargarArchivo(string rutaArchivo, string nombreArchivo)
+        {
+            try
+            {
+                var fs = new FileStream(rutaArchivo, FileMode.Open);
+                return File(fs, "application/octet-stream", nombreArchivo);
             }
             catch (Exception e)
             {

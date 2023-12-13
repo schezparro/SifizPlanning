@@ -280,7 +280,7 @@ namespace SifizPlanning
                 url: "catalogos/modulos/{id}",
                 defaults: new { controller = "Admin", action = "DarModulos", id = UrlParameter.Optional }
             );
-            
+
             routes.MapRoute(
                 name: "DarTecnologias",
                 url: "catalogos/tecnologias/{id}",
@@ -1112,29 +1112,29 @@ namespace SifizPlanning
                 defaults: new { controller = "User", action = "SolicitarTarea", id = UrlParameter.Optional }
             );
 
-			routes.MapRoute(
-			   name: "SolicitudVacacionesUsuario",
-			   url: "user/solicitar-vacaciones/{id}",
-			   defaults: new { controller = "User", action = "SolicitudVacacionesUsuario", id = UrlParameter.Optional }
-		    );
+            routes.MapRoute(
+               name: "SolicitudVacacionesUsuario",
+               url: "user/solicitar-vacaciones/{id}",
+               defaults: new { controller = "User", action = "SolicitudVacacionesUsuario", id = UrlParameter.Optional }
+            );
 
-			routes.MapRoute(
-			   name: "SolicitudPermisosUsuario",
-			   url: "user/solicitar-permisos/{id}",
-			   defaults: new { controller = "User", action = "SolicitudPermisosUsuario", id = UrlParameter.Optional }
-			);
+            routes.MapRoute(
+               name: "SolicitudPermisosUsuario",
+               url: "user/solicitar-permisos/{id}",
+               defaults: new { controller = "User", action = "SolicitudPermisosUsuario", id = UrlParameter.Optional }
+            );
 
-			routes.MapRoute(
-			   name: "VacacionesUsuario",
-			   url: "user/vacaciones-usuario/{id}",
-			   defaults: new { controller = "User", action = "VacacionesUsuario", id = UrlParameter.Optional }
-			);
+            routes.MapRoute(
+               name: "VacacionesUsuario",
+               url: "user/vacaciones-usuario/{id}",
+               defaults: new { controller = "User", action = "VacacionesUsuario", id = UrlParameter.Optional }
+            );
 
-			routes.MapRoute(
-			   name: "PermisosUsuario",
-			   url: "user/permisos-usuario/{id}",
-			   defaults: new { controller = "User", action = "PermisosUsuario", id = UrlParameter.Optional }
-			);
+            routes.MapRoute(
+               name: "PermisosUsuario",
+               url: "user/permisos-usuario/{id}",
+               defaults: new { controller = "User", action = "PermisosUsuario", id = UrlParameter.Optional }
+            );
 
             routes.MapRoute(
                name: "VacacionesUsuarios",
@@ -1160,7 +1160,7 @@ namespace SifizPlanning
                 url: "user/dar-datos-usuario/{id}",
                 defaults: new { controller = "User", action = "DarDatosUsuario", id = UrlParameter.Optional }
             );
-            
+
             routes.MapRoute(
                 name: "DarUsersActivos",
                 url: "user/usuarios-activos-chat/{id}",
@@ -1239,11 +1239,23 @@ namespace SifizPlanning
                 defaults: new { controller = "User", action = "Sistema", id = UrlParameter.Optional }
             );
 
-            //Url para obtener el PDF
+            //--------------------- RUTAS DEL FTP -------------------------
             routes.MapRoute(
-                name: "DarPDF",
-                url: "user/{fileName}",
-                defaults: new { controller = "User", action = "DarPDF", id = UrlParameter.Optional }
+                name: "DarFTP",
+                url: "user/ftp/dar-ftp/{id}",
+                defaults: new { controller = "User", action = "DarFTP", id = UrlParameter.Optional }
+            );
+            
+            routes.MapRoute(
+                name: "NavegarFTP",
+                url: "user/ftp/navegar-ftp/{id}",
+                defaults: new { controller = "User", action = "NavegarFTP", id = UrlParameter.Optional }
+            );
+            
+            routes.MapRoute(
+                name: "DescargarArchivo",
+                url: "user/ftp/descargar-archivo/{id}",
+                defaults: new { controller = "User", action = "DescargarArchivo", id = UrlParameter.Optional }
             );
 
             //---------------------  RUTAS DE LOS CLIENTES ----------------
@@ -1411,7 +1423,7 @@ namespace SifizPlanning
                 url: "tickets/asignaciones-colaborador/{id}",
                 defaults: new { controller = "Ticket", action = "DarAsignacionesColaborador", id = UrlParameter.Optional }
             );
-            
+
             routes.MapRoute(
                 name: "Estimaciones",
                 url: "tickets/estimaciones/{id}",
@@ -1772,19 +1784,19 @@ namespace SifizPlanning
                 url: "rrhh/guardar-feriado/{id}",
                 defaults: new { controller = "Rrhh", action = "GuardarFeriado", id = UrlParameter.Optional }
             );
-            
+
             routes.MapRoute(
                 name: "DarFeriados",
                 url: "rrhh/dar-feriado/{id}",
                 defaults: new { controller = "Rrhh", action = "DarFeriados", id = UrlParameter.Optional }
             );
-            
+
             routes.MapRoute(
                 name: "EliminarFeriado",
                 url: "rrhh/eliminar-feriado/{id}",
                 defaults: new { controller = "Rrhh", action = "EliminarFeriado", id = UrlParameter.Optional }
             );
-            
+
             routes.MapRoute(
                 name: "GuardarVacaciones",
                 url: "rrhh/guardar-vacaciones/{id}",

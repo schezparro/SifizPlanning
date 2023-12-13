@@ -1,0 +1,37 @@
+<div>
+    <button ng-click="cargarFTP()" class="btn btn-primary"><i class="glyphicon glyphicon-home"></i></button>
+</div>
+
+<div style="height: 500px; overflow-y: scroll; margin-top: 5px;">
+    <table class="table table-condensed">
+
+        <thead>
+            <tr>
+                <th width="5"></th>
+                <th width="10">Nombre</th>
+                <th width="10">Ext</th>
+                <th width="5">Última Modificación</th>
+                <th width="5">Peso</th>
+                <th width="5"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="item in filesAndFolders.dirs" ng-click="navegarFTP(item.path)">
+                <td><i class="glyphicon glyphicon-folder-open" style="color: #337ab7;"></i></td>
+                <td><a>{{ item.name }}</a></td>
+                <td>dir</td>
+                <td>{{ item.lastModified | strDateToStr }}</td>
+                <td>-</td>
+                <td></td>
+            </tr>
+            <tr ng-repeat="item in filesAndFolders.files">
+                <td><i class="glyphicon glyphicon-file" style="color: #f0ad4e;"></i></td>
+                <td><a>{{ item.name }}</a></td>
+                <td>{{ item.ext }}</td>
+                <td>{{ item.lastModified | strDateToStr }}</td>
+                <td>{{ item.size }} MB</td>
+                <td><button class="btn btn-success" ng-click="descargarArchivo(item)"><i class="glyphicon glyphicon-download-alt"></i></button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

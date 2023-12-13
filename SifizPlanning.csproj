@@ -1104,7 +1104,7 @@
     <Content Include="Views\Consultas\windowOfertaTickets.cshtml" />
     <Content Include="Views\User\windowUserSolicitudes.cshtml" />
     <Content Include="Views\Rrhh\windowControlVacaciones.cshtml" />
-    <Content Include="Views\User\windowUserPDF.cshtml" />
+    <Content Include="Views\User\windowUserFTP.cshtml" />
     <Content Include="Views\Rrhh\windowFeriados.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -1136,7 +1136,7 @@
     <Content Include="Web\js\consultas\actasContratos.js" />
     <Content Include="Web\js\tfs\consultaCambios.js" />
     <Content Include="Web\js\tfs\consultaProyectos.js" />
-    <Content Include="Web\js\user\pdfController.js" />
+    <Content Include="Web\js\user\ftpController.js" />
     <Content Include="Web\js\user\proyectosController.js" />
     <Content Include="Web\js\user\solicitudesController.js" />
     <Content Include="Web\js\user\ticketsController.js" />
@@ -1519,7 +1519,8 @@
     <Content Include="Views\Ticket\inicioTicket.cshtml" />
     <Content Include="Views\Report\Index.cshtml" />
     <Content Include="Views\Report\VerReporte.cshtml" />
-    <Content Include="Web\resources\pdf\colaboradores.pdf" />
+    <Content Include="Web\resources\ftp\pdf\colaboradores.pdf" />
+    <Content Include="Web\resources\ftp\otros.pdf" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />

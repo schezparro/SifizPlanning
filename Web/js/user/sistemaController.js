@@ -53,7 +53,7 @@ devApp.controller('desarrolladoresController', ['$scope', '$http', function ($sc
         angular.element("#panel_tickets").addClass('invisible');
         angular.element("#panel_proyectos").addClass('invisible');
         angular.element("#panel_solicitudes").addClass('invisible');
-        angular.element("#panel_pdf").addClass('invisible');
+        angular.element("#panel_ftp").addClass('invisible');
     };
 
     $scope.IrMisTareas = function () {
@@ -100,10 +100,10 @@ devApp.controller('desarrolladoresController', ['$scope', '$http', function ($sc
         $scope.funcionalidad = "Permisos";
     };
 
-    $scope.IrPanelPDF = function () {
+    $scope.IrPanelFTP = function () {
         ocultar();
-        angular.element("#panel_pdf").removeClass('invisible');
-        $scope.funcionalidad = "PDF";
+        angular.element("#panel_ftp").removeClass('invisible');
+        $scope.funcionalidad = "FTP";
     };
 
     $scope.buscarTicketPorPublicar = function () {
