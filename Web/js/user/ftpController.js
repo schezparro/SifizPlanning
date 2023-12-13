@@ -19,8 +19,6 @@
     $scope.cargarFTP();
 
     $scope.navegarFTP = function (path) {
-
-        $scope.history.push(path);
         
         var ajaxFTP = $http.post("user/ftp/navegar-ftp/", { path: path });
 
