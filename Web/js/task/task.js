@@ -76,6 +76,7 @@ taskApp.controller('mainTaskController', ['$scope', '$http', function ($scope, $
         angular.element("#panel_consolidacion_tareas").addClass('invisible');
         angular.element("#panel_disponibilidad_recursos").addClass('invisible');
         angular.element("#panel_incidencias_colaboradores").addClass('invisible');
+        angular.element("#panel_informes_recursos").addClass('invisible');
     };
 
     /**********************************************/
@@ -318,6 +319,12 @@ taskApp.controller('mainTaskController', ['$scope', '$http', function ($scope, $
         angular.element("#panel_incidencias_colaboradores").removeClass('invisible');
         $scope.funcionalidad = 'INCIDENCIAS DE COLABORADORES';
         cargarIncidenciaColaboradores();
+    };
+
+    $scope.IrInformesRecursos = function () {
+        ocultar();
+        angular.element("#panel_informes_recursos").removeClass('invisible');
+        $scope.funcionalidad = 'INFORMES RECURSOS';
     };
 
     //Actualizar datosTarea

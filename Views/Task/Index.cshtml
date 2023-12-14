@@ -37,6 +37,7 @@
                 <li role="presentation"><a href="#" ng-click="IrConsolidacionTareas()">Consolidación de Tareas</a></li>
                 <li role="presentation"><a href="#" ng-click="IrDisponibilidadRecursos()">Disponibilidad de Recursos</a></li>
                 <li role="presentation"><a href="#" ng-click="IrIncidenciasColaboradores()">Incidencias</a></li>
+                <li role="presentation"><a href="#" ng-click="IrInformesRecursos()">Informes Recursos</a></li>
 
             </ul>
 
@@ -76,6 +77,10 @@
 
                 <div id="panel_incidencias_colaboradores" class="invisible" ng-controller="incidenciasController">
                     @{Html.RenderPartial("windowIncidencias");}
+                </div>
+                
+                <div id="panel_informes_recursos" class="invisible" ng-controller="informesRecursosController">
+                    @{Html.RenderPartial("windowInformesRecursos");}
                 </div>
 
                 <div id="loadingDiv">
@@ -151,6 +156,7 @@
     <script type="text/javascript" src="~/Web/js/task/consolidacionTareas.js"></script>
     <script type="text/javascript" src="~/Web/js/task/disponibilidadRecursos.js"></script>
     <script type="text/javascript" src="~/Web/js/task/incidenciasColaboradores.js"></script>
+    <script type="text/javascript" src="~/Web/js/task/informesRecursosController.js"></script>
     <script type="text/javascript" src="~/Web/js/angular-bootstrap-multiselect.js"></script>
 </body>
 </html>

@@ -941,6 +941,26 @@ namespace SifizPlanning
                 defaults: new { controller = "Task", action = "SubirExcel", id = UrlParameter.Optional }
             );
 
+            //---------------------- RUTA SUBIR ARCHIVO INFORMES RECURSOS-------------------------------
+
+            routes.MapRoute(
+                name: "SubirInformesRecursos",
+                url: "task/subir-informes-recursos/{id}",
+                defaults: new { controller = "Task", action = "SubirInformesRecursos", id = UrlParameter.Optional }
+            );
+            
+            routes.MapRoute(
+                name: "DarInformesRecursos",
+                url: "task/dar-informes-recursos/{id}",
+                defaults: new { controller = "Task", action = "DarInformesRecursos", id = UrlParameter.Optional }
+            );
+            
+            routes.MapRoute(
+                name: "DescargarInformesRecursos",
+                url: "task/descargar-informes-recursos/{id}",
+                defaults: new { controller = "Task", action = "DescargarInformesRecursos", id = UrlParameter.Optional }
+            );
+
             //---------------------- RUTAS DEL USUARIO -------------------------------
             //RUTAS DE LA EDICION DE LAS TAREAS POR EL USUARIO            
 
@@ -1245,13 +1265,13 @@ namespace SifizPlanning
                 url: "user/ftp/dar-ftp/{id}",
                 defaults: new { controller = "User", action = "DarFTP", id = UrlParameter.Optional }
             );
-            
+
             routes.MapRoute(
                 name: "NavegarFTP",
                 url: "user/ftp/navegar-ftp/{id}",
                 defaults: new { controller = "User", action = "NavegarFTP", id = UrlParameter.Optional }
             );
-            
+
             routes.MapRoute(
                 name: "DescargarArchivo",
                 url: "user/ftp/descargar-archivo/{id}",

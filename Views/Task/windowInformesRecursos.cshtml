@@ -1,0 +1,28 @@
+<table class="table table-condensed">
+    <thead>
+        <tr>
+            <th width="5"></th>
+            <th width="10">Nombre</th>
+            <th width="5">Ext</th>
+            <th width="5">Última Modificación</th>
+            <th width="5">Peso</th>
+            <th width="5"></th>
+            <th width="5"></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><i class="glyphicon glyphicon-file" style="color: #f0ad4e;"></i></td>
+            <td>{{file.name}}</td>
+            <td>{{file.ext}}</td>
+            <td>{{file.lastModified | strDateToStr}}</td>
+            <td>{{file.size}} Mb</td>
+            <td>
+                <button type="button" id="buttonAdjuntoModal" class="btn btn-primary" onclick="document.getElementById('selectedFile').click();"><span id="titulo-archivo" class="glyphicon glyphicon-paperclip"></span>Seleccione el archivo</button>
+                <input type="file" onchange="angular.element(this).scope().resetearAdjunto()" id="selectedFile" style="display: none;" />
+                <button id="btn-subir-archivo" ng-click="subirArchivo()" style="display: none" class="btn btn-success"><i class="glyphicon glyphicon-upload"></i></button>
+            </td>
+            <td><button ng-click="descargarArchivo()" class="btn btn-success"><i class="glyphicon glyphicon-download-alt"></i></button></td>
+        </tr>
+    </tbody>
+</table>

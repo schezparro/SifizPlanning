@@ -1905,11 +1905,11 @@ namespace SifizPlanning.Controllers
                                 HorasUtilizadas = 0,
                                 NumeroVerificador = 1,
                                 TiempoEstimacion = new TimeSpan(horasEstimadas, minutosEstimados, 0)
-                        };
+                            };
                         }
                         else
                         {
-                            return NuevaTarea(idTrabajador, diaSiguiente.ToString("dd/MM/yyyy"), cliente, ubicacion, modulo, actividad, horas, minutos, horasEstimadas , minutosEstimados ,detalle, referencia, coordinador, repetir, finSemana, repetirTipoFin, numVeces, fechaHasta, extraordinaria, idTarea, verificador);
+                            return NuevaTarea(idTrabajador, diaSiguiente.ToString("dd/MM/yyyy"), cliente, ubicacion, modulo, actividad, horas, minutos, horasEstimadas, minutosEstimados, detalle, referencia, coordinador, repetir, finSemana, repetirTipoFin, numVeces, fechaHasta, extraordinaria, idTarea, verificador);
                         }
                     }
                     else
@@ -10313,6 +10313,144 @@ vac in db.Vacaciones on colab.Secuencial equals vac.SecuencialColaborador
                     datos = datos
                 };
                 return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, LIDERES, OPERACIONES")]
+        public ActionResult SubirInformesRecursos(HttpPostedFileBase file)
+        {
+            try
+            {
+
+                string ext = file.FileName.Split('.')[1];
+                string formato = "INFORME DE RECURSOS." + ext;
+                string ruta = Path.Combine(Server.MapPath("~/Web/resources/informesrecursos/"), formato);
+
+                file.SaveAs(ruta);
+
+                var archivo = new
+                {
+                    name = Path.GetFileName(ruta),
+                    lastModified = System.IO.File.GetLastWriteTime(ruta),
+                    size = (new FileInfo(ruta).Length / 1024.0 / 1024.0).ToString("F2"),
+                    ext = ext,
+                    path = ruta,
+                };
+
+                var resp = new
+                {
+                    success = true,
+                    msg = "Informe Recursos Guardado correctamente",
+                    file = archivo,
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+        
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, LIDERES, OPERACIONES")]
+        public ActionResult DarInformesRecursos()
+        {
+            try
+            {
+
+                string emailUser = User.Identity.Name;
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+                Persona persona = user.persona;
+                Colaborador colab = persona.colaborador.FirstOrDefault();
+
+                //Buscando el usuario por el idtrabajador
+                var roles = (from t in db.Colaborador
+                             join
+                                 p in db.Persona on t.persona equals p
+                             join
+                                 u in db.Usuario on p equals u.persona
+                             join
+                                 ur in db.UsuarioRol on u.Secuencial equals ur.SecuencialUsuario
+                             join
+                                catrol in db.Rol on ur.SecuencialRol equals catrol.Secuencial
+                             where t.Secuencial == colab.Secuencial
+                             select new
+                             {
+                                 id = catrol.Secuencial,
+                                 rol = catrol.Codigo
+                             }).ToList();
+
+                string rootdir = Server.MapPath("~/Web/resources/informesrecursos/");
+
+                string[] files = Directory.GetFiles(rootdir);
+                var file = files.Select(f => new
+                {
+                    fullname = Path.GetFileName(f),
+                    name = Path.GetFileNameWithoutExtension(f),
+                    ext = Path.GetExtension(f).Split('.')[1],
+                    path = f,
+                    size = (new FileInfo(f).Length / 1024.0 / 1024.0).ToString("F2"),
+                    lastModified = System.IO.File.GetLastWriteTime(f)
+                }).FirstOrDefault();
+
+                var resp = new
+                {
+                    success = true,
+                    file = file,
+                    roles = roles
+                };
+
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+        
+        [HttpGet]
+        [Authorize(Roles = "ADMIN, LIDERES, OPERACIONES")]
+        public ActionResult DescargarInformesRecursos()
+        {
+            try
+            {
+
+                string rootdir = Server.MapPath("~/Web/resources/informesrecursos/");
+
+                string[] files = Directory.GetFiles(rootdir);
+                var file = files.Select(f => new
+                {
+                    fullname = Path.GetFileName(f),
+                    name = Path.GetFileNameWithoutExtension(f),
+                    ext = Path.GetExtension(f).Split('.')[1],
+                    path = f,
+                    size = (new FileInfo(f).Length / 1024.0 / 1024.0).ToString("F2"),
+                    lastModified = System.IO.File.GetLastWriteTime(f)
+                }).FirstOrDefault();
+
+                var fs = new FileStream(file.path, FileMode.Open);
+                return File(fs, "application/octet-stream", file.fullname);
+
             }
             catch (Exception e)
             {

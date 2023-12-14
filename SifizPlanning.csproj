@@ -1106,6 +1106,7 @@
     <Content Include="Views\Rrhh\windowControlVacaciones.cshtml" />
     <Content Include="Views\User\windowUserFTP.cshtml" />
     <Content Include="Views\Rrhh\windowFeriados.cshtml" />
+    <Content Include="Views\Task\windowInformesRecursos.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1134,6 +1135,7 @@
     <Content Include="Web\js\rrhh\solicitudesController.js" />
     <Content Include="Web\js\solid-gauge.js" />
     <Content Include="Web\js\consultas\actasContratos.js" />
+    <Content Include="Web\js\task\informesRecursosController.js" />
     <Content Include="Web\js\tfs\consultaCambios.js" />
     <Content Include="Web\js\tfs\consultaProyectos.js" />
     <Content Include="Web\js\user\ftpController.js" />
@@ -1551,6 +1553,7 @@
     <Folder Include="Web\images\chat\" />
     <Folder Include="Web\images\logFBSError\" />
     <Folder Include="Web\resources\contracts\" />
+    <Folder Include="Web\resources\informesrecursos\" />
     <Folder Include="Web\resources\tasks\" />
     <Folder Include="Web\resources\tickets\" />
   </ItemGroup>
