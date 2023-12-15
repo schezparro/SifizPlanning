@@ -153,7 +153,9 @@ namespace SifizPlanning.Controllers
                                       horasCreado = t.HorasCreado,
                                       semaforosResolucion = db.ResolucionSemaforoPrioridad.Where(w => w.SecuencialPrioridad == pr.Secuencial).ToList(),
                                       horasResolucion = t.HorasResolucion,
-                                      pendienteAPago = t.PendienteAPago
+                                      pendienteAPago = t.PendienteAPago,
+                                      errorInfraestructura = t.ErrorInfraestructura,
+                                      revisado = t.Revisado
                                   }).ToList();
 
             if (User.IsInRole("GESTOR") && !User.IsInRole("ADMIN"))
@@ -211,8 +213,9 @@ namespace SifizPlanning.Controllers
                                horasCreado = t.horasCreado,
                                semaforosResolucion = t.semaforosResolucion,
                                horasResolucion = t.horasResolucion,
-                               pendienteAPago = t.pendienteAPago
-
+                               pendienteAPago = t.pendienteAPago,
+                               errorInfraestructura = t.errorInfraestructura,
+                               revisado = t.revisado
                            }).ToList();
 
             }
@@ -264,7 +267,9 @@ namespace SifizPlanning.Controllers
                                horasCreado = t.HorasCreado,
                                semaforosResolucion = db.ResolucionSemaforoPrioridad.Where(w => w.SecuencialPrioridad == pr.Secuencial).ToList(),
                                horasResolucion = t.HorasResolucion,
-                               pendienteAPago = t.PendienteAPago
+                               pendienteAPago = t.PendienteAPago,
+                               errorInfraestructura = t.ErrorInfraestructura,
+                               revisado = t.Revisado
                            }).ToList();
 
                 if (User.IsInRole("GESTOR") && !User.IsInRole("ADMIN"))
@@ -1202,6 +1207,8 @@ namespace SifizPlanning.Controllers
                                            horasResolucion = t.HorasResolucion,
                                            semaforoResolucion = "",
                                            modulo = db.Modulo.Where(m => m.Secuencial == t.SecuencialModulo).FirstOrDefault().Descripcion ?? "No asignado",
+                                           errorInfraestructura = t.ErrorInfraestructura,
+                                           revisado = t.Revisado
                                        }).FirstOrDefault();
 
                 //Calculando la reputación
@@ -1324,6 +1331,8 @@ namespace SifizPlanning.Controllers
                     adjuntos = datosTicketTemp.adjuntos,
                     botones = datosTicketTemp.botones,
                     modulo = datosTicketTemp.modulo,
+                    errorInfraestructura = datosTicketTemp.errorInfraestructura,
+                    revisado = datosTicketTemp.revisado,
                     verificador = datosTicketTemp.verificador,
                     semaforo = datosTicketTemp.semaforos != null ? datosTicketTemp.semaforos.Where(w => w.horas <= datosTicketTemp.horasCreado).OrderByDescending(d => d.horas).FirstOrDefault()?.value ?? "VERDE" : "VERDE",
                     semaforoResolucion = datosTicketTemp.semaforosResolucion != null ? datosTicketTemp.semaforosResolucion.Where(w => w.horas <= datosTicketTemp.horasResolucion).OrderByDescending(d => d.horas).FirstOrDefault()?.value ?? "VERDE" : "VERDE",
@@ -1918,7 +1927,8 @@ namespace SifizPlanning.Controllers
             int tipoRecurso, int ticketVC, int reputacion, int estimacion, bool seFactura, bool facturado,
             int reprocesos, bool ingresoInterno, string fechaRevisado, int colaborador = 0, string observaciones = "",
             bool error = false, bool requiereTesting = false, bool pendienteAPago = false,
-            HttpPostedFileBase[] adjuntos = null, bool esEstimacion = false, int diasGarantia = 30)
+            HttpPostedFileBase[] adjuntos = null, bool esEstimacion = false, int diasGarantia = 30,
+            bool errorInfraestructura = false, bool revisado = false)
         {
             try
             {
@@ -1938,6 +1948,8 @@ namespace SifizPlanning.Controllers
                 ticket.IngresoInterno = ingresoInterno;
                 ticket.Reprocesos = reprocesos;
                 ticket.SeFactura = seFactura;
+                ticket.ErrorInfraestructura = errorInfraestructura;
+                ticket.Revisado = revisado;
                 ticket.Facturado = facturado;
                 ticket.DiasGarantia = diasGarantia;
                 ticket.PendienteAPago = pendienteAPago;

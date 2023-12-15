@@ -1652,6 +1652,8 @@
           <Property Name="HORASRESOLUCION" Type="int" />
           <Property Name="PENDIENTEAPAGO" Type="bit" />
           <Property Name="SECUENCIALMODULO" Type="int" />
+          <Property Name="ERRORINFRAESTRUCTURA" Type="bit" />
+          <Property Name="REVISADO" Type="bit" />
         </EntityType>
         <EntityType Name="TICKET_CATEGORIAREVISADA">
           <Key>
@@ -7528,6 +7530,8 @@
           <Property Name="PendienteAPago" Type="Boolean" />
           <Property Name="SecuencialModulo" Type="Int32" />
           <NavigationProperty Name="MODULO" Relationship="SifizPlanningModel.FK_TICKET_MODULO" FromRole="Ticket" ToRole="Modulo" />
+          <Property Name="ErrorInfraestructura" Type="Boolean" />
+          <Property Name="Revisado" Type="Boolean" />
         </EntityType>
         <EntityType Name="Ticket_ContratoCliente">
           <Key>
@@ -12090,6 +12094,8 @@
           <EntitySetMapping Name="Ticket">
             <EntityTypeMapping TypeName="SifizPlanningModel.Ticket">
               <MappingFragment StoreEntitySet="TICKET">
+                <ScalarProperty Name="Revisado" ColumnName="REVISADO" />
+                <ScalarProperty Name="ErrorInfraestructura" ColumnName="ERRORINFRAESTRUCTURA" />
                 <ScalarProperty Name="SecuencialModulo" ColumnName="SECUENCIALMODULO" />
                 <ScalarProperty Name="PendienteAPago" ColumnName="PENDIENTEAPAGO" />
                 <ScalarProperty Name="HorasResolucion" ColumnName="HORASRESOLUCION" />

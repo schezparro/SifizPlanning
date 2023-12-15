@@ -976,6 +976,8 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
                                     $scope.semaforoResolucion = data.datosTicket.semaforoResolucion;
                                     $scope.categoriaTicket = data.datosTicket.categoriaDesc;
                                     $scope.moduloTicket = data.datosTicket.modulo;
+                                    $scope.errorInfraestructura = data.datosTicket.errorInfraestructura;
+                                    $scope.revisado = data.datosTicket.revisado;
                                     $scope.adjuntosTicket = data.datosTicket.adjuntos;
                                     $scope.estimacionTicket = data.datosTicket.estimacion;
                                     $scope.detalleTicket = data.datosTicket.detalle;
@@ -1232,6 +1234,8 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
         formData.append('adjuntos', document.getElementById('selectedFile').files[0]);
         formData.append('esEstimacion', $scope.esEstimacion);
         formData.append('diasGarantia', $scope.diasGarantia);
+        formData.append('errorInfraestructura', $scope.errorInfraestructura);
+        formData.append('revisado', $scope.revisado);
 
         var guardarTicket = $http.post("tickets/guardar-datos-ticket",
             formData,

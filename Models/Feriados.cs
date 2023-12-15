@@ -14,11 +14,6 @@ namespace SifizPlanning.Models
     
     public partial class Feriados
     {
-        public Feriados(DateTime fecha)
-        {
-            Fecha = fecha;
-        }
-
         public int Secuencial { get; set; }
         public System.DateTime Fecha { get; set; }
     }

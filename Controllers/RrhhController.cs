@@ -55,7 +55,10 @@ namespace SifizPlanning.Controllers
                 else
                 {
                     // Si no existe un feriado con la misma fecha, agregar el nuevo feriado
-                    var feriado = new Feriados(fecha);
+                    var feriado = new Feriados
+                    {
+                        Fecha = fecha
+                    };
                     db.Feriados.Add(feriado);
                     db.SaveChanges();
 
