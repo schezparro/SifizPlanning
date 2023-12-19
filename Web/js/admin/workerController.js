@@ -207,8 +207,7 @@
         formData.append('sede', $scope.sede);
         formData.append('publicacionesDosCinco', $scope.publicacionesDosCinco);
         formData.append('departamento', $scope.departamento);
-        formData.append('fechaIngreso', angular.element('#dtpk-fecha_ing').val());
-        console.log(angular.element('#dtpk-fecha_ing').val());
+        formData.append('fechaIngreso', $scope.fechaIngreso.toISOString());
         formData.append('idTrabajador', $scope.idTrabajadorEdit);
 
         var newWorker = $http.post("admin/nuevo-trabajador",
@@ -349,7 +348,7 @@
                 $scope.cargo = data.trabajador.cargo;
                 $scope.email = data.trabajador.email;
                 $scope.departamento = data.trabajador.departamento;
-                $scope.fechaIngreso = data.fechaIngreso;
+                $scope.fechaIngreso = convertDate(data.trabajador.fi);
 
                 var foto = angular.element(".fileinput-preview")[0];
                 $(foto).html('<img src="Web/images/' + data.trabajador.foto + '">');
@@ -670,7 +669,7 @@
         if ($scope.idTrabajador == 0 || $scope.idTrabajador == undefined)
             messageDialog.show('Información', 'Por favor seleccione un trabajador.');
         else {
-            
+
             var ajaxNivelesTecnologias = $http.post("admin/niveles-tecnologia-trabajador/", {
                 idColaborador: $scope.idTrabajador,
             });
@@ -737,7 +736,7 @@
         var nivel = 0;
         var tdEstrellas = angular.element(this).parent().prev();
 
-        var idTecnologia= angular.element(tdEstrellas).attr('data-id-tecnologia');
+        var idTecnologia = angular.element(tdEstrellas).attr('data-id-tecnologia');
         var estrellasFila = angular.element(tdEstrellas).children();
 
         var ajaxEstablecerNivel = $http.post("admin/establecer-nivel-tecnologia-trabajador/", {
@@ -756,5 +755,8 @@
         });
 
     });
-
 }]);
+
+function convertDate(dateStr) {
+    return new Date(parseInt(dateStr.replace(/\/Date\((\d+)\)\//, "$1")));
+}
