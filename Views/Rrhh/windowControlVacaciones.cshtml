@@ -46,7 +46,7 @@
                         <button class="btn btn-link" ng-click="aceptarVacaciones(solicitudVac)">
                             <span class="glyphicon glyphicon-ok" style="color: seagreen"></span>
                         </button>
-                        <button class="btn btn-link" ng-click="rechazarVacaciones(solicitudVac)">
+                        <button class="btn btn-link" ng-click="rechazarSolicitudVacaciones(solicitudVac)">
                             <span class="glyphicon glyphicon-remove" style="color: darkred"></span>
                         </button>
                     </div>
@@ -123,7 +123,7 @@
                         <button class="btn btn-link" ng-click="aceptarPermiso(solicitudPer)">
                             <span class="glyphicon glyphicon-ok" style="color: seagreen"></span>
                         </button>
-                        <button class="btn btn-link" ng-click="rechazarPermiso(solicitudPer)">
+                        <button class="btn btn-link" ng-click="rechazarSolicitudPermiso(solicitudPer)">
                             <span class="glyphicon glyphicon-remove" style="color: darkred"></span>
                         </button>
                     </div>
@@ -337,6 +337,44 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="generarVacacionesPDF()">Exportar a PDF</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal-rechazar-permiso" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h5 class="modal-title"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Rechazar Permiso</h5>
+            </div>
+            <div class="modal-body">
+                Comentario de rechazo de permiso:
+                <textarea class="form-control" ng-model="rechazoPermisoComentario" maxlength="300" rows="8" ng-required="true"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal" ng-click="rechazarPermiso()">Enviar</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal-rechazar-vacaciones" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h5 class="modal-title"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Rechazar Vacaciones</h5>
+            </div>
+            <div class="modal-body">
+                Comentario de rechazo de vacaciones:
+                <textarea class="form-control" ng-model="rechazoVacacionesComentario" maxlength="300" rows="8" ng-required="true"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal" ng-click="rechazarVacaciones()">Enviar</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>

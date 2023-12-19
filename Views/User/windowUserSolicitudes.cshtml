@@ -32,7 +32,7 @@
         </thead>
 
         <tbody>
-            <tr ng-repeat="solicitud in vacaciones">
+            <tr ng-repeat="solicitud in vacaciones" ng-dblclick="editarSolicitudVacaciones(solicitud)">
                 <td>{{solicitud.Estado}}</td>
                 <td>{{solicitud.ApellidosNombres}}</td>
                 <td>{{solicitud.Cargo}}</td>
@@ -81,7 +81,7 @@
         </thead>
 
         <tbody>
-            <tr ng-repeat="solicitud in permisos">
+            <tr ng-repeat="solicitud in permisos" ng-dblclick="editarSolicitudPermiso(solicitud)">
                 <td>{{solicitud.Estado}}</td>
                 <td>{{solicitud.ApellidosNombres}}</td>
                 <td>{{solicitud.Area}}</td>

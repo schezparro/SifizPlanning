@@ -19,6 +19,7 @@ using System.Web.Hosting;
 using SifizPlanning.Models.ViewModel;
 using DocumentFormat.OpenXml.Bibliography;
 using Org.BouncyCastle.Bcpg.OpenPgp;
+using System.Data.Entity.Validation;
 
 namespace SifizPlanning.Controllers
 {
@@ -2182,7 +2183,7 @@ r in db.Rol on ur.rol equals r
 
 		[HttpPost]
 		[Authorize(Roles = "USER, ADMIN")]
-		public ActionResult SolicitudVacacionesUsuario([System.Web.Http.FromBody] SolicitudVacacionesDTO solicitud)
+		public ActionResult SolicitudVacacionesUsuario([System.Web.Http.FromBody] SolicitudVacacionesDTO solicitud, string rechazoVacacionesComentario = "")
 		{
 			try
 			{
@@ -2283,9 +2284,13 @@ r in db.Rol on ur.rol equals r
 
 						while(fechaDesde <= fechaHasta)
 						{
-							Vacaciones vaca = db.Vacaciones.Where(x => x.SecuencialColaborador == col.Secuencial && x.Fecha == fechaDesde).FirstOrDefault();
-							db.Vacaciones.Remove(vaca);
-							fechaDesde = fechaDesde.AddDays(1);
+                            Vacaciones vaca = db.Vacaciones.Where(x => x.SecuencialColaborador == col.Secuencial && x.Fecha == fechaDesde).FirstOrDefault();
+                            if (vaca != null)
+                            {
+                                db.Vacaciones.Remove(vaca);
+                            }
+
+                            fechaDesde = fechaDesde.AddDays(1);
 						}
 
 						//emails.AddRange(Utiles.CorreoPorGrupoEmail("RRHH"));
@@ -2295,7 +2300,8 @@ r in db.Rol on ur.rol equals r
 
 						string textoHtml = "<div class=\"textoCuerpo\">Se ha rechazado la solicitud de vacaciones.<br/>";
 						textoHtml += "Solicitada por: <b>" + solVacaciones.ApellidosNombres + "</b><br/>";
-						textoHtml += "Puede contactar con RRHH para más información<br/></div>";
+                        textoHtml += "Comentario de rechazo: <b>" + rechazoVacacionesComentario + "</b><br/>";
+                        textoHtml += "Puede contactar con RRHH para más información<br/></div>";
 
 						Utiles.EnviarEmailSistema(emails.ToArray(), textoHtml, "Vacaciones Rechazadas");
 					}
@@ -2310,20 +2316,20 @@ r in db.Rol on ur.rol equals r
 				};
 				return Json(resp);
 			}
-			catch(Exception e)
-			{
-				var resp = new
-				{
-					success = false,
-					msg = e.Message
-				};
-				return Json(resp);
-			}
-		}
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message,
+                };
+                return Json(resp);
+            }
+        }
 
-		[HttpPost]
+        [HttpPost]
 		[Authorize(Roles = "USER, ADMIN")]
-		public ActionResult SolicitudPermisosUsuario([System.Web.Http.FromBody] SolicitudPermisosDTO solicitud)
+		public ActionResult SolicitudPermisosUsuario([System.Web.Http.FromBody] SolicitudPermisosDTO solicitud, string rechazoPermisoComentario = "")
 		{
 			try
 			{
@@ -2449,7 +2455,7 @@ r in db.Rol on ur.rol equals r
 							s.FechaInicio == fechaDesde &&
 							s.FechaFin == fechaHasta &&
 							s.Motivo == solPermisos.Motivo
-						).First();
+						).FirstOrDefault();
 
 						if(permiso != null)
 						{
@@ -2464,6 +2470,7 @@ r in db.Rol on ur.rol equals r
 
 						string textoHtml = "<div class=\"textoCuerpo\">Se ha rechazado la solicitud de permiso.<br/>";
 						textoHtml += "Solicitada por: <b>" + solPermisos.ApellidosNombres + "</b><br/>";
+						textoHtml += "Comentario de rechazo: <b>" + rechazoPermisoComentario + "</b><br/>";
 						textoHtml += "Puede contactar con RRHH para más información<br/></div>";
 
 						Utiles.EnviarEmailSistema(emails.ToArray(), textoHtml, "Permiso Rechazado");

@@ -58,22 +58,30 @@
     };
 
     $scope.rechazarVacaciones = function (solVac) {
-        waitingDialog.show('Rechazando solicitud...', { dialogSize: 'sm', progressType: 'success' });
 
-        solVac.Estado = "RECHAZADA"
-        var solicitudVacaciones = $http.post("user/solicitar-vacaciones",
-            {
-                solicitud: solVac
+        if ($scope.rechazoVacacionesComentario === null || $scope.rechazoVacacionesComentario === "") {
+            messageDialog.show('Información', "El comentario no puede estar vacío.");
+        } else {
+            waitingDialog.show('Rechazando solicitud...', { dialogSize: 'sm', progressType: 'success' });
+
+            $scope.solVacTemp.Estado = "RECHAZADA"
+            console.log($scope.solVacTemp);
+            var solicitudVacaciones = $http.post("user/solicitar-vacaciones",
+                {
+                    solicitud: $scope.solVacTemp,
+                    rechazoVacacionesComentario: $scope.rechazoVacacionesComentario
+                });
+            solicitudVacaciones.success(function (data) {
+                if (data.success === true) {
+                    $scope.recargarVacaciones();
+                    waitingDialog.hide();
+                }
+                else {
+                    console.log(data);
+                    messageDialog.show('Información', data.msg);
+                }
             });
-        solicitudVacaciones.success(function (data) {
-            if (data.success === true) {
-                $scope.recargarVacaciones();
-                waitingDialog.hide();
-            }
-            else {
-                messageDialog.show('Información', data.msg);
-            }
-        });
+        }
     };
 
     $scope.aceptarPermiso = function (solPer) {
@@ -94,24 +102,43 @@
         });
     };
 
-    $scope.rechazarPermiso = function (solPer) {
-        waitingDialog.show('Rechazando solicitud...', { dialogSize: 'sm', progressType: 'success' });
+    $scope.rechazarPermiso = function () {
 
-        solPer.Estado = "RECHAZADA"
-        var solicitudPermisos = $http.post("user/solicitar-permisos",
-            {
-                solicitud: solPer
+        if ($scope.rechazoPermisoComentario === null || $scope.rechazoPermisoComentario === "") {
+            messageDialog.show('Información', "El comentario no puede estar vacío.");
+        } else {
+            waitingDialog.show('Rechazando solicitud...', { dialogSize: 'sm', progressType: 'success' });
+
+            $scope.solPerTemp.Estado = "RECHAZADA"
+            var solicitudPermisos = $http.post("user/solicitar-permisos",
+                {
+                    solicitud: $scope.solPerTemp,
+                    rechazoPermisoComentario: $scope.rechazoPermisoComentario
+                });
+            solicitudPermisos.success(function (data) {
+                if (data.success === true) {
+                    $scope.recargarPermisos();
+                    waitingDialog.hide();
+                }
+                else {
+                    console.log(data.msg);
+                    messageDialog.show('Información', data.msg);
+                }
             });
-        solicitudPermisos.success(function (data) {
-            if (data.success === true) {
-                $scope.recargarPermisos();
-                waitingDialog.hide();
-            }
-            else {
-                messageDialog.show('Información', data.msg);
-            }
-        });
+        }
     };
+
+    $scope.rechazarSolicitudPermiso = function (solPer) {
+        $scope.rechazoPermisoComentario = "";
+        $scope.solPerTemp = solPer;
+        angular.element("#modal-rechazar-permiso").modal('show');
+    }
+
+    $scope.rechazarSolicitudVacaciones = function (solVac) {
+        $scope.rechazoVacacionesComentario = "";
+        $scope.solVacTemp = solVac;
+        angular.element("#modal-rechazar-vacaciones").modal('show');
+    }
 
     $scope.showVacDetail = function (sol) {
         $scope.solicitudVacacionesUsuario = sol;
@@ -150,9 +177,6 @@
         newWin.print();
         newWin.close();
     };
-
-
-
 
     /*
     $scope.printTable = function () {

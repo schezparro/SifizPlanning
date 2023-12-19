@@ -282,6 +282,46 @@
         }
     };
 
+    $scope.editarSolicitudVacaciones = function (solVac) {
+        if (solVac.Estado === "RECHAZADA") {
+            $scope.solVacaciones.cedula = solVac.Cedula;
+            $scope.solVacaciones.fechaIngresoSolicitud = convertDate(solVac.FechaIngresoSolicitud);
+            $scope.solVacaciones.empresa = solVac.Empresa;
+            $scope.solVacaciones.fechaIngresoInstitucion = convertDate(solVac.FechaIngresoInstitucion);
+            $scope.solVacaciones.aniosServicio = solVac.AniosServicio;
+            $scope.solVacaciones.diasCorresponden = solVac.DiasCorresponden;
+            $scope.solVacaciones.diasDisfrutar = solVac.DiasDisfrutar;
+            $scope.solVacaciones.diasPendientes = solVac.DiasPendientes;
+            $scope.solVacaciones.delAnio = solVac.DelAnio;
+            $scope.solVacaciones.alAnio = solVac.AlAnio;
+            $scope.solVacaciones.fechaInicioVacaciones = convertDate(solVac.FechaInicioVacaciones);
+            $scope.solVacaciones.fechaFinVacaciones = convertDate(solVac.FechaFinVacaciones);
+            $scope.solVacaciones.fechaPresentarseTrabajar = convertDate(solVac.FechaPresentarseTrabajar);
+            $scope.solVacaciones.observaciones = solVac.Observaciones;
+            $scope.windowSolicitarVacaciones();
+        }
+    };
+
+    $scope.editarSolicitudPermiso = function (solPer) {
+        if (solPer.Estado === "RECHAZADA") {
+            $scope.solicitudPer.cedula = solPer.Cedula;
+            $scope.solicitudPer.fechaIngresoSolicitud = convertDate(solPer.FechaIngresoSolicitud);
+            $scope.solicitudPer.empresa = solPer.Empresa;
+            $scope.solicitudPer.personal = solPer.Personal;
+            $scope.solicitudPer.matrimonio = solPer.Matrimonio;
+            $scope.solicitudPer.comida = solPer.Comida;
+            $scope.solicitudPer.paternidad = solPer.Paternidad;
+            $scope.solicitudPer.otros = solPer.Otros;
+            $scope.solicitudPer.fechaDesde = convertDate(solPer.FechaDesde);
+            $scope.solicitudPer.horaSalida = solPer.HoraSalida;
+            $scope.solicitudPer.fechaHasta = convertDate(solPer.FechaHasta);
+            $scope.solicitudPer.horaRetorno = solPer.HoraRetorno;
+            $scope.solicitudPer.motivo = solPer.Motivo;
+            $scope.solicitudPer.jefe = solPer.Jefe;
+            $scope.windowSolicitarPermiso();
+        }
+    };
+
 }]);
 
 devApp.filter("strDateToStr", function () {
@@ -293,6 +333,16 @@ devApp.filter("strDateToStr", function () {
         return "";
     }
 });
+
+function convertDate(dateStr) {
+    return new Date(parseInt(dateStr.replace(/\/Date\((\d+)\)\//, "$1")));
+}
+
+function convertTime(time) {
+    var partes = time.split(":");
+    return partes[0] + ":" + partes[1];
+}
+
 
 function dateToStr(dateObj, format, separator) {
     /**
