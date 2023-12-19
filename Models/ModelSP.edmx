@@ -1328,6 +1328,7 @@
           <Property Name="TIEMPODESARROLLO" Type="int" />
           <Property Name="TIEMPOPRUEBA" Type="int" />
           <Property Name="SECUENCIALENTREGABLEESTIMACION" Type="int" />
+          <Property Name="TIEMPOQA" Type="int" />
         </EntityType>
         <EntityType Name="ENTREGABLEDETALLEESTIMACION">
           <Key>
@@ -8104,6 +8105,7 @@
           <Property Name="TiempoPrueba" Type="Int32" />
           <Property Name="SecuencialEntregableEstimacion" Type="Int32" />
           <NavigationProperty Name="entregableDetalleEstimacion" Relationship="SifizPlanningModel.FK_DETALLEESTIMACIONTICKET_ENTREGABLEDETALLEESTIMACION" FromRole="DetalleEstimacionTicket" ToRole="ENTREGABLEDETALLEESTIMACION" />
+          <Property Name="TiempoQA" Type="Int32" />
         </EntityType>
         <Association Name="RefNIVELCOLABORADOR109">
           <End Type="SifizPlanningModel.NivelColaborador" Role="NivelColaborador" Multiplicity="1" />
@@ -12271,6 +12273,7 @@
           <EntitySetMapping Name="DetalleEstimacionTicket">
             <EntityTypeMapping TypeName="SifizPlanningModel.DetalleEstimacionTicket">
               <MappingFragment StoreEntitySet="DETALLEESTIMACIONTICKET">
+                <ScalarProperty Name="TiempoQA" ColumnName="TIEMPOQA" />
                 <ScalarProperty Name="SecuencialEntregableEstimacion" ColumnName="SECUENCIALENTREGABLEESTIMACION" />
                 <ScalarProperty Name="TiempoPrueba" ColumnName="TIEMPOPRUEBA" />
                 <ScalarProperty Name="TiempoDesarrollo" ColumnName="TIEMPODESARROLLO" />

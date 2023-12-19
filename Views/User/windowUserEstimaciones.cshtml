@@ -93,6 +93,7 @@
                                                 <th>TIEMPO(H)</th>
                                                 <th>TIEMPO(DES)</th>
                                                 <th>Tiempo(PRU)</th>
+                                                <th>Tiempo(QA)</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -103,6 +104,7 @@
                                                 <td>{{d.tiempoDesarrollo + d.tiempoPrueba}}</td>
                                                 <td>{{d.tiempoDesarrollo}}</td>
                                                 <td>{{d.tiempoPrueba}}</td>
+                                                <td>{{d.tiempoQA}}</td>
                                             </tr>
                                         </tbody>
 
@@ -231,6 +233,11 @@
             <label>Tiempo<br>(PRU)</label>
             <input type="text" class="solo-numero form-control" ng-required="true" />
         </div>
+        
+        <div class="col-md-1">
+            <label>Tiempo<br>(QA)</label>
+            <input type="text" class="solo-numero form-control" ng-required="true" />
+        </div>
 
         <div class="col-md-3">
             <label>Tipo<br>Recurso:</label>
@@ -253,6 +260,11 @@
             <input type="text" class="solo-numero form-control" ng-required="true" />
         </div>
 
+        <div class="col-md-1">
+            <br>
+            <input type="text" class="solo-numero form-control" ng-required="true" />
+        </div>
+        
         <div class="col-md-1">
             <br>
             <input type="text" class="solo-numero form-control" ng-required="true" />

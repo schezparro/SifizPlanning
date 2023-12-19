@@ -2612,6 +2612,7 @@ namespace SifizPlanning.Controllers
                                                   tiempoEstimacion = de.TiempoEstimacion,
                                                   tiempoDesarrollo = de.TiempoDesarrollo,
                                                   tiempoPrueba = de.TiempoPrueba,
+                                                  tiempoQA = de.TiempoQA,
                                                   nivel = de.SecuencialNivelColaborador
                                               }).ToList();
                     var resp = new
@@ -3090,6 +3091,7 @@ namespace SifizPlanning.Controllers
                                                                                   tiempoEstimacion = d.TiempoEstimacion,
                                                                                   tiempoDesarrollo = d.TiempoDesarrollo ?? 0,
                                                                                   tiempoPrueba = d.TiempoPrueba ?? 0,
+                                                                                  tiempoQA = d.TiempoQA ?? 0,
                                                                                   nivel = db.NivelColaborador.Where(s => s.Secuencial == d.SecuencialNivelColaborador).FirstOrDefault().Codigo.ToUpper(),
                                                                               }).ToList()
                                                               }).ToList(),

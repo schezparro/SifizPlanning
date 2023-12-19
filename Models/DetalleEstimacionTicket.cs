@@ -22,6 +22,7 @@ namespace SifizPlanning.Models
         public Nullable<int> TiempoDesarrollo { get; set; }
         public Nullable<int> TiempoPrueba { get; set; }
         public Nullable<int> SecuencialEntregableEstimacion { get; set; }
+        public Nullable<int> TiempoQA { get; set; }
     
         public virtual NivelColaborador nivelColaborador { get; set; }
         public virtual EstimacionTicket estimacionTicket { get; set; }

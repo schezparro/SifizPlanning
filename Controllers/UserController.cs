@@ -3171,6 +3171,7 @@ r in db.Rol on ur.rol equals r
                                                                   tiempoEstimacion = d.TiempoEstimacion,
                                                                   tiempoDesarrollo = d.TiempoDesarrollo ?? 0,
                                                                   tiempoPrueba = d.TiempoPrueba ?? 0,
+                                                                  tiempoQA = d.TiempoQA ?? 0,
                                                                   nivel = db.NivelColaborador.Where(s => s.Secuencial == d.SecuencialNivelColaborador).FirstOrDefault().Codigo,
                                                               }).ToList()
                                               }).ToList();
@@ -3510,6 +3511,7 @@ r in db.Rol on ur.rol equals r
                     int tiempoEstimacion = int.Parse(obj["tiempoEstimacion"]);
                     int tiempoDesarrollo = int.Parse(obj["tiempoDesarrollo"]);
                     int tiempoPrueba = int.Parse(obj["tiempoPrueba"]);
+                    int tiempoQA = int.Parse(obj["tiempoQA"]);
                     int nivel = int.Parse(obj["nivel"]);
 
                     DetalleEstimacionTicket newDetalle = new DetalleEstimacionTicket
@@ -3520,6 +3522,7 @@ r in db.Rol on ur.rol equals r
                         TiempoEstimacion = tiempoEstimacion,
                         TiempoDesarrollo = tiempoDesarrollo,
                         TiempoPrueba = tiempoPrueba,
+                        TiempoQA = tiempoQA,
                         SecuencialEntregableEstimacion = entregableDetalleEstimacion.Secuencial
                     };
                     db.DetalleEstimacionTicket.Add(newDetalle);

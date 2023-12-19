@@ -1062,6 +1062,7 @@
     <Content Include="SCRIPTSDATABASE\12\05-OFERTAS.sql" />
     <Content Include="SCRIPTSDATABASE\12\07-COLABORADOR.sql" />
     <Content Include="SCRIPTSDATABASE\12\08-TICKET.sql" />
+    <Content Include="SCRIPTSDATABASE\12\09-DETALLEESTIMACIONTICKET.sql" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />

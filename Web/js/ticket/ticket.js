@@ -1730,6 +1730,7 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
                     var texto = detalle.detalle;
                     var tiempo = detalle.tiempo;
                     var nivel = detalle.nivel;
+                    var tiempoQA = detalle.tiempoQA
 
                     var hijo = undefined;
                     if (i === 0) {

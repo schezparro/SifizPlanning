@@ -265,6 +265,7 @@
             var detalle = angular.element(divHijo).find('textarea').val();
             var tiempoDesarrollo = angular.element(divHijo).find('input').eq(0).val();
             var tiempoPrueba = angular.element(divHijo).find('input').eq(1).val();
+            var tiempoQA = angular.element(divHijo).find('input').eq(2).val();
             var nivel = angular.element(divHijo).find('select').val();
 
             var datoDetalle = {
@@ -272,6 +273,7 @@
                 tiempoEstimacion: '0',
                 tiempoDesarrollo: tiempoDesarrollo,
                 tiempoPrueba: tiempoPrueba,
+                tiempoQA: tiempoQA,
                 nivel: nivel
             };
             arreglo.push(datoDetalle);

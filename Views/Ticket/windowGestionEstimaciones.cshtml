@@ -195,6 +195,7 @@
                                                     <th style="text-align: center">Tiempo (H)</th>
                                                     <th style="text-align: center">Tiempo (DES)</th>
                                                     <th style="text-align: center">Tiempo (PRU)</th>
+                                                    <th style="text-align: center">Tiempo (QA)</th>
                                                 </tr>
                                             </thead>
                                             <tr ng-repeat="detalle in entregable.detalles">
@@ -203,6 +204,7 @@
                                                 <td align="center">{{detalle.tiempoDesarrollo + detalle.tiempoPrueba + detalle.tiempoEstimacion}}</td>
                                                 <td align="center">{{detalle.tiempoDesarrollo}}</td>
                                                 <td align="center">{{detalle.tiempoPrueba}}</td>
+                                                <td align="center">{{detalle.tiempoQA}}</td>
                                             </tr>
                                         </table>
                                     </td>
