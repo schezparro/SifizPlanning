@@ -3,7 +3,7 @@
     var pagina = 1;
     $scope.idEstimacion = 0;
     $scope.mostrarTodasEstimaciones = false;
-    
+
     $scope.cargarEstimaciones = function (start, lenght) {
         if (start === undefined)
             start = 0;
@@ -157,6 +157,7 @@
                     var texto = detalle.detalle;
                     var tiempoDesarrollo = detalle.tiempoDesarrollo;
                     var tiempoPrueba = detalle.tiempoPrueba;
+                    var tiempoQA = detalle.tiempoQA;
                     var nivel = detalle.nivel;
 
                     var hijo = undefined;
@@ -171,6 +172,7 @@
                     angular.element(hijo).find('textarea').val(texto);
                     angular.element(hijo).find('input').eq(0).val(tiempoDesarrollo);
                     angular.element(hijo).find('input').eq(1).val(tiempoPrueba);
+                    angular.element(hijo).find('input').eq(2).val(tiempoQA);
                     angular.element(hijo).find('select').val(nivel);
                 }
                 angular.element("#modal-edicion-entregable-ticket").modal('show');
@@ -308,6 +310,7 @@
             var detalle = angular.element(divHijo).find('textarea').val();
             var tiempoDesarrollo = angular.element(divHijo).find('input').eq(0).val();
             var tiempoPrueba = angular.element(divHijo).find('input').eq(1).val();
+            var tiempoQA = angular.element(divHijo).find('input').eq(2).val();
             var nivel = angular.element(divHijo).find('select').val();
 
             var datoDetalle = {
@@ -315,6 +318,7 @@
                 tiempoEstimacion: '0',
                 tiempoDesarrollo: tiempoDesarrollo,
                 tiempoPrueba: tiempoPrueba,
+                tiempoQA: tiempoQA,
                 nivel: nivel
             };
             arreglo.push(datoDetalle);
