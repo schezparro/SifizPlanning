@@ -2492,6 +2492,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_TICKET_MODULO">
+          <End Role="MODULO" Type="Self.MODULO" Multiplicity="0..1" />
+          <End Role="TICKET" Type="Self.TICKET" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MODULO">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="TICKET">
+              <PropertyRef Name="SECUENCIALMODULO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_TICKET_TICKETVERSIONCLIENTE">
           <End Role="TICKETVERSIONCLIENTE" Type="Self.TICKETVERSIONCLIENTE" Multiplicity="0..1" />
           <End Role="TICKET" Type="Self.TICKET" Multiplicity="*" />
@@ -4947,6 +4959,10 @@
           <AssociationSet Name="FK_TICKET_ACTIVIDAD_TICKET_ACTIVIDAD" Association="Self.FK_TICKET_ACTIVIDAD_TICKET_ACTIVIDAD">
             <End Role="TICKET" EntitySet="TICKET" />
             <End Role="TICKET_COMPLEMENTO" EntitySet="TICKET_COMPLEMENTO" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TICKET_MODULO" Association="Self.FK_TICKET_MODULO">
+            <End Role="MODULO" EntitySet="MODULO" />
+            <End Role="TICKET" EntitySet="TICKET" />
           </AssociationSet>
           <AssociationSet Name="FK_TICKET_TICKETVERSIONCLIENTE" Association="Self.FK_TICKET_TICKETVERSIONCLIENTE">
             <End Role="TICKETVERSIONCLIENTE" EntitySet="TICKETVERSIONCLIENTE" />
