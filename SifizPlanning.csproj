@@ -1114,8 +1114,6 @@
     <Content Include="Views\User\windowUserFTP.cshtml" />
     <Content Include="Views\Rrhh\windowFeriados.cshtml" />
     <Content Include="Views\Task\windowInformesRecursos.cshtml" />
-    <Content Include="Views\_ViewStart.cshtml" />
-    <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\User\windowUserIncidencias.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
