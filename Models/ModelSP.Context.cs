@@ -187,5 +187,6 @@ namespace SifizPlanning.Models
         public virtual DbSet<TecnologiasYProcesos> TecnologiasYProcesos { get; set; }
         public virtual DbSet<NivelColaboradorTecnologia> NivelColaboradorTecnologia { get; set; }
         public virtual DbSet<Feriados> Feriados { get; set; }
+        public virtual DbSet<Incidencias> Incidencias { get; set; }
     }
 }

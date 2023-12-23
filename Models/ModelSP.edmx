@@ -1434,6 +1434,16 @@
           <Property Name="ANIO" Type="numeric" Precision="4" Scale="0" Nullable="false" />
           <Property Name="HORASCONSUMIDAS" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="INCIDENCIAS">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="VERSION" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="SECUENCIALMODULO" Type="int" Nullable="false" />
+          <Property Name="INCIDENTE" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="ADJUNTO" Type="nvarchar" MaxLength="255" Nullable="false" />
+        </EntityType>
         <EntityType Name="INFOTICKETS">
           <Key>
             <PropertyRef Name="ID" />
@@ -2191,6 +2201,18 @@
             </Principal>
             <Dependent Role="GESTORSERVICIOS">
               <PropertyRef Name="SECUENCIALCOLABORADOR" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_INCIDENCIAS_MODULO">
+          <End Role="MODULO" Type="Self.MODULO" Multiplicity="1" />
+          <End Role="INCIDENCIAS" Type="Self.INCIDENCIAS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MODULO">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="INCIDENCIAS">
+              <PropertyRef Name="SECUENCIALMODULO" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -4690,6 +4712,7 @@
           <EntitySet Name="HISTORICOADJUNTO" EntityType="Self.HISTORICOADJUNTO" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="HISTORICOINFORMACIONTICKET" EntityType="Self.HISTORICOINFORMACIONTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="HORASCONSUMIDAS" EntityType="Self.HORASCONSUMIDAS" Schema="TICKET" store:Type="Tables" />
+          <EntitySet Name="INCIDENCIAS" EntityType="Self.INCIDENCIAS" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="INFOTICKETS" EntityType="Self.INFOTICKETS" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="MOTIVODEVOLUCIONTICKET" EntityType="Self.MOTIVODEVOLUCIONTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="MOTIVOPRIORIDADTICKET" EntityType="Self.MOTIVOPRIORIDADTICKET" Schema="TICKET" store:Type="Tables" />
@@ -4840,6 +4863,10 @@
           <AssociationSet Name="FK_GESTORSERVICIOS_COLABORADOR" Association="Self.FK_GESTORSERVICIOS_COLABORADOR">
             <End Role="COLABORADOR" EntitySet="COLABORADOR" />
             <End Role="GESTORSERVICIOS" EntitySet="GESTORSERVICIOS" />
+          </AssociationSet>
+          <AssociationSet Name="FK_INCIDENCIAS_MODULO" Association="Self.FK_INCIDENCIAS_MODULO">
+            <End Role="MODULO" EntitySet="MODULO" />
+            <End Role="INCIDENCIAS" EntitySet="INCIDENCIAS" />
           </AssociationSet>
           <AssociationSet Name="FK_MODULO_TIPO" Association="Self.FK_MODULO_TIPO">
             <End Role="TipoModulo" EntitySet="TipoModulo" />
@@ -6697,6 +6724,11 @@
             <End Role="NIVELCOLABORADORTECNOLOGIA" EntitySet="NivelColaboradorTecnologia" />
           </AssociationSet>
           <EntitySet Name="Feriados" EntityType="SifizPlanningModel.Feriados" />
+          <EntitySet Name="Incidencias" EntityType="SifizPlanningModel.Incidencias" />
+          <AssociationSet Name="FK_INCIDENCIAS_MODULO" Association="SifizPlanningModel.FK_INCIDENCIAS_MODULO">
+            <End Role="Modulo" EntitySet="Modulo" />
+            <End Role="INCIDENCIAS" EntitySet="Incidencias" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="Rol">
           <Key>
@@ -10466,6 +10498,7 @@
           <NavigationProperty Name="subModulo" Relationship="SifizPlanningModel.FK_SUBMODULO_MODULO" FromRole="Modulo" ToRole="SubModulo" />
           <NavigationProperty Name="proyectoModuloCliente" Relationship="SifizPlanningModel.RefMODULO151" FromRole="Modulo" ToRole="PROYECTOMODULOCLIENTE" />
           <NavigationProperty Name="TICKET" Relationship="SifizPlanningModel.FK_TICKET_MODULO" FromRole="Modulo" ToRole="Ticket" />
+          <NavigationProperty Name="INCIDENCIAS" Relationship="SifizPlanningModel.FK_INCIDENCIAS_MODULO" FromRole="Modulo" ToRole="INCIDENCIAS" />
         </EntityType>
         <Association Name="FK_MODULO_TIPO">
           <End Type="SifizPlanningModel.TipoModulo" Role="TipoModulo" Multiplicity="0..1" />
@@ -11661,6 +11694,29 @@
           <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
         </EntityType>
+        <EntityType Name="Incidencias">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Version" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SecuencialModulo" Type="Int32" Nullable="false" />
+          <Property Name="Incidente" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Adjunto" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="modulo" Relationship="SifizPlanningModel.FK_INCIDENCIAS_MODULO" FromRole="INCIDENCIAS" ToRole="Modulo" />
+        </EntityType>
+        <Association Name="FK_INCIDENCIAS_MODULO">
+          <End Type="SifizPlanningModel.Modulo" Role="Modulo" Multiplicity="1" />
+          <End Type="SifizPlanningModel.Incidencias" Role="INCIDENCIAS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Modulo">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="INCIDENCIAS">
+              <PropertyRef Name="SecuencialModulo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -13669,6 +13725,17 @@
             <EntityTypeMapping TypeName="SifizPlanningModel.Feriados">
               <MappingFragment StoreEntitySet="FERIADOS">
                 <ScalarProperty Name="Fecha" ColumnName="FECHA" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Incidencias">
+            <EntityTypeMapping TypeName="SifizPlanningModel.Incidencias">
+              <MappingFragment StoreEntitySet="INCIDENCIAS">
+                <ScalarProperty Name="Adjunto" ColumnName="ADJUNTO" />
+                <ScalarProperty Name="Incidente" ColumnName="INCIDENTE" />
+                <ScalarProperty Name="SecuencialModulo" ColumnName="SECUENCIALMODULO" />
+                <ScalarProperty Name="Version" ColumnName="VERSION" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
               </MappingFragment>
             </EntityTypeMapping>

@@ -1,0 +1,58 @@
+﻿<label style="display: inline-block">
+    Mostrar Todas:
+    <input style="vertical-align: -2px;" type="checkbox" ng-click="cargarIncidencias()" ng-model="mostrarTodasIncidencias" ng-init="mostrarTodasIncidencias=false" />
+</label>
+<input type="text" ng-keyup="cargarIncidencias()" ng-model="filtroIncidencias" class="form-control right filtro" placeholder="Filtrar..." />
+<div class="clear"></div>
+<div id="tabla-user-estimacion">
+    <table id="tabla-incidencias-usuario" class="table table-striped">
+        <thead>
+            <tr>
+                <th width="5">Versión</th>
+                <th width="10">Módulo/Funcionalidad</th>
+                <th width="10">Incidente</th>
+                <th width="35">Corrección/Adjunto</th>
+                
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr ng-repeat="incidencia in incidencias">
+                <td>{{incidencia.version}}</td>
+                <td>{{incidencia.modulo}}</td>
+                <td>{{incidencia.incidente}}</td>
+                <td>
+                    <a class="btn btn-success btn-xs"  target="_blank" href="Web{{incidencia.adjunto}}">
+                        <span class="glyphicon glyphicon-download"></span> Adjunto 
+                    </a>
+                </td>
+               
+            </tr>
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <th colspan="6">
+
+                    <nav>
+                        <ul class="pagination">
+                            <li ng-click="atrazarPagina()">
+                                <a href="#" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
+                            <li ng-click="avanzarPagina()">
+                                <a href="#" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </th>
+            </tr>
+        </tfoot>
+
+    </table>
+</div>
+

@@ -643,6 +643,9 @@
     <Compile Include="Models\ImplicacionError.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Incidencias.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\InfoTickets.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
@@ -1063,6 +1066,7 @@
     <Content Include="SCRIPTSDATABASE\12\07-COLABORADOR.sql" />
     <Content Include="SCRIPTSDATABASE\12\08-TICKET.sql" />
     <Content Include="SCRIPTSDATABASE\12\09-DETALLEESTIMACIONTICKET.sql" />
+    <Content Include="SCRIPTSDATABASE\12\10-INCIDENCIAS.sql" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
@@ -1109,6 +1113,9 @@
     <Content Include="Views\User\windowUserFTP.cshtml" />
     <Content Include="Views\Rrhh\windowFeriados.cshtml" />
     <Content Include="Views\Task\windowInformesRecursos.cshtml" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\User\windowUserIncidencias.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1141,6 +1148,7 @@
     <Content Include="Web\js\tfs\consultaCambios.js" />
     <Content Include="Web\js\tfs\consultaProyectos.js" />
     <Content Include="Web\js\user\ftpController.js" />
+    <Content Include="Web\js\user\incidenciasController.js" />
     <Content Include="Web\js\user\proyectosController.js" />
     <Content Include="Web\js\user\solicitudesController.js" />
     <Content Include="Web\js\user\ticketsController.js" />
@@ -1550,7 +1558,6 @@
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="SCRIPTSDATABASE\01\" />
     <Folder Include="SCRIPTSDATABASE\02\" />
-    <Folder Include="Views\Shared\" />
     <Folder Include="Web\files\asignaciones\" />
     <Folder Include="Web\images\chat\" />
     <Folder Include="Web\images\logFBSError\" />

@@ -2811,6 +2811,80 @@ r in db.Rol on ur.rol equals r
 			}
 		}
 
+		//INCIDENCIAS DE LOS USUARIOS
+		[HttpPost]
+		[Authorize(Roles = "USER, ADMIN")]
+		public ActionResult IncidenciasUsuario(int start, int lenght, string filtro = "", bool todos = false)
+		{
+            try {
+				var totalIncidencias = db.Incidencias.Count();
+				if (totalIncidencias==0) {
+					Incidencias nuevaIncidencia1 = new Incidencias
+					{
+					Version = "hiunday",
+					SecuencialModulo = 6,
+					Incidente = "se rayo",
+					Adjunto = "/ resources / tickets / jqazzcdq.lgn.zip"
+					};
+
+					Incidencias nuevaIncidencia2 = new Incidencias
+					{
+						Version = "ford",
+						SecuencialModulo = 7,
+						Incidente = "verde",
+						Adjunto = "/resources/tickets/reezajfv.1ej.pdf"
+					};
+
+					Incidencias nuevaIncidencia3 = new Incidencias
+					{
+						Version = "Ferrari",
+						SecuencialModulo = 8,
+						Incidente = "red",
+						Adjunto = "/resources/tickets/n4yowlpa.kno.msg"
+					};
+
+					db.Incidencias.Add(nuevaIncidencia1);
+					db.Incidencias.Add(nuevaIncidencia2);
+					db.Incidencias.Add(nuevaIncidencia3);
+					db.SaveChanges();
+				}
+
+
+
+				var incidenciasUsuario = (from inc in db.Incidencias
+										  join md in db.Modulo on inc.SecuencialModulo equals md.Secuencial
+										  select new
+										  {
+											  version = inc.Version,
+											  modulo = md.Descripcion,
+											  incidente = inc.Incidente,
+											  adjunto = inc.Adjunto
+
+										  }).ToList();
+
+			
+				int total = incidenciasUsuario.Count();
+				incidenciasUsuario = incidenciasUsuario.Skip(start).Take(lenght).ToList();
+
+				var result = new
+				{
+					success = true,
+					total = total,
+					incidencias = incidenciasUsuario
+				};
+				return Json(result);
+			}
+			catch (Exception e)
+			{
+				var result = new
+				{
+					success = false,
+					msg = e.Message
+				};
+				return Json(result);
+			}
+		}
+
 		//ESTIMACIONES DE LOS USUARIOS
 		[HttpPost]
 		[Authorize(Roles = "USER, ADMIN")]

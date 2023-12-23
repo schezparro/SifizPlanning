@@ -54,6 +54,7 @@ devApp.controller('desarrolladoresController', ['$scope', '$http', function ($sc
         angular.element("#panel_proyectos").addClass('invisible');
         angular.element("#panel_solicitudes").addClass('invisible');
         angular.element("#panel_ftp").addClass('invisible');
+        angular.element("#panel_incidencias").addClass('invisible');
     };
 
     $scope.IrMisTareas = function () {
@@ -104,6 +105,12 @@ devApp.controller('desarrolladoresController', ['$scope', '$http', function ($sc
         ocultar();
         angular.element("#panel_ftp").removeClass('invisible');
         $scope.funcionalidad = "FTP";
+    };
+
+    $scope.IrPanelIncidencias = function () {
+        ocultar();
+        angular.element("#panel_incidencias").removeClass('invisible');
+        $scope.funcionalidad = "Incidencias";
     };
 
     $scope.buscarTicketPorPublicar = function () {
