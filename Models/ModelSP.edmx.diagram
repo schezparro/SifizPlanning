@@ -391,6 +391,8 @@
         <AssociationConnector Association="SifizPlanningModel.FK_NIVELCOLABORADORTECNOLOGIA_COLABORADOR" />
         <AssociationConnector Association="SifizPlanningModel.FK_NIVELCOLABORADORTECNOLOGIA_TECNOLOGIASYPROCESOS" />
         <EntityTypeShape EntityType="SifizPlanningModel.Feriados" Width="1.5" PointX="11.375" PointY="17.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Incidencias" Width="1.5" PointX="11.875" PointY="42.5" />
+        <AssociationConnector Association="SifizPlanningModel.FK_INCIDENCIAS_MODULO" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
