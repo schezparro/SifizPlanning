@@ -80,22 +80,24 @@
 
 
     $scope.GuardarNuevaIncidencia = function () {
-
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
 
+        var fileInput = angular.element('#uniqueFileInputID')[0];
         var modulo = angular.element("#select-tipo-modulo")[0].value;
 
-        var datosEnvio = {          
-            version: $scope.newVersion,
-            modulo: modulo,
-            incidente: $scope.newIncidente,
-            adjunto: $scope.newAdjunto   
-        };
-       
-        var ajaxEnvioDatos = $http.post("user/guardar-incidencia",
-            {
-                datos: angular.toJson(datosEnvio)
-            });
+        var formData = new FormData();
+        formData.append('version', $scope.newVersion);
+        formData.append('modulo', modulo);
+        formData.append('incidente', $scope.newIncidente);
+        formData.append('adjuntos', fileInput.files[0]);
+
+        var ajaxEnvioDatos = $http({
+            method: 'POST',
+            url: "user/guardar-incidencia",
+            data: formData,
+            headers: { 'Content-Type': undefined },
+            transformRequest: angular.identity
+        });
 
         ajaxEnvioDatos.success(function (data) {
             waitingDialog.hide();
@@ -107,13 +109,13 @@
                 messageDialog.show("Información", data.msg);
             }
         });
+    };
 
-        
-    }
+    // Obtén la plantilla y añade un ID único
+    var fileInputTemplate = angular.element("#htmlFile").html();
+    var uniqueId = "uniqueFileInputID"; // Genera un ID único de alguna manera
+    var fileInputWithId = fileInputTemplate.replace('<input type="file"', '<input type="file" id="' + uniqueId + '"');
+
+    // Añade la plantilla modificada al DOM
+    angular.element("#panel-add-adjunto").append(fileInputWithId);
 }]);
-
-
-
-
-
-

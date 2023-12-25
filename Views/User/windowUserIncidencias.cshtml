@@ -3,7 +3,7 @@
     Mostrar Todas:
     <input style="vertical-align: -2px;" type="checkbox" ng-click="cargarIncidencias()" ng-model="mostrarTodasIncidencias" ng-init="mostrarTodasIncidencias=false" />
 </label>
-<button class="btn btn-primary" ng-click="windowAgregarIncidencias()"><span class="glyphicon glyphicon-time aria-hidden=" true"></span>Nueva Incidencia</button>
+<button class="btn btn-primary" ng-click="windowAgregarIncidencias()"><span class="glyphicon glyphicon-time aria-hidden="true"></span>Nueva Incidencia</button>
 <input type="text" ng-keyup="cargarIncidencias()" ng-model="filtroIncidencias" class="form-control right filtro" placeholder="Filtrar..." />
 <div class="clear"></div>
 <div id="tabla-user-estimacion">
@@ -24,7 +24,7 @@
                 <td>{{incidencia.modulo}}</td>
                 <td>{{incidencia.incidente}}</td>
                 <td>
-                    <a class="btn btn-success btn-xs"  target="_blank" href="Web{{incidencia.adjunto}}">
+                    <a class="btn btn-success btn-xs" target="_blank" href="Web{{incidencia.adjunto}}">
                         <span class="glyphicon glyphicon-download"></span> Adjunto
                     </a>
                 </td>
@@ -35,7 +35,6 @@
         <tfoot>
             <tr>
                 <th colspan="6">
-
                     <nav>
                         <ul class="pagination">
                             <li ng-click="atrazarPagina()">
@@ -68,32 +67,21 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
-                    <table class="table table-condensed table-striped table-active">
-                        <tr>
-                            <td colspan="5">
-                                VERSIÓN:
-                                <input type="text" class="form-control" ng-model="newVersion" ng-required="true" >
-                            </td>
-                            <td colspan="5">
-                                MODULO:
-                                <select id="select-tipo-modulo"  ng-model="tipoSeleccionado" class="form-control" required="required">
-                                    <option value="">Seleccione...</option>
-                                    <option value = "{{tipo.id}}"  ng-repeat="tipo in tipoModulo">{{tipo.nombre}}</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">
-                                INCIDENTE:
-                                <input type="text" class="form-control" ng-model="newIncidente" ng-required="true" >
-                            </td>
-                            <td colspan="5">
-                                ADJUNTO:
-                                <input type="text" class="form-control" ng-model="newAdjunto" ng-required="true" >
-                            </td>
-                        </tr>
-                        <tr>
-                       </table>
+                    <div style="column-count: 2">
+                        VERSIÓN:
+                        <input type="text" class="form-control" ng-model="newVersion" ng-required="true">
+                        <br>
+                        MODULO:
+                        <select id="select-tipo-modulo" ng-model="tipoSeleccionado" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{tipo.id}}" ng-repeat="tipo in tipoModulo">{{tipo.nombre}}</option>
+                        </select>
+                        INCIDENTE:
+                        <textarea type="text" class="form-control" ng-model="newIncidente" ng-required="true"></textarea>
+                        ADJUNTO:
+                        <div id="panel-add-adjunto"></div>
+                        <div class="clear"></div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" id="enviar-modal-incidencias-btn" class="btn btn-primary">Enviar</button>

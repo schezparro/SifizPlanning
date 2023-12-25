@@ -2284,13 +2284,13 @@ r in db.Rol on ur.rol equals r
 
 						while(fechaDesde <= fechaHasta)
 						{
-                            Vacaciones vaca = db.Vacaciones.Where(x => x.SecuencialColaborador == col.Secuencial && x.Fecha == fechaDesde).FirstOrDefault();
-                            if (vaca != null)
-                            {
-                                db.Vacaciones.Remove(vaca);
-                            }
+							Vacaciones vaca = db.Vacaciones.Where(x => x.SecuencialColaborador == col.Secuencial && x.Fecha == fechaDesde).FirstOrDefault();
+							if(vaca != null)
+							{
+								db.Vacaciones.Remove(vaca);
+							}
 
-                            fechaDesde = fechaDesde.AddDays(1);
+							fechaDesde = fechaDesde.AddDays(1);
 						}
 
 						//emails.AddRange(Utiles.CorreoPorGrupoEmail("RRHH"));
@@ -2300,8 +2300,8 @@ r in db.Rol on ur.rol equals r
 
 						string textoHtml = "<div class=\"textoCuerpo\">Se ha rechazado la solicitud de vacaciones.<br/>";
 						textoHtml += "Solicitada por: <b>" + solVacaciones.ApellidosNombres + "</b><br/>";
-                        textoHtml += "Comentario de rechazo: <b>" + rechazoVacacionesComentario + "</b><br/>";
-                        textoHtml += "Puede contactar con RRHH para más información<br/></div>";
+						textoHtml += "Comentario de rechazo: <b>" + rechazoVacacionesComentario + "</b><br/>";
+						textoHtml += "Puede contactar con RRHH para más información<br/></div>";
 
 						Utiles.EnviarEmailSistema(emails.ToArray(), textoHtml, "Vacaciones Rechazadas");
 					}
@@ -2316,18 +2316,18 @@ r in db.Rol on ur.rol equals r
 				};
 				return Json(resp);
 			}
-            catch (Exception e)
-            {
-                var resp = new
-                {
-                    success = false,
-                    msg = e.Message,
-                };
-                return Json(resp);
-            }
-        }
+			catch(Exception e)
+			{
+				var resp = new
+				{
+					success = false,
+					msg = e.Message,
+				};
+				return Json(resp);
+			}
+		}
 
-        [HttpPost]
+		[HttpPost]
 		[Authorize(Roles = "USER, ADMIN")]
 		public ActionResult SolicitudPermisosUsuario([System.Web.Http.FromBody] SolicitudPermisosDTO solicitud, string rechazoPermisoComentario = "")
 		{
@@ -2818,7 +2818,8 @@ r in db.Rol on ur.rol equals r
 		{
 
 
-            try {
+			try
+			{
 				var incidenciasUsuario = (from inc in db.Incidencias
 										  join md in db.Modulo on inc.SecuencialModulo equals md.Secuencial
 										  select new
@@ -2840,7 +2841,7 @@ r in db.Rol on ur.rol equals r
 				};
 				return Json(result);
 			}
-			catch (Exception e)
+			catch(Exception e)
 			{
 				var result = new
 				{
@@ -2860,7 +2861,7 @@ r in db.Rol on ur.rol equals r
 			var datos = (from tm in db.Modulo
 						 orderby tm.Descripcion
 						 select new
-						 {   
+						 {
 							 id = tm.Secuencial,
 							 nombre = tm.Descripcion
 						 }).ToList();
@@ -2876,31 +2877,35 @@ r in db.Rol on ur.rol equals r
 		//Guardar modal nuevas incidencias
 		[HttpPost]
 		[Authorize(Roles = "USER, ADMIN")]
-		public ActionResult GuardarIncidencia(string datos)
+		public ActionResult GuardarIncidencia(string version, string modulo, string incidente, HttpPostedFileBase[] adjuntos = null)
 		{
 			try
 			{
 				var s = new JavaScriptSerializer();
-				var jsonObj = s.Deserialize<dynamic>(datos);
+				var Url = "";
+				foreach(var adj in adjuntos.Where(adj => adj != null))
+				{
+					string extFile = Path.GetExtension(adj.FileName);
+					string newNameFile = Utiles.RandomString(10) + extFile;
+					newNameFile = System.IO.Path.GetRandomFileName() + extFile;
+					string path = Path.Combine(Server.MapPath("~/Web/resources/incidencias"), newNameFile);
+					adj.SaveAs(path);
 
-				
-				string version = (string)jsonObj["version"];
-				string modulo = (string)jsonObj["modulo"];
-				string incidente = (string)jsonObj["incidente"];
-				string adjunto = (string)jsonObj["adjunto"];
+					Url = "/resources/incidencias" + "/" + newNameFile;
+					break;
+				}
 
 				int moduloid = int.Parse(modulo);
-				
 				Incidencias nuevaIncidencia = new Incidencias
 				{
 					Version = version,
 					SecuencialModulo = moduloid,
 					Incidente = incidente,
-					Adjunto = adjunto
+					Adjunto = Url
 				};
 
 				db.Incidencias.Add(nuevaIncidencia);
-     			db.SaveChanges();
+				db.SaveChanges();
 
 				return Json(new
 				{
@@ -2908,7 +2913,7 @@ r in db.Rol on ur.rol equals r
 					msg = "Se ha realizado la operación correctamente."
 				});
 			}
-			catch (Exception e)
+			catch(Exception e)
 			{
 				return Json(new
 				{
@@ -3256,35 +3261,35 @@ r in db.Rol on ur.rol equals r
 			}
 		}
 
-        [HttpPost]
-        [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult DatosEstimacionUsuario(int idEstimacion)
-        {
-            try
-            {
-                EstimacionTicket estimacionTicket = db.EstimacionTicket.Find(idEstimacion);
-                if (estimacionTicket != null)
-                {
-                    var detallesEstimacion = (from de in db.DetalleEstimacionTicket
-                                              join et in db.EntregableDetalleEstimacion on de.SecuencialEntregableEstimacion equals et.Secuencial
-                                              where de.SecuencialEstimacionTicket == idEstimacion
-                                              group et by new { et.Secuencial, et.Nombre } into g
-                                              select new
-                                              {
-                                                  id = g.Key.Secuencial,
-                                                  nombre = g.Key.Nombre.ToUpper(),
-                                                  detalles = (from d in db.DetalleEstimacionTicket
-                                                              where d.SecuencialEntregableEstimacion == g.Key.Secuencial
-                                                              select new
-                                                              {
-                                                                  detalle = d.Detalle,
-                                                                  tiempoEstimacion = d.TiempoEstimacion,
-                                                                  tiempoDesarrollo = d.TiempoDesarrollo ?? 0,
-                                                                  tiempoPrueba = d.TiempoPrueba ?? 0,
-                                                                  tiempoQA = d.TiempoQA ?? 0,
-                                                                  nivel = db.NivelColaborador.Where(s => s.Secuencial == d.SecuencialNivelColaborador).FirstOrDefault().Codigo,
-                                                              }).ToList()
-                                              }).ToList();
+		[HttpPost]
+		[Authorize(Roles = "USER, ADMIN")]
+		public ActionResult DatosEstimacionUsuario(int idEstimacion)
+		{
+			try
+			{
+				EstimacionTicket estimacionTicket = db.EstimacionTicket.Find(idEstimacion);
+				if(estimacionTicket != null)
+				{
+					var detallesEstimacion = (from de in db.DetalleEstimacionTicket
+											  join et in db.EntregableDetalleEstimacion on de.SecuencialEntregableEstimacion equals et.Secuencial
+											  where de.SecuencialEstimacionTicket == idEstimacion
+											  group et by new { et.Secuencial, et.Nombre } into g
+											  select new
+											  {
+												  id = g.Key.Secuencial,
+												  nombre = g.Key.Nombre.ToUpper(),
+												  detalles = (from d in db.DetalleEstimacionTicket
+															  where d.SecuencialEntregableEstimacion == g.Key.Secuencial
+															  select new
+															  {
+																  detalle = d.Detalle,
+																  tiempoEstimacion = d.TiempoEstimacion,
+																  tiempoDesarrollo = d.TiempoDesarrollo ?? 0,
+																  tiempoPrueba = d.TiempoPrueba ?? 0,
+																  tiempoQA = d.TiempoQA ?? 0,
+																  nivel = db.NivelColaborador.Where(s => s.Secuencial == d.SecuencialNivelColaborador).FirstOrDefault().Codigo,
+															  }).ToList()
+											  }).ToList();
 
 					var tiempoTotal = (from de in detallesEstimacion
 									   from d in de.detalles
@@ -3613,33 +3618,33 @@ r in db.Rol on ur.rol equals r
 				entregableDetalleEstimacion.Nombre = entregable;
 				db.EntregableDetalleEstimacion.Add(entregableDetalleEstimacion);
 
-                var s = new JavaScriptSerializer();
-                var jsonDetallesObj = s.Deserialize<dynamic>(jsonDetalles);
-                for (int i = 0; i < jsonDetallesObj.Length; i++)
-                {
-                    var obj = jsonDetallesObj[i];
-                    string detalle = (string)obj["detalle"];
-                    int tiempoEstimacion = int.Parse(obj["tiempoEstimacion"]);
-                    int tiempoDesarrollo = int.Parse(obj["tiempoDesarrollo"]);
-                    int tiempoPrueba = int.Parse(obj["tiempoPrueba"]);
-                    int tiempoQA = int.Parse(obj["tiempoQA"]);
-                    int nivel = int.Parse(obj["nivel"]);
+				var s = new JavaScriptSerializer();
+				var jsonDetallesObj = s.Deserialize<dynamic>(jsonDetalles);
+				for(int i = 0; i < jsonDetallesObj.Length; i++)
+				{
+					var obj = jsonDetallesObj[i];
+					string detalle = (string)obj["detalle"];
+					int tiempoEstimacion = int.Parse(obj["tiempoEstimacion"]);
+					int tiempoDesarrollo = int.Parse(obj["tiempoDesarrollo"]);
+					int tiempoPrueba = int.Parse(obj["tiempoPrueba"]);
+					int tiempoQA = int.Parse(obj["tiempoQA"]);
+					int nivel = int.Parse(obj["nivel"]);
 
-                    DetalleEstimacionTicket newDetalle = new DetalleEstimacionTicket
-                    {
-                        SecuencialEstimacionTicket = idEstimacion,
-                        SecuencialNivelColaborador = nivel,
-                        Detalle = detalle,
-                        TiempoEstimacion = tiempoEstimacion,
-                        TiempoDesarrollo = tiempoDesarrollo,
-                        TiempoPrueba = tiempoPrueba,
-                        TiempoQA = tiempoQA,
-                        SecuencialEntregableEstimacion = entregableDetalleEstimacion.Secuencial
-                    };
-                    db.DetalleEstimacionTicket.Add(newDetalle);
-                }
-                //estimacionTicket
-                estimacionTicket.EstimacionTerminada = 0;
+					DetalleEstimacionTicket newDetalle = new DetalleEstimacionTicket
+					{
+						SecuencialEstimacionTicket = idEstimacion,
+						SecuencialNivelColaborador = nivel,
+						Detalle = detalle,
+						TiempoEstimacion = tiempoEstimacion,
+						TiempoDesarrollo = tiempoDesarrollo,
+						TiempoPrueba = tiempoPrueba,
+						TiempoQA = tiempoQA,
+						SecuencialEntregableEstimacion = entregableDetalleEstimacion.Secuencial
+					};
+					db.DetalleEstimacionTicket.Add(newDetalle);
+				}
+				//estimacionTicket
+				estimacionTicket.EstimacionTerminada = 0;
 
 				db.SaveChanges();
 

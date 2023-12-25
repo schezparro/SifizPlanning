@@ -1561,6 +1561,7 @@
     <Folder Include="Web\images\chat\" />
     <Folder Include="Web\images\logFBSError\" />
     <Folder Include="Web\resources\contracts\" />
+    <Folder Include="Web\resources\incidencias\" />
     <Folder Include="Web\resources\informesrecursos\" />
     <Folder Include="Web\resources\tasks\" />
     <Folder Include="Web\resources\tickets\" />
