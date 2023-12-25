@@ -31,7 +31,7 @@
             <ul class="nav nav-pills">
                 <li role="presentation" class="active"><a href="#" ng-click="IrMisTareas()">Tareas</a></li>
                 <li role="presentation"><a href="#" ng-click="IrEstimaciones()">Estimaciones</a></li>
-                <li role="presentation"><a href="#" ng-click="IrPanelTareasCompensatorias()">T-Compensatorias</a></li>
+                @*<li role="presentation"><a href="#" ng-click="IrPanelTareasCompensatorias()">T-Compensatorias</a></li>*@
                 @if (Roles.IsUserInRole("ADMINTFS"))
                 {
                     <li role="presentation"><a href="#" ng-click="IrRegistrarPublicaciones()">Publicaciones</a></li>
@@ -66,9 +66,9 @@
                     @{ Html.RenderPartial("windowUserEstimaciones"); }
                 </div>
 
-                <div id="panel_tareas_compensatorias" ng-controller="tareasCompensatoriasController" class="invisible">
+                @*<div id="panel_tareas_compensatorias" ng-controller="tareasCompensatoriasController" class="invisible">
                     @{ Html.RenderPartial("windowUserTareasCompensatorias"); }
-                </div>
+                </div>*@
 
                 <div id="panel_publicaciones" ng-controller="publicacionesController" class="invisible">
                     @{ Html.RenderPartial("windowUserPublicaciones"); }
@@ -257,7 +257,7 @@
     <script type="text/javascript" src="~/Web/js/user/sistemaController.js"></script>
     <script type="text/javascript" src="~/Web/js/user/taskController.js"></script>
     <script type="text/javascript" src="~/Web/js/user/estimacionesController.js"></script>
-    <script type="text/javascript" src="~/Web/js/user/tareasCompensatoriasController.js"></script>
+    @*<script type="text/javascript" src="~/Web/js/user/tareasCompensatoriasController.js"></script>*@
     <script type="text/javascript" src="~/Web/js/user/ticketsController.js"></script>
     <script type="text/javascript" src="~/Web/js/user/proyectosController.js"></script>
     <script type="text/javascript" src="~/Web/js/user/solicitudesController.js"></script>
