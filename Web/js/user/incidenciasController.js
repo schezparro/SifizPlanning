@@ -63,4 +63,57 @@
         });
     };
     $scope.cargarIncidencias();
+
+
+    $scope.windowAgregarIncidencias = function () {
+        angular.element("#modal-agregar-incidencias").modal("show");
+    };
+
+
+    var ajaxTipoModulo = $http.post("user/tipo-modulo", {});
+
+    ajaxTipoModulo.success(function (data) {
+        if (data.success === true) {
+            $scope.tipoModulo = data.tipoModulo;
+        }
+    });
+
+
+    $scope.GuardarNuevaIncidencia = function () {
+
+        waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
+
+        var modulo = angular.element("#select-tipo-modulo")[0].value;
+
+        var datosEnvio = {          
+            version: $scope.newVersion,
+            modulo: modulo,
+            incidente: $scope.newIncidente,
+            adjunto: $scope.newAdjunto   
+        };
+       
+        var ajaxEnvioDatos = $http.post("user/guardar-incidencia",
+            {
+                datos: angular.toJson(datosEnvio)
+            });
+
+        ajaxEnvioDatos.success(function (data) {
+            waitingDialog.hide();
+            if (data.success === true) {
+                messageDialog.show("Información", data.msg);
+                angular.element("#modal-agregar-incidencias").modal("hide");
+                $scope.cargarIncidencias();
+            } else {
+                messageDialog.show("Información", data.msg);
+            }
+        });
+
+        
+    }
 }]);
+
+
+
+
+
+
