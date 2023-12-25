@@ -102,7 +102,6 @@
         ajaxEnvioDatos.success(function (data) {
             waitingDialog.hide();
             if (data.success === true) {
-                messageDialog.show("Información", data.msg);
                 angular.element("#modal-agregar-incidencias").modal("hide");
                 $scope.cargarIncidencias();
             } else {
