@@ -2816,41 +2816,9 @@ r in db.Rol on ur.rol equals r
 		[Authorize(Roles = "USER, ADMIN")]
 		public ActionResult IncidenciasUsuario(int start, int lenght, string filtro = "", bool todos = false)
 		{
+
+
             try {
-				var totalIncidencias = db.Incidencias.Count();
-				if (totalIncidencias==0) {
-					Incidencias nuevaIncidencia1 = new Incidencias
-					{
-					Version = "hiunday",
-					SecuencialModulo = 6,
-					Incidente = "se rayo",
-					Adjunto = "/ resources / tickets / jqazzcdq.lgn.zip"
-					};
-
-					Incidencias nuevaIncidencia2 = new Incidencias
-					{
-						Version = "ford",
-						SecuencialModulo = 7,
-						Incidente = "verde",
-						Adjunto = "/resources/tickets/reezajfv.1ej.pdf"
-					};
-
-					Incidencias nuevaIncidencia3 = new Incidencias
-					{
-						Version = "Ferrari",
-						SecuencialModulo = 8,
-						Incidente = "red",
-						Adjunto = "/resources/tickets/n4yowlpa.kno.msg"
-					};
-
-					db.Incidencias.Add(nuevaIncidencia1);
-					db.Incidencias.Add(nuevaIncidencia2);
-					db.Incidencias.Add(nuevaIncidencia3);
-					db.SaveChanges();
-				}
-
-
-
 				var incidenciasUsuario = (from inc in db.Incidencias
 										  join md in db.Modulo on inc.SecuencialModulo equals md.Secuencial
 										  select new
@@ -2859,10 +2827,8 @@ r in db.Rol on ur.rol equals r
 											  modulo = md.Descripcion,
 											  incidente = inc.Incidente,
 											  adjunto = inc.Adjunto
-
 										  }).ToList();
 
-			
 				int total = incidenciasUsuario.Count();
 				incidenciasUsuario = incidenciasUsuario.Skip(start).Take(lenght).ToList();
 
@@ -2882,6 +2848,73 @@ r in db.Rol on ur.rol equals r
 					msg = e.Message
 				};
 				return Json(result);
+			}
+		}
+
+
+
+		[HttpPost]
+		[Authorize(Roles = "USER, ADMIN")]
+		public ActionResult DarTipoModulo()
+		{
+			var datos = (from tm in db.Modulo
+						 orderby tm.Descripcion
+						 select new
+						 {   
+							 id = tm.Secuencial,
+							 nombre = tm.Descripcion
+						 }).ToList();
+
+			return Json(new
+			{
+				success = true,
+				tipoModulo = datos
+			});
+		}
+
+
+		//Guardar modal nuevas incidencias
+		[HttpPost]
+		[Authorize(Roles = "USER, ADMIN")]
+		public ActionResult GuardarIncidencia(string datos)
+		{
+			try
+			{
+				var s = new JavaScriptSerializer();
+				var jsonObj = s.Deserialize<dynamic>(datos);
+
+				
+				string version = (string)jsonObj["version"];
+				string modulo = (string)jsonObj["modulo"];
+				string incidente = (string)jsonObj["incidente"];
+				string adjunto = (string)jsonObj["adjunto"];
+
+				int moduloid = int.Parse(modulo);
+				
+				Incidencias nuevaIncidencia = new Incidencias
+				{
+					Version = version,
+					SecuencialModulo = moduloid,
+					Incidente = incidente,
+					Adjunto = adjunto
+				};
+
+				db.Incidencias.Add(nuevaIncidencia);
+     			db.SaveChanges();
+
+				return Json(new
+				{
+					success = true,
+					msg = "Se ha realizado la operación correctamente."
+				});
+			}
+			catch (Exception e)
+			{
+				return Json(new
+				{
+					success = false,
+					msg = e.Message
+				});
 			}
 		}
 
