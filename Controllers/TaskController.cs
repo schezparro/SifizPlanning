@@ -858,7 +858,7 @@ namespace SifizPlanning.Controllers
                     List<DataTarea> lPermisos = new List<DataTarea>();
                     lPermisos = (from per in permisos
                                  where per.idColaborador == idTrabajador &&
-                                       per.finicio >= fecha && per.finicio < fechaDespues
+                                       per.finicio <= fecha && per.finicio < fechaDespues
                                  select new DataTarea
                                  {
                                      id = per.id,
