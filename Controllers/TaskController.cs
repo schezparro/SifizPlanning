@@ -803,7 +803,7 @@ namespace SifizPlanning.Controllers
                                 clase = (per.SecuencialEstadoPermiso == 1) ? "permiso-solicitado" : "permiso-aprobado"
                             }).ToList();
             //Buscando los dias feriados en en intervalo de tiempo
-            List<DateTime> diasFeriados = db.DiaInactivo.Where(x => x.Fecha >= lunes && x.Fecha < fechaFin && x.EstaActivo == 1).Select(x => x.Fecha).ToList<DateTime>();
+            List<DateTime> diasFeriados = db.Feriados.Where(x => x.Fecha >= lunes && x.Fecha < fechaFin).Select(x => x.Fecha).ToList<DateTime>();
 
             List<Object> tareasProgramadores = new List<Object>();
             int cant = trabajadores.Count();
