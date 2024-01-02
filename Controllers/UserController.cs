@@ -2822,12 +2822,14 @@ r in db.Rol on ur.rol equals r
 			{
 				var incidenciasUsuario = (from inc in db.Incidencias
 										  join md in db.Modulo on inc.SecuencialModulo equals md.Secuencial
+										  join cli in db.Cliente on inc.SecuencialCliente equals cli.Secuencial										  
 										  select new
 										  {
-											  version = inc.Version,
+											  cliente = cli.Descripcion,
 											  modulo = md.Descripcion,
 											  incidente = inc.Incidente,
-											  adjunto = inc.Adjunto
+											  acciones = inc.Acciones,
+     										  adjunto = inc.Adjunto
 										  }).ToList();
 
 				int total = incidenciasUsuario.Count();
@@ -2873,11 +2875,53 @@ r in db.Rol on ur.rol equals r
 			});
 		}
 
+		[HttpPost]
+		[Authorize(Roles = "USER, ADMIN")]
+		public ActionResult DarClientesIncidencias()
+		{
+			var datos = (from cli in db.Cliente
+						 orderby cli.Descripcion
+						 select new
+						 {
+							 id = cli.Secuencial,
+							 nombre = cli.Descripcion
+						 }).ToList();
+
+			return Json(new
+			{
+				success = true,
+				clientes = datos
+			});
+		}
+
+		[HttpPost]
+		[Authorize(Roles = "USER, ADMIN")]
+		public ActionResult DarRolColaboradorIncidencias()
+		{
+			var datos = (from colab in db.Colaborador
+						 join pe in db.Persona on colab.SecuencialPersona equals pe.Secuencial
+						 join car in db.Cargo on colab.SecuencialCargo equals car.Secuencial
+						 join usu in db.Usuario on pe.Secuencial equals usu.SecuencialPersona
+						 where car.Descripcion == "LIDER DE PROYECTO" || car.Descripcion == "COORDINADOR PROYECTOS"
+						 select new
+						 {
+							 id = colab.Secuencial,
+							 nombre = pe.Nombre1 + " " + pe.Apellido1,
+							 email = usu.Email
+						 }).ToList();
+
+			return Json(new
+			{ 
+				success = true,
+		       lideres = datos
+			});
+		}
+
 
 		//Guardar modal nuevas incidencias
 		[HttpPost]
 		[Authorize(Roles = "USER, ADMIN")]
-		public ActionResult GuardarIncidencia(string version, string modulo, string incidente, HttpPostedFileBase[] adjuntos = null)
+		public ActionResult GuardarIncidencia(string cliente, string modulo, string incidente, string acciones, string lideres, HttpPostedFileBase[] adjuntos = null)
 		{
 			try
 			{
@@ -2896,17 +2940,40 @@ r in db.Rol on ur.rol equals r
 				}
 
 				int moduloid = int.Parse(modulo);
+				int clienteid = int.Parse(cliente);
+				
+
+
 				Incidencias nuevaIncidencia = new Incidencias
 				{
-					Version = version,
+					SecuencialCliente = clienteid,
 					SecuencialModulo = moduloid,
 					Incidente = incidente,
+					Acciones = acciones,
 					Adjunto = Url
 				};
 
 				db.Incidencias.Add(nuevaIncidencia);
 				db.SaveChanges();
 
+
+				string email = lideres;
+				string[] emails = email.Split(',');
+				List<string> correosDestinos = emails.ToList();
+
+				string textoEmail = @"<div class='textoCuerpo'><br/>";
+				    textoEmail += "Buen día,";
+				    textoEmail += @"<br/>";
+
+				    textoEmail += "Con el presente correo se le notifica la incidencia: " + incidente + ", y las acciones a realizar: " + acciones;
+				    textoEmail += "</div>";
+
+
+				    string asuntoEmail = "Notificar incidencias";
+			        Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmail, asuntoEmail);
+
+
+				 
 				return Json(new
 				{
 					success = true,

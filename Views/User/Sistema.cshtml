@@ -14,6 +14,7 @@
     <link href="~/Web/css/jasny-bootstrap.min.css" rel="stylesheet" />
     <link href="~/Web/css/admin/admin.css" rel="stylesheet" />
     <link href="~/Web/css/home/home.css" rel="stylesheet" />
+    
 
     <script type="text/javascript" src="~/Web/js/jquery-2.1.3.min.js"></script>
     <script type="text/javascript" src="~/Web/js/jquery.signalR-2.1.2.min.js"></script>
@@ -22,180 +23,181 @@
     <script type="text/javascript" src="~/Web/js/angular-route.min.js"></script>
     <script type="text/javascript" src="~/Web/js/pdf.min.js"></script>
     <script type="text/javascript" src="~/Web/js/pdf.worker.min.js"></script>
+    
 </head>
-<body ng-controller="desarrolladoresController">
+    <body ng-controller="desarrolladoresController">
 
-    <div id="content_body">
+        <div id="content_body">
 
-        <div id="menu-principal">
-            <ul class="nav nav-pills">
-                <li role="presentation" class="active"><a href="#" ng-click="IrMisTareas()">Tareas</a></li>
-                <li role="presentation"><a href="#" ng-click="IrEstimaciones()">Estimaciones</a></li>
-                @*<li role="presentation"><a href="#" ng-click="IrPanelTareasCompensatorias()">T-Compensatorias</a></li>*@
-                @if (Roles.IsUserInRole("ADMINTFS"))
-                {
-                    <li role="presentation"><a href="#" ng-click="IrRegistrarPublicaciones()">Publicaciones</a></li>
-                }
-                <li role="presentation"><a href="#" ng-click="IrPanelTickets()">Tickets</a></li>
-                <li role="presentation"><a href="#" ng-click="IrPanelProyectos()">Proyectos</a></li>
-                @if (Roles.IsUserInRole("ADMIN"))
-                {
-                    <li role="presentation"><a href="#" ng-click="IrPanelSolicitudes()">Permisos</a></li>
-                }
-                <li role="presentation"><a href="#" ng-click="IrPanelFTP()">FTP</a></li>
-                <li role="presentation"><a href="#" ng-click="IrPanelIncidencias()">Incidencias</a></li>
+            <div id="menu-principal">
+                <ul class="nav nav-pills">
+                    <li role="presentation" class="active"><a href="#" ng-click="IrMisTareas()">Tareas</a></li>
+                    <li role="presentation"><a href="#" ng-click="IrEstimaciones()">Estimaciones</a></li>
+                    @*<li role="presentation"><a href="#" ng-click="IrPanelTareasCompensatorias()">T-Compensatorias</a></li>*@
+                    @if (Roles.IsUserInRole("ADMINTFS"))
+                    {
+                        <li role="presentation"><a href="#" ng-click="IrRegistrarPublicaciones()">Publicaciones</a></li>
+                    }
+                    <li role="presentation"><a href="#" ng-click="IrPanelTickets()">Tickets</a></li>
+                    <li role="presentation"><a href="#" ng-click="IrPanelProyectos()">Proyectos</a></li>
+                    @if (Roles.IsUserInRole("ADMIN"))
+                    {
+                        <li role="presentation"><a href="#" ng-click="IrPanelSolicitudes()">Permisos</a></li>
+                    }
+                    <li role="presentation"><a href="#" ng-click="IrPanelFTP()">FTP</a></li>
+                    <li role="presentation"><a href="#" ng-click="IrPanelIncidencias()">Incidencias</a></li>
 
-                <a href="cerrar/sesion/" class="right btn btn-danger"><span class="glyphicon glyphicon-off"></span> Cerrar Sesión</a>
-                <a href="main-menu" style="margin-right: 4px;" class="right btn btn-warning"><span class="glyphicon glyphicon-menu-hamburger"></span> Menú Principal</a>
-                <a id="btnChangePassUser" style="margin-right: 4px;" href="#" class="right btn btn-primary" data-toggle="modal" data-target="#modalNewChangePassUser"><span class="glyphicon glyphicon-user"></span> Cambiar Contraseña</a>
-            </ul>
-        </div>
-
-        <div id="panel-principal" class="panel panel-default">
-
-            <div class="panel-heading">
-                <h3 class="panel-title" ng-init="funcionalidad = 'Mis Tareas';">{{funcionalidad}}</h3>
+                    <a href="cerrar/sesion/" class="right btn btn-danger"><span class="glyphicon glyphicon-off"></span> Cerrar Sesión</a>
+                    <a href="main-menu" style="margin-right: 4px;" class="right btn btn-warning"><span class="glyphicon glyphicon-menu-hamburger"></span> Menú Principal</a>
+                    <a id="btnChangePassUser" style="margin-right: 4px;" href="#" class="right btn btn-primary" data-toggle="modal" data-target="#modalNewChangePassUser"><span class="glyphicon glyphicon-user"></span> Cambiar Contraseña</a>
+                </ul>
             </div>
 
-            <div id="funcionalidad">
-                <div id="panel_tasks" ng-controller="taskController">
-                    @{ Html.RenderPartial("windowUserTask"); }
+            <div id="panel-principal" class="panel panel-default">
+
+                <div class="panel-heading">
+                    <h3 class="panel-title" ng-init="funcionalidad = 'Mis Tareas';">{{funcionalidad}}</h3>
                 </div>
 
-                <div id="panel_estimaciones" ng-controller="estimacionesController" class="invisible">
-                    @{ Html.RenderPartial("windowUserEstimaciones"); }
-                </div>
+                <div id="funcionalidad">
+                    <div id="panel_tasks" ng-controller="taskController">
+                        @{ Html.RenderPartial("windowUserTask"); }
+                    </div>
 
-                @*<div id="panel_tareas_compensatorias" ng-controller="tareasCompensatoriasController" class="invisible">
-                    @{ Html.RenderPartial("windowUserTareasCompensatorias"); }
-                </div>*@
+                    <div id="panel_estimaciones" ng-controller="estimacionesController" class="invisible">
+                        @{ Html.RenderPartial("windowUserEstimaciones"); }
+                    </div>
 
-                <div id="panel_publicaciones" ng-controller="publicacionesController" class="invisible">
-                    @{ Html.RenderPartial("windowUserPublicaciones"); }
-                </div>
-                <div id="panel_tickets" ng-controller="ticketsController" class="invisible">
-                    @{ Html.RenderPartial("windowUserTickets"); }
-                </div>
+                    @*<div id="panel_tareas_compensatorias" ng-controller="tareasCompensatoriasController" class="invisible">
+                        @{ Html.RenderPartial("windowUserTareasCompensatorias"); }
+                    </div>*@
 
-                <div id="panel_proyectos" ng-controller="proyectosController" class="invisible">
-                    @{ Html.RenderPartial("windowUserProyectos"); }
-                </div>
+                    <div id="panel_publicaciones" ng-controller="publicacionesController" class="invisible">
+                        @{ Html.RenderPartial("windowUserPublicaciones"); }
+                    </div>
+                    <div id="panel_tickets" ng-controller="ticketsController" class="invisible">
+                        @{ Html.RenderPartial("windowUserTickets"); }
+                    </div>
 
-                <div id="panel_solicitudes" ng-controller="solicitudesController" class="invisible">
-                    @{ Html.RenderPartial("windowUserSolicitudes"); }
-                </div>
+                    <div id="panel_proyectos" ng-controller="proyectosController" class="invisible">
+                        @{ Html.RenderPartial("windowUserProyectos"); }
+                    </div>
 
-                <div id="panel_ftp" ng-controller="ftpController" class="invisible">
-                    @{ Html.RenderPartial("windowUserFTP"); }
-                </div>
+                    <div id="panel_solicitudes" ng-controller="solicitudesController" class="invisible">
+                        @{ Html.RenderPartial("windowUserSolicitudes"); }
+                    </div>
 
-                <div id="panel_incidencias" ng-controller="incidenciasController" class="invisible">
-                    @{ Html.RenderPartial("windowUserIncidencias"); }
-                </div>
-            </div>
+                    <div id="panel_ftp" ng-controller="ftpController" class="invisible">
+                        @{ Html.RenderPartial("windowUserFTP"); }
+                    </div>
 
-            <!-- Cambiar el Pass del usuario-->
-            <div class="modal fade" id="modalNewChangePassUser" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-dialog .filter">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title" id="myModalLabel">
-                                <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-                                <span id="title-filter">Cambiar contraseña</span>
-                            </h4>
-                        </div>
-                        <form method="post" id="frm-changePassUser" ng-submit="cambiarPassUsuario()">
-                            <div class="modal-body">
-
-                                <div class="fila">
-                                    <div class="left">
-                                        <label>Contraseña:</label><br />
-                                        <input type="password" ng-required="true" ng-model="passw" class="form-control" />
-                                    </div>
-                                    <div class="clear"></div>
-                                    <div class="left">
-                                        <label>Nueva Contraseña:</label><br />
-                                        <input type="password" ng-required="true" ng-model="passw1" class="form-control" />
-                                    </div>
-                                    <div class="clear"></div>
-                                    <div class="left">
-                                        <label>Repita la nueva Contraseña:</label><br />
-                                        <input type="password" ng-required="true" ng-model="passw2" class="form-control" />
-                                    </div>
-                                </div>
-
-                                <div class="clear"></div>
-
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-                                <button type="submit" class="btn btn-primary">Grabar</button>
-                            </div>
-                        </form>
+                    <div id="panel_incidencias" ng-controller="incidenciasController" class="invisible">
+                        @{ Html.RenderPartial("windowUserIncidencias"); }
                     </div>
                 </div>
-            </div>
 
-            <!-- Histórico del ticket -->
-            <div class="modal fade" id="modal-historico-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title" id="modal-historico-ticket-label"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Histórico del Ticket</h4>
-                        </div>
-                        <div class="modal-body">
-                            <div class="left eventos">
-                                <div class="panel panel-default">
-                                    <input class="form-control" type="text" placeholder="Filtrar..." ng-model="filtroEventoTicket" ng-keyup="cargarEventosTickets()" />
-                                    <div id="panel-historico-izq">
-                                        <div id="div-tabla-eventos-historico">
-                                            <table id="tabla-eventos-historico" class="table table-striped tabla-hover">
-                                                <tbody>
-                                                    <tr ng-repeat="evento in eventosHistorico" ng-click="verDatosEventoTicket(evento.Tipo, evento.SecuencialObjeto)">
-                                                        <td>{{evento.Fecha | strDateToStr}} - {{evento.Descripcion}}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                <!-- Cambiar el Pass del usuario-->
+    <div class="modal fade" id="modalNewChangePassUser" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog .filter">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                        <span id="title-filter">Cambiar contraseña</span>
+                    </h4>
+                </div>
+                <form method="post" id="frm-changePassUser" ng-submit="cambiarPassUsuario()">
+                    <div class="modal-body">
 
-                            <div class="left datos-eventos">
-                                <div class="panel panel-default">
-                                    <div>
-                                        <div class="left half">
-                                            <label>Ticket:</label>{{numeroHistoricoTicket | rellenarIzq : 0}}<br />
-                                            <label>Cliente:</label>{{clienteHistoricoTicket}}
-                                        </div>
-                                        <div class="left half">
-                                            <label>Categoría:</label>{{categoriaHistoricoTicket}}<br />
-                                            <label>Prioridad:</label>{{prioridadHistoricoTicket}}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        Datos:
-                                        <div id="datos-historico-ticket" class="panel panel-default"></div>
-                                    </div>
-                                </div>
+                        <div class="fila">
+                            <div class="left">
+                                <label>Contraseña:</label><br />
+                                <input type="password" ng-required="true" ng-model="passw" class="form-control" />
                             </div>
                             <div class="clear"></div>
+                            <div class="left">
+                                <label>Nueva Contraseña:</label><br />
+                                <input type="password" ng-required="true" ng-model="passw1" class="form-control" />
+                            </div>
+                            <div class="clear"></div>
+                            <div class="left">
+                                <label>Repita la nueva Contraseña:</label><br />
+                                <input type="password" ng-required="true" ng-model="passw2" class="form-control" />
+                            </div>
                         </div>
 
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                        <div class="clear"></div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Grabar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Histórico del ticket -->
+    <div class="modal fade" id="modal-historico-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="modal-historico-ticket-label"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Histórico del Ticket</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="left eventos">
+                        <div class="panel panel-default">
+                            <input class="form-control" type="text" placeholder="Filtrar..." ng-model="filtroEventoTicket" ng-keyup="cargarEventosTickets()" />
+                            <div id="panel-historico-izq">
+                                <div id="div-tabla-eventos-historico">
+                                    <table id="tabla-eventos-historico" class="table table-striped tabla-hover">
+                                        <tbody>
+                                            <tr ng-repeat="evento in eventosHistorico" ng-click="verDatosEventoTicket(evento.Tipo, evento.SecuencialObjeto)">
+                                                <td>{{evento.Fecha | strDateToStr}} - {{evento.Descripcion}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="left datos-eventos">
+                        <div class="panel panel-default">
+                            <div>
+                                <div class="left half">
+                                    <label>Ticket:</label>{{numeroHistoricoTicket | rellenarIzq : 0}}<br />
+                                    <label>Cliente:</label>{{clienteHistoricoTicket}}
+                                </div>
+                                <div class="left half">
+                                    <label>Categoría:</label>{{categoriaHistoricoTicket}}<br />
+                                    <label>Prioridad:</label>{{prioridadHistoricoTicket}}
+                                </div>
+                            </div>
+                            <div>
+                                Datos:
+                                <div id="datos-historico-ticket" class="panel panel-default"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </div>
-
-            <div id="loadingDiv">
-                <img src="~/Web/images/ajax-loader.gif" />
-            </div>
-
         </div>
+    </div>
+
+    <div id="loadingDiv">
+        <img src="~/Web/images/ajax-loader.gif" />
+    </div>
+
+    </div>
 
     </div>
 
@@ -265,5 +267,5 @@
     <script type="text/javascript" src="~/Web/js/user/incidenciasController.js"></script>
     <script type="text/javascript" src="~/Web/js/pdf.min.js"></script>
     <script type="text/javascript" src="~/Web/js/pdf.worker.min.js"></script>
-</body>
+    </body>
 </html>

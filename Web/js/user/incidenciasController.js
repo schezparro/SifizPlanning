@@ -79,16 +79,47 @@
     });
 
 
+    var ajaxClienteIncidencias = $http.post("user/cliente-incidencias", {});
+
+    ajaxClienteIncidencias.success(function (data) {
+        if (data.success === true) {
+            $scope.clientes = data.clientes;
+        }
+    });
+
+
+    var ajaxRolColaboradorIncidencias = $http.post("user/rol-colaborador-incidencias", {});
+
+    ajaxRolColaboradorIncidencias.success(function (data) {
+        if (data.success === true) {
+            $scope.lideres = data.lideres;
+        }
+    });
+
+
     $scope.GuardarNuevaIncidencia = function () {
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
 
         var fileInput = angular.element('#uniqueFileInputID')[0];
         var modulo = angular.element("#select-tipo-modulo")[0].value;
+        var cliente = angular.element("#select-cliente-incidencias")[0].value;
+        var lideres = [];
+        var selectMultiple = document.querySelector('#select-notificar-lideres');
+       for (var i = 0; i < selectMultiple.options.length; i++) {
+            if (selectMultiple.options[i].selected) {
+                lideres.push(selectMultiple.options[i].value);
+            }
+        }
+        lideresString = lideres.join(',');
+        
 
+      
         var formData = new FormData();
-        formData.append('version', $scope.newVersion);
-        formData.append('modulo', modulo);
+        formData.append('cliente', cliente);
+        formData.append('modulo', modulo);        
         formData.append('incidente', $scope.newIncidente);
+        formData.append('acciones', $scope.newAcciones);
+        formData.append('lideres', lideresString);
         formData.append('adjuntos', fileInput.files[0]);
 
         var ajaxEnvioDatos = $http({
@@ -118,3 +149,5 @@
     // Añade la plantilla modificada al DOM
     angular.element("#panel-add-adjunto").append(fileInputWithId);
 }]);
+
+

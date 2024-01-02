@@ -1439,10 +1439,11 @@
             <PropertyRef Name="SECUENCIAL" />
           </Key>
           <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="VERSION" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="SECUENCIALCLIENTE" Type="int" Nullable="false" />
           <Property Name="SECUENCIALMODULO" Type="int" Nullable="false" />
           <Property Name="INCIDENTE" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="ADJUNTO" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="ACCIONES" Type="nvarchar" MaxLength="255" Nullable="false" />
         </EntityType>
         <EntityType Name="INFOTICKETS">
           <Key>
@@ -2201,6 +2202,18 @@
             </Principal>
             <Dependent Role="GESTORSERVICIOS">
               <PropertyRef Name="SECUENCIALCOLABORADOR" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_INCIDENCIAS_CLIENTE">
+          <End Role="CLIENTE" Type="Self.CLIENTE" Multiplicity="1" />
+          <End Role="INCIDENCIAS" Type="Self.INCIDENCIAS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CLIENTE">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="INCIDENCIAS">
+              <PropertyRef Name="SECUENCIALCLIENTE" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -4864,6 +4877,10 @@
             <End Role="COLABORADOR" EntitySet="COLABORADOR" />
             <End Role="GESTORSERVICIOS" EntitySet="GESTORSERVICIOS" />
           </AssociationSet>
+          <AssociationSet Name="FK_INCIDENCIAS_CLIENTE" Association="Self.FK_INCIDENCIAS_CLIENTE">
+            <End Role="CLIENTE" EntitySet="CLIENTE" />
+            <End Role="INCIDENCIAS" EntitySet="INCIDENCIAS" />
+          </AssociationSet>
           <AssociationSet Name="FK_INCIDENCIAS_MODULO" Association="Self.FK_INCIDENCIAS_MODULO">
             <End Role="MODULO" EntitySet="MODULO" />
             <End Role="INCIDENCIAS" EntitySet="INCIDENCIAS" />
@@ -6725,6 +6742,10 @@
           </AssociationSet>
           <EntitySet Name="Feriados" EntityType="SifizPlanningModel.Feriados" />
           <EntitySet Name="Incidencias" EntityType="SifizPlanningModel.Incidencias" />
+          <AssociationSet Name="FK_INCIDENCIAS_CLIENTE" Association="SifizPlanningModel.FK_INCIDENCIAS_CLIENTE">
+            <End Role="Cliente" EntitySet="Cliente" />
+            <End Role="INCIDENCIAS" EntitySet="Incidencias" />
+          </AssociationSet>
           <AssociationSet Name="FK_INCIDENCIAS_MODULO" Association="SifizPlanningModel.FK_INCIDENCIAS_MODULO">
             <End Role="Modulo" EntitySet="Modulo" />
             <End Role="INCIDENCIAS" EntitySet="Incidencias" />
@@ -6825,6 +6846,7 @@
           <NavigationProperty Name="comentarioTicketCliente" Relationship="SifizPlanningModel.FK_COMENTARIOTICKETCLIENTE_CLIENTE" FromRole="Cliente" ToRole="COMENTARIOTICKETCLIENTE" />
           <NavigationProperty Name="clienteAuxiliar" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_CLIENTE" FromRole="Cliente" ToRole="ClienteAuxiliar" />
           <NavigationProperty Name="ofertas" Relationship="SifizPlanningModel.FK_OFERTAS_CLIENTE" FromRole="Cliente" ToRole="OFERTAS" />
+          <NavigationProperty Name="INCIDENCIAS" Relationship="SifizPlanningModel.FK_INCIDENCIAS_CLIENTE" FromRole="Cliente" ToRole="INCIDENCIAS" />
         </EntityType>
         <EntityType Name="Colaborador">
           <Key>
@@ -11699,12 +11721,26 @@
             <PropertyRef Name="Secuencial" />
           </Key>
           <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Version" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="SecuencialCliente" Type="Int32" Nullable="false" />
           <Property Name="SecuencialModulo" Type="Int32" Nullable="false" />
           <Property Name="Incidente" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Name="Adjunto" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Acciones" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="cliente" Relationship="SifizPlanningModel.FK_INCIDENCIAS_CLIENTE" FromRole="INCIDENCIAS" ToRole="Cliente" />
           <NavigationProperty Name="modulo" Relationship="SifizPlanningModel.FK_INCIDENCIAS_MODULO" FromRole="INCIDENCIAS" ToRole="Modulo" />
         </EntityType>
+        <Association Name="FK_INCIDENCIAS_CLIENTE">
+          <End Type="SifizPlanningModel.Cliente" Role="Cliente" Multiplicity="1" />
+          <End Type="SifizPlanningModel.Incidencias" Role="INCIDENCIAS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Cliente">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="INCIDENCIAS">
+              <PropertyRef Name="SecuencialCliente" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_INCIDENCIAS_MODULO">
           <End Type="SifizPlanningModel.Modulo" Role="Modulo" Multiplicity="1" />
           <End Type="SifizPlanningModel.Incidencias" Role="INCIDENCIAS" Multiplicity="*" />
@@ -13732,10 +13768,11 @@
           <EntitySetMapping Name="Incidencias">
             <EntityTypeMapping TypeName="SifizPlanningModel.Incidencias">
               <MappingFragment StoreEntitySet="INCIDENCIAS">
+                <ScalarProperty Name="Acciones" ColumnName="ACCIONES" />
                 <ScalarProperty Name="Adjunto" ColumnName="ADJUNTO" />
                 <ScalarProperty Name="Incidente" ColumnName="INCIDENTE" />
                 <ScalarProperty Name="SecuencialModulo" ColumnName="SECUENCIALMODULO" />
-                <ScalarProperty Name="Version" ColumnName="VERSION" />
+                <ScalarProperty Name="SecuencialCliente" ColumnName="SECUENCIALCLIENTE" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
               </MappingFragment>
             </EntityTypeMapping>
