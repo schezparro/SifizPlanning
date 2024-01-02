@@ -10,9 +10,10 @@
     <table id="tabla-incidencias-usuario" class="table table-striped">
         <thead>
             <tr>
-                <th width="5">Versión</th>
-                <th width="10">Módulo/Funcionalidad</th>
+                <th width="5">Cliente</th>
+                <th width="5">Módulo/Funcionalidad</th>
                 <th width="10">Incidente</th>
+                <th width="10">Acciones a realizar</th>
                 <th width="35">Corrección/Adjunto</th>
 
             </tr>
@@ -20,9 +21,10 @@
 
         <tbody>
             <tr ng-repeat="incidencia in incidencias">
-                <td>{{incidencia.version}}</td>
+                <td>{{incidencia.cliente}}</td>
                 <td>{{incidencia.modulo}}</td>
                 <td>{{incidencia.incidente}}</td>
+                <td>{{incidencia.acciones}}</td>
                 <td>
                     <a class="btn btn-success btn-xs" target="_blank" href="Web{{incidencia.adjunto}}">
                         <span class="glyphicon glyphicon-download"></span> Adjunto
@@ -68,23 +70,46 @@
                 </div>
                 <div class="modal-body">
                     <div style="column-count: 2">
-                        VERSIÓN:
-                        <input type="text" class="form-control" ng-model="newVersion" ng-required="true">
-                        <br>
+                        CLIENTE:
+                        <select id="select-cliente-incidencias" ng-model="clienteSeleccionado" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{cliente.id}}" ng-repeat="cliente in clientes">{{cliente.nombre}}</option>
+                        </select>
+
                         MODULO:
                         <select id="select-tipo-modulo" ng-model="tipoSeleccionado" class="form-control" required="required">
                             <option value="">Seleccione...</option>
                             <option value="{{tipo.id}}" ng-repeat="tipo in tipoModulo">{{tipo.nombre}}</option>
                         </select>
+                    </div>
+
+                    <div>
                         INCIDENTE:
                         <textarea type="text" class="form-control" ng-model="newIncidente" ng-required="true"></textarea>
+
+                        ACCIONES A REALIZAR O RESOLUCION:
+                        <textarea type="text" class="form-control" ng-model="newAcciones" ng-required="true"></textarea>
+                    </div>
+
+                    
+                    <div style="column-count: 2">
+
+                        NOTIFICAR LIDERES:
+                        <select id="select-notificar-lideres" ng-model="liderSeleccionado" class="form-control" multiple  required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{lider.email}}" ng-repeat="lider in lideres">{{lider.nombre}}</option>
+                        </select>
+
                         ADJUNTO:
                         <div id="panel-add-adjunto"></div>
                         <div class="clear"></div>
+
+
                     </div>
-                </div>
+                        
+                   </div>
                 <div class="modal-footer">
-                    <button type="submit" id="enviar-modal-incidencias-btn" class="btn btn-primary">Enviar</button>
+                    <button type="submit" id="enviar-modal-incidencias-btn" class="btn btn-primary">Guardar</button>
                     <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </form>

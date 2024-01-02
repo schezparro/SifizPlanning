@@ -15,11 +15,13 @@ namespace SifizPlanning.Models
     public partial class Incidencias
     {
         public int Secuencial { get; set; }
-        public string Version { get; set; }
+        public int SecuencialCliente { get; set; }
         public int SecuencialModulo { get; set; }
         public string Incidente { get; set; }
         public string Adjunto { get; set; }
+        public string Acciones { get; set; }
     
+        public virtual Cliente cliente { get; set; }
         public virtual Modulo modulo { get; set; }
     }
 }
