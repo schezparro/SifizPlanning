@@ -91,23 +91,27 @@
                         <textarea type="text" class="form-control" ng-model="newAcciones" ng-required="true"></textarea>
                     </div>
 
-                    
-                    <div style="column-count: 2">
 
+                    <div class="col-md-6">
                         NOTIFICAR LIDERES:
-                        <select id="select-notificar-lideres" ng-model="liderSeleccionado" class="form-control" multiple  required="required">
+                        <input type="checkbox" ng-model="mostrarSelectLideres" ng-init="mostrarSelectLideres=false" />
+
+                        <select id="select-notificar-lideres" ng-model="liderSeleccionado" class="form-control" multiple required="required" ng-show="mostrarSelectLideres">
                             <option value="">Seleccione...</option>
                             <option value="{{lider.email}}" ng-repeat="lider in lideres">{{lider.nombre}}</option>
                         </select>
-
+                    </div>
+                    <div class="col-md-6">
                         ADJUNTO:
                         <div id="panel-add-adjunto"></div>
                         <div class="clear"></div>
-
-
                     </div>
-                        
-                   </div>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                </div>
                 <div class="modal-footer">
                     <button type="submit" id="enviar-modal-incidencias-btn" class="btn btn-primary">Guardar</button>
                     <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>

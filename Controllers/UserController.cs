@@ -332,8 +332,8 @@ namespace SifizPlanning.Controllers
 						List<DataTarea> lPermisos = new List<DataTarea>();
 						lPermisos = (from per in permisos
 									 where per.idColaborador == idTrabajador &&
-                                           per.finicio <= fecha && per.finicio < fechaDespues
-                                     select new DataTarea
+										   per.finicio <= fecha && per.finicio < fechaDespues
+									 select new DataTarea
 									 {
 										 id = per.id,
 										 sdetalle = per.smotivo,
@@ -2822,14 +2822,14 @@ r in db.Rol on ur.rol equals r
 			{
 				var incidenciasUsuario = (from inc in db.Incidencias
 										  join md in db.Modulo on inc.SecuencialModulo equals md.Secuencial
-										  join cli in db.Cliente on inc.SecuencialCliente equals cli.Secuencial										  
+										  join cli in db.Cliente on inc.SecuencialCliente equals cli.Secuencial
 										  select new
 										  {
 											  cliente = cli.Descripcion,
 											  modulo = md.Descripcion,
 											  incidente = inc.Incidente,
 											  acciones = inc.Acciones,
-     										  adjunto = inc.Adjunto
+											  adjunto = inc.Adjunto
 										  }).ToList();
 
 				int total = incidenciasUsuario.Count();
@@ -2911,9 +2911,9 @@ r in db.Rol on ur.rol equals r
 						 }).ToList();
 
 			return Json(new
-			{ 
+			{
 				success = true,
-		       lideres = datos
+				lideres = datos
 			});
 		}
 
@@ -2941,8 +2941,6 @@ r in db.Rol on ur.rol equals r
 
 				int moduloid = int.Parse(modulo);
 				int clienteid = int.Parse(cliente);
-				
-
 
 				Incidencias nuevaIncidencia = new Incidencias
 				{
@@ -2956,24 +2954,25 @@ r in db.Rol on ur.rol equals r
 				db.Incidencias.Add(nuevaIncidencia);
 				db.SaveChanges();
 
+				if(lideres != "")
+				{
+					string email = lideres;
+					string[] emails = email.Split(',');
+					List<string> correosDestinos = emails.ToList();
 
-				string email = lideres;
-				string[] emails = email.Split(',');
-				List<string> correosDestinos = emails.ToList();
+					string textoEmail = @"<div class='textoCuerpo'><br/>";
+					textoEmail += "Buen día,";
+					textoEmail += @"<br/>";
 
-				string textoEmail = @"<div class='textoCuerpo'><br/>";
-				    textoEmail += "Buen día,";
-				    textoEmail += @"<br/>";
+					textoEmail += "Por el presente se le notifica de que se ha detectado una nueva incidencia";
+					textoEmail += @"<br/>";
+					textoEmail += "Puede revizarla en el Sifizplanning en el módulo de desarrolladores y darle seguimiento.";
+					textoEmail += "</div>";
 
-				    textoEmail += "Con el presente correo se le notifica la incidencia: " + incidente + ", y las acciones a realizar: " + acciones;
-				    textoEmail += "</div>";
+					string asuntoEmail = "Nueva incidencia";
+					Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmail, asuntoEmail);
+				}
 
-
-				    string asuntoEmail = "Notificar incidencias";
-			        Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmail, asuntoEmail);
-
-
-				 
 				return Json(new
 				{
 					success = true,
