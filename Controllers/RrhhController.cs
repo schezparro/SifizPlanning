@@ -378,7 +378,12 @@ namespace SifizPlanning.Controllers
 
                 foreach (Tarea t in tareas)
                 {
-                    db.Tarea.Where(tarea => t.Secuencial == tarea.Secuencial).First().FechaInicio = fechaHasta.AddDays(1);
+                    DateTime nuevaFechaInicio = fechaHasta.AddDays(1);
+                    while (nuevaFechaInicio.DayOfWeek == DayOfWeek.Saturday || nuevaFechaInicio.DayOfWeek == DayOfWeek.Sunday || db.Feriados.Any(f => f.Fecha == nuevaFechaInicio))
+                    {
+                        nuevaFechaInicio = nuevaFechaInicio.AddDays(1);
+                    }
+                    db.Tarea.Where(tarea => t.Secuencial == tarea.Secuencial).First().FechaInicio = nuevaFechaInicio;
                 }
 
                 Permiso permiso = new Permiso
