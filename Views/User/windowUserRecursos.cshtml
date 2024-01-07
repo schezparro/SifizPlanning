@@ -1,0 +1,109 @@
+﻿<!--
+<label style="display: inline-block">
+    Mostrar Todas:
+    <input style="vertical-align: -2px;" type="checkbox" ng-click="cargarRecursos()" ng-model="mostrarTodosRecursos" ng-init="mostrarTodosRecursos=false" />
+</label>
+ -->
+<button class="btn btn-primary" ng-click="windowAgregarRecursos()">Nuevo Recurso</button>
+<input type="text" ng-keyup="cargarRecursos()" ng-model="filtroRecursos" class="form-control right filtro" placeholder="Filtrar..." />
+<div class="clear"></div>
+<div id="tabla-user-recursos">
+    <table id="tabla-recursos-usuario" class="table table-striped">
+        <thead>
+            <tr>
+                <th width="10">Título</th>
+                <th width="20">Detalle</th>
+                <th width="8">Fecha</th>
+                <th width="20">Categoría</th>
+                <th width="15">Adjunto</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr ng-repeat="recurso in recursos | filter: filtroRecursos">
+                <td>{{recurso.titulo}}</td>
+                <td>{{recurso.detalle}}</td>
+                <td>{{recurso.fecha | jsonDate:'mediumDate'}}</td>
+                <td>{{recurso.categoria}}</td>
+                <td>
+                    <a class="btn btn-success btn-xs" target="_blank" ng-href="{{getFullPath(recurso.adjunto)}}">
+                        <span class="glyphicon glyphicon-download"></span> Adjunto
+                    </a>
+
+                </td>
+            </tr>
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <th colspan="6">
+                    <nav>
+                        <ul class="pagination">
+                            <li ng-click="atrazarPagina()">
+                                <a href="#" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
+                            <li ng-click="avanzarPagina()">
+                                <a href="#" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </th>
+            </tr>
+        </tfoot>
+
+    </table>
+</div>
+
+
+<div id="modal-agregar-recursos" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form ng-submit="GuardarNuevoRecurso()">
+                <div class="modal-header">
+                    <h5 class="modal-title">NUEVO RECURSO</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="form-group">
+
+                        <label for="inputTitulo">TÍTULO:</label>
+                        <input type="text" class="form-control" ng-model="newTitulo" ng-required="true" placeholder="Título">
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="inputDetalle">DETALLE:</label>
+                        <textarea type="text" class="form-control" ng-model="newDetalle" ng-required="true" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="inputCategoria">CATEGORÍA:</label>
+                        <select id="select-categoria-recursos" ng-model="categoriaSeleccionada" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{categoria.id}}" ng-repeat="categoria in categoriaRecursos">{{categoria.nombre}}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="inputArchivo">ADJUNTO:</label>
+                        <input type="file" id="panel-add-adjuntorecursos" class="form-control-file" />
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" id="enviar-modal-recursos-btn" class="btn btn-primary">Guardar</button>
+                    <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

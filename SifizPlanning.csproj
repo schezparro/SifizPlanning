@@ -469,6 +469,9 @@
     <Compile Include="Models\CategoriaCompetencia.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\CategoriaRecursos.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\CategoriaTicket.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
@@ -743,6 +746,9 @@
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ProyectoTFS.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Recursos.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Renegociacion.cs">
@@ -1117,6 +1123,7 @@
     <Content Include="Views\Rrhh\windowFeriados.cshtml" />
     <Content Include="Views\Task\windowInformesRecursos.cshtml" />
     <Content Include="Views\User\windowUserIncidencias.cshtml" />
+    <Content Include="Views\User\windowUserRecursos.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1149,6 +1156,7 @@
     <Content Include="Web\js\tfs\consultaCambios.js" />
     <Content Include="Web\js\tfs\consultaProyectos.js" />
     <Content Include="Web\js\user\ftpController.js" />
+    <Content Include="Web\js\user\recursosController.js" />
     <Content Include="Web\js\user\incidenciasController.js" />
     <Content Include="Web\js\user\proyectosController.js" />
     <Content Include="Web\js\user\solicitudesController.js" />

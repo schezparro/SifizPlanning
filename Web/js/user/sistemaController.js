@@ -37,7 +37,7 @@ devApp.config(function ($provide, $httpProvider) {
 
 });
 
-devApp.controller('desarrolladoresController', ['$scope', '$http', function ($scope, $http) {
+devApp.controller('desarrolladoresController', ['$scope', '$http', 'filtroService', function ($scope, $http, filtroService) {
     //FUNCIONES DEL MENU
     //Para la clase de la seleccion
     angular.element('#menu-principal').on('click', '[role="presentation"]', function () {
@@ -55,6 +55,7 @@ devApp.controller('desarrolladoresController', ['$scope', '$http', function ($sc
         angular.element("#panel_solicitudes").addClass('invisible');
         angular.element("#panel_ftp").addClass('invisible');
         angular.element("#panel_incidencias").addClass('invisible');
+        angular.element("#panel_recursos").addClass('invisible');
     };
 
     $scope.IrMisTareas = function () {
@@ -111,6 +112,14 @@ devApp.controller('desarrolladoresController', ['$scope', '$http', function ($sc
         ocultar();
         angular.element("#panel_incidencias").removeClass('invisible');
         $scope.funcionalidad = "Incidencias";
+        filtroService.filtroIncidencias = '';
+    };
+
+    $scope.IrPanelRecursos = function () {
+        ocultar();
+        angular.element("#panel_recursos").removeClass('invisible');
+        $scope.funcionalidad = "Recursos";
+        filtroService.filtroRecursos = '';
     };
 
     $scope.buscarTicketPorPublicar = function () {
@@ -392,4 +401,10 @@ devApp.filter("userEmail", function () {
         var array = textEmail.split('@');
         return array[0];
     }
+});
+
+
+//Limpiar los filtros
+$rootScope.$on('$locationChangeSuccess', function () {
+    $scope.filtroRecursos = "";
 });

@@ -1036,6 +1036,24 @@ namespace SifizPlanning
                 defaults: new { controller = "User", action = "GuardarIncidencia", id = UrlParameter.Optional }
             );
 
+            routes.MapRoute(
+                name: "RecursosUsuario",
+                url: "user/recursos-usuario/{id}",
+                defaults: new { controller = "User", action = "RecursosUsuario", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarCategoriaRecurso",
+                url: "user/categoria-recursos/{id}",
+                defaults: new { controller = "User", action = "DarCategoriaRecurso", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "GuardarRecurso",
+                url: "user/guardar-recurso/{id}",
+                defaults: new { controller = "User", action = "GuardarRecurso", id = UrlParameter.Optional }
+            );
+
 
             routes.MapRoute(
                 name: "ProyectosUsuario",

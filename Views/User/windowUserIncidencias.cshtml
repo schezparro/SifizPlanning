@@ -1,4 +1,3 @@
-﻿
 <label style="display: inline-block">
     Fin de Dia:
     <input style="vertical-align: -2px;" type="checkbox" ng-click="cargarIncidencias()" ng-model="mostrarFinDiaIncidencias" ng-init="mostrarFinDiaIncidencias=false" />
@@ -22,7 +21,7 @@
         </thead>
 
         <tbody>
-            <tr ng-repeat="incidencia in incidencias">
+            <tr ng-repeat="incidencia in incidencias  | filter: filtroIncidencias">
                 <td>{{incidencia.cliente}}</td>
                 <td>{{incidencia.modulo}}</td>
                 <td>{{incidencia.incidente}}</td>

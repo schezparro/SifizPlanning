@@ -26,9 +26,7 @@
     
 </head>
     <body ng-controller="desarrolladoresController">
-
         <div id="content_body">
-
             <div id="menu-principal">
                 <ul class="nav nav-pills">
                     <li role="presentation" class="active"><a href="#" ng-click="IrMisTareas()">Tareas</a></li>
@@ -46,6 +44,7 @@
                     }
                     <li role="presentation"><a href="#" ng-click="IrPanelFTP()">FTP</a></li>
                     <li role="presentation"><a href="#" ng-click="IrPanelIncidencias()">Incidencias</a></li>
+                    <li role="presentation"><a href="#" ng-click="IrPanelRecursos()">Recursos</a></li>
 
                     <a href="cerrar/sesion/" class="right btn btn-danger"><span class="glyphicon glyphicon-off"></span> Cerrar Sesión</a>
                     <a href="main-menu" style="margin-right: 4px;" class="right btn btn-warning"><span class="glyphicon glyphicon-menu-hamburger"></span> Menú Principal</a>
@@ -94,6 +93,10 @@
                     <div id="panel_incidencias" ng-controller="incidenciasController" class="invisible">
                         @{ Html.RenderPartial("windowUserIncidencias"); }
                     </div>
+                    
+                    <div id="panel_recursos" ng-controller="recursosController" class="invisible">
+                        @{ Html.RenderPartial("windowUserRecursos"); }
+                    </div>
                 </div>
 
                 <!-- Cambiar el Pass del usuario-->
@@ -109,7 +112,6 @@
                 </div>
                 <form method="post" id="frm-changePassUser" ng-submit="cambiarPassUsuario()">
                     <div class="modal-body">
-
                         <div class="fila">
                             <div class="left">
                                 <label>Contraseña:</label><br />
@@ -265,6 +267,7 @@
     <script type="text/javascript" src="~/Web/js/user/solicitudesController.js"></script>
     <script type="text/javascript" src="~/Web/js/user/ftpController.js"></script>
     <script type="text/javascript" src="~/Web/js/user/incidenciasController.js"></script>
+    <script type="text/javascript" src="~/Web/js/user/recursosController.js"></script>
     <script type="text/javascript" src="~/Web/js/pdf.min.js"></script>
     <script type="text/javascript" src="~/Web/js/pdf.worker.min.js"></script>
     </body>

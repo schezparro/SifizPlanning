@@ -20,6 +20,7 @@ using SifizPlanning.Models.ViewModel;
 using DocumentFormat.OpenXml.Bibliography;
 using Org.BouncyCastle.Bcpg.OpenPgp;
 using System.Data.Entity.Validation;
+using System.Web.Mvc.Html;
 
 namespace SifizPlanning.Controllers
 {
@@ -3011,6 +3012,120 @@ r in db.Rol on ur.rol equals r
 				});
 			}
 		}
+
+		//RECURSOS DE LOS USUARIOS
+		[HttpPost]
+		[Authorize(Roles = "USER, ADMIN")]
+		public ActionResult RecursosUsuario(int start, int lenght, string filtro = "", bool todos = false)
+		{
+
+
+			try
+			{
+				var recursosUsuario = (from rec in db.Recursos
+									   join catrec in db.CategoriaRecursos on rec.SecuencialCategoriaRecursos equals catrec.Secuencial
+									   select new
+										{
+											titulo = rec.Titulo,
+											detalle = rec.Detalle,
+											fecha = rec.Fecha,
+											categoria = rec.CategoriaRecursos.Descripcion,
+											adjunto = rec.Adjunto
+								}).ToList();
+
+				int total = recursosUsuario.Count();
+				recursosUsuario = recursosUsuario.Skip(start).Take(lenght).ToList();
+
+				var result = new
+				{
+					success = true,
+					total = total,
+					recursos = recursosUsuario
+				};
+				return Json(result);
+			}
+			catch (Exception e)
+			{
+				var result = new
+				{
+					success = false,
+					msg = e.Message
+				};
+				return Json(result);
+			}
+		}
+
+
+
+		[HttpPost]
+		[Authorize(Roles = "USER, ADMIN")]
+		public ActionResult DarCategoriaRecurso()
+		{
+			var datos = (from cat in db.CategoriaRecursos
+						 orderby cat.Descripcion
+						 select new
+						 {
+							 id = cat.Secuencial,
+							 nombre = cat.Descripcion
+						 }).ToList();
+			 
+			return Json(new
+			{
+				success = true,
+				categoriaRecursos = datos
+			});
+		}
+
+
+		//Guardar modal nuevos recursos
+		[HttpPost]
+		[Authorize(Roles = "USER, ADMIN")]
+		public ActionResult GuardarRecurso(string titulo, string detalle, DateTime fecha, int categoria, HttpPostedFileBase[] adjuntos = null)
+		{
+			try
+			{
+				var s = new JavaScriptSerializer();
+				var Url = "";
+				foreach (var adj in adjuntos.Where(adj => adj != null))
+				{
+					string extFile = Path.GetExtension(adj.FileName);
+					string newNameFile = Utiles.RandomString(10) + extFile;
+					newNameFile = System.IO.Path.GetRandomFileName() + extFile;
+					string path = Path.Combine(Server.MapPath("~/Web/resources/recursos"), newNameFile);
+					adj.SaveAs(path);
+
+					Url = "/resources/recursos" + "/" + newNameFile;
+					break;
+				}
+				Recursos nuevoRecurso = new Recursos
+				{
+					Titulo = titulo,
+					Detalle = detalle,
+					Fecha = fecha,
+					SecuencialCategoriaRecursos = categoria,
+					Adjunto = Url
+				};
+
+				db.Recursos.Add(nuevoRecurso);
+				db.SaveChanges();
+
+				return Json(new
+				{
+					success = true,
+					msg = "Se ha realizado la operación correctamente."
+				});
+			}
+			catch (Exception e)
+			{
+				return Json(new
+				{
+					success = false,
+					msg = e.Message
+				});
+			}
+		}
+
+
 
 		//ESTIMACIONES DE LOS USUARIOS
 		[HttpPost]
