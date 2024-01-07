@@ -1190,6 +1190,16 @@
           <Property Name="DESCRIPCION" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="CATEGORIARECURSOS">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CODIGO" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="DESCRIPCION" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="CATEGORIATICKET">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
@@ -1439,11 +1449,11 @@
             <PropertyRef Name="SECUENCIAL" />
           </Key>
           <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="SECUENCIALCLIENTE" Type="int" Nullable="false" />
           <Property Name="SECUENCIALMODULO" Type="int" Nullable="false" />
           <Property Name="INCIDENTE" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="ADJUNTO" Type="nvarchar" MaxLength="255" Nullable="false" />
-          <Property Name="ACCIONES" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="SECUENCIALCLIENTE" Type="int" />
+          <Property Name="ACCIONES" Type="nvarchar" MaxLength="250" />
           <Property Name="FECHA" Type="date" />
           <Property Name="FINDIA" Type="numeric" Precision="1" Scale="0" />
         </EntityType>
@@ -1592,6 +1602,17 @@
           <Property Name="DESCRIPCION" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="RECURSOS">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TITULO" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="DETALLE" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="FECHA" Type="date" Nullable="false" />
+          <Property Name="SECUENCIALCATEGORIARECURSOS" Type="int" Nullable="false" />
+          <Property Name="ADJUNTO" Type="varchar" MaxLength="255" Nullable="false" />
         </EntityType>
         <EntityType Name="RENEGOCIACION">
           <Key>
@@ -2207,6 +2228,30 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_INCIDENCIAS_CLIENTE">
+          <End Role="CLIENTE" Type="Self.CLIENTE" Multiplicity="0..1" />
+          <End Role="INCIDENCIAS" Type="Self.INCIDENCIAS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CLIENTE">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="INCIDENCIAS">
+              <PropertyRef Name="SECUENCIALCLIENTE" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_INCIDENCIAS_MODULO">
+          <End Role="MODULO" Type="Self.MODULO" Multiplicity="1" />
+          <End Role="INCIDENCIAS" Type="Self.INCIDENCIAS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MODULO">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="INCIDENCIAS">
+              <PropertyRef Name="SECUENCIALMODULO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_MODULO_TIPO">
           <End Role="TipoModulo" Type="Self.TipoModulo" Multiplicity="0..1" />
           <End Role="MODULO" Type="Self.MODULO" Multiplicity="*" />
@@ -2387,6 +2432,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_RECURSOS_CATEGORIARECURSOS">
+          <End Role="CATEGORIARECURSOS" Type="Self.CATEGORIARECURSOS" Multiplicity="1" />
+          <End Role="RECURSOS" Type="Self.RECURSOS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CATEGORIARECURSOS">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="RECURSOS">
+              <PropertyRef Name="SECUENCIALCATEGORIARECURSOS" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_RESOLUCIONSEMAFOROPRIORIDAD_PRIORIDADTICKET">
           <End Role="PRIORIDADTICKET" Type="Self.PRIORIDADTICKET" Multiplicity="1" />
           <End Role="RESOLUCIONSEMAFOROPRIORIDAD" Type="Self.RESOLUCIONSEMAFOROPRIORIDAD" Multiplicity="*" />
@@ -2480,18 +2537,6 @@
             </Principal>
             <Dependent Role="TICKET_COMPLEMENTO">
               <PropertyRef Name="SECUENCIALTICKET" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_TICKET_MODULO">
-          <End Role="MODULO" Type="Self.MODULO" Multiplicity="0..1" />
-          <End Role="TICKET" Type="Self.TICKET" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MODULO">
-              <PropertyRef Name="SECUENCIAL" />
-            </Principal>
-            <Dependent Role="TICKET">
-              <PropertyRef Name="SECUENCIALMODULO" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -4679,6 +4724,7 @@
           <EntitySet Name="ACTIVIDADPROPUESTA" EntityType="Self.ACTIVIDADPROPUESTA" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="ADJUNTOTICKET" EntityType="Self.ADJUNTOTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="BOTONESTADOTICKET" EntityType="Self.BOTONESTADOTICKET" Schema="TICKET" store:Type="Tables" />
+          <EntitySet Name="CATEGORIARECURSOS" EntityType="Self.CATEGORIARECURSOS" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="CATEGORIATICKET" EntityType="Self.CATEGORIATICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="CATEGORIATICKETTIPOCONTRCLIENT" EntityType="Self.CATEGORIATICKETTIPOCONTRCLIENT" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="CAUSANOTERMINACION" EntityType="Self.CAUSANOTERMINACION" Schema="TICKET" store:Type="Tables" />
@@ -4716,6 +4762,7 @@
           <EntitySet Name="PERSONA_CLIENTE" EntityType="Self.PERSONA_CLIENTE" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="PRIORIDADTICKET" EntityType="Self.PRIORIDADTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="PROXIMAACTIVIDAD" EntityType="Self.PROXIMAACTIVIDAD" Schema="TICKET" store:Type="Tables" />
+          <EntitySet Name="RECURSOS" EntityType="Self.RECURSOS" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="RENEGOCIACION" EntityType="Self.RENEGOCIACION" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="RESOLUCIONSEMAFOROPRIORIDAD" EntityType="Self.RESOLUCIONSEMAFOROPRIORIDAD" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="SEMAFORO" EntityType="Self.SEMAFORO" Schema="TICKET" store:Type="Tables" />
@@ -4855,6 +4902,14 @@
             <End Role="COLABORADOR" EntitySet="COLABORADOR" />
             <End Role="GESTORSERVICIOS" EntitySet="GESTORSERVICIOS" />
           </AssociationSet>
+          <AssociationSet Name="FK_INCIDENCIAS_CLIENTE" Association="Self.FK_INCIDENCIAS_CLIENTE">
+            <End Role="CLIENTE" EntitySet="CLIENTE" />
+            <End Role="INCIDENCIAS" EntitySet="INCIDENCIAS" />
+          </AssociationSet>
+          <AssociationSet Name="FK_INCIDENCIAS_MODULO" Association="Self.FK_INCIDENCIAS_MODULO">
+            <End Role="MODULO" EntitySet="MODULO" />
+            <End Role="INCIDENCIAS" EntitySet="INCIDENCIAS" />
+          </AssociationSet>
           <AssociationSet Name="FK_MODULO_TIPO" Association="Self.FK_MODULO_TIPO">
             <End Role="TipoModulo" EntitySet="TipoModulo" />
             <End Role="MODULO" EntitySet="MODULO" />
@@ -4915,6 +4970,10 @@
             <End Role="SubModulo" EntitySet="SubModulo" />
             <End Role="PROYECTOMODULOCLIENTE" EntitySet="PROYECTOMODULOCLIENTE" />
           </AssociationSet>
+          <AssociationSet Name="FK_RECURSOS_CATEGORIARECURSOS" Association="Self.FK_RECURSOS_CATEGORIARECURSOS">
+            <End Role="CATEGORIARECURSOS" EntitySet="CATEGORIARECURSOS" />
+            <End Role="RECURSOS" EntitySet="RECURSOS" />
+          </AssociationSet>
           <AssociationSet Name="FK_RESOLUCIONSEMAFOROPRIORIDAD_PRIORIDADTICKET" Association="Self.FK_RESOLUCIONSEMAFOROPRIORIDAD_PRIORIDADTICKET">
             <End Role="PRIORIDADTICKET" EntitySet="PRIORIDADTICKET" />
             <End Role="RESOLUCIONSEMAFOROPRIORIDAD" EntitySet="RESOLUCIONSEMAFOROPRIORIDAD" />
@@ -4946,10 +5005,6 @@
           <AssociationSet Name="FK_TICKET_ACTIVIDAD_TICKET_ACTIVIDAD" Association="Self.FK_TICKET_ACTIVIDAD_TICKET_ACTIVIDAD">
             <End Role="TICKET" EntitySet="TICKET" />
             <End Role="TICKET_COMPLEMENTO" EntitySet="TICKET_COMPLEMENTO" />
-          </AssociationSet>
-          <AssociationSet Name="FK_TICKET_MODULO" Association="Self.FK_TICKET_MODULO">
-            <End Role="MODULO" EntitySet="MODULO" />
-            <End Role="TICKET" EntitySet="TICKET" />
           </AssociationSet>
           <AssociationSet Name="FK_TICKET_TICKETVERSIONCLIENTE" Association="Self.FK_TICKET_TICKETVERSIONCLIENTE">
             <End Role="TICKETVERSIONCLIENTE" EntitySet="TICKETVERSIONCLIENTE" />
@@ -6712,13 +6767,19 @@
           </AssociationSet>
           <EntitySet Name="Feriados" EntityType="SifizPlanningModel.Feriados" />
           <EntitySet Name="Incidencias" EntityType="SifizPlanningModel.Incidencias" />
-          <AssociationSet Name="FK_INCIDENCIAS_CLIENTE" Association="SifizPlanningModel.FK_INCIDENCIAS_CLIENTE">
-            <End Role="Cliente" EntitySet="Cliente" />
-            <End Role="INCIDENCIAS" EntitySet="Incidencias" />
-          </AssociationSet>
           <AssociationSet Name="FK_INCIDENCIAS_MODULO" Association="SifizPlanningModel.FK_INCIDENCIAS_MODULO">
             <End Role="Modulo" EntitySet="Modulo" />
             <End Role="INCIDENCIAS" EntitySet="Incidencias" />
+          </AssociationSet>
+          <EntitySet Name="CategoriaRecursos" EntityType="SifizPlanningModel.CategoriaRecursos" />
+          <EntitySet Name="Recursos" EntityType="SifizPlanningModel.Recursos" />
+          <AssociationSet Name="FK_RECURSOS_CATEGORIARECURSOS" Association="SifizPlanningModel.FK_RECURSOS_CATEGORIARECURSOS">
+            <End Role="CATEGORIARECURSOS" EntitySet="CategoriaRecursos" />
+            <End Role="RECURSOS" EntitySet="Recursos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_INCIDENCIAS_CLIENTE" Association="SifizPlanningModel.FK_INCIDENCIAS_CLIENTE">
+            <End Role="Cliente" EntitySet="Cliente" />
+            <End Role="Incidencias" EntitySet="Incidencias" />
           </AssociationSet>
           </EntityContainer>
         <EntityType Name="Rol">
@@ -6816,7 +6877,7 @@
           <NavigationProperty Name="comentarioTicketCliente" Relationship="SifizPlanningModel.FK_COMENTARIOTICKETCLIENTE_CLIENTE" FromRole="Cliente" ToRole="COMENTARIOTICKETCLIENTE" />
           <NavigationProperty Name="clienteAuxiliar" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_CLIENTE" FromRole="Cliente" ToRole="ClienteAuxiliar" />
           <NavigationProperty Name="ofertas" Relationship="SifizPlanningModel.FK_OFERTAS_CLIENTE" FromRole="Cliente" ToRole="OFERTAS" />
-          <NavigationProperty Name="INCIDENCIAS" Relationship="SifizPlanningModel.FK_INCIDENCIAS_CLIENTE" FromRole="Cliente" ToRole="INCIDENCIAS" />
+          <NavigationProperty Name="INCIDENCIAS" Relationship="SifizPlanningModel.FK_INCIDENCIAS_CLIENTE" FromRole="Cliente" ToRole="Incidencias" />
         </EntityType>
         <EntityType Name="Colaborador">
           <Key>
@@ -11691,28 +11752,16 @@
             <PropertyRef Name="Secuencial" />
           </Key>
           <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="SecuencialCliente" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialCliente" Type="Int32" />
           <Property Name="SecuencialModulo" Type="Int32" Nullable="false" />
           <Property Name="Incidente" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Name="Adjunto" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="Acciones" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="cliente" Relationship="SifizPlanningModel.FK_INCIDENCIAS_CLIENTE" FromRole="INCIDENCIAS" ToRole="Cliente" />
+          <Property Name="Acciones" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="modulo" Relationship="SifizPlanningModel.FK_INCIDENCIAS_MODULO" FromRole="INCIDENCIAS" ToRole="Modulo" />
           <Property Name="Fecha" Type="DateTime" Precision="0" />
           <Property Name="FinDia" Type="Decimal" Precision="1" Scale="0" />
+          <NavigationProperty Name="cliente" Relationship="SifizPlanningModel.FK_INCIDENCIAS_CLIENTE" FromRole="Incidencias" ToRole="Cliente" />
         </EntityType>
-        <Association Name="FK_INCIDENCIAS_CLIENTE">
-          <End Type="SifizPlanningModel.Cliente" Role="Cliente" Multiplicity="1" />
-          <End Type="SifizPlanningModel.Incidencias" Role="INCIDENCIAS" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Cliente">
-              <PropertyRef Name="Secuencial" />
-            </Principal>
-            <Dependent Role="INCIDENCIAS">
-              <PropertyRef Name="SecuencialCliente" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_INCIDENCIAS_MODULO">
           <End Type="SifizPlanningModel.Modulo" Role="Modulo" Multiplicity="1" />
           <End Type="SifizPlanningModel.Incidencias" Role="INCIDENCIAS" Multiplicity="*" />
@@ -11722,6 +11771,53 @@
             </Principal>
             <Dependent Role="INCIDENCIAS">
               <PropertyRef Name="SecuencialModulo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="CategoriaRecursos">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Codigo" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Descripcion" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <Property Name="NumeroVerificador" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="recursos" Relationship="SifizPlanningModel.FK_RECURSOS_CATEGORIARECURSOS" FromRole="CATEGORIARECURSOS" ToRole="RECURSOS" />
+        </EntityType>
+        <EntityType Name="Recursos">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Titulo" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Detalle" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="SecuencialCategoriaRecursos" Type="Int32" Nullable="false" />
+          <Property Name="Adjunto" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="CategoriaRecursos" Relationship="SifizPlanningModel.FK_RECURSOS_CATEGORIARECURSOS" FromRole="RECURSOS" ToRole="CATEGORIARECURSOS" />
+        </EntityType>
+        <Association Name="FK_RECURSOS_CATEGORIARECURSOS">
+          <End Type="SifizPlanningModel.CategoriaRecursos" Role="CATEGORIARECURSOS" Multiplicity="1" />
+          <End Type="SifizPlanningModel.Recursos" Role="RECURSOS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CATEGORIARECURSOS">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="RECURSOS">
+              <PropertyRef Name="SecuencialCategoriaRecursos" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_INCIDENCIAS_CLIENTE">
+          <End Type="SifizPlanningModel.Cliente" Role="Cliente" Multiplicity="0..1" />
+          <End Type="SifizPlanningModel.Incidencias" Role="Incidencias" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Cliente">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="Incidencias">
+              <PropertyRef Name="SecuencialCliente" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -13747,6 +13843,29 @@
                 <ScalarProperty Name="Incidente" ColumnName="INCIDENTE" />
                 <ScalarProperty Name="SecuencialModulo" ColumnName="SECUENCIALMODULO" />
                 <ScalarProperty Name="SecuencialCliente" ColumnName="SECUENCIALCLIENTE" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CategoriaRecursos">
+            <EntityTypeMapping TypeName="SifizPlanningModel.CategoriaRecursos">
+              <MappingFragment StoreEntitySet="CATEGORIARECURSOS">
+                <ScalarProperty Name="NumeroVerificador" ColumnName="NUMEROVERIFICADOR" />
+                <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
+                <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
+                <ScalarProperty Name="Codigo" ColumnName="CODIGO" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Recursos">
+            <EntityTypeMapping TypeName="SifizPlanningModel.Recursos">
+              <MappingFragment StoreEntitySet="RECURSOS">
+                <ScalarProperty Name="Adjunto" ColumnName="ADJUNTO" />
+                <ScalarProperty Name="SecuencialCategoriaRecursos" ColumnName="SECUENCIALCATEGORIARECURSOS" />
+                <ScalarProperty Name="Fecha" ColumnName="FECHA" />
+                <ScalarProperty Name="Detalle" ColumnName="DETALLE" />
+                <ScalarProperty Name="Titulo" ColumnName="TITULO" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
               </MappingFragment>
             </EntityTypeMapping>

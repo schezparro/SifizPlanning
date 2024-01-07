@@ -394,6 +394,10 @@
         <EntityTypeShape EntityType="SifizPlanningModel.Incidencias" Width="1.5" PointX="11.875" PointY="0.75" />
         <AssociationConnector Association="SifizPlanningModel.FK_INCIDENCIAS_CLIENTE" />
         <AssociationConnector Association="SifizPlanningModel.FK_INCIDENCIAS_MODULO" />
+        <EntityTypeShape EntityType="SifizPlanningModel.CategoriaRecursos" Width="1.5" PointX="37.375" PointY="36" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Recursos" Width="1.5" PointX="39.625" PointY="36" />
+        <AssociationConnector Association="SifizPlanningModel.FK_RECURSOS_CATEGORIARECURSOS" />
+        <AssociationConnector Association="SifizPlanningModel.FK_INCIDENCIAS_CLIENTE" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
