@@ -20,6 +20,8 @@ namespace SifizPlanning.Models
         public string Incidente { get; set; }
         public string Adjunto { get; set; }
         public string Acciones { get; set; }
+        public Nullable<System.DateTime> Fecha { get; set; }
+        public Nullable<decimal> FinDia { get; set; }
     
         public virtual Cliente cliente { get; set; }
         public virtual Modulo modulo { get; set; }

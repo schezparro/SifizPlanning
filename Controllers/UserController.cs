@@ -2814,7 +2814,7 @@ r in db.Rol on ur.rol equals r
 		//INCIDENCIAS DE LOS USUARIOS
 		[HttpPost]
 		[Authorize(Roles = "USER, ADMIN")]
-		public ActionResult IncidenciasUsuario(int start, int lenght, string filtro = "", bool todos = false)
+		public ActionResult IncidenciasUsuario(int start, int lenght, string filtro = "", bool finDia = false)
 		{
 
 
@@ -2829,8 +2829,27 @@ r in db.Rol on ur.rol equals r
 											  modulo = md.Descripcion,
 											  incidente = inc.Incidente,
 											  acciones = inc.Acciones,
-											  adjunto = inc.Adjunto
+											  adjunto = inc.Adjunto,
+											  fecha = inc.Fecha,
+											  findia = inc.FinDia
 										  }).ToList();
+
+
+				if (!finDia)
+				{
+					incidenciasUsuario = incidenciasUsuario.Where(inc => inc.findia == 1).ToList();
+				}
+
+
+				if (filtro != "")
+				{
+					incidenciasUsuario = incidenciasUsuario.Where(x =>
+																	x.cliente.ToString().ToLower().Contains(filtro.ToLower()) ||
+																	x.modulo.ToString().ToLower().Contains(filtro.ToLower()) ||
+																	x.incidente.ToString().ToLower().Contains(filtro.ToLower()) ||
+																	x.acciones.ToString().ToLower().Contains(filtro.ToLower())
+																).ToList();
+				}
 
 				int total = incidenciasUsuario.Count();
 				incidenciasUsuario = incidenciasUsuario.Skip(start).Take(lenght).ToList();
@@ -2902,7 +2921,7 @@ r in db.Rol on ur.rol equals r
 						 join pe in db.Persona on colab.SecuencialPersona equals pe.Secuencial
 						 join car in db.Cargo on colab.SecuencialCargo equals car.Secuencial
 						 join usu in db.Usuario on pe.Secuencial equals usu.SecuencialPersona
-						 where car.Descripcion == "LIDER DE PROYECTO" || car.Descripcion == "COORDINADOR PROYECTOS"
+						 where usu.EstaActivo == 1 && car.Descripcion == "LIDER DE PROYECTO" || car.Descripcion == "COORDINADOR PROYECTOS"
 						 select new
 						 {
 							 id = colab.Secuencial,
@@ -2921,7 +2940,7 @@ r in db.Rol on ur.rol equals r
 		//Guardar modal nuevas incidencias
 		[HttpPost]
 		[Authorize(Roles = "USER, ADMIN")]
-		public ActionResult GuardarIncidencia(string cliente, string modulo, string incidente, string acciones, string lideres, HttpPostedFileBase[] adjuntos = null)
+		public ActionResult GuardarIncidencia(string cliente, string modulo, string incidente, string acciones, string fechaincidencia, bool findia, string lideres, HttpPostedFileBase[] adjuntos = null)
 		{
 			try
 			{
@@ -2941,6 +2960,8 @@ r in db.Rol on ur.rol equals r
 
 				int moduloid = int.Parse(modulo);
 				int clienteid = int.Parse(cliente);
+				DateTime fecha = DateTime.Parse(fechaincidencia);
+				
 
 				Incidencias nuevaIncidencia = new Incidencias
 				{
@@ -2948,6 +2969,8 @@ r in db.Rol on ur.rol equals r
 					SecuencialModulo = moduloid,
 					Incidente = incidente,
 					Acciones = acciones,
+					Fecha = fecha,
+					FinDia = findia? 1 : 0,
 					Adjunto = Url
 				};
 
