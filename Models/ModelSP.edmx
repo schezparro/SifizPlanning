@@ -1444,6 +1444,8 @@
           <Property Name="INCIDENTE" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="ADJUNTO" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="ACCIONES" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="FECHA" Type="date" />
+          <Property Name="FINDIA" Type="numeric" Precision="1" Scale="0" />
         </EntityType>
         <EntityType Name="INFOTICKETS">
           <Key>
@@ -2202,30 +2204,6 @@
             </Principal>
             <Dependent Role="GESTORSERVICIOS">
               <PropertyRef Name="SECUENCIALCOLABORADOR" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_INCIDENCIAS_CLIENTE">
-          <End Role="CLIENTE" Type="Self.CLIENTE" Multiplicity="1" />
-          <End Role="INCIDENCIAS" Type="Self.INCIDENCIAS" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="CLIENTE">
-              <PropertyRef Name="SECUENCIAL" />
-            </Principal>
-            <Dependent Role="INCIDENCIAS">
-              <PropertyRef Name="SECUENCIALCLIENTE" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_INCIDENCIAS_MODULO">
-          <End Role="MODULO" Type="Self.MODULO" Multiplicity="1" />
-          <End Role="INCIDENCIAS" Type="Self.INCIDENCIAS" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MODULO">
-              <PropertyRef Name="SECUENCIAL" />
-            </Principal>
-            <Dependent Role="INCIDENCIAS">
-              <PropertyRef Name="SECUENCIALMODULO" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -4876,14 +4854,6 @@
           <AssociationSet Name="FK_GESTORSERVICIOS_COLABORADOR" Association="Self.FK_GESTORSERVICIOS_COLABORADOR">
             <End Role="COLABORADOR" EntitySet="COLABORADOR" />
             <End Role="GESTORSERVICIOS" EntitySet="GESTORSERVICIOS" />
-          </AssociationSet>
-          <AssociationSet Name="FK_INCIDENCIAS_CLIENTE" Association="Self.FK_INCIDENCIAS_CLIENTE">
-            <End Role="CLIENTE" EntitySet="CLIENTE" />
-            <End Role="INCIDENCIAS" EntitySet="INCIDENCIAS" />
-          </AssociationSet>
-          <AssociationSet Name="FK_INCIDENCIAS_MODULO" Association="Self.FK_INCIDENCIAS_MODULO">
-            <End Role="MODULO" EntitySet="MODULO" />
-            <End Role="INCIDENCIAS" EntitySet="INCIDENCIAS" />
           </AssociationSet>
           <AssociationSet Name="FK_MODULO_TIPO" Association="Self.FK_MODULO_TIPO">
             <End Role="TipoModulo" EntitySet="TipoModulo" />
@@ -11728,6 +11698,8 @@
           <Property Name="Acciones" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="cliente" Relationship="SifizPlanningModel.FK_INCIDENCIAS_CLIENTE" FromRole="INCIDENCIAS" ToRole="Cliente" />
           <NavigationProperty Name="modulo" Relationship="SifizPlanningModel.FK_INCIDENCIAS_MODULO" FromRole="INCIDENCIAS" ToRole="Modulo" />
+          <Property Name="Fecha" Type="DateTime" Precision="0" />
+          <Property Name="FinDia" Type="Decimal" Precision="1" Scale="0" />
         </EntityType>
         <Association Name="FK_INCIDENCIAS_CLIENTE">
           <End Type="SifizPlanningModel.Cliente" Role="Cliente" Multiplicity="1" />
@@ -13768,6 +13740,8 @@
           <EntitySetMapping Name="Incidencias">
             <EntityTypeMapping TypeName="SifizPlanningModel.Incidencias">
               <MappingFragment StoreEntitySet="INCIDENCIAS">
+                <ScalarProperty Name="FinDia" ColumnName="FINDIA" />
+                <ScalarProperty Name="Fecha" ColumnName="FECHA" />
                 <ScalarProperty Name="Acciones" ColumnName="ACCIONES" />
                 <ScalarProperty Name="Adjunto" ColumnName="ADJUNTO" />
                 <ScalarProperty Name="Incidente" ColumnName="INCIDENTE" />
