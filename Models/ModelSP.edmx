@@ -1484,6 +1484,16 @@
           <Property Name="ESTADO" Type="varchar" MaxLength="50" />
           <Property Name="APLICAA" Type="varchar" MaxLength="50" />
         </EntityType>
+        <EntityType Name="ITEMESPECIAL">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DESCRIPCION" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="TIEMPOESTIMACION" Type="int" Nullable="false" />
+          <Property Name="SECUENCIALESTIMACION" Type="int" Nullable="false" />
+          <Property Name="SECUENCIALTIPORECURSO" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="MOTIVODEVOLUCIONTICKET">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
@@ -2249,6 +2259,30 @@
             </Principal>
             <Dependent Role="INCIDENCIAS">
               <PropertyRef Name="SECUENCIALMODULO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ITEMESPECIAL_ESTIMACIONTICKET">
+          <End Role="ESTIMACIONTICKET" Type="Self.ESTIMACIONTICKET" Multiplicity="1" />
+          <End Role="ITEMESPECIAL" Type="Self.ITEMESPECIAL" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ESTIMACIONTICKET">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="ITEMESPECIAL">
+              <PropertyRef Name="SECUENCIALESTIMACION" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ITEMESPECIAL_TIPORECURSO">
+          <End Role="TIPORECURSO" Type="Self.TIPORECURSO" Multiplicity="1" />
+          <End Role="ITEMESPECIAL" Type="Self.ITEMESPECIAL" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TIPORECURSO">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="ITEMESPECIAL">
+              <PropertyRef Name="SECUENCIALTIPORECURSO" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -4751,6 +4785,7 @@
           <EntitySet Name="HORASCONSUMIDAS" EntityType="Self.HORASCONSUMIDAS" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="INCIDENCIAS" EntityType="Self.INCIDENCIAS" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="INFOTICKETS" EntityType="Self.INFOTICKETS" Schema="TICKET" store:Type="Tables" />
+          <EntitySet Name="ITEMESPECIAL" EntityType="Self.ITEMESPECIAL" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="MOTIVODEVOLUCIONTICKET" EntityType="Self.MOTIVODEVOLUCIONTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="MOTIVOPRIORIDADTICKET" EntityType="Self.MOTIVOPRIORIDADTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="MOTIVOTRABAJOTICKET" EntityType="Self.MOTIVOTRABAJOTICKET" Schema="TICKET" store:Type="Tables" />
@@ -4909,6 +4944,14 @@
           <AssociationSet Name="FK_INCIDENCIAS_MODULO" Association="Self.FK_INCIDENCIAS_MODULO">
             <End Role="MODULO" EntitySet="MODULO" />
             <End Role="INCIDENCIAS" EntitySet="INCIDENCIAS" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ITEMESPECIAL_ESTIMACIONTICKET" Association="Self.FK_ITEMESPECIAL_ESTIMACIONTICKET">
+            <End Role="ESTIMACIONTICKET" EntitySet="ESTIMACIONTICKET" />
+            <End Role="ITEMESPECIAL" EntitySet="ITEMESPECIAL" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ITEMESPECIAL_TIPORECURSO" Association="Self.FK_ITEMESPECIAL_TIPORECURSO">
+            <End Role="TIPORECURSO" EntitySet="TIPORECURSO" />
+            <End Role="ITEMESPECIAL" EntitySet="ITEMESPECIAL" />
           </AssociationSet>
           <AssociationSet Name="FK_MODULO_TIPO" Association="Self.FK_MODULO_TIPO">
             <End Role="TipoModulo" EntitySet="TipoModulo" />
@@ -6781,6 +6824,15 @@
             <End Role="Cliente" EntitySet="Cliente" />
             <End Role="Incidencias" EntitySet="Incidencias" />
           </AssociationSet>
+          <EntitySet Name="ItemEspecial" EntityType="SifizPlanningModel.ItemEspecial" />
+          <AssociationSet Name="FK_ITEMESPECIAL_ESTIMACIONTICKET" Association="SifizPlanningModel.FK_ITEMESPECIAL_ESTIMACIONTICKET">
+            <End Role="EstimacionTicket" EntitySet="EstimacionTicket" />
+            <End Role="ITEMESPECIAL" EntitySet="ItemEspecial" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ITEMESPECIAL_TIPORECURSO" Association="SifizPlanningModel.FK_ITEMESPECIAL_TIPORECURSO">
+            <End Role="TipoRecurso" EntitySet="TipoRecurso" />
+            <End Role="ITEMESPECIAL" EntitySet="ItemEspecial" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="Rol">
           <Key>
@@ -8221,6 +8273,7 @@
           <Property Name="FactorTiempo" Type="Decimal" Nullable="false" Precision="2" Scale="0" />
           <Property Name="FechaLimite" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="NumeroHoras" Type="Decimal" Nullable="false" Precision="5" Scale="0" />
+          <NavigationProperty Name="ITEMESPECIAL" Relationship="SifizPlanningModel.FK_ITEMESPECIAL_ESTIMACIONTICKET" FromRole="EstimacionTicket" ToRole="ITEMESPECIAL" />
         </EntityType>
         <Association Name="RefCOLABORADOR73">
           <End Type="SifizPlanningModel.Colaborador" Role="Colaborador" Multiplicity="1" />
@@ -9655,6 +9708,7 @@
           <Property Name="NumeroVerificador" Type="Int32" Nullable="false" />
           <NavigationProperty Name="ticket" Relationship="SifizPlanningModel.RefTIPORECURSO187" FromRole="TIPORECURSO" ToRole="Ticket" />
           <NavigationProperty Name="ticketHistorico" Relationship="SifizPlanningModel.RefTIPORECURSO190" FromRole="TIPORECURSO" ToRole="TicketHistorico" />
+          <NavigationProperty Name="ITEMESPECIAL" Relationship="SifizPlanningModel.FK_ITEMESPECIAL_TIPORECURSO" FromRole="TipoRecurso" ToRole="ITEMESPECIAL" />
         </EntityType>
         <Association Name="RefPROXIMAACTIVIDAD186">
           <End Type="SifizPlanningModel.ProximaActividad" Role="PROXIMAACTIVIDAD" Multiplicity="1" />
@@ -11821,6 +11875,42 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="ItemEspecial">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Descripcion" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="TiempoEstimacion" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialEstimacion" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialTipoRecurso" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ESTIMACIONTICKET" Relationship="SifizPlanningModel.FK_ITEMESPECIAL_ESTIMACIONTICKET" FromRole="ITEMESPECIAL" ToRole="EstimacionTicket" />
+          <NavigationProperty Name="TIPORECURSO" Relationship="SifizPlanningModel.FK_ITEMESPECIAL_TIPORECURSO" FromRole="ITEMESPECIAL" ToRole="TipoRecurso" />
+        </EntityType>
+        <Association Name="FK_ITEMESPECIAL_ESTIMACIONTICKET">
+          <End Type="SifizPlanningModel.EstimacionTicket" Role="EstimacionTicket" Multiplicity="1" />
+          <End Type="SifizPlanningModel.ItemEspecial" Role="ITEMESPECIAL" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EstimacionTicket">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="ITEMESPECIAL">
+              <PropertyRef Name="SecuencialEstimacion" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ITEMESPECIAL_TIPORECURSO">
+          <End Type="SifizPlanningModel.TipoRecurso" Role="TipoRecurso" Multiplicity="1" />
+          <End Type="SifizPlanningModel.ItemEspecial" Role="ITEMESPECIAL" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TipoRecurso">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="ITEMESPECIAL">
+              <PropertyRef Name="SecuencialTipoRecurso" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -13866,6 +13956,17 @@
                 <ScalarProperty Name="Fecha" ColumnName="FECHA" />
                 <ScalarProperty Name="Detalle" ColumnName="DETALLE" />
                 <ScalarProperty Name="Titulo" ColumnName="TITULO" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ItemEspecial">
+            <EntityTypeMapping TypeName="SifizPlanningModel.ItemEspecial">
+              <MappingFragment StoreEntitySet="ITEMESPECIAL">
+                <ScalarProperty Name="SecuencialTipoRecurso" ColumnName="SECUENCIALTIPORECURSO" />
+                <ScalarProperty Name="SecuencialEstimacion" ColumnName="SECUENCIALESTIMACION" />
+                <ScalarProperty Name="TiempoEstimacion" ColumnName="TIEMPOESTIMACION" />
+                <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
               </MappingFragment>
             </EntityTypeMapping>

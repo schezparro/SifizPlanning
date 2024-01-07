@@ -652,6 +652,9 @@
     <Compile Include="Models\InfoTickets.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ItemEspecial.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\LugarTarea.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>

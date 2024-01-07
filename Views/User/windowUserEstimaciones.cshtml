@@ -15,6 +15,7 @@
                 <th width="35">Fecha Límite</th>
                 <th width="10">Estado Estimación</th>
                 <th width="20">Adjuntos</th>
+                <th width="5"></th>
             </tr>
         </thead>
 
@@ -30,6 +31,9 @@
                     <a class="btn btn-success btn-xs" ng-repeat="adj in estimacion.adjuntos" target="_blank" href="Web{{adj.url}}">
                         <span class="glyphicon glyphicon-download"></span> Adjunto {{$index+1}}
                     </a>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-success btn-xs" ng-click="mostrarItemsEspeciales(estimacion.id)">Items Especiales</button>
                 </td>
             </tr>
         </tbody>
@@ -233,7 +237,7 @@
             <label>Tiempo<br>(PRU)</label>
             <input type="text" class="solo-numero form-control" ng-required="true" />
         </div>
-        
+
         <div class="col-md-1">
             <label>Tiempo<br>(QA)</label>
             <input type="text" class="solo-numero form-control" ng-required="true" />
@@ -264,7 +268,7 @@
             <br>
             <input type="text" class="solo-numero form-control" ng-required="true" />
         </div>
-        
+
         <div class="col-md-1">
             <br>
             <input type="text" class="solo-numero form-control" ng-required="true" />
@@ -336,3 +340,94 @@
         </div>
     </div>
 </div>
+
+<!-- Windows Modal Items Especiales -->
+<div class="modal fade" id="modal-items-especiales" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Items Espciales</h4>
+            </div>
+
+            <div class="modal-body">
+                <div style="overflow-y:auto; height: 300px;">
+                    <table class="table table-striped">
+
+                        <thead>
+                            <tr>
+                                <th width="10">Descripcion</th>
+                                <th width="5">Tipo Recurso</th>
+                                <th width="3">Tiempo Estimado</th>
+                                <th width="3"></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr class="table-tr" ng-repeat="item in items" data-id="{{ item.id }}">
+                                <td class="col-md-2">{{ item.descripcion }}</td>
+                                <td class="col-md-2">{{ item.recurso }}</td>
+                                <td class="col-md-2">{{ item.tiempoEstimacion }}</td>
+                                <td class="col-md-2"><button type="button" class="btn btn-danger" ng-click="eliminarItemEspecial(item.id)">Eliminar</button></td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                    <div class="clear"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" ng-click="mostrarAgregarItemEspecial()">Agregar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Windows Modal Agregar Item Especial -->
+    <div class="modal fade" id="modal-agregar-item-especial" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Agregar Item Espcial</h4>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="fila">
+                        <div class="left">
+                            <label>Descripcion:</label>
+                            <input type="text" ng-model="itemEspecialDescripcion" />
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="fila">
+                        <div class="left half half-padding-right">
+                            <label>Tipo Recurso:</label>
+                            <select class="form-control" ng-model="itemEspecialTipoRecurso" ng-required="true">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="recurso in recursos" value="{{recurso.id}}">{{recurso.descripcion}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="left half half-padding-left">
+                        <label>Tiempo Estimado:</label>
+                        <div class="form-group">
+
+                            <input type='number' class="form-control" ng-model="itemEspecialTiempoEstimacion" ng-required="true" />
+
+                        </div>
+                    </div>
+                </div>
+                <div class="clear"></div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" ng-click="guardarItemEspecial()">Agregar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
