@@ -1,27 +1,33 @@
-﻿<label style="display: inline-block">
-    Mostrar Todas:
-    <input style="vertical-align: -2px;" type="checkbox" ng-click="cargarIncidencias()" ng-model="mostrarTodasIncidencias" ng-init="mostrarTodasIncidencias=false" />
+<label style="display: inline-block">
+    Fin de Dia:
+    <input style="vertical-align: -2px;" type="checkbox" ng-click="cargarIncidencias()" ng-model="mostrarFinDiaIncidencias" ng-init="mostrarFinDiaIncidencias=false" />
 </label>
 <button class="btn btn-primary" ng-click="windowAgregarIncidencias()">Nueva Incidencia</button>
 <input type="text" ng-keyup="cargarIncidencias()" ng-model="filtroIncidencias" class="form-control right filtro" placeholder="Filtrar..." />
 <div class="clear"></div>
-<div id="tabla-user-estimacion">
+<div id="tabla-user-incidencias">
     <table id="tabla-incidencias-usuario" class="table table-striped">
         <thead>
             <tr>
-                <th width="5">Versión</th>
-                <th width="10">Módulo/Funcionalidad</th>
-                <th width="10">Incidente</th>
-                <th width="35">Corrección/Adjunto</th>
+                <th width="5">Cliente</th>
+                <th width="5">Módulo/Funcionalidad</th>
+                <th width="35">Incidente</th>
+                <th width="35">Acciones a realizar</th>
+                <th width="5">Fecha incidencia</th>
+                <th width="10">Fin de Dia</th>
+                <th width="10">Corrección/Adjunto</th>
 
             </tr>
         </thead>
 
         <tbody>
             <tr ng-repeat="incidencia in incidencias  | filter: filtroIncidencias">
-                <td>{{incidencia.version}}</td>
+                <td>{{incidencia.cliente}}</td>
                 <td>{{incidencia.modulo}}</td>
                 <td>{{incidencia.incidente}}</td>
+                <td>{{incidencia.acciones}}</td>
+                <td>{{incidencia.fecha | strDateToStr}}</td>
+                <td>{{incidencia.findia}}</td>
                 <td>
                     <a class="btn btn-success btn-xs" target="_blank" href="Web{{incidencia.adjunto}}">
                         <span class="glyphicon glyphicon-download"></span> Adjunto
@@ -67,23 +73,61 @@
                 </div>
                 <div class="modal-body">
                     <div style="column-count: 2">
-                        VERSIÓN:
-                        <input type="text" class="form-control" ng-model="newVersion" ng-required="true">
-                        <br>
+                        CLIENTE:
+                        <select id="select-cliente-incidencias" ng-model="clienteSeleccionado" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{cliente.id}}" ng-repeat="cliente in clientes">{{cliente.nombre}}</option>
+                        </select>
+
                         MODULO:
                         <select id="select-tipo-modulo" ng-model="tipoSeleccionado" class="form-control" required="required">
                             <option value="">Seleccione...</option>
                             <option value="{{tipo.id}}" ng-repeat="tipo in tipoModulo">{{tipo.nombre}}</option>
                         </select>
+                    </div>
+
+                    <div>
                         INCIDENTE:
                         <textarea type="text" class="form-control" ng-model="newIncidente" ng-required="true"></textarea>
+
+                        ACCIONES A REALIZAR O RESOLUCION:
+                        <textarea type="text" class="form-control" ng-model="newAcciones" ng-required="true"></textarea>
+                    </div>
+                    <br />
+
+                    <div style="column-count: 2">
+                        <div class="div-info-ticket">
+                            FECHA INCIDENCIA:
+                            <input id="fechaIncidencia" name="fechaIncidencia" ng-model="fechaIncidencia" class="form-control" />
+                        </div>
+
                         ADJUNTO:
                         <div id="panel-add-adjunto"></div>
                         <div class="clear"></div>
                     </div>
+
+                    <div class="col-md-6">
+                        FIN DE DIA:
+                        <input id="check-fin-dia" type="checkbox" ng-model="finDia" />
+                    </div>
+                    <div class="col-md-6">
+                        NOTIFICAR LIDERES:
+                        <input type="checkbox" ng-model="mostrarSelectLideres" ng-init="mostrarSelectLideres=false" />
+
+                        <select id="select-notificar-lideres" ng-model="liderSeleccionado" class="form-control" multiple required="required" ng-show="mostrarSelectLideres">
+                            <option value="">Seleccione...</option>
+                            <option value="{{lider.email}}" ng-repeat="lider in lideres">{{lider.nombre}}</option>
+                        </select>
+                    </div>
+
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" id="enviar-modal-incidencias-btn" class="btn btn-primary">Enviar</button>
+                    <button type="submit" id="enviar-modal-incidencias-btn" class="btn btn-primary">Guardar</button>
                     <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </form>

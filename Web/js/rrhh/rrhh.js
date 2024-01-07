@@ -274,6 +274,7 @@ rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $
             motivo: $scope.motivoPermiso
         });
         ajaxPermisos.success(function (data) {
+            console.log(data);
             if (data.success === true) {
                 $scope.aprobarPermisoColaborador(data.idPermiso);
             }

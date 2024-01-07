@@ -333,7 +333,7 @@ namespace SifizPlanning.Controllers
 						List<DataTarea> lPermisos = new List<DataTarea>();
 						lPermisos = (from per in permisos
 									 where per.idColaborador == idTrabajador &&
-                                           per.finicio <= fecha && per.finicio < fechaDespues
+                                           per.finicio <= fecha && per.ffin >= fecha
                                      select new DataTarea
 									 {
 										 id = per.id,
@@ -2815,7 +2815,7 @@ r in db.Rol on ur.rol equals r
 		//INCIDENCIAS DE LOS USUARIOS
 		[HttpPost]
 		[Authorize(Roles = "USER, ADMIN")]
-		public ActionResult IncidenciasUsuario(int start, int lenght, string filtro = "", bool todos = false)
+		public ActionResult IncidenciasUsuario(int start, int lenght, string filtro = "", bool finDia = false)
 		{
 
 
@@ -2823,13 +2823,34 @@ r in db.Rol on ur.rol equals r
 			{
 				var incidenciasUsuario = (from inc in db.Incidencias
 										  join md in db.Modulo on inc.SecuencialModulo equals md.Secuencial
+										  join cli in db.Cliente on inc.SecuencialCliente equals cli.Secuencial
 										  select new
 										  {
-											  version = inc.Version,
+											  cliente = cli.Descripcion,
 											  modulo = md.Descripcion,
 											  incidente = inc.Incidente,
-											  adjunto = inc.Adjunto
+											  acciones = inc.Acciones,
+											  adjunto = inc.Adjunto,
+											  fecha = inc.Fecha,
+											  findia = inc.FinDia
 										  }).ToList();
+
+
+				if (!finDia)
+				{
+					incidenciasUsuario = incidenciasUsuario.Where(inc => inc.findia == 1).ToList();
+				}
+
+
+				if (filtro != "")
+				{
+					incidenciasUsuario = incidenciasUsuario.Where(x =>
+																	x.cliente.ToString().ToLower().Contains(filtro.ToLower()) ||
+																	x.modulo.ToString().ToLower().Contains(filtro.ToLower()) ||
+																	x.incidente.ToString().ToLower().Contains(filtro.ToLower()) ||
+																	x.acciones.ToString().ToLower().Contains(filtro.ToLower())
+																).ToList();
+				}
 
 				int total = incidenciasUsuario.Count();
 				incidenciasUsuario = incidenciasUsuario.Skip(start).Take(lenght).ToList();
@@ -2874,11 +2895,53 @@ r in db.Rol on ur.rol equals r
 			});
 		}
 
+		[HttpPost]
+		[Authorize(Roles = "USER, ADMIN")]
+		public ActionResult DarClientesIncidencias()
+		{
+			var datos = (from cli in db.Cliente
+						 orderby cli.Descripcion
+						 select new
+						 {
+							 id = cli.Secuencial,
+							 nombre = cli.Descripcion
+						 }).ToList();
+
+			return Json(new
+			{
+				success = true,
+				clientes = datos
+			});
+		}
+
+		[HttpPost]
+		[Authorize(Roles = "USER, ADMIN")]
+		public ActionResult DarRolColaboradorIncidencias()
+		{
+			var datos = (from colab in db.Colaborador
+						 join pe in db.Persona on colab.SecuencialPersona equals pe.Secuencial
+						 join car in db.Cargo on colab.SecuencialCargo equals car.Secuencial
+						 join usu in db.Usuario on pe.Secuencial equals usu.SecuencialPersona
+						 where usu.EstaActivo == 1 && car.Descripcion == "LIDER DE PROYECTO" || car.Descripcion == "COORDINADOR PROYECTOS"
+						 select new
+						 {
+							 id = colab.Secuencial,
+							 nombre = pe.Nombre1 + " " + pe.Apellido1,
+							 email = usu.Email
+						 }).ToList();
+
+			return Json(new
+			{
+				success = true,
+				lideres = datos
+			});
+		}
+
 
 		//Guardar modal nuevas incidencias
 		[HttpPost]
 		[Authorize(Roles = "USER, ADMIN")]
-		public ActionResult GuardarIncidencia(string version, string modulo, string incidente, HttpPostedFileBase[] adjuntos = null)
+		public ActionResult GuardarIncidencia(string cliente, string modulo, string incidente, string acciones, string fechaincidencia, bool findia, string lideres, HttpPostedFileBase[] adjuntos = null)
 		{
 			try
 			{
@@ -2897,16 +2960,42 @@ r in db.Rol on ur.rol equals r
 				}
 
 				int moduloid = int.Parse(modulo);
+				int clienteid = int.Parse(cliente);
+				DateTime fecha = DateTime.Parse(fechaincidencia);
+				
+
 				Incidencias nuevaIncidencia = new Incidencias
 				{
-					Version = version,
+					SecuencialCliente = clienteid,
 					SecuencialModulo = moduloid,
 					Incidente = incidente,
+					Acciones = acciones,
+					Fecha = fecha,
+					FinDia = findia? 1 : 0,
 					Adjunto = Url
 				};
 
 				db.Incidencias.Add(nuevaIncidencia);
 				db.SaveChanges();
+
+				if(lideres != "")
+				{
+					string email = lideres;
+					string[] emails = email.Split(',');
+					List<string> correosDestinos = emails.ToList();
+
+					string textoEmail = @"<div class='textoCuerpo'><br/>";
+					textoEmail += "Buen día,";
+					textoEmail += @"<br/>";
+
+					textoEmail += "Por el presente se le notifica de que se ha detectado una nueva incidencia";
+					textoEmail += @"<br/>";
+					textoEmail += "Puede revizarla en el Sifizplanning en el módulo de desarrolladores y darle seguimiento.";
+					textoEmail += "</div>";
+
+					string asuntoEmail = "Nueva incidencia";
+					Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmail, asuntoEmail);
+				}
 
 				return Json(new
 				{

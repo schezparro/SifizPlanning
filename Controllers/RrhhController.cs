@@ -12,6 +12,7 @@ using SifizPlanning.Util;
 using SifizPlanning.Security;
 using System.Globalization;
 using SifizPlanning.Models.ViewModel;
+using System.Data.Entity;
 
 namespace SifizPlanning.Controllers
 {
@@ -370,6 +371,21 @@ namespace SifizPlanning.Controllers
                     throw new Exception("Error, las fechas de este permiso se solapan con las de otro");
                 }
 
+                List<Tarea> tareas = (from t in db.Tarea
+                                      where t.colaborador.Secuencial == idColaborador
+                                      && t.FechaInicio >= fechaDesde && t.FechaInicio <= fechaHasta
+                                      select t).ToList<Tarea>();
+
+                foreach (Tarea t in tareas)
+                {
+                    DateTime nuevaFechaInicio = fechaHasta.AddDays(1);
+                    while (nuevaFechaInicio.DayOfWeek == DayOfWeek.Saturday || nuevaFechaInicio.DayOfWeek == DayOfWeek.Sunday || db.Feriados.Any(f => f.Fecha == nuevaFechaInicio))
+                    {
+                        nuevaFechaInicio = nuevaFechaInicio.AddDays(1);
+                    }
+                    db.Tarea.Where(tarea => t.Secuencial == tarea.Secuencial).First().FechaInicio = nuevaFechaInicio;
+                }
+
                 Permiso permiso = new Permiso
                 {
                     SecuencialTipoPermiso = tipoPermiso,
@@ -380,13 +396,15 @@ namespace SifizPlanning.Controllers
                     Motivo = motivo
                 };
 
+
                 db.Permiso.Add(permiso);
                 db.SaveChanges();
+
 
                 var resp = new
                 {
                     success = true,
-                    idPermiso = permiso.Secuencial
+                    idPermiso = permiso.Secuencial,
                 };
                 return Json(resp);
             }
@@ -400,6 +418,7 @@ namespace SifizPlanning.Controllers
                 return Json(resp);
             }
         }
+
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, RRHH")]

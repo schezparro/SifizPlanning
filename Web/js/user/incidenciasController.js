@@ -2,7 +2,7 @@
     var numerosPorPagina = 10;
     var pagina = 1;
     $scope.idIncidencias = 0;
-    $scope.mostrarTodasIncidencias = false;
+    $scope.mostrarFinDiaIncidencias = false;
 
     $scope.cargarIncidencias = function (start, lenght) {
         if (start === undefined)
@@ -16,7 +16,7 @@
                 start: start,
                 lenght: lenght,
                 filtro: $scope.filtroIncidencias,
-                todos: $scope.mostrarTodasIncidencias
+                finDia: $scope.mostrarFinDiaIncidencias
             });
         incidencias.success(function (data) {
             $scope.loading.hide();
@@ -64,6 +64,32 @@
     };
     $scope.cargarIncidencias();
 
+    //El Paginador
+    $scope.paginar = function () {
+        var start = (pagina - 1) * numerosPorPagina;
+        var lenght = numerosPorPagina;
+        $scope.cargarIncidencias(start, lenght);
+    };
+
+    $scope.cambiarPagina = function (pag) {
+        pagina = pag;
+        $scope.paginar();
+    };
+
+    $scope.atrazarPagina = function () {
+        if (pagina > 1) {
+            pagina--;
+            $scope.paginar();
+        }
+    };
+
+    $scope.avanzarPagina = function () {
+        if (pagina < $scope.cantPaginas) {
+            pagina++;
+            $scope.paginar();
+        }
+    };
+
 
     $scope.windowAgregarIncidencias = function () {
         angular.element("#modal-agregar-incidencias").modal("show");
@@ -79,16 +105,50 @@
     });
 
 
+    var ajaxClienteIncidencias = $http.post("user/cliente-incidencias", {});
+
+    ajaxClienteIncidencias.success(function (data) {
+        if (data.success === true) {
+            $scope.clientes = data.clientes;
+        }
+    });
+
+
+    var ajaxRolColaboradorIncidencias = $http.post("user/rol-colaborador-incidencias", {});
+
+    ajaxRolColaboradorIncidencias.success(function (data) {
+        if (data.success === true) {
+            $scope.lideres = data.lideres;
+        }
+    });
+
+
     $scope.GuardarNuevaIncidencia = function () {
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
 
         var fileInput = angular.element('#uniqueFileInputID')[0];
         var modulo = angular.element("#select-tipo-modulo")[0].value;
+        var cliente = angular.element("#select-cliente-incidencias")[0].value;
+        var lideres = [];
+        var selectMultiple = document.querySelector('#select-notificar-lideres');
+        for (var i = 0; i < selectMultiple.options.length; i++) {
+            if (selectMultiple.options[i].selected) {
+                lideres.push(selectMultiple.options[i].value);
+            }
+        }
+        lideresString = lideres.join(',');
 
+       
+        
+            
         var formData = new FormData();
-        formData.append('version', $scope.newVersion);
-        formData.append('modulo', modulo);
+        formData.append('cliente', cliente);
+        formData.append('modulo', modulo);        
         formData.append('incidente', $scope.newIncidente);
+        formData.append('acciones', $scope.newAcciones);
+        formData.append('fechaincidencia', $scope.fechaIncidencia);
+        formData.append('findia', $scope.finDia);
+        formData.append('lideres', lideresString);
         formData.append('adjuntos', fileInput.files[0]);
 
         var ajaxEnvioDatos = $http({
@@ -102,6 +162,11 @@
         ajaxEnvioDatos.success(function (data) {
             waitingDialog.hide();
             if (data.success === true) {
+                if (data.fechaincidencia !== "01/01/0001") {
+                    $scope.fechaIncidencia = data.fechaincidencia;
+                } else {
+                    $scope.fechaIncidencia = '';
+                };
                 angular.element("#modal-agregar-incidencias").modal("hide");
                 $scope.cargarIncidencias();
             } else {
@@ -117,4 +182,47 @@
 
     // Añade la plantilla modificada al DOM
     angular.element("#panel-add-adjunto").append(fileInputWithId);
+
+
+    //Filters
+    //Filter de angular para las fechas
+    devApp.filter("strDateToStr", function () {
+        return function (textDate) {
+            if (textDate !== undefined) {
+                var fecha = new Date(parseInt(textDate.replace('/Date(', '')));
+                return dateToStr(fecha);
+            }
+            return "";
+        }
+    });
+
+    function dateToStr(dateObj, format, separator) {
+        /**
+         * Convert a date object to a string
+         * @argument dateObj {Date} A date object
+         * @argument format {string} An string representation of the date format. Default: dd-mm-yyyy. More could be added as necessary
+         * @argument separator {string} Character used for join the parts of the date
+         * @returns {string} An string representation of a Date
+         */
+        var year = dateObj.getFullYear().toString();
+        var month = dateObj.getMonth() + 1;
+        var month = (month < 10) ? '0' + month : month;
+        var day = dateObj.getDate();
+        var day = (day < 10) ? '0' + day : day;
+        var sep = (separator) ? separator : '/';
+        switch (format) {
+            case 'mm/dd/yyyy':
+                var out = [month, day, year];
+                break;
+            case 'yyyy/mm/dd':
+                var out = [year, month, day];
+                break;
+            default: //dd/mm/yyyy
+                var out = [day, month, year];
+        }
+        return out.join(sep);
+    };
+
 }]);
+
+
