@@ -44,6 +44,7 @@
                 }
                 <li role="presentation"><a href="#" ng-click="IrPanelFTP()">FTP</a></li>
                 <li role="presentation"><a href="#" ng-click="IrPanelIncidencias()">Incidencias</a></li>
+                <li role="presentation"><a href="#" ng-click="IrPanelRecursos()">Recursos</a></li>
 
                 <a href="cerrar/sesion/" class="right btn btn-danger"><span class="glyphicon glyphicon-off"></span> Cerrar Sesión</a>
                 <a href="main-menu" style="margin-right: 4px;" class="right btn btn-warning"><span class="glyphicon glyphicon-menu-hamburger"></span> Menú Principal</a>
@@ -67,8 +68,8 @@
                 </div>
 
                 @*<div id="panel_tareas_compensatorias" ng-controller="tareasCompensatoriasController" class="invisible">
-                    @{ Html.RenderPartial("windowUserTareasCompensatorias"); }
-                </div>*@
+                        @{ Html.RenderPartial("windowUserTareasCompensatorias"); }
+                    </div>*@
 
                 <div id="panel_publicaciones" ng-controller="publicacionesController" class="invisible">
                     @{ Html.RenderPartial("windowUserPublicaciones"); }
@@ -91,6 +92,10 @@
 
                 <div id="panel_incidencias" ng-controller="incidenciasController" class="invisible">
                     @{ Html.RenderPartial("windowUserIncidencias"); }
+                </div>
+
+                <div id="panel_recursos" ng-controller="recursosController" class="invisible">
+                    @{ Html.RenderPartial("windowUserRecursos"); }
                 </div>
             </div>
 
@@ -263,6 +268,7 @@
     <script type="text/javascript" src="~/Web/js/user/solicitudesController.js"></script>
     <script type="text/javascript" src="~/Web/js/user/ftpController.js"></script>
     <script type="text/javascript" src="~/Web/js/user/incidenciasController.js"></script>
+    <script type="text/javascript" src="~/Web/js/user/recursosController.js"></script>
     <script type="text/javascript" src="~/Web/js/pdf.min.js"></script>
     <script type="text/javascript" src="~/Web/js/pdf.worker.min.js"></script>
 </body>

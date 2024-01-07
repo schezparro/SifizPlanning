@@ -1,5 +1,4 @@
-﻿
-<label style="display: inline-block">
+﻿<label style="display: inline-block">
     Mostrar Todas:
     <input style="vertical-align: -2px;" type="checkbox" ng-click="cargarIncidencias()" ng-model="mostrarTodasIncidencias" ng-init="mostrarTodasIncidencias=false" />
 </label>
@@ -19,7 +18,7 @@
         </thead>
 
         <tbody>
-            <tr ng-repeat="incidencia in incidencias">
+            <tr ng-repeat="incidencia in incidencias  | filter: filtroIncidencias">
                 <td>{{incidencia.version}}</td>
                 <td>{{incidencia.modulo}}</td>
                 <td>{{incidencia.incidente}}</td>
