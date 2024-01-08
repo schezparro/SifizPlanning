@@ -23,7 +23,7 @@
         recursos.success(function (data) {
             $scope.loading.hide();
             if (data.success === true) {
-               
+
                 var posPagin = pagina;
                 $scope.recursos = data.recursos;
                 $scope.cantPaginas = Math.ceil(data.total / numerosPorPagina);
@@ -91,6 +91,10 @@
 
 
     $scope.windowAgregarRecursos = function () {
+        $scope.newTitulo = '';
+        $scope.newDetalle = '';
+        $scope.categoriaSeleccionada = '';
+        $scope.newTitulo = '';
         angular.element("#modal-agregar-recursos").modal("show");
     };
 
