@@ -90,8 +90,19 @@
         }
     };
 
-
+    angular.element('#fecha-incidencia').datepicker({
+        format: 'dd/mm/yyyy',
+        forceParse: false
+    });
     $scope.windowAgregarIncidencias = function () {
+        $scope.clienteSeleccionado = '';
+        $scope.tipoSeleccionado = '';
+        $scope.newIncidente = '';
+        $scope.newAcciones = '';
+        $scope.fechaIncidencia = '';
+        $scope.finDia = false;
+        $scope.mostrarSelectLideres = false;
+        $scope.liderSeleccionado = '';
         angular.element("#modal-agregar-incidencias").modal("show");
     };
 
@@ -104,7 +115,6 @@
         }
     });
 
-
     var ajaxClienteIncidencias = $http.post("user/cliente-incidencias", {});
 
     ajaxClienteIncidencias.success(function (data) {
@@ -113,7 +123,6 @@
         }
     });
 
-
     var ajaxRolColaboradorIncidencias = $http.post("user/rol-colaborador-incidencias", {});
 
     ajaxRolColaboradorIncidencias.success(function (data) {
@@ -121,7 +130,6 @@
             $scope.lideres = data.lideres;
         }
     });
-
 
     $scope.GuardarNuevaIncidencia = function () {
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
@@ -137,9 +145,6 @@
             }
         }
         lideresString = lideres.join(',');
-
-       
-        
             
         var formData = new FormData();
         formData.append('cliente', cliente);
@@ -195,7 +200,6 @@
             return "";
         }
     });
-
     function dateToStr(dateObj, format, separator) {
         /**
          * Convert a date object to a string
@@ -224,5 +228,3 @@
     };
 
 }]);
-
-

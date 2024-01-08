@@ -1,4 +1,4 @@
-<label style="display: inline-block">
+﻿<label style="display: inline-block">
     Fin de Dia:
     <input style="vertical-align: -2px;" type="checkbox" ng-click="cargarIncidencias()" ng-model="mostrarFinDiaIncidencias" ng-init="mostrarFinDiaIncidencias=false" />
 </label>
@@ -10,12 +10,12 @@
         <thead>
             <tr>
                 <th width="5">Cliente</th>
-                <th width="5">Módulo/Funcionalidad</th>
+                <th width="5">Módulo</th>
                 <th width="35">Incidente</th>
                 <th width="35">Acciones a realizar</th>
                 <th width="5">Fecha incidencia</th>
                 <th width="10">Fin de Dia</th>
-                <th width="10">Corrección/Adjunto</th>
+                <th width="10">Adjunto</th>
 
             </tr>
         </thead>
@@ -29,7 +29,7 @@
                 <td>{{incidencia.fecha | strDateToStr}}</td>
                 <td>{{incidencia.findia}}</td>
                 <td>
-                    <a class="btn btn-success btn-xs" target="_blank" href="Web{{incidencia.adjunto}}">
+                    <a class="btn btn-success btn-xs" target="_blank" href="Web{{incidencia.adjunto}}" ng-show="incidencia.adjunto != ''">
                         <span class="glyphicon glyphicon-download"></span> Adjunto
                     </a>
                 </td>
@@ -97,8 +97,8 @@
 
                     <div style="column-count: 2">
                         <div class="div-info-ticket">
-                            FECHA INCIDENCIA:
-                            <input id="fechaIncidencia" name="fechaIncidencia" ng-model="fechaIncidencia" class="form-control" />
+                            FECHA INCIDENCIA
+                            <input id="fecha-incidencia" ng-model="fechaIncidencia" class="form-control" ng-required="true" autocomplete="off" />
                         </div>
 
                         ADJUNTO:
@@ -114,7 +114,7 @@
                         NOTIFICAR LIDERES:
                         <input type="checkbox" ng-model="mostrarSelectLideres" ng-init="mostrarSelectLideres=false" />
 
-                        <select id="select-notificar-lideres" ng-model="liderSeleccionado" class="form-control" multiple required="required" ng-show="mostrarSelectLideres">
+                        <select id="select-notificar-lideres" ng-model="liderSeleccionado" class="form-control" multiple ng-show="mostrarSelectLideres">
                             <option value="">Seleccione...</option>
                             <option value="{{lider.email}}" ng-repeat="lider in lideres">{{lider.nombre}}</option>
                         </select>

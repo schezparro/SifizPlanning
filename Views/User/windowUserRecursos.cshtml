@@ -23,13 +23,12 @@
             <tr ng-repeat="recurso in recursos | filter: filtroRecursos">
                 <td>{{recurso.titulo}}</td>
                 <td>{{recurso.detalle}}</td>
-                <td>{{recurso.fecha | jsonDate:'mediumDate'}}</td>
+                <td>{{recurso.fecha | strDateToStr}}</td>
                 <td>{{recurso.categoria}}</td>
                 <td>
-                    <a class="btn btn-success btn-xs" target="_blank" ng-href="{{getFullPath(recurso.adjunto)}}">
+                    <a class="btn btn-success btn-xs" target="_blank" href="Web{{recurso.adjunto}}" ng-show="recurso.adjunto != ''">
                         <span class="glyphicon glyphicon-download"></span> Adjunto
                     </a>
-
                 </td>
             </tr>
         </tbody>
@@ -71,19 +70,16 @@
                 <div class="modal-body">
 
                     <div class="form-group">
-
                         <label for="inputTitulo">TÍTULO:</label>
                         <input type="text" class="form-control" ng-model="newTitulo" ng-required="true" placeholder="Título">
                     </div>
 
                     <div class="form-group">
-
                         <label for="inputDetalle">DETALLE:</label>
                         <textarea type="text" class="form-control" ng-model="newDetalle" ng-required="true" rows="3"></textarea>
                     </div>
 
                     <div class="form-group">
-
                         <label for="inputCategoria">CATEGORÍA:</label>
                         <select id="select-categoria-recursos" ng-model="categoriaSeleccionada" class="form-control" required="required">
                             <option value="">Seleccione...</option>
@@ -92,9 +88,9 @@
                     </div>
 
                     <div class="form-group">
-
                         <label for="inputArchivo">ADJUNTO:</label>
-                        <input type="file" id="panel-add-adjuntorecursos" class="form-control-file" />
+                        <div id="panel-add-adjuntorecursos"></div>
+                        <div class="clear"></div>
                     </div>
 
                 </div>

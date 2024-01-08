@@ -333,8 +333,8 @@ namespace SifizPlanning.Controllers
 						List<DataTarea> lPermisos = new List<DataTarea>();
 						lPermisos = (from per in permisos
 									 where per.idColaborador == idTrabajador &&
-                                           per.finicio <= fecha && per.ffin >= fecha
-                                     select new DataTarea
+										   per.finicio <= fecha && per.ffin >= fecha
+									 select new DataTarea
 									 {
 										 id = per.id,
 										 sdetalle = per.smotivo,
@@ -2831,18 +2831,18 @@ r in db.Rol on ur.rol equals r
 											  incidente = inc.Incidente,
 											  acciones = inc.Acciones,
 											  adjunto = inc.Adjunto,
-											  fecha = inc.Fecha,
-											  findia = inc.FinDia
+											  fecha = inc.Fecha.HasValue ? inc.Fecha : DateTime.MinValue,
+											  findia = inc.FinDia == 1 ? "SI" : "NO"
 										  }).ToList();
 
 
-				if (!finDia)
+				if(finDia)
 				{
-					incidenciasUsuario = incidenciasUsuario.Where(inc => inc.findia == 1).ToList();
+					incidenciasUsuario = incidenciasUsuario.Where(inc => inc.findia == "SI").ToList();
 				}
 
 
-				if (filtro != "")
+				if(filtro != "")
 				{
 					incidenciasUsuario = incidenciasUsuario.Where(x =>
 																	x.cliente.ToString().ToLower().Contains(filtro.ToLower()) ||
@@ -2947,22 +2947,30 @@ r in db.Rol on ur.rol equals r
 			{
 				var s = new JavaScriptSerializer();
 				var Url = "";
-				foreach(var adj in adjuntos.Where(adj => adj != null))
+				if(adjuntos != null)
 				{
-					string extFile = Path.GetExtension(adj.FileName);
-					string newNameFile = Utiles.RandomString(10) + extFile;
-					newNameFile = System.IO.Path.GetRandomFileName() + extFile;
-					string path = Path.Combine(Server.MapPath("~/Web/resources/incidencias"), newNameFile);
-					adj.SaveAs(path);
+					foreach(var adj in adjuntos.Where(adj => adj != null))
+					{
+						string extFile = Path.GetExtension(adj.FileName);
+						string newNameFile = Utiles.RandomString(10) + extFile;
+						newNameFile = System.IO.Path.GetRandomFileName() + extFile;
+						string path = Path.Combine(Server.MapPath("~/Web/resources/incidencias"), newNameFile);
+						adj.SaveAs(path);
 
-					Url = "/resources/incidencias" + "/" + newNameFile;
-					break;
+						Url = "/resources/incidencias" + "/" + newNameFile;
+						break;
+					}
 				}
 
 				int moduloid = int.Parse(modulo);
 				int clienteid = int.Parse(cliente);
-				DateTime fecha = DateTime.Parse(fechaincidencia);
-				
+
+				string[] fechas = fechaincidencia.Split(new Char[] { '/' });
+				int dia = Int32.Parse(fechas[0]);
+				int mes = Int32.Parse(fechas[1]);
+				int anno = Int32.Parse(fechas[2]);
+				DateTime fecha = new DateTime(anno, mes, dia);
+
 
 				Incidencias nuevaIncidencia = new Incidencias
 				{
@@ -2971,7 +2979,7 @@ r in db.Rol on ur.rol equals r
 					Incidente = incidente,
 					Acciones = acciones,
 					Fecha = fecha,
-					FinDia = findia? 1 : 0,
+					FinDia = findia ? 1 : 0,
 					Adjunto = Url
 				};
 
@@ -3025,13 +3033,13 @@ r in db.Rol on ur.rol equals r
 				var recursosUsuario = (from rec in db.Recursos
 									   join catrec in db.CategoriaRecursos on rec.SecuencialCategoriaRecursos equals catrec.Secuencial
 									   select new
-										{
-											titulo = rec.Titulo,
-											detalle = rec.Detalle,
-											fecha = rec.Fecha,
-											categoria = rec.CategoriaRecursos.Descripcion,
-											adjunto = rec.Adjunto
-								}).ToList();
+									   {
+										   titulo = rec.Titulo,
+										   detalle = rec.Detalle,
+										   fecha = rec.Fecha,
+										   categoria = rec.CategoriaRecursos.Descripcion,
+										   adjunto = rec.Adjunto
+									   }).ToList();
 
 				int total = recursosUsuario.Count();
 				recursosUsuario = recursosUsuario.Skip(start).Take(lenght).ToList();
@@ -3044,7 +3052,7 @@ r in db.Rol on ur.rol equals r
 				};
 				return Json(result);
 			}
-			catch (Exception e)
+			catch(Exception e)
 			{
 				var result = new
 				{
@@ -3068,7 +3076,7 @@ r in db.Rol on ur.rol equals r
 							 id = cat.Secuencial,
 							 nombre = cat.Descripcion
 						 }).ToList();
-			 
+
 			return Json(new
 			{
 				success = true,
@@ -3086,16 +3094,19 @@ r in db.Rol on ur.rol equals r
 			{
 				var s = new JavaScriptSerializer();
 				var Url = "";
-				foreach (var adj in adjuntos.Where(adj => adj != null))
+				if(adjuntos != null)
 				{
-					string extFile = Path.GetExtension(adj.FileName);
-					string newNameFile = Utiles.RandomString(10) + extFile;
-					newNameFile = System.IO.Path.GetRandomFileName() + extFile;
-					string path = Path.Combine(Server.MapPath("~/Web/resources/recursos"), newNameFile);
-					adj.SaveAs(path);
+					foreach(var adj in adjuntos.Where(adj => adj != null))
+					{
+						string extFile = Path.GetExtension(adj.FileName);
+						string newNameFile = Utiles.RandomString(10) + extFile;
+						newNameFile = System.IO.Path.GetRandomFileName() + extFile;
+						string path = Path.Combine(Server.MapPath("~/Web/resources/recursos"), newNameFile);
+						adj.SaveAs(path);
 
-					Url = "/resources/recursos" + "/" + newNameFile;
-					break;
+						Url = "/resources/recursos" + "/" + newNameFile;
+						break;
+					}
 				}
 				Recursos nuevoRecurso = new Recursos
 				{
@@ -3115,7 +3126,7 @@ r in db.Rol on ur.rol equals r
 					msg = "Se ha realizado la operación correctamente."
 				});
 			}
-			catch (Exception e)
+			catch(Exception e)
 			{
 				return Json(new
 				{

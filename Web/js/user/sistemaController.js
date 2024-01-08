@@ -323,8 +323,6 @@ devApp.controller('publicacionesController', ['$scope', '$http', function ($scop
             $scope.idPublicacionLote.push(idTicket);
 
         }
-
-        console.log($scope.idPublicacionLote);
     });
 
 }]);
@@ -401,10 +399,4 @@ devApp.filter("userEmail", function () {
         var array = textEmail.split('@');
         return array[0];
     }
-});
-
-
-//Limpiar los filtros
-$rootScope.$on('$locationChangeSuccess', function () {
-    $scope.filtroRecursos = "";
 });
