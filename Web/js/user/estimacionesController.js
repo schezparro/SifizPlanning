@@ -404,6 +404,76 @@
         $scope.nombreEntregable = "";
         angular.element("#modal-estimacion-entregable-ticket").modal("show");
     };
+
+    $scope.cargarItemsEspeciales = function () {
+        var ajaxDarItemsEspeciales = $http.post("user/dar-items-especiales/", {
+            idEstimacion: $scope.estimacionIdTmp
+        });
+
+        ajaxDarItemsEspeciales.success(function (data) {
+            if (data.success === true) {
+
+                $scope.recursos = data.recursos;
+                $scope.items = data.items;
+                angular.element("#modal-items-especiales").modal("show");
+            } else {
+                messageDialog.show('Información', data.msg);
+            }
+
+        });
+    };
+
+    //Mostrar Items Espciales
+    $scope.mostrarItemsEspeciales = function (estimacionId) {
+
+        $scope.estimacionIdTmp = estimacionId;
+        $scope.itemEspecialDescripcion = "";
+        $scope.itemEspecialTipoRecurso = "";
+        $scope.itemEspecialTiempoEstimacion = 0;
+
+        $scope.cargarItemsEspeciales();
+    };
+
+    //Modal Agregar Items Especiales
+    $scope.mostrarAgregarItemEspecial = function () {
+        angular.element("#modal-agregar-item-especial").modal("show");
+    };
+
+    $scope.guardarItemEspecial = function () {
+        
+        var ajaxGuardarItemEspecial = $http.post("user/guardar-item-especial/", {
+            idEstimacion: $scope.estimacionIdTmp,
+            idRecurso: $scope.itemEspecialTipoRecurso,
+            descripcion: $scope.itemEspecialDescripcion,
+            tiempoEstimacion: $scope.itemEspecialTiempoEstimacion
+        });
+
+        ajaxGuardarItemEspecial.success(function (data) {
+            if (data.success === true) {
+                $scope.itemEspecialDescripcion = "";
+                $scope.itemEspecialTipoRecurso = "";
+                $scope.itemEspecialTiempoEstimacion = 0;
+                angular.element("#modal-agregar-item-especial").modal("hide");
+                $scope.cargarItemsEspeciales();
+            } else {
+                messageDialog.show('Información', data.msg);
+            }            
+        });
+    };
+
+    $scope.eliminarItemEspecial = function (itemId) {
+        var ajaxEliminarItemEspecial = $http.post("user/eliminar-item-especial/", {
+            itemId: itemId,
+        });
+
+        ajaxEliminarItemEspecial.success(function (data) {
+            if (data.success === true) {
+                $scope.cargarItemsEspeciales();
+            } else {
+                messageDialog.show('Información', data.msg);
+            }
+        });
+    };
 }]);
 
 

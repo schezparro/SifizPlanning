@@ -948,13 +948,13 @@ namespace SifizPlanning
                 url: "task/subir-informes-recursos/{id}",
                 defaults: new { controller = "Task", action = "SubirInformesRecursos", id = UrlParameter.Optional }
             );
-            
+
             routes.MapRoute(
                 name: "DarInformesRecursos",
                 url: "task/dar-informes-recursos/{id}",
                 defaults: new { controller = "Task", action = "DarInformesRecursos", id = UrlParameter.Optional }
             );
-            
+
             routes.MapRoute(
                 name: "DescargarInformesRecursos",
                 url: "task/descargar-informes-recursos/{id}",
@@ -1125,6 +1125,24 @@ namespace SifizPlanning
                 name: "DarDatosTicketsUser",
                 url: "user/datos-ticket/{id}",
                 defaults: new { controller = "User", action = "DarDatosTickets", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarItemsEspeciales",
+                url: "user/dar-items-especiales/{id}",
+                defaults: new { controller = "User", action = "DarItemsEspeciales", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "GuardarItemEspecial",
+                url: "user/guardar-item-especial/{id}",
+                defaults: new { controller = "User", action = "GuardarItemEspecial", id = UrlParameter.Optional }
+            );
+            
+            routes.MapRoute(
+                name: "EliminarItemEspecial",
+                url: "user/eliminar-item-especial/{id}",
+                defaults: new { controller = "User", action = "EliminarItemEspecial", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(
