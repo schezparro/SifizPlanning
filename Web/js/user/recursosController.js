@@ -89,21 +89,20 @@
         $scope.cargarRecursos((pagina - 1) * numerosPorPagina, numerosPorPagina);
     };
 
-
     $scope.windowAgregarRecursos = function () {
         $scope.newTitulo = '';
         $scope.newDetalle = '';
-        $scope.categoriaSeleccionada = '';
+        $scope.moduloSeleccionado = '';
         $scope.newTitulo = '';
         angular.element("#modal-agregar-recursos").modal("show");
     };
 
 
-    var ajaxCategoriaRecursos = $http.post("user/categoria-recursos", {});
+    var ajaxTipoModulo = $http.post("user/tipo-modulo", {});
 
-    ajaxCategoriaRecursos.success(function (data) {
+    ajaxTipoModulo.success(function (data) {
         if (data.success === true) {
-            $scope.categoriaRecursos = data.categoriaRecursos;
+            $scope.tipoModulo = data.tipoModulo;
         }
     });
 
@@ -111,7 +110,7 @@
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
 
         var fileInput = angular.element('#uniqueFileInputIDRecursos')[0];
-        var categoria = angular.element("#select-categoria-recursos")[0].value;
+        var modulo = angular.element("#select-modulo-recursos")[0].value;
 
         var fechaSistema = new Date().toISOString();
 
@@ -119,7 +118,7 @@
         formData.append('titulo', $scope.newTitulo);
         formData.append('detalle', $scope.newDetalle);
         formData.append('fecha', fechaSistema);
-        formData.append('categoria', categoria);
+        formData.append('modulo', modulo);
         formData.append('adjuntos', fileInput.files[0]);
 
         var ajaxEnvioDatos = $http({
@@ -143,6 +142,29 @@
         ajaxEnvioDatos.error(function (data) {
             waitingDialog.hide();
             console.log('Error: ' + data);
+        });
+    };
+
+    $scope.mostrarDetalleRecurso = function (secuencial) {
+        $scope.secuencialRecurso = secuencial;
+
+        var ajaxObtenerIncidencia = $http.post("user/dar-datos-recurso-usuario",
+            {
+                secuencialRecurso: secuencial
+            });
+        ajaxObtenerIncidencia.success(function (data) {
+            if (data.success === true) {
+                $scope.tituloV = data.recursoResult.titulo;
+                $scope.detalleV = data.recursoResult.detalle;
+                $scope.moduloV = data.recursoResult.modulo;
+                $scope.fechaV= data.recursoResult.fecha;
+                $scope.adjuntoV = data.recursoResult.adjunto;
+
+                angular.element("#modal-datos-recurso").modal("show");
+            }
+            else {
+                messageDialog.show('Información', data.msg);
+            }
         });
     };
 

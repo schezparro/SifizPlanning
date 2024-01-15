@@ -1013,6 +1013,18 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "DarDatosIncidenciaUsuario",
+                url: "user/dar-datos-incidencia-usuario/{id}",
+                defaults: new { controller = "User", action = "DarDatosIncidenciaUsuario", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarDatosRecursoUsuario",
+                url: "user/dar-datos-recurso-usuario/{id}",
+                defaults: new { controller = "User", action = "DarDatosRecursoUsuario", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "DarTipoModulo",
                 url: "user/tipo-modulo/{id}",
                 defaults: new { controller = "User", action = "DarTipoModulo", id = UrlParameter.Optional }

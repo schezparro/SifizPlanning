@@ -14,17 +14,17 @@
                 <th width="10">Título</th>
                 <th width="20">Detalle</th>
                 <th width="8">Fecha</th>
-                <th width="20">Categoría</th>
+                <th width="20">Modulo</th>
                 <th width="15">Adjunto</th>
             </tr>
         </thead>
 
         <tbody>
-            <tr ng-repeat="recurso in recursos | filter: filtroRecursos">
-                <td>{{recurso.titulo}}</td>
-                <td>{{recurso.detalle}}</td>
+            <tr ng-repeat="recurso in recursos | filter: filtroRecursos" ng-dblclick="mostrarDetalleRecurso(recurso.secuencial)">
+                <td>{{recurso.titulo | limitTo:100}}</td>
+                <td>{{recurso.detalle | limitTo:100}}</td>
                 <td>{{recurso.fecha | strDateToStr}}</td>
-                <td>{{recurso.categoria}}</td>
+                <td>{{recurso.modulo}}</td>
                 <td>
                     <a class="btn btn-success btn-xs" target="_blank" href="Web{{recurso.adjunto}}" ng-show="recurso.adjunto != ''">
                         <span class="glyphicon glyphicon-download"></span> Adjunto
@@ -80,13 +80,12 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="inputCategoria">CATEGORÍA:</label>
-                        <select id="select-categoria-recursos" ng-model="categoriaSeleccionada" class="form-control" required="required">
+                        <label for="inputModulo">MÓDULO:</label>
+                        <select id="select-modulo-recursos" ng-model="moduloSeleccionado" class="form-control" required="required">
                             <option value="">Seleccione...</option>
-                            <option value="{{categoria.id}}" ng-repeat="categoria in categoriaRecursos">{{categoria.nombre}}</option>
+                            <option value="{{tipo.id}}" ng-repeat="tipo in tipoModulo">{{tipo.nombre}}</option>
                         </select>
                     </div>
-
                     <div class="form-group">
                         <label for="inputArchivo">ADJUNTO:</label>
                         <div id="panel-add-adjuntorecursos"></div>
@@ -100,6 +99,46 @@
                     <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<div id="modal-datos-recurso" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="padding: 10px, 10px">
+                <label>CAPACITACIÓN</label>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
+                <div class="row">
+                    <div class="col-sm-4"><strong>Título:</strong></div>
+                    <div class="col-sm-8">{{tituloV}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4"><strong>Detalle:</strong></div>
+                    <div class="col-sm-8">{{detalleV}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4"><strong>Módulo:</strong></div>
+                    <div class="col-sm-8">{{moduloV}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4"><strong>Fecha:</strong></div>
+                    <div class="col-sm-8">{{fechaV | strDateToStr}}</div>
+                </div>
+                <div class="row" ng-show="adjuntoV != ''">
+                    <div class="col-sm-4"><strong>Adjunto:</strong></div>
+                    <div class="col-sm-8">
+                        <a class="btn btn-success btn-xs" target="_blank" href="Web{{adjuntoV}}">
+                            <span class="glyphicon glyphicon-download"></span> Adjunto
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+            </div>
         </div>
     </div>
 </div>

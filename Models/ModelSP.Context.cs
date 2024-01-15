@@ -189,7 +189,7 @@ namespace SifizPlanning.Models
         public virtual DbSet<Feriados> Feriados { get; set; }
         public virtual DbSet<Incidencias> Incidencias { get; set; }
         public virtual DbSet<CategoriaRecursos> CategoriaRecursos { get; set; }
-        public virtual DbSet<Recursos> Recursos { get; set; }
         public virtual DbSet<ItemEspecial> ItemEspecial { get; set; }
+        public virtual DbSet<Recursos> Recursos { get; set; }
     }
 }
