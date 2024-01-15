@@ -1082,7 +1082,6 @@
     <Content Include="SCRIPTSDATABASE\12\14-INCIDENCIAS.sql" />
     <Content Include="SCRIPTSDATABASE\12\15-CATEGORIARECURSOS.sql" />
     <Content Include="SCRIPTSDATABASE\12\16-CREATERECURSOS.sql" />
-    <Content Include="SCRIPTSDATABASE\12\16-RECURSOS.sql" />
     <Content Include="SCRIPTSDATABASE\12\17-ITEMESPECIAL.sql" />
     <Content Include="SCRIPTSDATABASE\12\18-CAMPOSINCIDENCIAS.sql" />
     <Content Include="Scripts\jquery-1.10.2.js" />
