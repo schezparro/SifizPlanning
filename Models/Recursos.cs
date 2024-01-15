@@ -18,9 +18,9 @@ namespace SifizPlanning.Models
         public string Titulo { get; set; }
         public string Detalle { get; set; }
         public System.DateTime Fecha { get; set; }
-        public int SecuencialCategoriaRecursos { get; set; }
+        public int SecuencialModulo { get; set; }
         public string Adjunto { get; set; }
     
-        public virtual CategoriaRecursos CategoriaRecursos { get; set; }
+        public virtual Modulo modulo { get; set; }
     }
 }
