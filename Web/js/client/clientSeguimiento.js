@@ -648,5 +648,96 @@
         });
     };
 
+    
 
+    //ABRIR MODAL DE CALIFICAR
+    $scope.abrirModalCalificar = function () {
+    
+        var ajaxEnvioDatos = $http.post("clientes/preguntas-calificar-ticket",
+            {
+                idticket: $scope.idTicket
+            });
+       
+        
+        ajaxEnvioDatos.success(function (data) {
+            if (data.success === true) {
+                $scope.preguntasCatalogo = data.preguntas;
+
+                setTimeout(function () {
+                    var filas = angular.element(".nivel-star-calificar");
+                    angular.forEach(filas, function (fila, key) {
+                        var nivelFila = angular.element(fila).attr('data-calificacion');
+                        var estrellasFila = angular.element(fila).children();
+
+                        for (var i = nivelFila; i < 5; i++) {
+                            angular.element(estrellasFila[i]).removeClass('glyphicon-star');
+                            angular.element(estrellasFila[i]).addClass('glyphicon-star-empty');
+                        }
+                    });
+
+                }, 100);
+
+                angular.element("#modal-calificar-ticket").modal('show');
+            }
+            else {
+                messageDialog.show(data.msg);
+            }
+        });
+    };
+
+    //Guardar calificacion de Ticket
+    angular.element("#tabla-calificacion-ticket-cliente").on('click', '.level-star', function () {
+        var calificacion = angular.element(this).index() + 1;
+        var tdEstrellas = angular.element(this).parent();
+        var idPregunta = angular.element(tdEstrellas).attr('data-id-calificacion');
+        var estrellasFila = angular.element(tdEstrellas).children();
+
+        var ajaxEstablecerCalificacion = $http.post("clientes/guardar-calificacion-ticket/", {
+            idPregunta: idPregunta,
+            idticket: $scope.idTicket,
+            calificacion: calificacion
+        });
+        ajaxEstablecerCalificacion.success(function (data) {
+            if (data.success === true) {
+                for (var i = 0; i < 5; i++) {
+                    if (i < calificacion) {
+                        angular.element(estrellasFila[i]).removeClass('glyphicon-star-empty');
+                        angular.element(estrellasFila[i]).addClass('glyphicon-star');
+                    }
+                    else {
+                        angular.element(estrellasFila[i]).removeClass('glyphicon-star');
+                        angular.element(estrellasFila[i]).addClass('glyphicon-star-empty');
+                    }
+                }
+            }
+            else {
+                messageDialog.show(data.msg);
+            }
+        });
+
+    });
+
+    angular.element("#tabla-calificacion-ticket-cliente").on('click', '.level-star-eliminar', function () {
+        var calificacion = 0;
+        var tdEstrellas = angular.element(this).parent().prev();
+
+        var idPregunta = angular.element(tdEstrellas).attr('data-id-calificacion');
+        var estrellasFila = angular.element(tdEstrellas).children();
+
+        var ajaxEstablecerCalificacion = $http.post("clientes/guardar-calificacion-ticket/", {
+            idPregunta: idPregunta,
+            idticket: $scope.idTicket,
+            calificacion: calificacion
+        });
+        ajaxEstablecerCalificacion.success(function (data) {
+            if (data.success === true) {
+                angular.element(estrellasFila).removeClass('glyphicon-star');
+                angular.element(estrellasFila).addClass('glyphicon-star-empty');
+            }
+            else {
+                messageDialog.show(data.msg);
+            }
+        });
+
+    });
 }]);

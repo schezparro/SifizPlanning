@@ -191,5 +191,7 @@ namespace SifizPlanning.Models
         public virtual DbSet<CategoriaRecursos> CategoriaRecursos { get; set; }
         public virtual DbSet<Recursos> Recursos { get; set; }
         public virtual DbSet<ItemEspecial> ItemEspecial { get; set; }
+        public virtual DbSet<CalificacionTicket> CalificacionTicket { get; set; }
+        public virtual DbSet<CalificacionTicketCliente> CalificacionTicketCliente { get; set; }
     }
 }

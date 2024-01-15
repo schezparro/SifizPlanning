@@ -1431,6 +1431,18 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "PreguntasCalificarTicket",
+                url: "clientes/preguntas-calificar-ticket",
+                defaults: new { controller = "Client", action = "PreguntasCalificarTicket", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "GuardarCalificacionTicket",
+                url: "clientes/guardar-calificacion-ticket",
+                defaults: new { controller = "Client", action = "GuardarCalificacionTicket", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "Clientes",
                 url: "clientes/{id}",
                 defaults: new { controller = "Client", action = "Index", id = UrlParameter.Optional }

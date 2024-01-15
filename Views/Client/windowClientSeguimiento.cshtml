@@ -290,7 +290,7 @@
                             <div ng-show="ticketVersionCliente != 'NO ASIGNADO'">
                                 <label class="label-data-ticket">Aplica a: </label><span>{{ticketVersionCliente}}</span><br />
                             </div>
-                            
+
                         </div>
                     </div>
                 </div>
@@ -298,7 +298,7 @@
                 <div id="panel-vista-detalle-ticket" class="panel panel-default">
                     <div class="left half half-padding-right">
                         <div><label>Detalle del ticket:</label></div>
-                        <textarea  rows="3" class="panel panel-default form-control" ng-readonly="estadoTicket != 'ABIERTO'"  ng-model="detalleTicket"></textarea>
+                        <textarea rows="3" class="panel panel-default form-control" ng-readonly="estadoTicket != 'ABIERTO'" ng-model="detalleTicket"></textarea>
                     </div>
 
                     <div id="panel-vista-adjuntos-ticket" class="left">
@@ -320,6 +320,7 @@
                 <button ng-hide="estadoTicket != 'ABIERTO' && estadoTicket != 'ASIGNADO' && estadoTicket != 'PENDIENTE' && estadoTicket != 'EN DESARROLLO' && estadoTicket != 'INCONCLUSO' && estadoTicket != 'RESUELTO'" type="button" class="btn btn-primary" ng-click="cerrarTicket()"> <span class="glyphicon glyphicon-flag"></span> Aceptar</button>
                 <button ng-hide="estadoTicket != 'ABIERTO' && estadoTicket != 'ASIGNADO' && estadoTicket != 'PENDIENTE' && estadoTicket != 'EN DESARROLLO' && estadoTicket != 'INCONCLUSO' && estadoTicket != 'RESUELTO'" type="button" class="btn btn-danger" ng-click="abrirModalRechazar()"> <span class="glyphicon glyphicon-remove"></span> Devolver</button>
                 <button ng-hide="estadoTicket != 'ABIERTO' && estadoTicket != 'ASIGNADO' && estadoTicket != 'PENDIENTE' && estadoTicket != 'EN DESARROLLO' && estadoTicket != 'INCONCLUSO' && estadoTicket != 'RESUELTO'" type="button" class="btn btn-warning" ng-click="abrirModalAnular()"> <span class="glyphicon glyphicon-trash"></span> Anular</button>
+                <button type="button" class="btn btn-success" ng-click="abrirModalCalificar()">Calificar</button>
                 <button type="button" class="btn btn-primary" ng-click="grabarAdjuntosTicket()">Grabar</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
             </div>
@@ -461,6 +462,56 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Windows Calificar Tickets -->
+<div class="modal fade" id="modal-calificar-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form ng-submit="GuardarCalificacionTicket()">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="modal-vista-ticket-label"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Calificar Ticket</h4>
+                </div>
+                <div class="modal-body">
+
+                    <div class="fila">
+                        <div id="tabla-calificacion-ticket-cliente">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Preguntas</th>
+                                        <th>Calificación</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="pre in preguntasCatalogo">
+                                        <td>{{pre.descripcion}}</td>
+                                        <td class="nivel-star-calificar" data-id-calificacion="{{pre.idpregunta}}" data-calificacion="{{pre.calificacion}}">
+                                            <span class="level-star glyphicon glyphicon-star"></span>
+                                            <span class="level-star glyphicon glyphicon-star"></span>
+                                            <span class="level-star glyphicon glyphicon-star"></span>
+                                        </td>
+                                        <td><span class="level-star-eliminar glyphicon glyphicon-remove" title="Poner el nivel en 0 para este ticket"></span></td>
+                                    </tr>
+                                        <!--<td>
+                                         <input class="idPregunta"  type="hidden" ng-model="pregunta.id" />
+                                         <input type="hidden" ng-model="idTicket" />
+                                         <input type="text" ng-model="calificacionTicket">
+                                        </td>  -->
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>           
+                </div>
+                <div class="modal-footer">                   
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

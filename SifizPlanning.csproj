@@ -457,6 +457,12 @@
     <Compile Include="Models\BotonEstadoTicket.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\CalificacionTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\CalificacionTicketCliente.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\CampoCatalogo.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
