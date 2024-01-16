@@ -2405,6 +2405,7 @@ namespace SifizPlanning.Controllers
                                         tiempo = et.NumeroHoras,
                                         catalogada = et.FactorTiempo == 0 ? "SIN CATALOGAR" : et.FactorTiempo == 4 ? "PROBABLE" : et.FactorTiempo == 1 ? "OPTIMISTA" : "PESIMISTA"
                                     }).ToList();
+
                 var resp = new
                 {
                     success = true,
@@ -3068,6 +3069,7 @@ namespace SifizPlanning.Controllers
                 var estimacionesParcial = (from est in db.EstimacionTicket
                                            where est.SecuencialTicket == idTicket && est.EstaActiva == 1
                                            orderby est.Secuencial
+                                           join ie in db.ItemEspecial on est.Secuencial equals ie.SecuencialEstimacion
                                            select new
                                            {
                                                id = est.Secuencial,
@@ -3075,6 +3077,9 @@ namespace SifizPlanning.Controllers
                                                numeroHoras = est.NumeroHoras,
                                                informacionComplementaria = est.InformacionComplementaria,
                                                entregablesAdicionales = est.EntregablesAdicionales,
+                                               requerimientoNuevo = est.RequerimientoNuevo != null ? est.RequerimientoNuevo : true,
+                                               tiempoInicial = est.TiempoInicial != null ? est.TiempoInicial : 0,
+                                               tiempoPegado = est.TiempoPegado != null ? est.TiempoPegado : 0,
                                                entregables = (from de in db.DetalleEstimacionTicket
                                                               join et in db.EntregableDetalleEstimacion on de.SecuencialEntregableEstimacion equals et.Secuencial
                                                               where de.SecuencialEstimacionTicket == est.Secuencial
@@ -3095,7 +3100,17 @@ namespace SifizPlanning.Controllers
                                                                                   nivel = db.NivelColaborador.Where(s => s.Secuencial == d.SecuencialNivelColaborador).FirstOrDefault().Codigo.ToUpper(),
                                                                               }).ToList()
                                                               }).ToList(),
+                                               items = (from i in db.ItemEspecial
+                                                        join r in db.TipoRecurso on i.SecuencialTipoRecurso equals r.Secuencial
+                                                               where i.SecuencialEstimacion == est.Secuencial
+                                                               select new
+                                                               {
+                                                                   descripcion = i.Descripcion,
+                                                                   recurso = r.Descripcion,
+                                                                   tiempoEstimacion = i.TiempoEstimacion
+                                                               }).ToList(),
                                            }).ToList();
+
 
                 //calculando tiempo total
                 var tiempoTotal = 0;
@@ -3120,10 +3135,14 @@ namespace SifizPlanning.Controllers
                                                informacionComplementaria = ep.informacionComplementaria,
                                                entregablesAdicionales = ep.entregablesAdicionales,
                                                entregables = ep.entregables,
+                                               requerimientoNuevo = ep.requerimientoNuevo,
+                                               tiempoInicial = ep.tiempoInicial,
+                                               tiempoPegado = ep.tiempoPegado,
                                                colaboradorHoras = (from det in ep.entregables
                                                                    from detalle in det.detalles
                                                                    select detalle.tiempoDesarrollo + detalle.tiempoPrueba
-                                                                   ).Sum()
+                                                                   ).Sum(),
+                                               items = ep.items
                                            }).ToList();
 
                 if (estimacionesParcial.Count() == 0)
@@ -3153,7 +3172,49 @@ namespace SifizPlanning.Controllers
                     tiempoTotal = tiempoTotal,
                     permitirValidar = permitirValidar,
                     success = true,
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
 
+        [HttpPost]
+        [Authorize(Roles = "COORDINADOR, ADMIN, TICKET, GESTOR, USER")]
+        public ActionResult DarItemsEspecialesTicket(int idEstimacion)
+        {
+            try
+            {
+                EstimacionTicket estimacion = db.EstimacionTicket.Find(idEstimacion);
+                if (estimacion == null)
+                {
+                    throw new Exception("No se encontró la estimación.");
+                }
+
+                var itemsEspeciales = (from ie in db.ItemEspecial
+                                       join tr in db.TipoRecurso on ie.SecuencialTipoRecurso equals tr.Secuencial
+                                       where ie.SecuencialEstimacion == estimacion.Secuencial
+                                       select new
+                                       {
+                                           id = ie.Secuencial,
+                                           descripcion = ie.Descripcion,
+                                           tiempoEstimacion = ie.TiempoEstimacion,
+                                           idEstimacion = ie.SecuencialEstimacion,
+                                           idTipoRecurso = ie.SecuencialTipoRecurso,
+                                           recurso = tr.Descripcion
+                                       }).ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    items = itemsEspeciales,
                 };
                 return Json(resp);
             }

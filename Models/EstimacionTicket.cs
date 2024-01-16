@@ -16,6 +16,7 @@ namespace SifizPlanning.Models
     {
         public EstimacionTicket()
         {
+            this.RequerimientoNuevo = true;
             this.detalleEstimacionTicket = new HashSet<DetalleEstimacionTicket>();
             this.ITEMESPECIAL = new HashSet<ItemEspecial>();
         }
@@ -30,6 +31,9 @@ namespace SifizPlanning.Models
         public decimal FactorTiempo { get; set; }
         public System.DateTime FechaLimite { get; set; }
         public decimal NumeroHoras { get; set; }
+        public Nullable<bool> RequerimientoNuevo { get; set; }
+        public Nullable<int> TiempoInicial { get; set; }
+        public Nullable<int> TiempoPegado { get; set; }
     
         public virtual Colaborador colaborador { get; set; }
         public virtual ICollection<DetalleEstimacionTicket> detalleEstimacionTicket { get; set; }
