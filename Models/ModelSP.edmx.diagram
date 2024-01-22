@@ -395,8 +395,6 @@
         <AssociationConnector Association="SifizPlanningModel.FK_INCIDENCIAS_CLIENTE" />
         <AssociationConnector Association="SifizPlanningModel.FK_INCIDENCIAS_MODULO" />
         <EntityTypeShape EntityType="SifizPlanningModel.CategoriaRecursos" Width="1.5" PointX="37.375" PointY="36" />
-        <EntityTypeShape EntityType="SifizPlanningModel.Recursos" Width="1.5" PointX="39.625" PointY="36" />
-        <AssociationConnector Association="SifizPlanningModel.FK_RECURSOS_CATEGORIARECURSOS" />
         <EntityTypeShape EntityType="SifizPlanningModel.ItemEspecial" Width="1.5" PointX="33.25" PointY="7" />
         <AssociationConnector Association="SifizPlanningModel.FK_ITEMESPECIAL_ESTIMACIONTICKET" />
         <AssociationConnector Association="SifizPlanningModel.FK_ITEMESPECIAL_TIPORECURSO" />
@@ -404,6 +402,8 @@
         <EntityTypeShape EntityType="SifizPlanningModel.CalificacionTicketCliente" Width="1.5" PointX="35.5" PointY="44.5" />
         <AssociationConnector Association="SifizPlanningModel.FK_CALIFICACIONTICKETCLIENTE_CALIFICACIONTICKET" />
         <AssociationConnector Association="SifizPlanningModel.FK_CALIFICACIONTICKETCLIENTE_TICKET" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Recursos" Width="1.5" PointX="11.875" PointY="42.5" />
+        <AssociationConnector Association="SifizPlanningModel.FK_RECURSOS_MODULO" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

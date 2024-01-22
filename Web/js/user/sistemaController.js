@@ -118,7 +118,7 @@ devApp.controller('desarrolladoresController', ['$scope', '$http', 'filtroServic
     $scope.IrPanelRecursos = function () {
         ocultar();
         angular.element("#panel_recursos").removeClass('invisible');
-        $scope.funcionalidad = "Recursos";
+        $scope.funcionalidad = "Capacitaciones";
         filtroService.filtroRecursos = '';
     };
 

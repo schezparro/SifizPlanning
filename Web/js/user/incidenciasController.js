@@ -82,7 +82,6 @@
             $scope.paginar();
         }
     };
-
     $scope.avanzarPagina = function () {
         if (pagina < $scope.cantPaginas) {
             pagina++;
@@ -124,7 +123,6 @@
     });
 
     var ajaxRolColaboradorIncidencias = $http.post("user/rol-colaborador-incidencias", {});
-
     ajaxRolColaboradorIncidencias.success(function (data) {
         if (data.success === true) {
             $scope.lideres = data.lideres;
@@ -167,15 +165,35 @@
         ajaxEnvioDatos.success(function (data) {
             waitingDialog.hide();
             if (data.success === true) {
-                if (data.fechaincidencia !== "01/01/0001") {
-                    $scope.fechaIncidencia = data.fechaincidencia;
-                } else {
-                    $scope.fechaIncidencia = '';
-                };
                 angular.element("#modal-agregar-incidencias").modal("hide");
                 $scope.cargarIncidencias();
             } else {
                 messageDialog.show("Información", data.msg);
+            }
+        });
+    };
+
+    $scope.mostrarDetalleIncidencia = function (secuencial) {
+        $scope.secuencialIncidencia = secuencial;
+
+        var ajaxObtenerIncidencia = $http.post("user/dar-datos-incidencia-usuario",
+            {
+                secuencialIncidencia: secuencial
+            });
+        ajaxObtenerIncidencia.success(function (data) {
+            if (data.success === true) {
+                $scope.clienteV = data.incidenciaResult.cliente;
+                $scope.moduloV = data.incidenciaResult.modulo;
+                $scope.incidenteV = data.incidenciaResult.incidente;
+                $scope.accionesV = data.incidenciaResult.acciones;
+                $scope.fechaV = data.incidenciaResult.fecha;
+                $scope.finDiaV = data.incidenciaResult.finDeDia;
+                $scope.adjuntoV = data.incidenciaResult.adjunto;
+
+                angular.element("#modal-datos-incidencia").modal("show");
+            }
+            else {
+                messageDialog.show('Información', data.msg);
             }
         });
     };
