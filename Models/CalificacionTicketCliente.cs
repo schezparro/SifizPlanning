@@ -19,7 +19,7 @@ namespace SifizPlanning.Models
         public int SecuencialTicket { get; set; }
         public int Calificacion { get; set; }
     
-        public virtual CalificacionTicket calificacionticket { get; set; }
+        public virtual CalificacionTicket calificacionTicket { get; set; }
         public virtual Ticket ticket { get; set; }
     }
 }

@@ -16,7 +16,7 @@ namespace SifizPlanning.Models
     {
         public CalificacionTicket()
         {
-            this.calificacionticketcliente = new HashSet<CalificacionTicketCliente>();
+            this.calificacionTicketCliente = new HashSet<CalificacionTicketCliente>();
         }
     
         public int Secuencial { get; set; }
@@ -25,6 +25,6 @@ namespace SifizPlanning.Models
         public decimal EstaActivo { get; set; }
         public int NumeroVerificador { get; set; }
     
-        public virtual ICollection<CalificacionTicketCliente> calificacionticketcliente { get; set; }
+        public virtual ICollection<CalificacionTicketCliente> calificacionTicketCliente { get; set; }
     }
 }

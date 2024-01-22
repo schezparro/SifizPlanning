@@ -14,17 +14,10 @@ namespace SifizPlanning.Models
     
     public partial class CategoriaRecursos
     {
-        public CategoriaRecursos()
-        {
-            this.recursos = new HashSet<Recursos>();
-        }
-    
         public int Secuencial { get; set; }
         public string Codigo { get; set; }
         public string Descripcion { get; set; }
         public decimal EstaActivo { get; set; }
         public int NumeroVerificador { get; set; }
-    
-        public virtual ICollection<Recursos> recursos { get; set; }
     }
 }

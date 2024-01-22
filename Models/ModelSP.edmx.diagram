@@ -398,6 +398,10 @@
         <EntityTypeShape EntityType="SifizPlanningModel.ItemEspecial" Width="1.5" PointX="33.25" PointY="7" />
         <AssociationConnector Association="SifizPlanningModel.FK_ITEMESPECIAL_ESTIMACIONTICKET" />
         <AssociationConnector Association="SifizPlanningModel.FK_ITEMESPECIAL_TIPORECURSO" />
+        <EntityTypeShape EntityType="SifizPlanningModel.CalificacionTicket" Width="1.5" PointX="33.25" PointY="59.5" />
+        <EntityTypeShape EntityType="SifizPlanningModel.CalificacionTicketCliente" Width="1.5" PointX="35.5" PointY="44.5" />
+        <AssociationConnector Association="SifizPlanningModel.FK_CALIFICACIONTICKETCLIENTE_CALIFICACIONTICKET" />
+        <AssociationConnector Association="SifizPlanningModel.FK_CALIFICACIONTICKETCLIENTE_TICKET" />
         <EntityTypeShape EntityType="SifizPlanningModel.Recursos" Width="1.5" PointX="11.875" PointY="42.5" />
         <AssociationConnector Association="SifizPlanningModel.FK_RECURSOS_MODULO" />
         </Diagram>

@@ -16,9 +16,8 @@ namespace SifizPlanning.Models
     {
         public EstimacionTicket()
         {
-            this.RequerimientoNuevo = true;
             this.detalleEstimacionTicket = new HashSet<DetalleEstimacionTicket>();
-            this.ITEMESPECIAL = new HashSet<ItemEspecial>();
+            this.itemEspecial = new HashSet<ItemEspecial>();
         }
     
         public int Secuencial { get; set; }
@@ -38,6 +37,6 @@ namespace SifizPlanning.Models
         public virtual Colaborador colaborador { get; set; }
         public virtual ICollection<DetalleEstimacionTicket> detalleEstimacionTicket { get; set; }
         public virtual Ticket ticket { get; set; }
-        public virtual ICollection<ItemEspecial> ITEMESPECIAL { get; set; }
+        public virtual ICollection<ItemEspecial> itemEspecial { get; set; }
     }
 }
