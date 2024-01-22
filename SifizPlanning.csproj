@@ -1090,6 +1090,10 @@
     <Content Include="SCRIPTSDATABASE\12\16-CREATERECURSOS.sql" />
     <Content Include="SCRIPTSDATABASE\12\17-ITEMESPECIAL.sql" />
     <Content Include="SCRIPTSDATABASE\12\18-CAMPOSINCIDENCIAS.sql" />
+    <Content Include="SCRIPTSDATABASE\12\19-CALIFICACIONTICKET.sql" />
+    <Content Include="SCRIPTSDATABASE\12\20-CALIFICACIONTICKETCLIENTE.sql" />
+    <Content Include="SCRIPTSDATABASE\12\21-CALIFICACIONTICKETok.sql" />
+    <Content Include="SCRIPTSDATABASE\12\22-CALIFICACIONTICKETCLIENTEok.sql" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
