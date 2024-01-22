@@ -1559,8 +1559,6 @@
     <Content Include="Views\Ticket\inicioTicket.cshtml" />
     <Content Include="Views\Report\Index.cshtml" />
     <Content Include="Views\Report\VerReporte.cshtml" />
-    <Content Include="Web\resources\ftp\pdf\colaboradores.pdf" />
-    <Content Include="Web\resources\ftp\otros.pdf" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
@@ -1590,6 +1588,7 @@
     <Folder Include="Web\images\chat\" />
     <Folder Include="Web\images\logFBSError\" />
     <Folder Include="Web\resources\contracts\" />
+    <Folder Include="Web\resources\ftp\pdf\" />
     <Folder Include="Web\resources\incidencias\" />
     <Folder Include="Web\resources\informesrecursos\" />
     <Folder Include="Web\resources\recursos\" />
