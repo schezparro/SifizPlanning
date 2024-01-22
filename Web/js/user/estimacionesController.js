@@ -111,12 +111,19 @@
                 idEstimacion: id
             });
         estimacion.success(function (data) {
+
+            console.log(data);
+
             if (data.success === true) {
                 datosInicialesEstimacion();
                 $scope.detallesEstimacion = data.detallesEstimacion;
                 $scope.tiempoTotal = data.tiempoTotal;
                 $scope.entregablesAdicionales = data.entregables;
                 $scope.informacionComplementaria = data.informacion;
+
+                $scope.requerimientoNuevo = data.requerimientoNuevo;
+                $scope.tiempoInicial = data.tiempoInicial;
+                $scope.tiempoPegado = data.tiempoPegado;
 
                 if (data.estimacionTerminada === 1) {
                     $scope.edicionEstimacion = true;
@@ -134,8 +141,31 @@
             }
         });
 
+        if ($scope.requerimientoNuevo === true) {
+            angular.element('#div-tiempo-incial').css('display', 'none');
+            angular.element('#div-tiempo-pegado').css('display', 'block');
+        } else {
+            angular.element('#div-tiempo-incial').css('display', 'block');
+            angular.element('#div-tiempo-pegado').css('display', 'none');
+        }
+
+        $scope.estimacionIdTmp = id;
+        $scope.cargarItemsEspeciales(id);
+
         angular.element("#modal-estimacion-dev-ticket").modal('show');
     };
+
+    $scope.changeRequerimientoNuevo = function () {
+
+        if ($scope.requerimientoNuevo === true) {
+            angular.element('#div-tiempo-incial').css('display', 'none');
+            angular.element('#div-tiempo-pegado').css('display', 'block');
+        } else {
+            angular.element('#div-tiempo-incial').css('display', 'block');
+            angular.element('#div-tiempo-pegado').css('display', 'none');
+        }
+    };
+
 
     //Mostrar el windows de estimacioneditarEntregable
     $scope.editarEntregable = function (id) {
@@ -238,11 +268,20 @@
     $scope.estimarDesarrolloTicket = function () {
         waitingDialog.show('Enviando Estimación...', { dialogSize: 'sm', progressType: 'success' });
 
+        if ($scope.requerimientoNuevo === true) {
+            $scope.tiempoInicial = 0;
+        } else {
+            $scope.tiempoPegado = 0;
+        }
+
         var estimacionesEnvio = $http.post("user/guardar-estimacion",
             {
                 idEstimacion: $scope.idEstimacion,
                 entregables: $scope.entregablesAdicionales,
-                informacionComplementaria: $scope.informacionComplementaria
+                informacionComplementaria: $scope.informacionComplementaria,
+                requerimientoNuevo: $scope.requerimientoNuevo,
+                tiempoInicial: $scope.tiempoInicial,
+                tiempoPegado: $scope.tiempoPegado
             });
 
         estimacionesEnvio.success(function (data) {
@@ -405,9 +444,18 @@
         angular.element("#modal-estimacion-entregable-ticket").modal("show");
     };
 
-    $scope.cargarItemsEspeciales = function () {
+    $scope.adicionarItemsEspeciales = function () {
+
+        $scope.itemEspecialDescripcion = "";
+        $scope.itemEspecialTipoRecurso = "";
+        $scope.itemEspecialTiempoEstimacion = 0;
+
+        angular.element("#modal-estimacion-items-ticket").modal("show");
+    };
+
+    $scope.cargarItemsEspeciales = function (id) {
         var ajaxDarItemsEspeciales = $http.post("user/dar-items-especiales/", {
-            idEstimacion: $scope.estimacionIdTmp
+            idEstimacion: id
         });
 
         ajaxDarItemsEspeciales.success(function (data) {
@@ -415,7 +463,6 @@
 
                 $scope.recursos = data.recursos;
                 $scope.items = data.items;
-                angular.element("#modal-items-especiales").modal("show");
             } else {
                 messageDialog.show('Información', data.msg);
             }
@@ -423,24 +470,8 @@
         });
     };
 
-    //Mostrar Items Espciales
-    $scope.mostrarItemsEspeciales = function (estimacionId) {
-
-        $scope.estimacionIdTmp = estimacionId;
-        $scope.itemEspecialDescripcion = "";
-        $scope.itemEspecialTipoRecurso = "";
-        $scope.itemEspecialTiempoEstimacion = 0;
-
-        $scope.cargarItemsEspeciales();
-    };
-
-    //Modal Agregar Items Especiales
-    $scope.mostrarAgregarItemEspecial = function () {
-        angular.element("#modal-agregar-item-especial").modal("show");
-    };
-
     $scope.guardarItemEspecial = function () {
-        
+
         var ajaxGuardarItemEspecial = $http.post("user/guardar-item-especial/", {
             idEstimacion: $scope.estimacionIdTmp,
             idRecurso: $scope.itemEspecialTipoRecurso,
@@ -453,11 +484,11 @@
                 $scope.itemEspecialDescripcion = "";
                 $scope.itemEspecialTipoRecurso = "";
                 $scope.itemEspecialTiempoEstimacion = 0;
-                angular.element("#modal-agregar-item-especial").modal("hide");
-                $scope.cargarItemsEspeciales();
+                angular.element("#modal-estimacion-items-ticket").modal("hide");
+                $scope.cargarItemsEspeciales($scope.estimacionIdTmp);
             } else {
                 messageDialog.show('Información', data.msg);
-            }            
+            }
         });
     };
 
@@ -468,7 +499,42 @@
 
         ajaxEliminarItemEspecial.success(function (data) {
             if (data.success === true) {
-                $scope.cargarItemsEspeciales();
+                $scope.cargarItemsEspeciales($scope.estimacionIdTmp);
+            } else {
+                messageDialog.show('Información', data.msg);
+            }
+        });
+    };
+
+    $scope.editarItem = function (item) {
+        $scope.itemId = item.id;
+        $scope.itemEspecialDescripcion = item.descripcion;
+        $scope.itemEspecialTipoRecurso = item.idTipoRecurso;
+        $scope.itemEspecialTiempoEstimacion = item.tiempoEstimacion;
+
+        angular.element("#modal-edicion-items-ticket").modal("show");
+    };
+
+    $scope.editarItemEspecial = function () {
+
+        var ajaxEditarItemEspecial = $http.post("user/editar-item-especial/", {
+            itemId: $scope.itemId,
+            idRecurso: $scope.itemEspecialTipoRecurso,
+            descripcion: $scope.itemEspecialDescripcion,
+            tiempoEstimacion: $scope.itemEspecialTiempoEstimacion
+        });
+
+        ajaxEditarItemEspecial.success(function (data) {
+            if (data.success === true) {
+
+                $scope.itemId = 0;
+                $scope.itemEspecialDescripcion = "";
+                $scope.itemEspecialTipoRecurso = "";
+                $scope.itemEspecialTiempoEstimacion = 0;
+
+                angular.element("#modal-edicion-items-ticket").modal("hide");
+                $scope.cargarItemsEspeciales($scope.estimacionIdTmp);
+                messageDialog.show('Información', data.msg);
             } else {
                 messageDialog.show('Información', data.msg);
             }

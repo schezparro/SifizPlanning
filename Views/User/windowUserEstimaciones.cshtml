@@ -32,9 +32,6 @@
                         <span class="glyphicon glyphicon-download"></span> Adjunto {{$index+1}}
                     </a>
                 </td>
-                <td>
-                    <button type="button" class="btn btn-success btn-xs" ng-click="mostrarItemsEspeciales(estimacion.id)">Items Especiales</button>
-                </td>
             </tr>
         </tbody>
 
@@ -78,6 +75,7 @@
             <form method="post" id="frm-modal-estimar-ticket" ng-submit="estimarDesarrolloTicket()">
                 <div class="modal-body" style="max-height: 768px; max-width: 1024px; overflow-y: auto">
                     <button type="button" class="btn btn-success btn-xs" ng-click="adicionarEntregable()">Añadir Entregable</button>
+                    <button type="button" class="btn btn-success btn-xs" ng-click="adicionarItemsEspeciales()">Añadir Items Especiales</button>
                     <table id="tabla-estimacion-entregable-ticket" class="table">
                         <tr>
                             <th>
@@ -115,10 +113,62 @@
                                     </table>
                                 </td>
                             </tr>
+                            <tr>
+                                <td>
+                                    <text style="font-weight:bold">Items Especiales</text>
+                                    <table class="table table-striped">
+
+                                        <thead>
+                                            <tr>
+                                                <th>N°</th>
+                                                <th>Descripcion</th>
+                                                <th>Tipo Recurso</th>
+                                                <th>Tiempo Estimado</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr class="table-tr" ng-repeat="item in items" data-id="{{ item.id }}" ng-dblclick="editarItem(item)">
+                                                <td>T_ESP{{$index + 1}}</td>
+                                                <td>{{ item.descripcion }}</td>
+                                                <td>{{ item.recurso }}</td>
+                                                <td>{{ item.tiempoEstimacion }}</td>
+                                                <td><button type="button" class="btn btn-danger btn-xs" ng-click="eliminarItemEspecial(item.id)">Eliminar</button></td>
+                                            </tr>
+                                        </tbody>
+
+                                    </table>
+                                </td>
+                            </tr>
                         </tbody>
 
                     </table>
-                    <div>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <label style="display: inline-block">
+                                <input ng-model="requerimientoNuevo" ng-click="changeRequerimientoNuevo()" type="checkbox" />
+                                Es estimación requerimiento nuevo/es estimación de pegado
+                            </label>
+                        </div>
+
+                        <div id="div-tiempo-incial" class="col-md-4">
+                            <label style="display: inline-block">
+                                <input ng-model="tiempoInicial" style="width:50%" type="number" />
+                                Tiempo Inicial
+                            </label>
+                        </div>
+
+                        <div id="div-tiempo-pegado" class="col-md-4">
+                            <label style="display: inline-block">
+                                <input ng-model="tiempoPegado" style="width:50%" type="number" />
+                                Tiempo Pegado
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="display:none">
                         <label>Entregables Adicionales:</label>
                         <textarea class="form-control" ng-model="entregablesAdicionales"></textarea>
                     </div>
@@ -221,6 +271,95 @@
     </div>
 </div>
 
+<!-- Modal de Items Especiales de la Estimacion -->
+<div class="modal fade" id="modal-estimacion-items-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-final-item-label">
+                    <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+                    <span id="title-filter">Items Especiales</span>
+                </h4>
+            </div>
+            <form method="post" id="frm-modal-items-ticket" ng-submit="guardarItemEspecial()">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Descripcion:</label>
+                            <input type="text" class="form-control" ng-required="true" ng-model="itemEspecialDescripcion" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Tiempo Estimado:</label>
+                            <input type='text' class="solo-numero form-control" ng-model="itemEspecialTiempoEstimacion" ng-required="true" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Tipo Recurso:</label>
+                            <select class="form-control" ng-model="itemEspecialTipoRecurso" ng-required="true">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="recurso in recursos" value="{{recurso.id}}">{{recurso.descripcion}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Agregar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de edicion de Items Especiales de la Estimacion -->
+<div class="modal fade" id="modal-edicion-items-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-final-item-label">
+                    <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+                    <span id="title-filter">Items Especiales</span>
+                </h4>
+            </div>
+            <form method="post" id="frm-modal-edicion-items-ticket" ng-submit="editarItemEspecial()">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Descripcion:</label>
+                            <input type="text" class="form-control" ng-required="true" ng-model="itemEspecialDescripcion" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Tiempo Estimado:</label>
+                            <input type='text' class="solo-numero form-control" ng-model="itemEspecialTiempoEstimacion" ng-required="true" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Tipo Recurso:</label>
+                            <select class="form-control" ng-model="itemEspecialTipoRecurso" ng-required="true">
+                                <option value="">Seleccione...</option>
+                                <option ng-repeat="recurso in recursos" value="{{recurso.id}}">{{recurso.descripcion}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Agregar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Entregables -->
 <div id="add-informacion-estimacion-inicial" class="invisible">
     <div class="row">
         <div class="col-md-5">
@@ -337,98 +476,6 @@
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
             </div>
 
-        </div>
-    </div>
-</div>
-
-<!-- Windows Modal Items Especiales -->
-<div class="modal fade" id="modal-items-especiales" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Items Espciales</h4>
-            </div>
-
-            <div class="modal-body">
-                <div style="overflow-y:auto; height: 300px;">
-                    <table class="table table-striped">
-
-                        <thead>
-                            <tr>
-                                <th width="10">Descripcion</th>
-                                <th width="5">Tipo Recurso</th>
-                                <th width="3">Tiempo Estimado</th>
-                                <th width="3"></th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            <tr class="table-tr" ng-repeat="item in items" data-id="{{ item.id }}">
-                                <td class="col-md-2">{{ item.descripcion }}</td>
-                                <td class="col-md-2">{{ item.recurso }}</td>
-                                <td class="col-md-2">{{ item.tiempoEstimacion }}</td>
-                                <td class="col-md-2"><button type="button" class="btn btn-danger" ng-click="eliminarItemEspecial(item.id)">Eliminar</button></td>
-                            </tr>
-                        </tbody>
-
-                    </table>
-                    <div class="clear"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" ng-click="mostrarAgregarItemEspecial()">Agregar</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-                </div>
-
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Windows Modal Agregar Item Especial -->
-<div class="modal fade" id="modal-agregar-item-especial" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Agregar Item Espcial</h4>
-            </div>
-
-            <div class="modal-body">
-
-                <div class="fila">
-                    <div class="left">
-                        <label>Descripcion:</label>
-                        <input type="text" ng-model="itemEspecialDescripcion" />
-                    </div>
-                </div>
-
-                <div class="clear"></div>
-
-                <div class="fila">
-                    <div class="left half half-padding-right">
-                        <label>Tipo Recurso:</label>
-                        <select class="form-control" ng-model="itemEspecialTipoRecurso" ng-required="true">
-                            <option value="">Seleccione...</option>
-                            <option ng-repeat="recurso in recursos" value="{{recurso.id}}">{{recurso.descripcion}}</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="left half half-padding-left">
-                    <label>Tiempo Estimado:</label>
-                    <div class="form-group">
-
-                        <input type='number' class="form-control" ng-model="itemEspecialTiempoEstimacion" ng-required="true" />
-
-                    </div>
-                </div>
-            </div>
-            <div class="clear"></div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success" ng-click="guardarItemEspecial()">Agregar</button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-            </div>
         </div>
     </div>
 </div>

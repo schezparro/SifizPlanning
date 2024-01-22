@@ -1152,6 +1152,12 @@ namespace SifizPlanning
             );
             
             routes.MapRoute(
+                name: "EditarItemEspecial",
+                url: "user/editar-item-especial/{id}",
+                defaults: new { controller = "User", action = "EditarItemEspecial", id = UrlParameter.Optional }
+            );
+            
+            routes.MapRoute(
                 name: "EliminarItemEspecial",
                 url: "user/eliminar-item-especial/{id}",
                 defaults: new { controller = "User", action = "EliminarItemEspecial", id = UrlParameter.Optional }
@@ -1587,6 +1593,12 @@ namespace SifizPlanning
                 name: "DetalleEstimacionTicket",
                 url: "tickets/detalle-estimacion-ticket/{id}",
                 defaults: new { controller = "Ticket", action = "DetalleEstimacionTicket", id = UrlParameter.Optional }
+            );
+            
+            routes.MapRoute(
+                name: "DarItemsEspecialesTicket",
+                url: "tickets/dar-items-especiales/{id}",
+                defaults: new { controller = "Ticket", action = "DarItemsEspecialesTicket", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(

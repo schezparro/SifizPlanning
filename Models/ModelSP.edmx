@@ -1413,6 +1413,9 @@
           <Property Name="ESTIMACIONTERMINADA" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="FECHALIMITE" Type="date" Nullable="false" />
           <Property Name="ESTAACTIVA" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="REQUERIMIENTONUEVO" Type="bit" />
+          <Property Name="TIEMPOINICIAL" Type="int" />
+          <Property Name="TIEMPOPEGADO" Type="int" />
         </EntityType>
         <EntityType Name="FLUJOESTADOTICKET">
           <Key>
@@ -8337,6 +8340,9 @@
           <Property Name="FechaLimite" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="NumeroHoras" Type="Decimal" Nullable="false" Precision="5" Scale="0" />
           <NavigationProperty Name="ITEMESPECIAL" Relationship="SifizPlanningModel.FK_ITEMESPECIAL_ESTIMACIONTICKET" FromRole="EstimacionTicket" ToRole="ITEMESPECIAL" />
+          <Property Name="RequerimientoNuevo" Type="Boolean" DefaultValue="True" />
+          <Property Name="TiempoInicial" Type="Int32" />
+          <Property Name="TiempoPegado" Type="Int32" />
         </EntityType>
         <Association Name="RefCOLABORADOR73">
           <End Type="SifizPlanningModel.Colaborador" Role="Colaborador" Multiplicity="1" />
@@ -12644,6 +12650,9 @@
           <EntitySetMapping Name="EstimacionTicket">
             <EntityTypeMapping TypeName="SifizPlanningModel.EstimacionTicket">
               <MappingFragment StoreEntitySet="ESTIMACIONTICKET">
+                <ScalarProperty Name="TiempoPegado" ColumnName="TIEMPOPEGADO" />
+                <ScalarProperty Name="TiempoInicial" ColumnName="TIEMPOINICIAL" />
+                <ScalarProperty Name="RequerimientoNuevo" ColumnName="REQUERIMIENTONUEVO" />
                 <ScalarProperty Name="NumeroHoras" ColumnName="NUMEROHORAS" />
                 <ScalarProperty Name="FechaLimite" ColumnName="FECHALIMITE" />
                 <ScalarProperty Name="FactorTiempo" ColumnName="FACTORTIEMPO" />

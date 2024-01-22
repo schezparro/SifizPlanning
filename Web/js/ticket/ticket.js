@@ -1695,6 +1695,7 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
                 idTicket: $scope.idTicket
             });
         estimacionesTicket.success(function (data) {
+            console.log(data);
             if (data.success === true) {
                 $scope.colaboradoresEstimacion = data.estimaciones
             }
@@ -1807,6 +1808,8 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
                 idTicket: $scope.idTicket
             });
         detalleEstimacionTicket.success(function (data) {
+            //Aqui es la ventana sola del ticket
+            console.log(data);
             if (data.success === true) {
                 $scope.estimacionesTicket = data.estimaciones;
                 $scope.idTicketDetalle = data.idTicketDetalle;
@@ -2396,8 +2399,7 @@ ticketApp.controller('gestionEstimacionesController', ['$scope', '$http', functi
                 messageDialog.show('Información', data.msg);
             }
         });
-    }
-
+    };
 
     $scope.mostrarDetalleEstimacionTicket = function (numero, id, estado) {
         var detalleEstimacionTicket = $http.post("tickets/detalle-estimacion-ticket/",
@@ -2407,6 +2409,7 @@ ticketApp.controller('gestionEstimacionesController', ['$scope', '$http', functi
             });
 
         detalleEstimacionTicket.success(function (data) {
+            console.log(data);
             if (data.success === true) {
                 $scope.detallesEstimaciones = data.estimaciones;
                 $scope.tiempoTotal = data.tiempoTotal;

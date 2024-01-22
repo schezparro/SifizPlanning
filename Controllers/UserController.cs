@@ -21,6 +21,9 @@ using DocumentFormat.OpenXml.Bibliography;
 using Org.BouncyCastle.Bcpg.OpenPgp;
 using System.Data.Entity.Validation;
 using System.Web.Mvc.Html;
+using Microsoft.TeamFoundation.VersionControl.Client;
+using System.Web.UI.WebControls;
+using DocumentFormat.OpenXml.Drawing.Charts;
 
 namespace SifizPlanning.Controllers
 {
@@ -2817,39 +2820,40 @@ r in db.Rol on ur.rol equals r
         [Authorize(Roles = "USER, ADMIN")]
         public ActionResult IncidenciasUsuario(int start, int lenght, string filtro = "", bool finDia = false)
         {
-			try
-			{
-				var incidenciasUsuario = (from inc in db.Incidencias
-										  join md in db.Modulo on inc.SecuencialModulo equals md.Secuencial
-										  join cli in db.Cliente on inc.SecuencialCliente equals cli.Secuencial
-										  select new
-										  {
-                                              secuencial = inc.Secuencial,
-											  cliente = cli.Descripcion,
-											  modulo = md.Descripcion,
-											  incidente = inc.Incidente,
-											  acciones = inc.Acciones,
-											  adjunto = inc.Adjunto,
-											  fecha = inc.Fecha.HasValue ? inc.Fecha : DateTime.MinValue,
-											  findia = inc.FinDia == 1 ? "SI" : "NO"
-										  }).ToList();
+
+          try
+          {
+            var incidenciasUsuario = (from inc in db.Incidencias
+                          join md in db.Modulo on inc.SecuencialModulo equals md.Secuencial
+                          join cli in db.Cliente on inc.SecuencialCliente equals cli.Secuencial
+                          select new
+                          {
+                                                  secuencial = inc.Secuencial,
+                            cliente = cli.Descripcion,
+                            modulo = md.Descripcion,
+                            incidente = inc.Incidente,
+                            acciones = inc.Acciones,
+                            adjunto = inc.Adjunto,
+                            fecha = inc.Fecha.HasValue ? inc.Fecha : DateTime.MinValue,
+                            findia = inc.FinDia == 1 ? "SI" : "NO"
+                          }).ToList();
 
 
-				if(finDia)
-				{
-					incidenciasUsuario = incidenciasUsuario.Where(inc => inc.findia == "SI").ToList();
-				}
+            if(finDia)
+            {
+              incidenciasUsuario = incidenciasUsuario.Where(inc => inc.findia == "SI").ToList();
+            }
 
 
-				if(filtro != "")
-				{
-					incidenciasUsuario = incidenciasUsuario.Where(x =>
-																	x.cliente.ToString().ToLower().Contains(filtro.ToLower()) ||
-																	x.modulo.ToString().ToLower().Contains(filtro.ToLower()) ||
-																	x.incidente.ToString().ToLower().Contains(filtro.ToLower()) ||
-																	x.acciones.ToString().ToLower().Contains(filtro.ToLower())
-																).ToList();
-				}
+            if(filtro != "")
+            {
+              incidenciasUsuario = incidenciasUsuario.Where(x =>
+                                      x.cliente.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                      x.modulo.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                      x.incidente.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                      x.acciones.ToString().ToLower().Contains(filtro.ToLower())
+                                    ).ToList();
+            }
 
                 int total = incidenciasUsuario.Count();
                 incidenciasUsuario = incidenciasUsuario.Skip(start).Take(lenght).ToList();
@@ -3024,50 +3028,50 @@ r in db.Rol on ur.rol equals r
         }
 
 
-		//Guardar modal nuevas incidencias
-		[HttpPost]
-		[Authorize(Roles = "USER, ADMIN")]
-		public ActionResult GuardarIncidencia(string cliente, string modulo, string incidente, string acciones, string fechaincidencia, bool findia, string lideres, HttpPostedFileBase[] adjuntos = null)
-		{
-			try
-			{
-				var s = new JavaScriptSerializer();
-				var Url = "";
-				if(adjuntos != null)
-				{
-					foreach(var adj in adjuntos.Where(adj => adj != null))
-					{
-						string extFile = Path.GetExtension(adj.FileName);
-						string newNameFile = Utiles.RandomString(10) + extFile;
-						newNameFile = System.IO.Path.GetRandomFileName() + extFile;
-						string path = Path.Combine(Server.MapPath("~/Web/resources/incidencias"), newNameFile);
-						adj.SaveAs(path);
+        //Guardar modal nuevas incidencias
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult GuardarIncidencia(string cliente, string modulo, string incidente, string acciones, string fechaincidencia, bool findia, string lideres, HttpPostedFileBase[] adjuntos = null)
+        {
+            try
+            {
+                var s = new JavaScriptSerializer();
+                var Url = "";
+                if (adjuntos != null)
+                {
+                    foreach (var adj in adjuntos.Where(adj => adj != null))
+                    {
+                        string extFile = Path.GetExtension(adj.FileName);
+                        string newNameFile = Utiles.RandomString(10) + extFile;
+                        newNameFile = System.IO.Path.GetRandomFileName() + extFile;
+                        string path = Path.Combine(Server.MapPath("~/Web/resources/incidencias"), newNameFile);
+                        adj.SaveAs(path);
 
-						Url = "/resources/incidencias" + "/" + newNameFile;
-						break;
-					}
-				}
+                        Url = "/resources/incidencias" + "/" + newNameFile;
+                        break;
+                    }
+                }
 
-				int moduloid = int.Parse(modulo);
-				int clienteid = int.Parse(cliente);
+                int moduloid = int.Parse(modulo);
+                int clienteid = int.Parse(cliente);
 
-				string[] fechas = fechaincidencia.Split(new Char[] { '/' });
-				int dia = Int32.Parse(fechas[0]);
-				int mes = Int32.Parse(fechas[1]);
-				int anno = Int32.Parse(fechas[2]);
-				DateTime fecha = new DateTime(anno, mes, dia);
+                string[] fechas = fechaincidencia.Split(new Char[] { '/' });
+                int dia = Int32.Parse(fechas[0]);
+                int mes = Int32.Parse(fechas[1]);
+                int anno = Int32.Parse(fechas[2]);
+                DateTime fecha = new DateTime(anno, mes, dia);
 
 
-				Incidencias nuevaIncidencia = new Incidencias
-				{
-					SecuencialCliente = clienteid,
-					SecuencialModulo = moduloid,
-					Incidente = incidente,
-					Acciones = acciones,
-					Fecha = fecha,
-					FinDia = findia ? 1 : 0,
-					Adjunto = Url
-				};
+                Incidencias nuevaIncidencia = new Incidencias
+                {
+                    SecuencialCliente = clienteid,
+                    SecuencialModulo = moduloid,
+                    Incidente = incidente,
+                    Acciones = acciones,
+                    Fecha = fecha,
+                    FinDia = findia ? 1 : 0,
+                    Adjunto = Url
+                };
 
                 db.Incidencias.Add(nuevaIncidencia);
                 db.SaveChanges();
@@ -3112,7 +3116,6 @@ r in db.Rol on ur.rol equals r
         [Authorize(Roles = "USER, ADMIN")]
         public ActionResult RecursosUsuario(int start, int lenght, string filtro = "", bool todos = false)
         {
-
 
 			try
 			{
@@ -3203,25 +3206,24 @@ r in db.Rol on ur.rol equals r
 					SecuencialModulo = modulo,
 					Adjunto = Url
 				};
-
                 db.Recursos.Add(nuevoRecurso);
                 db.SaveChanges();
 
-				return Json(new
-				{
-					success = true,
-					msg = "Se ha realizado la operación correctamente."
-				});
-			}
-			catch(Exception e)
-			{
-				return Json(new
-				{
-					success = false,
-					msg = e.Message
-				});
-			}
-		}
+                return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
 
 
 
@@ -3604,7 +3606,10 @@ r in db.Rol on ur.rol equals r
                         tiempoTotal = tiempoTotal,
                         entregables = estimacionTicket.EntregablesAdicionales,
                         informacion = estimacionTicket.InformacionComplementaria,
-                        estimacionTerminada = estimacionTicket.EstimacionTerminada
+                        estimacionTerminada = estimacionTicket.EstimacionTerminada,
+                        requerimientoNuevo = estimacionTicket.RequerimientoNuevo != null ? estimacionTicket.RequerimientoNuevo : true,
+                        tiempoInicial = estimacionTicket.TiempoInicial != null ? estimacionTicket.TiempoInicial : 0,
+                        tiempoPegado = estimacionTicket.TiempoPegado != null ? estimacionTicket.TiempoPegado : 0
                     };
                     return Json(resp);
                 }
@@ -3617,7 +3622,10 @@ r in db.Rol on ur.rol equals r
                         tiempoTotal = 0,
                         entregables = "",
                         informacion = "",
-                        estimacionTerminada = 0
+                        estimacionTerminada = 0,
+                        requerimientoNuevo = true,
+                        tiempoInicial = 0,
+                        tiempoPegado = 0
                     };
                     return Json(resp);
                 }
@@ -3673,7 +3681,7 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult GuardarEstimacionUsuario(int idEstimacion, string entregables, string informacionComplementaria)
+        public ActionResult GuardarEstimacionUsuario(int idEstimacion, string entregables, string informacionComplementaria, bool requerimientoNuevo, int tiempoInicial, int tiempoPegado)
         {
             try
             {
@@ -3687,6 +3695,10 @@ r in db.Rol on ur.rol equals r
                 {
                     estimacionTicket.EntregablesAdicionales = entregables.Trim();
                     estimacionTicket.InformacionComplementaria = informacionComplementaria.Trim();
+
+                    estimacionTicket.RequerimientoNuevo = requerimientoNuevo;
+                    estimacionTicket.TiempoInicial = tiempoInicial;
+                    estimacionTicket.TiempoPegado = tiempoPegado;
 
                     int cantidadEstimacionesSinTerminar = (from et in db.EstimacionTicket
                                                            where et.EstaActiva == 1 && et.SecuencialTicket == estimacionTicket.SecuencialTicket &&
@@ -3794,6 +3806,10 @@ r in db.Rol on ur.rol equals r
                     estimacionTicket.EntregablesAdicionales = entregables.Trim();
                     estimacionTicket.InformacionComplementaria = informacionComplementaria.Trim();
                     estimacionTicket.EstimacionTerminada = 1;
+
+                    estimacionTicket.RequerimientoNuevo = requerimientoNuevo;
+                    estimacionTicket.TiempoInicial = tiempoInicial;
+                    estimacionTicket.TiempoPegado = tiempoPegado;
 
                     //Verificando si s el último de los colaboradores por estimar
                     int cantidadEstimacionesSinTerminar = (from et in db.EstimacionTicket
@@ -4408,7 +4424,51 @@ r in db.Rol on ur.rol equals r
                 return Json(resp);
             }
         }
-        
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult EditarItemEspecial(int itemId, int idRecurso, string descripcion, int tiempoEstimacion)
+        {
+            try
+            {
+                TipoRecurso tipoRecurso = db.TipoRecurso.Find(idRecurso);
+                if (tipoRecurso == null)
+                {
+                    throw new Exception("No se encontró el recurso");
+                }
+
+                ItemEspecial item = db.ItemEspecial.Find(itemId);
+                if (item == null)
+                {
+                    throw new Exception("No se encontró el item especial");
+                }
+                else
+                {
+                    item.Descripcion = descripcion;
+                    item.TiempoEstimacion = tiempoEstimacion;
+                    item.SecuencialTipoRecurso = tipoRecurso.Secuencial;
+                }
+
+                db.SaveChanges();
+
+                var resp = new
+                {
+                    success = true,
+                    msg = "Item Especial Editado"
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
         public ActionResult EliminarItemEspecial(int itemId)
@@ -5474,6 +5534,7 @@ r in db.Rol on ur.rol equals r
             }
         }
 
+        //Nuevo Excel
         public string GenerarExcelEstimaciones(int id)
         {
             using (SLDocument sl = new SLDocument())
@@ -5482,11 +5543,14 @@ r in db.Rol on ur.rol equals r
 
                 sl.SetColumnWidth(1, 13.22);
                 sl.SetColumnWidth(2, 46.67);
-                sl.SetColumnWidth(3, 22.56);
+                sl.SetColumnWidth(3, 10.78);
                 sl.SetColumnWidth(4, 10.78);
                 sl.SetColumnWidth(5, 10.78);
                 sl.SetColumnWidth(6, 10.78);
                 sl.SetColumnWidth(7, 10.78);
+                sl.SetColumnWidth(8, 10.78);
+                sl.SetColumnWidth(9, 10.78);
+                sl.SetColumnWidth(10, 10.78);
 
                 SLStyle style8 = sl.CreateStyle();
                 style8.SetHorizontalAlignment(HorizontalAlignmentValues.Left);
@@ -5499,23 +5563,33 @@ r in db.Rol on ur.rol equals r
                 style1.Font.FontSize = 12;
                 style1.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.LightSteelBlue, System.Drawing.Color.Blue);
                 sl.SetCellStyle(1, 1, style1);
-                sl.SetCellValue("A1", "ESTIMACIÓN DE REQUERIMIENTOS");
-                sl.MergeWorksheetCells("A1", "G1");
+                sl.SetCellValue("A1", "REQUERIMIENTOS");
+                sl.MergeWorksheetCells("A1", "J1");
+
+                SLStyle style3 = sl.CreateStyle();
+                style3.SetHorizontalAlignment(HorizontalAlignmentValues.Right);
+                sl.SetCellStyle(2, 5, style3);
+                sl.SetCellStyle(3, 5, style3);
+                sl.SetCellStyle(4, 5, style3);
 
                 SLStyle style2 = sl.CreateStyle();
-                style2.SetHorizontalAlignment(HorizontalAlignmentValues.Left);
+                style2.SetHorizontalAlignment(HorizontalAlignmentValues.Right);
                 style2.Font.Bold = true;
                 style2.Font.FontSize = 11;
                 sl.SetCellStyle(2, 1, style2);
                 sl.SetCellStyle(3, 1, style2);
                 sl.SetCellStyle(4, 1, style2);
                 sl.SetCellStyle(5, 1, style2);
-                sl.SetCellStyle(2, 6, style2);
-                sl.SetCellStyle(3, 6, style2);
-                sl.SetCellStyle(4, 6, style2);
+                sl.SetCellStyle(2, 3, style2);
+                sl.SetCellStyle(3, 3, style2);
+                sl.SetCellStyle(4, 3, style2);
+                sl.SetCellStyle(2, 7, style2);
+                sl.SetCellStyle(3, 7, style2);
+                sl.SetCellStyle(4, 7, style2);
+                sl.SetCellStyle(5, 7, style2);
                 sl.SetCellValue("A2", "Cliente:");
                 sl.SetCellValue("B2", estimacion.ticket.persona_cliente.cliente.Descripcion);
-                sl.SetCellValue("A3", "Responsable:");
+                sl.SetCellValue("A3", "Autor(es):");
                 string responsable = (
                                     db.TicketTarea.Where(x => x.SecuencialTicket == estimacion.SecuencialTicket && x.EstaActiva == 1).Count() > 0
                                ) ?
@@ -5531,32 +5605,110 @@ r in db.Rol on ur.rol equals r
                 sl.SetCellValue("A4", "Tema:");
                 sl.SetCellValue("B4", estimacion.ticket.Asunto);
                 sl.SetCellStyle(4, 2, style8);
-                sl.SetCellValue("A5", "Descripción:");
+                sl.SetCellValue("A5", "Detalle:");
                 sl.SetCellValue("B5", estimacion.ticket.Detalle);
                 sl.SetCellStyle(5, 2, style8);
-                sl.SetCellValue("F2", "Fecha Sol.:");
+                sl.MergeWorksheetCells("B5", "F5");
+
+                //Fechas
+                sl.SetCellValue("C2", "Fecha Solicitud:");
+                sl.MergeWorksheetCells("C2", "D2");
                 if (estimacion.ticket.Fecha.HasValue)
                 {
-                    sl.SetCellValue("G2", estimacion.ticket.Fecha.Value.ToString("dd/MM/yyyy"));
+                    sl.SetCellValue("E2", estimacion.ticket.Fecha.Value.ToString("dd/MM/yyyy"));
                 }
-                sl.SetCellValue("F3", "Ticket:");
-                sl.SetCellValue("G3", estimacion.ticket.Secuencial);
-                sl.SetCellValue("F4", "Fecha Est.:");
-                sl.SetCellValue("G4", DateTime.Now.ToString("dd/MM/yyyy"));
-                sl.MergeWorksheetCells("B5", "G5");
+                sl.MergeWorksheetCells("E2", "F2");
 
-                SLStyle style3 = sl.CreateStyle();
-                style3.SetVerticalAlignment(VerticalAlignmentValues.Justify);
-                style3.Font.Bold = true;
-                style3.Font.FontSize = 10;
-                style3.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.Yellow, System.Drawing.Color.Blue);
+                sl.SetCellValue("C3", "Fecha Límite Env:");
+                sl.MergeWorksheetCells("C3", "D3");
+                sl.SetCellValue("E3", estimacion.FechaLimite.ToString("dd/MM/yyyy"));
+                sl.MergeWorksheetCells("E3", "F3");
+
+                sl.SetCellValue("C4", "Fecha Estimación:");
+                sl.MergeWorksheetCells("C4", "D4");
+                sl.SetCellValue("E4", DateTime.Now.ToString("dd/MM/yyyy"));
+                sl.MergeWorksheetCells("E4", "F4");
+
+                //Otros Datos
+                sl.SetCellValue("G2", "Solicitado Por:");
+                sl.MergeWorksheetCells("G2", "H2");
+                sl.SetCellValue("I2", estimacion.ticket.ReportadoPor);
+                sl.MergeWorksheetCells("I2", "J2");
+
+                sl.SetCellValue("G3", "Revisado Por:");
+                sl.MergeWorksheetCells("G3", "H3");
+                sl.SetCellValue("I3", ""); //Revisado por (persona)
+                sl.MergeWorksheetCells("I3", "J3");
+
+                sl.SetCellValue("G4", "Aprobado Por:");
+                sl.MergeWorksheetCells("G4", "H4");
+                sl.SetCellValue("I4", ""); //Aprobado por (persona)
+                sl.MergeWorksheetCells("I4", "J4");
+
+
+                sl.SetCellValue("G5", "Ticket:");
+                sl.MergeWorksheetCells("G5", "H5");
+                sl.SetCellValue("I5", estimacion.ticket.Secuencial);
+                sl.MergeWorksheetCells("I5", "J5");
+
+                //Entregables
+                SLStyle style9 = sl.CreateStyle();
+                style9.SetVerticalAlignment(VerticalAlignmentValues.Justify);
+                style9.Font.Bold = true;
+                style9.Font.FontSize = 10;
+                style9.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.Yellow, System.Drawing.Color.Blue);
 
                 SLStyle style4 = sl.CreateStyle();
                 style4.SetHorizontalAlignment(HorizontalAlignmentValues.Center);
-                style4.SetVerticalAlignment(VerticalAlignmentValues.Justify);
+                style4.SetVerticalAlignment(VerticalAlignmentValues.Distributed);
                 style4.Font.Bold = true;
                 style4.Font.FontSize = 10;
                 style4.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.LightSteelBlue, System.Drawing.Color.Blue);
+
+                SLStyle style16 = sl.CreateStyle();
+                style16.SetHorizontalAlignment(HorizontalAlignmentValues.Center);
+                style16.SetVerticalAlignment(VerticalAlignmentValues.Distributed);
+                style16.Font.Bold = true;
+                style16.Font.FontSize = 10;
+                style16.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.Blue, System.Drawing.Color.Blue);
+
+                SLStyle style10 = sl.CreateStyle();
+                style10.SetHorizontalAlignment(HorizontalAlignmentValues.Center);
+                style10.SetVerticalAlignment(VerticalAlignmentValues.Distributed);
+                style10.Font.Bold = true;
+                style10.Font.FontSize = 10;
+                style10.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.LightGreen, System.Drawing.Color.LightGreen);
+
+                SLStyle style11 = sl.CreateStyle();
+                style11.SetHorizontalAlignment(HorizontalAlignmentValues.Right);
+                style11.SetVerticalAlignment(VerticalAlignmentValues.Distributed);
+                style11.Font.Bold = false;
+                style11.Font.FontSize = 10;
+                style11.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.LightGreen, System.Drawing.Color.LightGreen);
+
+                SLStyle style12 = sl.CreateStyle();
+                style12.SetHorizontalAlignment(HorizontalAlignmentValues.Right);
+                style12.SetVerticalAlignment(VerticalAlignmentValues.Distributed);
+                style12.Font.Bold = false;
+                style12.Font.FontSize = 10;
+                style12.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.Green, System.Drawing.Color.Green);
+
+                SLStyle style13 = sl.CreateStyle();
+                style13.SetHorizontalAlignment(HorizontalAlignmentValues.Right);
+                style13.SetVerticalAlignment(VerticalAlignmentValues.Distributed);
+                style13.Font.Bold = false;
+                style13.Font.FontSize = 10;
+                style13.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.Blue, System.Drawing.Color.Blue);
+
+                SLStyle style14 = sl.CreateStyle();
+                style14.SetHorizontalAlignment(HorizontalAlignmentValues.Right);
+                style14.SetVerticalAlignment(VerticalAlignmentValues.Distributed);
+                style14.Font.Bold = false;
+                style14.Font.FontSize = 10;
+                style14.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.Orange, System.Drawing.Color.Orange);
+
+                SLStyle style15 = sl.CreateStyle();
+                style15.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.Gray, System.Drawing.Color.Gray);
 
                 SLStyle style5 = sl.CreateStyle();
                 style5.SetVerticalAlignment(VerticalAlignmentValues.Justify);
@@ -5572,7 +5724,11 @@ r in db.Rol on ur.rol equals r
                 style7.SetHorizontalAlignment(HorizontalAlignmentValues.Right);
                 style7.SetVerticalAlignment(VerticalAlignmentValues.Justify);
                 style7.Font.FontSize = 10;
-                style7.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.YellowGreen, System.Drawing.Color.Blue);
+
+                SLStyle style17 = sl.CreateStyle();
+                style17.SetHorizontalAlignment(HorizontalAlignmentValues.Center);
+                style17.SetVerticalAlignment(VerticalAlignmentValues.Distributed);
+                style17.Font.FontSize = 11;
 
 
                 var entregables = (from de in db.DetalleEstimacionTicket
@@ -5591,63 +5747,249 @@ r in db.Rol on ur.rol equals r
                                                        tiempoHoras = d.TiempoDesarrollo + d.TiempoPrueba,
                                                        tiempoDesarrollo = d.TiempoDesarrollo ?? 0,
                                                        tiempoPrueba = d.TiempoPrueba ?? 0,
+                                                       tiempoQA = d.TiempoQA ?? 0,
                                                        nivel = db.NivelColaborador.Where(s => s.Secuencial == d.SecuencialNivelColaborador).FirstOrDefault().Codigo,
                                                    }).ToList()
                                    }).ToList();
                 int sum = 0;
-                int tiempoTotal = 0;
+                int tiempoTotalDes = 0;
+                int tiempoTotalPru = 0;
+                int tiempoTotalTotal = 0;
+                int tiempoTotalQA = 0;
+                int tiempoTotalEst = 0;
+                int tiempoTotalH = 0;
                 foreach (var item in entregables.Select((value, index) => new { value, index }))
                 {
-                    tiempoTotal += (int)item.value.detalles.Sum(s => s.tiempoHoras);
+                    var tiempoEst = item.value.detalles.Sum(s => (s.tiempoHoras ?? 0) + s.tiempoDesarrollo + s.tiempoPrueba + s.tiempoQA);
+
+                    tiempoTotalDes += (int)item.value.detalles.Sum(s => s.tiempoDesarrollo);
+                    tiempoTotalPru += (int)item.value.detalles.Sum(s => s.tiempoPrueba);
+                    tiempoTotalTotal += (int)item.value.detalles.Sum(s => s.tiempoHoras);
+                    tiempoTotalQA += (int)item.value.detalles.Sum(s => s.tiempoQA);
+                    tiempoTotalEst += tiempoEst;
+                    tiempoTotalH += tiempoEst * 2;
                     int cantidad = item.value.detalles.Count;
                     int index = item.index;
 
-                    sl.SetCellValue("A" + (6 + 2 * (index + 1) + 1 * index - 2 + sum), "ENTREGABLE" + (index + 1) + ": " + item.value.nombre);
-                    sl.MergeWorksheetCells("A" + (6 + 2 * (index + 1) + 1 * index - 2 + sum), "G" + (6 + 2 * (index + 1) + 1 * index - 2 + sum));
+                    sl.SetCellValue("A" + (7 + 3 * (index + 1) + 1 * index - 2 + sum), "ITEM" + (index + 1));
+                    sl.MergeWorksheetCells("A" + (7 + 3 * (index + 1) + 1 * index - 2 + sum), "J" + (7 + 3 * (index + 1) + 1 * index - 2 + sum));
 
-                    sl.SetCellStyle((6 + 2 * (index + 1) + 1 * index - 2 + sum), 1, style5);
-                    sl.SetCellStyle((6 + 2 * (index + 1) + 1 * index - 1 + sum), 1, style4);
-                    sl.SetCellStyle((6 + 2 * (index + 1) + 1 * index - 1 + sum), 2, style4);
-                    sl.SetCellStyle((6 + 2 * (index + 1) + 1 * index - 1 + sum), 3, style4);
-                    sl.SetCellStyle((6 + 2 * (index + 1) + 1 * index - 1 + sum), 4, style4);
-                    sl.SetCellStyle((6 + 2 * (index + 1) + 1 * index - 1 + sum), 5, style4);
-                    sl.SetCellStyle((6 + 2 * (index + 1) + 1 * index - 1 + sum), 6, style4);
-                    sl.SetCellStyle((6 + 2 * (index + 1) + 1 * index - 1 + sum), 7, style4);
-                    sl.SetCellValue("A" + (6 + 2 * (index + 1) + 1 * index - 1 + sum), "N°");
-                    sl.SetCellValue("B" + (6 + 2 * (index + 1) + 1 * index - 1 + sum), "TAREA PROPUESTA");
-                    sl.SetCellValue("C" + (6 + 2 * (index + 1) + 1 * index - 1 + sum), "TIPO RECURSO");
-                    sl.SetCellValue("D" + (6 + 2 * (index + 1) + 1 * index - 1 + sum), "REF. FORMATOS ADAPTAR");
-                    sl.SetCellValue("E" + (6 + 2 * (index + 1) + 1 * index - 1 + sum), "TIEMPO (H)");
-                    sl.SetCellValue("F" + (6 + 2 * (index + 1) + 1 * index - 1 + sum), "TIEMPO DES");
-                    sl.SetCellValue("G" + (6 + 2 * (index + 1) + 1 * index - 1 + sum), "TIEMPO PRU");
+                    sl.SetCellStyle((7 + 3 * (index + 1) + 1 * index - 2 + sum), 1, style5);
+                    sl.SetCellStyle((7 + 3 * (index + 1) + 1 * index - 1 + sum), 1, style4);
+                    sl.SetCellStyle((7 + 3 * (index + 1) + 1 * index - 1 + sum), 2, style4);
+                    sl.SetCellStyle((7 + 3 * (index + 1) + 1 * index - 1 + sum), 3, style4);
+                    sl.SetCellStyle((7 + 3 * (index + 1) + 1 * index - 1 + sum), 4, style4);
+                    sl.SetCellStyle((7 + 3 * (index + 1) + 1 * index - 1 + sum), 5, style4);
+                    sl.SetCellStyle((7 + 3 * (index + 1) + 1 * index - 1 + sum), 6, style4);
+                    sl.SetCellStyle((7 + 3 * (index + 1) + 1 * index - 1 + sum), 7, style4);
+                    sl.SetCellStyle((7 + 3 * (index + 1) + 1 * index - 1 + sum), 8, style4);
+                    sl.SetCellStyle((7 + 3 * (index + 1) + 1 * index - 1 + sum), 9, style4);
+                    sl.SetCellStyle((7 + 3 * (index + 1) + 1 * index - 1 + sum), 10, style4);
+
+                    sl.SetCellStyle((8 + 3 * (index + 1) + 1 * index - 1 + sum), 5, style10);
+                    sl.SetCellStyle((8 + 3 * (index + 1) + 1 * index - 1 + sum), 6, style10);
+                    sl.SetCellStyle((8 + 3 * (index + 1) + 1 * index - 1 + sum), 7, style4);
+
+                    sl.SetCellValue("A" + (7 + 3 * (index + 1) + 1 * index - 1 + sum), "N°");
+                    sl.MergeWorksheetCells("A" + (7 + 3 * (index + 1) + 1 * index - 1 + sum), "A" + (8 + 3 * (index + 1) + 1 * index - 1 + sum));
+
+                    sl.SetCellValue("B" + (7 + 3 * (index + 1) + 1 * index - 1 + sum), "TAREA PROPUESTA");
+                    sl.MergeWorksheetCells("B" + (7 + 3 * (index + 1) + 1 * index - 1 + sum), "B" + (8 + 3 * (index + 1) + 1 * index - 1 + sum));
+
+                    sl.SetCellValue("C" + (7 + 3 * (index + 1) + 1 * index - 1 + sum), "TIPO RECURSO");
+                    sl.MergeWorksheetCells("C" + (7 + 3 * (index + 1) + 1 * index - 1 + sum), "C" + (8 + 3 * (index + 1) + 1 * index - 1 + sum));
+
+                    sl.SetCellValue("D" + (7 + 3 * (index + 1) + 1 * index - 1 + sum), "FORMATOS ADAPTAR");
+                    sl.MergeWorksheetCells("D" + (7 + 3 * (index + 1) + 1 * index - 1 + sum), "D" + (8 + 3 * (index + 1) + 1 * index - 1 + sum));
+
+                    sl.SetCellValue("E" + (7 + 3 * (index + 1) + 1 * index - 1 + sum), "TIEMPO DESARROLLO");
+                    sl.MergeWorksheetCells("E" + (7 + 3 * (index + 1) + 1 * index - 1 + sum), "G" + (7 + 3 * (index + 1) + 1 * index - 1 + sum));
+
+                    sl.SetCellValue("E" + (8 + 3 * (index + 1) + 1 * index - 1 + sum), "T DES");
+                    sl.SetCellValue("F" + (8 + 3 * (index + 1) + 1 * index - 1 + sum), "T PRU");
+                    sl.SetCellValue("G" + (8 + 3 * (index + 1) + 1 * index - 1 + sum), "T TOTAL");
+
+                    sl.SetCellValue("H" + (7 + 3 * (index + 1) + 1 * index - 1 + sum), "TIEMPO QA");
+                    sl.MergeWorksheetCells("H" + (7 + 3 * (index + 1) + 1 * index - 1 + sum), "H" + (8 + 3 * (index + 1) + 1 * index - 1 + sum));
+
+                    sl.SetCellValue("I" + (7 + 3 * (index + 1) + 1 * index - 1 + sum), "TIEMPO EST");
+                    sl.MergeWorksheetCells("I" + (7 + 3 * (index + 1) + 1 * index - 1 + sum), "I" + (8 + 3 * (index + 1) + 1 * index - 1 + sum));
+
+                    sl.SetCellValue("J" + (7 + 3 * (index + 1) + 1 * index - 1 + sum), "TIEMPO (H)");
+                    sl.MergeWorksheetCells("J" + (7 + 3 * (index + 1) + 1 * index - 1 + sum), "J" + (8 + 3 * (index + 1) + 1 * index - 1 + sum));
 
                     foreach (var it in item.value.detalles.Select((v, i) => new { v, i }))
                     {
-                        sl.SetCellValue("A" + (6 + 2 * (index + 1) + 1 * index + sum + it.i), "TAR" + (it.i + 1));
-                        sl.SetCellValue("B" + (6 + 2 * (index + 1) + 1 * index + sum + it.i), it.v.detalle);
-                        sl.SetCellValue("C" + (6 + 2 * (index + 1) + 1 * index + sum + it.i), it.v.nivel);
-                        sl.SetCellValue("D" + (6 + 2 * (index + 1) + 1 * index + sum + it.i), "");
-                        sl.SetCellValue("E" + (6 + 2 * (index + 1) + 1 * index + sum + it.i), it.v.tiempoHoras ?? 0);
-                        sl.SetCellValue("F" + (6 + 2 * (index + 1) + 1 * index + sum + it.i), it.v.tiempoDesarrollo);
-                        sl.SetCellValue("G" + (6 + 2 * (index + 1) + 1 * index + sum + it.i), it.v.tiempoPrueba);
+                        sl.SetCellValue("A" + (8 + 3 * (index + 1) + 1 * index + sum + it.i), "TAR" + (it.i + 1));
+                        sl.SetCellValue("B" + (8 + 3 * (index + 1) + 1 * index + sum + it.i), it.v.detalle);
+                        sl.SetCellValue("C" + (8 + 3 * (index + 1) + 1 * index + sum + it.i), it.v.nivel);
+                        sl.SetCellValue("D" + (8 + 3 * (index + 1) + 1 * index + sum + it.i), "");
+                        sl.SetCellValue("E" + (8 + 3 * (index + 1) + 1 * index + sum + it.i), it.v.tiempoDesarrollo);
+                        sl.SetCellValue("F" + (8 + 3 * (index + 1) + 1 * index + sum + it.i), it.v.tiempoPrueba);
+                        sl.SetCellValue("G" + (8 + 3 * (index + 1) + 1 * index + sum + it.i), it.v.tiempoHoras ?? 0);
+
+                        sl.SetCellValue("H" + (8 + 3 * (index + 1) + 1 * index + sum + it.i), it.v.tiempoQA);
+                        sl.SetCellValue("I" + (8 + 3 * (index + 1) + 1 * index + sum + it.i), it.v.tiempoDesarrollo + it.v.tiempoPrueba + (it.v.tiempoHoras ?? 0) + it.v.tiempoQA);
+
+                        sl.SetCellStyle("J" + (8 + 3 * (index + 1) + 1 * index + sum + it.i), style15);
                     }
-                    sl.SetCellStyle((6 + 2 * (index + 1) + 1 * index + sum + item.value.detalles.Count), 4, style3);
-                    sl.SetCellStyle((6 + 2 * (index + 1) + 1 * index + sum + item.value.detalles.Count), 5, style3);
-                    sl.SetCellStyle((6 + 2 * (index + 1) + 1 * index + sum + item.value.detalles.Count), 6, style6);
-                    sl.SetCellStyle((6 + 2 * (index + 1) + 1 * index + sum + item.value.detalles.Count), 7, style6);
-                    sl.MergeWorksheetCells("A" + (6 + 2 * (index + 1) + 1 * index + sum + item.value.detalles.Count), "C" + (6 + 2 * (index + 1) + 1 * index + sum + item.value.detalles.Count));
-                    sl.SetCellValue("D" + (6 + 2 * (index + 1) + 1 * index + sum + item.value.detalles.Count), "TOTAL:");
-                    sl.SetCellValue("E" + (6 + 2 * (index + 1) + 1 * index + sum + item.value.detalles.Count), item.value.detalles.Sum(s => s.tiempoHoras ?? 0));
-                    sl.SetCellValue("F" + (6 + 2 * (index + 1) + 1 * index + sum + item.value.detalles.Count), item.value.detalles.Sum(s => s.tiempoDesarrollo));
-                    sl.SetCellValue("G" + (6 + 2 * (index + 1) + 1 * index + sum + item.value.detalles.Count), item.value.detalles.Sum(s => s.tiempoPrueba));
+
+                    sl.SetCellStyle((7 + 4 * (index + 1) + 1 * sum + item.value.detalles.Count), 4, style3);
+                    sl.SetCellStyle((7 + 4 * (index + 1) + 1 * sum + item.value.detalles.Count), 5, style11);
+                    sl.SetCellStyle((7 + 4 * (index + 1) + 1 * sum + item.value.detalles.Count), 6, style11);
+                    sl.SetCellStyle((7 + 4 * (index + 1) + 1 * sum + item.value.detalles.Count), 7, style12);
+                    sl.SetCellStyle((7 + 4 * (index + 1) + 1 * sum + item.value.detalles.Count), 8, style13);
+                    sl.SetCellStyle((7 + 4 * (index + 1) + 1 * sum + item.value.detalles.Count), 9, style14);
+                    sl.SetCellStyle((7 + 4 * (index + 1) + 1 * sum + item.value.detalles.Count), 10, style14);
+
+                    sl.MergeWorksheetCells("A" + (7 + 4 * (index + 1) + 1 * sum + item.value.detalles.Count), "C" + (7 + 4 * (index + 1) + 1 * sum + item.value.detalles.Count));
+
+                    sl.SetCellValue("D" + (7 + 4 * (index + 1) + 1 * sum + item.value.detalles.Count), "TOTAL:");
+                    sl.SetCellValue("E" + (7 + 4 * (index + 1) + 1 * sum + item.value.detalles.Count), item.value.detalles.Sum(s => s.tiempoDesarrollo));
+                    sl.SetCellValue("F" + (7 + 4 * (index + 1) + 1 * sum + item.value.detalles.Count), item.value.detalles.Sum(s => s.tiempoPrueba));
+                    sl.SetCellValue("G" + (7 + 4 * (index + 1) + 1 * sum + item.value.detalles.Count), item.value.detalles.Sum(s => s.tiempoHoras ?? 0));
+                    sl.SetCellValue("H" + (7 + 4 * (index + 1) + 1 * sum + item.value.detalles.Count), item.value.detalles.Sum(s => s.tiempoQA));
+                    sl.SetCellValue("I" + (7 + 4 * (index + 1) + 1 * sum + item.value.detalles.Count), tiempoEst);
+                    sl.SetCellValue("J" + (7 + 4 * (index + 1) + 1 * sum + item.value.detalles.Count), tiempoEst * 2);
                     sum += cantidad;
                 }
 
-                sl.SetCellStyle((6 + 3 * entregables.Count + sum + 1), 1, style7);
-                sl.SetCellStyle((6 + 3 * entregables.Count + sum + 1), 5, style7);
-                sl.MergeWorksheetCells("A" + (6 + 3 * entregables.Count + sum + 1), "D" + (6 + 3 * entregables.Count + sum + 1));
-                sl.SetCellValue("A" + (6 + 3 * entregables.Count + sum + 1), "TIEMPO FINAL:");
-                sl.SetCellValue("E" + (6 + 3 * entregables.Count + sum + 1), tiempoTotal);
+                sl.SetCellStyle((7 + 5 * entregables.Count + sum + 2 - entregables.Count), 1, style7);
+                sl.SetCellStyle((7 + 5 * entregables.Count + sum + 2 - entregables.Count), 5, style10);
+                sl.SetCellStyle((7 + 5 * entregables.Count + sum + 2 - entregables.Count), 6, style10);
+                sl.SetCellStyle((7 + 5 * entregables.Count + sum + 2 - entregables.Count), 7, style12);
+                sl.SetCellStyle((7 + 5 * entregables.Count + sum + 2 - entregables.Count), 8, style13);
+                sl.SetCellStyle((7 + 5 * entregables.Count + sum + 2 - entregables.Count), 9, style14);
+                sl.SetCellStyle((7 + 5 * entregables.Count + sum + 2 - entregables.Count), 10, style14);
+
+                sl.MergeWorksheetCells("A" + (7 + 5 * entregables.Count + sum + 2 - entregables.Count), "D" + (7 + 5 * entregables.Count + sum + 2 - entregables.Count));
+
+                sl.SetCellValue("A" + (7 + 5 * entregables.Count + sum + 2 - entregables.Count), "TIEMPO TOTAL DE DESARROLLO:");
+                sl.SetCellValue("E" + (7 + 5 * entregables.Count + sum + 2 - entregables.Count), tiempoTotalDes);
+                sl.SetCellValue("F" + (7 + 5 * entregables.Count + sum + 2 - entregables.Count), tiempoTotalPru);
+                sl.SetCellValue("G" + (7 + 5 * entregables.Count + sum + 2 - entregables.Count), tiempoTotalTotal);
+                sl.SetCellValue("H" + (7 + 5 * entregables.Count + sum + 2 - entregables.Count), tiempoTotalQA);
+                sl.SetCellValue("I" + (7 + 5 * entregables.Count + sum + 2 - entregables.Count), tiempoTotalEst);
+                sl.SetCellValue("J" + (7 + 5 * entregables.Count + sum + 2 - entregables.Count), tiempoTotalH);
+
+                //Items Especiales
+                var pivot = 7 + 5 * entregables.Count + sum + 3 - entregables.Count; //Coordenadas de la siguiente row a "TIEMPO TOTAL DE DESARROLLO:"
+
+                var itemsEspeciales = (from ie in db.ItemEspecial
+                                       join tr in db.TipoRecurso on ie.SecuencialTipoRecurso equals tr.Secuencial
+                                       where ie.SecuencialEstimacion == estimacion.Secuencial
+                                       select new
+                                       {
+                                           id = ie.Secuencial,
+                                           descripcion = ie.Descripcion,
+                                           tiempoEstimacion = ie.TiempoEstimacion,
+                                           idEstimacion = ie.SecuencialEstimacion,
+                                           idTipoRecurso = ie.SecuencialTipoRecurso,
+                                           recurso = tr.Descripcion
+                                       }).ToList();
+
+                sl.SetCellValue("A" + (pivot + 1), "ITEMS ESPECIALES");
+                sl.MergeWorksheetCells("A" + (pivot + 1), "B" + (pivot + 1));
+                sl.SetCellStyle((pivot + 1), 1, style4);
+
+                sl.SetCellValue("C" + (pivot + 1), "RECURSO");
+                sl.SetCellStyle((pivot + 1), 3, style4);
+
+                sl.SetCellValue("D" + (pivot + 1), "TIEMPO EST");
+                sl.MergeWorksheetCells("D" + (pivot + 1), "E" + (pivot + 1));
+                sl.SetCellStyle((pivot + 1), 4, style4);
+
+                sl.SetCellValue("F" + (pivot + 1), "TIEMPO (H)");
+                sl.MergeWorksheetCells("F" + (pivot + 1), "G" + (pivot + 1));
+                sl.SetCellStyle((pivot + 1), 6, style4);
+
+                sl.SetCellValue("H" + (pivot + 1), "TIEMPO TOTAL DEL REQ.");
+                sl.MergeWorksheetCells("H" + (pivot + 1), "J" + (pivot + 1));
+                sl.SetCellStyle((pivot + 1), 8, style16);
+
+                var tiempoEstIETotal = 0;
+                foreach (var item in itemsEspeciales.Select((value, index) => new { value, index }))
+                {
+                    int index = item.index + 1;
+                    tiempoEstIETotal += item.value.tiempoEstimacion;
+                    sl.SetCellValue("A" + (pivot + 1 + index), "T_ESP" + index);
+                    sl.SetCellValue("B" + (pivot + 1 + index), item.value.descripcion);
+
+                    sl.SetCellValue("C" + (pivot + 1 + index), item.value.recurso);
+                    sl.SetCellStyle("C" + (pivot + 1 + index), style17);
+
+                    sl.SetCellValue("D" + (pivot + 1 + index), item.value.tiempoEstimacion);
+                    sl.MergeWorksheetCells("D" + (pivot + 1 + index), "E" + (pivot + 1 + index));
+
+                    sl.SetCellStyle("F" + (pivot + 1 + index), style15);
+                    sl.MergeWorksheetCells("F" + (pivot + 1 + index), "G" + (pivot + 1 + index));
+
+                    sl.SetCellStyle("H" + (pivot + 1 + index), style4);
+                    sl.MergeWorksheetCells("H" + (pivot + 1 + index), "J" + (pivot + 1 + index));
+                }
+
+                sl.SetCellValue("A" + (pivot + 1 + itemsEspeciales.Count + 1), "TOTAL:");
+                sl.MergeWorksheetCells("A" + (pivot + 1 + itemsEspeciales.Count + 1), "C" + (pivot + 1 + itemsEspeciales.Count + 1));
+                sl.SetCellStyle("A" + (pivot + 1 + itemsEspeciales.Count + 1), style3);
+
+                sl.SetCellValue("D" + (pivot + 1 + itemsEspeciales.Count + 1), tiempoEstIETotal);
+                sl.MergeWorksheetCells("D" + (pivot + 1 + itemsEspeciales.Count + 1), "E" + (pivot + 1 + itemsEspeciales.Count + 1));
+                sl.SetCellStyle("D" + (pivot + 1 + itemsEspeciales.Count + 1), style14);
+
+                sl.SetCellValue("F" + (pivot + 1 + itemsEspeciales.Count + 1), 0);
+                sl.MergeWorksheetCells("F" + (pivot + 1 + itemsEspeciales.Count + 1), "G" + (pivot + 1 + itemsEspeciales.Count + 1));
+                sl.SetCellStyle("F" + (pivot + 1 + itemsEspeciales.Count + 1), style14);
+
+                sl.SetCellValue("H" + (pivot + 1 + itemsEspeciales.Count + 1), 0);
+                sl.MergeWorksheetCells("H" + (pivot + 1 + itemsEspeciales.Count + 1), "J" + (pivot + 1 + itemsEspeciales.Count + 1));
+                sl.SetCellStyle("H" + (pivot + 1 + itemsEspeciales.Count + 1), style13);
+
+                //Tiempos
+                var pivot2 = pivot + 2 + itemsEspeciales.Count + 1; //Coordenadas de la siguiente row a "TOTAL: de items especiales"
+
+                sl.SetCellValue("A" + (pivot2 + 1), "TIEMPOS DE DESARROLLO/PEGADO");
+                sl.MergeWorksheetCells("A" + (pivot2 + 1), "B" + (pivot2 + 1));
+                sl.SetCellStyle((pivot2 + 1), 1, style4);
+
+                sl.SetCellValue("C" + (pivot2 + 1), "RECURSO");
+                sl.SetCellStyle((pivot2 + 1), 3, style4);
+
+                sl.SetCellValue("D" + (pivot2 + 1), "TIEMPO EST");
+                sl.MergeWorksheetCells("D" + (pivot2 + 1), "E" + (pivot2 + 1));
+                sl.SetCellStyle((pivot2 + 1), 4, style4);
+
+                sl.SetCellValue("F" + (pivot2 + 1), "TIEMPO (H)");
+                sl.MergeWorksheetCells("F" + (pivot2 + 1), "G" + (pivot2 + 1));
+                sl.SetCellStyle((pivot2 + 1), 6, style4);
+
+                //Valores de los tiempos
+                sl.SetCellValue("A" + (pivot2 + 2), "T_DEV1");
+                sl.SetCellValue("A" + (pivot2 + 3), "T_DEV2");
+
+                sl.SetCellValue("B" + (pivot2 + 2), "Tiempo de desarrollo inicial");
+                sl.SetCellValue("B" + (pivot2 + 3), "Tiempo de desarrollo pegado");
+
+                sl.SetCellValue("D" + (pivot2 + 2), (int)estimacion.TiempoInicial);
+                sl.MergeWorksheetCells("D" + (pivot2 + 2), "E" + (pivot2 + 2));
+                sl.SetCellValue("D" + (pivot2 + 3), (int)estimacion.TiempoPegado);
+                sl.MergeWorksheetCells("D" + (pivot2 + 3), "E" + (pivot2 + 3));
+
+                sl.SetCellStyle("F" + (pivot2 + 2), style15);
+                sl.MergeWorksheetCells("F" + (pivot2 + 2), "G" + (pivot2 + 2));
+                sl.SetCellStyle("F" + (pivot2 + 3), style15);
+                sl.MergeWorksheetCells("F" + (pivot2 + 3), "G" + (pivot2 + 3));
+
+                sl.SetCellValue("A" + (pivot2 + 4), "TOTAL:");
+                sl.SetCellStyle("A" + (pivot2 + 4), style3);
+                sl.MergeWorksheetCells("A" + (pivot2 + 4), "C" + (pivot2 + 4));
+
+                sl.SetCellValue("D" + (pivot2 + 4), ((int)estimacion.TiempoInicial + (int)estimacion.TiempoPegado));
+                sl.SetCellStyle("D" + (pivot2 + 4), style14);
+                sl.MergeWorksheetCells("D" + (pivot2 + 4), "E" + (pivot2 + 4));
+                
+                sl.SetCellValue("F" + (pivot2 + 4), 0);
+                sl.SetCellStyle("F" + (pivot2 + 4), style14);
+                sl.MergeWorksheetCells("F" + (pivot2 + 4), "G" + (pivot2 + 4));
 
                 string newNameFile = "est_" + Utiles.RandomString(10) + ".xlsx";
                 string path = Path.Combine(Server.MapPath("~/Web/resources/tickets"), newNameFile);

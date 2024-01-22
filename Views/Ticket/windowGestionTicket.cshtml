@@ -1244,7 +1244,7 @@
             </div>
             <div class="modal-body" style="height: 480px; overflow-y: auto;">
                 <table class="table" style="width: 100%">
-                    <p>Total estimaciones: <mark>{{tiempoTotal}}</mark></p>
+                    <tr>Total estimaciones: <mark>{{tiempoTotal}}</mark></tr>
                     <tr ng-repeat="est in estimacionesTicket">
                         <td>
                             <p>Colaborador: <mark>{{est.colaborador}}  </mark>  Total de Horas: <mark>{{est.colaboradorHoras}}</mark></p>
@@ -1276,6 +1276,50 @@
                                         </table>
                                     </td>
                                 </tr>
+                            </table>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <label ng-readonly="true" style="display: inline-block">
+                                        <input ng-model="est.requerimientoNuevo" type="checkbox" />
+                                        Es estimación requerimiento nuevo/es estimación de pegado
+                                    </label>
+                                </div>
+
+                                <div id="div-tiempo-incial" class="col-md-2">
+                                    <label style="display: inline-block">
+                                        Tiempo Inicial:
+                                        {{est.tiempoInicial}}
+                                    </label>
+                                </div>
+
+                                <div id="div-tiempo-pegado" class="col-md-2">
+                                    <label style="display: inline-block">
+                                        Tiempo Pegado:
+                                        {{est.tiempoPegado}}
+                                    </label>
+                                </div>
+                            </div>
+
+                            <text style="font-weight:bold">Items Especiales</text>
+                            <table class="table table-striped">
+
+                                <thead>
+                                    <tr>
+                                        <th>N°</th>
+                                        <th>Descripcion</th>
+                                        <th>Tipo Recurso</th>
+                                        <th>Tiempo Estimado</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr class="table-tr" ng-repeat="item in est.items" data-id="{{ item.id }}">
+                                        <td>T_ESP{{$index + 1}}</td>
+                                        <td>{{ item.descripcion }}</td>
+                                        <td>{{ item.recurso }}</td>
+                                        <td>{{ item.tiempoEstimacion }}</td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </td>
                     </tr>
