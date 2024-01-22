@@ -6,7 +6,7 @@
 <input type="text" ng-keyup="cargarIncidencias()" ng-model="filtroIncidencias" class="form-control right filtro" placeholder="Filtrar..." />
 <div class="clear"></div>
 <div id="tabla-user-incidencias">
-    <table id="tabla-incidencias-usuario" class="table table-striped">
+    <table id="tabla-incidencias-usuario" class="table table-striped table-condensed nowrap">
         <thead>
             <tr>
                 <th width="5">Cliente</th>
@@ -14,18 +14,17 @@
                 <th width="35">Incidente</th>
                 <th width="35">Acciones a realizar</th>
                 <th width="5">Fecha incidencia</th>
-                <th width="10">Fin de Dia</th>
+                <th width="10">Fin de Día</th>
                 <th width="10">Adjunto</th>
-
             </tr>
         </thead>
 
         <tbody>
-            <tr ng-repeat="incidencia in incidencias  | filter: filtroIncidencias">
+            <tr ng-repeat="incidencia in incidencias  | filter: filtroIncidencias" ng-dblclick="mostrarDetalleIncidencia(incidencia.secuencial)">
                 <td>{{incidencia.cliente}}</td>
                 <td>{{incidencia.modulo}}</td>
-                <td>{{incidencia.incidente}}</td>
-                <td>{{incidencia.acciones}}</td>
+                <td>{{incidencia.incidente | limitTo:50}}</td>
+                <td>{{incidencia.acciones  | limitTo:50}}</td>
                 <td>{{incidencia.fecha | strDateToStr}}</td>
                 <td>{{incidencia.findia}}</td>
                 <td>
@@ -98,7 +97,12 @@
                     <div style="column-count: 2">
                         <div class="div-info-ticket">
                             FECHA INCIDENCIA
-                            <input id="fecha-incidencia" ng-model="fechaIncidencia" class="form-control" ng-required="true" autocomplete="off" />
+                            <div class='input-group date'>
+                                <input id="fecha-incidencia" ng-model="fechaIncidencia" class="form-control" ng-required="true" autocomplete="off" />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
                         </div>
 
                         ADJUNTO:
@@ -107,17 +111,17 @@
                     </div>
 
                     <div class="col-md-6">
-                        FIN DE DIA:
-                        <input id="check-fin-dia" type="checkbox" ng-model="finDia" />
-                    </div>
-                    <div class="col-md-6">
                         NOTIFICAR LIDERES:
                         <input type="checkbox" ng-model="mostrarSelectLideres" ng-init="mostrarSelectLideres=false" />
 
                         <select id="select-notificar-lideres" ng-model="liderSeleccionado" class="form-control" multiple ng-show="mostrarSelectLideres">
-                            <option value="">Seleccione...</option>
                             <option value="{{lider.email}}" ng-repeat="lider in lideres">{{lider.nombre}}</option>
                         </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        FIN DE DIA:
+                        <input id="check-fin-dia" type="checkbox" ng-model="finDia" />
                     </div>
 
                     <br>
@@ -131,6 +135,54 @@
                     <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<div id="modal-datos-incidencia" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="padding: 10px, 10px">
+                <label>INCIDENCIA</label>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
+                <div class="row">
+                    <div class="col-sm-4"><strong>Cliente:</strong></div>
+                    <div class="col-sm-8">{{clienteV}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4"><strong>Módulo:</strong></div>
+                    <div class="col-sm-8">{{moduloV}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4"><strong>Incidente:</strong></div>
+                    <div class="col-sm-8">{{incidenteV}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4"><strong>Acción a realizar:</strong></div>
+                    <div class="col-sm-8">{{accionesV}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4"><strong>Fecha incidencia:</strong></div>
+                    <div class="col-sm-8">{{fechaV}}</div>
+                </div>
+                <div class="row" ng-show="adjuntoV != ''">
+                    <div class="col-sm-4"><strong>Adjunto:</strong></div>
+                    <div class="col-sm-8">
+                        <a class="btn btn-success btn-xs" target="_blank" href="Web{{adjuntoV}}">
+                            <span class="glyphicon glyphicon-download"></span> Adjunto
+                        </a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4"><strong>Fin de día:</strong></div>
+                    <div class="col-sm-8">{{finDiaV ? 'Sí' : 'No'}}</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+            </div>
         </div>
     </div>
 </div>

@@ -12,15 +12,19 @@ namespace SifizPlanning.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Recursos
+    public partial class CalificacionTicket
     {
-        public int Secuencial { get; set; }
-        public string Titulo { get; set; }
-        public string Detalle { get; set; }
-        public System.DateTime Fecha { get; set; }
-        public int SecuencialModulo { get; set; }
-        public string Adjunto { get; set; }
+        public CalificacionTicket()
+        {
+            this.calificacionticketcliente = new HashSet<CalificacionTicketCliente>();
+        }
     
-        public virtual Modulo modulo { get; set; }
+        public int Secuencial { get; set; }
+        public string Codigo { get; set; }
+        public string Descripcion { get; set; }
+        public decimal EstaActivo { get; set; }
+        public int NumeroVerificador { get; set; }
+    
+        public virtual ICollection<CalificacionTicketCliente> calificacionticketcliente { get; set; }
     }
 }

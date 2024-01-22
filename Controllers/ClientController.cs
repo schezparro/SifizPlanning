@@ -2054,5 +2054,101 @@ namespace SifizPlanning.Controllers
                 return Json(resp);
             }
         }
+
+
+        //Guardar calificacion del ticket
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, CLIENTE")]
+        public ActionResult GuardarCalificacionTicket(int idPregunta, int idticket, int calificacion)
+        {
+            try
+            {
+                //Buscando si ya existe
+                CalificacionTicketCliente calificacionTicket = db.CalificacionTicketCliente.Where(x =>
+                                                            x.SecuencialTicket == idticket &&
+                                                            x.SecuencialCalificacion == idPregunta).FirstOrDefault();
+                if (calificacionTicket != null)
+                {
+                    calificacionTicket.Calificacion = calificacion;
+                }
+                else
+                {
+                    calificacionTicket = new CalificacionTicketCliente
+                    {
+                        SecuencialCalificacion = idPregunta,
+                        SecuencialTicket = idticket,
+                        Calificacion = calificacion,
+                        
+                    };
+                    db.CalificacionTicketCliente.Add(calificacionTicket);
+                }
+
+                db.SaveChanges();
+
+                var resp = new
+                {
+                    success = true
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+
+        // Dar Preguntas para calificacion del ticket
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, CLIENTE")]
+        public ActionResult PreguntasCalificarTicket(int idticket)
+        {
+            try
+            {
+                List<object> calificacion = new List<object>();
+                var pregunta = db.CalificacionTicket.Where(x => x.EstaActivo == 1).OrderBy(x => x.Descripcion).ToList();
+
+                foreach (var preg in pregunta)
+                {
+                    CalificacionTicketCliente ctc = db.CalificacionTicketCliente.Where(x =>
+                                                                                x.SecuencialCalificacion == preg.Secuencial &&
+                                                                                x.SecuencialTicket == idticket).FirstOrDefault();
+                    int calif = 0;
+                    if (ctc != null)
+                    {
+                        calif = (int)ctc.Calificacion;
+                    }
+
+                    calificacion.Add(new
+                    {
+                        idpregunta = preg.Secuencial,
+                        descripcion = preg.Descripcion,
+                        calificacion = calif
+                    });
+                }
+
+                var resp = new
+                {
+                    success = true,
+                    preguntas = calificacion
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
     }
 }

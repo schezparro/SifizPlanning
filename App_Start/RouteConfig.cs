@@ -1013,6 +1013,18 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "DarDatosIncidenciaUsuario",
+                url: "user/dar-datos-incidencia-usuario/{id}",
+                defaults: new { controller = "User", action = "DarDatosIncidenciaUsuario", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarDatosRecursoUsuario",
+                url: "user/dar-datos-recurso-usuario/{id}",
+                defaults: new { controller = "User", action = "DarDatosRecursoUsuario", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "DarTipoModulo",
                 url: "user/tipo-modulo/{id}",
                 defaults: new { controller = "User", action = "DarTipoModulo", id = UrlParameter.Optional }
@@ -1434,6 +1446,18 @@ namespace SifizPlanning
                 name: "EnviarEmailTicketDevueltoCliente",
                 url: "clientes/enviar-email-ticket-devuelto-cliente",
                 defaults: new { controller = "Client", action = "EnviarEmailTicketDevueltoCliente", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "PreguntasCalificarTicket",
+                url: "clientes/preguntas-calificar-ticket",
+                defaults: new { controller = "Client", action = "PreguntasCalificarTicket", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "GuardarCalificacionTicket",
+                url: "clientes/guardar-calificacion-ticket",
+                defaults: new { controller = "Client", action = "GuardarCalificacionTicket", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(

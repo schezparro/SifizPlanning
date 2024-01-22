@@ -2821,39 +2821,39 @@ r in db.Rol on ur.rol equals r
         public ActionResult IncidenciasUsuario(int start, int lenght, string filtro = "", bool finDia = false)
         {
 
+          try
+          {
+            var incidenciasUsuario = (from inc in db.Incidencias
+                          join md in db.Modulo on inc.SecuencialModulo equals md.Secuencial
+                          join cli in db.Cliente on inc.SecuencialCliente equals cli.Secuencial
+                          select new
+                          {
+                                                  secuencial = inc.Secuencial,
+                            cliente = cli.Descripcion,
+                            modulo = md.Descripcion,
+                            incidente = inc.Incidente,
+                            acciones = inc.Acciones,
+                            adjunto = inc.Adjunto,
+                            fecha = inc.Fecha.HasValue ? inc.Fecha : DateTime.MinValue,
+                            findia = inc.FinDia == 1 ? "SI" : "NO"
+                          }).ToList();
 
-            try
+
+            if(finDia)
             {
-                var incidenciasUsuario = (from inc in db.Incidencias
-                                          join md in db.Modulo on inc.SecuencialModulo equals md.Secuencial
-                                          join cli in db.Cliente on inc.SecuencialCliente equals cli.Secuencial
-                                          select new
-                                          {
-                                              cliente = cli.Descripcion,
-                                              modulo = md.Descripcion,
-                                              incidente = inc.Incidente,
-                                              acciones = inc.Acciones,
-                                              adjunto = inc.Adjunto,
-                                              fecha = inc.Fecha.HasValue ? inc.Fecha : DateTime.MinValue,
-                                              findia = inc.FinDia == 1 ? "SI" : "NO"
-                                          }).ToList();
+              incidenciasUsuario = incidenciasUsuario.Where(inc => inc.findia == "SI").ToList();
+            }
 
 
-                if (finDia)
-                {
-                    incidenciasUsuario = incidenciasUsuario.Where(inc => inc.findia == "SI").ToList();
-                }
-
-
-                if (filtro != "")
-                {
-                    incidenciasUsuario = incidenciasUsuario.Where(x =>
-                                                                    x.cliente.ToString().ToLower().Contains(filtro.ToLower()) ||
-                                                                    x.modulo.ToString().ToLower().Contains(filtro.ToLower()) ||
-                                                                    x.incidente.ToString().ToLower().Contains(filtro.ToLower()) ||
-                                                                    x.acciones.ToString().ToLower().Contains(filtro.ToLower())
-                                                                ).ToList();
-                }
+            if(filtro != "")
+            {
+              incidenciasUsuario = incidenciasUsuario.Where(x =>
+                                      x.cliente.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                      x.modulo.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                      x.incidente.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                      x.acciones.ToString().ToLower().Contains(filtro.ToLower())
+                                    ).ToList();
+            }
 
                 int total = incidenciasUsuario.Count();
                 incidenciasUsuario = incidenciasUsuario.Skip(start).Take(lenght).ToList();
@@ -2877,7 +2877,94 @@ r in db.Rol on ur.rol equals r
             }
         }
 
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult DarDatosIncidenciaUsuario(int secuencialIncidencia)
+        {
+            try
+            {
+                Incidencias incidencia = db.Incidencias.Find(secuencialIncidencia);
+                if (incidencia == null)
+                {
+                    throw new Exception("La incidencia no se encuentra en el sistema");
+                }
 
+                var inc = (from i in db.Incidencias
+                            join md in db.Modulo on i.SecuencialModulo equals md.Secuencial
+                            join cli in db.Cliente on i.SecuencialCliente equals cli.Secuencial
+                           where i.Secuencial == secuencialIncidencia
+                                  select new
+                                  {
+                                      secuencial = i.Secuencial,
+                                      cliente = cli.Descripcion,
+                                      modulo = md.Descripcion,
+                                      incidente = i.Incidente,
+                                      acciones = i.Acciones,
+                                      adjunto = i.Adjunto,
+                                      fecha = i.Fecha.HasValue ? i.Fecha.Value.ToString() : "",
+                                      findia = i.FinDia == 1 ? "SI" : "NO"
+                                  }).FirstOrDefault();
+
+                var result = new
+                {
+                    success = true,
+                    incidenciaResult = inc
+                };
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+                var result = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(result);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult DarDatosRecursoUsuario(int secuencialRecurso)
+        {
+            try
+            {
+                Recursos recurso = db.Recursos.Find(secuencialRecurso);
+                if (recurso == null)
+                {
+                    throw new Exception("El recurso no se encuentra en el sistema");
+                }
+
+                var rec = (from r in db.Recursos
+                           join md in db.Modulo on r.SecuencialModulo equals md.Secuencial
+                           where r.Secuencial == secuencialRecurso
+                           select new
+                           {
+                               secuencial = r.Secuencial,
+                               titulo = r.Titulo,
+                               modulo = md.Descripcion,
+                               detalle = r.Detalle,
+                               adjunto = r.Adjunto,
+                               fecha = r.Fecha,
+                           }).FirstOrDefault();
+
+                var result = new
+                {
+                    success = true,
+                    recursoResult = rec
+                };
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+                var result = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(result);
+            }
+        }
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
@@ -3030,96 +3117,95 @@ r in db.Rol on ur.rol equals r
         public ActionResult RecursosUsuario(int start, int lenght, string filtro = "", bool todos = false)
         {
 
-
-            try
-            {
-                var recursosUsuario = (from rec in db.Recursos
-                                       join catrec in db.CategoriaRecursos on rec.SecuencialCategoriaRecursos equals catrec.Secuencial
-                                       select new
-                                       {
-                                           titulo = rec.Titulo,
-                                           detalle = rec.Detalle,
-                                           fecha = rec.Fecha,
-                                           categoria = rec.CategoriaRecursos.Descripcion,
-                                           adjunto = rec.Adjunto
-                                       }).ToList();
+			try
+			{
+				var recursosUsuario = (from rec in db.Recursos
+									   join modulo in db.Modulo on rec.SecuencialModulo equals modulo.Secuencial
+									   select new
+									   {
+                                           secuencial = rec.Secuencial,
+										   titulo = rec.Titulo,
+										   detalle = rec.Detalle,
+										   fecha = rec.Fecha,
+										   modulo = rec.modulo.Descripcion,
+										   adjunto = rec.Adjunto
+									   }).ToList();
 
                 int total = recursosUsuario.Count();
                 recursosUsuario = recursosUsuario.Skip(start).Take(lenght).ToList();
 
-                var result = new
-                {
-                    success = true,
-                    total = total,
-                    recursos = recursosUsuario
-                };
-                return Json(result);
-            }
-            catch (Exception e)
-            {
-                var result = new
-                {
-                    success = false,
-                    msg = e.Message
-                };
-                return Json(result);
-            }
-        }
+				var result = new
+				{
+					success = true,
+					total = total,
+					recursos = recursosUsuario
+				};
+				return Json(result);
+			}
+			catch(Exception e)
+			{
+				var result = new
+				{
+					success = false,
+					msg = e.Message
+				};
+				return Json(result);
+			}
+		}
 
 
 
-        [HttpPost]
-        [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult DarCategoriaRecurso()
-        {
-            var datos = (from cat in db.CategoriaRecursos
-                         orderby cat.Descripcion
-                         select new
-                         {
-                             id = cat.Secuencial,
-                             nombre = cat.Descripcion
-                         }).ToList();
+		[HttpPost]
+		[Authorize(Roles = "USER, ADMIN")]
+		public ActionResult DarCategoriaRecurso()
+		{
+			var datos = (from cat in db.CategoriaRecursos
+						 orderby cat.Descripcion
+						 select new
+						 {
+							 id = cat.Secuencial,
+							 nombre = cat.Descripcion
+						 }).ToList();
 
-            return Json(new
-            {
-                success = true,
-                categoriaRecursos = datos
-            });
-        }
+			return Json(new
+			{
+				success = true,
+				categoriaRecursos = datos
+			});
+		}
 
 
-        //Guardar modal nuevos recursos
-        [HttpPost]
-        [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult GuardarRecurso(string titulo, string detalle, DateTime fecha, int categoria, HttpPostedFileBase[] adjuntos = null)
-        {
-            try
-            {
-                var s = new JavaScriptSerializer();
-                var Url = "";
-                if (adjuntos != null)
-                {
-                    foreach (var adj in adjuntos.Where(adj => adj != null))
-                    {
-                        string extFile = Path.GetExtension(adj.FileName);
-                        string newNameFile = Utiles.RandomString(10) + extFile;
-                        newNameFile = System.IO.Path.GetRandomFileName() + extFile;
-                        string path = Path.Combine(Server.MapPath("~/Web/resources/recursos"), newNameFile);
-                        adj.SaveAs(path);
+		//Guardar modal nuevos recursos
+		[HttpPost]
+		[Authorize(Roles = "USER, ADMIN")]
+		public ActionResult GuardarRecurso(string titulo, string detalle, DateTime fecha, int modulo, HttpPostedFileBase[] adjuntos = null)
+		{
+			try
+			{
+				var s = new JavaScriptSerializer();
+				var Url = "";
+				if(adjuntos != null)
+				{
+					foreach(var adj in adjuntos.Where(adj => adj != null))
+					{
+						string extFile = Path.GetExtension(adj.FileName);
+						string newNameFile = Utiles.RandomString(10) + extFile;
+						newNameFile = System.IO.Path.GetRandomFileName() + extFile;
+						string path = Path.Combine(Server.MapPath("~/Web/resources/recursos"), newNameFile);
+						adj.SaveAs(path);
 
-                        Url = "/resources/recursos" + "/" + newNameFile;
-                        break;
-                    }
-                }
-                Recursos nuevoRecurso = new Recursos
-                {
-                    Titulo = titulo,
-                    Detalle = detalle,
-                    Fecha = fecha,
-                    SecuencialCategoriaRecursos = categoria,
-                    Adjunto = Url
-                };
-
+						Url = "/resources/recursos" + "/" + newNameFile;
+						break;
+					}
+				}
+				Recursos nuevoRecurso = new Recursos
+				{
+					Titulo = titulo,
+					Detalle = detalle,
+					Fecha = fecha,
+					SecuencialModulo = modulo,
+					Adjunto = Url
+				};
                 db.Recursos.Add(nuevoRecurso);
                 db.SaveChanges();
 
