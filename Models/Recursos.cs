@@ -20,6 +20,8 @@ namespace SifizPlanning.Models
         public System.DateTime Fecha { get; set; }
         public int SecuencialModulo { get; set; }
         public string Adjunto { get; set; }
+        public string TiempoCapacitacion { get; set; }
+        public string AdjuntoAsistencia { get; set; }
     
         public virtual Modulo modulo { get; set; }
     }
