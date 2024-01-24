@@ -1645,6 +1645,8 @@
           <Property Name="FECHA" Type="date" Nullable="false" />
           <Property Name="SECUENCIALMODULO" Type="int" Nullable="false" />
           <Property Name="ADJUNTO" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="ADJUNTOASISTENCIA" Type="varchar" MaxLength="255" />
+          <Property Name="TIEMPOCAPACITACION" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="RENEGOCIACION">
           <Key>
@@ -12014,6 +12016,8 @@
           <Property Name="SecuencialModulo" Type="Int32" Nullable="false" />
           <Property Name="Adjunto" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="modulo" Relationship="SifizPlanningModel.FK_RECURSOS_MODULO" FromRole="RECURSOS" ToRole="Modulo" />
+          <Property Name="TiempoCapacitacion" Type="String" />
+          <Property Name="AdjuntoAsistencia" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
         </EntityType>
         <Association Name="FK_RECURSOS_MODULO">
           <End Type="SifizPlanningModel.Modulo" Role="Modulo" Multiplicity="1" />
@@ -14102,6 +14106,8 @@
           <EntitySetMapping Name="Recursos">
             <EntityTypeMapping TypeName="SifizPlanningModel.Recursos">
               <MappingFragment StoreEntitySet="RECURSOS">
+                <ScalarProperty Name="AdjuntoAsistencia" ColumnName="ADJUNTOASISTENCIA" />
+                <ScalarProperty Name="TiempoCapacitacion" ColumnName="TIEMPOCAPACITACION" />
                 <ScalarProperty Name="Adjunto" ColumnName="ADJUNTO" />
                 <ScalarProperty Name="SecuencialModulo" ColumnName="SECUENCIALMODULO" />
                 <ScalarProperty Name="Fecha" ColumnName="FECHA" />

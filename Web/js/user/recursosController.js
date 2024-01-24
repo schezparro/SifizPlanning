@@ -23,7 +23,7 @@
         recursos.success(function (data) {
             $scope.loading.hide();
             if (data.success === true) {
-
+                console.log(data);
                 var posPagin = pagina;
                 $scope.recursos = data.recursos;
                 $scope.cantPaginas = Math.ceil(data.total / numerosPorPagina);
@@ -93,7 +93,9 @@
         $scope.newTitulo = '';
         $scope.newDetalle = '';
         $scope.moduloSeleccionado = '';
-        $scope.newTitulo = '';
+        $scope.newHoras = "";
+        $scope.newMins = ""; 
+
         angular.element("#modal-agregar-recursos").modal("show");
     };
 
@@ -110,6 +112,7 @@
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
 
         var fileInput = angular.element('#uniqueFileInputIDRecursos')[0];
+        var fileInput2 = angular.element('#uniqueFileInputIDRecursos2')[0];
         var modulo = angular.element("#select-modulo-recursos")[0].value;
 
         var fechaSistema = new Date().toISOString();
@@ -120,6 +123,10 @@
         formData.append('fecha', fechaSistema);
         formData.append('modulo', modulo);
         formData.append('adjuntos', fileInput.files[0]);
+        formData.append('adjuntoAsistencia', fileInput2.files[0]);
+        formData.append('tiempo', $scope.newHoras + ":" + $scope.newMins);
+
+        console.log(formData);
 
         var ajaxEnvioDatos = $http({
             method: 'POST',
@@ -154,11 +161,15 @@
             });
         ajaxObtenerIncidencia.success(function (data) {
             if (data.success === true) {
+                console.log(data);
+
                 $scope.tituloV = data.recursoResult.titulo;
                 $scope.detalleV = data.recursoResult.detalle;
                 $scope.moduloV = data.recursoResult.modulo;
                 $scope.fechaV= data.recursoResult.fecha;
                 $scope.adjuntoV = data.recursoResult.adjunto;
+                $scope.tiempoV = data.recursoResult.tiempo;
+                $scope.adjuntoAsistenciaV = data.recursoResult.adjuntoAsistencia;
 
                 angular.element("#modal-datos-recurso").modal("show");
             }
@@ -171,10 +182,13 @@
     // Obtén la plantilla y añade un ID único
     var fileInputTemplate = angular.element("#htmlFile").html();
     var uniqueId = "uniqueFileInputIDRecursos"; // Genera un ID único de alguna manera
+    var uniqueId2 = "uniqueFileInputIDRecursos2"; // Genera un ID único de alguna manera
     var fileInputWithId = fileInputTemplate.replace('<input type="file"', '<input type="file" id="' + uniqueId + '"');
+    var fileInputWithId2 = fileInputTemplate.replace('<input type="file"', '<input type="file" id="' + uniqueId2 + '"');
 
     // Añade la plantilla modificada al DOM
     angular.element("#panel-add-adjuntorecursos").append(fileInputWithId);
+    angular.element("#panel-add-adjuntorecursos2").append(fileInputWithId2);
 }]);
 
 //Servicio del filtrado para limpiar los filtros

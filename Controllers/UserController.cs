@@ -2946,6 +2946,7 @@ r in db.Rol on ur.rol equals r
                                detalle = r.Detalle,
                                adjunto = r.Adjunto,
                                fecha = r.Fecha,
+                               tiempo = r.TiempoCapacitacion
                            }).FirstOrDefault();
 
                 var result = new
@@ -3128,7 +3129,9 @@ r in db.Rol on ur.rol equals r
 										   detalle = rec.Detalle,
 										   fecha = rec.Fecha,
 										   modulo = rec.modulo.Descripcion,
-										   adjunto = rec.Adjunto
+										   adjunto = rec.Adjunto,
+                                           tiempo = rec.TiempoCapacitacion,
+                                           adjuntoAsistencia = rec.AdjuntoAsistencia
 									   }).ToList();
 
                 int total = recursosUsuario.Count();
@@ -3178,7 +3181,7 @@ r in db.Rol on ur.rol equals r
 		//Guardar modal nuevos recursos
 		[HttpPost]
 		[Authorize(Roles = "USER, ADMIN")]
-		public ActionResult GuardarRecurso(string titulo, string detalle, DateTime fecha, int modulo, HttpPostedFileBase[] adjuntos = null)
+		public ActionResult GuardarRecurso(string titulo, string detalle, DateTime fecha, int modulo, string tiempo, HttpPostedFileBase[] adjuntos = null, HttpPostedFileBase[] adjuntoAsistencia = null)
 		{
 			try
 			{
@@ -3198,14 +3201,33 @@ r in db.Rol on ur.rol equals r
 						break;
 					}
 				}
+                
+                var adjuntoAsistenciaUrl = "";
+				if(adjuntoAsistencia != null)
+				{
+					foreach(var adj in adjuntoAsistencia.Where(adj => adj != null))
+					{
+						string extFile = Path.GetExtension(adj.FileName);
+						string newNameFile = Utiles.RandomString(10) + extFile;
+						newNameFile = System.IO.Path.GetRandomFileName() + extFile;
+						string path = Path.Combine(Server.MapPath("~/Web/resources/recursos"), newNameFile);
+						adj.SaveAs(path);
+
+                        adjuntoAsistenciaUrl = "/resources/recursos" + "/" + newNameFile;
+						break;
+					}
+				}
+
 				Recursos nuevoRecurso = new Recursos
 				{
 					Titulo = titulo,
 					Detalle = detalle,
 					Fecha = fecha,
 					SecuencialModulo = modulo,
-					Adjunto = Url
-				};
+					Adjunto = Url,
+                    TiempoCapacitacion = tiempo,
+                    AdjuntoAsistencia = adjuntoAsistenciaUrl,
+                };
                 db.Recursos.Add(nuevoRecurso);
                 db.SaveChanges();
 

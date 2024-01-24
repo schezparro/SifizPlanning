@@ -1095,6 +1095,10 @@
     <Content Include="SCRIPTSDATABASE\12\21-CALIFICACIONTICKETok.sql" />
     <Content Include="SCRIPTSDATABASE\12\22-CALIFICACIONTICKETCLIENTEok.sql" />
     <Content Include="SCRIPTSDATABASE\12\23-ESTIMACIONTICKET.sql" />
+    <Content Include="SCRIPTSDATABASE\12\24-RECURSOS.sql" />
+    <Content Include="SCRIPTSDATABASE\12\25-RECURSOS.sql" />
+    <Content Include="SCRIPTSDATABASE\12\26-RECURSOS.sql" />
+    <Content Include="SCRIPTSDATABASE\12\27-RECURSOS.sql" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
