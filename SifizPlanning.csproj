@@ -1588,6 +1588,7 @@
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="SCRIPTSDATABASE\01\" />
     <Folder Include="SCRIPTSDATABASE\02\" />
+    <Folder Include="SCRIPTSDATABASE\TEMPSCRIPTS\" />
     <Folder Include="Web\files\asignaciones\" />
     <Folder Include="Web\images\chat\" />
     <Folder Include="Web\images\logFBSError\" />

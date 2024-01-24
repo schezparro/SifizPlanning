@@ -3096,11 +3096,9 @@ r in db.Rol on ur.rol equals r
                     Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmail, asuntoEmail);
                 }
 
-                if (findia == true)
+                if (findia)
                 {
-                    string email = grupoOperaciones;
-                    string[] emails = email.Split(',');
-                    List<string> correosDestinos = emails.ToList();
+					List<string> correosDestinos = Utiles.CorreoPorGrupoEmail("OPERACIONES");
 
                     string textoEmail = @"<div class='textoCuerpo'><br/>";
                     textoEmail += "Buen día,";
