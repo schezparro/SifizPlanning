@@ -3096,6 +3096,25 @@ r in db.Rol on ur.rol equals r
                     Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmail, asuntoEmail);
                 }
 
+                if (findia == true)
+                {
+                    string email = grupoOperaciones;
+                    string[] emails = email.Split(',');
+                    List<string> correosDestinos = emails.ToList();
+
+                    string textoEmail = @"<div class='textoCuerpo'><br/>";
+                    textoEmail += "Buen día,";
+                    textoEmail += @"<br/>";
+
+                    textoEmail += "Por el presente se le notifica de que se ha detectado una nueva incidencia de Fin de Dia";
+                    textoEmail += @"<br/>";
+                    textoEmail += "Puede revizarla en el Sifizplanning en el módulo de desarrolladores y darle seguimiento.";
+                    textoEmail += "</div>";
+
+                    string asuntoEmail = "Nueva incidencia de Fin de Dia";
+                    Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmail, asuntoEmail);
+                }
+
                 return Json(new
                 {
                     success = true,
