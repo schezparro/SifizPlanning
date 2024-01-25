@@ -2821,39 +2821,39 @@ r in db.Rol on ur.rol equals r
         public ActionResult IncidenciasUsuario(int start, int lenght, string filtro = "", bool finDia = false)
         {
 
-          try
-          {
-            var incidenciasUsuario = (from inc in db.Incidencias
-                          join md in db.Modulo on inc.SecuencialModulo equals md.Secuencial
-                          join cli in db.Cliente on inc.SecuencialCliente equals cli.Secuencial
-                          select new
-                          {
-                                                  secuencial = inc.Secuencial,
-                            cliente = cli.Descripcion,
-                            modulo = md.Descripcion,
-                            incidente = inc.Incidente,
-                            acciones = inc.Acciones,
-                            adjunto = inc.Adjunto,
-                            fecha = inc.Fecha.HasValue ? inc.Fecha : DateTime.MinValue,
-                            findia = inc.FinDia == 1 ? "SI" : "NO"
-                          }).ToList();
-
-
-            if(finDia)
+            try
             {
-              incidenciasUsuario = incidenciasUsuario.Where(inc => inc.findia == "SI").ToList();
-            }
+                var incidenciasUsuario = (from inc in db.Incidencias
+                                          join md in db.Modulo on inc.SecuencialModulo equals md.Secuencial
+                                          join cli in db.Cliente on inc.SecuencialCliente equals cli.Secuencial
+                                          select new
+                                          {
+                                              secuencial = inc.Secuencial,
+                                              cliente = cli.Descripcion,
+                                              modulo = md.Descripcion,
+                                              incidente = inc.Incidente,
+                                              acciones = inc.Acciones,
+                                              adjunto = inc.Adjunto,
+                                              fecha = inc.Fecha.HasValue ? inc.Fecha : DateTime.MinValue,
+                                              findia = inc.FinDia == 1 ? "SI" : "NO"
+                                          }).ToList();
 
 
-            if(filtro != "")
-            {
-              incidenciasUsuario = incidenciasUsuario.Where(x =>
-                                      x.cliente.ToString().ToLower().Contains(filtro.ToLower()) ||
-                                      x.modulo.ToString().ToLower().Contains(filtro.ToLower()) ||
-                                      x.incidente.ToString().ToLower().Contains(filtro.ToLower()) ||
-                                      x.acciones.ToString().ToLower().Contains(filtro.ToLower())
-                                    ).ToList();
-            }
+                if (finDia)
+                {
+                    incidenciasUsuario = incidenciasUsuario.Where(inc => inc.findia == "SI").ToList();
+                }
+
+
+                if (filtro != "")
+                {
+                    incidenciasUsuario = incidenciasUsuario.Where(x =>
+                                            x.cliente.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.modulo.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.incidente.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.acciones.ToString().ToLower().Contains(filtro.ToLower())
+                                          ).ToList();
+                }
 
                 int total = incidenciasUsuario.Count();
                 incidenciasUsuario = incidenciasUsuario.Skip(start).Take(lenght).ToList();
@@ -2890,20 +2890,20 @@ r in db.Rol on ur.rol equals r
                 }
 
                 var inc = (from i in db.Incidencias
-                            join md in db.Modulo on i.SecuencialModulo equals md.Secuencial
-                            join cli in db.Cliente on i.SecuencialCliente equals cli.Secuencial
+                           join md in db.Modulo on i.SecuencialModulo equals md.Secuencial
+                           join cli in db.Cliente on i.SecuencialCliente equals cli.Secuencial
                            where i.Secuencial == secuencialIncidencia
-                                  select new
-                                  {
-                                      secuencial = i.Secuencial,
-                                      cliente = cli.Descripcion,
-                                      modulo = md.Descripcion,
-                                      incidente = i.Incidente,
-                                      acciones = i.Acciones,
-                                      adjunto = i.Adjunto,
-                                      fecha = i.Fecha.HasValue ? i.Fecha.Value.ToString() : "",
-                                      findia = i.FinDia == 1 ? "SI" : "NO"
-                                  }).FirstOrDefault();
+                           select new
+                           {
+                               secuencial = i.Secuencial,
+                               cliente = cli.Descripcion,
+                               modulo = md.Descripcion,
+                               incidente = i.Incidente,
+                               acciones = i.Acciones,
+                               adjunto = i.Adjunto,
+                               fecha = i.Fecha.HasValue ? i.Fecha.Value.ToString() : "",
+                               findia = i.FinDia == 1 ? "SI" : "NO"
+                           }).FirstOrDefault();
 
                 var result = new
                 {
@@ -3098,7 +3098,7 @@ r in db.Rol on ur.rol equals r
 
                 if (findia)
                 {
-					List<string> correosDestinos = Utiles.CorreoPorGrupoEmail("OPERACIONES");
+                    List<string> correosDestinos = Utiles.CorreoPorGrupoEmail("OPERACIONES");
 
                     string textoEmail = @"<div class='textoCuerpo'><br/>";
                     textoEmail += "Buen día,";
@@ -3135,114 +3135,114 @@ r in db.Rol on ur.rol equals r
         public ActionResult RecursosUsuario(int start, int lenght, string filtro = "", bool todos = false)
         {
 
-			try
-			{
-				var recursosUsuario = (from rec in db.Recursos
-									   join modulo in db.Modulo on rec.SecuencialModulo equals modulo.Secuencial
-									   select new
-									   {
+            try
+            {
+                var recursosUsuario = (from rec in db.Recursos
+                                       join modulo in db.Modulo on rec.SecuencialModulo equals modulo.Secuencial
+                                       select new
+                                       {
                                            secuencial = rec.Secuencial,
-										   titulo = rec.Titulo,
-										   detalle = rec.Detalle,
-										   fecha = rec.Fecha,
-										   modulo = rec.modulo.Descripcion,
-										   adjunto = rec.Adjunto,
-                                           tiempo = rec.TiempoCapacitacion,
+                                           titulo = rec.Titulo,
+                                           detalle = rec.Detalle,
+                                           fecha = rec.Fecha,
+                                           modulo = rec.modulo.Descripcion,
+                                           adjunto = rec.Adjunto,
+                                           tiempo = rec.TiempoCapacitacion.ToString().Substring(0, 5),
                                            adjuntoAsistencia = rec.AdjuntoAsistencia
-									   }).ToList();
+                                       }).ToList();
 
                 int total = recursosUsuario.Count();
                 recursosUsuario = recursosUsuario.Skip(start).Take(lenght).ToList();
 
-				var result = new
-				{
-					success = true,
-					total = total,
-					recursos = recursosUsuario
-				};
-				return Json(result);
-			}
-			catch(Exception e)
-			{
-				var result = new
-				{
-					success = false,
-					msg = e.Message
-				};
-				return Json(result);
-			}
-		}
+                var result = new
+                {
+                    success = true,
+                    total = total,
+                    recursos = recursosUsuario
+                };
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+                var result = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(result);
+            }
+        }
 
 
 
-		[HttpPost]
-		[Authorize(Roles = "USER, ADMIN")]
-		public ActionResult DarCategoriaRecurso()
-		{
-			var datos = (from cat in db.CategoriaRecursos
-						 orderby cat.Descripcion
-						 select new
-						 {
-							 id = cat.Secuencial,
-							 nombre = cat.Descripcion
-						 }).ToList();
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult DarCategoriaRecurso()
+        {
+            var datos = (from cat in db.CategoriaRecursos
+                         orderby cat.Descripcion
+                         select new
+                         {
+                             id = cat.Secuencial,
+                             nombre = cat.Descripcion
+                         }).ToList();
 
-			return Json(new
-			{
-				success = true,
-				categoriaRecursos = datos
-			});
-		}
+            return Json(new
+            {
+                success = true,
+                categoriaRecursos = datos
+            });
+        }
 
 
-		//Guardar modal nuevos recursos
-		[HttpPost]
-		[Authorize(Roles = "USER, ADMIN")]
-		public ActionResult GuardarRecurso(string titulo, string detalle, DateTime fecha, int modulo, string tiempo, HttpPostedFileBase[] adjuntos = null, HttpPostedFileBase[] adjuntoAsistencia = null)
-		{
-			try
-			{
-				var s = new JavaScriptSerializer();
-				var Url = "";
-				if(adjuntos != null)
-				{
-					foreach(var adj in adjuntos.Where(adj => adj != null))
-					{
-						string extFile = Path.GetExtension(adj.FileName);
-						string newNameFile = Utiles.RandomString(10) + extFile;
-						newNameFile = System.IO.Path.GetRandomFileName() + extFile;
-						string path = Path.Combine(Server.MapPath("~/Web/resources/recursos"), newNameFile);
-						adj.SaveAs(path);
+        //Guardar modal nuevos recursos
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult GuardarRecurso(string titulo, string detalle, DateTime fecha, int modulo, string tiempo, HttpPostedFileBase[] adjuntos = null, HttpPostedFileBase[] adjuntoAsistencia = null)
+        {
+            try
+            {
+                var s = new JavaScriptSerializer();
+                var Url = "";
+                if (adjuntos != null)
+                {
+                    foreach (var adj in adjuntos.Where(adj => adj != null))
+                    {
+                        string extFile = Path.GetExtension(adj.FileName);
+                        string newNameFile = Utiles.RandomString(10) + extFile;
+                        newNameFile = System.IO.Path.GetRandomFileName() + extFile;
+                        string path = Path.Combine(Server.MapPath("~/Web/resources/recursos"), newNameFile);
+                        adj.SaveAs(path);
 
-						Url = "/resources/recursos" + "/" + newNameFile;
-						break;
-					}
-				}
-                
+                        Url = "/resources/recursos" + "/" + newNameFile;
+                        break;
+                    }
+                }
+
                 var adjuntoAsistenciaUrl = "";
-				if(adjuntoAsistencia != null)
-				{
-					foreach(var adj in adjuntoAsistencia.Where(adj => adj != null))
-					{
-						string extFile = Path.GetExtension(adj.FileName);
-						string newNameFile = Utiles.RandomString(10) + extFile;
-						newNameFile = System.IO.Path.GetRandomFileName() + extFile;
-						string path = Path.Combine(Server.MapPath("~/Web/resources/recursos"), newNameFile);
-						adj.SaveAs(path);
+                if (adjuntoAsistencia != null)
+                {
+                    foreach (var adj in adjuntoAsistencia.Where(adj => adj != null))
+                    {
+                        string extFile = Path.GetExtension(adj.FileName);
+                        string newNameFile = Utiles.RandomString(10) + extFile;
+                        newNameFile = System.IO.Path.GetRandomFileName() + extFile;
+                        string path = Path.Combine(Server.MapPath("~/Web/resources/recursos"), newNameFile);
+                        adj.SaveAs(path);
 
                         adjuntoAsistenciaUrl = "/resources/recursos" + "/" + newNameFile;
-						break;
-					}
-				}
+                        break;
+                    }
+                }
 
-				Recursos nuevoRecurso = new Recursos
-				{
-					Titulo = titulo,
-					Detalle = detalle,
-					Fecha = fecha,
-					SecuencialModulo = modulo,
-					Adjunto = Url,
-                    TiempoCapacitacion = tiempo,
+                Recursos nuevoRecurso = new Recursos
+                {
+                    Titulo = titulo,
+                    Detalle = detalle,
+                    Fecha = fecha,
+                    SecuencialModulo = modulo,
+                    Adjunto = Url,
+                    TiempoCapacitacion = TimeSpan.Parse(tiempo),
                     AdjuntoAsistencia = adjuntoAsistenciaUrl,
                 };
                 db.Recursos.Add(nuevoRecurso);
@@ -4379,15 +4379,8 @@ r in db.Rol on ur.rol equals r
                     throw new Exception("No se encontró la estimación.");
                 }
 
-                var tiposRecursos = (from tr in db.TipoRecurso
-                                     select new
-                                     {
-                                         id = tr.Secuencial,
-                                         descripcion = tr.Descripcion
-                                     }).ToList();
-
                 var itemsEspeciales = (from ie in db.ItemEspecial
-                                       join tr in db.TipoRecurso on ie.SecuencialTipoRecurso equals tr.Secuencial
+                                       join nc in db.NivelColaborador on ie.SecuencialNivelColaborador equals nc.Secuencial
                                        where ie.SecuencialEstimacion == estimacion.Secuencial
                                        select new
                                        {
@@ -4395,14 +4388,13 @@ r in db.Rol on ur.rol equals r
                                            descripcion = ie.Descripcion,
                                            tiempoEstimacion = ie.TiempoEstimacion,
                                            idEstimacion = ie.SecuencialEstimacion,
-                                           idTipoRecurso = ie.SecuencialTipoRecurso,
-                                           recurso = tr.Descripcion
+                                           idNivelColab = ie.SecuencialNivelColaborador,
+                                           nivel = nc.Descripcion
                                        }).ToList();
 
                 var resp = new
                 {
                     success = true,
-                    recursos = tiposRecursos,
                     items = itemsEspeciales,
                 };
                 return Json(resp);
@@ -4420,7 +4412,7 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult GuardarItemEspecial(int idEstimacion, int idRecurso, string descripcion, int tiempoEstimacion)
+        public ActionResult GuardarItemEspecial(int idEstimacion, int idNivelColab, string descripcion, int tiempoEstimacion)
         {
             try
             {
@@ -4430,10 +4422,10 @@ r in db.Rol on ur.rol equals r
                     throw new Exception("No se encontró la estimación.");
                 }
 
-                TipoRecurso tipoRecurso = db.TipoRecurso.Find(idRecurso);
-                if (tipoRecurso == null)
+                NivelColaborador nivelColab = db.NivelColaborador.Find(idNivelColab);
+                if (nivelColab == null)
                 {
-                    throw new Exception("No se encontró el recurso");
+                    throw new Exception("No se encontró el nivel del colaborador.");
                 }
 
                 var item = new ItemEspecial
@@ -4441,7 +4433,7 @@ r in db.Rol on ur.rol equals r
                     Descripcion = descripcion,
                     TiempoEstimacion = tiempoEstimacion,
                     SecuencialEstimacion = estimacion.Secuencial,
-                    SecuencialTipoRecurso = tipoRecurso.Secuencial
+                    SecuencialNivelColaborador = nivelColab.Secuencial
                 };
 
                 db.ItemEspecial.Add(item);
@@ -4466,26 +4458,26 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult EditarItemEspecial(int itemId, int idRecurso, string descripcion, int tiempoEstimacion)
+        public ActionResult EditarItemEspecial(int itemId, int idNivelColab, string descripcion, int tiempoEstimacion)
         {
             try
             {
-                TipoRecurso tipoRecurso = db.TipoRecurso.Find(idRecurso);
-                if (tipoRecurso == null)
+                NivelColaborador nivelColaborador = db.NivelColaborador.Find(idNivelColab);
+                if (nivelColaborador == null)
                 {
-                    throw new Exception("No se encontró el recurso");
+                    throw new Exception("No se encontró el nivel del colaborador.");
                 }
 
                 ItemEspecial item = db.ItemEspecial.Find(itemId);
                 if (item == null)
                 {
-                    throw new Exception("No se encontró el item especial");
+                    throw new Exception("No se encontró el item especial.");
                 }
                 else
                 {
                     item.Descripcion = descripcion;
                     item.TiempoEstimacion = tiempoEstimacion;
-                    item.SecuencialTipoRecurso = tipoRecurso.Secuencial;
+                    item.SecuencialNivelColaborador = nivelColaborador.Secuencial;
                 }
 
                 db.SaveChanges();
@@ -5915,7 +5907,7 @@ r in db.Rol on ur.rol equals r
                 var pivot = 7 + 5 * entregables.Count + sum + 3 - entregables.Count; //Coordenadas de la siguiente row a "TIEMPO TOTAL DE DESARROLLO:"
 
                 var itemsEspeciales = (from ie in db.ItemEspecial
-                                       join tr in db.TipoRecurso on ie.SecuencialTipoRecurso equals tr.Secuencial
+                                       join nc in db.NivelColaborador on ie.SecuencialNivelColaborador equals nc.Secuencial
                                        where ie.SecuencialEstimacion == estimacion.Secuencial
                                        select new
                                        {
@@ -5923,8 +5915,8 @@ r in db.Rol on ur.rol equals r
                                            descripcion = ie.Descripcion,
                                            tiempoEstimacion = ie.TiempoEstimacion,
                                            idEstimacion = ie.SecuencialEstimacion,
-                                           idTipoRecurso = ie.SecuencialTipoRecurso,
-                                           recurso = tr.Descripcion
+                                           idNivelColab = ie.SecuencialNivelColaborador,
+                                           nivel = nc.Descripcion
                                        }).ToList();
 
                 sl.SetCellValue("A" + (pivot + 1), "ITEMS ESPECIALES");
@@ -5954,7 +5946,7 @@ r in db.Rol on ur.rol equals r
                     sl.SetCellValue("A" + (pivot + 1 + index), "T_ESP" + index);
                     sl.SetCellValue("B" + (pivot + 1 + index), item.value.descripcion);
 
-                    sl.SetCellValue("C" + (pivot + 1 + index), item.value.recurso);
+                    sl.SetCellValue("C" + (pivot + 1 + index), item.value.nivel);
                     sl.SetCellStyle("C" + (pivot + 1 + index), style17);
 
                     sl.SetCellValue("D" + (pivot + 1 + index), item.value.tiempoEstimacion);
@@ -6025,7 +6017,7 @@ r in db.Rol on ur.rol equals r
                 sl.SetCellValue("D" + (pivot2 + 4), ((int)estimacion.TiempoInicial + (int)estimacion.TiempoPegado));
                 sl.SetCellStyle("D" + (pivot2 + 4), style14);
                 sl.MergeWorksheetCells("D" + (pivot2 + 4), "E" + (pivot2 + 4));
-                
+
                 sl.SetCellValue("F" + (pivot2 + 4), 0);
                 sl.SetCellStyle("F" + (pivot2 + 4), style14);
                 sl.MergeWorksheetCells("F" + (pivot2 + 4), "G" + (pivot2 + 4));

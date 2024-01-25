@@ -18,9 +18,9 @@ namespace SifizPlanning.Models
         public string Descripcion { get; set; }
         public int TiempoEstimacion { get; set; }
         public int SecuencialEstimacion { get; set; }
-        public int SecuencialTipoRecurso { get; set; }
+        public Nullable<int> SecuencialNivelColaborador { get; set; }
     
         public virtual EstimacionTicket ESTIMACIONTICKET { get; set; }
-        public virtual TipoRecurso TIPORECURSO { get; set; }
+        public virtual NivelColaborador NIVELCOLABORADOR { get; set; }
     }
 }

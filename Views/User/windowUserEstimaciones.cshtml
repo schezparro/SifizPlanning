@@ -132,7 +132,7 @@
                                             <tr class="table-tr" ng-repeat="item in items" data-id="{{ item.id }}" ng-dblclick="editarItem(item)">
                                                 <td>T_ESP{{$index + 1}}</td>
                                                 <td>{{ item.descripcion }}</td>
-                                                <td>{{ item.recurso }}</td>
+                                                <td>{{ item.nivel }}</td>
                                                 <td>{{ item.tiempoEstimacion }}</td>
                                                 <td><button type="button" class="btn btn-danger btn-xs" ng-click="eliminarItemEspecial(item.id)">Eliminar</button></td>
                                             </tr>
@@ -297,9 +297,9 @@
 
                         <div class="col-md-3">
                             <label>Tipo Recurso:</label>
-                            <select class="form-control" ng-model="itemEspecialTipoRecurso" ng-required="true">
+                            <select class="form-control" ng-model="itemEspecialNivelColab" ng-required="true">
                                 <option value="">Seleccione...</option>
-                                <option ng-repeat="recurso in recursos" value="{{recurso.id}}">{{recurso.descripcion}}</option>
+                                <option ng-repeat="nivel in niveles" value="{{nivel.id}}">{{nivel.name}}</option>
                             </select>
                         </div>
                     </div>
@@ -341,9 +341,9 @@
 
                         <div class="col-md-3">
                             <label>Tipo Recurso:</label>
-                            <select class="form-control" ng-model="itemEspecialTipoRecurso" ng-required="true">
+                            <select class="form-control" ng-model="itemEspecialNivelColab" ng-required="true">
                                 <option value="">Seleccione...</option>
-                                <option ng-repeat="recurso in recursos" value="{{recurso.id}}">{{recurso.descripcion}}</option>
+                                <option ng-repeat="nivel in niveles" value="{{nivel.id}}">{{nivel.name}}</option>
                             </select>
                         </div>
                     </div>

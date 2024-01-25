@@ -93,8 +93,6 @@
         $scope.newTitulo = '';
         $scope.newDetalle = '';
         $scope.moduloSeleccionado = '';
-        $scope.newHoras = "";
-        $scope.newMins = ""; 
 
         angular.element("#modal-agregar-recursos").modal("show");
     };
@@ -124,7 +122,7 @@
         formData.append('modulo', modulo);
         formData.append('adjuntos', fileInput.files[0]);
         formData.append('adjuntoAsistencia', fileInput2.files[0]);
-        formData.append('tiempo', $scope.newHoras + ":" + $scope.newMins);
+        formData.append('tiempo', $scope.newTiempo);
 
         console.log(formData);
 

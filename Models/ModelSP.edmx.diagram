@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="41eaed6327af4b2585e910c8381c19a4" Name="Diagram1" ZoomLevel="94">
+      <Diagram DiagramId="41eaed6327af4b2585e910c8381c19a4" Name="Diagram1" ZoomLevel="124">
         <EntityTypeShape EntityType="SifizPlanningModel.Rol" Width="1.5" PointX="26.625" PointY="16.625" />
         <EntityTypeShape EntityType="SifizPlanningModel.Usuario" Width="1.5" PointX="25.625" PointY="9.25" />
         <EntityTypeShape EntityType="SifizPlanningModel.UsuarioRol" Width="1.5" PointX="26.625" PointY="13.25" />
@@ -395,15 +395,15 @@
         <AssociationConnector Association="SifizPlanningModel.FK_INCIDENCIAS_CLIENTE" />
         <AssociationConnector Association="SifizPlanningModel.FK_INCIDENCIAS_MODULO" />
         <EntityTypeShape EntityType="SifizPlanningModel.CategoriaRecursos" Width="1.5" PointX="37.375" PointY="36" />
-        <EntityTypeShape EntityType="SifizPlanningModel.ItemEspecial" Width="1.5" PointX="33.25" PointY="7" />
-        <AssociationConnector Association="SifizPlanningModel.FK_ITEMESPECIAL_ESTIMACIONTICKET" />
-        <AssociationConnector Association="SifizPlanningModel.FK_ITEMESPECIAL_TIPORECURSO" />
         <EntityTypeShape EntityType="SifizPlanningModel.CalificacionTicket" Width="1.5" PointX="33.25" PointY="59.5" />
         <EntityTypeShape EntityType="SifizPlanningModel.CalificacionTicketCliente" Width="1.5" PointX="35.5" PointY="44.5" />
         <AssociationConnector Association="SifizPlanningModel.FK_CALIFICACIONTICKETCLIENTE_CALIFICACIONTICKET" />
         <AssociationConnector Association="SifizPlanningModel.FK_CALIFICACIONTICKETCLIENTE_TICKET" />
         <EntityTypeShape EntityType="SifizPlanningModel.Recursos" Width="1.5" PointX="11.875" PointY="42.5" />
         <AssociationConnector Association="SifizPlanningModel.FK_RECURSOS_MODULO" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ItemEspecial" Width="1.5" PointX="28.25" PointY="35.625" />
+        <AssociationConnector Association="SifizPlanningModel.FK_ITEMESPECIAL_ESTIMACIONTICKET" />
+        <AssociationConnector Association="SifizPlanningModel.FK_ITEMESPECIAL_NIVELCOLABORADOR" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

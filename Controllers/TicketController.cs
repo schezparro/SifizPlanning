@@ -3101,12 +3101,12 @@ namespace SifizPlanning.Controllers
                                                                               }).ToList()
                                                               }).ToList(),
                                                items = (from i in db.ItemEspecial
-                                                        join r in db.TipoRecurso on i.SecuencialTipoRecurso equals r.Secuencial
+                                                        join nc in db.NivelColaborador on i.SecuencialNivelColaborador equals nc.Secuencial
                                                                where i.SecuencialEstimacion == est.Secuencial
                                                                select new
                                                                {
                                                                    descripcion = i.Descripcion,
-                                                                   recurso = r.Descripcion,
+                                                                   nivel = nc.Descripcion,
                                                                    tiempoEstimacion = i.TiempoEstimacion
                                                                }).ToList(),
                                            }).ToList();
@@ -3199,7 +3199,7 @@ namespace SifizPlanning.Controllers
                 }
 
                 var itemsEspeciales = (from ie in db.ItemEspecial
-                                       join tr in db.TipoRecurso on ie.SecuencialTipoRecurso equals tr.Secuencial
+                                       join nc in db.NivelColaborador on ie.SecuencialNivelColaborador equals nc.Secuencial
                                        where ie.SecuencialEstimacion == estimacion.Secuencial
                                        select new
                                        {
@@ -3207,8 +3207,8 @@ namespace SifizPlanning.Controllers
                                            descripcion = ie.Descripcion,
                                            tiempoEstimacion = ie.TiempoEstimacion,
                                            idEstimacion = ie.SecuencialEstimacion,
-                                           idTipoRecurso = ie.SecuencialTipoRecurso,
-                                           recurso = tr.Descripcion
+                                           idNivelColab = ie.SecuencialNivelColaborador,
+                                           nivel = nc.Descripcion
                                        }).ToList();
 
                 var resp = new
