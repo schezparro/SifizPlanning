@@ -3104,7 +3104,7 @@ r in db.Rol on ur.rol equals r
                     textoEmail += "Buen día,";
                     textoEmail += @"<br/>";
 
-                    textoEmail += "Por el presente se le notifica de que se ha detectado una nueva incidencia de Fin de Dia";
+                    textoEmail += "Por el presente se le notifica de que se ha registrado una nueva incidencia de Fin de Dia";
                     textoEmail += @"<br/>";
                     textoEmail += "Puede revizarla en el Sifizplanning en el módulo de desarrolladores y darle seguimiento.";
                     textoEmail += "</div>";
