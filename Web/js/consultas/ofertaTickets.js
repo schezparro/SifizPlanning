@@ -124,4 +124,16 @@
             }
         });
     };
+
+    $scope.recargarDatosOfertas = function () {
+        var ajaxOfertas = $http.post("consultas/dar-ofertas-tickets", {
+            filtro: $scope.filtroOfertas,
+        });
+        ajaxOfertas.success(function (data) {
+            if (data.success === true) {
+                $scope.ofertas = data.ofertas;
+            }
+        });
+    };
+
 }]);

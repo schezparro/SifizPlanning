@@ -567,8 +567,6 @@ consultasApp.controller('mainConsultasController', ['$scope', '$http', function 
         ajaxClientes.success(function (data) {
             if (data.success === true) {
                 $scope.clientes = data.clientes;
-                console.log($scope.clientes);
-
                 $scope.clientes = $scope.clientes.filter(function (c) { return c.id != 78; });
             }
         });
@@ -578,7 +576,6 @@ consultasApp.controller('mainConsultasController', ['$scope', '$http', function 
         ajaxColaboradores.success(function (data) {
             if (data.success === true) {
                 $scope.colaboradores = data.coordinadores;
-                console.log($scope.colaboradores);
                 $scope.colaboradores = $scope.colaboradores.filter(function (c) { return c.id != 2122; });
             }
         });
@@ -603,7 +600,6 @@ consultasApp.controller('mainConsultasController', ['$scope', '$http', function 
         ajaxOfertas.success(function (data) {
             if (data.success === true) {
                 $scope.ofertas = data.ofertas;
-                console.log(data.ofertas);
             }
         });
 

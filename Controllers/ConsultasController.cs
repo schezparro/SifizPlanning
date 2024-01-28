@@ -713,7 +713,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
-        public ActionResult DarOfertasTickets()
+        public ActionResult DarOfertasTickets(string filtro = "")
         {
             try
             {
@@ -754,6 +754,19 @@ namespace SifizPlanning.Controllers
                                    },
                                    editable = false
                                }).ToList();
+
+                if(filtro != "")
+                {
+                    ofertas = ofertas.Where(s =>
+                                            s.cliente.nombre.ToString().ToUpper().Contains(filtro.ToUpper()) ||
+                                            s.colaborador.nombre.ToString().ToUpper().Contains(filtro.ToUpper()) ||
+                                            s.Detalle.ToString().ToUpper().Contains(filtro.ToUpper()) ||
+                                            s.FechaDisponibilidad.ToString().ToUpper().Contains(filtro.ToUpper()) ||
+                                            s.FechaProduccion.ToString().ToUpper().Contains(filtro.ToUpper()) ||
+                                            s.FechaRegistro.ToString().ToUpper().Contains(filtro.ToUpper()) ||
+                                            s.HorasEstimacion.ToString().ToUpper().Contains(filtro.ToUpper())
+                                        ).ToList();
+                }
 
                 var resp = new
                 {
