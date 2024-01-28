@@ -1101,6 +1101,8 @@
     <Content Include="SCRIPTSDATABASE\12\27-RECURSOS.sql" />
     <Content Include="SCRIPTSDATABASE\12\28-RECURSOS.sql" />
     <Content Include="SCRIPTSDATABASE\12\29-RECURSOS.sql" />
+    <Content Include="SCRIPTSDATABASE\12\30-ITEMESPECIAL.sql" />
+    <Content Include="SCRIPTSDATABASE\12\31-ITEMESPECIAL.sql" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />

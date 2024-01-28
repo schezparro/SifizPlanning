@@ -61,53 +61,54 @@
     };
 
     $scope.agregarOferta = function () {
-        if ($scope.nuevaOferta.cliente !== "" && $scope.nuevaOferta.colaborador !== "") {
-            var clienteSeleccionado = $scope.clientes.find(function (cliente) {
+        var clienteSeleccionado = 0;
+        var colaboradorSeleccionado = 0;
+        if ($scope.nuevaOferta.cliente !== "") {
+            clienteSeleccionado = $scope.clientes.find(function (cliente) {
                 return cliente.id === $scope.nuevaOferta.cliente;
             });
-
-            var colaboradorSeleccionado = $scope.colaboradores.find(function (colaborador) {
+        }
+        if ($scope.nuevaOferta.colaborador !== "") {
+            colaboradorSeleccionado = $scope.colaboradores.find(function (colaborador) {
                 return colaborador.id === $scope.nuevaOferta.colaborador;
             });
-
-            var nuevaOferta = {
-                FechaRegistro: $scope.nuevaOferta.FechaRegistro ?
-                    new Date(...$scope.nuevaOferta.FechaRegistro.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)) :
-                    null,
-                FechaProduccion: $scope.nuevaOferta.FechaProduccion ?
-                    new Date(...$scope.nuevaOferta.FechaProduccion.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)) :
-                    null,
-                FechaDisponibilidad: $scope.nuevaOferta.FechaDisponibilidad ?
-                    new Date(...$scope.nuevaOferta.FechaDisponibilidad.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)) :
-                    null,
-                Detalle: $scope.nuevaOferta.Detalle,
-                HorasEstimacion: $scope.nuevaOferta.HorasEstimacion || 0,
-                cliente: clienteSeleccionado,
-                colaborador: colaboradorSeleccionado,
-                editable: false
-            };
-
-            var ajaxOfertas = $http.post("consultas/agregar-ofertas-tickets", {
-                fechaRegistro: nuevaOferta.FechaRegistro,
-                FechaProduccion: nuevaOferta.FechaProduccion,
-                fechaDisponibilidad: nuevaOferta.FechaDisponibilidad,
-                detalle: nuevaOferta.Detalle,
-                horasEstimacion: nuevaOferta.HorasEstimacion,
-                cliente: nuevaOferta.cliente.id,
-                colaborador: nuevaOferta.colaborador.id
-            });
-
-            ajaxOfertas.success(function (data) {
-                if (data.success === true) {
-                    $scope.cargarDatosOfertas()
-
-                } else {
-                    messageDialog.show("Información", data.msg);
-                }
-            });
-        } else {
-            messageDialog.show("Información", "Seleccione el colaborador y el cliente");
         }
+
+        var nuevaOferta = {
+            FechaRegistro: $scope.nuevaOferta.FechaRegistro ?
+                new Date(...$scope.nuevaOferta.FechaRegistro.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)) :
+                null,
+            FechaProduccion: $scope.nuevaOferta.FechaProduccion ?
+                new Date(...$scope.nuevaOferta.FechaProduccion.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)) :
+                null,
+            FechaDisponibilidad: $scope.nuevaOferta.FechaDisponibilidad ?
+                new Date(...$scope.nuevaOferta.FechaDisponibilidad.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)) :
+                null,
+            Detalle: $scope.nuevaOferta.Detalle,
+            HorasEstimacion: $scope.nuevaOferta.HorasEstimacion || 0,
+            cliente: clienteSeleccionado,
+            colaborador: colaboradorSeleccionado,
+            editable: false
+        };
+
+        var ajaxOfertas = $http.post("consultas/agregar-ofertas-tickets", {
+            fechaRegistro: nuevaOferta.FechaRegistro,
+            FechaProduccion: nuevaOferta.FechaProduccion,
+            fechaDisponibilidad: nuevaOferta.FechaDisponibilidad,
+            detalle: nuevaOferta.Detalle,
+            horasEstimacion: nuevaOferta.HorasEstimacion,
+            cliente: nuevaOferta.cliente.id,
+            colaborador: nuevaOferta.colaborador.id
+        });
+
+        ajaxOfertas.success(function (data) {
+            if (data.success === true) {
+                $scope.cargarDatosOfertas()
+
+            } else {
+                messageDialog.show("Información", data.msg);
+            }
+        });
     };
 
     $scope.eliminarOferta = function (id) {
