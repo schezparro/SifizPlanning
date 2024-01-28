@@ -447,7 +447,7 @@
     $scope.adicionarItemsEspeciales = function () {
 
         $scope.itemEspecialDescripcion = "";
-        $scope.itemEspecialTipoRecurso = "";
+        $scope.itemEspecialNivelColab = "";
         $scope.itemEspecialTiempoEstimacion = 0;
 
         angular.element("#modal-estimacion-items-ticket").modal("show");
@@ -460,8 +460,7 @@
 
         ajaxDarItemsEspeciales.success(function (data) {
             if (data.success === true) {
-
-                $scope.recursos = data.recursos;
+                
                 $scope.items = data.items;
             } else {
                 messageDialog.show('Información', data.msg);
@@ -474,7 +473,7 @@
 
         var ajaxGuardarItemEspecial = $http.post("user/guardar-item-especial/", {
             idEstimacion: $scope.estimacionIdTmp,
-            idRecurso: $scope.itemEspecialTipoRecurso,
+            idNivelColab: $scope.itemEspecialNivelColab,
             descripcion: $scope.itemEspecialDescripcion,
             tiempoEstimacion: $scope.itemEspecialTiempoEstimacion
         });
@@ -482,7 +481,7 @@
         ajaxGuardarItemEspecial.success(function (data) {
             if (data.success === true) {
                 $scope.itemEspecialDescripcion = "";
-                $scope.itemEspecialTipoRecurso = "";
+                $scope.itemEspecialNivelColab = "";
                 $scope.itemEspecialTiempoEstimacion = 0;
                 angular.element("#modal-estimacion-items-ticket").modal("hide");
                 $scope.cargarItemsEspeciales($scope.estimacionIdTmp);
@@ -509,7 +508,7 @@
     $scope.editarItem = function (item) {
         $scope.itemId = item.id;
         $scope.itemEspecialDescripcion = item.descripcion;
-        $scope.itemEspecialTipoRecurso = item.idTipoRecurso;
+        $scope.itemEspecialNivelColab = item.idNivelColab;
         $scope.itemEspecialTiempoEstimacion = item.tiempoEstimacion;
 
         angular.element("#modal-edicion-items-ticket").modal("show");
@@ -519,7 +518,7 @@
 
         var ajaxEditarItemEspecial = $http.post("user/editar-item-especial/", {
             itemId: $scope.itemId,
-            idRecurso: $scope.itemEspecialTipoRecurso,
+            idNivelColab: $scope.itemEspecialNivelColab,
             descripcion: $scope.itemEspecialDescripcion,
             tiempoEstimacion: $scope.itemEspecialTiempoEstimacion
         });
@@ -529,7 +528,7 @@
 
                 $scope.itemId = 0;
                 $scope.itemEspecialDescripcion = "";
-                $scope.itemEspecialTipoRecurso = "";
+                $scope.itemEspecialNivelColab = "";
                 $scope.itemEspecialTiempoEstimacion = 0;
 
                 angular.element("#modal-edicion-items-ticket").modal("hide");

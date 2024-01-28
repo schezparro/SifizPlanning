@@ -1099,6 +1099,8 @@
     <Content Include="SCRIPTSDATABASE\12\25-RECURSOS.sql" />
     <Content Include="SCRIPTSDATABASE\12\26-RECURSOS.sql" />
     <Content Include="SCRIPTSDATABASE\12\27-RECURSOS.sql" />
+    <Content Include="SCRIPTSDATABASE\12\28-RECURSOS.sql" />
+    <Content Include="SCRIPTSDATABASE\12\29-RECURSOS.sql" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
