@@ -61,9 +61,9 @@ namespace SifizPlanning.Controllers
             List<string> filtroPrioridad = new List<string>();
             bool tieneFiltroPrioridad = false;
             dynamic prioridad = jsonObj["prioridad"];
-            if (prioridad != null && prioridad.GetType().FullName != "System.String")
+            if(prioridad != null && prioridad.GetType().FullName != "System.String")
             {
-                foreach (var pri in prioridad)
+                foreach(var pri in prioridad)
                 {
                     filtroPrioridad.Add(pri);
                 }
@@ -73,9 +73,9 @@ namespace SifizPlanning.Controllers
             List<string> filtroCategoria = new List<string>();
             bool tieneFiltroCategoria = false;
             dynamic categoria = jsonObj["categoria"];
-            if (categoria != null && categoria.GetType().FullName != "System.String")
+            if(categoria != null && categoria.GetType().FullName != "System.String")
             {
-                foreach (var cat in categoria)
+                foreach(var cat in categoria)
                 {
                     filtroCategoria.Add(cat);
                 }
@@ -85,9 +85,9 @@ namespace SifizPlanning.Controllers
             List<string> filtroEstado = new List<string>();
             bool tieneFiltroEstado = false;
             dynamic estado = jsonObj["estado"];
-            if (estado != null && estado.GetType().FullName != "System.String")
+            if(estado != null && estado.GetType().FullName != "System.String")
             {
-                foreach (var est in estado)
+                foreach(var est in estado)
                 {
                     filtroEstado.Add(est);
                 }
@@ -97,9 +97,9 @@ namespace SifizPlanning.Controllers
             List<string> filtroProximaActividad = new List<string>();
             bool tieneFiltroProximaActividad = false;
             dynamic proximaActividad = jsonObj["proximaActividad"];
-            if (proximaActividad != null && proximaActividad.GetType().FullName != "System.String")
+            if(proximaActividad != null && proximaActividad.GetType().FullName != "System.String")
             {
-                foreach (var prox in proximaActividad)
+                foreach(var prox in proximaActividad)
                 {
                     filtroProximaActividad.Add(prox);
                 }
@@ -109,9 +109,9 @@ namespace SifizPlanning.Controllers
             List<string> filtroTicketVersionCliente = new List<string>();
             bool tieneFiltroTicketVersionCliente = false;
             dynamic ticketVersionCliente = jsonObj["ticketVersionCliente"];
-            if (ticketVersionCliente != null && ticketVersionCliente.GetType().FullName != "System.String")
+            if(ticketVersionCliente != null && ticketVersionCliente.GetType().FullName != "System.String")
             {
-                foreach (var tvc in ticketVersionCliente)
+                foreach(var tvc in ticketVersionCliente)
                 {
                     filtroTicketVersionCliente.Add(tvc);
                 }
@@ -158,7 +158,7 @@ namespace SifizPlanning.Controllers
                                       revisado = t.Revisado
                                   }).ToList();
 
-            if (User.IsInRole("GESTOR") && !User.IsInRole("ADMIN"))
+            if(User.IsInRole("GESTOR") && !User.IsInRole("ADMIN"))
             {
                 var ticketTempParcial = (from t in ticketsParcial
                                          from c in clientes
@@ -170,7 +170,7 @@ namespace SifizPlanning.Controllers
             var tickets = ticketsParcial;
 
             //En el caso que no se muestren todos los tickets se realiza la consulta de asignados aparte lo que optimiza el rendimiento, si se muestran los 6000 y mas tickets se realiza la consulta de asignados dentro de la de tickets
-            if (todos == false)
+            if(todos == false)
             {
                 var asignados = (from t in db.Ticket
                                  join ttar in db.TicketTarea on t.Secuencial equals ttar.SecuencialTicket
@@ -272,7 +272,7 @@ namespace SifizPlanning.Controllers
                                revisado = t.Revisado
                            }).ToList();
 
-                if (User.IsInRole("GESTOR") && !User.IsInRole("ADMIN"))
+                if(User.IsInRole("GESTOR") && !User.IsInRole("ADMIN"))
                 {
                     var ticketsAll = (from t in tickets
                                       from c in clientes
@@ -283,56 +283,56 @@ namespace SifizPlanning.Controllers
             }
 
             //Filtro de si se facturan
-            if (tipoFacturable != "t")//Todos
+            if(tipoFacturable != "t")//Todos
             {
-                if (tipoFacturable == "F")//Facturables
+                if(tipoFacturable == "F")//Facturables
                 {
                     tickets = tickets.Where(x => x.seFactura == true).ToList();
                 }
-                else if (tipoFacturable == "FF")//Facturables Facturados
+                else if(tipoFacturable == "FF")//Facturables Facturados
                 {
                     tickets = tickets.Where(x => x.seFactura == true && x.facturado == true).ToList();
                 }
-                else if (tipoFacturable == "FNF")//Facturables No Facturados
+                else if(tipoFacturable == "FNF")//Facturables No Facturados
                 {
                     tickets = tickets.Where(x => x.seFactura == true && x.facturado == false).ToList();
                 }
-                else if (tipoFacturable == "PAP")
+                else if(tipoFacturable == "PAP")
                 {
                     tickets = tickets.Where(x => x.pendienteAPago == true).ToList();
                 }
-                else if (tipoFacturable == "SF")
+                else if(tipoFacturable == "SF")
                 {
                     tickets = tickets.Where(x => x.seFactura == false).ToList();
                 }
             }
 
             //Aplicando los filtros
-            if (filtroNumero != "")
+            if(filtroNumero != "")
             {
                 tickets = (from t in tickets
                            where t.numero.ToString().PadLeft(6, '0').Contains(filtroNumero)
                            select t).ToList();
             }
-            if (filtroCliente != "")
+            if(filtroCliente != "")
             {
                 tickets = (from t in tickets
                            where t.cliente.ToString().ToLower().Contains(filtroCliente.ToLower())
                            select t).ToList();
             }
-            if (filtroFecha != "")
+            if(filtroFecha != "")
             {
                 tickets = (from t in tickets
                            where t.fecha.ToString("dd/MM/yyyy").Contains(filtroFecha)
                            select t).ToList();
             }
-            if (filtroAsunto != "")
+            if(filtroAsunto != "")
             {
                 tickets = (from t in tickets
                            where t.asunto.ToString().ToLower().Contains(filtroAsunto.ToLower())
                            select t).ToList();
             }
-            if (filtroAsignado != "")
+            if(filtroAsignado != "")
             {
 
                 tickets = (from t in tickets
@@ -340,31 +340,31 @@ namespace SifizPlanning.Controllers
                            select t).ToList();
 
             }
-            if (tieneFiltroPrioridad)
+            if(tieneFiltroPrioridad)
             {
                 tickets = (from t in tickets
                            where filtroPrioridad.Contains(t.prioridad.ToString().ToUpper())
                            select t).ToList();
             }
-            if (tieneFiltroCategoria)
+            if(tieneFiltroCategoria)
             {
                 tickets = (from t in tickets
                            where filtroCategoria.Contains(t.categoria.ToString().ToUpper())
                            select t).ToList();
             }
-            if (tieneFiltroEstado)
+            if(tieneFiltroEstado)
             {
                 tickets = (from t in tickets
                            where filtroEstado.Contains(t.estado.ToString().ToUpper())
                            select t).ToList();
             }
-            if (tieneFiltroProximaActividad)
+            if(tieneFiltroProximaActividad)
             {
                 tickets = (from t in tickets
                            where filtroProximaActividad.Contains(t.proximaActividad.ToString().ToUpper())
                            select t).ToList();
             }
-            if (tieneFiltroTicketVersionCliente)
+            if(tieneFiltroTicketVersionCliente)
             {
                 tickets = (from t in tickets
                            where filtroTicketVersionCliente.Contains(t.ticketVersionCliente.ToString().ToUpper())
@@ -372,13 +372,13 @@ namespace SifizPlanning.Controllers
             }
 
             //Se Ordena
-            if (order > 0)
+            if(order > 0)
             {
-                switch (order)
+                switch(order)
                 {
                     case 1:
 
-                        if (asc == 1)
+                        if(asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.numero
@@ -395,7 +395,7 @@ namespace SifizPlanning.Controllers
 
                     case 2:
 
-                        if (asc == 1)
+                        if(asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.cliente
@@ -412,7 +412,7 @@ namespace SifizPlanning.Controllers
 
                     case 3:
 
-                        if (asc == 1)
+                        if(asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.fecha
@@ -429,7 +429,7 @@ namespace SifizPlanning.Controllers
 
                     case 4:
 
-                        if (asc == 1)
+                        if(asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.asunto
@@ -446,7 +446,7 @@ namespace SifizPlanning.Controllers
 
                     case 5:
 
-                        if (asc == 1)
+                        if(asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.asignado
@@ -463,7 +463,7 @@ namespace SifizPlanning.Controllers
 
                     case 6:
 
-                        if (asc == 1)
+                        if(asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.prioridad
@@ -480,7 +480,7 @@ namespace SifizPlanning.Controllers
 
                     case 7:
 
-                        if (asc == 1)
+                        if(asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.categoria
@@ -497,7 +497,7 @@ namespace SifizPlanning.Controllers
 
                     case 8:
 
-                        if (asc == 1)
+                        if(asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.estado
@@ -513,7 +513,7 @@ namespace SifizPlanning.Controllers
                         break;
                     case 9:
 
-                        if (asc == 1)
+                        if(asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.proximaActividad
@@ -529,7 +529,7 @@ namespace SifizPlanning.Controllers
                         break;
                     case 10:
 
-                        if (asc == 1)
+                        if(asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.ticketVersionCliente
@@ -556,7 +556,7 @@ namespace SifizPlanning.Controllers
 
             //Calculando los dias desde la fecha en el servidor
             List<object> ticketsResp = new List<object>();
-            for (int i = 0; i < tickets.Count; i++)
+            for(int i = 0; i < tickets.Count; i++)
             {
                 var t = tickets[i];
                 ticketsResp.Add(new
@@ -611,9 +611,9 @@ namespace SifizPlanning.Controllers
             List<string> filtroPrioridad = new List<string>();
             bool tieneFiltroPrioridad = false;
             dynamic prioridad = jsonObj["prioridad"];
-            if (prioridad != null && prioridad.GetType().FullName != "System.String")
+            if(prioridad != null && prioridad.GetType().FullName != "System.String")
             {
-                foreach (var pri in prioridad)
+                foreach(var pri in prioridad)
                 {
                     filtroPrioridad.Add(pri);
                 }
@@ -623,9 +623,9 @@ namespace SifizPlanning.Controllers
             List<string> filtroCategoria = new List<string>();
             bool tieneFiltroCategoria = false;
             dynamic categoria = jsonObj["categoria"];
-            if (categoria != null && categoria.GetType().FullName != "System.String")
+            if(categoria != null && categoria.GetType().FullName != "System.String")
             {
-                foreach (var cat in categoria)
+                foreach(var cat in categoria)
                 {
                     filtroCategoria.Add(cat);
                 }
@@ -635,9 +635,9 @@ namespace SifizPlanning.Controllers
             List<string> filtroEstado = new List<string>();
             bool tieneFiltroEstado = false;
             dynamic estado = jsonObj["estado"];
-            if (estado != null && estado.GetType().FullName != "System.String")
+            if(estado != null && estado.GetType().FullName != "System.String")
             {
-                foreach (var est in estado)
+                foreach(var est in estado)
                 {
                     filtroEstado.Add(est);
                 }
@@ -647,9 +647,9 @@ namespace SifizPlanning.Controllers
             List<string> filtroProximaActividad = new List<string>();
             bool tieneFiltroProximaActividad = false;
             dynamic proximaActividad = jsonObj["proximaActividad"];
-            if (proximaActividad != null && proximaActividad.GetType().FullName != "System.String")
+            if(proximaActividad != null && proximaActividad.GetType().FullName != "System.String")
             {
-                foreach (var prox in proximaActividad)
+                foreach(var prox in proximaActividad)
                 {
                     filtroProximaActividad.Add(prox);
                 }
@@ -659,9 +659,9 @@ namespace SifizPlanning.Controllers
             List<string> filtroTicketVersionCliente = new List<string>();
             bool tieneFiltroTicketVersionCliente = false;
             dynamic ticketVersionCliente = jsonObj["ticketVersionCliente"];
-            if (ticketVersionCliente != null && ticketVersionCliente.GetType().FullName != "System.String")
+            if(ticketVersionCliente != null && ticketVersionCliente.GetType().FullName != "System.String")
             {
-                foreach (var tvc in ticketVersionCliente)
+                foreach(var tvc in ticketVersionCliente)
                 {
                     filtroTicketVersionCliente.Add(tvc);
                 }
@@ -714,7 +714,7 @@ namespace SifizPlanning.Controllers
             var tickets = ticketsNew;
 
             //En el caso que no se muestren todos los tickets se realiza la consulta de asignados aparte lo que optimiza el rendimiento, si se muestran los 6000 y mas tickets se realiza la consulta de asignados dentro de la de tickets
-            if (todos == false)
+            if(todos == false)
             {
                 var asignados = (from t in db.Ticket
                                  join ttar in db.TicketTarea on t.Secuencial equals ttar.SecuencialTicket
@@ -819,52 +819,52 @@ namespace SifizPlanning.Controllers
             }
 
             //Filtro de si se facturan
-            if (tipoFacturable != "t")//Todos
+            if(tipoFacturable != "t")//Todos
             {
-                if (tipoFacturable == "F")//Facturables
+                if(tipoFacturable == "F")//Facturables
                 {
                     tickets = tickets.Where(x => x.seFactura == true).ToList();
                 }
-                else if (tipoFacturable == "FF")//Facturables Facturados
+                else if(tipoFacturable == "FF")//Facturables Facturados
                 {
                     tickets = tickets.Where(x => x.seFactura == true && x.facturado == true).ToList();
                 }
-                else if (tipoFacturable == "FNF")//Facturables No Facturados
+                else if(tipoFacturable == "FNF")//Facturables No Facturados
                 {
                     tickets = tickets.Where(x => x.seFactura == true && x.facturado == false).ToList();
                 }
-                else if (tipoFacturable == "SF")
+                else if(tipoFacturable == "SF")
                 {
                     tickets = tickets.Where(x => x.seFactura == false).ToList();
                 }
             }
 
             //Aplicando los filtros
-            if (filtroNumero != "")
+            if(filtroNumero != "")
             {
                 tickets = (from t in tickets
                            where t.numero.ToString().PadLeft(6, '0').Contains(filtroNumero)
                            select t).ToList();
             }
-            if (filtroCliente != "")
+            if(filtroCliente != "")
             {
                 tickets = (from t in tickets
                            where t.cliente.ToString().ToLower().Contains(filtroCliente.ToLower())
                            select t).ToList();
             }
-            if (filtroFecha != "")
+            if(filtroFecha != "")
             {
                 tickets = (from t in tickets
                            where t.fecha.ToString("dd/MM/yyyy").Contains(filtroFecha)
                            select t).ToList();
             }
-            if (filtroAsunto != "")
+            if(filtroAsunto != "")
             {
                 tickets = (from t in tickets
                            where t.asunto.ToString().ToLower().Contains(filtroAsunto.ToLower())
                            select t).ToList();
             }
-            if (filtroAsignado != "")
+            if(filtroAsignado != "")
             {
 
                 tickets = (from t in tickets
@@ -872,44 +872,44 @@ namespace SifizPlanning.Controllers
                            select t).ToList();
 
             }
-            if (tieneFiltroPrioridad)
+            if(tieneFiltroPrioridad)
             {
                 tickets = (from t in tickets
                            where filtroPrioridad.Contains(t.prioridad.ToString().ToUpper())
                            select t).ToList();
             }
-            if (tieneFiltroCategoria)
+            if(tieneFiltroCategoria)
             {
                 tickets = (from t in tickets
                            where filtroCategoria.Contains(t.categoria.ToString().ToUpper())
                            select t).ToList();
             }
-            if (tieneFiltroEstado)
+            if(tieneFiltroEstado)
             {
                 tickets = (from t in tickets
                            where filtroEstado.Contains(t.estado.ToString().ToUpper())
                            select t).ToList();
             }
-            if (tieneFiltroProximaActividad)
+            if(tieneFiltroProximaActividad)
             {
                 tickets = (from t in tickets
                            where filtroProximaActividad.Contains(t.proximaActividad.ToString().ToUpper())
                            select t).ToList();
             }
-            if (tieneFiltroTicketVersionCliente)
+            if(tieneFiltroTicketVersionCliente)
             {
                 tickets = (from t in tickets
                            where filtroTicketVersionCliente.Contains(t.ticketVersionCliente.ToString().ToUpper())
                            select t).ToList();
             }
             //Se Ordena
-            if (order > 0)
+            if(order > 0)
             {
-                switch (order)
+                switch(order)
                 {
                     case 1:
 
-                        if (asc == 1)
+                        if(asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.numero
@@ -926,7 +926,7 @@ namespace SifizPlanning.Controllers
 
                     case 2:
 
-                        if (asc == 1)
+                        if(asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.cliente
@@ -943,7 +943,7 @@ namespace SifizPlanning.Controllers
 
                     case 3:
 
-                        if (asc == 1)
+                        if(asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.fecha
@@ -960,7 +960,7 @@ namespace SifizPlanning.Controllers
 
                     case 4:
 
-                        if (asc == 1)
+                        if(asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.asunto
@@ -977,7 +977,7 @@ namespace SifizPlanning.Controllers
 
                     case 5:
 
-                        if (asc == 1)
+                        if(asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.asignado
@@ -994,7 +994,7 @@ namespace SifizPlanning.Controllers
 
                     case 6:
 
-                        if (asc == 1)
+                        if(asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.prioridad
@@ -1011,7 +1011,7 @@ namespace SifizPlanning.Controllers
 
                     case 7:
 
-                        if (asc == 1)
+                        if(asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.categoria
@@ -1028,7 +1028,7 @@ namespace SifizPlanning.Controllers
 
                     case 8:
 
-                        if (asc == 1)
+                        if(asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.estado
@@ -1044,7 +1044,7 @@ namespace SifizPlanning.Controllers
                         break;
                     case 9:
 
-                        if (asc == 1)
+                        if(asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.proximaActividad
@@ -1071,7 +1071,7 @@ namespace SifizPlanning.Controllers
 
             //Calculando los dias desde la fecha en el servidor
             List<object> ticketsResp = new List<object>();
-            for (int i = 0; i < tickets.Count; i++)
+            for(int i = 0; i < tickets.Count; i++)
             {
                 var t = tickets[i];
                 ticketsResp.Add(new
@@ -1115,7 +1115,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("El ticket no se encuentra en el sistema");
                 }
@@ -1249,25 +1249,25 @@ namespace SifizPlanning.Controllers
 
                 List<object> asignaciones = new List<object>();
                 int counter = 1;
-                foreach (TicketTarea ttar in ticketsTareas)
+                foreach(TicketTarea ttar in ticketsTareas)
                 {
                     Tarea tar = ttar.tarea;
-                    if (tar.SecuencialEstadoTarea != 4)
+                    if(tar.SecuencialEstadoTarea != 4)
                     {
 
                         int horas = (tar.FechaFin - tar.FechaInicio).Hours;
-                        if (tar.FechaInicio.Hour < 13 && tar.FechaFin.Hour > 13)
+                        if(tar.FechaInicio.Hour < 13 && tar.FechaFin.Hour > 13)
                         {
                             horas--;
                         }
-                        else if (tar.FechaInicio.Hour == 13)
+                        else if(tar.FechaInicio.Hour == 13)
                         {
                             horas--;
                         }
 
                         int idCoordinador = 0;
                         Tarea_Coordinador tareaCorrdinador = tar.tarea_coordinador;
-                        if (tareaCorrdinador != null)
+                        if(tareaCorrdinador != null)
                         {
                             idCoordinador = tareaCorrdinador.SecuencialColaborador;
                         }
@@ -1361,7 +1361,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -1380,7 +1380,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 DateTime fFecha;
-                if (fecha != null)
+                if(fecha != null)
                 {
                     string[] fechas = fecha.Split(new Char[] { '/' });
                     int mes = Int32.Parse(fechas[0]);
@@ -1490,7 +1490,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -1508,14 +1508,14 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("Error, no se encontró el ticket.");
                 }
 
                 bool concuerda = db.EstadoTicketProximaActividad.Where(x => x.SecuencialEstadoTicket == ticket.SecuencialEstadoTicket && x.SecuencialProximaActividad == ticket.SecuencialProximaActividad).Count() > 0;
 
-                if (!concuerda)
+                if(!concuerda)
                 {
 
                     var proximasActividades = (from pa in db.ProximaActividad
@@ -1544,7 +1544,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -1562,14 +1562,14 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("Error, no se encontró el ticket.");
                 }
 
                 bool concuerda = db.EstadoTicketProximaActividad.Where(x => x.SecuencialEstadoTicket == ticket.SecuencialEstadoTicket && x.SecuencialProximaActividad == idProximaActividad).Count() > 0;
 
-                if (!concuerda)
+                if(!concuerda)
                 {
                     throw new Exception("La próxima actividad no es válida de acuerdo al flujo definido.");
                 }
@@ -1618,7 +1618,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -1636,7 +1636,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("El ticket no se encuentra en el sistema");
                 }
@@ -1645,7 +1645,7 @@ namespace SifizPlanning.Controllers
                 List<object> funcionalidadesContrato = null;
                 List<object> modulos = null;
 
-                if (ticket.categoriaTicket.Codigo == "REQUERIMIENTO NUEVO")
+                if(ticket.categoriaTicket.Codigo == "REQUERIMIENTO NUEVO")
                 {
                     var funcionalidadesContrato1 = (from fc in db.Funcionalidad
                                                     where fc.EstaActiva == 1 && fc.modulo.EstaActivo == 1
@@ -1735,7 +1735,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -1753,7 +1753,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                     throw new Exception("No se encontró el ticket.");
                 var proximasActividades = (from pa in db.ProximaActividad
                                            join etpa in db.EstadoTicketProximaActividad on pa.Secuencial equals etpa.SecuencialProximaActividad
@@ -1771,7 +1771,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -1792,7 +1792,7 @@ namespace SifizPlanning.Controllers
                 DateTime hoy = DateTime.Today;
                 int diaMes = hoy.Day;
                 DateTime diaInicioMes = hoy.AddDays((diaMes - 1) * (-1));
-                if (addMes != 0)
+                if(addMes != 0)
                 {
                     diaInicioMes = diaInicioMes.AddMonths(addMes);
                 }
@@ -1814,20 +1814,20 @@ namespace SifizPlanning.Controllers
 
                 List<object> semanas = new List<object>();
                 DateTime dia = diaInicioMes;
-                while (dia.Month == diaInicioMes.Month)
+                while(dia.Month == diaInicioMes.Month)
                 {
                     int i = (int)dia.DayOfWeek - 1;
-                    if (i < 0)
+                    if(i < 0)
                     {
                         i = 6;
                     }
                     List<object> arregloDias = new List<object>();
 
-                    while (i < 7)
+                    while(i < 7)
                     {
-                        if (dia.Day == 1)
+                        if(dia.Day == 1)
                         {//Aqui es el primer día, rellenar a la izquierda
-                            for (int j = 0; j < i; j++)
+                            for(int j = 0; j < i; j++)
                             {
                                 var obj = new
                                 {
@@ -1849,12 +1849,12 @@ namespace SifizPlanning.Controllers
 
                         List<object> asignaciones = new List<object>();
                         int horasDisponibles = 8;
-                        foreach (var asig in asignacionesFecha)
+                        foreach(var asig in asignacionesFecha)
                         {
                             TimeSpan tiempoTarea = asig.fechaFin - asig.fechaInicio;
                             int horas = tiempoTarea.Hours;
 
-                            if (asig.fechaInicio.Hour < 13 && asig.fechaFin.Hour > 13)
+                            if(asig.fechaInicio.Hour < 13 && asig.fechaFin.Hour > 13)
                             {
                                 horas--;
                             }
@@ -1870,12 +1870,12 @@ namespace SifizPlanning.Controllers
                         }
 
                         string clase = "no-opacar";
-                        if ((int)dia.DayOfWeek == 0 || (int)dia.DayOfWeek == 6)
+                        if((int)dia.DayOfWeek == 0 || (int)dia.DayOfWeek == 6)
                         {
                             clase = "fin-semana";
                         }
 
-                        if (dia.Date == DateTime.Now.Date)
+                        if(dia.Date == DateTime.Now.Date)
                         {
                             clase += " dia-hoy bordear";
                         }
@@ -1893,7 +1893,7 @@ namespace SifizPlanning.Controllers
                         dia = dia.AddDays(1);
                         i++;
 
-                        if (dia.Month != diaInicioMes.Month)
+                        if(dia.Month != diaInicioMes.Month)
                         {
                             break;
                         }
@@ -1909,7 +1909,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -1933,15 +1933,33 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("No se pudo encontrar el ticket.");
                 }
 
+                string emailUser = User.Identity.Name;
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+                Colaborador col = user.persona.colaborador.FirstOrDefault();
+
                 ticket.Reputacion = reputacion;
                 ticket.SecuencialProximaActividad = actividadProxima;
+
+                var pa = db.ProximaActividad.Find(actividadProxima).Codigo;
+                if(pa == "COTIZAR")
+                {
+                    Ofertas oferta = new Ofertas();
+                    oferta.cliente = ticket.persona_cliente.cliente;
+                    oferta.colaborador = col;
+                    oferta.Detalle = "Estimación del ticket: " + ticket.Secuencial;
+                    oferta.HorasEstimacion = ticket.Estimacion;
+                    oferta.FechaDisponibilidad = new DateTime(0001 / 01 / 01);
+                    oferta.FechaProduccion = new DateTime(0001 / 01 / 01);
+                    oferta.FechaRegistro = DateTime.Now;
+                }
+
                 ticket.SecuencialTipoRecurso = tipoRecurso;
-                if (ticketVC != 0)
+                if(ticketVC != 0)
                     ticket.SecuencialTicketVersionCliente = ticketVC;
                 ticket.Estimacion = estimacion;
 
@@ -1954,7 +1972,7 @@ namespace SifizPlanning.Controllers
                 ticket.DiasGarantia = diasGarantia;
                 ticket.PendienteAPago = pendienteAPago;
                 ticket.RequiereTesting = requiereTesting;
-                if (fechaRevisado != "")
+                if(fechaRevisado != "")
                 {
                     string[] fechas = fechaRevisado.Split(new Char[] { '/' });
                     int dia = Int32.Parse(fechas[0]);
@@ -1964,8 +1982,7 @@ namespace SifizPlanning.Controllers
                     ticket.FechaRevisado = fRevisado;
                 }
                 //Actualizando el histórico
-                string emailUser = User.Identity.Name;
-                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+
                 int numeroVersion = db.TicketHistorico.Where(x => x.SecuencialTicket == ticket.Secuencial).Count();
 
                 TicketHistorico ticketHistorico = new TicketHistorico
@@ -1994,25 +2011,25 @@ namespace SifizPlanning.Controllers
                     FechaOperacion = DateTime.Now,
                     RequiereTesting = requiereTesting
                 };
-                if (fechaRevisado != "")
+                if(fechaRevisado != "")
                 {
                     ticketHistorico.FechaRevisado = ticket.FechaRevisado;
                 }
-                if (categoria != 0)
+                if(categoria != 0)
                 {
                     ticketHistorico.SecuencialCategoriaRevisada = categoria;
                 }
-                if (prioridad != 0)
+                if(prioridad != 0)
                 {
                     ticketHistorico.SecuencialPrioridadRevisada = prioridad;
                 }
                 db.TicketHistorico.Add(ticketHistorico);
 
-                if (colaborador != 0)
+                if(colaborador != 0)
                 {
                     //Busco si existe el Tecnico asociado a ese ticket
                     Ticket_Resolucion trs = db.Ticket_Resolucion.Find(idTicket);
-                    if (trs == null)
+                    if(trs == null)
                     {
                         trs = new Ticket_Resolucion();
                         trs.SecuencialColaborador = colaborador;
@@ -2031,10 +2048,10 @@ namespace SifizPlanning.Controllers
                     }
                 }
 
-                if (categoria != 0)
+                if(categoria != 0)
                 {
                     Ticket_CategoriaRevisada ctr = db.Ticket_CategoriaRevisada.Find(idTicket);
-                    if (ctr == null)
+                    if(ctr == null)
                     {
                         ctr = new Ticket_CategoriaRevisada();
                         ctr.SecuencialColaborador = user.persona.colaborador.FirstOrDefault().Secuencial;
@@ -2056,10 +2073,10 @@ namespace SifizPlanning.Controllers
                     throw new Exception("Debe seleccionar una categoría revisada.");
                 }
 
-                if (prioridad != 0)
+                if(prioridad != 0)
                 {
                     Ticket_PrioridadRevisada prr = db.Ticket_PrioridadRevisada.Find(idTicket);
-                    if (prr == null)
+                    if(prr == null)
                     {
                         prr = new Ticket_PrioridadRevisada();
                         prr.SecuencialColaborador = user.persona.colaborador.FirstOrDefault().Secuencial;
@@ -2079,7 +2096,7 @@ namespace SifizPlanning.Controllers
                 }
 
                 Ticket_Error err = db.Ticket_Error.Find(idTicket);
-                if (err == null)
+                if(err == null)
                 {
                     err = new Ticket_Error();
                     err.SecuencialColaborador = user.persona.colaborador.FirstOrDefault().Secuencial;
@@ -2097,13 +2114,13 @@ namespace SifizPlanning.Controllers
                 }
 
                 //Por los ficheros adjuntos
-                if (adjuntos != null)
-                    foreach (HttpPostedFileBase adj in adjuntos)
+                if(adjuntos != null)
+                    foreach(HttpPostedFileBase adj in adjuntos)
                     {
-                        if (adj != null)
+                        if(adj != null)
                         {
                             string newNameFile = "";
-                            if (esEstimacion == true)
+                            if(esEstimacion == true)
                             {
                                 string extFile = Path.GetExtension(adj.FileName);
                                 newNameFile = "est_" + Utiles.RandomString(10) + ".xlsx";
@@ -2142,7 +2159,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -2161,7 +2178,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("No se pudo encontrar el ticket.");
                 }
@@ -2212,7 +2229,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -2237,7 +2254,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("No se encontró el ticket");
                 }
@@ -2246,10 +2263,10 @@ namespace SifizPlanning.Controllers
                 var idColaboradoresArray = s.Deserialize<dynamic>(idColaboradores);
                 List<string> list = new List<string>();
 
-                foreach (var idColab in idColaboradoresArray)
+                foreach(var idColab in idColaboradoresArray)
                 {
                     Colaborador colab = db.Colaborador.Find(int.Parse(idColab));
-                    if (colab == null)
+                    if(colab == null)
                     {
                         throw new Exception("No se encontró un colaborador");
                     }
@@ -2271,7 +2288,7 @@ namespace SifizPlanning.Controllers
                     //envío de correo a los especialistas
                     Persona persona = colab.persona;
                     string saludo = "Estimado " + Utiles.UpperCamelCase(persona.Nombre1.ToLower()) + " " + Utiles.UpperCamelCase(persona.Apellido1.ToLower());
-                    if (persona.Sexo == "F")
+                    if(persona.Sexo == "F")
                     {
                         saludo = "Estimada " + Utiles.UpperCamelCase(persona.Nombre1.ToLower()) + " " + Utiles.UpperCamelCase(persona.Apellido1.ToLower());
                     }
@@ -2286,7 +2303,7 @@ namespace SifizPlanning.Controllers
                     usuariosDestinos.Add(userColaborador.Email);
 
                     var gestores = ticket.persona_cliente.cliente.gestorServicios.ToList();
-                    foreach (var g in gestores)
+                    foreach(var g in gestores)
                     {
                         usuariosDestinos.Add(g.colaborador.persona.usuario.FirstOrDefault().Email);
                     }
@@ -2294,7 +2311,7 @@ namespace SifizPlanning.Controllers
 
                     List<string> listaPathFicheros = new List<string>();
                     var adjuntos = db.AdjuntoTicket.Where(t => t.SecuencialTicket == idTicket).ToList();
-                    foreach (var item in adjuntos)
+                    foreach(var item in adjuntos)
                     {
                         string path = Server.MapPath("~/Web/" + item.Url);
                         listaPathFicheros.Add(path);
@@ -2348,7 +2365,7 @@ namespace SifizPlanning.Controllers
                 };
                 db.TicketHistorico.Add(ticketHistorico);
 
-                foreach (var l in list)
+                foreach(var l in list)
                 {
                     HistoricoInformacionTicket historicoCorreo = new HistoricoInformacionTicket
                     {
@@ -2368,7 +2385,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -2386,7 +2403,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("Error, no se encontró el ticket");
                 }
@@ -2413,7 +2430,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -2469,53 +2486,53 @@ namespace SifizPlanning.Controllers
                                                     }).ToList()
                                     }).ToList();
 
-                if (todos == false)
+                if(todos == false)
                 {
                     estimaciones = (from d in estimaciones
                                     where d.estado == "POR ESTIMAR"
                                     select d).ToList();
                 }
 
-                if (filtroNumero != "")
+                if(filtroNumero != "")
                 {
                     estimaciones = (from d in estimaciones
                                     where d.numero.ToString().ToUpper().Contains(filtroNumero.ToUpper())
                                     select d).ToList();
                 }
 
-                if (filtroColaborador != "")
+                if(filtroColaborador != "")
                 {
                     estimaciones = (from d in estimaciones
                                     where d.colaborador.ToString().ToUpper().Contains(filtroColaborador.ToUpper())
                                     select d).ToList();
                 }
 
-                if (filtroCliente != "")
+                if(filtroCliente != "")
                 {
                     estimaciones = (from d in estimaciones
                                     where d.cliente.ToString().ToUpper().Contains(filtroCliente.ToUpper())
                                     select d).ToList();
                 }
-                if (filtroPrioridad != "")
+                if(filtroPrioridad != "")
                 {
                     estimaciones = (from d in estimaciones
                                     where d.prioridad.ToString().ToUpper().Contains(filtroPrioridad.ToUpper())
                                     select d).ToList();
                 }
-                if (filtroFechaLimite != "")
+                if(filtroFechaLimite != "")
                 {
                     estimaciones = (from d in estimaciones
                                     where d.fechaLimite.ToString("dd/MM/yyyy").Contains(filtroFechaLimite)
                                     select d).ToList();
                 }
-                if (filtroDetalle != "")
+                if(filtroDetalle != "")
                 {
                     estimaciones = (from d in estimaciones
                                     where d.detalle.ToString().ToUpper().Contains(filtroDetalle.ToUpper())
                                     select d).ToList();
                 }
 
-                if (filtroEstadoEstimacion != "")
+                if(filtroEstadoEstimacion != "")
                 {
                     estimaciones = (from d in estimaciones
                                     where d.estado.ToString().ToUpper().Contains(filtroEstadoEstimacion.ToUpper())
@@ -2533,7 +2550,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(result);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var result = new
                 {
@@ -2585,7 +2602,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(result);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var result = new
                 {
@@ -2603,7 +2620,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 EstimacionTicket estimacionTicket = db.EstimacionTicket.Find(idEstimacion);
-                if (estimacionTicket != null)
+                if(estimacionTicket != null)
                 {
                     var detallesEstimacion = (from de in db.DetalleEstimacionTicket
                                               where de.SecuencialEstimacionTicket == idEstimacion
@@ -2640,7 +2657,7 @@ namespace SifizPlanning.Controllers
                     return Json(resp);
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -2663,15 +2680,15 @@ namespace SifizPlanning.Controllers
             try
             {
                 EstimacionTicket et = db.EstimacionTicket.Find(idEstimacion);
-                if (et == null)
+                if(et == null)
                 {
                     throw new Exception("No se encontró la estimación del usuario");
                 }
-                if (catalogar != -1 && catalogar != 1 && catalogar != 4)
+                if(catalogar != -1 && catalogar != 1 && catalogar != 4)
                 {
                     throw new Exception("No se reconoce el código de la catalogación de la estimación");
                 }
-                if (et.EstimacionTerminada == 0)
+                if(et.EstimacionTerminada == 0)
                 {
                     throw new Exception("La estimación debe estar terminada para poder catalogarla");
                 }
@@ -2680,9 +2697,9 @@ namespace SifizPlanning.Controllers
                 int secuencialTicket = et.SecuencialTicket;
                 var estimaciones = db.EstimacionTicket.Where(x => x.SecuencialTicket == secuencialTicket && x.Secuencial != idEstimacion).ToList();
 
-                foreach (EstimacionTicket estimacion in estimaciones)
+                foreach(EstimacionTicket estimacion in estimaciones)
                 {
-                    if (estimacion.FactorTiempo == catalogar)
+                    if(estimacion.FactorTiempo == catalogar)
                     {
                         estimacion.FactorTiempo = 0;
                     }
@@ -2695,10 +2712,10 @@ namespace SifizPlanning.Controllers
                 int totalFactor = 0;
                 //Calculando el tiempo total de la estimación
                 estimaciones = db.EstimacionTicket.Where(x => x.SecuencialTicket == secuencialTicket && x.EstaActiva == 1).ToList();
-                foreach (EstimacionTicket estimacion in estimaciones)
+                foreach(EstimacionTicket estimacion in estimaciones)
                 {
                     int factor = (int)(estimacion.FactorTiempo);
-                    if (factor < 0)
+                    if(factor < 0)
                     {
                         factor *= -1;
                     }
@@ -2716,7 +2733,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -2735,18 +2752,18 @@ namespace SifizPlanning.Controllers
             {
                 //Cambiar el estado del ticket a estimacion terminada
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("Error, no se encontró en el ticket");
                 }
                 EstadoTicket estadoTicket = db.EstadoTicket.Where(x => x.Codigo == "ESTIMACION TERMINADA").FirstOrDefault();
-                if (estadoTicket == null)
+                if(estadoTicket == null)
                 {
                     throw new Exception("No se encontró el estado de ESTIMACIÓN TERMINADA.");
                 }
                 //Buscando si tiene estimaciones por terminar
                 var cantEstimacionesSinTerminar = db.EstimacionTicket.Where(x => x.SecuencialTicket == idTicket && x.EstimacionTerminada == 0 && x.EstaActiva == 1).Count();
-                if (cantEstimacionesSinTerminar > 0)
+                if(cantEstimacionesSinTerminar > 0)
                 {
                     throw new Exception("No se han terminado todas las estimaciones del ticket.");
                 }
@@ -2757,9 +2774,20 @@ namespace SifizPlanning.Controllers
                 ticket.estadoTicket = estadoTicket;
                 ticket.SecuencialProximaActividad = secuencialProximaActividad;
 
-                //Adicionando el histórico del ticket
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+                Colaborador colaborador = user.persona.colaborador.FirstOrDefault();
+
+                Ofertas oferta = new Ofertas();
+                oferta.cliente = ticket.persona_cliente.cliente;
+                oferta.colaborador = colaborador;
+                oferta.Detalle = "Estimación del ticket: " + ticket.Secuencial;
+                oferta.HorasEstimacion = estimacion;
+                oferta.FechaDisponibilidad = new DateTime(0001 / 01 / 01);
+                oferta.FechaProduccion = new DateTime(0001 / 01 / 01);
+                oferta.FechaRegistro = DateTime.Now;
+
+                //Adicionando el histórico del ticket
                 int numeroVersion = db.TicketHistorico.Where(x => x.SecuencialTicket == ticket.Secuencial).Count();
 
                 TicketHistorico ticketHistorico = new TicketHistorico
@@ -2796,7 +2824,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -2825,13 +2853,24 @@ namespace SifizPlanning.Controllers
                 int numeroVersion = db.TicketHistorico.Where(x => x.SecuencialTicket == ticket.Secuencial).Count();
                 numeroVersion--;
                 TicketHistorico ticketHistorico = db.TicketHistorico.Where(x => x.SecuencialTicket == ticket.Secuencial && x.Version == numeroVersion).FirstOrDefault();
-                if (ticketHistorico == null)
+                if(ticketHistorico == null)
                 {
                     throw new Exception("No se encontró el versionamiento del ticket.");
                 }
                 numeroVersion++;
+
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+                Colaborador colaborador = user.persona.colaborador.FirstOrDefault();
+
+                Ofertas oferta = new Ofertas();
+                oferta.cliente = ticket.persona_cliente.cliente;
+                oferta.colaborador = colaborador;
+                oferta.Detalle = "Estimación del ticket: " + ticket.Secuencial;
+                oferta.HorasEstimacion = ticket.Estimacion;
+                oferta.FechaDisponibilidad = new DateTime(0001 / 01 / 01);
+                oferta.FechaProduccion = new DateTime(0001 / 01 / 01);
+                oferta.FechaRegistro = DateTime.Now;
 
                 TicketHistorico ticketHis = new TicketHistorico
                 {
@@ -2865,7 +2904,7 @@ namespace SifizPlanning.Controllers
 
                 List<string> destinatarios = Utiles.CorreoPorGrupoEmail("COORD");
                 var gestores = ticket.persona_cliente.cliente.gestorServicios.ToList();
-                foreach (var g in gestores)
+                foreach(var g in gestores)
                 {
                     destinatarios.Add(g.colaborador.persona.usuario.FirstOrDefault().Email);
                 }
@@ -2880,7 +2919,7 @@ namespace SifizPlanning.Controllers
                 string asunto = ticket.persona_cliente.cliente.Codigo + " HESO " + String.Format("{0:000000}", ticket.Secuencial) + " - ESTIMACION COMPLETADA(" + ticket.Asunto + ")";
 
                 string htmlMail = "<div class=\"textoCuerpo\">Estimado " + Utiles.UpperCamelCase(personaEmail.Nombre1.ToLower()) + " " + Utiles.UpperCamelCase(personaEmail.Apellido1.ToLower()) + ":<br>";
-                if (personaEmail.Sexo == "F")
+                if(personaEmail.Sexo == "F")
                 {
                     htmlMail = "<div class=\"textoCuerpo\">Estimada " + Utiles.UpperCamelCase(personaEmail.Nombre1.ToLower()) + " " + Utiles.UpperCamelCase(personaEmail.Apellido1.ToLower()) + ":<br>";
                 }
@@ -2911,7 +2950,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -2929,7 +2968,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 var estimaciones = db.EstimacionTicket.Where(s => s.SecuencialTicket == numero && s.EstaActiva == 1).ToList();
-                foreach (var e in estimaciones)
+                foreach(var e in estimaciones)
                 {
                     RechazarEstimacionTicket(e.Secuencial, comentario);
                 }
@@ -2939,7 +2978,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -2970,7 +3009,7 @@ namespace SifizPlanning.Controllers
                 int numeroVersion = db.TicketHistorico.Where(x => x.SecuencialTicket == ticket.Secuencial).Count();
                 numeroVersion--;
                 TicketHistorico ticketHistorico = db.TicketHistorico.Where(x => x.SecuencialTicket == ticket.Secuencial && x.Version == numeroVersion).FirstOrDefault();
-                if (ticketHistorico == null)
+                if(ticketHistorico == null)
                 {
                     throw new Exception("No se encontró el versionamiento del ticket.");
                 }
@@ -3010,7 +3049,7 @@ namespace SifizPlanning.Controllers
 
                 List<string> destinatarios = new List<string>();
                 var gestores = ticket.persona_cliente.cliente.gestorServicios.ToList();
-                foreach (var g in gestores)
+                foreach(var g in gestores)
                 {
                     destinatarios.Add(g.colaborador.persona.usuario.FirstOrDefault().Email);
                 }
@@ -3022,7 +3061,7 @@ namespace SifizPlanning.Controllers
                 string asunto = ticket.persona_cliente.cliente.Codigo + " HESO " + String.Format("{0:000000}", ticket.Secuencial) + " - ESTIMACION RECHAZADA(" + ticket.Asunto + ")";
 
                 string htmlMail = "<div class=\"textoCuerpo\">Estimado " + Utiles.UpperCamelCase(personaEmail.Nombre1.ToLower()) + " " + Utiles.UpperCamelCase(personaEmail.Apellido1.ToLower()) + ":<br>";
-                if (personaEmail.Sexo == "F")
+                if(personaEmail.Sexo == "F")
                 {
                     htmlMail = "<div class=\"textoCuerpo\">Estimada " + Utiles.UpperCamelCase(personaEmail.Nombre1.ToLower()) + " " + Utiles.UpperCamelCase(personaEmail.Apellido1.ToLower()) + ":<br>";
                 }
@@ -3048,7 +3087,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -3102,25 +3141,25 @@ namespace SifizPlanning.Controllers
                                                               }).ToList(),
                                                items = (from i in db.ItemEspecial
                                                         join nc in db.NivelColaborador on i.SecuencialNivelColaborador equals nc.Secuencial
-                                                               where i.SecuencialEstimacion == est.Secuencial
-                                                               select new
-                                                               {
-                                                                   descripcion = i.Descripcion,
-                                                                   nivel = nc.Descripcion,
-                                                                   tiempoEstimacion = i.TiempoEstimacion
-                                                               }).ToList(),
+                                                        where i.SecuencialEstimacion == est.Secuencial
+                                                        select new
+                                                        {
+                                                            descripcion = i.Descripcion,
+                                                            nivel = nc.Descripcion,
+                                                            tiempoEstimacion = i.TiempoEstimacion
+                                                        }).ToList(),
                                            }).ToList();
 
 
                 //calculando tiempo total
                 var tiempoTotal = 0;
 
-                foreach (var estimacion in estimacionesParcial)
+                foreach(var estimacion in estimacionesParcial)
                 {
                     var entrega = estimacion.entregables;
-                    foreach (var estima in entrega)
+                    foreach(var estima in entrega)
                     {
-                        foreach (var est in estima.detalles)
+                        foreach(var est in estima.detalles)
                         {
                             tiempoTotal += est.tiempoDesarrollo + est.tiempoPrueba;
                         }
@@ -3145,12 +3184,12 @@ namespace SifizPlanning.Controllers
                                                items = ep.items
                                            }).ToList();
 
-                if (estimacionesParcial.Count() == 0)
+                if(estimacionesParcial.Count() == 0)
                 {
                     throw new Exception("El ticket no se ha enviado a estimar.");
                 }
                 var cantEstimacionesSinTerminar = db.EstimacionTicket.Where(x => x.SecuencialTicket == idTicket && x.EstimacionTerminada == 0 && x.EstaActiva == 1).Count();
-                if (cantEstimacionesSinTerminar > 0)
+                if(cantEstimacionesSinTerminar > 0)
                 {
                     throw new Exception("No se han terminado todas las estimaciones del ticket.");
                 }
@@ -3161,7 +3200,7 @@ namespace SifizPlanning.Controllers
                 //{
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
-                if (user != null && (user.Email == "vhidalgo@sifizsoft.com" || user.Email == "rsanchez@sifizsoft.com"))
+                if(user != null && (user.Email == "vhidalgo@sifizsoft.com" || user.Email == "rsanchez@sifizsoft.com"))
                     permitirValidar = true;
                 //}
 
@@ -3175,7 +3214,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -3193,7 +3232,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 EstimacionTicket estimacion = db.EstimacionTicket.Find(idEstimacion);
-                if (estimacion == null)
+                if(estimacion == null)
                 {
                     throw new Exception("No se encontró la estimación.");
                 }
@@ -3218,7 +3257,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -3260,7 +3299,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -3278,27 +3317,27 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("Error, no se encontró el ticket.");
                 }
                 EstadoTicket estadoTicket = db.EstadoTicket.Where(x => x.Codigo == "COTIZÁNDOSE").FirstOrDefault();
-                if (estadoTicket == null)
+                if(estadoTicket == null)
                 {
                     throw new Exception("Error,  no se encontró el estado COTIZÁNDOSE.");
                 }
                 Colaborador colaborador = db.Colaborador.Where(x => x.Secuencial == idColaborador).FirstOrDefault();
-                if (colaborador == null)
+                if(colaborador == null)
                 {
                     throw new Exception("Error,  no se encontró el cotizador.");
                 }
 
                 //Actualizando la estimación si no está definida
-                if (ticket.Estimacion == 0)
+                if(ticket.Estimacion == 0)
                 {
                     ticket.Estimacion = estimacion;
                 }
-                if (ticket.Estimacion == 0)
+                if(ticket.Estimacion == 0)
                 {
                     throw new Exception("Error, el ticket no puede tener 0 horas de estimación.");
                 }
@@ -3360,7 +3399,7 @@ namespace SifizPlanning.Controllers
                 Persona persona = colaborador.persona;
 
                 string saludo = "Estimado: " + Utiles.UpperCamelCase(persona.Nombre1.ToLower()) + " " + Utiles.UpperCamelCase(persona.Apellido1.ToLower()) + ",<br/>";
-                if (persona.Sexo == "F")
+                if(persona.Sexo == "F")
                     saludo = "Estimada: " + Utiles.UpperCamelCase(persona.Nombre1.ToLower()) + " " + Utiles.UpperCamelCase(persona.Apellido1.ToLower()) + ",<br/>";
 
                 string htmlMail = "<div class=\"textoCuerpo\">" + saludo + @"Se ha entrado una nueva petición de cotización de ticket al sistema Sifizplanning,<br/>
@@ -3377,7 +3416,7 @@ namespace SifizPlanning.Controllers
                 usuariosDestinos.Add(usuario.Email);
 
                 var gestores = ticket.persona_cliente.cliente.gestorServicios.ToList();
-                foreach (var g in gestores)
+                foreach(var g in gestores)
                 {
                     usuariosDestinos.Add(g.colaborador.persona.usuario.FirstOrDefault().Email);
                 }
@@ -3391,7 +3430,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -3428,7 +3467,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -3467,7 +3506,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -3559,10 +3598,10 @@ namespace SifizPlanning.Controllers
                 Websocket.getInstance().NuevoComentarioMuyImportante();
 
                 //Por los ficheros adjuntos
-                if (adjuntos != null)
-                    foreach (HttpPostedFileBase adj in adjuntos)
+                if(adjuntos != null)
+                    foreach(HttpPostedFileBase adj in adjuntos)
                     {
-                        if (adj != null)
+                        if(adj != null)
                         {
                             string extFile = Path.GetExtension(adj.FileName);
                             string newNameFile = Utiles.RandomString(10) + extFile;
@@ -3587,7 +3626,7 @@ namespace SifizPlanning.Controllers
                 string emailCliente = persona.usuario.FirstOrDefault().Email;
 
                 string textoEmail = @"<div class='textoCuerpo'>Estimado: ";
-                if (persona.Sexo == "F")
+                if(persona.Sexo == "F")
                     textoEmail = @"Estimada: ";
                 textoEmail += persona.Nombre1 + " " + persona.Apellido1 + "<br>";
 
@@ -3606,7 +3645,7 @@ namespace SifizPlanning.Controllers
                 usuariosDestinos.AddRange(Utiles.CorreoPorGrupoEmail("COORD"));
 
                 var gestores = ticket.persona_cliente.cliente.gestorServicios.ToList();
-                foreach (var g in gestores)
+                foreach(var g in gestores)
                 {
                     usuariosDestinos.Add(g.colaborador.persona.usuario.FirstOrDefault().Email);
                 }
@@ -3639,7 +3678,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -3676,7 +3715,7 @@ namespace SifizPlanning.Controllers
                                         categoria = t.categoriaTicket.Codigo
                                     }).ToList();
 
-                if (filtro != "")
+                if(filtro != "")
                 {
                     cotizaciones = (from c in cotizaciones
                                     where (c.categoria.ToLower().Contains(filtro.ToLower()) ||
@@ -3696,7 +3735,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -3714,7 +3753,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("No se encontró el ticket.");
                 }
@@ -3748,7 +3787,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -3767,7 +3806,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 CotizacionTicket cotizacion = db.CotizacionTicket.Find(idCotizacion);
-                if (cotizacion == null)
+                if(cotizacion == null)
                 {
                     throw new Exception("No se encontró la cotización");
                 }
@@ -3831,10 +3870,10 @@ namespace SifizPlanning.Controllers
                 db.TicketHistorico.Add(ticketHistorico);
 
                 //Por los ficheros adjuntos
-                if (adjuntos != null)
-                    foreach (HttpPostedFileBase adj in adjuntos)
+                if(adjuntos != null)
+                    foreach(HttpPostedFileBase adj in adjuntos)
                     {
-                        if (adj != null)
+                        if(adj != null)
                         {
                             string extFile = Path.GetExtension(adj.FileName);
                             string newNameFile = "C_" + Utiles.RandomString(10) + extFile;
@@ -3872,7 +3911,7 @@ namespace SifizPlanning.Controllers
                 usuariosDestinos.Add(emailUser);
 
                 var gestores = ticket.persona_cliente.cliente.gestorServicios.ToList();
-                foreach (var g in gestores)
+                foreach(var g in gestores)
                 {
                     usuariosDestinos.Add(g.colaborador.persona.usuario.FirstOrDefault().Email);
                 }
@@ -3886,7 +3925,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -3904,7 +3943,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("No se encontró el cliente solicitante.");
                 }
@@ -3930,7 +3969,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -3948,7 +3987,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("No se encontró el cliente solicitante.");
                 }
@@ -3985,7 +4024,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -4072,7 +4111,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("No se encontró el ticket");
                 }
@@ -4091,11 +4130,11 @@ namespace SifizPlanning.Controllers
                 var jsonObj = s.Deserialize<dynamic>(datos);
 
                 int totalHorasAsignadas = 0;
-                for (int i = 0; i < jsonObj.Length; i++)
+                for(int i = 0; i < jsonObj.Length; i++)
                 {
                     dynamic tipoId = jsonObj[i]["idColaborador"];
                     int idColaborador = 0;
-                    if (object.ReferenceEquals(tipoId.GetType(), idColaborador.GetType()))
+                    if(object.ReferenceEquals(tipoId.GetType(), idColaborador.GetType()))
                     {
                         idColaborador = tipoId;
                     }
@@ -4109,7 +4148,7 @@ namespace SifizPlanning.Controllers
                     {
                         dynamic tipoIdTarea = jsonObj[i]["idTarea"];
                         //Verificando si la tarea ya esta asignada
-                        if (object.ReferenceEquals(tipoId.GetType(), idTarea.GetType()))
+                        if(object.ReferenceEquals(tipoId.GetType(), idTarea.GetType()))
                         {
                             idTarea = tipoIdTarea;
                         }
@@ -4118,14 +4157,14 @@ namespace SifizPlanning.Controllers
                             idTarea = int.Parse(jsonObj[i]["idTarea"]);
                         }
                     }
-                    catch (Exception) { }
+                    catch(Exception) { }
 
-                    if (idTarea != 0)
+                    if(idTarea != 0)
                         continue;
 
                     dynamic idUbicacion = jsonObj[i]["ubicacion"];
                     int ubicacion = 0;
-                    if (object.ReferenceEquals(idUbicacion.GetType(), ubicacion.GetType()))
+                    if(object.ReferenceEquals(idUbicacion.GetType(), ubicacion.GetType()))
                     {
                         ubicacion = idUbicacion;
                     }
@@ -4136,7 +4175,7 @@ namespace SifizPlanning.Controllers
 
                     dynamic nHoras = jsonObj[i]["numeroHoras"];
                     int numeroHoras = 0;
-                    if (object.ReferenceEquals(nHoras.GetType(), numeroHoras.GetType()))
+                    if(object.ReferenceEquals(nHoras.GetType(), numeroHoras.GetType()))
                     {
                         numeroHoras = nHoras;
                     }
@@ -4152,7 +4191,7 @@ namespace SifizPlanning.Controllers
 
                     dynamic pCoordinador = jsonObj[i]["coordinador"];
                     int coordinador = 0;
-                    if (object.ReferenceEquals(coordinador.GetType(), pCoordinador.GetType()))
+                    if(object.ReferenceEquals(coordinador.GetType(), pCoordinador.GetType()))
                     {
                         coordinador = pCoordinador;
                     }
@@ -4183,7 +4222,7 @@ namespace SifizPlanning.Controllers
                                             ffin = t.FechaFin
                                         }).ToList();
                     int time = 0;
-                    foreach (var tarea in tareasDelDia)
+                    foreach(var tarea in tareasDelDia)
                     {
                         TimeSpan tiempo = tarea.ffin - tarea.finicio;
                         time += tiempo.Hours;
@@ -4193,11 +4232,11 @@ namespace SifizPlanning.Controllers
                     fechaInicio = fechaInicio.AddMinutes(30 + (8 * 60));//A las 8.30 empieza
                     DateTime fechaFin = fechaInicio.AddHours(numeroHoras);
 
-                    if (fechaInicio.Hour < 13 && fechaFin.Hour > 13)
+                    if(fechaInicio.Hour < 13 && fechaFin.Hour > 13)
                     {
                         fechaFin = fechaFin.AddHours(1);
                     }
-                    else if (fechaInicio.Hour == 13)
+                    else if(fechaInicio.Hour == 13)
                     {
                         fechaInicio = fechaInicio.AddHours(1);
                         fechaFin = fechaFin.AddHours(1);
@@ -4221,7 +4260,7 @@ namespace SifizPlanning.Controllers
                     };
                     db.Tarea.Add(tar);
 
-                    if (coordinador != 0)
+                    if(coordinador != 0)
                     {
                         db.Tarea_Coordinador.Add(
                             new Tarea_Coordinador
@@ -4243,7 +4282,7 @@ namespace SifizPlanning.Controllers
                     };
                     db.HistoricoTareaEstado.Add(histET);
 
-                    if (tareaPrincipal == null)
+                    if(tareaPrincipal == null)
                         tareaPrincipal = tar;
 
                     listaDiaColaborador.Add(new DiaColaborador { Fecha = tar.FechaInicio.Date, IdColaborador = tar.SecuencialColaborador });
@@ -4295,7 +4334,7 @@ namespace SifizPlanning.Controllers
                 }
 
                 //En el flujo básico que no se realiza el proceso de estimación
-                if (ticket.Estimacion == 0)
+                if(ticket.Estimacion == 0)
                     ticket.Estimacion = totalHorasAsignadas;
 
                 //Actualizando las reputaciones
@@ -4337,7 +4376,7 @@ namespace SifizPlanning.Controllers
                 db.SaveChanges();//Salvando los cambios
 
                 //Actualizando las fechas de los dias que existieron los cambios y en las fechas
-                foreach (DiaColaborador diaColab in listaDiaColaborador)
+                foreach(DiaColaborador diaColab in listaDiaColaborador)
                 {
                     Utiles.OrdenarTareasPermisos(diaColab.Fecha, diaColab.IdColaborador, user, db);
                 }
@@ -4349,7 +4388,7 @@ namespace SifizPlanning.Controllers
                 Persona personaCliente = ticket.persona_cliente.persona;
                 string emailCliente = personaCliente.usuario.FirstOrDefault().Email;
                 idColaboradoresTicket = idColaboradoresTicket.Distinct().ToList();
-                foreach (int idColab in idColaboradoresTicket)
+                foreach(int idColab in idColaboradoresTicket)
                 {
                     Persona personaColaborador = db.Colaborador.Find(idColab).persona;
                     string email = personaColaborador.usuario.FirstOrDefault().Email;
@@ -4363,13 +4402,13 @@ namespace SifizPlanning.Controllers
                 string textoIngenieros = String.Join(", Ing. ", nombresColaboradores);
 
                 string articulo = "al";
-                if (nombresColaboradores.Count > 1)
+                if(nombresColaboradores.Count > 1)
                     articulo = "a los";
                 string pronombreRelativo = "quien";
-                if (nombresColaboradores.Count > 1)
+                if(nombresColaboradores.Count > 1)
                     pronombreRelativo = "quienes";
                 string verboRelativo = "atenderá";
-                if (nombresColaboradores.Count > 1)
+                if(nombresColaboradores.Count > 1)
                     verboRelativo = "atenderán";
 
                 textoEmail += @"El requerimiento <b>" + string.Format("{0:000000}", ticket.Secuencial) + "</b> ha sido asignado " + articulo + " Ing. " + textoIngenieros + " " + pronombreRelativo + @" <br/>
@@ -4381,7 +4420,7 @@ namespace SifizPlanning.Controllers
                 string asuntoEmail = codigoCliente + " HESO " + string.Format("{0:000000}", ticket.Secuencial) + " - Asignación del requerimiento (" + ticket.Asunto + ")";
 
                 var gestores = ticket.persona_cliente.cliente.gestorServicios.ToList();
-                foreach (var g in gestores)
+                foreach(var g in gestores)
                 {
                     destinatarioCorreos.Add(g.colaborador.persona.usuario.FirstOrDefault().Email);
                 }
@@ -4414,7 +4453,7 @@ namespace SifizPlanning.Controllers
                 textoEmail += "Teléfono del cliente: " + ticket.persona_cliente.Telefono + "<br/>";
                 textoEmail += "Prioridad: " + ticket.prioridadTicket.Codigo + "<br/>";
                 textoEmail += "Reportado Por: " + ticket.ReportadoPor + "<br/>";
-                if (ticket.Telefono != "-" && ticket.Telefono != null)
+                if(ticket.Telefono != "-" && ticket.Telefono != null)
                 {
                     textoEmail += "Teléfono de contacto para este ticket: " + ticket.Telefono + "<br/>";
                 }
@@ -4424,12 +4463,12 @@ namespace SifizPlanning.Controllers
                 textoEmail += "Asunto: " + ticket.Asunto + "<br/>";
                 textoEmail += "Detalle: " + ticket.Detalle + "<br/>";
 
-                if (ticket.adjuntoTicket.Count > 0)
+                if(ticket.adjuntoTicket.Count > 0)
                 {//El ticket tiene adjuntos
                     textoEmail += "<b>Recursos para desarrollar el ticket:</b> <br/>";
                     string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
                     int i = 1;
-                    foreach (AdjuntoTicket recurso in ticket.adjuntoTicket)
+                    foreach(AdjuntoTicket recurso in ticket.adjuntoTicket)
                     {
                         textoEmail += "<a href=\"" + baseUrl + "/Web" + recurso.Url + "\">recurso " + i++ + "</a> <br/>";
                     }
@@ -4437,16 +4476,16 @@ namespace SifizPlanning.Controllers
                 }
 
                 List<string> diasAsignacion = new List<string>();
-                foreach (DiaColaborador diaColab in listaDiaColaborador)
+                foreach(DiaColaborador diaColab in listaDiaColaborador)
                 {
                     diasAsignacion.Add(diaColab.Fecha.ToString("dd/MM/yyyy"));
                 }
                 string strDiasAsignacion = String.Join(", ", diasAsignacion);
-                if (diasAsignacion.Count == 1)
+                if(diasAsignacion.Count == 1)
                 {
                     textoEmail += "Tarea asignada el: " + strDiasAsignacion;
                 }
-                else if (diasAsignacion.Count > 1)
+                else if(diasAsignacion.Count > 1)
                 {
                     textoEmail += "Las tareas están asignadas los días: <br/>";
                     textoEmail += strDiasAsignacion + "<br/>";
@@ -4500,7 +4539,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -4545,7 +4584,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -4562,7 +4601,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("El ticket no se encontró");
                 }
@@ -4611,7 +4650,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -4629,7 +4668,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("El ticket no se encontró");
                 }
@@ -4683,7 +4722,7 @@ namespace SifizPlanning.Controllers
 
                 //Borrar aqui
                 var gestores = ticket.persona_cliente.cliente.gestorServicios.ToList();
-                foreach (var g in gestores)
+                foreach(var g in gestores)
                 {
                     correosDestinos.Add(g.colaborador.persona.usuario.FirstOrDefault().Email);
                 }
@@ -4713,7 +4752,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -4759,7 +4798,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -4777,11 +4816,11 @@ namespace SifizPlanning.Controllers
         {
             try
             {
-                if (idTickets == null || idTickets.Length == 0)
+                if(idTickets == null || idTickets.Length == 0)
                 {
                     throw new Exception("Se debe seleccionar al menos un elemento.");
                 }
-                foreach (int idTicket in idTickets)
+                foreach(int idTicket in idTickets)
                 {
                     ActionResult action = this.CerrarTicket(idTicket);
                 }
@@ -4792,7 +4831,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -4850,7 +4889,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -4891,7 +4930,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -4910,7 +4949,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("El ticket no se encontró");
                 }
@@ -4969,7 +5008,7 @@ namespace SifizPlanning.Controllers
 
                 //Borrar aqui
                 var gestores = ticket.persona_cliente.cliente.gestorServicios.ToList();
-                foreach (var g in gestores)
+                foreach(var g in gestores)
                 {
                     correosDestinos.Add(g.colaborador.persona.usuario.FirstOrDefault().Email);
                 }
@@ -4999,7 +5038,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -5018,7 +5057,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("El ticket no se encontró");
                 }
@@ -5079,7 +5118,7 @@ namespace SifizPlanning.Controllers
 
                 //Borrar aqui
                 var gestores = ticket.persona_cliente.cliente.gestorServicios.ToList();
-                foreach (var g in gestores)
+                foreach(var g in gestores)
                 {
                     correosDestinos.Add(g.colaborador.persona.usuario.FirstOrDefault().Email);
                 }
@@ -5109,7 +5148,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -5128,7 +5167,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("El ticket no se encontró");
                 }
@@ -5183,11 +5222,11 @@ namespace SifizPlanning.Controllers
                 db.SaveChanges();
 
                 //Por los ficheros adjuntos   
-                if (adjuntos != null)
+                if(adjuntos != null)
                 {
-                    foreach (HttpPostedFileBase adj in adjuntos)
+                    foreach(HttpPostedFileBase adj in adjuntos)
                     {
-                        if (adj != null)
+                        if(adj != null)
                         {
                             string extFile = Path.GetExtension(adj.FileName);
                             string newNameFile = Utiles.RandomString(10) + extFile;
@@ -5213,7 +5252,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -5232,7 +5271,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("El ticket no se encontró");
                 }
@@ -5281,7 +5320,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -5316,7 +5355,7 @@ namespace SifizPlanning.Controllers
 
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -5333,7 +5372,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket_Resolucion tr = db.Ticket_Resolucion.Find(idTicket);
-                if (tr == null)
+                if(tr == null)
                 {
                     throw new Exception("Error, no puede estar en desacuerdo con la resolucion porque no se ha definido ninguna forma de resolucion en este ticket.");
                 }
@@ -5372,7 +5411,7 @@ namespace SifizPlanning.Controllers
 
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -5407,7 +5446,7 @@ namespace SifizPlanning.Controllers
 
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -5424,7 +5463,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket t = db.Ticket.Find(idTicket);
-                if (t == null)
+                if(t == null)
                 {
                     throw new Exception("Error, no puede insertar un comentario porque no se encontró el ticket.");
                 }
@@ -5436,7 +5475,7 @@ namespace SifizPlanning.Controllers
 
                 string palabra = comentario.Split(' ').First();
                 Colaborador col = null;
-                if (palabra == "ANULADO:")
+                if(palabra == "ANULADO:")
                 {
                     //string colaborador = System.Configuration.ConfigurationManager.AppSettings["ColaboradorDefault"];
                     string email = System.Configuration.ConfigurationManager.AppSettings["emailApp"];
@@ -5477,7 +5516,7 @@ namespace SifizPlanning.Controllers
 
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -5495,7 +5534,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket t = db.Ticket.Find(idTicket);
-                if (t == null)
+                if(t == null)
                 {
                     throw new Exception("Error, no puede insertar un comentario porque no se encontró el ticket.");
                 }
@@ -5509,17 +5548,17 @@ namespace SifizPlanning.Controllers
 
                 List<string> usuariosDestinos = new List<string>();
                 Regex rgx = new Regex(@"^(([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)(\s*;\s*|\s*$))*$");
-                if (!rgx.IsMatch(destinatariosEmailTicket))
+                if(!rgx.IsMatch(destinatariosEmailTicket))
                 {
                     throw new Exception("Debe ingresar una lista de correos válida separados por punto y coma(;)");
                 };
                 string[] emails = destinatariosEmailTicket.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (var email in emails)
+                foreach(var email in emails)
                 {
                     usuariosDestinos.Add(email);
                 }
                 var gestores = t.persona_cliente.cliente.gestorServicios.ToList();
-                foreach (var g in gestores)
+                foreach(var g in gestores)
                 {
                     usuariosDestinos.Add(g.colaborador.persona.usuario.FirstOrDefault().Email);
                 }
@@ -5534,7 +5573,7 @@ namespace SifizPlanning.Controllers
 
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -5553,13 +5592,13 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("Error, no se encontró el ticket");
                 }
 
                 bool financial25 = false;
-                if (ticket.SecuencialTicketVersionCliente != null && db.Ticket_RequierePublicacion.Find(ticket.Secuencial) != null)
+                if(ticket.SecuencialTicketVersionCliente != null && db.Ticket_RequierePublicacion.Find(ticket.Secuencial) != null)
                 {
                     financial25 = db.TicketVersionCliente.Find(ticket.SecuencialTicketVersionCliente).Codigo == "FBS 2.5";
                 }
@@ -5571,7 +5610,7 @@ namespace SifizPlanning.Controllers
 
                 string palabra = comentario.Split(' ').First();
                 Colaborador col = null;
-                if (palabra == "RECHAZADO:")
+                if(palabra == "RECHAZADO:")
                 {
                     string colaborador = System.Configuration.ConfigurationManager.AppSettings["ColaboradorDefault"];
                     colaborador += "@sifizsoft.com";
@@ -5632,7 +5671,7 @@ namespace SifizPlanning.Controllers
                                      presentando como justificación el siguiente comentario:<br/>" + comentario + @"<br/></div>";
 
                 List<string> correosDestinos = Utiles.CorreoPorGrupoEmail("COORD");
-                if (financial25)
+                if(financial25)
                 {
                     correosDestinos.Add("publicacionesdoscinco@sifizsoft.com");
                 }
@@ -5642,7 +5681,7 @@ namespace SifizPlanning.Controllers
 
                 //Enviando email
                 var gestores = ticket.persona_cliente.cliente.gestorServicios.ToList();
-                foreach (var g in gestores)
+                foreach(var g in gestores)
                 {
                     correosDestinos.Add(g.colaborador.persona.usuario.FirstOrDefault().Email);
                 }
@@ -5673,7 +5712,7 @@ namespace SifizPlanning.Controllers
 
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -5693,7 +5732,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("No se encontró el ticket");
                 }
@@ -5739,7 +5778,7 @@ namespace SifizPlanning.Controllers
                                                }).ToList<EventoTicket>();
                 eventos.AddRange(eventos3);
 
-                if (filtro != "")
+                if(filtro != "")
                 {
                     eventos = (from e in eventos
                                where e.Fecha.ToString().Contains(filtro) ||
@@ -5762,7 +5801,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -5780,17 +5819,17 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("No se encontró el ticket");
                 }
 
                 string dataHtml = "";
-                switch (tipo)
+                switch(tipo)
                 {
                     case 1://Aqui son las actualizaciones de los tickets ver en el historico
                         TicketHistorico ticketH = db.TicketHistorico.Find(idTicket, secuencialObjeto);
-                        if (ticketH == null)
+                        if(ticketH == null)
                         {
                             throw new Exception("No se encontró el histórico del ticket");
                         }
@@ -5798,12 +5837,12 @@ namespace SifizPlanning.Controllers
                         dataHtml += "<b>Usuario:</b> " + ticketH.usuario.persona.Nombre1 + " " + ticketH.usuario.persona.Apellido1 + "<br/>";
                         dataHtml += "<b>Estado del Ticket:</b> " + ticketH.estadoTicket.Codigo + "<br/>";
                         dataHtml += "<b>Prioridad del Ticket:</b> " + ticketH.prioridadTicket.Codigo + "<br/>";
-                        if (ticketH.prioridadRevisadaTicket != null)
+                        if(ticketH.prioridadRevisadaTicket != null)
                         {
                             dataHtml += "<b>Prioridad Revisada:</b> " + ticketH.prioridadRevisadaTicket.Codigo + "<br/>";
                         }
                         dataHtml += "<b>Categoría del Ticket:</b> " + ticketH.categoriaTicket.Codigo + "<br/>";
-                        if (ticketH.categoriaRevisadaTicket != null)
+                        if(ticketH.categoriaRevisadaTicket != null)
                         {
                             dataHtml += "<b>Categoría Revisada:</b> " + ticketH.categoriaRevisadaTicket.Codigo + "<br/>";
                         }
@@ -5817,7 +5856,7 @@ namespace SifizPlanning.Controllers
                         dataHtml += "<b>Detalle:</b> " + ticketH.Detalle + "<br/>";
                         dataHtml += "<b>Teléfonos:</b> " + ticketH.Telefono + "<br/>";
                         dataHtml += "<b>Fecha de Creación del Ticket:</b> " + ticketH.FechaCreado.ToString("dd/MM/yyyy HH:mm:ss") + "<br/>";
-                        if (ticketH.FechaRevisado.HasValue)
+                        if(ticketH.FechaRevisado.HasValue)
                         {
                             dataHtml += "<b>Fecha Revisado:</b> " + ticketH.FechaRevisado.Value.ToString("dd/MM/yyyy") + "<br/>";
                         }
@@ -5830,21 +5869,21 @@ namespace SifizPlanning.Controllers
 
                         string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
                         List<HistoricoInformacionTicket> historicoInformaciones = ticketH.historicoInformacionTicket.ToList();
-                        if (historicoInformaciones.Count > 0)
+                        if(historicoInformaciones.Count > 0)
                         {
                             string correos = @"
                                             -------------------------------------------------------------------------
                                              <br/><br/>";
 
-                            foreach (HistoricoInformacionTicket hct in historicoInformaciones)
+                            foreach(HistoricoInformacionTicket hct in historicoInformaciones)
                             {
                                 correos += hct.Texto;
                                 correos += @"<br/>";
 
                                 int i = 1;
-                                if (hct.historicoAdjunto.Count > 0)//Aqui tienen adjuntos
+                                if(hct.historicoAdjunto.Count > 0)//Aqui tienen adjuntos
                                 {
-                                    foreach (HistoricoAdjunto ha in hct.historicoAdjunto)
+                                    foreach(HistoricoAdjunto ha in hct.historicoAdjunto)
                                     {
                                         correos += "<a href=\"" + baseUrl + "/Web" + ha.Url + "\" target=\"_blank\">Adjunto" + i++ + "</a><br/>";
                                     }
@@ -5862,7 +5901,7 @@ namespace SifizPlanning.Controllers
 
                     case 2://Aqui son las actualizaciones de las cotizaciones de los tickets
                         OfertaCotizacionTicket oferta = db.OfertaCotizacionTicket.Find(secuencialObjeto);
-                        if (oferta == null)
+                        if(oferta == null)
                         {
                             throw new Exception("No se encontró la oferta de cotización");
                         }
@@ -5882,7 +5921,7 @@ namespace SifizPlanning.Controllers
 
                     case 3://Aqui son las actualizaciones de las renegociaciones de los clientes
                         Renegociacion renegociacion = db.Renegociacion.Find(secuencialObjeto);
-                        if (renegociacion == null)
+                        if(renegociacion == null)
                         {
                             throw new Exception("No se encontró la renegociación en la cotización");
                         }
@@ -5903,7 +5942,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -5921,13 +5960,13 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("No se encontró el ticket");
                 }
 
                 TicketHistorico ticketHistorico = db.TicketHistorico.Find(idTicket, secuencialObjeto);
-                if (ticketHistorico == null)
+                if(ticketHistorico == null)
                 {
                     throw new Exception("No se encontró el histórico del ticket");
                 }
@@ -5943,11 +5982,11 @@ namespace SifizPlanning.Controllers
                 db.SaveChanges();
 
                 //Por los ficheros adjuntos   
-                if (adjuntos != null)
+                if(adjuntos != null)
                 {
-                    foreach (HttpPostedFileBase adj in adjuntos)
+                    foreach(HttpPostedFileBase adj in adjuntos)
                     {
-                        if (adj != null)
+                        if(adj != null)
                         {
                             string extFile = Path.GetExtension(adj.FileName);
                             string newNameFile = Utiles.RandomString(10) + extFile;
@@ -5973,7 +6012,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -5991,7 +6030,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 Ticket ticket = db.Ticket.Find(idTicket);
-                if (ticket == null)
+                if(ticket == null)
                 {
                     throw new Exception("No se encontró el ticket");
                 }
@@ -6044,7 +6083,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -6063,7 +6102,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 DateTime fecha = DateTime.Today;
-                if (strFecha != "")
+                if(strFecha != "")
                 {
                     fecha = DateTime.Parse(strFecha);
                 }
@@ -6137,7 +6176,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -6159,7 +6198,7 @@ namespace SifizPlanning.Controllers
                 System.Globalization.CultureInfo cultureinfo = new System.Globalization.CultureInfo("es-ES");
                 DateTime fechaInicio = DateTime.Today;
                 DateTime fechaFin = DateTime.Today;
-                if (strFechaInicio != "" && strFechaFin != "")
+                if(strFechaInicio != "" && strFechaFin != "")
                 {
                     fechaInicio = DateTime.Parse(strFechaInicio, cultureinfo);
                     fechaFin = DateTime.Parse(strFechaFin, cultureinfo).AddDays(1);
@@ -6252,25 +6291,25 @@ namespace SifizPlanning.Controllers
                 var mantenimientoTicket = db.TicketMantenimientoBorar.Where(s => s.Fecha >= fechaInicio && s.Fecha < fechaFin).ToList();
 
                 var tick = tickets.ToList();
-                foreach (var i in tickets)
+                foreach(var i in tickets)
                 {
                     int countTareas = 0;
                     int countTickets = 0;
-                    foreach (var ta in mantenimientoTarea)
+                    foreach(var ta in mantenimientoTarea)
                     {
-                        if (i.tarea == ta.SecuencialTarea && i.fecha == ta.Fecha.ToString("dd/MM/yyyy"))
+                        if(i.tarea == ta.SecuencialTarea && i.fecha == ta.Fecha.ToString("dd/MM/yyyy"))
                         {
                             countTareas++;
                         }
                     }
-                    foreach (var ti in mantenimientoTicket)
+                    foreach(var ti in mantenimientoTicket)
                     {
-                        if (i.numero == ti.SecuencialTicket && i.fecha == ti.Fecha.ToString("dd/MM/yyyy"))
+                        if(i.numero == ti.SecuencialTicket && i.fecha == ti.Fecha.ToString("dd/MM/yyyy"))
                         {
                             countTickets++;
                         }
                     }
-                    if (countTareas > 0 || countTickets > 0)
+                    if(countTareas > 0 || countTickets > 0)
                     {
                         tick.Remove(i);
                     }
@@ -6280,7 +6319,7 @@ namespace SifizPlanning.Controllers
                 var ticketsAdd = db.TicketMantenimientoAgregar.Where(s => s.Fecha >= fechaInicio && s.Fecha < fechaFin).ToList();
                 var clienteAdd = db.Cliente.Where(s => s.Secuencial == idCliente).FirstOrDefault();
                 var ticketAgregados = ticketsAdd.Where(s => s.Cliente == clienteAdd.Codigo + "-" + clienteAdd.Descripcion).ToList();
-                foreach (var c in ticketAgregados)
+                foreach(var c in ticketAgregados)
                 {
                     tickets.Add(new { tarea = -1, cliente = c.Cliente, numero = c.TicketTarea, detalle = c.Detalle, reportado = c.Reportado, asignado = c.Tecnico, fecha = c.Fecha.ToString("dd/MM/yyyy"), fechaComparacion = fechaInicio, categoria = "", categoriaRevisada = "", estado = c.Estado, tiempo = (double)c.Tiempo });
                 }
@@ -6315,10 +6354,10 @@ namespace SifizPlanning.Controllers
                 var totalhoras = tickets.Sum(s => s.tiempo);
 
                 List<string> destinatarioCorreos = Utiles.CorreoPorGrupoEmail("COORD");
-                foreach (var personaCliente in db.Cliente.Where(s => s.Secuencial == idCliente).FirstOrDefault().persona_cliente)
+                foreach(var personaCliente in db.Cliente.Where(s => s.Secuencial == idCliente).FirstOrDefault().persona_cliente)
                 {
                     var usuario = personaCliente.persona.usuario.Where(s => s.EstaActivo == 1).FirstOrDefault();
-                    if (usuario != null)
+                    if(usuario != null)
                         destinatarioCorreos.Add(usuario.Email);
                 }
 
@@ -6336,7 +6375,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -6355,15 +6394,15 @@ namespace SifizPlanning.Controllers
             {
                 System.Globalization.CultureInfo cultureinfo = new System.Globalization.CultureInfo("es-ES");
                 DateTime fechaMantenimiento = DateTime.Today;
-                if (fecha == "")
+                if(fecha == "")
                 {
                     throw new Exception("Error al ingresar la fecha");
                 }
                 fechaMantenimiento = DateTime.Parse(fecha, cultureinfo);
 
-                if (idTarea == -1)
+                if(idTarea == -1)
                 {
-                    if (esTicket)
+                    if(esTicket)
                     {
                         TicketMantenimientoAgregar ticketMantenimientoAgregar = db.TicketMantenimientoAgregar.Where(s => s.Fecha == fechaMantenimiento && s.Cliente == cliente && s.TicketTarea == idTicket).FirstOrDefault();
                         ticketMantenimientoAgregar.Tiempo = tiempo;
@@ -6376,11 +6415,11 @@ namespace SifizPlanning.Controllers
                 }
                 else
                 {
-                    if (esTicket)
+                    if(esTicket)
                     {
 
                         TicketsMantenimiento ticket = db.TicketsMantenimiento.Where(t => t.Fecha == fechaMantenimiento && t.SecuencialTicket == idTicket).FirstOrDefault();
-                        if (ticket != null)
+                        if(ticket != null)
                         {
                             ticket.Tiempo = tiempo;
                         }
@@ -6396,7 +6435,7 @@ namespace SifizPlanning.Controllers
                     else
                     {
                         TareaMantenimiento tarea = db.TareaMantenimiento.Where(t => t.Fecha == fechaMantenimiento && t.SecuencialTarea == idTarea).FirstOrDefault();
-                        if (tarea != null)
+                        if(tarea != null)
                         {
                             tarea.Tiempo = tiempo;
                         }
@@ -6419,7 +6458,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -6438,7 +6477,7 @@ namespace SifizPlanning.Controllers
             {
                 System.Globalization.CultureInfo cultureinfo = new System.Globalization.CultureInfo("es-ES");
                 DateTime fechaMantenimiento = DateTime.Today;
-                if (cliente == "Seleccione..." || noReporteTicket == -1 || detalleReporteTicket == "" || reportadoReporteTicket == "Seleccione..." || tecnicoReporteTicket == "" || fecha == "" || estadoReporteTicket == "Seleccione..." || tiempo == -1)
+                if(cliente == "Seleccione..." || noReporteTicket == -1 || detalleReporteTicket == "" || reportadoReporteTicket == "Seleccione..." || tecnicoReporteTicket == "" || fecha == "" || estadoReporteTicket == "Seleccione..." || tiempo == -1)
                 {
                     throw new Exception("Debe llenar todos los campos");
                 }
@@ -6448,7 +6487,7 @@ namespace SifizPlanning.Controllers
 
                 var ticketTarea = db.TicketMantenimientoAgregar.Where(s => s.Fecha >= fechaInicio && s.Fecha < fechaFin).ToList();
                 var ticketT = ticketTarea.Where(s => s.TicketTarea == noReporteTicket && s.Fecha == fechaMantenimiento && s.Cliente == cliente).FirstOrDefault();
-                if (ticketT == null)
+                if(ticketT == null)
                 {
                     TicketMantenimientoAgregar ticketMantenimientoAgregar = new TicketMantenimientoAgregar();
                     ticketMantenimientoAgregar.Cliente = cliente;
@@ -6473,7 +6512,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -6492,7 +6531,7 @@ namespace SifizPlanning.Controllers
             {
                 System.Globalization.CultureInfo cultureinfo = new System.Globalization.CultureInfo("es-ES");
                 DateTime fechaMantenimiento = DateTime.Today;
-                if (cliente == 0 || fecha == "" || comentario == 0)
+                if(cliente == 0 || fecha == "" || comentario == 0)
                 {
                     throw new Exception("Debe escoger el cliente, la fecha inicio y el comentario");
                 }
@@ -6500,7 +6539,7 @@ namespace SifizPlanning.Controllers
                 DateTime fechaInicio = new DateTime(fechaMantenimiento.Year, fechaMantenimiento.Month, 1);
 
                 var ticket = db.ComentarioHorasMantenimiento.Where(s => s.Fecha == fechaInicio && s.SecuencialCliente == cliente).FirstOrDefault();
-                if (ticket == null)
+                if(ticket == null)
                 {
                     ComentarioHorasMantenimiento comentarioHorasMantenimiento = new ComentarioHorasMantenimiento();
                     comentarioHorasMantenimiento.SecuencialCliente = cliente;
@@ -6520,7 +6559,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -6539,15 +6578,15 @@ namespace SifizPlanning.Controllers
             {
                 System.Globalization.CultureInfo cultureinfo = new System.Globalization.CultureInfo("es-ES");
                 DateTime fechaMantenimiento = DateTime.Today;
-                if (fecha == "")
+                if(fecha == "")
                 {
                     throw new Exception("Error al ingresar la fecha");
                 }
                 fechaMantenimiento = DateTime.Parse(fecha, cultureinfo);
 
-                if (secuencialTarea == -1)
+                if(secuencialTarea == -1)
                 {
-                    if (esTicket)
+                    if(esTicket)
                     {
                         TicketMantenimientoAgregar ticketMantenimientoAgregar = db.TicketMantenimientoAgregar.Where(s => s.Fecha == fechaMantenimiento && s.Cliente == cliente && s.TicketTarea == numeroTticket).FirstOrDefault();
                         db.TicketMantenimientoAgregar.Remove(ticketMantenimientoAgregar);
@@ -6560,11 +6599,11 @@ namespace SifizPlanning.Controllers
                 }
                 else
                 {
-                    if (esTicket)
+                    if(esTicket)
                     {
 
                         TicketMantenimientoBorar ticket = db.TicketMantenimientoBorar.Where(t => t.Fecha == fechaMantenimiento && t.SecuencialTicket == numeroTticket).FirstOrDefault();
-                        if (ticket == null)
+                        if(ticket == null)
                         {
                             ticket = new TicketMantenimientoBorar();
                             ticket.SecuencialTicket = numeroTticket;
@@ -6575,7 +6614,7 @@ namespace SifizPlanning.Controllers
                     else
                     {
                         TareaMantenimientoBorrar tarea = db.TareaMantenimientoBorrar.Where(t => t.Fecha == fechaMantenimiento && t.SecuencialTarea == secuencialTarea).FirstOrDefault();
-                        if (tarea == null)
+                        if(tarea == null)
                         {
                             tarea = new TareaMantenimientoBorrar();
                             tarea.SecuencialTarea = secuencialTarea;
@@ -6592,7 +6631,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -6609,10 +6648,10 @@ namespace SifizPlanning.Controllers
         {
             try
             {
-                if (secuencial != 0)
+                if(secuencial != 0)
                 {
                     AdjuntoTicket adjunto = db.AdjuntoTicket.Where(s => s.Secuencial == secuencial).FirstOrDefault();
-                    if (adjunto != null)
+                    if(adjunto != null)
                     {
                         db.AdjuntoTicket.Remove(adjunto);
                     }
@@ -6632,7 +6671,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -6656,12 +6695,12 @@ namespace SifizPlanning.Controllers
                 var destinatarios = destinatariosEmail.Replace(',', ';');
                 List<string> usuariosDestinos = new List<string>();
                 Regex rgx = new Regex(@"^(([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)(\s*;\s*|\s*$))*$");
-                if (!rgx.IsMatch(destinatarios))
+                if(!rgx.IsMatch(destinatarios))
                 {
                     throw new Exception("Debe ingresar una lista de correos válida separados por coma ó punto y coma");
                 };
                 string[] emails = destinatarios.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (var email in emails)
+                foreach(var email in emails)
                 {
                     usuariosDestinos.Add(email);
                 }
@@ -6680,7 +6719,7 @@ namespace SifizPlanning.Controllers
                        "</thead>";
                 htmlMail += "<tbody>";
 
-                for (int i = 0; i < jsonObj.Length; i++)
+                for(int i = 0; i < jsonObj.Length; i++)
                 {
                     htmlMail += "<tr>" +
                                     "<td>" + jsonObj[i]["numero"] + "</td>" +
@@ -6783,7 +6822,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -6817,7 +6856,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -6850,7 +6889,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -6883,7 +6922,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -6919,7 +6958,7 @@ namespace SifizPlanning.Controllers
 
                 List<object> listaGauges = new List<object>();
 
-                foreach (var gauge in gaugesHabilitados)
+                foreach(var gauge in gaugesHabilitados)
                 {
                     int cant = db.Ticket.Where(x => x.SecuencialEstadoTicket == gauge.SecuencialEstadoTicket && x.SecuencialProximaActividad == gauge.SecuencialProximaActividad).Count();
                     string texto = cant < gauge.medio ? "BAJO" : cant < gauge.alto ? "MEDIO" : "ALTO";
@@ -6941,7 +6980,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 var resp = new
                 {
@@ -6954,7 +6993,7 @@ namespace SifizPlanning.Controllers
 
         public string GenerarExcelEstimaciones(int id)
         {
-            using (SLDocument sl = new SLDocument())
+            using(SLDocument sl = new SLDocument())
             {
                 var estimacion = db.EstimacionTicket.Find(id);
 
@@ -7013,7 +7052,7 @@ namespace SifizPlanning.Controllers
                 sl.SetCellValue("B5", estimacion.ticket.Detalle);
                 sl.SetCellStyle(5, 2, style8);
                 sl.SetCellValue("F2", "Fecha Sol.:");
-                if (estimacion.ticket.Fecha.HasValue)
+                if(estimacion.ticket.Fecha.HasValue)
                 {
                     sl.SetCellValue("G2", estimacion.ticket.Fecha.Value.ToString("dd/MM/yyyy"));
                 }
@@ -7074,7 +7113,7 @@ namespace SifizPlanning.Controllers
                                    }).ToList();
                 int sum = 0;
                 int tiempoTotal = 0;
-                foreach (var item in entregables.Select((value, index) => new { value, index }))
+                foreach(var item in entregables.Select((value, index) => new { value, index }))
                 {
                     tiempoTotal += (int)item.value.detalles.Sum(s => s.tiempoHoras);
                     int cantidad = item.value.detalles.Count;
@@ -7099,7 +7138,7 @@ namespace SifizPlanning.Controllers
                     sl.SetCellValue("F" + (6 + 2 * (index + 1) + 1 * index - 1 + sum), "TIEMPO DES");
                     sl.SetCellValue("G" + (6 + 2 * (index + 1) + 1 * index - 1 + sum), "TIEMPO PRU");
 
-                    foreach (var it in item.value.detalles.Select((v, i) => new { v, i }))
+                    foreach(var it in item.value.detalles.Select((v, i) => new { v, i }))
                     {
                         sl.SetCellValue("A" + (6 + 2 * (index + 1) + 1 * index + sum + it.i), "TAR" + (it.i + 1));
                         sl.SetCellValue("B" + (6 + 2 * (index + 1) + 1 * index + sum + it.i), it.v.detalle);
@@ -7146,7 +7185,7 @@ namespace SifizPlanning.Controllers
             string apiKey = "54b0d60f-0464-4e86-9c49-f85d33800126";
             string url = "https://messagebroker.sifizsoft.com/Email/AddEmailToQueue";
 
-            using (var client = new HttpClient())
+            using(var client = new HttpClient())
             {
                 //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("X-Api-Key", apiKey);
                 client.DefaultRequestHeaders.Add("X-Api-Key", apiKey);
@@ -7170,7 +7209,7 @@ namespace SifizPlanning.Controllers
 
                 var response = await client.PostAsync(url, content);
 
-                if (!response.IsSuccessStatusCode)
+                if(!response.IsSuccessStatusCode)
                 {
                     throw new Exception("Error al enviar el correo: " + response.ReasonPhrase + ":" + content);
                 }
@@ -7188,20 +7227,20 @@ namespace SifizPlanning.Controllers
             int horasLaborables = 0;
             fechaTicket = fechaTicket.AddHours(1);
 
-            while (fechaTicket <= fechaActual)
+            while(fechaTicket <= fechaActual)
             {
                 DateTime horaInicio = new DateTime(fechaTicket.Year, fechaTicket.Month, fechaTicket.Day, 8, 30, 0);
                 DateTime horaFin = new DateTime(fechaTicket.Year, fechaTicket.Month, fechaTicket.Day, 17, 30, 0);
                 DateTime horaAlmuerzoInicio = new DateTime(fechaTicket.Year, fechaTicket.Month, fechaTicket.Day, 13, 0, 0);
                 DateTime horaAlmuerzoFin = new DateTime(fechaTicket.Year, fechaTicket.Month, fechaTicket.Day, 14, 0, 0);
 
-                if (fechaTicket.DayOfWeek != DayOfWeek.Saturday && fechaTicket.DayOfWeek != DayOfWeek.Sunday)
+                if(fechaTicket.DayOfWeek != DayOfWeek.Saturday && fechaTicket.DayOfWeek != DayOfWeek.Sunday)
                 {
-                    if (fechaTicket > horaInicio && fechaTicket <= horaAlmuerzoInicio)
+                    if(fechaTicket > horaInicio && fechaTicket <= horaAlmuerzoInicio)
                     {
                         horasLaborables++;
                     }
-                    else if (fechaTicket > horaAlmuerzoFin && fechaTicket <= horaFin)
+                    else if(fechaTicket > horaAlmuerzoFin && fechaTicket <= horaFin)
                     {
                         horasLaborables++;
                     }
@@ -7209,11 +7248,11 @@ namespace SifizPlanning.Controllers
 
                 fechaTicket = fechaTicket.AddHours(1);
             }
-            if (fechaFinal.Minute >= fechaInicial.Minute && (fechaFinal - fechaInicial).TotalHours >= 1)
+            if(fechaFinal.Minute >= fechaInicial.Minute && (fechaFinal - fechaInicial).TotalHours >= 1)
             {
                 TimeSpan horaFinal = fechaFinal.TimeOfDay;
                 TimeSpan horaInicial = fechaInicial.TimeOfDay;
-                if (fechaFinal.DayOfWeek != DayOfWeek.Saturday &&
+                if(fechaFinal.DayOfWeek != DayOfWeek.Saturday &&
                    fechaFinal.DayOfWeek != DayOfWeek.Sunday &&
                    horaFinal >= new TimeSpan(8, 30, 0) &&
                    horaFinal < new TimeSpan(13, 0, 0) &&
