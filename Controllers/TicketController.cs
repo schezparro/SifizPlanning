@@ -1956,6 +1956,7 @@ namespace SifizPlanning.Controllers
                     oferta.FechaDisponibilidad = new DateTime(0001 / 01 / 01);
                     oferta.FechaProduccion = new DateTime(0001 / 01 / 01);
                     oferta.FechaRegistro = DateTime.Now;
+                    db.Ofertas.Add(oferta);
                 }
 
                 ticket.SecuencialTipoRecurso = tipoRecurso;
@@ -2786,6 +2787,7 @@ namespace SifizPlanning.Controllers
                 oferta.FechaDisponibilidad = new DateTime(0001 / 01 / 01);
                 oferta.FechaProduccion = new DateTime(0001 / 01 / 01);
                 oferta.FechaRegistro = DateTime.Now;
+                db.Ofertas.Add(oferta);
 
                 //Adicionando el histórico del ticket
                 int numeroVersion = db.TicketHistorico.Where(x => x.SecuencialTicket == ticket.Secuencial).Count();
@@ -2871,6 +2873,7 @@ namespace SifizPlanning.Controllers
                 oferta.FechaDisponibilidad = new DateTime(0001 / 01 / 01);
                 oferta.FechaProduccion = new DateTime(0001 / 01 / 01);
                 oferta.FechaRegistro = DateTime.Now;
+                db.Ofertas.Add(oferta);
 
                 TicketHistorico ticketHis = new TicketHistorico
                 {
