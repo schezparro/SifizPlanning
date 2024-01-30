@@ -759,6 +759,14 @@ consultasApp.filter("trim20", function () {
     };
 });
 
+consultasApp.filter("getFileName", function () {
+    return function (fileUrl) {
+        var fileName = fileUrl ? fileUrl.substring(fileUrl.lastIndexOf('/') + 1) : "";
+        return fileName;
+    }
+});
+
+
 function dateToStr(dateObj, format, separator) {
     /**
      * Convert a date object to a string

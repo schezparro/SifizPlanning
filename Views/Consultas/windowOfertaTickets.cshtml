@@ -11,6 +11,7 @@
                 <th>Horas Estimación</th>
                 <th>Colaborador</th>
                 <th>Fecha Disponibilidad</th>
+                <th>Adjunto</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -40,6 +41,11 @@
                 </td>
                 <td>
                     <input id="fecha-disponibilidad" ng-class="'form-control'" ng-model="nuevaOferta.FechaDisponibilidad">
+                </td>
+                <td>
+                    <button id="btn-add-adjunto-oferta" ng-class="'form-control'" class="btn btn-success btn-xs" ng-click="agregarAdjuntoOferta()"><span class="glyphicon glyphicon-plus"></span></button>
+                    <input id="add-adjunto-oferta" style="display: none" type="file" />
+                    <span id="adjunto-oferta-nombre" style="display: none">{{ adjuntoName }}</span>
                 </td>
                 <td>
                     <Button class="form-control btn btn-primary" ng-click="agregarOferta()">Añadir</Button>
@@ -87,6 +93,13 @@
                     <span ng-hide="oferta.editable" class="badge" style="background-color:seagreen">&nbsp;</span>
                     <span ng-hide="oferta.editable">&nbsp;{{ oferta.FechaDisponibilidad !== null ? (oferta.FechaDisponibilidad | strDateToStr) : "" }}</span>
                     <input id="fecha-disponibilidad-{{$index}}" ng-class="'form-control'" ng-show="oferta.editable" ng-model="oferta.FechaDisponibilidad">
+                </td>
+                <td>
+
+                    <a ng-if='oferta.adjunto !== ""' ng-hide="oferta.editable" href="Web{{oferta.adjunto}}" target="_blank" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-paperclip"></span>{{ oferta.adjunto | getFileName }}</a>
+                    <button ng-show="oferta.editable" id="btn-edit-adjunto-oferta" ng-class="'form-control'" class="btn btn-success btn-xs" ng-click="editarAdjuntoOferta()"><span class="glyphicon glyphicon-plus"></span></button>
+                    <input id="edit-adjunto-oferta" style="display: none" type="file" />
+                    <span id="edit-adjunto-oferta-nombre" style="display: none">{{ newAdjuntoName }}</span>
                 </td>
                 <td>
                     <span style="margin-right: 10px;" ng-click="editarOferta(oferta, $index)" ng-hide="oferta.editable">

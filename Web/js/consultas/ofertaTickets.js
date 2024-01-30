@@ -35,7 +35,28 @@
 
             oferta.editable = false;
 
-            var ajaxOfertas = $http.post("consultas/editar-ofertas-tickets", {
+            var adjunto = $scope.adjunto;
+
+            var formData = new FormData();
+            formData.append("ID", oferta.id);
+            formData.append("FechaRegistro", new Date(...oferta.FechaRegistro.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)));
+            formData.append("FechaProduccion", new Date(...oferta.FechaProduccion.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)));
+            formData.append("FechaDisponibilidad", new Date(...oferta.FechaDisponibilidad.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)));
+            formData.append("Detalle", oferta.Detalle);
+            formData.append("HorasEstimacion", oferta.HorasEstimacion);
+            formData.append("cliente", oferta.cliente.id);
+            formData.append("colaborador", oferta.colaborador.id);
+            formData.append("adjunto", adjunto);
+
+            var ajaxOfertas = $http({
+                method: 'POST',
+                url: "consultas/editar-ofertas-tickets",
+                data: formData,
+                headers: { 'Content-Type': undefined },
+                transformRequest: angular.identity
+            });
+
+            /*var ajaxOfertas = $http.post("consultas/editar-ofertas-tickets", {
                 ID: oferta.id,
                 FechaRegistro: new Date(...oferta.FechaRegistro.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)),
                 FechaProduccion: new Date(...oferta.FechaProduccion.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)),
@@ -44,7 +65,7 @@
                 HorasEstimacion: oferta.HorasEstimacion,
                 cliente: oferta.cliente.id,
                 colaborador: oferta.colaborador.id
-            });
+            });*/
 
             ajaxOfertas.success(function (data) {
                 if (data.success === true) {
@@ -58,6 +79,7 @@
         } else {
             messageDialog.show("Información", "Debe llenar todos los campos");
         }
+        $scope.adjunto = null;
     };
 
     $scope.agregarOferta = function () {
@@ -91,7 +113,27 @@
             editable: false
         };
 
-        var ajaxOfertas = $http.post("consultas/agregar-ofertas-tickets", {
+        var adjunto = $scope.adjunto;
+
+        var formData = new FormData();
+        formData.append("fechaRegistro", nuevaOferta.FechaRegistro);
+        formData.append("FechaProduccion", nuevaOferta.FechaProduccion);
+        formData.append("fechaDisponibilidad", nuevaOferta.fechaDisponibilidad);
+        formData.append("detalle", nuevaOferta.Detalle);
+        formData.append("horasEstimacion", nuevaOferta.HorasEstimacion);
+        formData.append("cliente", nuevaOferta.cliente.id);
+        formData.append("colaborador", nuevaOferta.colaborador.id);
+        formData.append("adjunto", adjunto);
+
+        var ajaxOfertas = $http({
+            method: 'POST',
+            url: "consultas/agregar-ofertas-tickets",
+            data: formData,
+            headers: { 'Content-Type': undefined },
+            transformRequest: angular.identity
+        });
+
+        /*var ajaxOfertas = $http.post("consultas/agregar-ofertas-tickets", {
             fechaRegistro: nuevaOferta.FechaRegistro,
             FechaProduccion: nuevaOferta.FechaProduccion,
             fechaDisponibilidad: nuevaOferta.FechaDisponibilidad,
@@ -99,7 +141,7 @@
             horasEstimacion: nuevaOferta.HorasEstimacion,
             cliente: nuevaOferta.cliente.id,
             colaborador: nuevaOferta.colaborador.id
-        });
+        });*/
 
         ajaxOfertas.success(function (data) {
             if (data.success === true) {
@@ -109,6 +151,7 @@
                 messageDialog.show("Información", data.msg);
             }
         });
+        $scope.adjunto = null;
     };
 
     $scope.eliminarOferta = function (id) {
@@ -131,9 +174,38 @@
         });
         ajaxOfertas.success(function (data) {
             if (data.success === true) {
+                console.log(data);
                 $scope.ofertas = data.ofertas;
             }
         });
     };
+
+    $scope.agregarAdjuntoOferta = function () {
+        
+        var adjunto = document.getElementById('add-adjunto-oferta');
+        adjunto.onchange = function () {
+            $scope.adjuntoName = this.files[0].name;
+            console.log($scope.adjuntoName);
+            $scope.adjunto = this.files[0];
+
+            angular.element("#adjunto-oferta-nombre").css("display", "block");
+            angular.element("#btn-add-adjunto-oferta").css("display", "none");
+        };
+        adjunto.click();
+    };
+
+    $scope.editarAdjuntoOferta = function () {
+        var adjunto = document.getElementById('add-adjunto-oferta');
+        adjunto.onchange = function () {
+            $scope.newAdjuntoName = this.files[0].name;
+            
+            $scope.adjunto = this.files[0];
+
+            angular.element("#edit-adjunto-oferta-nombre").css("display", "block");
+            angular.element("#btn-edit-adjunto-oferta").css("display", "none");
+        };
+        adjunto.click();
+    };
+
 
 }]);
