@@ -43,9 +43,10 @@
                     <input id="fecha-disponibilidad" ng-class="'form-control'" ng-model="nuevaOferta.FechaDisponibilidad">
                 </td>
                 <td>
-                    <button id="btn-add-adjunto-oferta" ng-class="'form-control'" class="btn btn-success btn-xs" ng-click="agregarAdjuntoOferta()"><span class="glyphicon glyphicon-plus"></span></button>
-                    <input id="add-adjunto-oferta" style="display: none" type="file" />
-                    <span id="adjunto-oferta-nombre" style="display: none">{{ adjuntoName }}</span>
+                    <button id="btn-add-adjunto-oferta" name="{{ adjuntoName }}" ng-class="'form-control'" class="btn btn-success btn-xs" onclick="document.getElementById('add-adjunto-oferta').click();">
+                        <span id="adjunto-oferta-icon" class="glyphicon glyphicon-plus"></span>
+                    </button>
+                    <input id="add-adjunto-oferta" style="display: none" type="file" onchange="angular.element(this).scope().agregarAdjuntoOferta()" />
                 </td>
                 <td>
                     <Button class="form-control btn btn-primary" ng-click="agregarOferta()">Añadir</Button>
@@ -95,10 +96,9 @@
                     <input id="fecha-disponibilidad-{{$index}}" ng-class="'form-control'" ng-show="oferta.editable" ng-model="oferta.FechaDisponibilidad">
                 </td>
                 <td>
-
                     <a ng-if='oferta.adjunto !== ""' ng-hide="oferta.editable" href="Web{{oferta.adjunto}}" target="_blank" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-paperclip"></span>{{ oferta.adjunto | getFileName }}</a>
-                    <button ng-show="oferta.editable" id="btn-edit-adjunto-oferta" ng-class="'form-control'" class="btn btn-success btn-xs" ng-click="editarAdjuntoOferta()"><span class="glyphicon glyphicon-plus"></span></button>
-                    <input id="edit-adjunto-oferta" style="display: none" type="file" />
+                    <button ng-show="oferta.editable" id="btn-edit-adjunto-oferta" ng-class="'form-control'" class="btn btn-success btn-xs" onclick="document.getElementById('edit-adjunto-oferta').click();"><span class="glyphicon glyphicon-plus"></span></button>
+                    <input id="edit-adjunto-oferta" style="display: none" type="file" onchange="angular.element(this).scope().editarAdjuntoOferta()"/>
                     <span id="edit-adjunto-oferta-nombre" style="display: none">{{ newAdjuntoName }}</span>
                 </td>
                 <td>
