@@ -24,6 +24,10 @@ using System.Web.Mvc.Html;
 using Microsoft.TeamFoundation.VersionControl.Client;
 using System.Web.UI.WebControls;
 using DocumentFormat.OpenXml.Drawing.Charts;
+using Newtonsoft.Json.Linq;
+using DocumentFormat.OpenXml.Drawing.Diagrams;
+using HorizontalAlignmentValues = DocumentFormat.OpenXml.Spreadsheet.HorizontalAlignmentValues;
+using VerticalAlignmentValues = DocumentFormat.OpenXml.Spreadsheet.VerticalAlignmentValues;
 
 namespace SifizPlanning.Controllers
 {
@@ -4379,23 +4383,39 @@ r in db.Rol on ur.rol equals r
                     throw new Exception("No se encontró la estimación.");
                 }
 
-                var itemsEspeciales = (from ie in db.ItemEspecial
-                                       join nc in db.NivelColaborador on ie.SecuencialNivelColaborador equals nc.Secuencial
-                                       where ie.SecuencialEstimacion == estimacion.Secuencial
-                                       select new
-                                       {
-                                           id = ie.Secuencial,
-                                           descripcion = ie.Descripcion,
-                                           tiempoEstimacion = ie.TiempoEstimacion,
-                                           idEstimacion = ie.SecuencialEstimacion,
-                                           idNivelColab = ie.SecuencialNivelColaborador,
-                                           nivel = nc.Descripcion
-                                       }).ToList();
+
+                var itemsEspecialesEstimacion = (from ie in db.ItemEspecialEstimacion
+                                                 join nc in db.NivelColaborador on ie.SecuencialNivelColaborador equals nc.Secuencial
+                                                 join iec in db.ItemEspecialCatalogo on ie.SecuencialItemEspecialCatalogo equals iec.Secuencial
+                                                 where ie.SecuencialEstimacion == estimacion.Secuencial
+                                                 select new
+                                                 {
+                                                     id = ie.Secuencial,
+                                                     descripcion = iec.Descripcion,
+                                                     tiempoEstimacion = ie.TiempoEstimacion,
+                                                     idEstimacion = ie.SecuencialEstimacion,
+                                                     idNivelColab = ie.SecuencialNivelColaborador,
+                                                     nivel = nc.Descripcion
+                                                 }).ToList();
+
+                var itemsEspecialesAdicionales = (from ie in db.ItemEspecial
+                                                  join nc in db.NivelColaborador on ie.SecuencialNivelColaborador equals nc.Secuencial
+                                                  where ie.SecuencialEstimacion == estimacion.Secuencial
+                                                  select new
+                                                  {
+                                                      id = ie.Secuencial,
+                                                      descripcion = ie.Descripcion,
+                                                      tiempoEstimacion = ie.TiempoEstimacion,
+                                                      idEstimacion = ie.SecuencialEstimacion,
+                                                      idNivelColab = ie.SecuencialNivelColaborador,
+                                                      nivel = nc.Descripcion
+                                                  }).ToList();
 
                 var resp = new
                 {
                     success = true,
-                    items = itemsEspeciales,
+                    itemsEstimacion = itemsEspecialesEstimacion,
+                    itemsAdicionales = itemsEspecialesAdicionales,
                 };
                 return Json(resp);
             }
@@ -4458,34 +4478,17 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult EditarItemEspecial(int itemId, int idNivelColab, string descripcion, int tiempoEstimacion)
+        public ActionResult EliminarItemEspecial(int itemId)
         {
             try
             {
-                NivelColaborador nivelColaborador = db.NivelColaborador.Find(idNivelColab);
-                if (nivelColaborador == null)
-                {
-                    throw new Exception("No se encontró el nivel del colaborador.");
-                }
-
-                ItemEspecial item = db.ItemEspecial.Find(itemId);
-                if (item == null)
-                {
-                    throw new Exception("No se encontró el item especial.");
-                }
-                else
-                {
-                    item.Descripcion = descripcion;
-                    item.TiempoEstimacion = tiempoEstimacion;
-                    item.SecuencialNivelColaborador = nivelColaborador.Secuencial;
-                }
-
+                var item = db.ItemEspecial.Find(itemId);
+                db.ItemEspecial.Remove(item);
                 db.SaveChanges();
 
                 var resp = new
                 {
                     success = true,
-                    msg = "Item Especial Editado"
                 };
                 return Json(resp);
             }
@@ -4502,17 +4505,155 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult EliminarItemEspecial(int itemId)
+        public ActionResult DarItemsEspecialesCatalogo()
         {
             try
             {
-                var item = db.ItemEspecial.Find(itemId);
-                db.ItemEspecial.Remove(item);
+                var itemsEspecialesCatalogo = (from iec in db.ItemEspecialCatalogo
+                                               where iec.EstaActivo == 1
+                                               select new
+                                               {
+                                                   id = iec.Secuencial,
+                                                   descripcion = iec.Descripcion,
+                                                   obligatorio = iec.Obligatorio
+                                               }).ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    items = itemsEspecialesCatalogo,
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult GuardarItemEspeciales(string itemEspecialesEstimacion, string itemEspecialesAdicionales)
+        {
+            try
+            {
+
+                var s = new JavaScriptSerializer();
+                var jsonItemEspecialesEstimacion = s.Deserialize<dynamic>(itemEspecialesEstimacion);
+                var jsonItemEspecialesAdicionales = s.Deserialize<dynamic>(itemEspecialesAdicionales);
+
+                for (int i = 0; i < jsonItemEspecialesEstimacion.Length; i++)
+                {
+                    var obj = jsonItemEspecialesEstimacion[i];
+
+                    ItemEspecialEstimacion newItem = new ItemEspecialEstimacion
+                    {
+                        SecuencialItemEspecialCatalogo = int.Parse(obj["secuencialItemEspecialCatalogo"].ToString()),
+                        SecuencialEstimacion = int.Parse(obj["secuencialEstimacion"].ToString()),
+                        SecuencialNivelColaborador = int.Parse(obj["secuencialNivelColaborador"].ToString()),
+                        TiempoEstimacion = int.Parse(obj["tiempoEstimacion"].ToString())
+                    };
+                    db.ItemEspecialEstimacion.Add(newItem);
+                }
+
+                for (int i = 0; i < jsonItemEspecialesAdicionales.Length; i++)
+                {
+                    var obj = jsonItemEspecialesAdicionales[i];
+
+                    ItemEspecial newItem = new ItemEspecial
+                    {
+                        Descripcion = (string)obj["descripcion"],
+                        SecuencialEstimacion = int.Parse(obj["secuencialEstimacion"].ToString()),
+                        SecuencialNivelColaborador = int.Parse(obj["secuencialNivelColaborador"].ToString()),
+                        TiempoEstimacion = int.Parse(obj["tiempoEstimacion"].ToString()),
+                    };
+                    db.ItemEspecial.Add(newItem);
+                }
+
+                db.SaveChanges();
+
+                var resp = new
+                {
+                    msg = "Items Especiales agregados correctamente",
+                    success = true,
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult EditarItemEspeciales(string itemEspecialesEstimacionEdit, string itemEspecialesAdicionalesEdit)
+        {
+            try
+            {
+                var s = new JavaScriptSerializer();
+                var jsonItemEspecialesEstimacionEdit = s.Deserialize<dynamic>(itemEspecialesEstimacionEdit);
+                var jsonItemEspecialesAdicionalesEdit = s.Deserialize<dynamic>(itemEspecialesAdicionalesEdit);
+
+                for (int i = 0; i < jsonItemEspecialesEstimacionEdit.Length; i++)
+                {
+                    var obj = jsonItemEspecialesEstimacionEdit[i];
+
+                    ItemEspecialEstimacion item = db.ItemEspecialEstimacion.Find(int.Parse(obj["id"].ToString()));
+
+                    if (item != null)
+                    {
+                        item.SecuencialNivelColaborador = int.Parse(obj["idNivelColab"].ToString());
+                        item.TiempoEstimacion = int.Parse(obj["tiempoEstimacion"].ToString());
+                    }
+                }
+
+                for (int i = 0; i < jsonItemEspecialesAdicionalesEdit.Length; i++)
+                {
+                    var obj = jsonItemEspecialesAdicionalesEdit[i];
+
+                    if (obj.ContainsKey("id"))
+                    {
+                        ItemEspecial item = db.ItemEspecial.Find(int.Parse(obj["id"].ToString()));
+
+                        if (item != null)
+                        {
+                            item.Descripcion = (string)obj["descripcion"];
+                            item.SecuencialNivelColaborador = int.Parse(obj["idNivelColab"].ToString());
+                            item.TiempoEstimacion = int.Parse(obj["tiempoEstimacion"].ToString());
+                        }
+                    }
+                    else
+                    {
+                        ItemEspecial newItem = new ItemEspecial
+                        {
+                            Descripcion = (string)obj["descripcion"],
+                            SecuencialEstimacion = int.Parse(obj["secuencialEstimacion"].ToString()),
+                            SecuencialNivelColaborador = int.Parse(obj["idNivelColab"].ToString()),
+                            TiempoEstimacion = int.Parse(obj["tiempoEstimacion"].ToString()),
+                        };
+
+                        db.ItemEspecial.Add(newItem);
+                    }
+                }
+
+
                 db.SaveChanges();
 
                 var resp = new
                 {
                     success = true,
+                    msg = "Items Especiales Editados"
                 };
                 return Json(resp);
             }
@@ -5906,6 +6047,20 @@ r in db.Rol on ur.rol equals r
                 //Items Especiales
                 var pivot = 7 + 5 * entregables.Count + sum + 3 - entregables.Count; //Coordenadas de la siguiente row a "TIEMPO TOTAL DE DESARROLLO:"
 
+                var itemsEspecialesEstimacion = (from ie in db.ItemEspecialEstimacion
+                                                 join nc in db.NivelColaborador on ie.SecuencialNivelColaborador equals nc.Secuencial
+                                                 join iec in db.ItemEspecialCatalogo on ie.SecuencialItemEspecialCatalogo equals iec.Secuencial
+                                                 where ie.SecuencialEstimacion == estimacion.Secuencial
+                                                 select new
+                                                 {
+                                                     id = ie.Secuencial,
+                                                     descripcion = iec.Descripcion,
+                                                     tiempoEstimacion = ie.TiempoEstimacion,
+                                                     idEstimacion = ie.SecuencialEstimacion,
+                                                     idNivelColab = ie.SecuencialNivelColaborador,
+                                                     nivel = nc.Descripcion
+                                                 }).ToList();
+
                 var itemsEspeciales = (from ie in db.ItemEspecial
                                        join nc in db.NivelColaborador on ie.SecuencialNivelColaborador equals nc.Secuencial
                                        where ie.SecuencialEstimacion == estimacion.Secuencial
@@ -5918,6 +6073,10 @@ r in db.Rol on ur.rol equals r
                                            idNivelColab = ie.SecuencialNivelColaborador,
                                            nivel = nc.Descripcion
                                        }).ToList();
+
+                List<dynamic> itemsCombinados = new List<dynamic>();
+                itemsCombinados.AddRange(itemsEspecialesEstimacion);
+                itemsCombinados.AddRange(itemsEspeciales);
 
                 sl.SetCellValue("A" + (pivot + 1), "ITEMS ESPECIALES");
                 sl.MergeWorksheetCells("A" + (pivot + 1), "B" + (pivot + 1));
@@ -5939,7 +6098,7 @@ r in db.Rol on ur.rol equals r
                 sl.SetCellStyle((pivot + 1), 8, style16);
 
                 var tiempoEstIETotal = 0;
-                foreach (var item in itemsEspeciales.Select((value, index) => new { value, index }))
+                foreach (var item in itemsCombinados.Select((value, index) => new { value, index }))
                 {
                     int index = item.index + 1;
                     tiempoEstIETotal += item.value.tiempoEstimacion;
@@ -5959,24 +6118,24 @@ r in db.Rol on ur.rol equals r
                     sl.MergeWorksheetCells("H" + (pivot + 1 + index), "J" + (pivot + 1 + index));
                 }
 
-                sl.SetCellValue("A" + (pivot + 1 + itemsEspeciales.Count + 1), "TOTAL:");
-                sl.MergeWorksheetCells("A" + (pivot + 1 + itemsEspeciales.Count + 1), "C" + (pivot + 1 + itemsEspeciales.Count + 1));
-                sl.SetCellStyle("A" + (pivot + 1 + itemsEspeciales.Count + 1), style3);
+                sl.SetCellValue("A" + (pivot + 1 + itemsCombinados.Count + 1), "TOTAL:");
+                sl.MergeWorksheetCells("A" + (pivot + 1 + itemsCombinados.Count + 1), "C" + (pivot + 1 + itemsCombinados.Count + 1));
+                sl.SetCellStyle("A" + (pivot + 1 + itemsCombinados.Count + 1), style3);
 
-                sl.SetCellValue("D" + (pivot + 1 + itemsEspeciales.Count + 1), tiempoEstIETotal);
-                sl.MergeWorksheetCells("D" + (pivot + 1 + itemsEspeciales.Count + 1), "E" + (pivot + 1 + itemsEspeciales.Count + 1));
-                sl.SetCellStyle("D" + (pivot + 1 + itemsEspeciales.Count + 1), style14);
+                sl.SetCellValue("D" + (pivot + 1 + itemsCombinados.Count + 1), tiempoEstIETotal);
+                sl.MergeWorksheetCells("D" + (pivot + 1 + itemsCombinados.Count + 1), "E" + (pivot + 1 + itemsCombinados.Count + 1));
+                sl.SetCellStyle("D" + (pivot + 1 + itemsCombinados.Count + 1), style14);
 
-                sl.SetCellValue("F" + (pivot + 1 + itemsEspeciales.Count + 1), 0);
-                sl.MergeWorksheetCells("F" + (pivot + 1 + itemsEspeciales.Count + 1), "G" + (pivot + 1 + itemsEspeciales.Count + 1));
-                sl.SetCellStyle("F" + (pivot + 1 + itemsEspeciales.Count + 1), style14);
+                sl.SetCellValue("F" + (pivot + 1 + itemsCombinados.Count + 1), 0);
+                sl.MergeWorksheetCells("F" + (pivot + 1 + itemsCombinados.Count + 1), "G" + (pivot + 1 + itemsCombinados.Count + 1));
+                sl.SetCellStyle("F" + (pivot + 1 + itemsCombinados.Count + 1), style14);
 
-                sl.SetCellValue("H" + (pivot + 1 + itemsEspeciales.Count + 1), 0);
-                sl.MergeWorksheetCells("H" + (pivot + 1 + itemsEspeciales.Count + 1), "J" + (pivot + 1 + itemsEspeciales.Count + 1));
-                sl.SetCellStyle("H" + (pivot + 1 + itemsEspeciales.Count + 1), style13);
+                sl.SetCellValue("H" + (pivot + 1 + itemsCombinados.Count + 1), 0);
+                sl.MergeWorksheetCells("H" + (pivot + 1 + itemsCombinados.Count + 1), "J" + (pivot + 1 + itemsCombinados.Count + 1));
+                sl.SetCellStyle("H" + (pivot + 1 + itemsCombinados.Count + 1), style13);
 
                 //Tiempos
-                var pivot2 = pivot + 2 + itemsEspeciales.Count + 1; //Coordenadas de la siguiente row a "TOTAL: de items especiales"
+                var pivot2 = pivot + 2 + itemsCombinados.Count + 1; //Coordenadas de la siguiente row a "TOTAL: de items especiales"
 
                 sl.SetCellValue("A" + (pivot2 + 1), "TIEMPOS DE DESARROLLO/PEGADO");
                 sl.MergeWorksheetCells("A" + (pivot2 + 1), "B" + (pivot2 + 1));
