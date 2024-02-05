@@ -1,9 +1,11 @@
-﻿using SifizPlanning.Models;
+﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
+using SifizPlanning.Models;
 using SifizPlanning.Security;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.SqlServer;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Web;
@@ -57,26 +59,26 @@ namespace SifizPlanning.Controllers
                              }).ToList();
 
                 //Se aplican los filtros
-                if(filtroCliente != "")
+                if (filtroCliente != "")
                 {
                     datos = (from d in datos
                              where d.cliente.ToString().ToUpper().Contains(filtroCliente.ToUpper())
                              select d).ToList();
                 }
 
-                if(filtroModulo != "")
+                if (filtroModulo != "")
                 {
                     datos = (from d in datos
                              where d.modulo.ToString().ToUpper().Contains(filtroModulo.ToUpper())
                              select d).ToList();
                 }
-                if(filtroSubModulo != "")
+                if (filtroSubModulo != "")
                 {
                     datos = (from d in datos
                              where d.subMod.ToString().ToUpper().Contains(filtroSubModulo.ToUpper())
                              select d).ToList();
                 }
-                if(filtroEstado != "")
+                if (filtroEstado != "")
                 {
                     datos = (from d in datos
                              where d.estado.ToString().ToUpper().Contains(filtroEstado.ToUpper())
@@ -85,13 +87,13 @@ namespace SifizPlanning.Controllers
 
 
                 //Se ordena
-                if(order > 0)
+                if (order > 0)
                 {
-                    switch(order)
+                    switch (order)
                     {
                         case 1:
 
-                            if(asc == 1)
+                            if (asc == 1)
                             {
                                 datos = (from d in datos
                                          orderby d.cliente
@@ -108,7 +110,7 @@ namespace SifizPlanning.Controllers
 
                         case 2:
 
-                            if(asc == 1)
+                            if (asc == 1)
                             {
                                 datos = (from d in datos
                                          orderby int.Parse(d.ordenModulo)
@@ -125,7 +127,7 @@ namespace SifizPlanning.Controllers
 
                         case 3:
 
-                            if(asc == 1)
+                            if (asc == 1)
                             {
                                 datos = (from d in datos
                                          orderby d.subMod
@@ -142,7 +144,7 @@ namespace SifizPlanning.Controllers
 
                         case 4:
 
-                            if(asc == 1)
+                            if (asc == 1)
                             {
                                 datos = (from d in datos
                                          orderby d.estado
@@ -171,7 +173,7 @@ namespace SifizPlanning.Controllers
                     success = true
                 });
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return Json(new
                 {
@@ -234,7 +236,7 @@ namespace SifizPlanning.Controllers
                     submodulos = submodulos
                 });
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return Json(new
                 {
@@ -263,7 +265,7 @@ namespace SifizPlanning.Controllers
                     success = true
                 });
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return Json(new
                 {
@@ -292,19 +294,19 @@ namespace SifizPlanning.Controllers
                                                     id = fc.Secuencial,
                                                     nombre = fc.Descripcion
                                                 }).ToList();
-                if(funcionalidades != null)
+                if (funcionalidades != null)
                 {
-                    if(funcionalidades.Length == funcionalidadesCompletas.Count)
+                    if (funcionalidades.Length == funcionalidadesCompletas.Count)
                     {
                         funcionalidadesCompletas.RemoveAll(x => true);
                     }
                     else
                     {
-                        for(int i = 0; i < funcionalidadesCompletas.Count; i++)
+                        for (int i = 0; i < funcionalidadesCompletas.Count; i++)
                         {
-                            for(int j = 0; j < funcionalidades.Length; j++)
+                            for (int j = 0; j < funcionalidades.Length; j++)
                             {
-                                if(i < funcionalidadesCompletas.Count && funcionalidadesCompletas.Count > 0 && funcionalidadesCompletas[i].id == int.Parse(funcionalidades[j]))
+                                if (i < funcionalidadesCompletas.Count && funcionalidadesCompletas.Count > 0 && funcionalidadesCompletas[i].id == int.Parse(funcionalidades[j]))
                                 {
                                     funcionalidadesCompletas.Remove(funcionalidadesCompletas[i]);
                                     j = 0;
@@ -320,7 +322,7 @@ namespace SifizPlanning.Controllers
                     funcionalidadesExtra = funcionalidadesCompletas
                 });
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return Json(new
                 {
@@ -349,7 +351,7 @@ namespace SifizPlanning.Controllers
                                          select pmc.SecuencialCliente).ToList()[0];
 
                 ProyectoModuloCliente proyectoModuloCliente = db.ProyectoModuloCliente.Find(secuencialModuloCliente);
-                if(subModulo != 0)
+                if (subModulo != 0)
                 {
                     proyectoModuloCliente.SecuencialSubModulo = subModulo;
                     db.SaveChanges();
@@ -380,7 +382,7 @@ namespace SifizPlanning.Controllers
 
                 var funcionalidadesEliminar = db.FuncionalidadCliente.Where(x => x.SecuencialCliente == secuencialCliente).ToList();
 
-                for(int i = 0; i < funcionalidadesEliminar.Count; i++)
+                for (int i = 0; i < funcionalidadesEliminar.Count; i++)
                 {
                     MethodInfo metodoRemove = typePropertyTabla.GetMethod("Remove");
                     newObj = metodoRemove.Invoke(dbSetTable, new object[1] { funcionalidadesEliminar[i] });
@@ -388,7 +390,7 @@ namespace SifizPlanning.Controllers
                 db.SaveChanges();
 
 
-                for(int i = 0; i < funcionalidadesArray.Length; i++)
+                for (int i = 0; i < funcionalidadesArray.Length; i++)
                 {
                     var datosFunc = funcionalidadesArray[i].Split(':');
 
@@ -412,7 +414,7 @@ namespace SifizPlanning.Controllers
                     success = true
                 });
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return Json(new
                 {
@@ -474,7 +476,7 @@ namespace SifizPlanning.Controllers
                                  numero = t.Secuencial
                              }).ToList();
 
-            if(todos == false)
+            if (todos == false)
             {
                 //Se crea la variable tickets con su colaborador asignado
                 var ticketsSinAsignado = (from t in ticketsParcial
@@ -529,57 +531,57 @@ namespace SifizPlanning.Controllers
             }
 
             //Aplicando los filtros
-            if(filtroNoTicket != "")
+            if (filtroNoTicket != "")
             {
                 tickets = (from t in tickets
                            where t.numero.ToString().PadLeft(6, '0').Contains(filtroNoTicket)
                            select t).ToList();
             }
-            if(filtroCliente != "")
+            if (filtroCliente != "")
             {
                 tickets = (from t in tickets
                            where t.cliente.ToString().ToLower().Contains(filtroCliente.ToLower())
                            select t).ToList();
             }
-            if(filtroAsunto != "")
+            if (filtroAsunto != "")
             {
                 tickets = (from t in tickets
                            where t.asunto.ToString().ToLower().Contains(filtroAsunto.ToLower())
                            select t).ToList();
             }
-            if(filtroAsignado != "")
+            if (filtroAsignado != "")
             {
 
                 tickets = (from t in tickets
                            where t.asignado.ToString().ToUpper().Contains(filtroAsignado.ToUpper())
                            select t).ToList();
             }
-            if(filtroFecha != "")
+            if (filtroFecha != "")
             {
                 tickets = (from t in tickets
                            where t.fecha.ToString("dd/MM/yyyy").Contains(filtroFecha)
                            select t).ToList();
             }
-            if(filtroFechaVencimiento != "")
+            if (filtroFechaVencimiento != "")
             {
                 tickets = (from t in tickets
                            where t.fechaVencimiento.ToString("dd/MM/yyyy").Contains(filtroFechaVencimiento)
                            select t).ToList();
             }
-            if(filtroDiasRestantes != "")
+            if (filtroDiasRestantes != "")
             {
                 tickets = (from t in tickets
                            where t.diasRestantes.ToString().ToUpper().Equals(filtroDiasRestantes.ToUpper())
                            select t).ToList();
             }
             //Se Ordena
-            if(order > 0)
+            if (order > 0)
             {
-                switch(order)
+                switch (order)
                 {
                     case 1:
 
-                        if(asc == 1)
+                        if (asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.numero
@@ -596,7 +598,7 @@ namespace SifizPlanning.Controllers
 
                     case 2:
 
-                        if(asc == 1)
+                        if (asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.cliente
@@ -613,7 +615,7 @@ namespace SifizPlanning.Controllers
 
                     case 3:
 
-                        if(asc == 1)
+                        if (asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.asunto
@@ -630,7 +632,7 @@ namespace SifizPlanning.Controllers
 
                     case 4:
 
-                        if(asc == 1)
+                        if (asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.asignado
@@ -647,7 +649,7 @@ namespace SifizPlanning.Controllers
 
                     case 5:
 
-                        if(asc == 1)
+                        if (asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.fecha
@@ -665,7 +667,7 @@ namespace SifizPlanning.Controllers
 
                     case 6:
 
-                        if(asc == 1)
+                        if (asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.fechaVencimiento
@@ -682,7 +684,7 @@ namespace SifizPlanning.Controllers
 
                     case 7:
 
-                        if(asc == 1)
+                        if (asc == 1)
                         {
                             tickets = (from t in tickets
                                        orderby t.diasRestantes
@@ -752,10 +754,11 @@ namespace SifizPlanning.Controllers
                                        id = 0,
                                        nombre = "NO ASIGNADO"
                                    },
-                                   editable = false
+                                   editable = false,
+                                   adjunto = o.Adjunto,
                                }).ToList();
 
-                if(filtro != "")
+                if (filtro != "")
                 {
                     ofertas = ofertas.Where(s =>
                                             s.cliente.nombre.ToString().ToUpper().Contains(filtro.ToUpper()) ||
@@ -775,7 +778,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return Json(new
                 {
@@ -787,18 +790,29 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, GESTOR")]
-        public ActionResult AgregarOfertaTickets(string fechaRegistro, string fechaProduccion, string fechaDisponibilidad, string detalle, int? horasEstimacion, int? cliente, int? colaborador)
+        public ActionResult AgregarOfertaTickets(string fechaRegistro, string fechaProduccion, string fechaDisponibilidad, string detalle, int? horasEstimacion, int? cliente, int? colaborador, HttpPostedFileBase adjunto = null)
         {
             try
             {
+
+                var adjuntoUrl = "";
+                if (adjunto != null)
+                {
+                    string path = Path.Combine(Server.MapPath("~/Web/resources/ofertas"), adjunto.FileName);
+                    adjunto.SaveAs(path);
+
+                    adjuntoUrl = "/resources/ofertas" + "/" + adjunto.FileName;
+                }
+
                 Ofertas oferta = new Ofertas();
-                oferta.FechaRegistro = fechaRegistro != null ? DateTime.Parse(fechaRegistro) : new DateTime(0001 / 01 / 01);
-                oferta.FechaProduccion = fechaProduccion != null ? DateTime.Parse(fechaProduccion) : new DateTime(0001 / 01 / 01);
-                oferta.FechaDisponibilidad = fechaDisponibilidad != null ? DateTime.Parse(fechaDisponibilidad) : new DateTime(0001 / 01 / 01);
+                oferta.FechaRegistro = DateTime.Today; //fechaRegistro != null ? DateTime.Parse(fechaRegistro) : new DateTime(0001 / 01 / 01);
+                oferta.FechaProduccion = DateTime.Today; //fechaProduccion != null ? DateTime.Parse(fechaProduccion) : new DateTime(0001 / 01 / 01);
+                oferta.FechaDisponibilidad = DateTime.Today; //fechaDisponibilidad != null ? DateTime.Parse(fechaDisponibilidad) : new DateTime(0001 / 01 / 01);
                 oferta.Detalle = detalle;
                 oferta.HorasEstimacion = horasEstimacion ?? 0;
                 oferta.cliente = cliente != null ? db.Cliente.Find(cliente) : db.Cliente.Find(78);
                 oferta.colaborador = colaborador != null ? db.Colaborador.Find(colaborador) : db.Colaborador.Find(2122);
+                oferta.Adjunto = adjuntoUrl;
 
                 db.Ofertas.Add(oferta);
                 db.SaveChanges();
@@ -809,7 +823,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return Json(new
                 {
@@ -821,25 +835,38 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, GESTOR")]
-        public ActionResult EditarOfertaTickets(int ID, string FechaRegistro, string FechaProduccion, string FechaDisponibilidad, string Detalle, int HorasEstimacion, int cliente, int colaborador)
+        public ActionResult EditarOfertaTickets(int ID, string FechaRegistro, string FechaProduccion, string FechaDisponibilidad, string Detalle, int HorasEstimacion, int cliente, int colaborador, HttpPostedFileBase adjunto = null)
         {
             try
             {
-                Ofertas oferta = db.Ofertas.FirstOrDefault(s => s.Secuencial == ID);
-                if(oferta != null)
-                {
-                    oferta.FechaRegistro = DateTime.Parse(FechaRegistro);
 
-                    DateTime fechaProduccion;
-                    if(DateTime.TryParse(FechaProduccion, out fechaProduccion))
+                Ofertas oferta = db.Ofertas.FirstOrDefault(s => s.Secuencial == ID);
+                if (oferta != null)
+                {
+                    oferta.FechaRegistro = DateTime.Today; //DateTime.Parse(FechaRegistro);
+                    oferta.FechaProduccion = DateTime.Today;
+
+                    /*DateTime fechaProduccion;
+                    if (DateTime.TryParse(FechaProduccion, out fechaProduccion))
                     {
                         oferta.FechaProduccion = fechaProduccion;
                     }
                     else
                     {
                         oferta.FechaProduccion = null;
+                    }*/
+
+                    var adjuntoUrl = "";
+                    if (adjunto != null)
+                    {
+                        string path = Path.Combine(Server.MapPath("~/Web/resources/ofertas"), adjunto.FileName);
+                        adjunto.SaveAs(path);
+
+                        adjuntoUrl = "/resources/ofertas" + "/" + adjunto.FileName;
+                        oferta.Adjunto = adjuntoUrl;
                     }
-                    oferta.FechaDisponibilidad = DateTime.Parse(FechaDisponibilidad);
+
+                    oferta.FechaDisponibilidad = DateTime.Today; //DateTime.Parse(FechaDisponibilidad);
                     oferta.Detalle = Detalle;
                     oferta.HorasEstimacion = HorasEstimacion;
                     oferta.cliente = db.Cliente.Find(cliente);
@@ -853,7 +880,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return Json(new
                 {
@@ -880,7 +907,7 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(resp);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return Json(new
                 {
