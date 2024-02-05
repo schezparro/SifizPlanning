@@ -294,111 +294,111 @@ namespace SifizPlanning.Util
 
         public static void EnviarEmail(string emailFuente, string[] emailsDestinos, string emailBody, string asunto = "Información", string password = "", bool adjuntarimagen = false, string[] imagenes = null, string[] adjuntos = null, int idCorreo = -1)
         {
-            var email = new MimeMessage();
-            email.From.Add(new MailboxAddress(emailFuente));
-            email.Subject = asunto;
+            //var email = new MimeMessage();
+            //email.From.Add(new MailboxAddress(emailFuente));
+            //email.Subject = asunto;
 
-            foreach(string emailDestino in emailsDestinos)
-            {
-                email.To.Add(new MailboxAddress(emailDestino));
-            }
-            var builder = new BodyBuilder();
-            if(adjuntarimagen)
-            {
-                foreach(string imagen in imagenes)
-                {
-                    string[] path = new string[2] { HostingEnvironment.MapPath("~/Web/images/email"), imagen };
-                    string imagePath = Path.Combine(path);
-                    builder.HtmlBody = emailBody;
-                    builder.Attachments.Add(imagePath);
-                }
-            }
-            else
-            {
-                builder.HtmlBody = emailBody;
-            }
-            if(adjuntos != null && adjuntos.Length > 0)
-            {
-                foreach(var adj in adjuntos)
-                {
-                    builder.Attachments.Add(adj);
-                }
-            }
-            email.Body = builder.ToMessageBody();
+            //foreach(string emailDestino in emailsDestinos)
+            //{
+            //    email.To.Add(new MailboxAddress(emailDestino));
+            //}
+            //var builder = new BodyBuilder();
+            //if(adjuntarimagen)
+            //{
+            //    foreach(string imagen in imagenes)
+            //    {
+            //        string[] path = new string[2] { HostingEnvironment.MapPath("~/Web/images/email"), imagen };
+            //        string imagePath = Path.Combine(path);
+            //        builder.HtmlBody = emailBody;
+            //        builder.Attachments.Add(imagePath);
+            //    }
+            //}
+            //else
+            //{
+            //    builder.HtmlBody = emailBody;
+            //}
+            //if(adjuntos != null && adjuntos.Length > 0)
+            //{
+            //    foreach(var adj in adjuntos)
+            //    {
+            //        builder.Attachments.Add(adj);
+            //    }
+            //}
+            //email.Body = builder.ToMessageBody();
 
-            using(var smtp = new SmtpClient())
-            {
-                smtp.Connect("sifizsoft.com", 465, true);
-                smtp.Authenticate(emailFuente, password);
+            //using(var smtp = new SmtpClient())
+            //{
+            //    smtp.Connect("sifizsoft.com", 465, true);
+            //    smtp.Authenticate(emailFuente, password);
 
-                bool enviado = false;
-                string mensaje = "";
+            //    bool enviado = false;
+            //    string mensaje = "";
 
-                try
-                {
-                    smtp.Send(email);
-                    enviado = true;
-                }
-                catch(Exception e)
-                {
-                    mensaje = e.Message;
-                }
+            //    try
+            //    {
+            //        smtp.Send(email);
+            //        enviado = true;
+            //    }
+            //    catch(Exception e)
+            //    {
+            //        mensaje = e.Message;
+            //    }
 
-                smtp.Disconnect(true);
+            //    smtp.Disconnect(true);
 
-                // The rest of your code related to database operations and error handling remains the same.
-                if(!enviado)
-                {
-                    //Si no se pudo enviar y es un correo nuevo, se guarda en la BD
-                    if(idCorreo <= 0)
-                    {
-                        CorreoNoEnviado objCorreoNoEnviado = new CorreoNoEnviado()
-                        {
-                            EmailEnvia = emailFuente,
-                            Password = EncriptacionSimetrica(password),
-                            FechaHora = DateTime.Now,
-                            Asunto = asunto,
-                            Texto = emailBody.Length > 8000 ? emailBody.Substring(0, 8000) : emailBody,
-                            EmailDestinos = emailsDestinos.ToString(),
-                            AdjuntarImagen = adjuntarimagen,
-                            Imagenes = imagenes.ToString(),
-                            Adjuntos = adjuntos.ToString(),
-                            MensajeError = mensaje,
-                            EstaActivo = true
-                        };
+            //    // The rest of your code related to database operations and error handling remains the same.
+            //    if(!enviado)
+            //    {
+            //        //Si no se pudo enviar y es un correo nuevo, se guarda en la BD
+            //        if(idCorreo <= 0)
+            //        {
+            //            CorreoNoEnviado objCorreoNoEnviado = new CorreoNoEnviado()
+            //            {
+            //                EmailEnvia = emailFuente,
+            //                Password = EncriptacionSimetrica(password),
+            //                FechaHora = DateTime.Now,
+            //                Asunto = asunto,
+            //                Texto = emailBody.Length > 8000 ? emailBody.Substring(0, 8000) : emailBody,
+            //                EmailDestinos = emailsDestinos.ToString(),
+            //                AdjuntarImagen = adjuntarimagen,
+            //                Imagenes = imagenes.ToString(),
+            //                Adjuntos = adjuntos.ToString(),
+            //                MensajeError = mensaje,
+            //                EstaActivo = true
+            //            };
 
-                        try
-                        {
-                            db.CorreoNoEnviado.Add(objCorreoNoEnviado);
-                            db.SaveChanges();
-                        }
-                        catch(Exception)
-                        {
-                            throw new Exception(mensaje);
-                        }
-                    }
-                    BackgroundJob.Schedule(() => EnviarEmail(emailFuente, emailsDestinos, emailBody, asunto, password, adjuntarimagen, imagenes, adjuntos, idCorreo), TimeSpan.FromMinutes(20));
-                }
-                else
-                {
-                    //Si se pudo enviar y no es un correo nuevo, se elimina de la BD
-                    if(idCorreo > 0)
-                    {
-                        CorreoNoEnviado objCorreoNoEnviado = db.CorreoNoEnviado.Find(idCorreo);
-                        if(objCorreoNoEnviado != null)
-                            objCorreoNoEnviado.EstaActivo = false;
-                        try
-                        {
-                            db.SaveChanges();
-                        }
-                        catch(Exception)
-                        {
-                            throw new Exception(mensaje);
-                        }
+            //            try
+            //            {
+            //                db.CorreoNoEnviado.Add(objCorreoNoEnviado);
+            //                db.SaveChanges();
+            //            }
+            //            catch(Exception)
+            //            {
+            //                throw new Exception(mensaje);
+            //            }
+            //        }
+            //        BackgroundJob.Schedule(() => EnviarEmail(emailFuente, emailsDestinos, emailBody, asunto, password, adjuntarimagen, imagenes, adjuntos, idCorreo), TimeSpan.FromMinutes(20));
+            //    }
+            //    else
+            //    {
+            //        //Si se pudo enviar y no es un correo nuevo, se elimina de la BD
+            //        if(idCorreo > 0)
+            //        {
+            //            CorreoNoEnviado objCorreoNoEnviado = db.CorreoNoEnviado.Find(idCorreo);
+            //            if(objCorreoNoEnviado != null)
+            //                objCorreoNoEnviado.EstaActivo = false;
+            //            try
+            //            {
+            //                db.SaveChanges();
+            //            }
+            //            catch(Exception)
+            //            {
+            //                throw new Exception(mensaje);
+            //            }
 
-                    }
-                }
-            }
+            //        }
+            //    }
+            //}
         }
 
         public static string darNombreTrabajador(int idTrabajador = 0)
