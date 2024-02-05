@@ -12,46 +12,46 @@ using System.Configuration;
 
 namespace SifizPlanning.Controllers
 {
-    public class ReportController : Controller
-    {
-        SifizPlanningEntidades db = DbCnx.getCnx();
+	public class ReportController : Controller
+	{
+		SifizPlanningEntidades db = DbCnx.getCnx();
 
-        // GET: Report
-        //PANTALLA INICIAL
-        [Authorize(Roles = "COORDINADOR, ADMIN")]
-        public ActionResult Index()
-        {
-            return View();
-        }
+		// GET: Report
+		//PANTALLA INICIAL
+		[Authorize(Roles = "COORDINADOR, ADMIN")]
+		public ActionResult Index()
+		{
+			return View();
+		}
 
 
-        //MUESTRA EL REPORTE SELECCIONADO
-        [Authorize(Roles = "COORDINADOR, ADMIN")]
-        public ActionResult VerReporte(string modulo, string reporte)
-        {
-            var url = (from r in db.Reporte
-                       where r.Modulo.Equals(modulo) && r.Nombre.Equals(reporte)
-                       select r.Url).ToList()[0];
+		//MUESTRA EL REPORTE SELECCIONADO
+		[Authorize(Roles = "COORDINADOR, ADMIN")]
+		public ActionResult VerReporte(string modulo, string reporte)
+		{
+			var url = (from r in db.Reporte
+					   where r.Modulo.Equals(modulo) && r.Nombre.Equals(reporte)
+					   select r.Url).ToList()[0];
 
-            string reportServerUser = ConfigurationManager.AppSettings.Get("ReportServerUser");
-            string reportServerPass = ConfigurationManager.AppSettings.Get("ReportServerPass");
-            string reportServerUrl = ConfigurationManager.AppSettings.Get("ReportServerUrl");
+			string reportServerUser = ConfigurationManager.AppSettings.Get("ReportServerUser");
+			string reportServerPass = ConfigurationManager.AppSettings.Get("ReportServerPass");
+			string reportServerUrl = ConfigurationManager.AppSettings.Get("ReportServerUrl");
 
-            ReportViewer reportViewer = new ReportViewer();
-            reportViewer.ProcessingMode = ProcessingMode.Remote;
-            reportViewer.ServerReport.ReportServerCredentials = new ReportServerCredentials(reportServerUser, reportServerPass, "");
+			ReportViewer reportViewer = new ReportViewer();
+			reportViewer.ProcessingMode = ProcessingMode.Remote;
+			reportViewer.ServerReport.ReportServerCredentials = new ReportServerCredentials(reportServerUser, reportServerPass, "");
 
-            reportViewer.SizeToReportContent = true;
-            reportViewer.Width = Unit.Percentage(100);
-            reportViewer.Height = Unit.Percentage(100);
+			reportViewer.SizeToReportContent = true;
+			reportViewer.Width = Unit.Percentage(100);
+			reportViewer.Height = Unit.Percentage(100);
 
-            reportViewer.ServerReport.ReportServerUrl = new Uri(reportServerUrl);
-            //reportViewer.ServerReport.ReportPath = "/Comercializacion/ClientePorModulo";
-            reportViewer.ServerReport.ReportPath = url;
+			reportViewer.ServerReport.ReportServerUrl = new Uri(reportServerUrl);
+			//reportViewer.ServerReport.ReportPath = "/Comercializacion/ClientePorModulo";
+			reportViewer.ServerReport.ReportPath = url;
 
-            ViewBag.ReportViewer = reportViewer;
-            return View();
-        }
+			ViewBag.ReportViewer = reportViewer;
+			return View();
+		}
 
-    }
+	}
 }
