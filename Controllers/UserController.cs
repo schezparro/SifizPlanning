@@ -28,6 +28,7 @@ using Newtonsoft.Json.Linq;
 using DocumentFormat.OpenXml.Drawing.Diagrams;
 using HorizontalAlignmentValues = DocumentFormat.OpenXml.Spreadsheet.HorizontalAlignmentValues;
 using VerticalAlignmentValues = DocumentFormat.OpenXml.Spreadsheet.VerticalAlignmentValues;
+using Microsoft.Ajax.Utilities;
 
 namespace SifizPlanning.Controllers
 {
@@ -2719,12 +2720,21 @@ r in db.Rol on ur.rol equals r
 					throw new Exception("No existe el ticket asociado a la tarea.");
 				}
 
+				List<string> comentarios = new List<string>();
+				var resueltos = db.TicketHistorico.Where(s => s.SecuencialTicket == ticket.Secuencial && s.SecuencialEstadoTicket == 10).OrderByDescending(s=> s.FechaOperacion).ToList();
+				foreach(var item in resueltos)
+				{
+					var str = db.HistoricoInformacionTicket.Where(s => s.SecuencialTicketHistorico == item.SecuencialTicket && s.VersionTicketHistorico == item.Version).OrderByDescending(o => o.Secuencial).First().Texto;
+					comentarios.Add(str);
+				}
+
 				var resp = new
 				{
 					success = true,
 					detalleTicket = ticket.Detalle,
 					textoResolucion = ticket.ticket_resolucion != null ? ticket.ticket_resolucion.Descripcion : "",
-					adjuntosTicket = ticket.adjuntoTicket.Select(x => x.Url).ToList()
+					adjuntosTicket = ticket.adjuntoTicket.Select(x => x.Url).ToList(),
+					comentarios = comentarios
 				};
 
 				return Json(resp);

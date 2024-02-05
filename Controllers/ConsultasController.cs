@@ -861,7 +861,6 @@ namespace SifizPlanning.Controllers
 		{
 			try
 			{
-
 				Ofertas oferta = db.Ofertas.FirstOrDefault(s => s.Secuencial == ID);
 				if(oferta != null)
 				{

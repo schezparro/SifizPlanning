@@ -574,9 +574,15 @@
                         <div class="texto-detalle-ticket">{{detalleTicket}}</div>
                     </div>
                     <div>
-                        <label>Resolución del ticket:</label>
+                        <label>Notas Técnicas:</label>
                         <div class="texto-detalle-ticket">{{textoResolucion}}</div>
                     </div>
+                    <div class="full-height">
+                        <div id="datos-historico-ticket" class="panel panel-default"></div>
+                    </div>
+                    @*<div ng-repeat="comentario in comentariosResueltos track by $index">
+                        {{ comentario }}
+                    </div>*@
                     <div>
                         <label>Adjuntos:</label>
                         <div>

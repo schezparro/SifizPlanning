@@ -743,8 +743,10 @@
                 $scope.detalleTicket = data.detalleTicket;
                 $scope.textoResolucion = data.textoResolucion;
                 $scope.adjuntosTicket = data.adjuntosTicket;
+                $scope.comentariosResueltos = data.comentarios;
 
                 angular.element('#modal-info-dev-ticket').modal('show');
+                angular.element("#datos-historico-ticket").html(data.comentarios);
             }
             else {
                 messageDialog.show('Información', data.msg);
