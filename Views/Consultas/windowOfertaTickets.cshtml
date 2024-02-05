@@ -96,7 +96,7 @@
                     <input id="fecha-disponibilidad-{{$index}}" ng-class="'form-control'" ng-show="oferta.editable" ng-model="oferta.FechaDisponibilidad">
                 </td>
                 <td>
-                    <a ng-if='oferta.adjunto !== ""' ng-hide="oferta.editable" href="Web{{oferta.adjunto}}" target="_blank" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-paperclip"></span>{{ oferta.adjunto | getFileName }}</a>
+                    <a ng-hide="oferta.editable || oferta.adjunto === '' || oferta.adjunto === null" href="Web{{oferta.adjunto}}" target="_blank" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-paperclip"></span>{{ oferta.adjunto | getFileName }}</a>
                     <button ng-show="oferta.editable" id="btn-edit-adjunto-oferta" ng-class="'form-control'" class="btn btn-success btn-xs" onclick="document.getElementById('edit-adjunto-oferta').click();"><span class="glyphicon glyphicon-plus"></span></button>
                     <input id="edit-adjunto-oferta" style="display: none" type="file" onchange="angular.element(this).scope().editarAdjuntoOferta()"/>
                     <span id="edit-adjunto-oferta-nombre" style="display: none">{{ newAdjuntoName }}</span>

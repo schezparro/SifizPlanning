@@ -1,10 +1,12 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
+using Microsoft.Owin;
 using SifizPlanning.Models;
 using SifizPlanning.Security;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.SqlServer;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -794,7 +796,6 @@ namespace SifizPlanning.Controllers
 		{
 			try
 			{
-
 				var adjuntoUrl = "";
 				if(adjunto != null)
 				{
@@ -804,10 +805,31 @@ namespace SifizPlanning.Controllers
 					adjuntoUrl = "/resources/ofertas" + "/" + adjunto.FileName;
 				}
 
+				DateTime dateRegistro = new DateTime(0001 / 01 / 01);
+				DateTime dateProduccion = new DateTime(0001 / 01 / 01);
+				DateTime dateDisponibilidad = new DateTime(0001 / 01 / 01);
+				string format = "ddd MMM dd yyyy HH:mm:ss 'GMT'K";
+
+				if(fechaRegistro != "null")
+				{
+					fechaRegistro = fechaRegistro.Split(new[] { " (" }, StringSplitOptions.None)[0];
+					dateRegistro = DateTime.ParseExact(fechaRegistro, format, CultureInfo.InvariantCulture);
+				}
+				if(fechaProduccion != "null")
+				{
+					fechaProduccion = fechaProduccion.Split(new[] { " (" }, StringSplitOptions.None)[0];
+					dateProduccion = DateTime.ParseExact(fechaProduccion, format, CultureInfo.InvariantCulture);
+				}
+				if(fechaDisponibilidad != "null")
+				{
+					fechaDisponibilidad = fechaDisponibilidad.Split(new[] { " (" }, StringSplitOptions.None)[0];
+					dateDisponibilidad = DateTime.ParseExact(fechaDisponibilidad, format, CultureInfo.InvariantCulture);
+				}
+
 				Ofertas oferta = new Ofertas();
-				oferta.FechaRegistro = DateTime.Today; //fechaRegistro != null ? DateTime.Parse(fechaRegistro) : new DateTime(0001 / 01 / 01);
-				oferta.FechaProduccion = DateTime.Today; //fechaProduccion != null ? DateTime.Parse(fechaProduccion) : new DateTime(0001 / 01 / 01);
-				oferta.FechaDisponibilidad = DateTime.Today; //fechaDisponibilidad != null ? DateTime.Parse(fechaDisponibilidad) : new DateTime(0001 / 01 / 01);
+				oferta.FechaRegistro = dateRegistro.Date;
+				oferta.FechaProduccion = dateProduccion.Date;
+				oferta.FechaDisponibilidad = dateDisponibilidad.Date;
 				oferta.Detalle = detalle;
 				oferta.HorasEstimacion = horasEstimacion ?? 0;
 				oferta.cliente = cliente != null ? db.Cliente.Find(cliente) : db.Cliente.Find(78);
@@ -843,18 +865,34 @@ namespace SifizPlanning.Controllers
 				Ofertas oferta = db.Ofertas.FirstOrDefault(s => s.Secuencial == ID);
 				if(oferta != null)
 				{
-					oferta.FechaRegistro = DateTime.Today; //DateTime.Parse(FechaRegistro);
-					oferta.FechaProduccion = DateTime.Today;
+					DateTime dateRegistro = new DateTime(0001 / 01 / 01);
+					DateTime dateProduccion = new DateTime(0001 / 01 / 01);
+					DateTime dateDisponibilidad = new DateTime(0001 / 01 / 01);
+					string format = "ddd MMM dd yyyy HH:mm:ss 'GMT'K";
 
-					/*DateTime fechaProduccion;
-                    if (DateTime.TryParse(FechaProduccion, out fechaProduccion))
-                    {
-                        oferta.FechaProduccion = fechaProduccion;
-                    }
-                    else
-                    {
-                        oferta.FechaProduccion = null;
-                    }*/
+					if(FechaRegistro != "null")
+					{
+						FechaRegistro = FechaRegistro.Split(new[] { " (" }, StringSplitOptions.None)[0];
+						dateRegistro = DateTime.ParseExact(FechaRegistro, format, CultureInfo.InvariantCulture);
+					}
+					if(FechaProduccion != "null")
+					{
+						FechaProduccion = FechaProduccion.Split(new[] { " (" }, StringSplitOptions.None)[0];
+						dateProduccion = DateTime.ParseExact(FechaProduccion, format, CultureInfo.InvariantCulture);
+					}
+					if(FechaDisponibilidad != "null")
+					{
+						FechaDisponibilidad = FechaDisponibilidad.Split(new[] { " (" }, StringSplitOptions.None)[0];
+						dateDisponibilidad = DateTime.ParseExact(FechaDisponibilidad, format, CultureInfo.InvariantCulture);
+					}
+
+					oferta.FechaRegistro = dateRegistro.Date;
+					oferta.FechaProduccion = dateProduccion.Date;
+					oferta.FechaDisponibilidad = dateDisponibilidad.Date;
+					oferta.Detalle = Detalle;
+					oferta.HorasEstimacion = HorasEstimacion;
+					oferta.cliente = db.Cliente.Find(cliente);
+					oferta.colaborador = db.Colaborador.Find(colaborador);
 
 					var adjuntoUrl = "";
 					if(adjunto != null)
@@ -865,12 +903,6 @@ namespace SifizPlanning.Controllers
 						adjuntoUrl = "/resources/ofertas" + "/" + adjunto.FileName;
 						oferta.Adjunto = adjuntoUrl;
 					}
-
-					oferta.FechaDisponibilidad = DateTime.Today; //DateTime.Parse(FechaDisponibilidad);
-					oferta.Detalle = Detalle;
-					oferta.HorasEstimacion = HorasEstimacion;
-					oferta.cliente = db.Cliente.Find(cliente);
-					oferta.colaborador = db.Colaborador.Find(colaborador);
 				}
 				db.SaveChanges();
 

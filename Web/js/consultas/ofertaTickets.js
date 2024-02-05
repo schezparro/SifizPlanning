@@ -12,29 +12,23 @@
             format: 'dd/mm/yyyy',
             language: 'es'
         });
-
         angular.element(`#fecha-produccion-` + index).datepicker({
             format: 'dd/mm/yyyy',
             language: 'es'
 
         })
-
         angular.element('#fecha-disponibilidad-' + index).datepicker({
             format: 'dd/mm/yyyy',
             language: 'es'
         });
-
     };
+
     $scope.guardarCambios = function (oferta) {
-        if (oferta.id !== "" && oferta.FechaRegistro !== "" && oferta.FechaProduccion !== "" &&
-            oferta.FechaDisponibilidad !== "" && oferta.Detalle !== "" && oferta.HorasEstimacion !== "" && oferta.cliente.id !== "" &&
-            oferta.colaborador.id !== "") {
             angular.element('#fecha-registro-' + oferta.id).datepicker('destroy');
             angular.element('#fecha-produccion-' + oferta.id).datepicker('destroy');
             angular.element('#fecha-disponibilidad-' + oferta.id).datepicker('destroy');
 
             oferta.editable = false;
-
             var adjunto = $scope.adjunto;
 
             var formData = new FormData();
@@ -56,17 +50,6 @@
                 transformRequest: angular.identity
             });
 
-            /*var ajaxOfertas = $http.post("consultas/editar-ofertas-tickets", {
-                ID: oferta.id,
-                FechaRegistro: new Date(...oferta.FechaRegistro.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)),
-                FechaProduccion: new Date(...oferta.FechaProduccion.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)),
-                FechaDisponibilidad: new Date(...oferta.FechaDisponibilidad.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)),
-                Detalle: oferta.Detalle,
-                HorasEstimacion: oferta.HorasEstimacion,
-                cliente: oferta.cliente.id,
-                colaborador: oferta.colaborador.id
-            });*/
-
             ajaxOfertas.success(function (data) {
                 if (data.success === true) {
                     $scope.cargarDatosOfertas()
@@ -76,9 +59,6 @@
                 }
             });
 
-        } else {
-            messageDialog.show("Información", "Debe llenar todos los campos");
-        }
         $scope.adjunto = null;
     };
 
@@ -117,8 +97,8 @@
 
         var formData = new FormData();
         formData.append("fechaRegistro", nuevaOferta.FechaRegistro);
-        formData.append("FechaProduccion", nuevaOferta.FechaProduccion);
-        formData.append("fechaDisponibilidad", nuevaOferta.fechaDisponibilidad);
+        formData.append("fechaProduccion", nuevaOferta.FechaProduccion);
+        formData.append("fechaDisponibilidad", nuevaOferta.FechaDisponibilidad);
         formData.append("detalle", nuevaOferta.Detalle);
         formData.append("horasEstimacion", nuevaOferta.HorasEstimacion);
         formData.append("cliente", nuevaOferta.cliente.id);
@@ -132,16 +112,6 @@
             headers: { 'Content-Type': undefined },
             transformRequest: angular.identity
         });
-
-        /*var ajaxOfertas = $http.post("consultas/agregar-ofertas-tickets", {
-            fechaRegistro: nuevaOferta.FechaRegistro,
-            FechaProduccion: nuevaOferta.FechaProduccion,
-            fechaDisponibilidad: nuevaOferta.FechaDisponibilidad,
-            detalle: nuevaOferta.Detalle,
-            horasEstimacion: nuevaOferta.HorasEstimacion,
-            cliente: nuevaOferta.cliente.id,
-            colaborador: nuevaOferta.colaborador.id
-        });*/
 
         ajaxOfertas.success(function (data) {
             if (data.success === true) {
