@@ -181,30 +181,25 @@
     };
 
     $scope.agregarAdjuntoOferta = function () {
-        
-        var adjunto = document.getElementById('add-adjunto-oferta');
-        adjunto.onchange = function () {
-            $scope.adjuntoName = this.files[0].name;
-            console.log($scope.adjuntoName);
-            $scope.adjunto = this.files[0];
 
-            angular.element("#adjunto-oferta-nombre").css("display", "block");
-            angular.element("#btn-add-adjunto-oferta").css("display", "none");
-        };
-        adjunto.click();
+        if (document.getElementById('add-adjunto-oferta').files[0].name.length > 20) {
+            document.getElementById('btn-add-adjunto-oferta').innerHTML = "..." + document.getElementById('add-adjunto-oferta').files[0].name.substring(document.getElementById('add-adjunto-oferta').files[0].name.length - 17, document.getElementById('add-adjunto-oferta').files[0].name.length);
+        } else {
+            document.getElementById('btn-add-adjunto-oferta').innerHTML = document.getElementById('add-adjunto-oferta').files[0].name.substring(0, 20);
+        }
+
+        $scope.adjunto = document.getElementById('add-adjunto-oferta').files[0];
     };
 
     $scope.editarAdjuntoOferta = function () {
-        var adjunto = document.getElementById('add-adjunto-oferta');
-        adjunto.onchange = function () {
-            $scope.newAdjuntoName = this.files[0].name;
-            
-            $scope.adjunto = this.files[0];
 
-            angular.element("#edit-adjunto-oferta-nombre").css("display", "block");
-            angular.element("#btn-edit-adjunto-oferta").css("display", "none");
-        };
-        adjunto.click();
+        if (document.getElementById('edit-adjunto-oferta').files[0].name.length > 20) {
+            document.getElementById('btn-edit-adjunto-oferta').innerHTML = "..." + document.getElementById('edit-adjunto-oferta').files[0].name.substring(document.getElementById('edit-adjunto-oferta').files[0].name.length - 17, document.getElementById('edit-adjunto-oferta').files[0].name.length);
+        } else {
+            document.getElementById('btn-edit-adjunto-oferta').innerHTML = document.getElementById('edit-adjunto-oferta').files[0].name.substring(0, 20);
+        }
+
+        $scope.adjunto = document.getElementById('edit-adjunto-oferta').files[0];
     };
 
 
