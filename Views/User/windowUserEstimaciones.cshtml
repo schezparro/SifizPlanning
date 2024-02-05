@@ -75,7 +75,7 @@
             <form method="post" id="frm-modal-estimar-ticket" ng-submit="estimarDesarrolloTicket()">
                 <div class="modal-body" style="max-height: 768px; max-width: 1024px; overflow-y: auto">
                     <button type="button" class="btn btn-success btn-xs" ng-click="adicionarEntregable()">Añadir Entregable</button>
-                    <button type="button" class="btn btn-success btn-xs" ng-click="adicionarItemsEspeciales()">Añadir Items Especiales</button>
+                    <button type="button" class="btn btn-success btn-xs" ng-click="adicionarItemsEspeciales()" id="add-items-especiales">Añadir Items Especiales</button>
                     <table id="tabla-estimacion-entregable-ticket" class="table">
                         <tr>
                             <th>
@@ -116,7 +116,7 @@
                             <tr>
                                 <td>
                                     <text style="font-weight:bold">Items Especiales</text>
-                                    <table class="table table-striped">
+                                    <table class="table table-striped" ng-dblclick="editarItems(itemsEstimacion, itemsAdicionales)">
 
                                         <thead>
                                             <tr>
@@ -124,17 +124,21 @@
                                                 <th>Descripcion</th>
                                                 <th>Tipo Recurso</th>
                                                 <th>Tiempo Estimado</th>
-                                                <th></th>
                                             </tr>
                                         </thead>
 
                                         <tbody>
-                                            <tr class="table-tr" ng-repeat="item in items" data-id="{{ item.id }}" ng-dblclick="editarItem(item)">
+                                            <tr class="table-tr" ng-repeat="item in itemsEstimacion" data-id="{{ item.id }}">
                                                 <td>T_ESP{{$index + 1}}</td>
                                                 <td>{{ item.descripcion }}</td>
                                                 <td>{{ item.nivel }}</td>
                                                 <td>{{ item.tiempoEstimacion }}</td>
-                                                <td><button type="button" class="btn btn-danger btn-xs" ng-click="eliminarItemEspecial(item.id)">Eliminar</button></td>
+                                            </tr>
+                                            <tr class="table-tr" ng-repeat="item in itemsAdicionales" data-id="{{ item.id }}">
+                                                <td>T_ESP{{itemsEstimacionLength + $index + 1}}</td>
+                                                <td>{{ item.descripcion }}</td>
+                                                <td>{{ item.nivel }}</td>
+                                                <td>{{ item.tiempoEstimacion }}</td>
                                             </tr>
                                         </tbody>
 
@@ -279,30 +283,73 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="modal-final-item-label">
                     <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
-                    <span id="title-filter">Items Especiales</span>
+                    <span id="title-filter">Añadir Items Especiales</span>
                 </h4>
             </div>
-            <form method="post" id="frm-modal-items-ticket" ng-submit="guardarItemEspecial()">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label>Descripcion:</label>
-                            <input type="text" class="form-control" ng-required="true" ng-model="itemEspecialDescripcion" />
-                        </div>
+            <form method="post" id="frm-modal-items-ticket" ng-submit="guardarItemEspeciales()">
+                <div class="modal-body" style="max-height: 768px; max-width: 1024px; overflow-y: auto">
+                    <table class="table table-striped table-responsive table-hover">
+                        <thead>
+                            <tr>
+                                <th width="5">N°</th>
+                                <th width="15">DESCRIPCION</th>
+                                <th width="10">TIPO RECURSO</th>
+                                <th width="3">TIEMPO EST</th>
+                                <th width="2">OBLIGATORIO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="itemEspecialEstimacion in itemEspecialesEstimacion" data-id="{{itemEspecialEstimacion.id}}">
+                                <td>T_ESP{{$index + 1}}</td>
+                                <td>{{itemEspecialEstimacion.descripcion}}</td>
+                                <td>
+                                    <select class="form-control" ng-model="itemEspecialEstimacion.secuencialNivelColaborador" ng-required="{{itemEspecialEstimacion.obligatorio}}">
+                                        <option value="">Seleccione...</option>
+                                        <option ng-repeat="nivel in niveles" value="{{nivel.id}}">{{nivel.name}}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input class="form-control" ng-model="itemEspecialEstimacion.tiempoEstimacion" type="number" ng-required="{{itemEspecialEstimacion.obligatorio}}" />
+                                </td>
+                                <td>
+                                    <input type="checkbox" ng-model="itemEspecialEstimacion.obligatorio" ng-disabled="true" />
+                                </td>
+                            </tr>
 
-                        <div class="col-md-3">
-                            <label>Tiempo Estimado:</label>
-                            <input type='text' class="solo-numero form-control" ng-model="itemEspecialTiempoEstimacion" ng-required="true" />
-                        </div>
-
-                        <div class="col-md-3">
-                            <label>Tipo Recurso:</label>
-                            <select class="form-control" ng-model="itemEspecialNivelColab" ng-required="true">
-                                <option value="">Seleccione...</option>
-                                <option ng-repeat="nivel in niveles" value="{{nivel.id}}">{{nivel.name}}</option>
-                            </select>
-                        </div>
-                    </div>
+                            <tr ng-repeat="itemEspecialAdicional in itemEspecialesAdicionales" data-id="{{itemEspecialAdicional.id}}">
+                                <td>T_ESP{{itemEspecialesEstimacionLength + $index + 1}}</td>
+                                <td>
+                                    <input class="form-control" ng-model="itemEspecialAdicional.descripcion" type="text" ng-required="true" />
+                                </td>
+                                <td>
+                                    <select class="form-control" ng-model="itemEspecialAdicional.secuencialNivelColaborador" ng-required="true">
+                                        <option value="">Seleccione...</option>
+                                        <option ng-repeat="nivel in niveles" value="{{nivel.id}}">{{nivel.name}}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input class="form-control" ng-model="itemEspecialAdicional.tiempoEstimacion" type="number" ng-required="true" />
+                                </td>
+                                <td>
+                                    <input type="checkbox" ng-disabled="true" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                </td>
+                                <td>
+                                </td>
+                                <td>
+                                </td>
+                                <td>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary" ng-click="nuevaFila()">Nuevo</button>
+                                    <button class="btn btn-danger" ng-click="eliminarFila()">Eliminar</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                     <div class="clear"></div>
                 </div>
 
@@ -323,35 +370,78 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="modal-final-item-label">
                     <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
-                    <span id="title-filter">Items Especiales</span>
+                    <span id="title-filter">Editar Items Especiales</span>
                 </h4>
             </div>
-            <form method="post" id="frm-modal-edicion-items-ticket" ng-submit="editarItemEspecial()">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label>Descripcion:</label>
-                            <input type="text" class="form-control" ng-required="true" ng-model="itemEspecialDescripcion" />
-                        </div>
+            <form method="post" id="frm-modal-edicion-items-ticket">
+                <div class="modal-body" style="max-height: 768px; max-width: 1024px; overflow-y: auto">
+                    <table class="table table-striped table-responsive table-hover">
+                        <thead>
+                            <tr>
+                                <th width="5">N°</th>
+                                <th width="15">DESCRIPCION</th>
+                                <th width="10">TIPO RECURSO</th>
+                                <th width="3">TIEMPO EST</th>
+                                <th width="2">OBLIGATORIO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="itemEstimacionEdit in itemsEstimacionEdit" data-id="{{itemEstimacionEdit.id}}">
+                                <td>T_ESP{{$index + 1}}</td>
+                                <td>{{itemEstimacionEdit.descripcion}}</td>
+                                <td>
+                                    <select class="form-control" ng-model="itemEstimacionEdit.idNivelColab" ng-required="{{itemEstimacionEdit.obligatorio}}">
+                                        <option value="">{{itemEstimacionEdit.nivel}}</option>
+                                        <option ng-repeat="nivel in niveles" value="{{nivel.id}}">{{nivel.name}}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input class="form-control" ng-model="itemEstimacionEdit.tiempoEstimacion" type="number" ng-required="{{itemEstimacionEdit.obligatorio}}" />
+                                </td>
+                                <td>
+                                    <input type="checkbox" ng-model="itemEstimacionEdit.obligatorio" ng-disabled="true" ng-checked="true" />
+                                </td>
+                            </tr>
 
-                        <div class="col-md-3">
-                            <label>Tiempo Estimado:</label>
-                            <input type='text' class="solo-numero form-control" ng-model="itemEspecialTiempoEstimacion" ng-required="true" />
-                        </div>
-
-                        <div class="col-md-3">
-                            <label>Tipo Recurso:</label>
-                            <select class="form-control" ng-model="itemEspecialNivelColab" ng-required="true">
-                                <option value="">Seleccione...</option>
-                                <option ng-repeat="nivel in niveles" value="{{nivel.id}}">{{nivel.name}}</option>
-                            </select>
-                        </div>
-                    </div>
+                            <tr ng-repeat="itemAdicionalEdit in itemsAdicionalesEdit" data-id="{{itemAdicionalEdit.id}}">
+                                <td>T_ESP{{itemsEstimacionEditLength + $index + 1}}</td>
+                                <td>
+                                    <input class="form-control" ng-model="itemAdicionalEdit.descripcion" type="text" ng-required="true" />
+                                </td>
+                                <td>
+                                    <select class="form-control" ng-model="itemAdicionalEdit.idNivelColab" ng-required="true">
+                                        <option value="">{{itemEstimacionEdit.nivel}}</option>
+                                        <option ng-repeat="nivel in niveles" value="{{nivel.id}}">{{nivel.name}}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input class="form-control" ng-model="itemAdicionalEdit.tiempoEstimacion" type="number" ng-required="true" />
+                                </td>
+                                <td>
+                                    <input type="checkbox" ng-disabled="true" />
+                                    <button class="btn btn-danger" ng-click="eliminarItemEspecial(itemAdicionalEdit.id)">Eliminar</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                </td>
+                                <td>
+                                </td>
+                                <td>
+                                </td>
+                                <td>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary" ng-click="nuevaFilaEdit()">Nuevo</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                     <div class="clear"></div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Agregar</button>
+                    <button type="button" class="btn btn-primary" ng-click="editarItemsEspeciales()">Agregar</button>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </form>

@@ -661,6 +661,12 @@
     <Compile Include="Models\ItemEspecial.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ItemEspecialCatalogo.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ItemEspecialEstimacion.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\LugarTarea.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
@@ -1103,6 +1109,8 @@
     <Content Include="SCRIPTSDATABASE\12\29-RECURSOS.sql" />
     <Content Include="SCRIPTSDATABASE\12\30-ITEMESPECIAL.sql" />
     <Content Include="SCRIPTSDATABASE\12\31-ITEMESPECIAL.sql" />
+    <Content Include="SCRIPTSDATABASE\12\33-ITEMESPECIALCATALOGO.sql" />
+    <Content Include="SCRIPTSDATABASE\12\34-ITEMESPECIALESTIMACION.sql" />
     <Content Include="SCRIPTSDATABASE\12\32-OFERTAS.sql" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />

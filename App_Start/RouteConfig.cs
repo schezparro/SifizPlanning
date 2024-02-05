@@ -1146,21 +1146,27 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
-                name: "GuardarItemEspecial",
-                url: "user/guardar-item-especial/{id}",
-                defaults: new { controller = "User", action = "GuardarItemEspecial", id = UrlParameter.Optional }
-            );
-            
-            routes.MapRoute(
-                name: "EditarItemEspecial",
-                url: "user/editar-item-especial/{id}",
-                defaults: new { controller = "User", action = "EditarItemEspecial", id = UrlParameter.Optional }
-            );
-            
-            routes.MapRoute(
                 name: "EliminarItemEspecial",
                 url: "user/eliminar-item-especial/{id}",
                 defaults: new { controller = "User", action = "EliminarItemEspecial", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarItemsEspecialesCatalogo",
+                url: "user/dar-items-especiales-catalogo/{id}",
+                defaults: new { controller = "User", action = "DarItemsEspecialesCatalogo", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "GuardarItemEspeciales",
+                url: "user/guardar-item-especiales/{id}",
+                defaults: new { controller = "User", action = "GuardarItemEspeciales", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "EditarItemEspeciales",
+                url: "user/editar-item-especiales/{id}",
+                defaults: new { controller = "User", action = "EditarItemEspeciales", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(
@@ -1594,7 +1600,7 @@ namespace SifizPlanning
                 url: "tickets/detalle-estimacion-ticket/{id}",
                 defaults: new { controller = "Ticket", action = "DetalleEstimacionTicket", id = UrlParameter.Optional }
             );
-            
+
             routes.MapRoute(
                 name: "DarItemsEspecialesTicket",
                 url: "tickets/dar-items-especiales/{id}",

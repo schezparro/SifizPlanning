@@ -1516,6 +1516,27 @@
           <Property Name="SECUENCIALESTIMACION" Type="int" Nullable="false" />
           <Property Name="SECUENCIALNIVELCOLABORADOR" Type="int" />
         </EntityType>
+        <EntityType Name="ITEMESPECIALCATALOGO">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CODIGO" Type="varchar" MaxLength="30" Nullable="false" />
+          <Property Name="DESCRIPCION" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
+          <Property Name="OBLIGATORIO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ITEMESPECIALESTIMACION">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SECUENCIALITEMESPECIALCATALOGO" Type="int" Nullable="false" />
+          <Property Name="SECUENCIALESTIMACION" Type="int" Nullable="false" />
+          <Property Name="SECUENCIALNIVELCOLABORADOR" Type="int" Nullable="false" />
+          <Property Name="TIEMPOESTIMACION" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="MOTIVODEVOLUCIONTICKET">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
@@ -2331,6 +2352,42 @@
               <PropertyRef Name="SECUENCIAL" />
             </Principal>
             <Dependent Role="ITEMESPECIAL">
+              <PropertyRef Name="SECUENCIALNIVELCOLABORADOR" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ITEMESPECIALESTIMACION_ESTIMACIONTICKET">
+          <End Role="ESTIMACIONTICKET" Type="Self.ESTIMACIONTICKET" Multiplicity="1" />
+          <End Role="ITEMESPECIALESTIMACION" Type="Self.ITEMESPECIALESTIMACION" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ESTIMACIONTICKET">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="ITEMESPECIALESTIMACION">
+              <PropertyRef Name="SECUENCIALESTIMACION" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ITEMESPECIALESTIMACION_ITEMESPECIALCATALOGO">
+          <End Role="ITEMESPECIALCATALOGO" Type="Self.ITEMESPECIALCATALOGO" Multiplicity="1" />
+          <End Role="ITEMESPECIALESTIMACION" Type="Self.ITEMESPECIALESTIMACION" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ITEMESPECIALCATALOGO">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="ITEMESPECIALESTIMACION">
+              <PropertyRef Name="SECUENCIALITEMESPECIALCATALOGO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ITEMESPECIALESTIMACION_NIVELCOLABORADOR">
+          <End Role="NIVELCOLABORADOR" Type="Self.NIVELCOLABORADOR" Multiplicity="1" />
+          <End Role="ITEMESPECIALESTIMACION" Type="Self.ITEMESPECIALESTIMACION" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="NIVELCOLABORADOR">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="ITEMESPECIALESTIMACION">
               <PropertyRef Name="SECUENCIALNIVELCOLABORADOR" />
             </Dependent>
           </ReferentialConstraint>
@@ -4837,6 +4894,8 @@
           <EntitySet Name="INCIDENCIAS" EntityType="Self.INCIDENCIAS" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="INFOTICKETS" EntityType="Self.INFOTICKETS" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="ITEMESPECIAL" EntityType="Self.ITEMESPECIAL" Schema="TICKET" store:Type="Tables" />
+          <EntitySet Name="ITEMESPECIALCATALOGO" EntityType="Self.ITEMESPECIALCATALOGO" Schema="TICKET" store:Type="Tables" />
+          <EntitySet Name="ITEMESPECIALESTIMACION" EntityType="Self.ITEMESPECIALESTIMACION" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="MOTIVODEVOLUCIONTICKET" EntityType="Self.MOTIVODEVOLUCIONTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="MOTIVOPRIORIDADTICKET" EntityType="Self.MOTIVOPRIORIDADTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="MOTIVOTRABAJOTICKET" EntityType="Self.MOTIVOTRABAJOTICKET" Schema="TICKET" store:Type="Tables" />
@@ -5011,6 +5070,18 @@
           <AssociationSet Name="FK_ITEMESPECIAL_NIVELCOLABORADOR" Association="Self.FK_ITEMESPECIAL_NIVELCOLABORADOR">
             <End Role="NIVELCOLABORADOR" EntitySet="NIVELCOLABORADOR" />
             <End Role="ITEMESPECIAL" EntitySet="ITEMESPECIAL" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ITEMESPECIALESTIMACION_ESTIMACIONTICKET" Association="Self.FK_ITEMESPECIALESTIMACION_ESTIMACIONTICKET">
+            <End Role="ESTIMACIONTICKET" EntitySet="ESTIMACIONTICKET" />
+            <End Role="ITEMESPECIALESTIMACION" EntitySet="ITEMESPECIALESTIMACION" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ITEMESPECIALESTIMACION_ITEMESPECIALCATALOGO" Association="Self.FK_ITEMESPECIALESTIMACION_ITEMESPECIALCATALOGO">
+            <End Role="ITEMESPECIALCATALOGO" EntitySet="ITEMESPECIALCATALOGO" />
+            <End Role="ITEMESPECIALESTIMACION" EntitySet="ITEMESPECIALESTIMACION" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ITEMESPECIALESTIMACION_NIVELCOLABORADOR" Association="Self.FK_ITEMESPECIALESTIMACION_NIVELCOLABORADOR">
+            <End Role="NIVELCOLABORADOR" EntitySet="NIVELCOLABORADOR" />
+            <End Role="ITEMESPECIALESTIMACION" EntitySet="ITEMESPECIALESTIMACION" />
           </AssociationSet>
           <AssociationSet Name="FK_MODULO_TIPO" Association="Self.FK_MODULO_TIPO">
             <End Role="TipoModulo" EntitySet="TipoModulo" />
@@ -6902,6 +6973,20 @@
             <End Role="NivelColaborador" EntitySet="NivelColaborador" />
             <End Role="ITEMESPECIAL" EntitySet="ItemEspecial" />
           </AssociationSet>
+          <EntitySet Name="ItemEspecialCatalogo" EntityType="SifizPlanningModel.ItemEspecialCatalogo" />
+          <EntitySet Name="ItemEspecialEstimacion" EntityType="SifizPlanningModel.ItemEspecialEstimacion" />
+          <AssociationSet Name="FK_ITEMESPECIALESTIMACION_ESTIMACIONTICKET" Association="SifizPlanningModel.FK_ITEMESPECIALESTIMACION_ESTIMACIONTICKET">
+            <End Role="EstimacionTicket" EntitySet="EstimacionTicket" />
+            <End Role="ITEMESPECIALESTIMACION" EntitySet="ItemEspecialEstimacion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ITEMESPECIALESTIMACION_ITEMESPECIALCATALOGO" Association="SifizPlanningModel.FK_ITEMESPECIALESTIMACION_ITEMESPECIALCATALOGO">
+            <End Role="ITEMESPECIALCATALOGO" EntitySet="ItemEspecialCatalogo" />
+            <End Role="ITEMESPECIALESTIMACION" EntitySet="ItemEspecialEstimacion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ITEMESPECIALESTIMACION_NIVELCOLABORADOR" Association="SifizPlanningModel.FK_ITEMESPECIALESTIMACION_NIVELCOLABORADOR">
+            <End Role="NivelColaborador" EntitySet="NivelColaborador" />
+            <End Role="ITEMESPECIALESTIMACION" EntitySet="ItemEspecialEstimacion" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="Rol">
           <Key>
@@ -7647,6 +7732,7 @@
           <Property Name="NumeroVerificador" Type="Int32" Nullable="false" />
           <NavigationProperty Name="detalleEstimacionTicket" Relationship="SifizPlanningModel.RefNIVELCOLABORADOR109" FromRole="NivelColaborador" ToRole="DETALLEESTIMACIONTICKET" />
           <NavigationProperty Name="ITEMESPECIAL" Relationship="SifizPlanningModel.FK_ITEMESPECIAL_NIVELCOLABORADOR" FromRole="NivelColaborador" ToRole="ITEMESPECIAL" />
+          <NavigationProperty Name="ITEMESPECIALESTIMACION" Relationship="SifizPlanningModel.FK_ITEMESPECIALESTIMACION_NIVELCOLABORADOR" FromRole="NivelColaborador" ToRole="ITEMESPECIALESTIMACION" />
         </EntityType>
         <EntityType Name="Persona_Cliente">
           <Key>
@@ -8348,6 +8434,7 @@
           <Property Name="TiempoInicial" Type="Int32" />
           <Property Name="TiempoPegado" Type="Int32" />
           <NavigationProperty Name="ITEMESPECIAL" Relationship="SifizPlanningModel.FK_ITEMESPECIAL_ESTIMACIONTICKET" FromRole="EstimacionTicket" ToRole="ITEMESPECIAL" />
+          <NavigationProperty Name="ITEMESPECIALESTIMACION" Relationship="SifizPlanningModel.FK_ITEMESPECIALESTIMACION_ESTIMACIONTICKET" FromRole="EstimacionTicket" ToRole="ITEMESPECIALESTIMACION" />
         </EntityType>
         <Association Name="RefCOLABORADOR73">
           <End Type="SifizPlanningModel.Colaborador" Role="Colaborador" Multiplicity="1" />
@@ -12033,6 +12120,67 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="ItemEspecialCatalogo">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Codigo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <Property Name="NumeroVerificador" Type="Int32" Nullable="false" />
+          <Property Name="Obligatorio" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <NavigationProperty Name="ITEMESPECIALESTIMACION" Relationship="SifizPlanningModel.FK_ITEMESPECIALESTIMACION_ITEMESPECIALCATALOGO" FromRole="ITEMESPECIALCATALOGO" ToRole="ITEMESPECIALESTIMACION" />
+          <Property Name="Descripcion" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="ItemEspecialEstimacion">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SecuencialItemEspecialCatalogo" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialEstimacion" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialNivelColaborador" Type="Int32" Nullable="false" />
+          <Property Name="TiempoEstimacion" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ESTIMACIONTICKET" Relationship="SifizPlanningModel.FK_ITEMESPECIALESTIMACION_ESTIMACIONTICKET" FromRole="ITEMESPECIALESTIMACION" ToRole="EstimacionTicket" />
+          <NavigationProperty Name="ITEMESPECIALCATALOGO" Relationship="SifizPlanningModel.FK_ITEMESPECIALESTIMACION_ITEMESPECIALCATALOGO" FromRole="ITEMESPECIALESTIMACION" ToRole="ITEMESPECIALCATALOGO" />
+          <NavigationProperty Name="NIVELCOLABORADOR" Relationship="SifizPlanningModel.FK_ITEMESPECIALESTIMACION_NIVELCOLABORADOR" FromRole="ITEMESPECIALESTIMACION" ToRole="NivelColaborador" />
+        </EntityType>
+        <Association Name="FK_ITEMESPECIALESTIMACION_ESTIMACIONTICKET">
+          <End Type="SifizPlanningModel.EstimacionTicket" Role="EstimacionTicket" Multiplicity="1" />
+          <End Type="SifizPlanningModel.ItemEspecialEstimacion" Role="ITEMESPECIALESTIMACION" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EstimacionTicket">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="ITEMESPECIALESTIMACION">
+              <PropertyRef Name="SecuencialEstimacion" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ITEMESPECIALESTIMACION_ITEMESPECIALCATALOGO">
+          <End Type="SifizPlanningModel.ItemEspecialCatalogo" Role="ITEMESPECIALCATALOGO" Multiplicity="1" />
+          <End Type="SifizPlanningModel.ItemEspecialEstimacion" Role="ITEMESPECIALESTIMACION" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ITEMESPECIALCATALOGO">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="ITEMESPECIALESTIMACION">
+              <PropertyRef Name="SecuencialItemEspecialCatalogo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ITEMESPECIALESTIMACION_NIVELCOLABORADOR">
+          <End Type="SifizPlanningModel.NivelColaborador" Role="NivelColaborador" Multiplicity="1" />
+          <End Type="SifizPlanningModel.ItemEspecialEstimacion" Role="ITEMESPECIALESTIMACION" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="NivelColaborador">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="ITEMESPECIALESTIMACION">
+              <PropertyRef Name="SecuencialNivelColaborador" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -14116,6 +14264,29 @@
                 <ScalarProperty Name="SecuencialEstimacion" ColumnName="SECUENCIALESTIMACION" />
                 <ScalarProperty Name="TiempoEstimacion" ColumnName="TIEMPOESTIMACION" />
                 <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ItemEspecialCatalogo">
+            <EntityTypeMapping TypeName="SifizPlanningModel.ItemEspecialCatalogo">
+              <MappingFragment StoreEntitySet="ITEMESPECIALCATALOGO">
+                <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
+                <ScalarProperty Name="Obligatorio" ColumnName="OBLIGATORIO" />
+                <ScalarProperty Name="NumeroVerificador" ColumnName="NUMEROVERIFICADOR" />
+                <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
+                <ScalarProperty Name="Codigo" ColumnName="CODIGO" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ItemEspecialEstimacion">
+            <EntityTypeMapping TypeName="SifizPlanningModel.ItemEspecialEstimacion">
+              <MappingFragment StoreEntitySet="ITEMESPECIALESTIMACION">
+                <ScalarProperty Name="TiempoEstimacion" ColumnName="TIEMPOESTIMACION" />
+                <ScalarProperty Name="SecuencialNivelColaborador" ColumnName="SECUENCIALNIVELCOLABORADOR" />
+                <ScalarProperty Name="SecuencialEstimacion" ColumnName="SECUENCIALESTIMACION" />
+                <ScalarProperty Name="SecuencialItemEspecialCatalogo" ColumnName="SECUENCIALITEMESPECIALCATALOGO" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
               </MappingFragment>
             </EntityTypeMapping>

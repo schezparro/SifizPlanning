@@ -404,6 +404,11 @@
         <EntityTypeShape EntityType="SifizPlanningModel.ItemEspecial" Width="1.5" PointX="28.25" PointY="35.625" />
         <AssociationConnector Association="SifizPlanningModel.FK_ITEMESPECIAL_ESTIMACIONTICKET" />
         <AssociationConnector Association="SifizPlanningModel.FK_ITEMESPECIAL_NIVELCOLABORADOR" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ItemEspecialCatalogo" Width="1.5" PointX="38" PointY="38.875" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ItemEspecialEstimacion" Width="1.5" PointX="40.25" PointY="23.625" />
+        <AssociationConnector Association="SifizPlanningModel.FK_ITEMESPECIALESTIMACION_ESTIMACIONTICKET" />
+        <AssociationConnector Association="SifizPlanningModel.FK_ITEMESPECIALESTIMACION_ITEMESPECIALCATALOGO" />
+        <AssociationConnector Association="SifizPlanningModel.FK_ITEMESPECIALESTIMACION_NIVELCOLABORADOR" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

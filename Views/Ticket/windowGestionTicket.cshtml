@@ -1313,13 +1313,20 @@
                                 </thead>
 
                                 <tbody>
-                                    <tr class="table-tr" ng-repeat="item in est.items" data-id="{{ item.id }}">
+                                    <tr class="table-tr" ng-repeat="item in itemsEstimacion" data-id="{{ item.id }}">
                                         <td>T_ESP{{$index + 1}}</td>
                                         <td>{{ item.descripcion }}</td>
-                                        <td>{{ item.recurso }}</td>
+                                        <td>{{ item.nivel }}</td>
+                                        <td>{{ item.tiempoEstimacion }}</td>
+                                    </tr>
+                                    <tr class="table-tr" ng-repeat="item in itemsAdicionales" data-id="{{ item.id }}">
+                                        <td>T_ESP{{itemsEstimacionLength + $index + 1}}</td>
+                                        <td>{{ item.descripcion }}</td>
+                                        <td>{{ item.nivel }}</td>
                                         <td>{{ item.tiempoEstimacion }}</td>
                                     </tr>
                                 </tbody>
+
                             </table>
                         </td>
                     </tr>

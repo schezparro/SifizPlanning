@@ -112,8 +112,6 @@
             });
         estimacion.success(function (data) {
 
-            console.log(data);
-
             if (data.success === true) {
                 datosInicialesEstimacion();
                 $scope.detallesEstimacion = data.detallesEstimacion;
@@ -151,6 +149,7 @@
 
         $scope.estimacionIdTmp = id;
         $scope.cargarItemsEspeciales(id);
+        $scope.cargarItemsEspecialesCatalogo();
 
         angular.element("#modal-estimacion-dev-ticket").modal('show');
     };
@@ -220,6 +219,12 @@
         angular.element('#frm-modal-estimar-ticket textarea').prop('disabled', false);
         angular.element('#frm-modal-estimar-ticket select').prop('disabled', false);
         angular.element('#frm-modal-estimar-ticket input').prop('disabled', false);
+
+        if ($scope.itemsEstimacion.length > 0 || $scope.itemsAdicionales.length > 0) {
+            angular.element("#add-items-especiales").prop("disabled", true);
+        } else {
+            angular.element("#add-items-especiales").prop("disabled", false);
+        }
     };
 
     //Adicionar Detalle de ticket
@@ -450,7 +455,49 @@
         $scope.itemEspecialNivelColab = "";
         $scope.itemEspecialTiempoEstimacion = 0;
 
+        $scope.itemEspecialesEstimacion = $scope.itemsEspecialesCatalogo.map(item => ({
+            secuencialItemEspecialCatalogo: item.id,
+            descripcion: item.descripcion,
+            secuencialEstimacion: $scope.estimacionIdTmp,
+            secuencialNivelColaborador: "",
+            tiempoEstimacion: "",
+            obligatorio: item.obligatorio === 1 ? true : false
+        }));
+
+        $scope.itemEspecialesEstimacionLength = $scope.itemEspecialesEstimacion.length;
+        $scope.itemEspecialesAdicionales = [];
         angular.element("#modal-estimacion-items-ticket").modal("show");
+    };
+
+    $scope.nuevaFila = function () {
+
+        var nuevoItem = {
+            descripcion: "",
+            secuencialEstimacion: $scope.estimacionIdTmp,
+            secuencialNivelColaborador: "",
+            tiempoEstimacion: "",
+        };
+        $scope.itemEspecialesAdicionales.push(nuevoItem);
+    };
+
+    $scope.nuevaFilaEdit = function () {
+
+        var nuevoItem = {
+            descripcion: "",
+            secuencialEstimacion: $scope.estimacionIdTmp,
+            idNivelColab: "",
+            nivel: "",
+            tiempoEstimacion: "",
+        };
+        $scope.itemsAdicionalesEdit.push(nuevoItem);
+    };
+
+    $scope.eliminarFila = function () {
+        $scope.itemEspecialesAdicionales.pop();
+    };
+
+    $scope.eliminarFilaEdit = function () {
+        $scope.itemsAdicionalesEdit.pop();
     };
 
     $scope.cargarItemsEspeciales = function (id) {
@@ -460,8 +507,11 @@
 
         ajaxDarItemsEspeciales.success(function (data) {
             if (data.success === true) {
-                
-                $scope.items = data.items;
+
+                $scope.itemsEstimacion = data.itemsEstimacion;
+                $scope.itemsEstimacionLength = $scope.itemsEstimacion.length;
+                $scope.itemsAdicionales = data.itemsAdicionales;
+
             } else {
                 messageDialog.show('Información', data.msg);
             }
@@ -469,25 +519,37 @@
         });
     };
 
-    $scope.guardarItemEspecial = function () {
+    $scope.cargarItemsEspecialesCatalogo = function (id) {
+        var ajaxDarItemsEspecialesCatalogo = $http.post("user/dar-items-especiales-catalogo/", {});
 
-        var ajaxGuardarItemEspecial = $http.post("user/guardar-item-especial/", {
-            idEstimacion: $scope.estimacionIdTmp,
-            idNivelColab: $scope.itemEspecialNivelColab,
-            descripcion: $scope.itemEspecialDescripcion,
-            tiempoEstimacion: $scope.itemEspecialTiempoEstimacion
-        });
-
-        ajaxGuardarItemEspecial.success(function (data) {
+        ajaxDarItemsEspecialesCatalogo.success(function (data) {
             if (data.success === true) {
-                $scope.itemEspecialDescripcion = "";
-                $scope.itemEspecialNivelColab = "";
-                $scope.itemEspecialTiempoEstimacion = 0;
-                angular.element("#modal-estimacion-items-ticket").modal("hide");
-                $scope.cargarItemsEspeciales($scope.estimacionIdTmp);
+                $scope.itemsEspecialesCatalogo = data.items;
             } else {
                 messageDialog.show('Información', data.msg);
             }
+
+        });
+    };
+
+    $scope.guardarItemEspeciales = function () {
+        $scope.itemEspecialesEstimacion = $scope.itemEspecialesEstimacion.filter(item => {
+            return item.obligatorio !== false || (item.tiempoEstimacion !== "" && item.secuencialNivelColaborador !== "");
+        });
+
+        var ajaxGuardarItemEspeciales = $http.post("user/guardar-item-especiales/", {
+            itemEspecialesEstimacion: angular.toJson($scope.itemEspecialesEstimacion),
+            itemEspecialesAdicionales: angular.toJson($scope.itemEspecialesAdicionales)
+        });
+
+        ajaxGuardarItemEspeciales.success(function (data) {
+            if (data.success === true) {
+                angular.element("#modal-estimacion-items-ticket").modal("hide");
+                messageDialog.show('Información', data.msg);
+            } else {
+                messageDialog.show('Información', data.msg);
+            }
+
         });
     };
 
@@ -498,38 +560,43 @@
 
         ajaxEliminarItemEspecial.success(function (data) {
             if (data.success === true) {
-                $scope.cargarItemsEspeciales($scope.estimacionIdTmp);
+                var itemIndex = $scope.itemsAdicionalesEdit.findIndex(item => item.id === itemId);
+
+                if (itemIndex != -1) {
+                    $scope.itemsAdicionalesEdit.splice(itemIndex, 1);
+                }
+
             } else {
                 messageDialog.show('Información', data.msg);
             }
         });
     };
 
-    $scope.editarItem = function (item) {
-        $scope.itemId = item.id;
-        $scope.itemEspecialDescripcion = item.descripcion;
-        $scope.itemEspecialNivelColab = item.idNivelColab;
-        $scope.itemEspecialTiempoEstimacion = item.tiempoEstimacion;
+    $scope.editarItems = function (itemsEstimacion, itemsAdicionales) {
 
-        angular.element("#modal-edicion-items-ticket").modal("show");
+        if (itemsEstimacion.length > 0 || itemsAdicionales.length > 0) {
+
+            $scope.itemsEstimacionEdit = itemsEstimacion;
+            $scope.itemsEstimacionEditLength = $scope.itemsEstimacionEdit.length;
+            $scope.itemsAdicionalesEdit = [];
+            $scope.itemsAdicionalesEdit = itemsAdicionales;
+
+            angular.element("#modal-edicion-items-ticket").modal("show");
+        }
     };
 
-    $scope.editarItemEspecial = function () {
+    $scope.editarItemsEspeciales = function () {
 
-        var ajaxEditarItemEspecial = $http.post("user/editar-item-especial/", {
-            itemId: $scope.itemId,
-            idNivelColab: $scope.itemEspecialNivelColab,
-            descripcion: $scope.itemEspecialDescripcion,
-            tiempoEstimacion: $scope.itemEspecialTiempoEstimacion
+        var ajaxEditarItemEspeciales = $http.post("user/editar-item-especiales/", {
+            itemEspecialesEstimacionEdit: angular.toJson($scope.itemsEstimacionEdit),
+            itemEspecialesAdicionalesEdit: angular.toJson($scope.itemsAdicionalesEdit)
         });
 
-        ajaxEditarItemEspecial.success(function (data) {
+        ajaxEditarItemEspeciales.success(function (data) {
             if (data.success === true) {
 
-                $scope.itemId = 0;
-                $scope.itemEspecialDescripcion = "";
-                $scope.itemEspecialNivelColab = "";
-                $scope.itemEspecialTiempoEstimacion = 0;
+                $scope.itemsEstimacionEdit = [];
+                $scope.itemsAdicionalesEdit = [];
 
                 angular.element("#modal-edicion-items-ticket").modal("hide");
                 $scope.cargarItemsEspeciales($scope.estimacionIdTmp);
@@ -539,6 +606,7 @@
             }
         });
     };
+
 }]);
 
 

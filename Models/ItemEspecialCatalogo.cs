@@ -12,23 +12,20 @@ namespace SifizPlanning.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class NivelColaborador
+    public partial class ItemEspecialCatalogo
     {
-        public NivelColaborador()
+        public ItemEspecialCatalogo()
         {
-            this.detalleEstimacionTicket = new HashSet<DetalleEstimacionTicket>();
-            this.ITEMESPECIAL = new HashSet<ItemEspecial>();
             this.ITEMESPECIALESTIMACION = new HashSet<ItemEspecialEstimacion>();
         }
     
         public int Secuencial { get; set; }
         public string Codigo { get; set; }
-        public string Descripcion { get; set; }
         public decimal EstaActivo { get; set; }
         public int NumeroVerificador { get; set; }
+        public decimal Obligatorio { get; set; }
+        public string Descripcion { get; set; }
     
-        public virtual ICollection<DetalleEstimacionTicket> detalleEstimacionTicket { get; set; }
-        public virtual ICollection<ItemEspecial> ITEMESPECIAL { get; set; }
         public virtual ICollection<ItemEspecialEstimacion> ITEMESPECIALESTIMACION { get; set; }
     }
 }
