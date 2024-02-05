@@ -1353,11 +1353,11 @@
           <Property Name="SECUENCIALNIVELCOLABORADOR" Type="int" Nullable="false" />
           <Property Name="SECUENCIALESTIMACIONTICKET" Type="int" Nullable="false" />
           <Property Name="DETALLE" Type="varchar" MaxLength="1000" Nullable="false" />
-          <Property Name="TIEMPOESTIMACION" Type="int" Nullable="false" />
-          <Property Name="TIEMPODESARROLLO" Type="int" />
-          <Property Name="TIEMPOPRUEBA" Type="int" />
+          <Property Name="TIEMPOESTIMACION" Type="float" />
+          <Property Name="TIEMPODESARROLLO" Type="float" />
+          <Property Name="TIEMPOPRUEBA" Type="float" />
           <Property Name="SECUENCIALENTREGABLEESTIMACION" Type="int" />
-          <Property Name="TIEMPOQA" Type="int" />
+          <Property Name="TIEMPOQA" Type="float" />
         </EntityType>
         <EntityType Name="ENTREGABLEDETALLEESTIMACION">
           <Key>
@@ -1414,8 +1414,8 @@
           <Property Name="FECHALIMITE" Type="date" Nullable="false" />
           <Property Name="ESTAACTIVA" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="REQUERIMIENTONUEVO" Type="bit" />
-          <Property Name="TIEMPOINICIAL" Type="int" />
-          <Property Name="TIEMPOPEGADO" Type="int" />
+          <Property Name="TIEMPOINICIAL" Type="float" />
+          <Property Name="TIEMPOPEGADO" Type="float" />
         </EntityType>
         <EntityType Name="FLUJOESTADOTICKET">
           <Key>
@@ -1512,7 +1512,7 @@
           </Key>
           <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="DESCRIPCION" Type="varchar" MaxLength="50" Nullable="false" />
-          <Property Name="TIEMPOESTIMACION" Type="int" Nullable="false" />
+          <Property Name="TIEMPOESTIMACION" Type="float" />
           <Property Name="SECUENCIALESTIMACION" Type="int" Nullable="false" />
           <Property Name="SECUENCIALNIVELCOLABORADOR" Type="int" />
         </EntityType>
@@ -1535,7 +1535,7 @@
           <Property Name="SECUENCIALITEMESPECIALCATALOGO" Type="int" Nullable="false" />
           <Property Name="SECUENCIALESTIMACION" Type="int" Nullable="false" />
           <Property Name="SECUENCIALNIVELCOLABORADOR" Type="int" Nullable="false" />
-          <Property Name="TIEMPOESTIMACION" Type="int" Nullable="false" />
+          <Property Name="TIEMPOESTIMACION" Type="float" />
         </EntityType>
         <EntityType Name="MOTIVODEVOLUCIONTICKET">
           <Key>
@@ -1626,7 +1626,7 @@
           <Property Name="DETALLE" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="HORASESTIMACION" Type="int" Nullable="false" />
           <Property Name="FECHAPRODUCCION" Type="date" />
-          <Property Name="ADJUNTO" Type="varchar" MaxLength="255" />
+          <Property Name="ADJUNTO" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="PERSONA_CLIENTE">
           <Key>
@@ -8394,12 +8394,12 @@
           <Property Name="Detalle" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="nivelColaborador" Relationship="SifizPlanningModel.RefNIVELCOLABORADOR109" FromRole="DETALLEESTIMACIONTICKET" ToRole="NivelColaborador" />
           <NavigationProperty Name="estimacionTicket" Relationship="SifizPlanningModel.RefESTIMACIONTICKET110" FromRole="DetalleEstimacionTicket" ToRole="ESTIMACIONTICKET" />
-          <Property Name="TiempoEstimacion" Type="Int32" Nullable="false" />
-          <Property Name="TiempoDesarrollo" Type="Int32" />
-          <Property Name="TiempoPrueba" Type="Int32" />
+          <Property Name="TiempoEstimacion" Type="Double" />
+          <Property Name="TiempoDesarrollo" Type="Double" />
+          <Property Name="TiempoPrueba" Type="Double" />
           <Property Name="SecuencialEntregableEstimacion" Type="Int32" />
           <NavigationProperty Name="entregableDetalleEstimacion" Relationship="SifizPlanningModel.FK_DETALLEESTIMACIONTICKET_ENTREGABLEDETALLEESTIMACION" FromRole="DetalleEstimacionTicket" ToRole="ENTREGABLEDETALLEESTIMACION" />
-          <Property Name="TiempoQA" Type="Int32" />
+          <Property Name="TiempoQA" Type="Double" />
         </EntityType>
         <Association Name="RefNIVELCOLABORADOR109">
           <End Type="SifizPlanningModel.NivelColaborador" Role="NivelColaborador" Multiplicity="1" />
@@ -8431,8 +8431,8 @@
           <Property Name="FechaLimite" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="NumeroHoras" Type="Decimal" Nullable="false" Precision="5" Scale="0" />
           <Property Name="RequerimientoNuevo" Type="Boolean" />
-          <Property Name="TiempoInicial" Type="Int32" />
-          <Property Name="TiempoPegado" Type="Int32" />
+          <Property Name="TiempoInicial" Type="Double" />
+          <Property Name="TiempoPegado" Type="Double" />
           <NavigationProperty Name="ITEMESPECIAL" Relationship="SifizPlanningModel.FK_ITEMESPECIAL_ESTIMACIONTICKET" FromRole="EstimacionTicket" ToRole="ITEMESPECIAL" />
           <NavigationProperty Name="ITEMESPECIALESTIMACION" Relationship="SifizPlanningModel.FK_ITEMESPECIALESTIMACION_ESTIMACIONTICKET" FromRole="EstimacionTicket" ToRole="ITEMESPECIALESTIMACION" />
         </EntityType>
@@ -11797,7 +11797,7 @@
           <NavigationProperty Name="cliente" Relationship="SifizPlanningModel.FK_OFERTAS_CLIENTE" FromRole="OFERTAS" ToRole="Cliente" />
           <NavigationProperty Name="colaborador" Relationship="SifizPlanningModel.FK_OFERTAS_COLABORADOR" FromRole="OFERTAS" ToRole="Colaborador" />
           <Property Name="FechaProduccion" Type="DateTime" Precision="0" />
-          <Property Name="Adjunto" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Adjunto" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
         <Association Name="FK_OFERTAS_CLIENTE">
           <End Type="SifizPlanningModel.Cliente" Role="Cliente" Multiplicity="1" />
@@ -12090,7 +12090,7 @@
           </Key>
           <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Descripcion" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="TiempoEstimacion" Type="Int32" Nullable="false" />
+          <Property Name="TiempoEstimacion" Type="Double" />
           <Property Name="SecuencialEstimacion" Type="Int32" Nullable="false" />
           <Property Name="SecuencialNivelColaborador" Type="Int32" />
           <NavigationProperty Name="ESTIMACIONTICKET" Relationship="SifizPlanningModel.FK_ITEMESPECIAL_ESTIMACIONTICKET" FromRole="ITEMESPECIAL" ToRole="EstimacionTicket" />
@@ -12140,7 +12140,7 @@
           <Property Name="SecuencialItemEspecialCatalogo" Type="Int32" Nullable="false" />
           <Property Name="SecuencialEstimacion" Type="Int32" Nullable="false" />
           <Property Name="SecuencialNivelColaborador" Type="Int32" Nullable="false" />
-          <Property Name="TiempoEstimacion" Type="Int32" Nullable="false" />
+          <Property Name="TiempoEstimacion" Type="Double" />
           <NavigationProperty Name="ESTIMACIONTICKET" Relationship="SifizPlanningModel.FK_ITEMESPECIALESTIMACION_ESTIMACIONTICKET" FromRole="ITEMESPECIALESTIMACION" ToRole="EstimacionTicket" />
           <NavigationProperty Name="ITEMESPECIALCATALOGO" Relationship="SifizPlanningModel.FK_ITEMESPECIALESTIMACION_ITEMESPECIALCATALOGO" FromRole="ITEMESPECIALESTIMACION" ToRole="ITEMESPECIALCATALOGO" />
           <NavigationProperty Name="NIVELCOLABORADOR" Relationship="SifizPlanningModel.FK_ITEMESPECIALESTIMACION_NIVELCOLABORADOR" FromRole="ITEMESPECIALESTIMACION" ToRole="NivelColaborador" />

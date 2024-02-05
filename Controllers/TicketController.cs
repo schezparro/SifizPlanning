@@ -2846,7 +2846,7 @@ namespace SifizPlanning.Controllers
 				EstimacionTicket estimacionTicket = db.EstimacionTicket.Find(idEstimacion);
 
 				Ticket ticket = estimacionTicket.ticket;
-				ticket.Estimacion = ticket.estimacionTicket.Sum(s => s.detalleEstimacionTicket.Sum(e => e.TiempoDesarrollo + e.TiempoPrueba).Value);
+				ticket.Estimacion = (int)ticket.estimacionTicket.Sum(s => s.detalleEstimacionTicket.Sum(e => e.TiempoDesarrollo + e.TiempoPrueba).Value);
 				EstadoTicket estadoTicket = db.EstadoTicket.Where(x => x.Codigo == "PENDIENTE" && x.EstaActivo == 1).FirstOrDefault();
 				ticket.estadoTicket = estadoTicket;
 				int secuencialProximaActividad = db.ProximaActividad.Where(x => x.Codigo == "COTIZAR" && x.EstaActivo == 1).FirstOrDefault().Secuencial;
@@ -3003,7 +3003,7 @@ namespace SifizPlanning.Controllers
 				estimacionTicket.EstimacionTerminada = 0;
 
 				Ticket ticket = estimacionTicket.ticket;
-				ticket.Estimacion = ticket.estimacionTicket.Sum(s => s.detalleEstimacionTicket.Sum(e => e.TiempoDesarrollo + e.TiempoPrueba).Value);
+				ticket.Estimacion = (int)ticket.estimacionTicket.Sum(s => s.detalleEstimacionTicket.Sum(e => e.TiempoDesarrollo + e.TiempoPrueba).Value);
 				EstadoTicket estadoTicket = db.EstadoTicket.Where(x => x.Codigo == "PENDIENTE" && x.EstaActivo == 1).FirstOrDefault();
 				ticket.estadoTicket = estadoTicket;
 				int secuencialProximaActividad = db.ProximaActividad.Where(x => x.Codigo == "ESTIMAR TECNICO" && x.EstaActivo == 1).FirstOrDefault().Secuencial;
@@ -3164,7 +3164,7 @@ namespace SifizPlanning.Controllers
 
 
 				//calculando tiempo total
-				var tiempoTotal = 0;
+				var tiempoTotal = 0.0;
 
 				foreach(var estimacion in estimacionesParcial)
 				{

@@ -12,16 +12,20 @@ namespace SifizPlanning.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class ItemEspecialEstimacion
+    public partial class DetallesEstimacionTicket
     {
         public int Secuencial { get; set; }
-        public int SecuencialItemEspecialCatalogo { get; set; }
-        public int SecuencialEstimacion { get; set; }
         public int SecuencialNivelColaborador { get; set; }
+        public int SecuencialEstimacionTicket { get; set; }
+        public string Detalle { get; set; }
         public Nullable<double> TiempoEstimacion { get; set; }
+        public Nullable<double> TiempoDesarrollo { get; set; }
+        public Nullable<double> TiempoPrueba { get; set; }
+        public Nullable<int> SecuencialEntregableEstimacionTicket { get; set; }
+        public Nullable<double> TiempoQA { get; set; }
     
+        public virtual EntregableDetalleEstimacion ENTREGABLEDETALLEESTIMACION { get; set; }
         public virtual EstimacionTicket ESTIMACIONTICKET { get; set; }
-        public virtual ItemEspecialCatalogo ITEMESPECIALCATALOGO { get; set; }
         public virtual NivelColaborador NIVELCOLABORADOR { get; set; }
     }
 }

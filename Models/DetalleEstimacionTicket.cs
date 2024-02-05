@@ -18,11 +18,11 @@ namespace SifizPlanning.Models
         public int SecuencialNivelColaborador { get; set; }
         public int SecuencialEstimacionTicket { get; set; }
         public string Detalle { get; set; }
-        public int TiempoEstimacion { get; set; }
-        public Nullable<int> TiempoDesarrollo { get; set; }
-        public Nullable<int> TiempoPrueba { get; set; }
+        public Nullable<double> TiempoEstimacion { get; set; }
+        public Nullable<double> TiempoDesarrollo { get; set; }
+        public Nullable<double> TiempoPrueba { get; set; }
         public Nullable<int> SecuencialEntregableEstimacion { get; set; }
-        public Nullable<int> TiempoQA { get; set; }
+        public Nullable<double> TiempoQA { get; set; }
     
         public virtual NivelColaborador nivelColaborador { get; set; }
         public virtual EstimacionTicket estimacionTicket { get; set; }

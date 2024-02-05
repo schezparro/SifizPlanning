@@ -32,8 +32,8 @@ namespace SifizPlanning.Models
         public System.DateTime FechaLimite { get; set; }
         public decimal NumeroHoras { get; set; }
         public Nullable<bool> RequerimientoNuevo { get; set; }
-        public Nullable<int> TiempoInicial { get; set; }
-        public Nullable<int> TiempoPegado { get; set; }
+        public Nullable<double> TiempoInicial { get; set; }
+        public Nullable<double> TiempoPegado { get; set; }
     
         public virtual Colaborador colaborador { get; set; }
         public virtual ICollection<DetalleEstimacionTicket> detalleEstimacionTicket { get; set; }
