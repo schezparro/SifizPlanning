@@ -2840,7 +2840,9 @@ r in db.Rol on ur.rol equals r
                 var incidenciasUsuario = (from inc in db.Incidencias
                                           join md in db.Modulo on inc.SecuencialModulo equals md.Secuencial
                                           join cli in db.Cliente on inc.SecuencialCliente equals cli.Secuencial
-                                          select new
+										  join c in db.Colaborador on inc.SecuencialColaborador equals c.Secuencial into colabGroup
+										  from c in colabGroup.DefaultIfEmpty()
+										  select new
                                           {
                                               secuencial = inc.Secuencial,
                                               cliente = cli.Descripcion,
@@ -2849,8 +2851,10 @@ r in db.Rol on ur.rol equals r
                                               acciones = inc.Acciones,
                                               adjunto = inc.Adjunto,
                                               fecha = inc.Fecha.HasValue ? inc.Fecha : DateTime.MinValue,
-                                              findia = inc.FinDia == 1 ? "SI" : "NO"
-                                          }).ToList();
+                                              findia = inc.FinDia == 1 ? "SI" : "NO",
+											  tiempo = inc.Tiempo ?? 0,
+											  colaborador = c != null ? c.persona.Nombre1 + " " + c.persona.Apellido1 : ""
+										  }).ToList();
 
 
                 if (finDia)
@@ -2906,7 +2910,9 @@ r in db.Rol on ur.rol equals r
                 var inc = (from i in db.Incidencias
                            join md in db.Modulo on i.SecuencialModulo equals md.Secuencial
                            join cli in db.Cliente on i.SecuencialCliente equals cli.Secuencial
-                           where i.Secuencial == secuencialIncidencia
+						   join c in db.Colaborador on i.SecuencialColaborador equals c.Secuencial into colabGroup
+						   from c in colabGroup.DefaultIfEmpty()
+						   where i.Secuencial == secuencialIncidencia
                            select new
                            {
                                secuencial = i.Secuencial,
@@ -2916,8 +2922,10 @@ r in db.Rol on ur.rol equals r
                                acciones = i.Acciones,
                                adjunto = i.Adjunto,
                                fecha = i.Fecha.HasValue ? i.Fecha.Value.ToString() : "",
-                               findia = i.FinDia == 1 ? "SI" : "NO"
-                           }).FirstOrDefault();
+                               findia = i.FinDia == 1 ? "SI" : "NO",
+                               tiempo = i.Tiempo ?? 0,
+							   colaborador = c != null ? c.persona.Nombre1 + " " + c.persona.Apellido1 : ""
+						   }).FirstOrDefault();
 
                 var result = new
                 {
@@ -3046,11 +3054,17 @@ r in db.Rol on ur.rol equals r
         //Guardar modal nuevas incidencias
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult GuardarIncidencia(string cliente, string modulo, string incidente, string acciones, string fechaincidencia, bool findia, string lideres, HttpPostedFileBase[] adjuntos = null)
+        public ActionResult GuardarIncidencia(string cliente, string modulo, string incidente, string acciones, string fechaincidencia, bool findia, int tiempo, string lideres, HttpPostedFileBase[] adjuntos = null)
         {
             try
             {
-                var s = new JavaScriptSerializer();
+				string emailUser = User.Identity.Name;
+				Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+
+				Persona persona = user.persona;
+				Colaborador colab = persona.colaborador.FirstOrDefault();
+
+				var s = new JavaScriptSerializer();
                 var Url = "";
                 if (adjuntos != null)
                 {
@@ -3085,6 +3099,8 @@ r in db.Rol on ur.rol equals r
                     Acciones = acciones,
                     Fecha = fecha,
                     FinDia = findia ? 1 : 0,
+                    SecuencialColaborador = colab.Secuencial,
+                    Tiempo = tiempo, 
                     Adjunto = Url
                 };
 

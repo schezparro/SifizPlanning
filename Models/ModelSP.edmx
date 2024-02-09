@@ -1478,6 +1478,8 @@
           <Property Name="ACCIONES" Type="nvarchar(max)" />
           <Property Name="FECHA" Type="date" />
           <Property Name="FINDIA" Type="numeric" Precision="1" Scale="0" />
+          <Property Name="TIEMPO" Type="int" />
+          <Property Name="SECUENCIALCOLABORADOR" Type="int" />
         </EntityType>
         <EntityType Name="INFOTICKETS">
           <Key>
@@ -1626,7 +1628,7 @@
           <Property Name="DETALLE" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="HORASESTIMACION" Type="int" Nullable="false" />
           <Property Name="FECHAPRODUCCION" Type="date" />
-          <Property Name="ADJUNTO" Type="varchar" MaxLength="50" />
+          <Property Name="ADJUNTO" Type="varchar" MaxLength="255" />
         </EntityType>
         <EntityType Name="PERSONA_CLIENTE">
           <Key>
@@ -2317,6 +2319,18 @@
             </Principal>
             <Dependent Role="INCIDENCIAS">
               <PropertyRef Name="SECUENCIALCLIENTE" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_INCIDENCIAS_COLABORADOR">
+          <End Role="COLABORADOR" Type="Self.COLABORADOR" Multiplicity="0..1" />
+          <End Role="INCIDENCIAS" Type="Self.INCIDENCIAS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="COLABORADOR">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="INCIDENCIAS">
+              <PropertyRef Name="SECUENCIALCOLABORADOR" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -5059,6 +5073,10 @@
             <End Role="CLIENTE" EntitySet="CLIENTE" />
             <End Role="INCIDENCIAS" EntitySet="INCIDENCIAS" />
           </AssociationSet>
+          <AssociationSet Name="FK_INCIDENCIAS_COLABORADOR" Association="Self.FK_INCIDENCIAS_COLABORADOR">
+            <End Role="COLABORADOR" EntitySet="COLABORADOR" />
+            <End Role="INCIDENCIAS" EntitySet="INCIDENCIAS" />
+          </AssociationSet>
           <AssociationSet Name="FK_INCIDENCIAS_MODULO" Association="Self.FK_INCIDENCIAS_MODULO">
             <End Role="MODULO" EntitySet="MODULO" />
             <End Role="INCIDENCIAS" EntitySet="INCIDENCIAS" />
@@ -6987,6 +7005,10 @@
             <End Role="NivelColaborador" EntitySet="NivelColaborador" />
             <End Role="ITEMESPECIALESTIMACION" EntitySet="ItemEspecialEstimacion" />
           </AssociationSet>
+          <AssociationSet Name="FK_INCIDENCIAS_COLABORADOR" Association="SifizPlanningModel.FK_INCIDENCIAS_COLABORADOR">
+            <End Role="Colaborador" EntitySet="Colaborador" />
+            <End Role="Incidencias" EntitySet="Incidencias" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="Rol">
           <Key>
@@ -7131,6 +7153,7 @@
           <Property Name="PublicacionesDosCinco" Type="Boolean" />
           <NavigationProperty Name="NIVELCOLABORADORTECNOLOGIA" Relationship="SifizPlanningModel.FK_NIVELCOLABORADORTECNOLOGIA_COLABORADOR" FromRole="Colaborador" ToRole="NIVELCOLABORADORTECNOLOGIA" />
           <Property Name="FechaIngreso" Type="DateTime" Precision="0" />
+          <NavigationProperty Name="incidencias" Relationship="SifizPlanningModel.FK_INCIDENCIAS_COLABORADOR" FromRole="Colaborador" ToRole="Incidencias" />
           </EntityType>
         <EntityType Name="Colaborador_JefeInmediato">
           <Key>
@@ -11797,7 +11820,7 @@
           <NavigationProperty Name="cliente" Relationship="SifizPlanningModel.FK_OFERTAS_CLIENTE" FromRole="OFERTAS" ToRole="Cliente" />
           <NavigationProperty Name="colaborador" Relationship="SifizPlanningModel.FK_OFERTAS_COLABORADOR" FromRole="OFERTAS" ToRole="Colaborador" />
           <Property Name="FechaProduccion" Type="DateTime" Precision="0" />
-          <Property Name="Adjunto" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Adjunto" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
         </EntityType>
         <Association Name="FK_OFERTAS_CLIENTE">
           <End Type="SifizPlanningModel.Cliente" Role="Cliente" Multiplicity="1" />
@@ -11977,6 +12000,9 @@
           <Property Name="Fecha" Type="DateTime" Precision="0" />
           <Property Name="FinDia" Type="Decimal" Precision="1" Scale="0" />
           <NavigationProperty Name="cliente" Relationship="SifizPlanningModel.FK_INCIDENCIAS_CLIENTE" FromRole="Incidencias" ToRole="Cliente" />
+          <Property Name="Tiempo" Type="Int32" />
+          <Property Name="SecuencialColaborador" Type="Int32" />
+          <NavigationProperty Name="colaborador" Relationship="SifizPlanningModel.FK_INCIDENCIAS_COLABORADOR" FromRole="Incidencias" ToRole="Colaborador" />
         </EntityType>
         <Association Name="FK_INCIDENCIAS_MODULO">
           <End Type="SifizPlanningModel.Modulo" Role="Modulo" Multiplicity="1" />
@@ -12178,6 +12204,18 @@
             </Principal>
             <Dependent Role="ITEMESPECIALESTIMACION">
               <PropertyRef Name="SecuencialNivelColaborador" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_INCIDENCIAS_COLABORADOR">
+          <End Type="SifizPlanningModel.Colaborador" Role="Colaborador" Multiplicity="0..1" />
+          <End Type="SifizPlanningModel.Incidencias" Role="Incidencias" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Colaborador">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="Incidencias">
+              <PropertyRef Name="SecuencialColaborador" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -14200,6 +14238,8 @@
           <EntitySetMapping Name="Incidencias">
             <EntityTypeMapping TypeName="SifizPlanningModel.Incidencias">
               <MappingFragment StoreEntitySet="INCIDENCIAS">
+                <ScalarProperty Name="SecuencialColaborador" ColumnName="SECUENCIALCOLABORADOR" />
+                <ScalarProperty Name="Tiempo" ColumnName="TIEMPO" />
                 <ScalarProperty Name="FinDia" ColumnName="FINDIA" />
                 <ScalarProperty Name="Fecha" ColumnName="FECHA" />
                 <ScalarProperty Name="Acciones" ColumnName="ACCIONES" />

@@ -22,8 +22,11 @@ namespace SifizPlanning.Models
         public string Acciones { get; set; }
         public Nullable<System.DateTime> Fecha { get; set; }
         public Nullable<decimal> FinDia { get; set; }
+        public Nullable<int> Tiempo { get; set; }
+        public Nullable<int> SecuencialColaborador { get; set; }
     
         public virtual Modulo modulo { get; set; }
         public virtual Cliente cliente { get; set; }
+        public virtual Colaborador colaborador { get; set; }
     }
 }

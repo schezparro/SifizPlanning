@@ -9,13 +9,15 @@
     <table id="tabla-incidencias-usuario" class="table table-striped table-condensed nowrap">
         <thead>
             <tr>
-                <th width="5">Cliente</th>
-                <th width="5">Módulo</th>
-                <th width="35">Incidente</th>
-                <th width="35">Acciones a realizar</th>
-                <th width="5">Fecha incidencia</th>
-                <th width="10">Fin de Día</th>
-                <th width="10">Adjunto</th>
+                <th>Cliente</th>
+                <th>Módulo</th>
+                <th>Incidente</th>
+                <th>Acciones a realizar</th>
+                <th>Fecha incidencia</th>
+                <th>Fin de Día</th>
+                <th>Colaborador</th>
+                <th>Tiempo Atención</th>
+                <th>Adjunto</th>
             </tr>
         </thead>
 
@@ -27,6 +29,8 @@
                 <td>{{incidencia.acciones  | limitTo:50}}</td>
                 <td>{{incidencia.fecha | strDateToStr}}</td>
                 <td>{{incidencia.findia}}</td>
+                <td>{{incidencia.colaborador}}</td>
+                <td>{{incidencia.tiempo}}</td>
                 <td>
                     <a class="btn btn-success btn-xs" target="_blank" href="Web{{incidencia.adjunto}}" ng-show="incidencia.adjunto != ''">
                         <span class="glyphicon glyphicon-download"></span> Adjunto
@@ -38,7 +42,7 @@
 
         <tfoot>
             <tr>
-                <th colspan="6">
+                <th colspan="9">
                     <nav>
                         <ul class="pagination">
                             <li ng-click="atrazarPagina()">
@@ -99,9 +103,6 @@
                             FECHA INCIDENCIA
                             <div class='input-group date'>
                                 <input id="fecha-incidencia" ng-model="fechaIncidencia" class="form-control" ng-required="true" autocomplete="off" />
-                                <span class="input-group-addon">
-                                    <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
                             </div>
                         </div>
 
@@ -121,7 +122,11 @@
 
                     <div class="col-md-6">
                         FIN DE DIA:
-                        <input id="check-fin-dia" type="checkbox" ng-model="finDia" />
+                        <input id="check-fin-dia" type="checkbox" ng-model="finDia" ng-init="finDia=false" />
+                        <div ng-show="finDia">
+                            TIEMPO DE ATENCION EN HORAS:
+                            <input type="number" class="form-control" ng-model="tiempo" />
+                        </div>
                     </div>
 
                     <br>
@@ -178,6 +183,14 @@
                 <div class="row">
                     <div class="col-sm-4"><strong>Fin de día:</strong></div>
                     <div class="col-sm-8">{{finDiaV ? 'Sí' : 'No'}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4"><strong>Colaborador:</strong></div>
+                    <div class="col-sm-8">{{colaboradorV}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4"><strong>Tiempo de Atención:</strong></div>
+                    <div class="col-sm-8">{{tiempoV}}</div>
                 </div>
             </div>
             <div class="modal-footer">

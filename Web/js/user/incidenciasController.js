@@ -151,6 +151,7 @@
         formData.append('acciones', $scope.newAcciones);
         formData.append('fechaincidencia', $scope.fechaIncidencia);
         formData.append('findia', $scope.finDia);
+        formData.append('tiempo', $scope.tiempo);
         formData.append('lideres', lideresString);
         formData.append('adjuntos', fileInput.files[0]);
 
@@ -189,6 +190,8 @@
                 $scope.fechaV = data.incidenciaResult.fecha;
                 $scope.finDiaV = data.incidenciaResult.finDeDia;
                 $scope.adjuntoV = data.incidenciaResult.adjunto;
+                $scope.tiempoV = data.incidenciaResult.tiempo;
+                $scope.colaboradorV = data.incidenciaResult.colaborador;
 
                 angular.element("#modal-datos-incidencia").modal("show");
             }
