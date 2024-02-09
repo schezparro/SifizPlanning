@@ -159,14 +159,14 @@
 
                         <div id="div-tiempo-incial" class="col-md-4">
                             <label style="display: inline-block">
-                                <input ng-model="tiempoInicial" style="width:50%" type="number" />
+                                <input ng-model="tiempoInicial" style="width:50%" type="number" step="0.01" />
                                 Tiempo Inicial
                             </label>
                         </div>
 
                         <div id="div-tiempo-pegado" class="col-md-4">
                             <label style="display: inline-block">
-                                <input ng-model="tiempoPegado" style="width:50%" type="number" />
+                                <input ng-model="tiempoPegado" style="width:50%" type="number" step="0.01" />
                                 Tiempo Pegado
                             </label>
                         </div>
@@ -309,7 +309,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <input class="form-control" ng-model="itemEspecialEstimacion.tiempoEstimacion" type="number" ng-required="{{itemEspecialEstimacion.obligatorio}}" />
+                                    <input class="form-control" ng-model="itemEspecialEstimacion.tiempoEstimacion" type="number" step="0.01" ng-required="{{itemEspecialEstimacion.obligatorio}}" />
                                 </td>
                                 <td>
                                     <input type="checkbox" ng-model="itemEspecialEstimacion.obligatorio" ng-disabled="true" />
@@ -328,7 +328,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <input class="form-control" ng-model="itemEspecialAdicional.tiempoEstimacion" type="number" ng-required="true" />
+                                    <input class="form-control" ng-model="itemEspecialAdicional.tiempoEstimacion" type="number" step="0.01" ng-required="true" />
                                 </td>
                                 <td>
                                     <input type="checkbox" ng-disabled="true" />
@@ -396,7 +396,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <input class="form-control" ng-model="itemEstimacionEdit.tiempoEstimacion" type="number" ng-required="{{itemEstimacionEdit.obligatorio}}" />
+                                    <input class="form-control" ng-model="itemEstimacionEdit.tiempoEstimacion" type="number" step="0.01" ng-required="{{itemEstimacionEdit.obligatorio}}" />
                                 </td>
                                 <td>
                                     <input type="checkbox" ng-model="itemEstimacionEdit.obligatorio" ng-disabled="true" ng-checked="true" />
@@ -415,7 +415,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <input class="form-control" ng-model="itemAdicionalEdit.tiempoEstimacion" type="number" ng-required="true" />
+                                    <input class="form-control" ng-model="itemAdicionalEdit.tiempoEstimacion" type="number" step="0.01" ng-required="true" />
                                 </td>
                                 <td>
                                     <input type="checkbox" ng-disabled="true" />
@@ -452,27 +452,27 @@
 <!-- Entregables -->
 <div id="add-informacion-estimacion-inicial" class="invisible">
     <div class="row">
-        <div class="col-md-5">
+        <div class="col-md-4">
             <label>Detalle:</label>
             <textarea class="form-control" ng-required="true"></textarea>
         </div>
 
-        <div class="col-md-1">
+        <div class="col-md-2">
             <label>Tiempo<br>(DES)</label>
-            <input type="text" class="solo-numero form-control" ng-required="true" />
+            <input type="number" step="0.01" class="form-control" ng-required="true" />
         </div>
 
-        <div class="col-md-1">
+        <div class="col-md-2">
             <label>Tiempo<br>(PRU)</label>
-            <input type="text" class="solo-numero form-control" ng-required="true" />
+            <input type="number" step="0.01" class="form-control" ng-required="true" />
         </div>
 
-        <div class="col-md-1">
+        <div class="col-md-2">
             <label>Tiempo<br>(QA)</label>
-            <input type="text" class="solo-numero form-control" ng-required="true" />
+            <input type="number" step="0.01" class="form-control" ng-required="true" />
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label>Tipo<br>Recurso:</label>
             <select class="form-control" ng-required="true">
                 <option value="">Seleccione...</option>
@@ -484,26 +484,26 @@
 
 <div id="add-informacion-estimacion" class="invisible">
     <div class="row">
-        <div class="col-md-5">
+        <div class="col-md-4">
             <textarea class="form-control" ng-required="true"></textarea>
         </div>
 
-        <div class="col-md-1">
+        <div class="col-md-2">
             <br>
-            <input type="text" class="solo-numero form-control" ng-required="true" />
+            <input type="number" step="0.01" class="form-control" ng-required="true" />
         </div>
 
-        <div class="col-md-1">
+        <div class="col-md-2">
             <br>
-            <input type="text" class="solo-numero form-control" ng-required="true" />
+            <input type="number" step="0.01" class="form-control" ng-required="true" />
         </div>
 
-        <div class="col-md-1">
+        <div class="col-md-2">
             <br>
-            <input type="text" class="solo-numero form-control" ng-required="true" />
+            <input type="number" step="0.01" class="form-control" ng-required="true" />
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-2">
             <br>
             <select class="form-control" ng-required="true">
                 <option value="">Seleccione...</option>
