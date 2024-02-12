@@ -1078,6 +1078,8 @@
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="SCRIPTSDATABASE\01\1-INCIDENCIAS.sql" />
+    <Content Include="SCRIPTSDATABASE\01\2-INCIDENCIAS.sql" />
     <Content Include="SCRIPTSDATABASE\12\06-FERIADOS.sql" />
     <Content Include="SCRIPTSDATABASE\12\01-TICKET.sql" />
     <Content Include="SCRIPTSDATABASE\12\02-TICKET.sql" />
@@ -1600,7 +1602,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Properties\PublishProfiles\" />
-    <Folder Include="SCRIPTSDATABASE\01\" />
     <Folder Include="SCRIPTSDATABASE\02\" />
     <Folder Include="SCRIPTSDATABASE\TEMPSCRIPTS\" />
     <Folder Include="Web\files\asignaciones\" />
