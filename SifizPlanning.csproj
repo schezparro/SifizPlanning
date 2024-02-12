@@ -1163,6 +1163,7 @@
     <Content Include="Views\Task\windowInformesRecursos.cshtml" />
     <Content Include="Views\User\windowUserRecursos.cshtml" />
     <Content Include="Views\User\windowUserIncidencias.cshtml" />
+    <Content Include="Views\Report\VerReporteCliente.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

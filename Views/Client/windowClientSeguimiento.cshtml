@@ -290,7 +290,7 @@
                             <div ng-show="ticketVersionCliente != 'NO ASIGNADO'">
                                 <label class="label-data-ticket">Aplica a: </label><span>{{ticketVersionCliente}}</span><br />
                             </div>
-
+                            <button type="button" class="btn btn-info" ng-click="VerReporteTicket()"><span class="glyphicon glyphicon-signal"></span> Reporte de Tickets</button>
                         </div>
                     </div>
                 </div>
@@ -315,6 +315,8 @@
                     <button id="eliminar-adj-ticket" class="btn btn-danger btn-xs" ng-click="eliminarAdjuntoTicket()"><span class="glyphicon glyphicon-minus"></span> Eliminar Adjunto</button>
                 </div>
             </div>
+            <a hidden id="ver-reporte" href="" target="_blank"></a>
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-warning left" ng-click="verComentarioTicket()"><span class="glyphicon glyphicon-comment"></span> Comentarios</button>
                 <button ng-hide="estadoTicket != 'ABIERTO' && estadoTicket != 'ASIGNADO' && estadoTicket != 'PENDIENTE' && estadoTicket != 'EN DESARROLLO' && estadoTicket != 'INCONCLUSO' && estadoTicket != 'RESUELTO'" type="button" class="btn btn-primary" ng-click="cerrarTicket()"> <span class="glyphicon glyphicon-flag"></span> Aceptar</button>
@@ -497,18 +499,18 @@
                                         </td>
                                         <td><span class="level-star-eliminar glyphicon glyphicon-remove" title="Poner el nivel en 0 para este ticket"></span></td>
                                     </tr>
-                                        <!--<td>
-                                         <input class="idPregunta"  type="hidden" ng-model="pregunta.id" />
-                                         <input type="hidden" ng-model="idTicket" />
-                                         <input type="text" ng-model="calificacionTicket">
-                                        </td>  -->
+                                    <!--<td>
+                                     <input class="idPregunta"  type="hidden" ng-model="pregunta.id" />
+                                     <input type="hidden" ng-model="idTicket" />
+                                     <input type="text" ng-model="calificacionTicket">
+                                    </td>  -->
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                    </div>           
+                    </div>
                 </div>
-                <div class="modal-footer">                   
+                <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </form>

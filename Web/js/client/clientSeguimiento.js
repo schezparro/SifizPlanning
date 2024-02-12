@@ -360,6 +360,7 @@
 
                 $scope.fechaTicket = data.datosTicket.fecha;
                 $scope.nombreCliente = data.datosTicket.cliente;
+                $scope.idCliente = data.datosTicket.idCliente;
                 $scope.usuarioCliente = data.datosTicket.usuarioCliente;
                 $scope.usuarioTelefono = data.datosTicket.clienteTelefono;
                 $scope.estadoTicket = data.datosTicket.estado;
@@ -382,6 +383,12 @@
         });
 
     };
+
+    $scope.VerReporteTicket = function () {
+        angular.element("#ver-reporte").attr({ "href": "/Report/VerReporteCliente?cliente=" + $scope.idCliente });
+        angular.element("#ver-reporte")[0].click();
+    };
+
     //Adicionando adjuntos al ticket
     angular.element("#eliminar-adj-ticket").prop("disabled", true);
     $scope.adicionarAdjuntoTicket = function () {
