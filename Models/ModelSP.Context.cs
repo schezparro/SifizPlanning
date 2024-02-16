@@ -195,5 +195,6 @@ namespace SifizPlanning.Models
         public virtual DbSet<ItemEspecial> ItemEspecial { get; set; }
         public virtual DbSet<ItemEspecialCatalogo> ItemEspecialCatalogo { get; set; }
         public virtual DbSet<ItemEspecialEstimacion> ItemEspecialEstimacion { get; set; }
+        public virtual DbSet<TiempoCerradoTicket> TiempoCerradoTicket { get; set; }
     }
 }

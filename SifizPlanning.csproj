@@ -901,6 +901,9 @@
     <Compile Include="Models\Ticket_ResolucionDesacuerdo.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\TiempoCerradoTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\TipoActa.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>

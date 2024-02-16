@@ -1628,7 +1628,7 @@
           <Property Name="DETALLE" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="HORASESTIMACION" Type="int" Nullable="false" />
           <Property Name="FECHAPRODUCCION" Type="date" />
-          <Property Name="ADJUNTO" Type="varchar" MaxLength="255" />
+          <Property Name="ADJUNTO" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="PERSONA_CLIENTE">
           <Key>
@@ -1907,6 +1907,18 @@
           <Property Name="DESCRIPCION" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="TIEMPOCERRADOTICKET">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CODIGO" Type="varchar" MaxLength="30" Nullable="false" />
+          <Property Name="DESCRIPCION" Type="varchar" MaxLength="30" Nullable="false" />
+          <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
+          <Property Name="DIASCERRADO" Type="int" Nullable="false" />
+          <Property Name="SECUENCIALCLIENTE" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="TIPOCONTRATOCLIENTE">
           <Key>
@@ -2751,6 +2763,18 @@
             </Principal>
             <Dependent Role="TICKETSMANTENIMIENTO">
               <PropertyRef Name="SECUENCIALTICKET" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TIEMPOCERRADOTICKET_CLIENTE">
+          <End Role="CLIENTE" Type="Self.CLIENTE" Multiplicity="1" />
+          <End Role="TIEMPOCERRADOTICKET" Type="Self.TIEMPOCERRADOTICKET" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CLIENTE">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="TIEMPOCERRADOTICKET">
+              <PropertyRef Name="SECUENCIALCLIENTE" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -4942,6 +4966,7 @@
           <EntitySet Name="TICKETSMANTENIMIENTO" EntityType="Self.TICKETSMANTENIMIENTO" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="TICKETTAREA" EntityType="Self.TICKETTAREA" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="TICKETVERSIONCLIENTE" EntityType="Self.TICKETVERSIONCLIENTE" Schema="TICKET" store:Type="Tables" />
+          <EntitySet Name="TIEMPOCERRADOTICKET" EntityType="Self.TIEMPOCERRADOTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="TIPOCONTRATOCLIENTE" EntityType="Self.TIPOCONTRATOCLIENTE" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="TIPONOTIFICACIONTICKET" EntityType="Self.TIPONOTIFICACIONTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="TIPORECURSO" EntityType="Self.TIPORECURSO" Schema="TICKET" store:Type="Tables" />
@@ -5216,6 +5241,10 @@
           <AssociationSet Name="FK_TICKETSMANTENIMIENTO_TICKET" Association="Self.FK_TICKETSMANTENIMIENTO_TICKET">
             <End Role="TICKET" EntitySet="TICKET" />
             <End Role="TICKETSMANTENIMIENTO" EntitySet="TICKETSMANTENIMIENTO" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TIEMPOCERRADOTICKET_CLIENTE" Association="Self.FK_TIEMPOCERRADOTICKET_CLIENTE">
+            <End Role="CLIENTE" EntitySet="CLIENTE" />
+            <End Role="TIEMPOCERRADOTICKET" EntitySet="TIEMPOCERRADOTICKET" />
           </AssociationSet>
           <AssociationSet Name="RefACTIVIDAD22" Association="Self.RefACTIVIDAD22">
             <End Role="ACTIVIDAD" EntitySet="ACTIVIDAD" />
@@ -7009,6 +7038,11 @@
             <End Role="Colaborador" EntitySet="Colaborador" />
             <End Role="Incidencias" EntitySet="Incidencias" />
           </AssociationSet>
+          <EntitySet Name="TiempoCerradoTicket" EntityType="SifizPlanningModel.TiempoCerradoTicket" />
+          <AssociationSet Name="FK_TIEMPOCERRADOTICKET_CLIENTE" Association="SifizPlanningModel.FK_TIEMPOCERRADOTICKET_CLIENTE">
+            <End Role="Cliente" EntitySet="Cliente" />
+            <End Role="TIEMPOCERRADOTICKET" EntitySet="TiempoCerradoTicket" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="Rol">
           <Key>
@@ -7106,6 +7140,7 @@
           <NavigationProperty Name="clienteAuxiliar" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_CLIENTE" FromRole="Cliente" ToRole="ClienteAuxiliar" />
           <NavigationProperty Name="ofertas" Relationship="SifizPlanningModel.FK_OFERTAS_CLIENTE" FromRole="Cliente" ToRole="OFERTAS" />
           <NavigationProperty Name="INCIDENCIAS" Relationship="SifizPlanningModel.FK_INCIDENCIAS_CLIENTE" FromRole="Cliente" ToRole="Incidencias" />
+          <NavigationProperty Name="TIEMPOCERRADOTICKET" Relationship="SifizPlanningModel.FK_TIEMPOCERRADOTICKET_CLIENTE" FromRole="Cliente" ToRole="TIEMPOCERRADOTICKET" />
         </EntityType>
         <EntityType Name="Colaborador">
           <Key>
@@ -11820,7 +11855,7 @@
           <NavigationProperty Name="cliente" Relationship="SifizPlanningModel.FK_OFERTAS_CLIENTE" FromRole="OFERTAS" ToRole="Cliente" />
           <NavigationProperty Name="colaborador" Relationship="SifizPlanningModel.FK_OFERTAS_COLABORADOR" FromRole="OFERTAS" ToRole="Colaborador" />
           <Property Name="FechaProduccion" Type="DateTime" Precision="0" />
-          <Property Name="Adjunto" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Adjunto" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
         <Association Name="FK_OFERTAS_CLIENTE">
           <End Type="SifizPlanningModel.Cliente" Role="Cliente" Multiplicity="1" />
@@ -12216,6 +12251,31 @@
             </Principal>
             <Dependent Role="Incidencias">
               <PropertyRef Name="SecuencialColaborador" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="TiempoCerradoTicket">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Codigo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Descripcion" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <Property Name="NumeroVerificador" Type="Int32" Nullable="false" />
+          <Property Name="DiasCerrado" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialCliente" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="CLIENTE" Relationship="SifizPlanningModel.FK_TIEMPOCERRADOTICKET_CLIENTE" FromRole="TIEMPOCERRADOTICKET" ToRole="Cliente" />
+        </EntityType>
+        <Association Name="FK_TIEMPOCERRADOTICKET_CLIENTE">
+          <End Type="SifizPlanningModel.Cliente" Role="Cliente" Multiplicity="1" />
+          <End Type="SifizPlanningModel.TiempoCerradoTicket" Role="TIEMPOCERRADOTICKET" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Cliente">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="TIEMPOCERRADOTICKET">
+              <PropertyRef Name="SecuencialCliente" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -14327,6 +14387,19 @@
                 <ScalarProperty Name="SecuencialNivelColaborador" ColumnName="SECUENCIALNIVELCOLABORADOR" />
                 <ScalarProperty Name="SecuencialEstimacion" ColumnName="SECUENCIALESTIMACION" />
                 <ScalarProperty Name="SecuencialItemEspecialCatalogo" ColumnName="SECUENCIALITEMESPECIALCATALOGO" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TiempoCerradoTicket">
+            <EntityTypeMapping TypeName="SifizPlanningModel.TiempoCerradoTicket">
+              <MappingFragment StoreEntitySet="TIEMPOCERRADOTICKET">
+                <ScalarProperty Name="SecuencialCliente" ColumnName="SECUENCIALCLIENTE" />
+                <ScalarProperty Name="DiasCerrado" ColumnName="DIASCERRADO" />
+                <ScalarProperty Name="NumeroVerificador" ColumnName="NUMEROVERIFICADOR" />
+                <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
+                <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
+                <ScalarProperty Name="Codigo" ColumnName="CODIGO" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
               </MappingFragment>
             </EntityTypeMapping>

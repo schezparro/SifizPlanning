@@ -164,7 +164,7 @@
                 $scope.tituloV = data.recursoResult.titulo;
                 $scope.detalleV = data.recursoResult.detalle;
                 $scope.moduloV = data.recursoResult.modulo;
-                $scope.fechaV= data.recursoResult.fecha;
+                $scope.fechaV = data.recursoResult.fecha;
                 $scope.adjuntoV = data.recursoResult.adjunto;
                 $scope.tiempoV = data.recursoResult.tiempo;
                 $scope.adjuntoAsistenciaV = data.recursoResult.adjuntoAsistencia;
