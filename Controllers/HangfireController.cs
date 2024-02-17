@@ -2236,6 +2236,9 @@ namespace SifizPlanning.Controllers
                                                                      select th).FirstOrDefault()
                                               }).ToList();
 
+                        var cliente = db.Cliente.FirstOrDefault(s => s.Secuencial == personaCliente.cliente && s.EstaActivo == 1);
+                        string emailUser = cliente.persona_cliente.FirstOrDefault().persona.usuario.FirstOrDefault().Email;
+
                         foreach (var ticket in ticketsCliente)
                         {
                             if (ticket.ticketHistorico != null)
@@ -2244,7 +2247,7 @@ namespace SifizPlanning.Controllers
                                 if (diasTranscurridos >= tiempo.diasCerrado)
                                 {
                                     TicketController ticketController = new TicketController();
-                                    ticketController.CerrarTicket(ticket.idTicket, "rsanchez@sifizsoft.com");
+                                    ticketController.CerrarTicket(ticket.idTicket, emailUser);
                                 }
                             }
                         }
