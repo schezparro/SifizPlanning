@@ -2840,9 +2840,9 @@ r in db.Rol on ur.rol equals r
                 var incidenciasUsuario = (from inc in db.Incidencias
                                           join md in db.Modulo on inc.SecuencialModulo equals md.Secuencial
                                           join cli in db.Cliente on inc.SecuencialCliente equals cli.Secuencial
-										  join c in db.Colaborador on inc.SecuencialColaborador equals c.Secuencial into colabGroup
-										  from c in colabGroup.DefaultIfEmpty()
-										  select new
+                                          join c in db.Colaborador on inc.SecuencialColaborador equals c.Secuencial into colabGroup
+                                          from c in colabGroup.DefaultIfEmpty()
+                                          select new
                                           {
                                               secuencial = inc.Secuencial,
                                               cliente = cli.Descripcion,
@@ -2852,9 +2852,9 @@ r in db.Rol on ur.rol equals r
                                               adjunto = inc.Adjunto,
                                               fecha = inc.Fecha.HasValue ? inc.Fecha : DateTime.MinValue,
                                               findia = inc.FinDia == 1 ? "SI" : "NO",
-											  tiempo = inc.Tiempo ?? 0,
-											  colaborador = c != null ? c.persona.Nombre1 + " " + c.persona.Apellido1 : ""
-										  }).ToList();
+                                              tiempo = inc.Tiempo ?? 0,
+                                              colaborador = c != null ? c.persona.Nombre1 + " " + c.persona.Apellido1 : ""
+                                          }).ToList();
 
 
                 if (finDia)
@@ -2910,9 +2910,9 @@ r in db.Rol on ur.rol equals r
                 var inc = (from i in db.Incidencias
                            join md in db.Modulo on i.SecuencialModulo equals md.Secuencial
                            join cli in db.Cliente on i.SecuencialCliente equals cli.Secuencial
-						   join c in db.Colaborador on i.SecuencialColaborador equals c.Secuencial into colabGroup
-						   from c in colabGroup.DefaultIfEmpty()
-						   where i.Secuencial == secuencialIncidencia
+                           join c in db.Colaborador on i.SecuencialColaborador equals c.Secuencial into colabGroup
+                           from c in colabGroup.DefaultIfEmpty()
+                           where i.Secuencial == secuencialIncidencia
                            select new
                            {
                                secuencial = i.Secuencial,
@@ -2924,8 +2924,8 @@ r in db.Rol on ur.rol equals r
                                fecha = i.Fecha.HasValue ? i.Fecha.Value.ToString() : "",
                                findia = i.FinDia == 1 ? "SI" : "NO",
                                tiempo = i.Tiempo ?? 0,
-							   colaborador = c != null ? c.persona.Nombre1 + " " + c.persona.Apellido1 : ""
-						   }).FirstOrDefault();
+                               colaborador = c != null ? c.persona.Nombre1 + " " + c.persona.Apellido1 : ""
+                           }).FirstOrDefault();
 
                 var result = new
                 {
@@ -3058,13 +3058,13 @@ r in db.Rol on ur.rol equals r
         {
             try
             {
-				string emailUser = User.Identity.Name;
-				Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+                string emailUser = User.Identity.Name;
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
-				Persona persona = user.persona;
-				Colaborador colab = persona.colaborador.FirstOrDefault();
+                Persona persona = user.persona;
+                Colaborador colab = persona.colaborador.FirstOrDefault();
 
-				var s = new JavaScriptSerializer();
+                var s = new JavaScriptSerializer();
                 var Url = "";
                 if (adjuntos != null)
                 {
@@ -3100,7 +3100,7 @@ r in db.Rol on ur.rol equals r
                     Fecha = fecha,
                     FinDia = findia ? 1 : 0,
                     SecuencialColaborador = colab.Secuencial,
-                    Tiempo = tiempo, 
+                    Tiempo = tiempo,
                     Adjunto = Url
                 };
 
@@ -3454,7 +3454,8 @@ r in db.Rol on ur.rol equals r
                                  join tar in db.Tarea on ttar.SecuencialTarea equals tar.Secuencial
                                  join c in db.Colaborador on tar.SecuencialColaborador equals c.Secuencial
                                  join p in db.Persona on c.SecuencialPersona equals p.Secuencial
-                                 where (/*p.Secuencial == persona.Secuencial && */ttar.EstaActiva == 1)
+                                 where (/*p.Secuencial == persona.Secuencial && */
+                ttar.EstaActiva == 1)
                                  orderby tar.FechaInicio descending
                                  select new
                                  {
@@ -3665,8 +3666,8 @@ r in db.Rol on ur.rol equals r
                                               }).ToList();
 
                     var tiempoTotal = Math.Round((from de in detallesEstimacion
-                                       from d in de.detalles
-                                       select d.tiempoDesarrollo + d.tiempoPrueba).Sum(), 2);
+                                                  from d in de.detalles
+                                                  select d.tiempoDesarrollo + d.tiempoPrueba).Sum(), 2);
 
                     var resp = new
                     {
