@@ -679,6 +679,7 @@ namespace SifizPlanning.Controllers
 								   categoria = ct.Codigo,
 								   asunto = t.Asunto,
 								   persona = pc.persona.Nombre1 + " " + pc.persona.Nombre2,
+								   idCliente= pc.cliente.Secuencial,
 								   cliente = pc.cliente.Descripcion,
 								   ticketVersionCliente = db.TicketVersionCliente.Where(tvc => tvc.Secuencial == t.SecuencialTicketVersionCliente).FirstOrDefault() != null ? db.TicketVersionCliente.Where(tvc => tvc.Secuencial == t.SecuencialTicketVersionCliente).FirstOrDefault().Descripcion : "NO ASIGNADO",
 								   asignado = (
@@ -931,7 +932,8 @@ namespace SifizPlanning.Controllers
 									   asunto = t.asunto,
 									   persona = t.persona,
 									   cliente = t.cliente,
-									   ticketVersionCliente = t.ticketVersionCliente,
+									   idCliente = t.idCliente,
+                                       ticketVersionCliente = t.ticketVersionCliente,
 									   asignado = t.asignado,
 									   fechaAsignado = t.fechaAsignado > fechaInicial ? t.fechaAsignado.ToString("dd/MM/yyyy") : "NO ASIGNADO",
 									   estado = t.estado,
@@ -947,7 +949,9 @@ namespace SifizPlanning.Controllers
 					success = true,
 					tickets = ticketFinal,
 					cantidadTickets = cantidad,
-					reputacion = reputacion
+					reputacion = reputacion,
+					idCliente = ticketFinal.First()?.idCliente
+
 				};
 				return Json(resp);
 			}

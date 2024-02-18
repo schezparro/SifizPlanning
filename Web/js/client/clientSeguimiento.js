@@ -384,11 +384,6 @@
 
     };
 
-    $scope.VerReporteTicket = function () {
-        angular.element("#ver-reporte").attr({ "href": "/Report/VerReporteCliente?cliente=" + $scope.idCliente });
-        angular.element("#ver-reporte")[0].click();
-    };
-
     //Adicionando adjuntos al ticket
     angular.element("#eliminar-adj-ticket").prop("disabled", true);
     $scope.adicionarAdjuntoTicket = function () {

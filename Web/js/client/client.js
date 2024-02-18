@@ -61,6 +61,11 @@ clientApp.controller('clientController', ['$scope', '$http', function ($scope, $
         $scope.funcionalidad = 'NUEVA SOLICITUD';
     };
 
+    $scope.VerReporteTicket = function () {
+        angular.element("#ver-reporte").attr({ "href": "/Report/VerReporteCliente?cliente=" + $scope.idCliente });
+        angular.element("#ver-reporte")[0].click();
+    };
+
     //Cambiar la contraseña del usuario
     $scope.cambiarPassUsuario = function () {
         waitingDialog.show('Cambiando la contraseña del usuario...', { dialogSize: 'sm', progressType: 'success' });
@@ -145,6 +150,7 @@ clientApp.controller('clientController', ['$scope', '$http', function ($scope, $
                 $scope.actualizarReputacionCliente(data.reputacion);
                 $scope.tickets = data.tickets;
                 $scope.totalTickets = data.cantidadTickets;
+                $scope.idCliente = data.idCliente;
 
                 var posPagin = pagina;
                 $scope.cantPaginas = Math.ceil(data.cantidadTickets / numerosPorPagina);
