@@ -2143,7 +2143,18 @@ f in db.FotoColaborador on t equals f.colaborador
 							}
 						}
 
-						if(nombreNegocioTabla == "FuncionalidadCliente")
+                        if (nombreNegocioTabla == "TiempoCerradoTicket")
+                        {
+                            if (campo.nombre == "CLIENTE")
+                            {
+                                int secuencialCliente = (int)value;
+                                value = (from cl in db.Cliente
+                                         where cl.Secuencial == secuencialCliente
+                                         select cl.Descripcion).ToList()[0];
+                            }
+                        }
+
+                        if (nombreNegocioTabla == "FuncionalidadCliente")
 						{
 							if(campo.nombre == "CLIENTE")
 							{
