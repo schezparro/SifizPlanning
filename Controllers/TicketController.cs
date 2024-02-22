@@ -2474,6 +2474,7 @@ namespace SifizPlanning.Controllers
                 string filtroEstadoEstimacion = jsonObj["estadoEstimacion"];
 
                 var estimaciones = (from est in db.EstimacionTicket
+                                    where est.ticket.estadoTicket.Codigo != "RESUELTO"
                                     orderby est.FechaLimite descending
                                     select new
                                     {
@@ -2503,7 +2504,7 @@ namespace SifizPlanning.Controllers
                 if (todos == false)
                 {
                     estimaciones = (from d in estimaciones
-                                    where d.estado == "POR ESTIMAR"
+                                    where d.estado == "POR ESTIMAR" || d.estado == "VALIDANDO"
                                     select d).ToList();
                 }
 
