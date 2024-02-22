@@ -2350,7 +2350,6 @@ ticketApp.controller('gestionEstimacionesController', ['$scope', '$http', functi
             });
         buscarEstimaciones.success(function (data) {
             $scope.loading.hide();
-
             if (data.success === true) {
                 var posPagin = pagina;
                 $scope.estimaciones = data.estimaciones;

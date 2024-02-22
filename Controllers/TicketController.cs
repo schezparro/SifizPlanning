@@ -2149,14 +2149,15 @@ namespace SifizPlanning.Controllers
                     Ofertas oferta = new Ofertas();
                     oferta.cliente = ticket.persona_cliente.cliente;
                     oferta.colaborador = col;
-                    oferta.Detalle = "Estimación del ticket: " + ticket.Secuencial;
+                    oferta.Detalle = ticket.Asunto;
                     oferta.HorasEstimacion = ticket.Estimacion;
                     oferta.FechaDisponibilidad = new DateTime(0001 / 01 / 01);
                     oferta.FechaProduccion = new DateTime(0001 / 01 / 01);
                     oferta.FechaRegistro = DateTime.Now;
 
                     //Agregar el ultimo adjunot del ticket a la oferta
-                    var lastAdj = db.AdjuntoTicket.Where(adj => adj.SecuencialTicket == ticket.Secuencial).OrderByDescending(adj => adj.Secuencial).FirstOrDefault();
+                    var lastAdj = db.AdjuntoTicket.Where(adj => adj.SecuencialTicket == ticket.Secuencial && adj.Url.Contains("est_"))
+                        .OrderByDescending(adj => adj.Secuencial).FirstOrDefault();
                     if (lastAdj != null)
                     {
                         oferta.Adjunto = lastAdj.Url;
@@ -2473,6 +2474,7 @@ namespace SifizPlanning.Controllers
                 string filtroEstadoEstimacion = jsonObj["estadoEstimacion"];
 
                 var estimaciones = (from est in db.EstimacionTicket
+                                    where est.ticket.estadoTicket.Codigo != "RESUELTO"
                                     orderby est.FechaLimite descending
                                     select new
                                     {
@@ -2502,7 +2504,7 @@ namespace SifizPlanning.Controllers
                 if (todos == false)
                 {
                     estimaciones = (from d in estimaciones
-                                    where d.estado == "POR ESTIMAR"
+                                    where d.estado == "POR ESTIMAR" || d.estado == "VALIDANDO"
                                     select d).ToList();
                 }
 
