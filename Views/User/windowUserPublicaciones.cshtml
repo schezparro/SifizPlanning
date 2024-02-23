@@ -1,11 +1,11 @@
 ﻿<div>
-    <div class="form-inline">        
-        <input type="text" class="form-control" ng-model="filterPublicaciones" placeholder="Filtrar..."/>
+    <div class="form-inline">
+        <input type="text" class="form-control" ng-model="filterPublicaciones" placeholder="Filtrar..." />
 
         @*<button class="right btn btn-danger btn-sm"><span class="glyphicon glyphicon-remove"></span> Limpiar Selección</button>
-        <div class="right">&nbsp;</div>*@
+            <div class="right">&nbsp;</div>*@
         <button class="right btn btn-primary btn-sm" ng-click="seleccionarPublicarEnUno()"><span class="glyphicon glyphicon-ok"></span> Publicados en 1</button>
-        
+
         <div class="clear"></div>
     </div>
     <div>
@@ -48,38 +48,81 @@
                 </div>
                 <form ng-submit="publicacionRealizada()">
                     <div class="modal-body">
-                        <div class="form-inline">
-                            <div>
-                                <label style="width: 200px;">Tipo de publicación:</label>
-                                <select style="width: 250px; margin-bottom:5px;" class="form-control" ng-model="tipoPublicacion" ng-required="1">
-                                    <option value="Cliente/Servidor">Cliente/Servidor</option>
-                                    <option value="Cliente">Cliente</option>
-                                    <option value="Servidor">Servidor</option>
-                                    <option value="Servidor">Sitio Web</option>
-                                </select>
+                        <div style="display: flex;">
+                            <div style="flex: 1; padding-right: 10px;">
+                                <div>
+                                    <label for="titulo">Título:</label>
+                                    <input type="text" class="form-control" ng-model="titulo" required>
+                                </div>
+
+                                <div>
+                                    <label>Publicar Cliente:</label>
+                                    <input type="checkbox" ng-model="publicarCliente"><br>
+                                </div>
+
+                                <div ng-show="publicarCliente">
+                                    <label>Actualizar Distribuidos:</label>
+                                    <input type="checkbox" ng-model="actualizarDistribuidos"><br>
+                                </div>
+
+                                <div>
+                                    <label>Publicar Servidor:</label>
+                                    <input type="checkbox" ng-model="publicarServidor"><br>
+                                </div>
+
+                                <div ng-show="publicarServidor">
+                                    <label>Servicios a actualizar:</label>
+                                    <textarea type="text" class="form-control" ng-model="serviciosAActualizar"></textarea>
+                                </div>
+
+                                <div>
+                                    <label>Actualizar Base de Datos:</label>
+                                    <input type="checkbox" ng-model="actualizarDB"><br>
+                                </div>
+
+                                <div ng-show="actualizarDB">
+                                    ADJUNTO:
+                                    <div id="panel-adjunto-publicacion"></div>
+                                </div>
                             </div>
-                            <div>
-                                <label style="width: 200px;">Objetivo de publicación:</label>
-                                <select style="width: 250px; margin-bottom:5px;" class="form-control" ng-model="objetivoPublicacion" ng-required="1">
-                                    <option value="pruebas">Pruebas</option>
-                                    <option value="producción">Producción</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label style="width: 200px;">FTP:</label>
-                                <input style="width: 250px; margin-bottom:5px;" class="form-control" ng-model="ftpPublicacion" ng-required="1" />
-                            </div>
-                            <div>
-                                <label style="width: 200px;">Usuario:</label>
-                                <input style="width: 250px; margin-bottom:5px;" class="form-control" ng-model="usuarioFtp" ng-required="1" />
-                            </div>
-                            <div>
-                                <label style="width: 200px;">Clave:</label>
-                                <input style="width: 250px; margin-bottom:5px;" class="form-control" ng-model="claveFtp" ng-required="1" />
-                            </div>
-                            <div>
-                                <label style="width: 200px;">Path:</label>
-                                <input style="width: 250px; margin-bottom:5px;" class="form-control" ng-model="pathPublicacion" ng-required="1" />
+
+                            <div style="flex: 1; padding-left: 10px;">
+                                <div>
+                                    <label>Tipo de publicación:</label>
+                                    <select class="form-control" ng-model="tipoPublicacion" ng-required="1">
+                                        <option value="Cliente/Servidor">Cliente/Servidor</option>
+                                        <option value="Cliente">Cliente</option>
+                                        <option value="Servidor">Servidor</option>
+                                        <option value="Servidor">Sitio Web</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label>Objetivo de publicación:</label>
+                                    <select class="form-control" ng-model="objetivoPublicacion" ng-required="1">
+                                        <option value="pruebas">Pruebas</option>
+                                        <option value="producción">Producción</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label>FTP:</label>
+                                    <input class="form-control" ng-model="ftpPublicacion" ng-required="1" />
+                                </div>
+
+                                <div>
+                                    <label>Usuario:</label>
+                                    <input class="form-control" ng-model="usuarioFtp" ng-required="1" />
+                                </div>
+                                <div>
+                                    <label>Clave:</label>
+                                    <input class="form-control" ng-model="claveFtp" ng-required="1" />
+                                </div>
+
+                                <div>
+                                    <label>Path:</label>
+                                    <input class="form-control" ng-model="pathPublicacion" ng-required="1" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -87,7 +130,7 @@
                         <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
                         <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Enviar</button>
                     </div>
-                </form>                
+                </form>
             </div>
         </div>
     </div>

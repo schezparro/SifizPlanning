@@ -2474,7 +2474,7 @@ namespace SifizPlanning.Controllers
                 string filtroEstadoEstimacion = jsonObj["estadoEstimacion"];
 
                 var estimaciones = (from est in db.EstimacionTicket
-                                    where est.ticket.estadoTicket.Codigo != "RESUELTO"
+                                    where est.ticket.estadoTicket.Codigo == "PENDIENTE"
                                     orderby est.FechaLimite descending
                                     select new
                                     {
@@ -4792,7 +4792,7 @@ namespace SifizPlanning.Controllers
 
         //CERRAR EL TICKET
         [Authorize(Roles = "COORDINADOR, ADMIN, TICKET, GESTOR, CLIENTE")]
-        public ActionResult CerrarTicket(int idTicket, string emailUser)
+        public ActionResult CerrarTicketPorCliente(int idTicket, string emailUser)
         {
             try
             {

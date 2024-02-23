@@ -2242,7 +2242,7 @@ namespace SifizPlanning.Controllers
                                 var diasTranscurridos = (DateTime.Now - ticket.ticketHistorico.FechaOperacion).Days;
                                 if (diasTranscurridos >= tiempo.diasCerrado)
                                 {
-                                    ticketController.CerrarTicket(ticket.idTicket, emailUser);
+                                    ticketController.CerrarTicketPorCliente(ticket.idTicket, emailUser);
                                 }
                             }
                         }

@@ -29,6 +29,9 @@ using DocumentFormat.OpenXml.Drawing.Diagrams;
 using HorizontalAlignmentValues = DocumentFormat.OpenXml.Spreadsheet.HorizontalAlignmentValues;
 using VerticalAlignmentValues = DocumentFormat.OpenXml.Spreadsheet.VerticalAlignmentValues;
 using Microsoft.Ajax.Utilities;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using System.Net.Http;
 
 namespace SifizPlanning.Controllers
 {
@@ -4856,7 +4859,7 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "ADMINTFS, ADMIN")]
-        public ActionResult TicketPublicado(int id, string publicacionClienteServidor, string publicacionPruebasProd, string dirFTP, string usuarioFTP, string claveFTP, string pathFTP, bool publicarEnUno, int[] idPublicacionLote)
+        public async Task<ActionResult> TicketPublicado(string titulo, int id, string publicacionClienteServidor, string publicacionPruebasProd, string dirFTP, string usuarioFTP, string claveFTP, string pathFTP, bool publicarEnUno, int[] idPublicacionLote, string descripcion, string tagsJson, HttpPostedFileBase[] adjuntos = null)
         {
             try
             {
@@ -4951,21 +4954,21 @@ r in db.Rol on ur.rol equals r
                         string linkAceptar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO"));
                         string linkRechazar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":NOACEPTADO"));
                         string textoEmailCliente = textoEmail + @"<br/><div style='font-size: 11pt; font-family: sans-serif; color: #1F497D;'>
-			                                                <span style='color:#128812'>
-				                                                Si usted <b>ACEPTA</b> este requerimiento por favor presione el siguiente link:
-			                                                </span><br/>                                                            
-			                                                <a href='" + linkAceptar + @"'>
+                                                   <span style='color:#128812'>
+                                                    Si usted <b>ACEPTA</b> este requerimiento por favor presione el siguiente link:
+                                                   </span><br/>                                                            
+                                                   <a href='" + linkAceptar + @"'>
                                                                 <i>" + linkAceptar + @"</i>
-			                                                </a>			
-			                                                <br/><br/>
-			                                                <span style='color:#EE1212'>Si por el contrario <b>NO ACEPTA</b> este requerimiento por favor presione el siguiente link:</span><br/>
-			                                                <a href='" + linkRechazar + @"'>
-				                                                <i>" + linkRechazar + @"</i>
-			                                                </a>
+                                                   </a>			
+                                                   <br/><br/>
+                                                   <span style='color:#EE1212'>Si por el contrario <b>NO ACEPTA</b> este requerimiento por favor presione el siguiente link:</span><br/>
+                                                   <a href='" + linkRechazar + @"'>
+                                                    <i>" + linkRechazar + @"</i>
+                                                   </a>
                                                             <br/>
                                                             <br/>
                                                             <i>El presente correo concluye la resolución de este requerimiento, formalmente solicitamos la certificación del mismo o sus observaciones. Si dentro de los próximos 5 días laborables no recibimos su respuesta, procederemos a cerrar el ticket. En caso de requerir correcciones será necesario que ingrese otro ticket.</i>
-		                                                </div>";
+                                                  </div>";
 
                         Persona_Cliente personaCliente = db.Persona_Cliente.Find(ticket.SecuencialPersona_Cliente);
                         Persona persona = personaCliente.persona;
@@ -5078,21 +5081,21 @@ r in db.Rol on ur.rol equals r
                     string linkAceptar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO"));
                     string linkRechazar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":NOACEPTADO"));
                     string textoEmailCliente = textoEmail + @"<br/><div style='font-size: 11pt; font-family: sans-serif; color: #1F497D;'>
-			                                                <span style='color:#128812'>
-				                                                Si usted <b>ACEPTA</b> este requerimiento por favor presione el siguiente link:
-			                                                </span><br/>                                                            
-			                                                <a href='" + linkAceptar + @"'>
+                                                   <span style='color:#128812'>
+                                                    Si usted <b>ACEPTA</b> este requerimiento por favor presione el siguiente link:
+                                                   </span><br/>                                                            
+                                                   <a href='" + linkAceptar + @"'>
                                                                 <i>" + linkAceptar + @"</i>
-			                                                </a>			
-			                                                <br/><br/>
-			                                                <span style='color:#EE1212'>Si por el contrario <b>NO ACEPTA</b> este requerimiento por favor presione el siguiente link:</span><br/>
-			                                                <a href='" + linkRechazar + @"'>
-				                                                <i>" + linkRechazar + @"</i>
-			                                                </a>
+                                                   </a>			
+                                                   <br/><br/>
+                                                   <span style='color:#EE1212'>Si por el contrario <b>NO ACEPTA</b> este requerimiento por favor presione el siguiente link:</span><br/>
+                                                   <a href='" + linkRechazar + @"'>
+                                                    <i>" + linkRechazar + @"</i>
+                                                   </a>
                                                             <br/>
                                                             <br/>
                                                             <i>El presente correo concluye la resolución de este requerimiento, formalmente solicitamos la certificación del mismo o sus observaciones. Si dentro de los próximos 5 días laborables no recibimos su respuesta, procederemos a cerrar el ticket. En caso de requerir correcciones será necesario que ingrese otro ticket.</i>
-		                                                </div>";
+                                                  </div>";
 
                     Persona_Cliente personaCliente = db.Persona_Cliente.Find(ticket.SecuencialPersona_Cliente);
                     Persona persona = personaCliente.persona;
@@ -5131,9 +5134,58 @@ r in db.Rol on ur.rol equals r
                     db.SaveChanges();
                 }
 
+                //Ticket ticketPublicacion = db.Ticket.Find(id);
+                //if (ticketPublicacion == null)
+                //{
+                //    throw new Exception("No se encontró el ticket");
+                //}
+                //Persona_Cliente perCliente = db.Persona_Cliente.Find(ticketPublicacion.SecuencialPersona_Cliente);
+
+                //string tituloP = titulo;
+                //string clienteP = perCliente.cliente.Codigo;
+                //string colaboradorP = user.persona.Nombre1 + " " + user.persona.Apellido1;
+                //string descripcionP = descripcion;
+                //string[] tagsP = JsonConvert.DeserializeObject<string[]>(tagsJson);
+
+                //var client = new HttpClient();
+                //var requestUrl = "https://api-publicaciones.sifizsoft.com/api/asignacion/asignar-feature";
+
+                //var data = new MultipartFormDataContent();
+
+                //data.Add(new StringContent(clienteP), "Cliente");
+                //data.Add(new StringContent(tituloP), "Titulo");
+                //data.Add(new StringContent(descripcionP), "Descripcion");
+                //data.Add(new StringContent(colaboradorP), "NombreTecnico");
+                //data.Add(new StringContent(string.Join(",", tagsP)), "Tags");
+                //data.Add(new StringContent("schezparro@gmail.com"), "NotificarA");
+
+                //if (adjuntos != null)
+                //{
+                //    foreach (var adjunto in adjuntos)
+                //    {
+                //        var stream = adjunto.InputStream;
+                //        data.Add(new StreamContent(stream), "ArchivoAdjunto", adjunto.FileName);
+                //    }
+                //}
+
+                //var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+                //requestMessage.Content = data;
+
+                //var response = await client.SendAsync(requestMessage);
+
+                bool successApi = true;
+                string error = "";
+                //if (!response.IsSuccessStatusCode)
+                //{
+                //    successApi = false;
+                //    error = response.StatusCode.ToString() + " " + response.ReasonPhrase;
+                //}
+
                 var resp = new
                 {
-                    success = true
+                    success = true,
+                    successApi = successApi,
+                    error = error
                 };
                 return Json(resp);
             }
