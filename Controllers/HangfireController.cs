@@ -2205,6 +2205,7 @@ namespace SifizPlanning.Controllers
         {
             try
             {
+                TicketController ticketController = new TicketController();
                 var tiemposCerradoTicket = (from t in db.TiempoCerradoTicket
                                             select new
                                             {
@@ -2214,29 +2215,24 @@ namespace SifizPlanning.Controllers
 
                 foreach (var tiempo in tiemposCerradoTicket)
                 {
-                    var personaCliente = (from p in db.Persona_Cliente
-                                          where p.SecuencialCliente == tiempo.cliente
-                                          select new
-                                          {
-                                              persona = p.SecuencialPersona,
-                                              cliente = p.SecuencialCliente
-                                          }).FirstOrDefault();
+                    Persona_Cliente personaCliente = (from p in db.Persona_Cliente
+                                                      where p.SecuencialCliente == tiempo.cliente
+                                                      select p).FirstOrDefault();
 
                     if (personaCliente != null)
                     {
                         var ticketsCliente = (from t in db.Ticket
-                                              join th in db.TicketHistorico on t.Secuencial equals th.SecuencialTicket
-                                              where t.SecuencialPersona_Cliente == personaCliente.persona
+                                              where t.persona_cliente.SecuencialCliente == personaCliente.SecuencialCliente && t.estadoTicket.Codigo == "RESUELTO"
                                               select new
                                               {
                                                   idTicket = t.Secuencial,
                                                   ticketHistorico = (from th in db.TicketHistorico
-                                                                     where th.SecuencialTicket == t.Secuencial && th.SecuencialEstadoTicket == 10
-                                                                     orderby th.FechaOperacion descending
-                                                                     select th).FirstOrDefault()
+                                                                where th.SecuencialTicket == t.Secuencial && th.estadoTicket.Codigo == "RESUELTO"
+                                                                orderby th.FechaOperacion descending
+                                                                select th).FirstOrDefault()
                                               }).ToList();
 
-                        var cliente = db.Cliente.FirstOrDefault(s => s.Secuencial == personaCliente.cliente && s.EstaActivo == 1);
+                        var cliente = db.Cliente.FirstOrDefault(s => s.Secuencial == personaCliente.SecuencialCliente && s.EstaActivo == 1);
                         string emailUser = cliente.persona_cliente.FirstOrDefault().persona.usuario.FirstOrDefault().Email;
 
                         foreach (var ticket in ticketsCliente)
@@ -2246,14 +2242,12 @@ namespace SifizPlanning.Controllers
                                 var diasTranscurridos = (DateTime.Now - ticket.ticketHistorico.FechaOperacion).Days;
                                 if (diasTranscurridos >= tiempo.diasCerrado)
                                 {
-                                    TicketController ticketController = new TicketController();
                                     ticketController.CerrarTicket(ticket.idTicket, emailUser);
                                 }
                             }
                         }
                     }
                 }
-
 
                 var resp = new
                 {
@@ -2270,12 +2264,13 @@ namespace SifizPlanning.Controllers
                 throw;
             }
         }
-    }
-    public class ClienteHoras
-    {
-        public string mes { get; set; }
-        public int trabajadas { get; set; }
-        public int contratadas { get; set; }
-        public int total { get; set; }
+
+        public class ClienteHoras
+        {
+            public string mes { get; set; }
+            public int trabajadas { get; set; }
+            public int contratadas { get; set; }
+            public int total { get; set; }
+        }
     }
 }
