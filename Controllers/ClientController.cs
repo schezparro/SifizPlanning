@@ -700,7 +700,9 @@ namespace SifizPlanning.Controllers
 										   (t.estadoTicket.Codigo == "ABIERTO" || t.estadoTicket.Codigo == "ESPERANDO LLAMADA") ? "fondoAbierto" : "fondoDesarrollo"
 							   }).ToList();
 
-				if(todos == false)
+				var firstID = tickets.First()?.idCliente;
+
+                if (todos == false)
 				{
 					tickets = tickets.Where(x => x.estado != "CERRADO" && x.estado != "ANULADO" && x.estado != "RECHAZADO").ToList();
 				}
@@ -950,9 +952,9 @@ namespace SifizPlanning.Controllers
 					tickets = ticketFinal,
 					cantidadTickets = cantidad,
 					reputacion = reputacion,
-					idCliente = ticketFinal.First()?.idCliente
+					idCliente = firstID
 
-				};
+                };
 				return Json(resp);
 			}
 			catch(Exception e)
