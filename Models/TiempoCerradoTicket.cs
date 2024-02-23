@@ -22,6 +22,6 @@ namespace SifizPlanning.Models
         public int DiasCerrado { get; set; }
         public int SecuencialCliente { get; set; }
     
-        public virtual Cliente CLIENTE { get; set; }
+        public virtual Cliente cliente { get; set; }
     }
 }

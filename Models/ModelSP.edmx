@@ -12265,7 +12265,7 @@
           <Property Name="NumeroVerificador" Type="Int32" Nullable="false" />
           <Property Name="DiasCerrado" Type="Int32" Nullable="false" />
           <Property Name="SecuencialCliente" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="CLIENTE" Relationship="SifizPlanningModel.FK_TIEMPOCERRADOTICKET_CLIENTE" FromRole="TIEMPOCERRADOTICKET" ToRole="Cliente" />
+          <NavigationProperty Name="cliente" Relationship="SifizPlanningModel.FK_TIEMPOCERRADOTICKET_CLIENTE" FromRole="TIEMPOCERRADOTICKET" ToRole="Cliente" />
         </EntityType>
         <Association Name="FK_TIEMPOCERRADOTICKET_CLIENTE">
           <End Type="SifizPlanningModel.Cliente" Role="Cliente" Multiplicity="1" />
