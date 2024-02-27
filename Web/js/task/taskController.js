@@ -824,7 +824,12 @@
         formData.append('minutos', $scope.numero_horas_minutos);
         formData.append('horasEstimadas', $scope.numero_horas_estimadas);
         formData.append('minutosEstimados', $scope.numero_minutos_estimados);
-        formData.append('detalle', $scope.detalle);
+        const detalleString = JSON.stringify($scope.detalle);
+        let detalleNew = detalleString.replace(/</g, '%3C').replace(/>/g, '%3E');
+        formData.append('detalle', detalleNew);
+        console.log(detalleString);
+
+
         formData.append('referencia', $scope.referencia);
 
         formData.append('coordinador', $scope.coordinador);
