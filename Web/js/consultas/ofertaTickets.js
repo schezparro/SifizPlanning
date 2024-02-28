@@ -2,6 +2,40 @@
 
     $scope.nuevaOferta = { FechaRegistro: '', FechaProduccion: '', FechaDisponibilidad: '', Detalle: '', HorasEstimacion: '', cliente: '', colaborador: '' };
 
+    var numerosPorPagina = 10;
+    var pagina = 1;
+
+    $scope.cambiarPagina = function (pag) {
+        pagina = pag;
+        $scope.paginar();
+    };
+
+    $scope.atrazarPagina = function () {
+        if (pagina > 1) {
+            pagina--;
+            $scope.paginar();
+        }
+    };
+
+    $scope.avanzarPagina = function () {
+        if (pagina < $scope.cantPaginasOfertas) {
+            pagina++;
+            $scope.paginar();
+        }
+    };
+
+    $scope.actualizarCantidadMostrar = function () {
+        numerosPorPagina = $scope.cantidadMostrarPorPagina;
+        $scope.paginar();
+    };
+
+    $scope.paginar = function () {
+        var start = (pagina - 1) * numerosPorPagina;
+        var lenght = numerosPorPagina;
+
+        $scope.recargarDatosOfertas(start, lenght);
+    };
+
     $scope.editarOferta = function (oferta, index) {
         oferta.editable = true;
         oferta.FechaRegistro = '';
@@ -24,40 +58,40 @@
     };
 
     $scope.guardarCambios = function (oferta) {
-            angular.element('#fecha-registro-' + oferta.id).datepicker('destroy');
-            angular.element('#fecha-produccion-' + oferta.id).datepicker('destroy');
-            angular.element('#fecha-disponibilidad-' + oferta.id).datepicker('destroy');
+        angular.element('#fecha-registro-' + oferta.id).datepicker('destroy');
+        angular.element('#fecha-produccion-' + oferta.id).datepicker('destroy');
+        angular.element('#fecha-disponibilidad-' + oferta.id).datepicker('destroy');
 
-            oferta.editable = false;
-            var adjunto = $scope.adjunto;
+        oferta.editable = false;
+        var adjunto = $scope.adjunto;
 
-            var formData = new FormData();
-            formData.append("ID", oferta.id);
-            formData.append("FechaRegistro", new Date(...oferta.FechaRegistro.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)));
-            formData.append("FechaProduccion", new Date(...oferta.FechaProduccion.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)));
-            formData.append("FechaDisponibilidad", new Date(...oferta.FechaDisponibilidad.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)));
-            formData.append("Detalle", oferta.Detalle);
-            formData.append("HorasEstimacion", oferta.HorasEstimacion);
-            formData.append("cliente", oferta.cliente.id);
-            formData.append("colaborador", oferta.colaborador.id);
-            formData.append("adjunto", adjunto);
+        var formData = new FormData();
+        formData.append("ID", oferta.id);
+        formData.append("FechaRegistro", new Date(...oferta.FechaRegistro.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)));
+        formData.append("FechaProduccion", new Date(...oferta.FechaProduccion.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)));
+        formData.append("FechaDisponibilidad", new Date(...oferta.FechaDisponibilidad.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)));
+        formData.append("Detalle", oferta.Detalle);
+        formData.append("HorasEstimacion", oferta.HorasEstimacion);
+        formData.append("cliente", oferta.cliente.id);
+        formData.append("colaborador", oferta.colaborador.id);
+        formData.append("adjunto", adjunto);
 
-            var ajaxOfertas = $http({
-                method: 'POST',
-                url: "consultas/editar-ofertas-tickets",
-                data: formData,
-                headers: { 'Content-Type': undefined },
-                transformRequest: angular.identity
-            });
+        var ajaxOfertas = $http({
+            method: 'POST',
+            url: "consultas/editar-ofertas-tickets",
+            data: formData,
+            headers: { 'Content-Type': undefined },
+            transformRequest: angular.identity
+        });
 
-            ajaxOfertas.success(function (data) {
-                if (data.success === true) {
-                    $scope.cargarDatosOfertas()
+        ajaxOfertas.success(function (data) {
+            if (data.success === true) {
+                $scope.cargarDatosOfertas()
 
-                } else {
-                    messageDialog.show("Información", data.msg);
-                }
-            });
+            } else {
+                messageDialog.show("Información", data.msg);
+            }
+        });
 
         $scope.adjunto = null;
     };
@@ -138,16 +172,59 @@
         });
     };
 
-    $scope.recargarDatosOfertas = function () {
+    $scope.recargarDatosOfertas = function (start, length) {
+
         var ajaxOfertas = $http.post("consultas/dar-ofertas-tickets", {
+            start: start,
+            length: length,
             filtro: $scope.filtroOfertas,
         });
+
         ajaxOfertas.success(function (data) {
             if (data.success === true) {
-                console.log(data);
+
                 $scope.ofertas = data.ofertas;
+                $scope.totalOfertas = data.cantidad;
+
+                var posPagin = pagina;
+                $scope.cantPaginasOfertas = Math.ceil($scope.totalOfertas / numerosPorPagina);
+
+                if ($scope.cantPaginasOfertas === 0 || $scope.cantPaginasOfertas === undefined) {
+                    $scope.cantPaginasOfertas = 1;
+                }
+
+                $scope.listaPaginasOfertas = [];
+                if ($scope.cantPaginasOfertas > 5 && pagina <= 5) {
+                    for (var i = 1; i <= 5; i++) {
+                        $scope.listaPaginasOfertas.push(i);
+                    }
+                }
+                else if ($scope.cantPaginasOfertas <= 5) {
+                    for (var i = 1; i <= $scope.cantPaginasOfertas; i++) {
+                        $scope.listaPaginasOfertas.push(i);
+                    }
+                }
+                else if ($scope.cantPaginasOfertas > 5) {
+                    for (var i = pagina - 4; i <= pagina; i++) {
+                        $scope.listaPaginasOfertas.push(i);
+                    }
+                    posPagin = 5;
+                }
+
+                if (pagina > $scope.cantPaginasOfertas) {
+                    pagina = $scope.cantPaginasOfertas;
+                    posPagin = pagina;
+                }
+
+                setTimeout(function () {
+                    var listaPaginador = angular.element("#tabla-ofertas-tickets .pagination li a");
+                    angular.element(listaPaginador).removeClass('pagSelect');
+                    angular.element(listaPaginador[posPagin]).addClass('pagSelect');
+                }, 300);
+            } else {
+                messageDialog.show("Información", data.msg);
             }
-        });
+        })
     };
 
     $scope.agregarAdjuntoOferta = function () {

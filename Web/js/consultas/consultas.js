@@ -596,10 +596,56 @@ consultasApp.controller('mainConsultasController', ['$scope', '$http', function 
             return colaborador ? colaborador.Nombre : '';
         };
 
-        var ajaxOfertas = $http.post("consultas/dar-ofertas-tickets");
+        var numerosPorPagina = 10;
+        var pagina = 1;
+        $scope.listaPaginasOfertas = [];
+
+        var ajaxOfertas = $http.post("consultas/dar-ofertas-tickets", {
+            start: 0,
+            length: 10,
+            filtro: $scope.filtroOfertas,
+        });
+
         ajaxOfertas.success(function (data) {
             if (data.success === true) {
                 $scope.ofertas = data.ofertas;
+                $scope.totalOfertas = data.cantidad;
+
+                var posPagin = pagina;
+                $scope.cantPaginasOfertas = Math.ceil($scope.totalOfertas / numerosPorPagina);
+
+                if ($scope.cantPaginasOfertas === 0 || $scope.cantPaginasOfertas === undefined) {
+                    $scope.cantPaginasOfertas = 1;
+                }
+
+                $scope.listaPaginasOfertas = [];
+                if ($scope.cantPaginasOfertas > 5 && pagina <= 5) {
+                    for (var i = 1; i <= 5; i++) {
+                        $scope.listaPaginasOfertas.push(i);
+                    }
+                }
+                else if ($scope.cantPaginasOfertas <= 5) {
+                    for (var i = 1; i <= $scope.cantPaginasOfertas; i++) {
+                        $scope.listaPaginasOfertas.push(i);
+                    }
+                }
+                else if ($scope.cantPaginasOfertas > 5) {
+                    for (var i = pagina - 4; i <= pagina; i++) {
+                        $scope.listaPaginasOfertas.push(i);
+                    }
+                    posPagin = 5;
+                }
+
+                if (pagina > $scope.cantPaginasOfertas) {
+                    pagina = $scope.cantPaginasOfertas;
+                    posPagin = pagina;
+                }
+
+                setTimeout(function () {
+                    var listaPaginador = angular.element("#tabla-ofertas-tickets .pagination li a");
+                    angular.element(listaPaginador).removeClass('pagSelect');
+                    angular.element(listaPaginador[posPagin]).addClass('pagSelect');
+                }, 300);
             }
         });
 

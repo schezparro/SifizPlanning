@@ -2149,7 +2149,7 @@ namespace SifizPlanning.Controllers
                     Ofertas oferta = new Ofertas();
                     oferta.cliente = ticket.persona_cliente.cliente;
                     oferta.colaborador = col;
-                    oferta.Detalle = ticket.Asunto;
+                    oferta.Detalle = "Estimación del ticket: " + ticket.Secuencial +" - "+ ticket.Asunto;
                     oferta.HorasEstimacion = ticket.Estimacion;
                     oferta.FechaDisponibilidad = new DateTime(0001 / 01 / 01);
                     oferta.FechaProduccion = new DateTime(0001 / 01 / 01);
