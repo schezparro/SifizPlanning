@@ -356,7 +356,7 @@
                                         <div id="panel-adjuntos-ticket" class="left info-ticket">
                                             <div ng-repeat="adj in adjuntosTicket" class="left">
                                                 <a href="Web{{adj.Url}}" target="_blank" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-paperclip"></span> Adjunto {{$index+1}}</a>
-                                                <span ng-click="eliminarAdjunto(adj.Secuencial)" style="cursor:pointer; vertical-align: middle; margin-right: 5px" class="glyphicon glyphicon-remove center"></span>
+                                                <span ng-click="modalEliminarAdjunto(adj.Secuencial)" style="cursor:pointer; vertical-align: middle; margin-right: 5px" class="glyphicon glyphicon-remove center"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -508,6 +508,26 @@
         </div>
     </div>
 </div>
+
+<!-- Windows Modal eliminar Adjuntos-->
+<div class="modal fade" id="modal-eliminar-adjuntos" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 30%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modal-gestion-ticket-label"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Eliminar adjunto</h4>
+            </div>
+            <div class="modal-body">
+                <label> ¿Está seguro que desea eliminar el adjunto? </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" ng-click="eliminarAdjunto(SecuencialAdjuntoEliminar)" data-dismiss="modal">Aceptar</button>
+                <button type="submit" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- Windows Modal Contratos por Cliente-->
 <div class="modal fade" id="modal-contratos-cliente" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

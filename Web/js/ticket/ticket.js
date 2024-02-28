@@ -2168,6 +2168,11 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
         angular.element("#modal-adjuntos").modal('show');
     };
 
+    $scope.modalEliminarAdjunto = function (id) {
+        $scope.SecuencialAdjuntoEliminar = id;
+        angular.element("#modal-eliminar-adjuntos").modal('show');
+    };
+
     //Funciones del comentario
     $scope.verComentarioTicket = function () {
         angular.element("#modal-comentarios-ticket").modal('show');
