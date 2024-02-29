@@ -86,7 +86,7 @@
 
         ajaxOfertas.success(function (data) {
             if (data.success === true) {
-                $scope.cargarDatosOfertas()
+                $scope.paginar()
 
             } else {
                 messageDialog.show("Información", data.msg);
@@ -149,7 +149,7 @@
 
         ajaxOfertas.success(function (data) {
             if (data.success === true) {
-                $scope.cargarDatosOfertas()
+                $scope.paginar()
 
             } else {
                 messageDialog.show("Información", data.msg);

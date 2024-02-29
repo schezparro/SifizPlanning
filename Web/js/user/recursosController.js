@@ -3,6 +3,8 @@
     var pagina = 1;
     $scope.idRecursos = 0;
     $scope.mostrarTodosRecursos = false;
+    $scope.horas = 0;
+    $scope.minutos = 0;
 
     $scope.filtroRecursos = filtroService.filtroRecursos;
 
@@ -122,9 +124,10 @@
         formData.append('modulo', modulo);
         formData.append('adjuntos', fileInput.files[0]);
         formData.append('adjuntoAsistencia', fileInput2.files[0]);
-        formData.append('tiempo', $scope.newTiempo);
 
-        console.log(formData);
+        var tiempo = toTotalMinutes($scope.horas, $scope.minutos)
+
+        formData.append('tiempo', tiempo);
 
         var ajaxEnvioDatos = $http({
             method: 'POST',
@@ -139,6 +142,9 @@
             if (data.success === true) {
                 angular.element("#modal-agregar-recursos").modal("hide");
                 $scope.cargarRecursos();
+
+                $scope.horas = 0;
+                $scope.minutos = 0;
             } else {
                 messageDialog.show("Información", data.msg);
             }
@@ -159,7 +165,6 @@
             });
         ajaxObtenerIncidencia.success(function (data) {
             if (data.success === true) {
-                console.log(data);
 
                 $scope.tituloV = data.recursoResult.titulo;
                 $scope.detalleV = data.recursoResult.detalle;
@@ -193,5 +198,33 @@
 devApp.service('filtroService', function () {
     this.filtroRecursos = "";
 });
+
+devApp.filter('toHoursAndMinutes', function () {
+    return function (totalMinutes) {
+        if (totalMinutes === 0) {
+            return '0';
+        }
+
+        var hours = Math.floor(totalMinutes / 60);
+        var minutes = totalMinutes % 60;
+
+        // Asegurarse de que los minutos se muestren siempre con dos dígitos
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+
+        return hours + ':' + minutes;
+    };
+});
+
+/*function toHoursAndMinutes(totalMinutes) {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return { hours, minutes };
+}*/
+
+function toTotalMinutes(hours, minutes) {
+    return (hours * 60) + minutes;
+}
+
+
 
 
