@@ -1084,6 +1084,8 @@
     <Content Include="SCRIPTSDATABASE\01\1-INCIDENCIAS.sql" />
     <Content Include="SCRIPTSDATABASE\01\2-INCIDENCIAS.sql" />
     <Content Include="SCRIPTSDATABASE\01\3-TIEMPOCERRADOTICKET.sql" />
+    <Content Include="SCRIPTSDATABASE\02\01-SOLICITUDVACACIONES.sql" />
+    <Content Include="SCRIPTSDATABASE\02\02-Convertir tiempo.sql" />
     <Content Include="SCRIPTSDATABASE\12\06-FERIADOS.sql" />
     <Content Include="SCRIPTSDATABASE\12\01-TICKET.sql" />
     <Content Include="SCRIPTSDATABASE\12\02-TICKET.sql" />
@@ -1607,7 +1609,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Properties\PublishProfiles\" />
-    <Folder Include="SCRIPTSDATABASE\02\" />
     <Folder Include="SCRIPTSDATABASE\TEMPSCRIPTS\" />
     <Folder Include="Web\files\asignaciones\" />
     <Folder Include="Web\images\chat\" />
