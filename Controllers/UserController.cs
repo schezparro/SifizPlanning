@@ -32,6 +32,7 @@ using Microsoft.Ajax.Utilities;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Net.Http;
+using System.Configuration;
 
 namespace SifizPlanning.Controllers
 {
@@ -1208,6 +1209,7 @@ namespace SifizPlanning.Controllers
                     string colaboradorP = user.persona.Nombre1 + " " + user.persona.Apellido1;
                     string descripcionP = descripcion;
                     string[] tagsP = JsonConvert.DeserializeObject<string[]>(tagsJson);
+                    string key = ConfigurationManager.AppSettings.Get("Devops");
 
                     string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
                     string linkAceptar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO"));
@@ -1228,6 +1230,7 @@ namespace SifizPlanning.Controllers
                     data.Add(new StringContent(ramaP), "NombreRama");
                     data.Add(new StringContent(requiereQAP), "RequiereQA");
                     data.Add(new StringContent(linksConcatenados), "URLSifizPlanning");
+                    data.Add(new StringContent(key), "Key");
 
                     if (adjuntos != null)
                     {
