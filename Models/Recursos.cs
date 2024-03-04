@@ -21,7 +21,7 @@ namespace SifizPlanning.Models
         public int SecuencialModulo { get; set; }
         public string Adjunto { get; set; }
         public string AdjuntoAsistencia { get; set; }
-        public Nullable<System.TimeSpan> TiempoCapacitacion { get; set; }
+        public Nullable<int> TiempoCapacitacion { get; set; }
     
         public virtual Modulo modulo { get; set; }
     }

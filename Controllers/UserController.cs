@@ -2265,10 +2265,11 @@ r in db.Rol on ur.rol equals r
                     solVacaciones.DiasCorresponden = solicitud.DiasCorresponden;
                     solVacaciones.DiasDisfrutar = solicitud.DiasDisfrutar;
                     solVacaciones.DiasPendientes = solicitud.DiasPendientes;
-                    solVacaciones.FechaIngresoInstitucion = solicitud.FechaIngresoInstitucion;
+                    solVacaciones.FechaIngresoInstitucion = solicitud.FechaPresentarseTrabajar; //No usar -> solicitud.FechaIngresoInstitucion;
                     solVacaciones.FechaIngresoSolicitud = solicitud.FechaIngresoSolicitud;
                     solVacaciones.Observaciones = solicitud.Observaciones;
                     solVacaciones.DelAnio = solicitud.DelAnio;
+                    solVacaciones.Jefe = solicitud.Jefe;
                 }
                 else
                 {
@@ -3277,7 +3278,7 @@ r in db.Rol on ur.rol equals r
         //Guardar modal nuevos recursos
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult GuardarRecurso(string titulo, string detalle, DateTime fecha, int modulo, string tiempo, HttpPostedFileBase[] adjuntos = null, HttpPostedFileBase[] adjuntoAsistencia = null)
+        public ActionResult GuardarRecurso(string titulo, string detalle, DateTime fecha, int modulo, int tiempo, HttpPostedFileBase[] adjuntos = null, HttpPostedFileBase[] adjuntoAsistencia = null)
         {
             try
             {
@@ -3321,7 +3322,7 @@ r in db.Rol on ur.rol equals r
                     Fecha = fecha,
                     SecuencialModulo = modulo,
                     Adjunto = Url,
-                    TiempoCapacitacion = TimeSpan.Parse(tiempo),
+                    TiempoCapacitacion = tiempo,
                     AdjuntoAsistencia = adjuntoAsistenciaUrl,
                 };
                 db.Recursos.Add(nuevoRecurso);
@@ -3596,6 +3597,7 @@ r in db.Rol on ur.rol equals r
                     solVacaciones.FechaIngresoSolicitud = solicitud.FechaIngresoSolicitud;
                     solVacaciones.Observaciones = solicitud.Observaciones;
                     solVacaciones.DelAnio = solicitud.DelAnio;
+                    solVacaciones.Jefe = solicitud.Jefe;
                     solVacaciones.Estado = solicitud.Estado != null ? solicitud.Estado == 1 ? "APROBADA" : "RECHAZADA" : "PENDIENTE";
                     solicitudesVacacionesDTO.Add(solVacaciones);
                 }

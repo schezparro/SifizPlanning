@@ -39,7 +39,7 @@
                     </a>
                 </td>
 
-                <td>{{recurso.tiempo}}</td>
+                <td>{{recurso.tiempo | toHoursAndMinutes}}</td>
             </tr>
         </tbody>
 
@@ -108,9 +108,13 @@
                         <div class="clear"></div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
                         TIEMPO DE CAPACITACIÓN:
-                        <br><input type="text" class="form-control" ng-model="newTiempo" ng-required="true">
+                        <input type="number" class="form-control" ng-model="horas" ng-required="true" style="width:10%; text-align:center;">
+                        horas
+                        :
+                        <input type="number" class="form-control" ng-model="minutos" ng-required="true" style="width: 10%; text-align: center;">
+                        minutos
                     </div>
 
                 </div>
@@ -158,7 +162,7 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-4"><strong>Tiempo de Capacitación:</strong></div>
-                    <div class="col-sm-8">{{tiempoV}}</div>
+                    <div class="col-sm-8">{{tiempoV | toHoursAndMinutes}}</div>
                 </div>
             </div>
             <div class="modal-footer">

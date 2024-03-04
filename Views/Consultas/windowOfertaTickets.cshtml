@@ -17,9 +17,8 @@
         </thead>
         <tfoot>
             <tr>
-                <th colspan="8">
-                    <div class="padding-lr-10">
-                        <div class="clear"></div>
+                <th colspan="9">
+                    <div class="padding-lr-10" >
                         <div class="left">
                             <nav>
                                 <ul class="pagination">
@@ -38,7 +37,7 @@
                             </nav>
                         </div>
 
-                        <div class="left form-inline gestion-lista-oferta" ng-init="cantidadMostrarPorPagina = 10" style="padding: 10px 0px 0px 0px">
+                        <div class="left form-inline gestion-lista-ticket" ng-init="cantidadMostrarPorPagina = 10" style="padding: 22px 0px 0px 0px">
                             <label>Cantidad Por Página:</label>
                             <select class="form-control" ng-model="cantidadMostrarPorPagina" ng-change="actualizarCantidadMostrar()">
                                 <option value="10">10</option>
@@ -48,12 +47,12 @@
                             </select>
                         </div>
 
-                        <div class="right gestion-lista-oferta" style="padding: 10px 0px 0px 0px">
+                        <div class="right gestion-lista-ticket" style="padding: 22px 0px 0px 0px">
                             <div>
                                 <label>Total de Páginas: </label>{{cantPaginasOfertas}}
                             </div>
                         </div>
-                        <div class="right gestion-lista-oferta" style="padding: 10px 0px 0px 0px">
+                        <div class="right gestion-lista-ticket" style="padding: 22px 0px 0px 0px">
                             <div>
                                 <label>Total de Ofertas: </label>{{totalOfertas}}
                             </div>

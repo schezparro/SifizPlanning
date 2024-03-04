@@ -17,7 +17,6 @@
                 <th>Cédula</th>
                 <th>Fecha Ingreso Solicitud</th>
                 <th>Empresa</th>
-                <th>Fecha Ingreso Institucion</th>
                 <th>Años Servicio</th>
                 <th>Dias Corresponden</th>
                 <th>Dias Disfrutar</th>
@@ -27,6 +26,7 @@
                 <th>Fecha Inicio Vacaciones</th>
                 <th>Fecha Fin Vacaciones</th>
                 <th>Fecha Presentarse Trabajar</th>
+                <th>Jefe</th>
                 <th>Observaciones</th>
             </tr>
         </thead>
@@ -39,7 +39,6 @@
                 <td>{{solicitud.Cedula}}</td>
                 <td>{{solicitud.FechaIngresoSolicitud | strDateToStr}}</td>
                 <td>{{solicitud.Empresa}}</td>
-                <td>{{solicitud.FechaIngresoInstitucion | strDateToStr}}</td>
                 <td>{{solicitud.AniosServicio}}</td>
                 <td>{{solicitud.DiasCorresponden}}</td>
                 <td>{{solicitud.DiasDisfrutar}}</td>
@@ -49,6 +48,7 @@
                 <td>{{solicitud.FechaInicioVacaciones | strDateToStr}}</td>
                 <td>{{solicitud.FechaFinVacaciones | strDateToStr}}</td>
                 <td>{{solicitud.FechaPresentarseTrabajar | strDateToStr}}</td>
+                <td>{{solicitud.Jefe}}</td>
                 <td>{{solicitud.Observaciones}}</td>
             </tr>
         </tbody>
@@ -149,9 +149,11 @@
                         <tr>
                             <td colspan="5">
                                 <div style="column-count: 2">
-                                    FECHA INGRESO A LA INSTITUCIÓN:
-                                    <input type="date" class="form-control" ng-model="solVacaciones.fechaIngresoInstitucion" ng-required="true">
-                                    AÑOS DE SERVICIO:
+                                    FECHA QUE DEBERÁ PRESENTARSE A TRABAJAR (dd/mm/aaaa):
+                                    <input type="date" class="form-control" ng-model="solVacaciones.fechaPresentarseTrabajar" ng-required="true">
+                                    <!--FECHA INGRESO A LA INSTITUCIÓN:
+                                    <input type="date" class="form-control" ng-model="solVacaciones.fechaIngresoInstitucion" ng-required="true">-->
+                                    <br />AÑOS DE SERVICIO:                                     
                                     <input type="number" class="form-control" ng-model="solVacaciones.aniosServicio" ng-required="true">
                                 </div>
                             </td>
@@ -193,9 +195,6 @@
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="5">FECHA QUE DEBERÁ PRESENTARSE A TRABAJAR (dd/mm/aaaa): <input type="date" class="form-control" ng-model="solVacaciones.fechaPresentarseTrabajar" ng-required="true"></td>
-                        </tr>
-                        <tr>
                             <td colspan="5">OBSERVACIONES: <textarea class="form-control" ng-model="solVacaciones.observaciones" ng-required="true"></textarea></td>
                         </tr>
                         <tr>
@@ -205,6 +204,12 @@
                         </tr>
                         <tr>
                             <td colspan="5">POR EL PRESENTE EXPRESO MI CONFORMIDAD DE SOLICITAR Y GOZAR MIS VACACIONES DE ACUERDO A LO QUE ESTABLECE EL ARTICULO 69 DEL CODIGO DE TRABAJO.</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">
+                                APELLIDOS Y NOMBRES JEFE (A) INMEDIATO:
+                                <input type="text" class="form-control" ng-model="solVacaciones.jefe" ng-required="true">
+                            </td>
                         </tr>
                     </table>
                 </div>

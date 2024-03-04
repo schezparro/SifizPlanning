@@ -32,5 +32,6 @@ namespace SifizPlanning.Models
         public System.DateTime FechaPresentarseTrabajar { get; set; }
         public string Observaciones { get; set; }
         public Nullable<decimal> Estado { get; set; }
+        public string Jefe { get; set; }
     }
 }

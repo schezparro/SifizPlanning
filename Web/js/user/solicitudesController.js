@@ -298,6 +298,7 @@
             $scope.solVacaciones.fechaFinVacaciones = convertDate(solVac.FechaFinVacaciones);
             $scope.solVacaciones.fechaPresentarseTrabajar = convertDate(solVac.FechaPresentarseTrabajar);
             $scope.solVacaciones.observaciones = solVac.Observaciones;
+            $scope.solVacaciones.jefe = solVac.Jefe;
             $scope.windowSolicitarVacaciones();
         }
     };

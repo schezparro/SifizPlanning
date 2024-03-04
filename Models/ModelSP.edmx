@@ -843,6 +843,7 @@
           <Property Name="FECHAPRESENTARSETRABAJAR" Type="datetime" Nullable="false" />
           <Property Name="OBSERVACIONES" Type="nvarchar(max)" Nullable="false" />
           <Property Name="ESTADO" Type="decimal" Precision="1" Scale="0" />
+          <Property Name="JEFE" Type="nvarchar(max)" />
         </EntityType>
         <EntityType Name="SUBCATEGORIACOMPETENCIA">
           <Key>
@@ -1670,7 +1671,7 @@
           <Property Name="SECUENCIALMODULO" Type="int" Nullable="false" />
           <Property Name="ADJUNTO" Type="varchar" MaxLength="255" Nullable="false" />
           <Property Name="ADJUNTOASISTENCIA" Type="varchar" MaxLength="255" />
-          <Property Name="TIEMPOCAPACITACION" Type="time" Precision="7" />
+          <Property Name="TIEMPOCAPACITACION" Type="int" />
         </EntityType>
         <EntityType Name="RENEGOCIACION">
           <Key>
@@ -11905,6 +11906,7 @@
           <Property Name="FechaPresentarseTrabajar" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="Observaciones" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Estado" Type="Decimal" Precision="1" Scale="0" />
+          <Property Name="Jefe" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="SolicitudPermisos">
           <Key>
@@ -12133,7 +12135,7 @@
           <Property Name="Adjunto" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="modulo" Relationship="SifizPlanningModel.FK_RECURSOS_MODULO" FromRole="RECURSOS" ToRole="Modulo" />
           <Property Name="AdjuntoAsistencia" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
-          <Property Name="TiempoCapacitacion" Type="Time" Precision="7" />
+          <Property Name="TiempoCapacitacion" Type="Int32" />
         </EntityType>
         <Association Name="FK_RECURSOS_MODULO">
           <End Type="SifizPlanningModel.Modulo" Role="Modulo" Multiplicity="1" />
@@ -14194,6 +14196,7 @@
           <EntitySetMapping Name="SolicitudVacaciones">
             <EntityTypeMapping TypeName="SifizPlanningModel.SolicitudVacaciones">
               <MappingFragment StoreEntitySet="SOLICITUDVACACIONES">
+                <ScalarProperty Name="Jefe" ColumnName="JEFE" />
                 <ScalarProperty Name="Estado" ColumnName="ESTADO" />
                 <ScalarProperty Name="Observaciones" ColumnName="OBSERVACIONES" />
                 <ScalarProperty Name="FechaPresentarseTrabajar" ColumnName="FECHAPRESENTARSETRABAJAR" />
