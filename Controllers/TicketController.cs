@@ -1208,7 +1208,8 @@ namespace SifizPlanning.Controllers
                                            semaforoResolucion = "",
                                            modulo = db.Modulo.Where(m => m.Secuencial == t.SecuencialModulo).FirstOrDefault().Descripcion ?? "No asignado",
                                            errorInfraestructura = t.ErrorInfraestructura,
-                                           revisado = t.Revisado
+                                           revisado = t.Revisado,
+                                           ofertaMasiva = t.OfertaMasiva
                                        }).FirstOrDefault();
 
                 //Calculando la reputación
@@ -1336,6 +1337,7 @@ namespace SifizPlanning.Controllers
                     verificador = datosTicketTemp.verificador,
                     semaforo = datosTicketTemp.semaforos != null ? datosTicketTemp.semaforos.Where(w => w.horas <= datosTicketTemp.horasCreado).OrderByDescending(d => d.horas).FirstOrDefault()?.value ?? "VERDE" : "VERDE",
                     semaforoResolucion = datosTicketTemp.semaforosResolucion != null ? datosTicketTemp.semaforosResolucion.Where(w => w.horas <= datosTicketTemp.horasResolucion).OrderByDescending(d => d.horas).FirstOrDefault()?.value ?? "VERDE" : "VERDE",
+                    ofertaMasiva = datosTicketTemp.ofertaMasiva
                 };
 
                 var resp = new
@@ -1928,7 +1930,7 @@ namespace SifizPlanning.Controllers
             int reprocesos, bool ingresoInterno, string fechaRevisado, int colaborador = 0, string observaciones = "",
             bool error = false, bool requiereTesting = false, bool pendienteAPago = false,
             HttpPostedFileBase[] adjuntos = null, bool esEstimacion = false, int diasGarantia = 30,
-            bool errorInfraestructura = false, bool revisado = false)
+            bool errorInfraestructura = false, bool revisado = false, bool ofertaMasiva = false)
         {
             try
             {
@@ -1959,6 +1961,18 @@ namespace SifizPlanning.Controllers
                 ticket.DiasGarantia = diasGarantia;
                 ticket.PendienteAPago = pendienteAPago;
                 ticket.RequiereTesting = requiereTesting;
+                if (ofertaMasiva == true && ticket.OfertaMasiva != true)
+                {
+                    ticket.OfertaMasiva = true;
+                    //Enviando el email de oferta masiva asistentecomercial@intecsoft.com
+                    string email = "melizzabatistamartinez@gmail.com";
+
+                    string[] emails = new string[] { email };
+
+                    string textoHtml = "<div class=\"textoCuerpo\">Estimado, el equipo de operaciones ha marcado el ticket con número " + ticket.Secuencial + " como estimación Masiva, por favor su gentil gestión.";
+
+                    Utiles.EnviarEmailSistema(emails, textoHtml, "Oferta masiva");
+                }
                 if (fechaRevisado != "")
                 {
                     string[] fechas = fechaRevisado.Split(new Char[] { '/' });

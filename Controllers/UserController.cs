@@ -32,6 +32,7 @@ using Microsoft.Ajax.Utilities;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Net.Http;
+using System.Configuration;
 
 namespace SifizPlanning.Controllers
 {
@@ -1072,7 +1073,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult EnviarEmailFinTicket(int idTarea, string texto, bool publicar = false, HttpPostedFileBase[] adjuntos = null)
+        public async Task<ActionResult> EnviarEmailFinTicket(int idTarea, string texto, bool publicar = false, HttpPostedFileBase[] adjuntos = null, string titulo = "", string rama = "", string descripcion = "", bool requiereQA = false, string tagsJson = "", HttpPostedFileBase[] adjuntoPublicacion = null)
         {
             try
             {
@@ -1200,6 +1201,51 @@ namespace SifizPlanning.Controllers
                         db.HistoricoAdjunto.Add(historicoAdjunto);
                     }
                     db.SaveChanges();
+
+                    string tituloP = titulo;
+                    string ramaP = rama;
+                    string requiereQAP = requiereQA ? "SI" : "NO";
+                    string clienteP = personaCliente.cliente.Codigo;
+                    string colaboradorP = user.persona.Nombre1 + " " + user.persona.Apellido1;
+                    string descripcionP = descripcion;
+                    string[] tagsP = JsonConvert.DeserializeObject<string[]>(tagsJson);
+                    string key = ConfigurationManager.AppSettings.Get("Devops");
+
+                    string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
+                    string linkAceptar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO"));
+                    string linkRechazar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":NOACEPTADO"));
+                    string linksConcatenados = linkAceptar + ", " + linkRechazar;
+
+                    var client = new HttpClient();
+                    var requestUrl = "https://api-publicaciones.sifizsoft.com/api/asignacion/asignar-feature";
+
+                    var data = new MultipartFormDataContent();
+
+                    data.Add(new StringContent(clienteP), "Cliente");
+                    data.Add(new StringContent(tituloP), "Titulo");
+                    data.Add(new StringContent(descripcionP), "Descripcion");
+                    data.Add(new StringContent(colaboradorP), "NombreSolicitante");
+                    data.Add(new StringContent(string.Join(",", tagsP)), "Tags");
+                    data.Add(new StringContent(destinos), "NotificarA");
+                    data.Add(new StringContent(ramaP), "NombreRama");
+                    data.Add(new StringContent(requiereQAP), "RequiereQA");
+                    data.Add(new StringContent(linksConcatenados), "URLSifizPlanning");
+                    data.Add(new StringContent(key), "Key");
+
+                    if (adjuntos != null)
+                    {
+                        foreach (var adjunto in adjuntoPublicacion)
+                        {
+                            var stream = adjunto.InputStream;
+                            data.Add(new StreamContent(stream), "ArchivoAdjunto", adjunto.FileName);
+                        }
+                    }
+
+                    var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+                    requestMessage.Content = data;
+
+                    var response = await client.SendAsync(requestMessage);
+
                 }
                 else
                 {
@@ -1247,7 +1293,7 @@ namespace SifizPlanning.Controllers
                     List<string> correosDestinos = new List<string>();
                     correosDestinos.Add(emailUser);
                     correosDestinos.AddRange(Utiles.CorreoPorGrupoEmail("COORD"));
-
+                    
                     string asuntoEmail = personaCliente.cliente.Codigo + " HESO " + string.Format("{0:000000}", ticket.Secuencial) + " - Ticket Resuelto (" + ticket.Asunto + ")";
                     Utiles.EnviarEmailSistema(new string[] { emailCliente }, textoEmailCliente, asuntoEmail, listaPathFicheros.ToArray(), string.Format("{0:000000}", ticket.Secuencial));
                     Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmail, asuntoEmail, listaPathFicheros.ToArray(), string.Format("{0:000000}", ticket.Secuencial));
@@ -4861,333 +4907,284 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "ADMINTFS, ADMIN")]
-        public async Task<ActionResult> TicketPublicado(string titulo, int id, string publicacionClienteServidor, string publicacionPruebasProd, string dirFTP, string usuarioFTP, string claveFTP, string pathFTP, bool publicarEnUno, int[] idPublicacionLote, string descripcion, string tagsJson, HttpPostedFileBase[] adjuntos = null)
+        public ActionResult TicketPublicado(int id, string publicacionClienteServidor, string publicacionPruebasProd, string dirFTP, string usuarioFTP, string claveFTP, string pathFTP, bool publicarEnUno, int[] idPublicacionLote)
         {
             try
             {
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
-                //if (publicarEnUno)
-                //{
-                //    int secuencialCliente = 0;
-                //    foreach (int idTicket in idPublicacionLote)
-                //    {
-                //        Ticket ticket = db.Ticket.Find(idTicket);
-                //        if (ticket == null)
-                //        {
-                //            throw new Exception("No se encontró el ticket");
-                //        }
-
-                //        int pSecuencialCliente = ticket.persona_cliente.SecuencialCliente;
-                //        if (secuencialCliente != 0 && secuencialCliente != pSecuencialCliente)
-                //        {
-                //            throw new Exception("Los tickets deben pertenecer al mismo cliente.");
-                //        }
-                //        secuencialCliente = pSecuencialCliente;
-                //    }
-
-                //    foreach (int idTicket in idPublicacionLote)
-                //    {
-                //        Ticket ticket = db.Ticket.Find(idTicket);
-
-                //        bool financial25 = false;
-                //        if (ticket.SecuencialTicketVersionCliente != null)
-                //        {
-                //            financial25 = db.TicketVersionCliente.Find(ticket.SecuencialTicketVersionCliente).Codigo == "FBS 2.5";
-                //        }
-
-                //        //Cambiando el estado del ticket
-                //        ticket.SecuencialEstadoTicket = 10;//EL TICKET ESTA RESUELTO
-                //        ticket.SecuencialProximaActividad = 17;//CERTIFICAR
-
-                //        //Adicionando el histórico del ticket                                                        
-                //        int numeroVersion = db.TicketHistorico.Where(x => x.SecuencialTicket == ticket.Secuencial).Count();
-
-                //        TicketHistorico ticketHistorico = new TicketHistorico
-                //        {
-                //            ticket = ticket,
-                //            Version = numeroVersion,
-                //            SecuencialEstadoTicket = ticket.SecuencialEstadoTicket,//  ("EL TICKET ESTA RESUELTO")
-                //            SecuencialPersona_Cliente = ticket.SecuencialPersona_Cliente,
-                //            SecuencialPrioridadTicket = ticket.SecuencialPrioridadTicket,
-                //            SecuencialCategoriaTicket = ticket.SecuencialCategoriaTicket,
-                //            SecuencialTipoRecurso = ticket.SecuencialTipoRecurso,
-                //            SecuencialProximaActividad = ticket.SecuencialProximaActividad,
-                //            usuario = user,
-                //            ReportadoPor = ticket.ReportadoPor,
-                //            Reputacion = ticket.Reputacion,
-                //            Telefono = ticket.Telefono,
-                //            Asunto = ticket.Asunto,
-                //            Detalle = ticket.Detalle,
-                //            FechaCreado = ticket.FechaCreado,
-                //            Estimacion = ticket.Estimacion,
-                //            NumeroVerificador = 1,
-                //            FechaOperacion = DateTime.Now,
-                //            SeFactura = ticket.SeFactura,
-                //            Facturado = ticket.Facturado,
-                //            IngresoInterno = ticket.IngresoInterno,
-                //            Reprocesos = ticket.Reprocesos
-                //        };
-
-                //        db.TicketHistorico.Add(ticketHistorico);
-
-                //        db.SaveChanges();//Salvando los cambios
-
-                //        //Enviando los emails
-                //        string texto = "Estimado(a):<br/>";
-                //        texto += "El motivo de este correo es para hacerle llegar la publicación de " + publicacionClienteServidor + " de " + publicacionPruebasProd + " solicitada.<br/>";
-                //        texto += "La publicación se encuentra almacenada en el ftp, a continuación se especifica el <b>link</b>, <b>usuario</b>, <b>clave</b> y <b>path</b>.<br/><br/>";
-                //        texto += "<span class=\"tab-campo\"><b>FTP: </b></span>" + dirFTP + "<br/>";
-                //        texto += "<span class=\"tab-campo\"><b>Usuario: </b></span>" + usuarioFTP + "<br/>";
-                //        texto += "<span class=\"tab-campo\"><b>Clave: </b></span>" + claveFTP + "<br/>";
-                //        texto += "<span class=\"tab-campo\"><b>Path: </b></span>" + pathFTP + "<br/></br>";
-
-                //        texto += "cualquier duda en el acceso al ftp, por favor comunicarse con: " + emailUser + ".</br>";
-
-                //        string textoEmail = @"<div class='textoCuerpo'><br/>";
-                //        textoEmail += texto;
-
-                //        textoEmail += @"<br/>";
-
-                //        //Los link que se le envían al usuario para aceptar o rechazar la resolución
-                //        string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
-
-                //        string linkAceptar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO"));
-                //        string linkRechazar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":NOACEPTADO"));
-                //        string textoEmailCliente = textoEmail + @"<br/><div style='font-size: 11pt; font-family: sans-serif; color: #1F497D;'>
-                //                                   <span style='color:#128812'>
-                //                                    Si usted <b>ACEPTA</b> este requerimiento por favor presione el siguiente link:
-                //                                   </span><br/>                                                            
-                //                                   <a href='" + linkAceptar + @"'>
-                //                                                <i>" + linkAceptar + @"</i>
-                //                                   </a>			
-                //                                   <br/><br/>
-                //                                   <span style='color:#EE1212'>Si por el contrario <b>NO ACEPTA</b> este requerimiento por favor presione el siguiente link:</span><br/>
-                //                                   <a href='" + linkRechazar + @"'>
-                //                                    <i>" + linkRechazar + @"</i>
-                //                                   </a>
-                //                                            <br/>
-                //                                            <br/>
-                //                                            <i>El presente correo concluye la resolución de este requerimiento, formalmente solicitamos la certificación del mismo o sus observaciones. Si dentro de los próximos 5 días laborables no recibimos su respuesta, procederemos a cerrar el ticket. En caso de requerir correcciones será necesario que ingrese otro ticket.</i>
-                //                                  </div>";
-
-                //        Persona_Cliente personaCliente = db.Persona_Cliente.Find(ticket.SecuencialPersona_Cliente);
-                //        Persona persona = personaCliente.persona;
-                //        string emailCliente = persona.usuario.FirstOrDefault().Email;
-
-                //        textoEmail += "<br/><i>El presente correo concluye la resolución de este requerimiento, formalmente solicitamos la certificación del mismo o sus observaciones. Si dentro de los próximos 5 días laborables no recibimos su respuesta, procederemos a cerrar el ticket. En caso de requerir correcciones será necesario que ingrese otro ticket.</i><br/><i>Se ha enviado una copia de este email al cliente. Email:" + emailCliente + "</i>";
-                //        textoEmail += "</div>";
-                //        textoEmailCliente += "</div>";
-
-                //        List<string> correosDestinos = new List<string>();
-                //        correosDestinos.Add(emailUser);
-                //        if (financial25)
-                //        {
-                //            correosDestinos.Add("publicacionesdoscinco@sifizsoft.com");
-                //        }
-                //        correosDestinos.AddRange(Utiles.CorreoPorGrupoEmail("COORD"));
-
-                //        string asuntoEmail = personaCliente.cliente.Codigo + " HESO " + string.Format("{0:000000}", ticket.Secuencial) + " - Ticket Publicado (" + ticket.Asunto + ")";
-                //        Utiles.EnviarEmailSistema(new string[] { emailCliente }, textoEmailCliente, asuntoEmail, null, string.Format("{0:000000}", ticket.Secuencial));
-                //        Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmail, asuntoEmail, null, string.Format("{0:000000}", ticket.Secuencial));
-
-                //        //adicionando el email a los historicos
-                //        string destinos = String.Join(", ", correosDestinos.ToArray());
-                //        string textoHistoricoCorreo = "<b>Correo de información, Ticket Publicado</b><br/>";
-                //        textoHistoricoCorreo += "<b>Destinos:</b> " + destinos + "<br/>";
-                //        textoHistoricoCorreo += "<b>Asunto:</b> " + asuntoEmail + "<br/>";
-                //        textoHistoricoCorreo += "<b>Texto del correo:</b> <br/>" + textoEmail;
-                //        HistoricoInformacionTicket historicoCorreoTicket = new HistoricoInformacionTicket
-                //        {
-                //            SecuencialTicketHistorico = ticketHistorico.SecuencialTicket,
-                //            VersionTicketHistorico = ticketHistorico.Version,
-                //            Fecha = DateTime.Now,
-                //            Texto = textoHistoricoCorreo
-                //        };
-                //        db.HistoricoInformacionTicket.Add(historicoCorreoTicket);
-                //        db.SaveChanges();
-                //    }
-                //}
-                //else
-                //{
-                //    Ticket ticket = db.Ticket.Find(id);
-                //    if (ticket == null)
-                //    {
-                //        throw new Exception("No se encontró el ticket");
-                //    }
-
-                //    bool financial25 = false;
-                //    if (ticket.SecuencialTicketVersionCliente != null)
-                //    {
-                //        financial25 = db.TicketVersionCliente.Find(ticket.SecuencialTicketVersionCliente).Codigo == "FBS 2.5";
-                //    }
-
-                //    //Cambiando el estado del ticket
-                //    ticket.SecuencialEstadoTicket = 10;//EL TICKET ESTA RESUELTO
-                //    ticket.SecuencialProximaActividad = 17;//CERTIFICAR
-
-                //    //Adicionando el histórico del ticket                                                        
-                //    int numeroVersion = db.TicketHistorico.Where(x => x.SecuencialTicket == ticket.Secuencial).Count();
-
-                //    TicketHistorico ticketHistorico = new TicketHistorico
-                //    {
-                //        ticket = ticket,
-                //        Version = numeroVersion,
-                //        SecuencialEstadoTicket = ticket.SecuencialEstadoTicket,//  ("EL TICKET ESTA RESUELTO")
-                //        SecuencialPersona_Cliente = ticket.SecuencialPersona_Cliente,
-                //        SecuencialPrioridadTicket = ticket.SecuencialPrioridadTicket,
-                //        SecuencialCategoriaTicket = ticket.SecuencialCategoriaTicket,
-                //        SecuencialTipoRecurso = ticket.SecuencialTipoRecurso,
-                //        SecuencialProximaActividad = ticket.SecuencialProximaActividad,
-                //        usuario = user,
-                //        ReportadoPor = ticket.ReportadoPor,
-                //        Reputacion = ticket.Reputacion,
-                //        Telefono = ticket.Telefono,
-                //        Asunto = ticket.Asunto,
-                //        Detalle = ticket.Detalle,
-                //        FechaCreado = ticket.FechaCreado,
-                //        Estimacion = ticket.Estimacion,
-                //        NumeroVerificador = 1,
-                //        FechaOperacion = DateTime.Now,
-                //        SeFactura = ticket.SeFactura,
-                //        Facturado = ticket.Facturado,
-                //        IngresoInterno = ticket.IngresoInterno,
-                //        Reprocesos = ticket.Reprocesos
-                //    };
-                //    db.TicketHistorico.Add(ticketHistorico);
-
-                //    db.SaveChanges();//Salvando los cambios
-
-                //    //Enviando los emails
-                //    string texto = "Estimado:<br/>";
-                //    if (user.persona.Sexo == "F")
-                //        texto = "Estimada:<br/>";
-                //    texto += "El motivo de este correo es para hacerle llegar la publicación de " + publicacionClienteServidor + " de " + publicacionPruebasProd + " solicitada.<br/>";
-                //    texto += "La publicación se encuentra almacenada en el ftp, a continuación se especifica el <b>link</b>, <b>usuario</b>, <b>clave</b> y <b>path</b>.<br/><br/>";
-                //    texto += "<span class=\"tab-campo\"><b>FTP: </b></span>" + dirFTP + "<br/>";
-                //    texto += "<span class=\"tab-campo\"><b>Usuario: </b></span>" + usuarioFTP + "<br/>";
-                //    texto += "<span class=\"tab-campo\"><b>Clave: </b></span>" + claveFTP + "<br/>";
-                //    texto += "<span class=\"tab-campo\"><b>Path: </b></span>" + pathFTP + "<br/></br>";
-
-                //    texto += "cualquier duda en el acceso al ftp, por favor comunicarse con: " + emailUser + ".</br>";
-
-                //    string textoEmail = @"<div class='textoCuerpo'><br/>";
-                //    textoEmail += texto;
-
-                //    textoEmail += @"<br/>";
-
-                //    //Los link que se le envían al usuario para aceptar o rechazar la resolución
-                //    string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
-
-                //    string linkAceptar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO"));
-                //    string linkRechazar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":NOACEPTADO"));
-                //    string textoEmailCliente = textoEmail + @"<br/><div style='font-size: 11pt; font-family: sans-serif; color: #1F497D;'>
-                //                                   <span style='color:#128812'>
-                //                                    Si usted <b>ACEPTA</b> este requerimiento por favor presione el siguiente link:
-                //                                   </span><br/>                                                            
-                //                                   <a href='" + linkAceptar + @"'>
-                //                                                <i>" + linkAceptar + @"</i>
-                //                                   </a>			
-                //                                   <br/><br/>
-                //                                   <span style='color:#EE1212'>Si por el contrario <b>NO ACEPTA</b> este requerimiento por favor presione el siguiente link:</span><br/>
-                //                                   <a href='" + linkRechazar + @"'>
-                //                                    <i>" + linkRechazar + @"</i>
-                //                                   </a>
-                //                                            <br/>
-                //                                            <br/>
-                //                                            <i>El presente correo concluye la resolución de este requerimiento, formalmente solicitamos la certificación del mismo o sus observaciones. Si dentro de los próximos 5 días laborables no recibimos su respuesta, procederemos a cerrar el ticket. En caso de requerir correcciones será necesario que ingrese otro ticket.</i>
-                //                                  </div>";
-
-                //    Persona_Cliente personaCliente = db.Persona_Cliente.Find(ticket.SecuencialPersona_Cliente);
-                //    Persona persona = personaCliente.persona;
-                //    string emailCliente = persona.usuario.FirstOrDefault().Email;
-
-                //    textoEmail += "<br/><i>El presente correo concluye la resolución de este requerimiento, formalmente solicitamos la certificación del mismo o sus observaciones. Si dentro de los próximos 5 días laborables no recibimos su respuesta, procederemos a cerrar el ticket. En caso de requerir correcciones será necesario que ingrese otro ticket.</i><br/><i>Se ha enviado una copia de este email al cliente. Email:" + emailCliente + "</i>";
-                //    textoEmail += "</div>";
-                //    textoEmailCliente += "</div>";
-
-                //    List<string> correosDestinos = new List<string>();
-                //    correosDestinos.Add(emailUser);
-                //    if (financial25)
-                //    {
-                //        correosDestinos.Add("publicacionesdoscinco@sifizsoft.com");
-                //    }
-                //    correosDestinos.AddRange(Utiles.CorreoPorGrupoEmail("COORD"));
-
-                //    string asuntoEmail = personaCliente.cliente.Codigo + " HESO " + string.Format("{0:000000}", ticket.Secuencial) + " - Ticket Publicado (" + ticket.Asunto + ")";
-                //    Utiles.EnviarEmailSistema(new string[] { emailCliente }, textoEmailCliente, asuntoEmail, null, string.Format("{0:000000}", ticket.Secuencial));
-                //    Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmail, asuntoEmail, null, string.Format("{0:000000}", ticket.Secuencial));
-
-                //    //adicionando el email a los historicos
-                //    string destinos = String.Join(", ", correosDestinos.ToArray());
-                //    string textoHistoricoCorreo = "<b>Correo de información, Ticket Publicado</b><br/>";
-                //    textoHistoricoCorreo += "<b>Destinos:</b> " + destinos + "<br/>";
-                //    textoHistoricoCorreo += "<b>Asunto:</b> " + asuntoEmail + "<br/>";
-                //    textoHistoricoCorreo += "<b>Texto del correo:</b> <br/>" + textoEmail;
-                //    HistoricoInformacionTicket historicoCorreoTicket = new HistoricoInformacionTicket
-                //    {
-                //        SecuencialTicketHistorico = ticketHistorico.SecuencialTicket,
-                //        VersionTicketHistorico = ticketHistorico.Version,
-                //        Fecha = DateTime.Now,
-                //        Texto = textoHistoricoCorreo
-                //    };
-                //    db.HistoricoInformacionTicket.Add(historicoCorreoTicket);
-                //    db.SaveChanges();
-                //}
-
-                Ticket ticketPublicacion = db.Ticket.Find(id);
-                if (ticketPublicacion == null)
+                if (publicarEnUno)
                 {
-                    throw new Exception("No se encontró el ticket");
-                }
-                Persona_Cliente perCliente = db.Persona_Cliente.Find(ticketPublicacion.SecuencialPersona_Cliente);
-
-                string tituloP = titulo;
-                string clienteP = perCliente.cliente.Codigo;
-                string colaboradorP = user.persona.Nombre1 + " " + user.persona.Apellido1;
-                string descripcionP = descripcion;
-                string[] tagsP = JsonConvert.DeserializeObject<string[]>(tagsJson);
-
-                var client = new HttpClient();
-                var requestUrl = "https://api-publicaciones.sifizsoft.com/api/asignacion/asignar-feature";
-
-                var data = new MultipartFormDataContent();
-
-                data.Add(new StringContent(clienteP), "Cliente");
-                data.Add(new StringContent(tituloP), "Titulo");
-                data.Add(new StringContent(descripcionP), "Descripcion");
-                data.Add(new StringContent(colaboradorP), "NombreTecnico");
-                data.Add(new StringContent(string.Join(",", tagsP)), "Tags");
-                data.Add(new StringContent("schezparro@gmail.com"), "NotificarA");
-
-                if (adjuntos != null)
-                {
-                    foreach (var adjunto in adjuntos)
+                    int secuencialCliente = 0;
+                    foreach (int idTicket in idPublicacionLote)
                     {
-                        var stream = adjunto.InputStream;
-                        data.Add(new StreamContent(stream), "ArchivoAdjunto", adjunto.FileName);
+                        Ticket ticket = db.Ticket.Find(idTicket);
+                        if (ticket == null)
+                        {
+                            throw new Exception("No se encontró el ticket");
+                        }
+
+                        int pSecuencialCliente = ticket.persona_cliente.SecuencialCliente;
+                        if (secuencialCliente != 0 && secuencialCliente != pSecuencialCliente)
+                        {
+                            throw new Exception("Los tickets deben pertenecer al mismo cliente.");
+                        }
+                        secuencialCliente = pSecuencialCliente;
+                    }
+
+                    foreach (int idTicket in idPublicacionLote)
+                    {
+                        Ticket ticket = db.Ticket.Find(idTicket);
+
+                        bool financial25 = false;
+                        if (ticket.SecuencialTicketVersionCliente != null)
+                        {
+                            financial25 = db.TicketVersionCliente.Find(ticket.SecuencialTicketVersionCliente).Codigo == "FBS 2.5";
+                        }
+
+                        //Cambiando el estado del ticket
+                        ticket.SecuencialEstadoTicket = 10;//EL TICKET ESTA RESUELTO
+                        ticket.SecuencialProximaActividad = 17;//CERTIFICAR
+
+                        //Adicionando el histórico del ticket                                                        
+                        int numeroVersion = db.TicketHistorico.Where(x => x.SecuencialTicket == ticket.Secuencial).Count();
+
+                        TicketHistorico ticketHistorico = new TicketHistorico
+                        {
+                            ticket = ticket,
+                            Version = numeroVersion,
+                            SecuencialEstadoTicket = ticket.SecuencialEstadoTicket,//  ("EL TICKET ESTA RESUELTO")
+                            SecuencialPersona_Cliente = ticket.SecuencialPersona_Cliente,
+                            SecuencialPrioridadTicket = ticket.SecuencialPrioridadTicket,
+                            SecuencialCategoriaTicket = ticket.SecuencialCategoriaTicket,
+                            SecuencialTipoRecurso = ticket.SecuencialTipoRecurso,
+                            SecuencialProximaActividad = ticket.SecuencialProximaActividad,
+                            usuario = user,
+                            ReportadoPor = ticket.ReportadoPor,
+                            Reputacion = ticket.Reputacion,
+                            Telefono = ticket.Telefono,
+                            Asunto = ticket.Asunto,
+                            Detalle = ticket.Detalle,
+                            FechaCreado = ticket.FechaCreado,
+                            Estimacion = ticket.Estimacion,
+                            NumeroVerificador = 1,
+                            FechaOperacion = DateTime.Now,
+                            SeFactura = ticket.SeFactura,
+                            Facturado = ticket.Facturado,
+                            IngresoInterno = ticket.IngresoInterno,
+                            Reprocesos = ticket.Reprocesos
+                        };
+
+                        db.TicketHistorico.Add(ticketHistorico);
+
+                        db.SaveChanges();//Salvando los cambios
+
+                        //Enviando los emails
+                        string texto = "Estimado(a):<br/>";
+                        texto += "El motivo de este correo es para hacerle llegar la publicación de " + publicacionClienteServidor + " de " + publicacionPruebasProd + " solicitada.<br/>";
+                        texto += "La publicación se encuentra almacenada en el ftp, a continuación se especifica el <b>link</b>, <b>usuario</b>, <b>clave</b> y <b>path</b>.<br/><br/>";
+                        texto += "<span class=\"tab-campo\"><b>FTP: </b></span>" + dirFTP + "<br/>";
+                        texto += "<span class=\"tab-campo\"><b>Usuario: </b></span>" + usuarioFTP + "<br/>";
+                        texto += "<span class=\"tab-campo\"><b>Clave: </b></span>" + claveFTP + "<br/>";
+                        texto += "<span class=\"tab-campo\"><b>Path: </b></span>" + pathFTP + "<br/></br>";
+
+                        texto += "cualquier duda en el acceso al ftp, por favor comunicarse con: " + emailUser + ".</br>";
+
+                        string textoEmail = @"<div class='textoCuerpo'><br/>";
+                        textoEmail += texto;
+
+                        textoEmail += @"<br/>";
+
+                        //Los link que se le envían al usuario para aceptar o rechazar la resolución
+                        string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
+
+                        string linkAceptar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO"));
+                        string linkRechazar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":NOACEPTADO"));
+                        string textoEmailCliente = textoEmail + @"<br/><div style='font-size: 11pt; font-family: sans-serif; color: #1F497D;'>
+			                                                <span style='color:#128812'>
+				                                                Si usted <b>ACEPTA</b> este requerimiento por favor presione el siguiente link:
+			                                                </span><br/>                                                            
+			                                                <a href='" + linkAceptar + @"'>
+                                                                <i>" + linkAceptar + @"</i>
+			                                                </a>			
+			                                                <br/><br/>
+			                                                <span style='color:#EE1212'>Si por el contrario <b>NO ACEPTA</b> este requerimiento por favor presione el siguiente link:</span><br/>
+			                                                <a href='" + linkRechazar + @"'>
+				                                                <i>" + linkRechazar + @"</i>
+			                                                </a>
+                                                            <br/>
+                                                            <br/>
+                                                            <i>El presente correo concluye la resolución de este requerimiento, formalmente solicitamos la certificación del mismo o sus observaciones. Si dentro de los próximos 5 días laborables no recibimos su respuesta, procederemos a cerrar el ticket. En caso de requerir correcciones será necesario que ingrese otro ticket.</i>
+		                                                </div>";
+
+                        Persona_Cliente personaCliente = db.Persona_Cliente.Find(ticket.SecuencialPersona_Cliente);
+                        Persona persona = personaCliente.persona;
+                        string emailCliente = persona.usuario.FirstOrDefault().Email;
+
+                        textoEmail += "<br/><i>El presente correo concluye la resolución de este requerimiento, formalmente solicitamos la certificación del mismo o sus observaciones. Si dentro de los próximos 5 días laborables no recibimos su respuesta, procederemos a cerrar el ticket. En caso de requerir correcciones será necesario que ingrese otro ticket.</i><br/><i>Se ha enviado una copia de este email al cliente. Email:" + emailCliente + "</i>";
+                        textoEmail += "</div>";
+                        textoEmailCliente += "</div>";
+
+                        List<string> correosDestinos = new List<string>();
+                        correosDestinos.Add(emailUser);
+                        if (financial25)
+                        {
+                            correosDestinos.Add("publicacionesdoscinco@sifizsoft.com");
+                        }
+                        correosDestinos.AddRange(Utiles.CorreoPorGrupoEmail("COORD"));
+
+                        string asuntoEmail = personaCliente.cliente.Codigo + " HESO " + string.Format("{0:000000}", ticket.Secuencial) + " - Ticket Publicado (" + ticket.Asunto + ")";
+                        Utiles.EnviarEmailSistema(new string[] { emailCliente }, textoEmailCliente, asuntoEmail, null, string.Format("{0:000000}", ticket.Secuencial));
+                        Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmail, asuntoEmail, null, string.Format("{0:000000}", ticket.Secuencial));
+
+                        //adicionando el email a los historicos
+                        string destinos = String.Join(", ", correosDestinos.ToArray());
+                        string textoHistoricoCorreo = "<b>Correo de información, Ticket Publicado</b><br/>";
+                        textoHistoricoCorreo += "<b>Destinos:</b> " + destinos + "<br/>";
+                        textoHistoricoCorreo += "<b>Asunto:</b> " + asuntoEmail + "<br/>";
+                        textoHistoricoCorreo += "<b>Texto del correo:</b> <br/>" + textoEmail;
+                        HistoricoInformacionTicket historicoCorreoTicket = new HistoricoInformacionTicket
+                        {
+                            SecuencialTicketHistorico = ticketHistorico.SecuencialTicket,
+                            VersionTicketHistorico = ticketHistorico.Version,
+                            Fecha = DateTime.Now,
+                            Texto = textoHistoricoCorreo
+                        };
+                        db.HistoricoInformacionTicket.Add(historicoCorreoTicket);
+                        db.SaveChanges();
                     }
                 }
-
-                var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUrl);
-                requestMessage.Content = data;
-
-                var response = await client.SendAsync(requestMessage);
-
-                bool successApi = true;
-                string error = "";
-                if (!response.IsSuccessStatusCode)
+                else
                 {
-                    successApi = false;
-                    error = response.StatusCode.ToString() + " " + response.ReasonPhrase;
+                    Ticket ticket = db.Ticket.Find(id);
+                    if (ticket == null)
+                    {
+                        throw new Exception("No se encontró el ticket");
+                    }
+
+                    bool financial25 = false;
+                    if (ticket.SecuencialTicketVersionCliente != null)
+                    {
+                        financial25 = db.TicketVersionCliente.Find(ticket.SecuencialTicketVersionCliente).Codigo == "FBS 2.5";
+                    }
+
+                    //Cambiando el estado del ticket
+                    ticket.SecuencialEstadoTicket = 10;//EL TICKET ESTA RESUELTO
+                    ticket.SecuencialProximaActividad = 17;//CERTIFICAR
+
+                    //Adicionando el histórico del ticket                                                        
+                    int numeroVersion = db.TicketHistorico.Where(x => x.SecuencialTicket == ticket.Secuencial).Count();
+
+                    TicketHistorico ticketHistorico = new TicketHistorico
+                    {
+                        ticket = ticket,
+                        Version = numeroVersion,
+                        SecuencialEstadoTicket = ticket.SecuencialEstadoTicket,//  ("EL TICKET ESTA RESUELTO")
+                        SecuencialPersona_Cliente = ticket.SecuencialPersona_Cliente,
+                        SecuencialPrioridadTicket = ticket.SecuencialPrioridadTicket,
+                        SecuencialCategoriaTicket = ticket.SecuencialCategoriaTicket,
+                        SecuencialTipoRecurso = ticket.SecuencialTipoRecurso,
+                        SecuencialProximaActividad = ticket.SecuencialProximaActividad,
+                        usuario = user,
+                        ReportadoPor = ticket.ReportadoPor,
+                        Reputacion = ticket.Reputacion,
+                        Telefono = ticket.Telefono,
+                        Asunto = ticket.Asunto,
+                        Detalle = ticket.Detalle,
+                        FechaCreado = ticket.FechaCreado,
+                        Estimacion = ticket.Estimacion,
+                        NumeroVerificador = 1,
+                        FechaOperacion = DateTime.Now,
+                        SeFactura = ticket.SeFactura,
+                        Facturado = ticket.Facturado,
+                        IngresoInterno = ticket.IngresoInterno,
+                        Reprocesos = ticket.Reprocesos
+                    };
+                    db.TicketHistorico.Add(ticketHistorico);
+
+                    db.SaveChanges();//Salvando los cambios
+
+                    //Enviando los emails
+                    string texto = "Estimado:<br/>";
+                    if (user.persona.Sexo == "F")
+                        texto = "Estimada:<br/>";
+                    texto += "El motivo de este correo es para hacerle llegar la publicación de " + publicacionClienteServidor + " de " + publicacionPruebasProd + " solicitada.<br/>";
+                    texto += "La publicación se encuentra almacenada en el ftp, a continuación se especifica el <b>link</b>, <b>usuario</b>, <b>clave</b> y <b>path</b>.<br/><br/>";
+                    texto += "<span class=\"tab-campo\"><b>FTP: </b></span>" + dirFTP + "<br/>";
+                    texto += "<span class=\"tab-campo\"><b>Usuario: </b></span>" + usuarioFTP + "<br/>";
+                    texto += "<span class=\"tab-campo\"><b>Clave: </b></span>" + claveFTP + "<br/>";
+                    texto += "<span class=\"tab-campo\"><b>Path: </b></span>" + pathFTP + "<br/></br>";
+
+                    texto += "cualquier duda en el acceso al ftp, por favor comunicarse con: " + emailUser + ".</br>";
+
+                    string textoEmail = @"<div class='textoCuerpo'><br/>";
+                    textoEmail += texto;
+
+                    textoEmail += @"<br/>";
+
+                    //Los link que se le envían al usuario para aceptar o rechazar la resolución
+                    string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
+
+                    string linkAceptar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO"));
+                    string linkRechazar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":NOACEPTADO"));
+                    string textoEmailCliente = textoEmail + @"<br/><div style='font-size: 11pt; font-family: sans-serif; color: #1F497D;'>
+			                                                <span style='color:#128812'>
+				                                                Si usted <b>ACEPTA</b> este requerimiento por favor presione el siguiente link:
+			                                                </span><br/>                                                            
+			                                                <a href='" + linkAceptar + @"'>
+                                                                <i>" + linkAceptar + @"</i>
+			                                                </a>			
+			                                                <br/><br/>
+			                                                <span style='color:#EE1212'>Si por el contrario <b>NO ACEPTA</b> este requerimiento por favor presione el siguiente link:</span><br/>
+			                                                <a href='" + linkRechazar + @"'>
+				                                                <i>" + linkRechazar + @"</i>
+			                                                </a>
+                                                            <br/>
+                                                            <br/>
+                                                            <i>El presente correo concluye la resolución de este requerimiento, formalmente solicitamos la certificación del mismo o sus observaciones. Si dentro de los próximos 5 días laborables no recibimos su respuesta, procederemos a cerrar el ticket. En caso de requerir correcciones será necesario que ingrese otro ticket.</i>
+		                                                </div>";
+
+                    Persona_Cliente personaCliente = db.Persona_Cliente.Find(ticket.SecuencialPersona_Cliente);
+                    Persona persona = personaCliente.persona;
+                    string emailCliente = persona.usuario.FirstOrDefault().Email;
+
+                    textoEmail += "<br/><i>El presente correo concluye la resolución de este requerimiento, formalmente solicitamos la certificación del mismo o sus observaciones. Si dentro de los próximos 5 días laborables no recibimos su respuesta, procederemos a cerrar el ticket. En caso de requerir correcciones será necesario que ingrese otro ticket.</i><br/><i>Se ha enviado una copia de este email al cliente. Email:" + emailCliente + "</i>";
+                    textoEmail += "</div>";
+                    textoEmailCliente += "</div>";
+
+                    List<string> correosDestinos = new List<string>();
+                    correosDestinos.Add(emailUser);
+                    if (financial25)
+                    {
+                        correosDestinos.Add("publicacionesdoscinco@sifizsoft.com");
+                    }
+                    correosDestinos.AddRange(Utiles.CorreoPorGrupoEmail("COORD"));
+
+                    string asuntoEmail = personaCliente.cliente.Codigo + " HESO " + string.Format("{0:000000}", ticket.Secuencial) + " - Ticket Publicado (" + ticket.Asunto + ")";
+                    Utiles.EnviarEmailSistema(new string[] { emailCliente }, textoEmailCliente, asuntoEmail, null, string.Format("{0:000000}", ticket.Secuencial));
+                    Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmail, asuntoEmail, null, string.Format("{0:000000}", ticket.Secuencial));
+
+                    //adicionando el email a los historicos
+                    string destinos = String.Join(", ", correosDestinos.ToArray());
+                    string textoHistoricoCorreo = "<b>Correo de información, Ticket Publicado</b><br/>";
+                    textoHistoricoCorreo += "<b>Destinos:</b> " + destinos + "<br/>";
+                    textoHistoricoCorreo += "<b>Asunto:</b> " + asuntoEmail + "<br/>";
+                    textoHistoricoCorreo += "<b>Texto del correo:</b> <br/>" + textoEmail;
+                    HistoricoInformacionTicket historicoCorreoTicket = new HistoricoInformacionTicket
+                    {
+                        SecuencialTicketHistorico = ticketHistorico.SecuencialTicket,
+                        VersionTicketHistorico = ticketHistorico.Version,
+                        Fecha = DateTime.Now,
+                        Texto = textoHistoricoCorreo
+                    };
+                    db.HistoricoInformacionTicket.Add(historicoCorreoTicket);
+                    db.SaveChanges();
                 }
 
                 var resp = new
                 {
-                    success = true,
-                    successApi = successApi,
-                    error = error
+                    success = true
                 };
                 return Json(resp);
             }

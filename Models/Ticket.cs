@@ -63,6 +63,7 @@ namespace SifizPlanning.Models
         public Nullable<int> SecuencialModulo { get; set; }
         public Nullable<bool> ErrorInfraestructura { get; set; }
         public Nullable<bool> Revisado { get; set; }
+        public Nullable<bool> OfertaMasiva { get; set; }
     
         public virtual ICollection<AdjuntoTicket> adjuntoTicket { get; set; }
         public virtual CategoriaTicket categoriaTicket { get; set; }

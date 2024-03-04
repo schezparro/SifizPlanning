@@ -250,15 +250,6 @@ devApp.controller('desarrolladoresController', ['$scope', '$http', 'filtroServic
 devApp.controller('publicacionesController', ['$scope', '$http', function ($scope, $http) {
     $scope.idTicket = 0;
     $scope.publicarEnUno = false;
-
-    // Obtén la plantilla y añade un ID único
-    var fileInputTemplate = angular.element("#htmlFile").html();
-    var uniqueId = "adjunto-publicacion"; // Genera un ID único de alguna manera
-    var fileInputWithId = fileInputTemplate.replace('<input type="file"', '<input type="file" id="' + uniqueId + '"');
-
-    // Añade la plantilla modificada al DOM
-    angular.element("#panel-adjunto-publicacion").append(fileInputWithId);
-
     //Una publicación se ha realizado...
     $scope.seleccionarParaPublicar = function (id) {
         $scope.idTicket = id;
@@ -276,51 +267,19 @@ devApp.controller('publicacionesController', ['$scope', '$http', function ($scop
             return false;
         }
 
-        var descripcion = '';
-        var tags = [];
-
-        if ($scope.publicarCliente) {
-            descripcion += 'Se va a publicar el cliente. ';
-            tags.push('CLIENTE');
-            if ($scope.actualizarDistribuidos) {
-                descripcion += 'Se va a actualizar los distribuidos. ';
-            }
-        }
-
-        if ($scope.publicarServidor) {
-            descripcion += 'Se va a publicar el servidor. ';
-            tags.push('SERVIDOR');
-            descripcion += 'Los servicios a publicar son: ' + $scope.serviciosAActualizar + '. ';
-        }
-
-        if ($scope.actualizarDB) {
-            descripcion += 'Se va a actualizar la base de datos. ';
-            tags.push('BASE DE DATOS');
-        }
-        var fileInput = angular.element('#adjunto-publicacion')[0];
-
-        var formData = new FormData();
-        formData.append('titulo', $scope.titulo);
-        formData.append('id', $scope.idTicket);
-        formData.append('publicacionClienteServidor', $scope.tipoPublicacion);
-        formData.append('publicacionPruebasProd', $scope.objetivoPublicacion);
-        formData.append('dirFTP', $scope.ftpPublicacion);
-        formData.append('usuarioFTP', $scope.usuarioFtp);
-        formData.append('claveFTP', $scope.claveFtp);
-        formData.append('pathFTP', $scope.pathPublicacion);
-        formData.append('publicarEnUno', $scope.publicarEnUno);
-        formData.append('idPublicacionLote', $scope.idPublicacionLote);
-        formData.append('descripcion', descripcion);
-        formData.append('tagsJson', JSON.stringify(tags));
-        formData.append('adjuntos', fileInput.files[0]);
-
-        var jsonTicketPublicacion = $http({
-            method: 'POST',
-            url: "user/ticket-publicado",
-            data: formData,
-            headers: { 'Content-Type': undefined },
-            transformRequest: angular.identity
-        }); 
+        $scope.$parent.loading.show();
+        var jsonTicketPublicacion = $http.post("user/ticket-publicado",
+            {
+                id: $scope.idTicket,
+                publicacionClienteServidor: $scope.tipoPublicacion,
+                publicacionPruebasProd: $scope.objetivoPublicacion,
+                dirFTP: $scope.ftpPublicacion,
+                usuarioFTP: $scope.usuarioFtp,
+                claveFTP: $scope.claveFtp,
+                pathFTP: $scope.pathPublicacion,
+                publicarEnUno: $scope.publicarEnUno,
+                idPublicacionLote: $scope.idPublicacionLote
+            });
         jsonTicketPublicacion.success(function (data) {
             $scope.$parent.loading.hide();
             if (data.success === true) {
