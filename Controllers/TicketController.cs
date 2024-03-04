@@ -1965,7 +1965,7 @@ namespace SifizPlanning.Controllers
                 {
                     ticket.OfertaMasiva = true;
                     //Enviando el email de oferta masiva asistentecomercial@intecsoft.com
-                    string email = "asistentecomercial@intecsoft.com.ecu";
+                    string email = "asistentecomercial@intecsoft.com.ec";
 
                     string[] emails = new string[] { email };
 
