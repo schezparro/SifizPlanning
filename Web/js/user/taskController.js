@@ -26,6 +26,15 @@
     $scope.horas = []; for (var i = 0; i < 24; i++) { $scope.horas.push(i); }
     $scope.minutos = []; for (var i = 0; i < 60; i++) { $scope.minutos.push(i); }
 
+    // Obtén la plantilla y añade un ID único
+    var fileInputTemplate = angular.element("#htmlFile").html();
+    var uniqueId = "adjunto-publicacion"; // Genera un ID único de alguna manera
+    var fileInputWithId = fileInputTemplate.replace('<input type="file"', '<input type="file" id="' + uniqueId + '"');
+
+    // Añade la plantilla modificada al DOM
+    angular.element("#panel-adjunto-publicacion").append(fileInputWithId);
+
+
     angular.element(document).on('click', '[data-toggle="popover"]', function () {
         var obj = this;
 
@@ -1058,17 +1067,47 @@
     };
 
     $scope.enviarInformacionFinTicket = function () {
+        $scope.finalizarTarea()
         $scope.ejecutarFinalizarTarea(function (idTarea) {
             waitingDialog.show('Enviando email...', { dialogSize: 'sm', progressType: 'success' });
+
+            var descripcion = '';
+            var tags = [];
+
+            if ($scope.publicarCliente) {
+                descripcion += 'Se va a publicar el cliente. ';
+                tags.push('CLIENTE');
+                if ($scope.actualizarDistribuidos) {
+                    descripcion += 'Se va a actualizar los distribuidos. ';
+                }
+            }
+
+            if ($scope.publicarServidor) {
+                descripcion += 'Se va a publicar el servidor. ';
+                tags.push('SERVIDOR');
+                descripcion += 'Los servicios a publicar son: ' + $scope.serviciosAActualizar + '. ';
+            }
+
+            if ($scope.actualizarDB) {
+                descripcion += 'Se va a actualizar la base de datos. ';
+                tags.push('BASE DE DATOS');
+            }
+            var filePub = angular.element('#adjunto-publicacion')[0];
 
             var formData = new FormData();
             formData.append('idTarea', idTarea);
             formData.append('texto', $scope.textoEmail);
             formData.append('publicar', $scope.requierePublicacion);
-
             angular.element.each(angular.element('#form-enviar-email-fin-ticket').find('[type="file"]'), function (pos, fileInput) {
                 formData.append('adjuntos', fileInput.files[0]);
             });            
+
+            formData.append('titulo', $scope.titulo);
+            formData.append('rama', $scope.rama);
+            formData.append('descripcion', descripcion);
+            formData.append('requiereQA', $scope.requiereQA);
+            formData.append('tagsJson', JSON.stringify(tags));
+            formData.append('adjuntoPublicacion', filePub.files[0]);
             
             var informacionFinTicket = $http.post("user/enviar-email-fin-ticket",
                                                   formData,
