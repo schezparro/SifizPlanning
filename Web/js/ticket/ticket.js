@@ -992,7 +992,8 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
 
                                     $scope.asignaciones = data.asignaciones;
                                     $scope.motivoTrabajo = data.motivoTrabajo;
-                                    $scope, esEstimacion = false;
+                                    $scope.esEstimacion = false;
+                                    $scope.ofertaMasiva = data.ofertaMasiva;
 
                                     if (data.tecnicoSugerido !== null) {
                                         $scope.tecnicoSugerido = data.tecnicoSugerido.idTec;
@@ -1236,6 +1237,7 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
         formData.append('diasGarantia', $scope.diasGarantia);
         formData.append('errorInfraestructura', $scope.errorInfraestructura);
         formData.append('revisado', $scope.revisado);
+        formData.append('ofertaMasiva', $scope.ofertaMasiva);
 
         var guardarTicket = $http.post("tickets/guardar-datos-ticket",
             formData,
@@ -2166,6 +2168,11 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
     //Funciones del adjunto
     $scope.cargarAdjunto = function () {
         angular.element("#modal-adjuntos").modal('show');
+    };
+
+    $scope.modalEliminarAdjunto = function (id) {
+        $scope.SecuencialAdjuntoEliminar = id;
+        angular.element("#modal-eliminar-adjuntos").modal('show');
     };
 
     //Funciones del comentario

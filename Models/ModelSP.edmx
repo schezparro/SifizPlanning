@@ -1628,7 +1628,7 @@
           <Property Name="DETALLE" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="HORASESTIMACION" Type="int" Nullable="false" />
           <Property Name="FECHAPRODUCCION" Type="date" />
-          <Property Name="ADJUNTO" Type="varchar" MaxLength="50" />
+          <Property Name="ADJUNTO" Type="varchar" MaxLength="255" />
         </EntityType>
         <EntityType Name="PERSONA_CLIENTE">
           <Key>
@@ -1747,6 +1747,7 @@
           <Property Name="SECUENCIALMODULO" Type="int" />
           <Property Name="ERRORINFRAESTRUCTURA" Type="bit" />
           <Property Name="REVISADO" Type="bit" />
+          <Property Name="OFERTAMASIVA" Type="bit" />
         </EntityType>
         <EntityType Name="TICKET_CATEGORIAREVISADA">
           <Key>
@@ -7885,6 +7886,7 @@
           <Property Name="ErrorInfraestructura" Type="Boolean" />
           <Property Name="Revisado" Type="Boolean" />
           <NavigationProperty Name="CALIFICACIONTICKETCLIENTE" Relationship="SifizPlanningModel.FK_CALIFICACIONTICKETCLIENTE_TICKET" FromRole="Ticket" ToRole="CALIFICACIONTICKETCLIENTE" />
+          <Property Name="OfertaMasiva" Type="Boolean" />
         </EntityType>
         <EntityType Name="Ticket_ContratoCliente">
           <Key>
@@ -11855,7 +11857,7 @@
           <NavigationProperty Name="cliente" Relationship="SifizPlanningModel.FK_OFERTAS_CLIENTE" FromRole="OFERTAS" ToRole="Cliente" />
           <NavigationProperty Name="colaborador" Relationship="SifizPlanningModel.FK_OFERTAS_COLABORADOR" FromRole="OFERTAS" ToRole="Colaborador" />
           <Property Name="FechaProduccion" Type="DateTime" Precision="0" />
-          <Property Name="Adjunto" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Adjunto" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
         </EntityType>
         <Association Name="FK_OFERTAS_CLIENTE">
           <End Type="SifizPlanningModel.Cliente" Role="Cliente" Multiplicity="1" />
@@ -12714,6 +12716,7 @@
           <EntitySetMapping Name="Ticket">
             <EntityTypeMapping TypeName="SifizPlanningModel.Ticket">
               <MappingFragment StoreEntitySet="TICKET">
+                <ScalarProperty Name="OfertaMasiva" ColumnName="OFERTAMASIVA" />
                 <ScalarProperty Name="Revisado" ColumnName="REVISADO" />
                 <ScalarProperty Name="ErrorInfraestructura" ColumnName="ERRORINFRAESTRUCTURA" />
                 <ScalarProperty Name="SecuencialModulo" ColumnName="SECUENCIALMODULO" />
