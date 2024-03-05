@@ -993,7 +993,7 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
                                     $scope.asignaciones = data.asignaciones;
                                     $scope.motivoTrabajo = data.motivoTrabajo;
                                     $scope.esEstimacion = false;
-                                    $scope.ofertaMasiva = data.ofertaMasiva;
+                                    $scope.ofertaMasiva = data.datosTicket.ofertaMasiva;
 
                                     if (data.tecnicoSugerido !== null) {
                                         $scope.tecnicoSugerido = data.tecnicoSugerido.idTec;

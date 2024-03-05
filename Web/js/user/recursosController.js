@@ -95,7 +95,7 @@
         $scope.newTitulo = '';
         $scope.newDetalle = '';
         $scope.moduloSeleccionado = '';
-
+        
         angular.element("#modal-agregar-recursos").modal("show");
     };
 

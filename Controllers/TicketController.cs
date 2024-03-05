@@ -1209,7 +1209,7 @@ namespace SifizPlanning.Controllers
                                            modulo = db.Modulo.Where(m => m.Secuencial == t.SecuencialModulo).FirstOrDefault().Descripcion ?? "No asignado",
                                            errorInfraestructura = t.ErrorInfraestructura,
                                            revisado = t.Revisado,
-                                           ofertaMasiva = t.OfertaMasiva
+                                           ofertaMasiva = t.OfertaMasiva ?? false
                                        }).FirstOrDefault();
 
                 //Calculando la reputación
