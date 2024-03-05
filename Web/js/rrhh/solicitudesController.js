@@ -4,6 +4,7 @@
         solicitudes.success(function (data) {
             waitingDialog.hide();
             if (data.success === true) {
+                console.log(data);
                 $scope.vacaciones = data.solicitudes;
             }
             else {

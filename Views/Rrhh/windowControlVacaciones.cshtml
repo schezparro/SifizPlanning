@@ -23,7 +23,6 @@
                 <th>Cédula</th>
                 <th>Fecha Ingreso Solicitud</th>
                 <th>Empresa</th>
-                <th>Fecha Ingreso Institucion</th>
                 <th>Años Servicio</th>
                 <th>Dias Corresponden</th>
                 <th>Dias Disfrutar</th>
@@ -33,6 +32,7 @@
                 <th>Fecha Inicio Vacaciones</th>
                 <th>Fecha Fin Vacaciones</th>
                 <th>Fecha Presentarse Trabajar</th>
+                <th>Jefe</th>
                 <th>Observaciones</th>
             </tr>
         </thead>
@@ -71,7 +71,6 @@
                 <td>{{solicitudVac.Cedula}}</td>
                 <td>{{solicitudVac.FechaIngresoSolicitud | strDateToStr}}</td>
                 <td>{{solicitudVac.Empresa}}</td>
-                <td>{{solicitudVac.FechaIngresoInstitucion | strDateToStr}}</td>
                 <td>{{solicitudVac.AniosServicio}}</td>
                 <td>{{solicitudVac.DiasCorresponden}}</td>
                 <td>{{solicitudVac.DiasDisfrutar}}</td>
@@ -81,6 +80,7 @@
                 <td>{{solicitudVac.FechaInicioVacaciones | strDateToStr}}</td>
                 <td>{{solicitudVac.FechaFinVacaciones | strDateToStr}}</td>
                 <td>{{solicitudVac.FechaPresentarseTrabajar | strDateToStr}}</td>
+                <td>{{solicitudVac.Jefe}}</td>
                 <td>{{solicitudVac.Observaciones}}</td>
             </tr>
         </tbody>
@@ -219,8 +219,8 @@
                         </tr>
                         <tr>
                             <td colspan="6">
-                                <strong>Fecha de Ingreso a la Institución:</strong>
-                                <span>{{solicitudVacacionesUsuario.FechaIngresoInstitucion | strDateToStr}}</span>
+                                <strong>FECHA QUE DEBERÁ PRESENTARSE A TRABAJAR (dd/mm/aaaa):</strong>
+                                <span>{{solicitudVacacionesUsuario.FechaPresentarseTrabajar | strDateToStr}}</span>
                             </td>
                             <td colspan="6">
                                 <strong>Años de Servicio:</strong>
@@ -280,13 +280,6 @@
                         </tr>
 
                         <tr>
-                            <td colspan="12">
-                                <strong>FECHA QUE DEBERÁ PRESENTARSE A TRABAJAR (dd/mm/aaaa):</strong>
-                                <span>{{solicitudVacacionesUsuario.FechaPresentarseTrabajar | strDateToStr}}</span>
-                            </td>
-                        </tr>
-
-                        <tr>
                             <td colspan="4">
                                 <strong>OBSERVACIONES:</strong>
                                 <span>{{solicitudVacacionesUsuario.Observaciones}}</span>
@@ -299,6 +292,13 @@
                         <tr>
                             <td colspan="12">
                                 <strong>Nota: El recibir esta solicitud no implica que está aprobada, su jefe inmediato le comunicará por escrito si su solicitud ha sido aprobada o no.</strong>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="12">
+                                <strong>APELLIDOS Y NOMBRES JEFE (A) INMEDIATO:</strong>
+                                <span>{{solicitudPerUsuario.Jefe}}</span>
                             </td>
                         </tr>
 
@@ -611,7 +611,8 @@
     .table > tbody > tr > td {
         padding: 5px;
     }
+
     table tr {
         height: 20px;
     }
-    </style>
+</style>
