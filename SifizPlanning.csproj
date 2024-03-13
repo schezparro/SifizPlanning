@@ -601,6 +601,12 @@
     <Compile Include="Models\EstimacionTicket.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\EtapasProyecto.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\EtapasProyectoCliente.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\FaseContrato.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
@@ -766,6 +772,9 @@
     <Compile Include="Models\Recursos.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\RecursosSubEtapasProyecto.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Renegociacion.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
@@ -809,6 +818,9 @@
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\SubCategoriaCompetencia.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SubEtapasProyectosCliente.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\SubModulo.cs">
@@ -1121,6 +1133,12 @@
     <Content Include="SCRIPTSDATABASE\12\34-ITEMESPECIALESTIMACION.sql" />
     <Content Include="SCRIPTSDATABASE\12\32-OFERTAS.sql" />
     <Content Include="SCRIPTSDATABASE\12\35-TIMES TO FLOAT FROM INT.sql" />
+    <Content Include="SCRIPTSDATABASE\3\ETAPASPROYECTO.sql" />
+    <Content Include="SCRIPTSDATABASE\3\ETAPASPROYECTOCLIENTE  okkkk.sql" />
+    <Content Include="SCRIPTSDATABASE\3\ETAPASPROYECTOCLIENTE.sql" />
+    <Content Include="SCRIPTSDATABASE\3\ETAPASPROYECTOCLIENTE2.sql" />
+    <Content Include="SCRIPTSDATABASE\3\RECURSOSSUBETAPASPROYECTO.sql" />
+    <Content Include="SCRIPTSDATABASE\3\SUBETAPASPROYECTOSCLIENTE  OKKKKKKK.sql" />
     <Content Include="SCRIPTSDATABASE\TEMPSCRIPTS\OFERTAMASIVATICKET.sql" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -1610,8 +1628,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Properties\PublishProfiles\" />
-    <Folder Include="SCRIPTSDATABASE\TEMPSCRIPTS\" />
-    <Folder Include="SCRIPTSDATABASE\02\" />
     <Folder Include="Web\files\asignaciones\" />
     <Folder Include="Web\images\chat\" />
     <Folder Include="Web\images\logFBSError\" />

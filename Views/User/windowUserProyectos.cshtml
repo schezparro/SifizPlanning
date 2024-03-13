@@ -1,4 +1,5 @@
 ﻿<div>
+    <button class="btn btn-primary" ng-click="windowAgregarProyecto()">Nuevo Proyecto</button>
     <input type="text" ng-keyup="cargarProyectos()" ng-model="filtroProyectos" class="form-control right filtro" placeholder="Filtrar..." />
     <div class="clear"></div>
 </div>
@@ -21,7 +22,7 @@
         </thead>
 
         <tbody>
-            <tr ng-repeat="proyecto in proyectos" ng-dblclick="mostrarWindowProyectos(proyecto)">
+            <tr ng-repeat="proyecto in proyectos" ng-dblclick="mostrarWindowProyectos(proyecto.id)">
                 <td>{{proyecto.descripcion | strLimit: 75}}</td>
                 <td>{{proyecto.nombre}}</td>
                 <td>{{proyecto.versionDesarrollo}}</td>
@@ -32,6 +33,12 @@
                 <td>{{proyecto.responsableCodigo}}</td>
                 <td>{{proyecto.responsablePublicacion}}</td>
                 <td>{{proyecto.versionBaseDatos}}</td>
+                <td>
+                    <button type="button" class="btn btn-xs btn-success" ng-click="abrirModalGenerarInforme(proyecto.id)"><span class="glyphicon glyphicon-ok"></span> Registrar cronograma</button>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-xs btn-success" ng-click="abrirModalGenerarReporte(proyecto.id)"><span class="glyphicon glyphicon-ok"></span> Generar informe</button>
+                </td>
             </tr>
         </tbody>
 
@@ -62,6 +69,112 @@
     </table>
 </div>
 
+<div id="modal-agregar-proyecto" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form ng-submit="GuardarNuevoProyecto()">
+                <div class="modal-header" style="padding: 10px, 10px">
+                    <label>NUEVO PROYECTO</label>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <div style="column-count: 2">
+                        CLIENTE:
+                        <select id="select-cliente-proyecto" ng-model="clientePro" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{cliente.id}}" ng-repeat="cliente in clientes">{{cliente.nombre}}</option>
+                        </select>
+
+                        UBICACION:
+                        <select id="select-ubicacion-proyecto" ng-model="ubicacionPro" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{responsable.id}}" ng-repeat="responsable in responsableProyectos">{{responsable.nombre}}</option>
+                        </select>
+                    </div>
+
+                    <div style="column-count: 2">
+                        RESPONSABLE CODIGO:
+                        <select id="select-responsableCodigo-proyecto" ng-model="responsableCodigoPro" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{responsable.id}}" ng-repeat="responsable in responsableProyectos">{{responsable.nombre}}</option>
+                        </select>
+
+                        RESPONSABLE PUBLICACION:
+                        <select id="select-responsablePublicacion-proyecto" ng-model="responsablePublicacionPro" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{responsable.id}}" ng-repeat="responsable in responsableProyectos">{{responsable.nombre}}</option>
+                        </select>
+                    </div>
+
+                    <div style="column-count: 2">
+                        RESPONSABLE ACCESO:
+                        <select id="select-responsableAcceso-proyecto" ng-model="responsableAccesoPro" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{responsable.id}}" ng-repeat="responsable in responsableProyectos">{{responsable.nombre}}</option>
+                        </select>
+
+                        LIDER PROYECTO:
+                        <select id="select-liderProyecto-proyecto" ng-model="liderPro" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{lider.id}}" ng-repeat="lider in lideres">{{lider.nombre}}</option>
+                        </select>
+                    </div>
+
+                    <div style="column-count: 2">
+                        VERSION DESARROLLO:
+                        <select id="select-versionDesarrollo-proyecto" ng-model="versioDesarrolloDPro" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{vD.id}}" ng-repeat="vD in versionDesarrollo">{{vD.nombre}}</option>
+                        </select>
+
+                        VERSION BASE DATOS:
+                        <select id="select-versionBD-proyecto" ng-model="versionBDPro" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{vBS.id}}" ng-repeat="vBS in versionBD">{{vBS.nombre}}</option>
+                        </select>
+                    </div>
+
+                    <div style="column-count: 2">
+                        REPOSITORIO:
+                        <select id="select-repositorio-proyecto" ng-model="repositoriosPro" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{repo.id}}" ng-repeat="repo in repositorios">{{repo.nombre}}</option>
+                        </select>
+
+                        <div class="div-info-ticket">
+                            FECHA SALIDA:
+                            <div class='input-group date'>
+                                <input id="fecha-salida-proyecto" ng-model="fechaSalidaPro" class="form-control" ng-required="true" autocomplete="off" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between;">
+                        <label style="display: inline-block; margin-right: 10px;">
+                            TIENE SOLUCION PROXIES:
+                            <input type="checkbox" id="check-solucionProxies-proyecto" ng-init="solucionesProxiesPro=true" ng-model="solucionesProxiesPro" ng-true-value="true" ng-false-value="false" required="required">
+                        </label>
+
+                        <label style="display: inline-block; margin-right: 10px;">
+                            TIENE CODIGO FUENTE:
+                            <input type="checkbox" id="check-codigoFuente-proyecto" ng-init="codigoFuentePro=true" ng-model="codigoFuentePro" ng-true-value="true" ng-false-value="false" required="required">
+                        </label>
+
+                        <label style="display: inline-block; margin-right: 10px;">
+                            ESTA ACTIVO:
+                            <input type="checkbox" id="check-estaActivo-proyecto" ng-init="estaActivoPro=true" ng-model="estaActivoPro" ng-true-value="true" ng-false-value="false" required="required">
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" id="enviar-modal-proyectos-btn" class="btn btn-primary">Guardar</button>
+                    <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Modal de otros datos del proyecto -->
 <div class="modal fade" id="modal-proyectos" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -86,6 +199,238 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Etapas -->
+<div class="modal fade" id="modal-etapas-proyecto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" style="overflow:hidden">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Gestión de etapas de proyecto </h4>
+            </div>
+            <div>
+                <button class="btn btn-primary" ng-click="windowAgregarEtapasProyecto(proyectoId)">Nueva Etapa</button>
+                <input type="text" ng-keyup="cargarEtapas()" ng-model="filtroEtapas" class="form-control right filtro" placeholder="Filtrar..." />
+                <div class="clear"></div>
+            </div>
+
+            <div id="div-user-etapas-proyectos">
+                <table id="tabla-user-etapas-proyectos" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Descripción</th>
+                            <th>Fecha Inicio</th>
+                            <th>Fecha Fin</th>
+                            <th>% Cumplimiento</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr ng-repeat="etapa in etapas" ng-dblclick="mostrarWindowEtapasProyectos(etapa)">
+                            <td>{{etapa.descripcion | strLimit: 75}}</td>
+                            <td>{{etapa.fechaInicio}}</td>
+                            <td>{{etapa.fechaFin}}</td>
+                            <td>{{etapa.descripcion }}</td>
+                            <td>
+                                <button type="button" class="btn btn-xs btn-success" ng-click="abrirModalAgregarSubTarea(etapa.id)"><span class="glyphicon glyphicon-ok"></span> Agregar Subetapa</button>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-xs btn-danger" ng-click="EliminarEtapaProyecto(etapa.id)"><span class="glyphicon glyphicon-ok"></span> Eliminar </button>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                    <tfoot>
+                        <tr>
+                            <th colspan="10">
+
+                                <nav>
+                                    <ul class="pagination">
+                                        <li ng-click="atrazarPagina()">
+                                            <a href="#" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                        <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
+                                        <li ng-click="avanzarPagina()">
+                                            <a href="#" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+
+                            </th>
+                        </tr>
+                    </tfoot>
+
+                </table>
+            </div>
+            <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+@*MODAL NUEVA ETAPA*@
+<div id="modal-agregar-etapas-proyecto" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <form ng-submit="GuardarNuevaEtapa()">
+                <div class="modal-header" style="padding: 10px, 10px">
+                    <label>NUEVA ETAPA</label>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <input hidden ng-model="proyectoId" />
+
+                        ETAPA:
+                        <select id="select-etapas-cliente-proyecto" ng-model="etapasPro" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{etapa.id}}" ng-repeat="etapa in etapasCat">{{etapa.nombre}}</option>
+                        </select>
+
+                        <div style="column-count: 2">
+                            <div class="div-info-ticket">
+                                FECHA INICIO:
+                                <div class='input-group date'>
+                                    <input id="fecha-inicio-etapa" ng-model="fechaIniEta" class="form-control" ng-required="true" autocomplete="off" />
+                                </div>
+                            </div>
+
+                            <div class="div-info-ticket">
+                                FECHA FIN:
+                                <div class='input-group date'>
+                                    <input id="fecha-fin-etapa" ng-model="fechaFinEta" class="form-control" ng-required="true" autocomplete="off" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" id="enviar-modal-etapas-proyectos-btn" class="btn btn-primary">Guardar</button>
+                    <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de SubEtapas -->
+<div class="modal fade" id="modal-sub-etapas-proyecto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" style="overflow:hidden">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Gestión de subetapas</h4>
+            </div>
+            <div>
+                <button class="btn btn-primary" ng-click="windowAgregarSubEtapasProyecto(etapaId)">Nueva Subetapa</button>
+                <input type="text" ng-keyup="cargarSubEtapas()" ng-model="filtroSubEtapas" class="form-control right filtro" placeholder="Filtrar..." />
+                <div class="clear"></div>
+            </div>
+
+            <div id="div-user-etapas-proyectos">
+                <table id="tabla-user-sub-etapas-proyectos" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Descripción</th>
+                            <th>Fecha Inicio</th>
+                            <th>Fecha Fin</th>
+                            <th>Recurso</th>
+                            <th>% Cumplimiento</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr ng-repeat="subetapa in subEtapas" ng-dblclick="mostrarWindowSubEtapasProyectos(etapa)">
+                            <td>{{subetapa.descripcion | strLimit: 75}}</td>
+                            <td>{{subetapa.fechaInicio}}</td>
+                            <td>{{subetapa.fechaFin}}</td>
+                            <td>{{subetapa.descripcion }}</td>
+                            <td>
+                                <button type="button" class="btn btn-xs btn-danger" ng-click="EliminarSubEtapaProyecto(subetapa.id)"><span class="glyphicon glyphicon-ok"></span> Eliminar </button>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                    <tfoot>
+                        <tr>
+                            <th colspan="10">
+
+                                <nav>
+                                    <ul class="pagination">
+                                        <li ng-click="atrazarPagina()">
+                                            <a href="#" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                        <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
+                                        <li ng-click="avanzarPagina()">
+                                            <a href="#" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+
+                            </th>
+                        </tr>
+                    </tfoot>
+
+                </table>
+            </div>
+            <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-agregar-sub-etapas-proyecto" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <form ng-submit="GuardarNuevaSubEtapa()">
+                <div class="modal-header" style="padding: 10px, 10px">
+                    <label>NUEVA SUBETAPA</label>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <input hidden ng-model="etapaId" />
+
+                        DESCRIPCION:
+                        <textarea type="text" class="form-control" ng-model="descripcionSubE" ng-required="true"></textarea>
+
+                        RECURSO:
+                        <select id="select-recursos-sub-etapas" ng-model="recursosSubE" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{recurso.id}}" ng-repeat="recurso in recursosSubEtapas">{{recurso.nombre}}</option>
+                        </select>
+
+                        <div style="column-count: 2">
+                            <div class="div-info-ticket">
+                                FECHA INICIO:
+                                <div class='input-group date'>
+                                    <input id="fecha-inicio-subetapa" ng-model="fechaIniSubE" class="form-control" ng-required="true" autocomplete="off" />
+                                </div>
+                            </div>
+
+                            <div class="div-info-ticket">
+                                FECHA FIN:
+                                <div class='input-group date'>
+                                    <input id="fecha-fin-subetapa" ng-model="fechaFinSubE" class="form-control" ng-required="true" autocomplete="off" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" id="enviar-modal-sub-etapas-btn" class="btn btn-primary">Guardar</button>
+                    <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

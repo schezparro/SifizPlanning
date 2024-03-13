@@ -1418,6 +1418,27 @@
           <Property Name="TIEMPOINICIAL" Type="float" />
           <Property Name="TIEMPOPEGADO" Type="float" />
         </EntityType>
+        <EntityType Name="ETAPASPROYECTO">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CODIGO" Type="varchar" MaxLength="30" Nullable="false" />
+          <Property Name="DESCRIPCION" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ETAPASPROYECTOCLIENTE">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SECUENCIALETAPAPROYECTO" Type="int" Nullable="false" />
+          <Property Name="FECHAINICIO" Type="date" Nullable="false" />
+          <Property Name="FECHAFIN" Type="date" Nullable="false" />
+          <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="SECUENCIALCLIENTEAUXILIAR" Type="int" />
+        </EntityType>
         <EntityType Name="FLUJOESTADOTICKET">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
@@ -1673,6 +1694,16 @@
           <Property Name="ADJUNTOASISTENCIA" Type="varchar" MaxLength="255" />
           <Property Name="TIEMPOCAPACITACION" Type="int" />
         </EntityType>
+        <EntityType Name="RECURSOSSUBETAPASPROYECTO">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CODIGO" Type="varchar" MaxLength="30" Nullable="false" />
+          <Property Name="DESCRIPCION" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="RENEGOCIACION">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
@@ -1713,6 +1744,18 @@
           <Property Name="HORAS" Type="int" Nullable="false" />
           <Property Name="ESTAACTIVO" Type="decimal" Precision="1" Scale="0" />
           <Property Name="NUMEROVERIFICADOR" Type="int" />
+        </EntityType>
+        <EntityType Name="SUBETAPASPROYECTOSCLIENTE">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SECUENCIALRECURSOSSUBETAPASPROYECTO" Type="int" Nullable="false" />
+          <Property Name="SECUENCIALETAPASPROYECTOCLIENTE" Type="int" Nullable="false" />
+          <Property Name="DESCRIPCION" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="FECHACOMIENZO" Type="date" Nullable="false" />
+          <Property Name="FECHAFIN" Type="date" Nullable="false" />
         </EntityType>
         <EntityType Name="TICKET">
           <Key>
@@ -2276,6 +2319,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1">
+          <End Role="CLIENTEAUXILIAR" Type="Self.CLIENTEAUXILIAR" Multiplicity="0..1" />
+          <End Role="ETAPASPROYECTOCLIENTE" Type="Self.ETAPASPROYECTOCLIENTE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CLIENTEAUXILIAR">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="ETAPASPROYECTOCLIENTE">
+              <PropertyRef Name="SECUENCIALCLIENTEAUXILIAR" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_FUNCIONALIDADCLIENTE_CLIENTE">
           <End Role="CLIENTE" Type="Self.CLIENTE" Multiplicity="1" />
           <End Role="FuncionalidadCliente" Type="Self.FuncionalidadCliente" Multiplicity="*" />
@@ -2657,6 +2712,30 @@
             </Principal>
             <Dependent Role="SEMAFOROPRIORIDAD">
               <PropertyRef Name="SECUENCIALSEMAFORO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SUBETAPASPROYECTOSCLIENTE_ETAPASPROYECTOCLIENTE">
+          <End Role="ETAPASPROYECTOCLIENTE" Type="Self.ETAPASPROYECTOCLIENTE" Multiplicity="1" />
+          <End Role="SUBETAPASPROYECTOSCLIENTE" Type="Self.SUBETAPASPROYECTOSCLIENTE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ETAPASPROYECTOCLIENTE">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="SUBETAPASPROYECTOSCLIENTE">
+              <PropertyRef Name="SECUENCIALETAPASPROYECTOCLIENTE" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SUBETAPASPROYECTOSCLIENTE_RECURSOSSUBETAPASPROYECTO">
+          <End Role="RECURSOSSUBETAPASPROYECTO" Type="Self.RECURSOSSUBETAPASPROYECTO" Multiplicity="1" />
+          <End Role="SUBETAPASPROYECTOSCLIENTE" Type="Self.SUBETAPASPROYECTOSCLIENTE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="RECURSOSSUBETAPASPROYECTO">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="SUBETAPASPROYECTOSCLIENTE">
+              <PropertyRef Name="SECUENCIALRECURSOSSUBETAPASPROYECTO" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -4926,6 +5005,8 @@
           <EntitySet Name="ESTADOTICKET" EntityType="Self.ESTADOTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="ESTADOTICKETPROXIMAACTIVIDAD" EntityType="Self.ESTADOTICKETPROXIMAACTIVIDAD" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="ESTIMACIONTICKET" EntityType="Self.ESTIMACIONTICKET" Schema="TICKET" store:Type="Tables" />
+          <EntitySet Name="ETAPASPROYECTO" EntityType="Self.ETAPASPROYECTO" Schema="TICKET" store:Type="Tables" />
+          <EntitySet Name="ETAPASPROYECTOCLIENTE" EntityType="Self.ETAPASPROYECTOCLIENTE" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="FLUJOESTADOTICKET" EntityType="Self.FLUJOESTADOTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="FUNCIONALIDAD" EntityType="Self.FUNCIONALIDAD" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="HISTORICOADJUNTO" EntityType="Self.HISTORICOADJUNTO" Schema="TICKET" store:Type="Tables" />
@@ -4948,10 +5029,12 @@
           <EntitySet Name="PRIORIDADTICKET" EntityType="Self.PRIORIDADTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="PROXIMAACTIVIDAD" EntityType="Self.PROXIMAACTIVIDAD" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="RECURSOS" EntityType="Self.RECURSOS" Schema="TICKET" store:Type="Tables" />
+          <EntitySet Name="RECURSOSSUBETAPASPROYECTO" EntityType="Self.RECURSOSSUBETAPASPROYECTO" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="RENEGOCIACION" EntityType="Self.RENEGOCIACION" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="RESOLUCIONSEMAFOROPRIORIDAD" EntityType="Self.RESOLUCIONSEMAFOROPRIORIDAD" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="SEMAFORO" EntityType="Self.SEMAFORO" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="SEMAFOROPRIORIDAD" EntityType="Self.SEMAFOROPRIORIDAD" Schema="TICKET" store:Type="Tables" />
+          <EntitySet Name="SUBETAPASPROYECTOSCLIENTE" EntityType="Self.SUBETAPASPROYECTOSCLIENTE" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="TICKET" EntityType="Self.TICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="TICKET_CATEGORIAREVISADA" EntityType="Self.TICKET_CATEGORIAREVISADA" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="TICKET_COMPLEMENTO" EntityType="Self.TICKET_COMPLEMENTO" Schema="TICKET" store:Type="Tables" />
@@ -5080,6 +5163,10 @@
             <End Role="TICKET" EntitySet="TICKET" />
             <End Role="ENTREGABLETICKET" EntitySet="ENTREGABLETICKET" />
           </AssociationSet>
+          <AssociationSet Name="FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1" Association="Self.FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1">
+            <End Role="CLIENTEAUXILIAR" EntitySet="CLIENTEAUXILIAR" />
+            <End Role="ETAPASPROYECTOCLIENTE" EntitySet="ETAPASPROYECTOCLIENTE" />
+          </AssociationSet>
           <AssociationSet Name="FK_FUNCIONALIDADCLIENTE_CLIENTE" Association="Self.FK_FUNCIONALIDADCLIENTE_CLIENTE">
             <End Role="CLIENTE" EntitySet="CLIENTE" />
             <End Role="FuncionalidadCliente" EntitySet="FuncionalidadCliente" />
@@ -5207,6 +5294,14 @@
           <AssociationSet Name="FK_SEMAFOROPRIORIDAD_SEMAFORO" Association="Self.FK_SEMAFOROPRIORIDAD_SEMAFORO">
             <End Role="SEMAFORO" EntitySet="SEMAFORO" />
             <End Role="SEMAFOROPRIORIDAD" EntitySet="SEMAFOROPRIORIDAD" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SUBETAPASPROYECTOSCLIENTE_ETAPASPROYECTOCLIENTE" Association="Self.FK_SUBETAPASPROYECTOSCLIENTE_ETAPASPROYECTOCLIENTE">
+            <End Role="ETAPASPROYECTOCLIENTE" EntitySet="ETAPASPROYECTOCLIENTE" />
+            <End Role="SUBETAPASPROYECTOSCLIENTE" EntitySet="SUBETAPASPROYECTOSCLIENTE" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SUBETAPASPROYECTOSCLIENTE_RECURSOSSUBETAPASPROYECTO" Association="Self.FK_SUBETAPASPROYECTOSCLIENTE_RECURSOSSUBETAPASPROYECTO">
+            <End Role="RECURSOSSUBETAPASPROYECTO" EntitySet="RECURSOSSUBETAPASPROYECTO" />
+            <End Role="SUBETAPASPROYECTOSCLIENTE" EntitySet="SUBETAPASPROYECTOSCLIENTE" />
           </AssociationSet>
           <AssociationSet Name="FK_SUBMODULO_MODULO" Association="Self.FK_SUBMODULO_MODULO">
             <End Role="MODULO" EntitySet="MODULO" />
@@ -7044,6 +7139,22 @@
           <AssociationSet Name="FK_TIEMPOCERRADOTICKET_CLIENTE" Association="SifizPlanningModel.FK_TIEMPOCERRADOTICKET_CLIENTE">
             <End Role="Cliente" EntitySet="Cliente" />
             <End Role="TIEMPOCERRADOTICKET" EntitySet="TiempoCerradoTicket" />
+          </AssociationSet>
+          <EntitySet Name="EtapasProyecto" EntityType="SifizPlanningModel.EtapasProyecto" />
+          <EntitySet Name="EtapasProyectoCliente" EntityType="SifizPlanningModel.EtapasProyectoCliente" />
+          <EntitySet Name="RecursosSubEtapasProyecto" EntityType="SifizPlanningModel.RecursosSubEtapasProyecto" />
+          <EntitySet Name="SUBETAPASPROYECTOSCLIENTE" EntityType="SifizPlanningModel.SubEtapasProyectosCliente" />
+          <AssociationSet Name="FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1" Association="SifizPlanningModel.FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1">
+            <End Role="ClienteAuxiliar" EntitySet="ClienteAuxiliar" />
+            <End Role="ETAPASPROYECTOCLIENTE" EntitySet="EtapasProyectoCliente" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SUBETAPASPROYECTOSCLIENTE_ETAPASPROYECTOCLIENTE" Association="SifizPlanningModel.FK_SUBETAPASPROYECTOSCLIENTE_ETAPASPROYECTOCLIENTE">
+            <End Role="ETAPASPROYECTOCLIENTE" EntitySet="EtapasProyectoCliente" />
+            <End Role="SUBETAPASPROYECTOSCLIENTE" EntitySet="SUBETAPASPROYECTOSCLIENTE" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SUBETAPASPROYECTOSCLIENTE_RECURSOSSUBETAPASPROYECTO" Association="SifizPlanningModel.FK_SUBETAPASPROYECTOSCLIENTE_RECURSOSSUBETAPASPROYECTO">
+            <End Role="RECURSOSSUBETAPASPROYECTO" EntitySet="RecursosSubEtapasProyecto" />
+            <End Role="SUBETAPASPROYECTOSCLIENTE" EntitySet="SUBETAPASPROYECTOSCLIENTE" />
           </AssociationSet>
           </EntityContainer>
         <EntityType Name="Rol">
@@ -11611,6 +11722,7 @@
           <NavigationProperty Name="versionBaseDatos" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_VERSIONBASEDATOS" FromRole="CLIENTEAUXILIAR" ToRole="VersionBaseDatos" />
           <NavigationProperty Name="versionDesarrollo" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_VERSIONDESARROLLO" FromRole="CLIENTEAUXILIAR" ToRole="VersionDesarrollo" />
           <NavigationProperty Name="cliente" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_CLIENTE" FromRole="ClienteAuxiliar" ToRole="Cliente" />
+          <NavigationProperty Name="etapasProyectoCliente" Relationship="SifizPlanningModel.FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1" FromRole="ClienteAuxiliar" ToRole="ETAPASPROYECTOCLIENTE" />
         </EntityType>
         <EntityType Name="ResponsableProyectos">
           <Key>
@@ -12280,6 +12392,90 @@
             </Principal>
             <Dependent Role="TIEMPOCERRADOTICKET">
               <PropertyRef Name="SecuencialCliente" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="EtapasProyecto">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Codigo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Descripcion" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <Property Name="NumeroVerificador" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="EtapasProyectoCliente">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SecuencialEtapaProyecto" Type="Int32" Nullable="false" />
+          <Property Name="FechaInicio" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="FechaFin" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <Property Name="SecuencialClienteAuxiliar" Type="Int32" />
+          <NavigationProperty Name="clienteAuxiliar" Relationship="SifizPlanningModel.FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1" FromRole="ETAPASPROYECTOCLIENTE" ToRole="ClienteAuxiliar" />
+          <NavigationProperty Name="subEtapasProyectosCliente" Relationship="SifizPlanningModel.FK_SUBETAPASPROYECTOSCLIENTE_ETAPASPROYECTOCLIENTE" FromRole="ETAPASPROYECTOCLIENTE" ToRole="SUBETAPASPROYECTOSCLIENTE" />
+        </EntityType>
+        <EntityType Name="RecursosSubEtapasProyecto">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Codigo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Descripcion" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <Property Name="NumeroVerificador" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="subEtapasProyectosCliente" Relationship="SifizPlanningModel.FK_SUBETAPASPROYECTOSCLIENTE_RECURSOSSUBETAPASPROYECTO" FromRole="RECURSOSSUBETAPASPROYECTO" ToRole="SUBETAPASPROYECTOSCLIENTE" />
+        </EntityType>
+        <EntityType Name="SubEtapasProyectosCliente">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SecuencialRecuros" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialEtapaProyecto" Type="Int32" Nullable="false" />
+          <Property Name="Descripcion" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <Property Name="FechaComienzo" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="FechaFin" Type="DateTime" Nullable="false" Precision="0" />
+          <NavigationProperty Name="etapasProyectosCliente" Relationship="SifizPlanningModel.FK_SUBETAPASPROYECTOSCLIENTE_ETAPASPROYECTOCLIENTE" FromRole="SUBETAPASPROYECTOSCLIENTE" ToRole="ETAPASPROYECTOCLIENTE" />
+          <NavigationProperty Name="recursosSubEtapasProyecto" Relationship="SifizPlanningModel.FK_SUBETAPASPROYECTOSCLIENTE_RECURSOSSUBETAPASPROYECTO" FromRole="SUBETAPASPROYECTOSCLIENTE" ToRole="RECURSOSSUBETAPASPROYECTO" />
+        </EntityType>
+        <Association Name="FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1">
+          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="ClienteAuxiliar" Multiplicity="0..1" />
+          <End Type="SifizPlanningModel.EtapasProyectoCliente" Role="ETAPASPROYECTOCLIENTE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClienteAuxiliar">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="ETAPASPROYECTOCLIENTE">
+              <PropertyRef Name="SecuencialClienteAuxiliar" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SUBETAPASPROYECTOSCLIENTE_ETAPASPROYECTOCLIENTE">
+          <End Type="SifizPlanningModel.EtapasProyectoCliente" Role="ETAPASPROYECTOCLIENTE" Multiplicity="1" />
+          <End Type="SifizPlanningModel.SubEtapasProyectosCliente" Role="SUBETAPASPROYECTOSCLIENTE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ETAPASPROYECTOCLIENTE">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="SUBETAPASPROYECTOSCLIENTE">
+              <PropertyRef Name="SecuencialEtapaProyecto" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SUBETAPASPROYECTOSCLIENTE_RECURSOSSUBETAPASPROYECTO">
+          <End Type="SifizPlanningModel.RecursosSubEtapasProyecto" Role="RECURSOSSUBETAPASPROYECTO" Multiplicity="1" />
+          <End Type="SifizPlanningModel.SubEtapasProyectosCliente" Role="SUBETAPASPROYECTOSCLIENTE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="RECURSOSSUBETAPASPROYECTO">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="SUBETAPASPROYECTOSCLIENTE">
+              <PropertyRef Name="SecuencialRecuros" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -14406,6 +14602,53 @@
                 <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
                 <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
                 <ScalarProperty Name="Codigo" ColumnName="CODIGO" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="EtapasProyecto">
+            <EntityTypeMapping TypeName="SifizPlanningModel.EtapasProyecto">
+              <MappingFragment StoreEntitySet="ETAPASPROYECTO">
+                <ScalarProperty Name="NumeroVerificador" ColumnName="NUMEROVERIFICADOR" />
+                <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
+                <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
+                <ScalarProperty Name="Codigo" ColumnName="CODIGO" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="EtapasProyectoCliente">
+            <EntityTypeMapping TypeName="SifizPlanningModel.EtapasProyectoCliente">
+              <MappingFragment StoreEntitySet="ETAPASPROYECTOCLIENTE">
+                <ScalarProperty Name="SecuencialClienteAuxiliar" ColumnName="SECUENCIALCLIENTEAUXILIAR" />
+                <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
+                <ScalarProperty Name="FechaFin" ColumnName="FECHAFIN" />
+                <ScalarProperty Name="FechaInicio" ColumnName="FECHAINICIO" />
+                <ScalarProperty Name="SecuencialEtapaProyecto" ColumnName="SECUENCIALETAPAPROYECTO" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RecursosSubEtapasProyecto">
+            <EntityTypeMapping TypeName="SifizPlanningModel.RecursosSubEtapasProyecto">
+              <MappingFragment StoreEntitySet="RECURSOSSUBETAPASPROYECTO">
+                <ScalarProperty Name="NumeroVerificador" ColumnName="NUMEROVERIFICADOR" />
+                <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
+                <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
+                <ScalarProperty Name="Codigo" ColumnName="CODIGO" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SUBETAPASPROYECTOSCLIENTE">
+            <EntityTypeMapping TypeName="SifizPlanningModel.SubEtapasProyectosCliente">
+              <MappingFragment StoreEntitySet="SUBETAPASPROYECTOSCLIENTE">
+                <ScalarProperty Name="FechaFin" ColumnName="FECHAFIN" />
+                <ScalarProperty Name="FechaComienzo" ColumnName="FECHACOMIENZO" />
+                <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
+                <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
+                <ScalarProperty Name="SecuencialEtapaProyecto" ColumnName="SECUENCIALETAPASPROYECTOCLIENTE" />
+                <ScalarProperty Name="SecuencialRecuros" ColumnName="SECUENCIALRECURSOSSUBETAPASPROYECTO" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
               </MappingFragment>
             </EntityTypeMapping>

@@ -3058,6 +3058,121 @@ r in db.Rol on ur.rol equals r
             });
         }
 
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult DarTipoVersionBD()
+        {
+            var datos = (from tm in db.VersionBaseDatos
+                         orderby tm.Descripcion
+                         select new
+                         {
+                             id = tm.Secuencial,
+                             nombre = tm.Descripcion
+                         }).ToList();
+
+            return Json(new
+            {
+                success = true,
+                versionBD = datos
+            });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult DarTipoVersionDesarrollo()
+        {
+            var datos = (from tm in db.VersionDesarrollo
+                         orderby tm.Descripcion
+                         select new
+                         {
+                             id = tm.Secuencial,
+                             nombre = tm.Descripcion
+                         }).ToList();
+
+            return Json(new
+            {
+                success = true,
+                versionDesarrollo = datos
+            });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult DarTipoResponsableProyectos()
+        {
+            var datos = (from tm in db.ResponsableProyectos
+                         orderby tm.Descripcion
+                         select new
+                         {
+                             id = tm.Secuencial,
+                             nombre = tm.Descripcion
+                         }).ToList();
+
+            return Json(new
+            {
+                success = true,
+                responsableProyectos = datos
+            });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult DarTipoRepositorio()
+        {
+            var datos = (from tm in db.Repositorio
+                         orderby tm.Descripcion
+                         select new
+                         {
+                             id = tm.Secuencial,
+                             nombre = tm.Descripcion
+                         }).ToList();
+
+            return Json(new
+            {
+                success = true,
+                repositorios = datos
+            });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult DarTipoEtapas()
+        {
+            var datos = (from tm in db.EtapasProyecto
+                         orderby tm.Descripcion
+                         select new
+                         {
+                             id = tm.Secuencial,
+                             nombre = tm.Descripcion
+                         }).ToList();
+
+            return Json(new
+            {
+                success = true,
+                etapasCat = datos
+            });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult DarTipoRecursosSubEtapas()
+        {
+            var datos = (from tm in db.RecursosSubEtapasProyecto
+                         orderby tm.Descripcion
+                         select new
+                         {
+                             id = tm.Secuencial,
+                             nombre = tm.Descripcion
+                         }).ToList();
+
+            return Json(new
+            {
+                success = true,
+                recursosSubEtapas = datos
+            });
+        }
+
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
         public ActionResult DarClientesIncidencias()
@@ -3100,6 +3215,226 @@ r in db.Rol on ur.rol equals r
             });
         }
 
+        //Guardar modal nuevas incidencias
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult GuardarProyecto(string ubicacion, string liderProyecto, string responsableCodigo, string versionDesarrollo, 
+            string cliente, string responsablePublicacion, string salidaProduccion, string responsableAcceso, string repositorio,
+            string versionBD, bool codigoFuente, bool estaActivo, bool solucionProxies  )
+        {
+            try
+            {
+
+                int ubicacionId = int.Parse(ubicacion);
+                int liderProyectoId = int.Parse(liderProyecto);
+                int responsableCodigoId = int.Parse(responsableCodigo);
+                int versionDesarrolloId = int.Parse(versionDesarrollo);
+                int clienteid = int.Parse(cliente);
+                int responsablePublicacionId = int.Parse(responsablePublicacion);
+                int responsableAccesoId = int.Parse(responsableAcceso);
+                int repositorioId = int.Parse(repositorio);
+                int versionBDId = int.Parse(versionBD);
+                int codigoFuenteId= codigoFuente == true ? 1 : 0;
+                int estaActivoId = estaActivo == true ? 1 : 0;
+                int solucionProxiesId = solucionProxies == true ? 1 : 0;
+
+
+                string[] fechas = salidaProduccion.Split(new Char[] { '/' });
+                int dia = Int32.Parse(fechas[0]);
+                int mes = Int32.Parse(fechas[1]);
+                int anno = Int32.Parse(fechas[2]);
+                DateTime fecha = new DateTime(anno, mes, dia);
+
+
+                ClienteAuxiliar nuevoProyecto = new ClienteAuxiliar
+                {
+                    SecuencialUbicacion = ubicacionId,
+                    TieneCodigoFuente = codigoFuenteId,
+                    SecuencialResponsableCodigo = responsableCodigoId,
+                    SecuencialVersionDesarrollo = versionDesarrolloId,
+                    SecuencialCliente = clienteid,
+                    SecuencialResponsablePublicacion = responsablePublicacionId,
+                    SecuencialResponsableAcceso = responsableAccesoId,
+                    SecuencialRepositorio = repositorioId,
+                    SecuencialVersionBaseDatos = versionBDId,
+                    SecuencialLiderProyecto = liderProyectoId,
+                    EstaActivo = estaActivoId,
+                    FechaProduccion = fecha
+                };
+
+                db.ClienteAuxiliar.Add(nuevoProyecto);
+                db.SaveChanges();
+
+               return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+        //Guardar modal nuevas incidencias
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult GuardarEtapasProyecto(string etapa, string cliAux, string fechaInicioEta, string fechaFinEta)
+        {
+            try
+            {
+                int etapaId = int.Parse(etapa);
+                int cliAuxId = int.Parse(cliAux);
+                
+                string[] fechaIni = fechaInicioEta.Split(new Char[] { '/' });
+                int dia = Int32.Parse(fechaIni[0]);
+                int mes = Int32.Parse(fechaIni[1]);
+                int anno = Int32.Parse(fechaIni[2]);
+                DateTime fechaInicio = new DateTime(anno, mes, dia);
+
+                string[] fechaF = fechaFinEta.Split(new Char[] { '/' });
+                int diaF = Int32.Parse(fechaF[0]);
+                int mesF = Int32.Parse(fechaF[1]);
+                int annoF = Int32.Parse(fechaF[2]);
+                DateTime fechaFin = new DateTime(annoF, mesF, diaF);
+
+                EtapasProyectoCliente nuevaEtapaProyecto = new EtapasProyectoCliente
+                {
+                    SecuencialEtapaProyecto = etapaId,
+                    SecuencialClienteAuxiliar = cliAuxId,
+                    FechaInicio = fechaInicio,
+                    FechaFin = fechaFin,
+                    EstaActivo = 1
+                };
+
+                db.EtapasProyectoCliente.Add(nuevaEtapaProyecto);
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+        //Guardar modal nuevas incidencias
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult GuardarSubEtapasProyecto(string descripcion, string recurso, string etapaId, string fechaIni, string fechaFin)
+        {
+            try
+            {
+                int recursoId = int.Parse(recurso);
+                int etap = int.Parse(etapaId);
+
+                string[] fechaI = fechaIni.Split(new Char[] { '/' });
+                int dia = Int32.Parse(fechaI[0]);
+                int mes = Int32.Parse(fechaI[1]);
+                int anno = Int32.Parse(fechaI[2]);
+                DateTime fechaInic = new DateTime(anno, mes, dia);
+
+                string[] fechaF = fechaFin.Split(new Char[] { '/' });
+                int diaF = Int32.Parse(fechaF[0]);
+                int mesF = Int32.Parse(fechaF[1]);
+                int annoF = Int32.Parse(fechaF[2]);
+                DateTime fechaFinal = new DateTime(annoF, mesF, diaF);
+
+                SubEtapasProyectosCliente nuevaSubEtapaProyecto = new SubEtapasProyectosCliente
+                {
+                    SecuencialEtapaProyecto = etap,
+                    SecuencialRecuros = recursoId,
+                    FechaComienzo = fechaInic,
+                    FechaFin = fechaFinal,
+                    Descripcion = descripcion,
+                    EstaActivo = 1
+                };
+
+                db.SUBETAPASPROYECTOSCLIENTE.Add(nuevaSubEtapaProyecto);
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult EliminarEtapaProyecto(int idEtapa)
+        {
+            try
+            {
+                var item = db.EtapasProyectoCliente.Find(idEtapa);
+                db.EtapasProyectoCliente.Remove(item);
+                db.SaveChanges();
+
+                var resp = new
+                {
+                    success = true,
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult EliminarSubEtapaProyecto(int idSubEtapa)
+        {
+            try
+            {
+                var item = db.SUBETAPASPROYECTOSCLIENTE.Find(idSubEtapa);
+                db.SUBETAPASPROYECTOSCLIENTE.Remove(item);
+                db.SaveChanges();
+
+                var resp = new
+                {
+                    success = true,
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
 
         //Guardar modal nuevas incidencias
         [HttpPost]
@@ -3369,6 +3704,7 @@ r in db.Rol on ur.rol equals r
                                         orderby c.cliente.Codigo
                                         select new
                                         {
+                                            id = c.Secuencial,
                                             nombre = c.cliente.Codigo,
                                             descripcion = c.cliente.Descripcion,
                                             versionDesarrollo = c.versionDesarrollo.Descripcion,
@@ -3392,6 +3728,7 @@ r in db.Rol on ur.rol equals r
 
                 var proyectos = proyectosUsuario.Select(c => new
                 {
+                    id = c.id,
                     nombre = c.nombre,
                     descripcion = c.descripcion,
                     versionDesarrollo = c.versionDesarrollo,
@@ -3432,6 +3769,129 @@ r in db.Rol on ur.rol equals r
                     success = true,
                     total = total,
                     proyectos = proyectos
+                };
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+                var result = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(result);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult EtapasProyectosUsuario(int start, int lenght, string filtro = "")
+        {
+            try
+            {
+               var etapasProyectosUsuario = (from c in db.EtapasProyectoCliente
+                                             join ca in db.EtapasProyecto on c.SecuencialEtapaProyecto equals ca.Secuencial
+                                        where c.EstaActivo == 1
+                                        orderby c.Secuencial
+                                        select new
+                                        {
+                                            id = c.Secuencial,
+                                            secuencialEtapa = c.SecuencialEtapaProyecto,
+                                            secuencialClienteAux = c.SecuencialClienteAuxiliar,
+                                            descripcion = ca.Descripcion,
+                                            fechaInicio = c.FechaInicio,
+                                            fechaFin = c.FechaFin
+                                        }).ToList();
+
+                var etapas = etapasProyectosUsuario.Select(c => new
+                {
+                    id = c.id,
+                    secuencialEtapa = c.secuencialEtapa,
+                    secuencialClienteAux = c.secuencialClienteAux,
+                    descripcion = c.descripcion,
+                    fechaInicio = c.fechaInicio.ToString("dd/MM/yyy"),
+                    fechaFin = c.fechaFin.ToString("dd/MM/yyy"),
+                }).ToList();
+
+                if (filtro != "")
+                {
+                    etapas = etapas.Where(x =>
+                      x.descripcion.ToString().ToLower().Contains(filtro.ToLower()) ||
+                      x.fechaInicio.ToString().ToLower().Contains(filtro.ToLower()) ||
+                      x.fechaFin.ToString().ToLower().Contains(filtro.ToLower())
+                      ).ToList();
+                }
+
+                int total = etapas.Count();
+                etapas = etapas.Skip(start).Take(lenght).ToList();
+
+                var result = new
+                {
+                    success = true,
+                    total = total,
+                    etapas = etapas
+                };
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+                var result = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(result);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult SubEtapasProyectosUsuario(int start, int lenght, string filtro = "")
+        {
+            try
+            {
+                var subEtapasProyectosUsuario = (from c in db.SUBETAPASPROYECTOSCLIENTE
+                                              join ca in db.RecursosSubEtapasProyecto on c.SecuencialRecuros equals ca.Secuencial
+                                              where c.EstaActivo == 1
+                                              orderby c.Secuencial
+                                              select new
+                                              {
+                                                  id = c.Secuencial,
+                                                  secuencialEtapa = c.SecuencialEtapaProyecto,
+                                                  descripcion = c.Descripcion,
+                                                  recurso =ca.Descripcion,
+                                                  fechaInicio = c.FechaComienzo,
+                                                  fechaFin = c.FechaFin
+                                              }).ToList();
+
+                var subetapas = subEtapasProyectosUsuario.Select(c => new
+                {
+                    id = c.id,
+                    secuencialEtapa = c.secuencialEtapa,
+                    recurso = c.recurso,
+                    descripcion = c.descripcion,
+                    fechaInicio = c.fechaInicio.ToString("dd/MM/yyy"),
+                    fechaFin = c.fechaFin.ToString("dd/MM/yyy"),
+                }).ToList();
+
+                if (filtro != "")
+                {
+                    subetapas = subetapas.Where(x =>
+                      x.descripcion.ToString().ToLower().Contains(filtro.ToLower()) ||
+                      x.recurso.ToString().ToLower().Contains(filtro.ToLower()) ||
+                      x.fechaInicio.ToString().ToLower().Contains(filtro.ToLower()) ||
+                      x.fechaFin.ToString().ToLower().Contains(filtro.ToLower())
+                      ).ToList();
+                }
+
+                int total = subetapas.Count();
+                subetapas = subetapas.Skip(start).Take(lenght).ToList();
+
+                var result = new
+                {
+                    success = true,
+                    total = total,
+                    subetapas = subetapas
                 };
                 return Json(result);
             }

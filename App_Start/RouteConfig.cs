@@ -1031,6 +1031,42 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "DarTipoVersionBD",
+                url: "user/tipo-version-base-datos/{id}",
+                defaults: new { controller = "User", action = "DarTipoVersionBD", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarTipoVersionDesarrollo",
+                url: "user/tipo-version-desarrollo/{id}",
+                defaults: new { controller = "User", action = "DarTipoVersionDesarrollo", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarTipoResponsableProyectos",
+                url: "user/tipo-responsable-proyectos/{id}",
+                defaults: new { controller = "User", action = "DarTipoResponsableProyectos", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarTipoRepositorio",
+                url: "user/tipo-repositorio/{id}",
+                defaults: new { controller = "User", action = "DarTipoRepositorio", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarTipoEtapas",
+                url: "user/tipo-etapas/{id}",
+                defaults: new { controller = "User", action = "DarTipoEtapas", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarTipoRecursosSubEtapas",
+                url: "user/tipo-recursos-subetapas/{id}",
+                defaults: new { controller = "User", action = "DarTipoRecursosSubEtapas", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "DarClientesIncidencias",
                 url: "user/cliente-incidencias/{id}",
                 defaults: new { controller = "User", action = "DarClientesIncidencias", id = UrlParameter.Optional }
@@ -1040,6 +1076,18 @@ namespace SifizPlanning
                 name: "DarRolColaboradorIncidencias",
                 url: "user/rol-colaborador-incidencias/{id}",
                 defaults: new { controller = "User", action = "DarRolColaboradorIncidencias", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "EliminarEtapaProyecto",
+                url: "user/eliminar-etapa-proyecto/{id}",
+                defaults: new { controller = "Admin", action = "EliminarEtapaProyecto", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "EliminarSubEtapaProyecto",
+                url: "user/eliminar-sub-etapa-proyecto/{id}",
+                defaults: new { controller = "Admin", action = "EliminarSubEtapaProyecto", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(
@@ -1066,11 +1114,40 @@ namespace SifizPlanning
                 defaults: new { controller = "User", action = "GuardarRecurso", id = UrlParameter.Optional }
             );
 
+            routes.MapRoute(
+                name: "GuardarProyecto",
+                url: "user/guardar-proyecto/{id}",
+                defaults: new { controller = "User", action = "GuardarProyecto", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "GuardarEtapasProyecto",
+                url: "user/guardar-etapas-proyecto/{id}",
+                defaults: new { controller = "User", action = "GuardarEtapasProyecto", id = UrlParameter.Optional }
+            );
 
             routes.MapRoute(
                 name: "ProyectosUsuario",
                 url: "user/proyectos-usuario/{id}",
                 defaults: new { controller = "User", action = "ProyectosUsuario", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "EtapasProyectosUsuario",
+                url: "user/etapas-proyectos-usuario/{id}",
+                defaults: new { controller = "User", action = "EtapasProyectosUsuario", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "SubEtapasProyectosUsuario",
+                url: "user/sub-etapas-proyectos-usuario/{id}",
+                defaults: new { controller = "User", action = "SubEtapasProyectosUsuario", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "GuardarSubEtapasProyecto",
+                url: "user/guardar-sub-etapas-proyecto/{id}",
+                defaults: new { controller = "User", action = "GuardarSubEtapasProyecto", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(

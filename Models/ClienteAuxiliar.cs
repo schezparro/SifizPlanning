@@ -14,6 +14,11 @@ namespace SifizPlanning.Models
     
     public partial class ClienteAuxiliar
     {
+        public ClienteAuxiliar()
+        {
+            this.etapasProyectoCliente = new HashSet<EtapasProyectoCliente>();
+        }
+    
         public int Secuencial { get; set; }
         public decimal EstaActivo { get; set; }
         public int NumeroVerificador { get; set; }
@@ -39,5 +44,6 @@ namespace SifizPlanning.Models
         public virtual VersionBaseDatos versionBaseDatos { get; set; }
         public virtual VersionDesarrollo versionDesarrollo { get; set; }
         public virtual Cliente cliente { get; set; }
+        public virtual ICollection<EtapasProyectoCliente> etapasProyectoCliente { get; set; }
     }
 }

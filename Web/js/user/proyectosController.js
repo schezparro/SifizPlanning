@@ -61,6 +61,165 @@
     };
     $scope.cargarProyectos();
 
+    angular.element('#fecha-salida-proyecto').datepicker({
+        format: 'dd/mm/yyyy',
+        forceParse: false
+    });
+
+    angular.element('#fecha-inicio-etapa').datepicker({
+        format: 'dd/mm/yyyy',
+        forceParse: false
+    });
+
+    angular.element('#fecha-fin-etapa').datepicker({
+        format: 'dd/mm/yyyy',
+        forceParse: false
+    });
+
+    angular.element('#fecha-inicio-subetapa').datepicker({
+        format: 'dd/mm/yyyy',
+        forceParse: false
+    });
+
+    angular.element('#fecha-fin-subetapa').datepicker({
+        format: 'dd/mm/yyyy',
+        forceParse: false
+    });
+
+    $scope.windowAgregarProyecto = function () {
+        $scope.ubicacionPro = '';
+        $scope.codigoFuentePro = false;
+        $scope.responsableCodigoPro = '';
+        $scope.versioDesarrolloDPro = '';
+        $scope.clientePro = '';
+        $scope.responsablePublicacionPro = '';
+        $scope.fechaSalidaPro = '';
+        $scope.responsableAccesoPro = '';
+        $scope.repositoriosPro = '';
+        $scope.versionBDPro = '';
+        $scope.liderPro = '';
+        $scope.solucionesProxiesPro = false;
+        $scope.estaActivoPro = true;
+        angular.element("#modal-agregar-proyecto").modal("show");
+    };
+
+    //CLIENTES
+    var ajaxClienteProyectos = $http.post("user/cliente-incidencias", {});
+    ajaxClienteProyectos.success(function (data) {
+        if (data.success === true) {
+            $scope.clientes = data.clientes;
+        }
+    });
+
+    //VERSION BASE DATOS
+    var ajaxRolVersionBaseDatos = $http.post("user/tipo-version-base-datos", {});
+    ajaxRolVersionBaseDatos.success(function (data) {
+        if (data.success === true) {
+            $scope.versionBD = data.versionBD;
+        }
+    });
+
+    //VERSION DESARROLLO
+    var ajaxVersionDesarrollo = $http.post("user/tipo-version-desarrollo", {});
+    ajaxVersionDesarrollo.success(function (data) {
+        if (data.success === true) {
+            $scope.versionDesarrollo = data.versionDesarrollo;
+        }
+    });
+
+    //RESPONSABLE PROYECTO
+    var ajaxResponsableProyecto = $http.post("user/tipo-responsable-proyectos", {});
+    ajaxResponsableProyecto.success(function (data) {
+        if (data.success === true) {
+            $scope.responsableProyectos = data.responsableProyectos;
+        }
+    });
+
+    //REPOSITORIO
+    var ajaxRepositorio = $http.post("user/tipo-repositorio", {});
+    ajaxRepositorio.success(function (data) {
+        if (data.success === true) {
+            $scope.repositorios = data.repositorios;
+        }
+    });
+
+    //ETAPAS
+    var ajaxetapas = $http.post("user/tipo-etapas", {});
+    ajaxetapas.success(function (data) {
+        if (data.success === true) {
+
+            console.log(data.etapasCat);
+            $scope.etapasCat = data.etapasCat;
+        }
+    });
+
+    //RECURSOS SUBETAPAS
+    var ajaxrecursosSubEtapas = $http.post("user/tipo-recursos-subetapas", {});
+    ajaxrecursosSubEtapas.success(function (data) {
+        if (data.success === true) {
+
+            console.log("subetapas " + data.recursosSubEtapas);
+            $scope.recursosSubEtapas = data.recursosSubEtapas;
+        }
+    });
+
+    //LIDERES
+    var ajaxLideres = $http.post("user/rol-colaborador-incidencias", {});
+    ajaxLideres.success(function (data) {
+        if (data.success === true) {
+            $scope.lideres = data.lideres;
+        }
+    });
+
+    $scope.GuardarNuevoProyecto = function () {
+        waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
+
+        var ubicacion = angular.element("#select-ubicacion-proyecto")[0].value;
+        var responsableCodigo = angular.element("#select-responsableCodigo-proyecto")[0].value;
+        var versionDesarrollo = angular.element("#select-versionDesarrollo-proyecto")[0].value;   
+        var cliente = angular.element("#select-cliente-proyecto")[0].value;
+        var responsablePublicacion = angular.element("#select-responsablePublicacion-proyecto")[0].value;
+        var salidaProduccion = angular.element("#fecha-salida-proyecto")[0].value;
+        var responsableAcceso = angular.element("#select-responsableAcceso-proyecto")[0].value;
+        var repositorio = angular.element("#select-repositorio-proyecto")[0].value;
+        var versionBD = angular.element("#select-versionBD-proyecto")[0].value;
+        var liderProyecto = angular.element("#select-liderProyecto-proyecto")[0].value;
+
+        var formData = new FormData();
+        formData.append('ubicacion', ubicacion);
+        formData.append('liderProyecto', liderProyecto);
+        formData.append('responsableCodigo', responsableCodigo);
+        formData.append('versionDesarrollo', versionDesarrollo);
+        formData.append('cliente', cliente);
+        formData.append('responsablePublicacion', responsablePublicacion);
+        formData.append('salidaProduccion', salidaProduccion);
+        formData.append('responsableAcceso', responsableAcceso);
+        formData.append('repositorio', repositorio);
+        formData.append('versionBD', versionBD);
+        formData.append('codigoFuente', $scope.codigoFuentePro);
+        formData.append('estaActivo', $scope.estaActivoPro);
+        formData.append('solucionProxies', $scope.solucionesProxiesPro);
+
+        var ajaxEnvioDatos = $http({
+            method: 'POST',
+            url: "user/guardar-proyecto",
+            data: formData,
+            headers: { 'Content-Type': undefined },
+            transformRequest: angular.identity
+        });
+
+        ajaxEnvioDatos.success(function (data) {
+            waitingDialog.hide();
+            if (data.success === true) {
+                angular.element("#modal-agregar-proyecto").modal("hide");
+                $scope.cargarProyectos();
+            } else {
+                messageDialog.show("Información", data.msg);
+            }
+        });
+    };
+
+
     //Mostrar el modal de proyectos
     $scope.mostrarWindowProyectos = function (proyecto) {
 
@@ -72,6 +231,267 @@
         angular.element("#modal-proyectos").modal('show');
     };
 
+    $scope.cargarEtapas = function (start, lenght) {
+        if (start === undefined)
+            start = 0;
+        if (lenght === undefined)
+            lenght = numerosPorPagina;
+
+        $scope.loading.show();
+        var etapas = $http.post("user/etapas-proyectos-usuario",
+            {
+                start: start,
+                lenght: lenght,
+                filtro: $scope.filtroEtapas
+            });
+        etapas.success(function (data) {
+            $scope.loading.hide();
+            if (data.success === true) {
+                var posPagin = pagina;
+                $scope.etapas = data.etapas;
+                $scope.cantPaginas = Math.ceil(data.total / numerosPorPagina);
+                if ($scope.cantPaginas === 0) {
+                    $scope.cantPaginas = 1;
+                }
+
+                $scope.listaPaginas = [];
+                if ($scope.cantPaginas > 5 && pagina <= 5) {
+                    for (var i = 1; i <= 5; i++) {
+                        $scope.listaPaginas.push(i);
+                    }
+                }
+                else if ($scope.cantPaginas < 5) {
+                    for (var i = 1; i <= $scope.cantPaginas; i++) {
+                        $scope.listaPaginas.push(i);
+                    }
+                }
+                else if ($scope.cantPaginas > 5) {
+                    for (var i = pagina - 4; i <= pagina; i++) {
+                        $scope.listaPaginas.push(i);
+                    }
+                    posPagin = 5;
+                }
+
+                if (pagina > $scope.cantPaginas) {
+                    pagina = $scope.cantPaginas;
+                    posPagin = pagina;
+                }
+
+                setTimeout(function () {
+                    var listaPaginador = angular.element("#tabla-user-etapas-proyectos .pagination li a");
+                    angular.element(listaPaginador).removeClass('pagSelect');
+                    angular.element(listaPaginador[posPagin]).addClass('pagSelect');
+                }, 300);
+            }
+            else {
+                messageDialog.show('Información', data.msg);
+            }
+        });
+    };
+    $scope.cargarEtapas();
+
+    $scope.GuardarNuevaEtapa = function () {
+        waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
+
+        var etapa = angular.element("#select-etapas-cliente-proyecto")[0].value;
+
+        //var cliAux = proyectoId;
+        var fechaInicioEta = angular.element("#fecha-inicio-etapa")[0].value;
+        var fechaFinEta = angular.element("#fecha-fin-etapa")[0].value;
+
+        var formData = new FormData();
+        formData.append('etapa', etapa);
+        formData.append('cliAux', $scope.proyectoId);
+        formData.append('fechaInicioEta', fechaInicioEta);
+        formData.append('fechaFinEta', fechaFinEta);
+
+        var ajaxEnvioDatos = $http({
+            method: 'POST',
+            url: "user/guardar-etapas-proyecto",
+            data: formData,
+            headers: { 'Content-Type': undefined },
+            transformRequest: angular.identity
+        });
+
+        ajaxEnvioDatos.success(function (data) {
+            waitingDialog.hide();
+            if (data.success === true) {
+                angular.element("#modal-agregar-etapas-proyecto").modal("hide");
+                $scope.cargarEtapas();
+            } else {
+                messageDialog.show("Información", data.msg);
+            }
+        });
+    };
+    
+    $scope.abrirModalGenerarInforme = function (proyectoId) {
+        $scope.proyectoId = proyectoId,
+            angular.element("#modal-etapas-proyecto").modal("show");
+    };
+
+    $scope.abrirModalAgregarSubTarea = function (etapaId) {
+        $scope.etapaId = etapaId,
+            angular.element("#modal-sub-etapas-proyecto").modal("show");
+    };
+
+    $scope.windowAgregarEtapasProyecto = function (proyectoId) {
+        $scope.proyectoId = proyectoId,
+        $scope.etapasPro = '';
+        $scope.fechaIniEta = '';
+        $scope.fechaFinEta = '';
+
+        angular.element("#modal-agregar-etapas-proyecto").modal("show");
+    };
+
+    $scope.windowAgregarSubEtapasProyecto = function (etapaId) {
+        $scope.etapaId = etapaId,
+        $scope.descripcionSubE = '',
+        $scope.recursosSubE = '';
+        $scope.fechaIniSubE = '';
+        $scope.fechaFinSubE = '';
+
+        angular.element("#modal-agregar-sub-etapas-proyecto").modal("show");
+    };
+
+    $scope.cargarSubEtapas = function (start, lenght) {
+        if (start === undefined)
+            start = 0;
+        if (lenght === undefined)
+            lenght = numerosPorPagina;
+
+        $scope.loading.show();
+        var subetapas = $http.post("user/sub-etapas-proyectos-usuario",
+            {
+                start: start,
+                lenght: lenght,
+                filtro: $scope.filtroSubEtapas
+            });
+        subetapas.success(function (data) {
+            $scope.loading.hide();
+            if (data.success === true) {
+                var posPagin = pagina;
+                console.log(data.subetapas);
+                $scope.subEtapas = data.subetapas;
+                $scope.cantPaginas = Math.ceil(data.total / numerosPorPagina);
+                if ($scope.cantPaginas === 0) {
+                    $scope.cantPaginas = 1;
+                }
+
+                $scope.listaPaginas = [];
+                if ($scope.cantPaginas > 5 && pagina <= 5) {
+                    for (var i = 1; i <= 5; i++) {
+                        $scope.listaPaginas.push(i);
+                    }
+                }
+                else if ($scope.cantPaginas < 5) {
+                    for (var i = 1; i <= $scope.cantPaginas; i++) {
+                        $scope.listaPaginas.push(i);
+                    }
+                }
+                else if ($scope.cantPaginas > 5) {
+                    for (var i = pagina - 4; i <= pagina; i++) {
+                        $scope.listaPaginas.push(i);
+                    }
+                    posPagin = 5;
+                }
+
+                if (pagina > $scope.cantPaginas) {
+                    pagina = $scope.cantPaginas;
+                    posPagin = pagina;
+                }
+
+                setTimeout(function () {
+                    var listaPaginador = angular.element("#tabla-user-sub-etapas-proyectos .pagination li a");
+                    angular.element(listaPaginador).removeClass('pagSelect');
+                    angular.element(listaPaginador[posPagin]).addClass('pagSelect');
+                }, 300);
+            }
+            else {
+                messageDialog.show('Información', data.msg);
+            }
+        });
+    };
+    $scope.cargarSubEtapas();
+
+    $scope.GuardarNuevaSubEtapa = function () {
+        waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
+
+        var recurso = angular.element("#select-recursos-sub-etapas")[0].value;
+        var fechaInicioEta = angular.element("#fecha-inicio-subetapa")[0].value;
+        var fechaFinEta = angular.element("#fecha-fin-subetapa")[0].value;
+
+        var formData = new FormData();
+        formData.append('descripcion', $scope.descripcionSubE);
+        formData.append('recurso', recurso);
+        formData.append('etapaId', $scope.etapaId);
+        formData.append('fechaIni', fechaInicioEta);
+        formData.append('fechaFin', fechaFinEta);
+
+        var ajaxEnvioDatos = $http({
+            method: 'POST',
+            url: "user/guardar-sub-etapas-proyecto",
+            data: formData,
+            headers: { 'Content-Type': undefined },
+            transformRequest: angular.identity
+        });
+
+        ajaxEnvioDatos.success(function (data) {
+            waitingDialog.hide();
+            if (data.success === true) {
+                angular.element("#modal-agregar-sub-etapas-proyecto").modal("hide");
+                $scope.cargarSubEtapas();
+            } else {
+                messageDialog.show("Información", data.msg);
+            }
+        });
+    };
+
+    $scope.EliminarEtapaProyecto = function (etapaId) {
+        var qMsgDialog = new questionMsgDialog();
+
+        console.log(subEtapasId);
+
+        qMsgDialog.show('Información', 'Está seguro de querer eliminar la etapa del proyecto.', 'Si, estoy seguro', function () {
+            waitingDialog.show('Eliminando...', { dialogSize: 'sm', progressType: 'success' });
+            var eliminarEtapa = $http.post("user/eliminar-etapa-proyecto", {
+                idEtapa: etapaId
+            });
+            eliminarEtapa.success(function (data) {
+                waitingDialog.hide();
+                qMsgDialog.hide();
+                if (data.success === true) {
+                    messageDialog.show('Información', data.msg);
+                    cargarEtapas();
+                }
+                else {
+                    messageDialog.show('Información', data.msg);
+                }
+            });
+        });
+    };
+
+    $scope.EliminarSubEtapaProyecto = function (subEtapasId) {
+        var qMsgDialog = new questionMsgDialog();
+
+        console.log(subEtapasId);
+        qMsgDialog.show('Información', 'Está seguro de querer eliminar la subetapa.', 'Si, estoy seguro', function () {
+            waitingDialog.show('Eliminando...', { dialogSize: 'sm', progressType: 'success' });
+            var eliminarSubEtapa = $http.post("user/eliminar-sub-etapa-proyecto", {
+                idSubEtapa: subEtapasId
+            });
+            eliminarSubEtapa.success(function (data) {
+                waitingDialog.hide();
+                qMsgDialog.hide();
+                if (data.success === true) {
+                    messageDialog.show('Información', data.msg);
+                    cargarSubEtapas();
+                }
+                else {
+                    messageDialog.show('Información', data.msg);
+                }
+            });
+        });
+    };
 
     //El Paginador
     $scope.paginar = function () {
@@ -80,6 +500,17 @@
         $scope.cargarProyectos(start, lenght);
     };
 
+    $scope.paginar = function () {
+        var start = (pagina - 1) * numerosPorPagina;
+        var lenght = numerosPorPagina;
+        $scope.cargarEtapas(start, lenght);
+    };
+
+    $scope.paginar = function () {
+        var start = (pagina - 1) * numerosPorPagina;
+        var lenght = numerosPorPagina;
+        $scope.cargarSubEtapas(start, lenght);
+    };
     $scope.cambiarPagina = function (pag) {
         pagina = pag;
         $scope.paginar();
