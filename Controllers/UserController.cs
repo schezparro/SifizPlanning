@@ -3811,6 +3811,7 @@ r in db.Rol on ur.rol equals r
                     descripcion = c.descripcion,
                     fechaInicio = c.fechaInicio.ToString("dd/MM/yyy"),
                     fechaFin = c.fechaFin.ToString("dd/MM/yyy"),
+                    duracion = (c.fechaFin - c.fechaInicio).Days
                 }).ToList();
 
                 if (filtro != "")

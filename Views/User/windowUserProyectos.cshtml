@@ -10,29 +10,23 @@
             <tr>
                 <th>CLIENTE</th>
                 <th>SIGLAS</th>
-                <th>IDE DESARROLLO</th>
                 <th>REPOSITORIO</th>
                 <th>UBICACIÓN</th>
-                <th>TIENE CÓDIGO FUENTE</th>
                 <th>RESPONSABLE OTORGAR ACCESO</th>
                 <th>RESPONSABLE INTEGRAR CÓDIGO</th>
                 <th>RESPONSABLE GENERAR PUBLICACIÓN</th>
-                <th>VERSIÓN BASE DE DATOS</th>
             </tr>
         </thead>
 
         <tbody>
-            <tr ng-repeat="proyecto in proyectos" ng-dblclick="mostrarWindowProyectos(proyecto.id)">
+            <tr ng-repeat="proyecto in proyectos" ng-dblclick="mostrarWindowProyectos(proyecto)">
                 <td>{{proyecto.descripcion | strLimit: 75}}</td>
                 <td>{{proyecto.nombre}}</td>
-                <td>{{proyecto.versionDesarrollo}}</td>
                 <td>{{proyecto.repositorio}}</td>
                 <td>{{proyecto.ubicacion}}</td>
-                <td>{{proyecto.tieneCodigoFuente}}</td>
                 <td>{{proyecto.responsableAcceso}}</td>
                 <td>{{proyecto.responsableCodigo}}</td>
                 <td>{{proyecto.responsablePublicacion}}</td>
-                <td>{{proyecto.versionBaseDatos}}</td>
                 <td>
                     <button type="button" class="btn btn-xs btn-success" ng-click="abrirModalGenerarInforme(proyecto.id)"><span class="glyphicon glyphicon-ok"></span> Registrar cronograma</button>
                 </td>
@@ -79,13 +73,13 @@
                 </div>
                 <div class="modal-body">
                     <div style="column-count: 2">
-                        CLIENTE:
+                        <label for="select-cliente-proyecto">CLIENTE:</label>
                         <select id="select-cliente-proyecto" ng-model="clientePro" class="form-control" required="required">
                             <option value="">Seleccione...</option>
                             <option value="{{cliente.id}}" ng-repeat="cliente in clientes">{{cliente.nombre}}</option>
                         </select>
 
-                        UBICACION:
+                        <label for="select-ubicacion-proyecto">UBICACION:</label>
                         <select id="select-ubicacion-proyecto" ng-model="ubicacionPro" class="form-control" required="required">
                             <option value="">Seleccione...</option>
                             <option value="{{responsable.id}}" ng-repeat="responsable in responsableProyectos">{{responsable.nombre}}</option>
@@ -93,13 +87,13 @@
                     </div>
 
                     <div style="column-count: 2">
-                        RESPONSABLE CODIGO:
+                        <label for="select-responsableCodigo-proyecto">RESPONSABLE CODIGO:</label>
                         <select id="select-responsableCodigo-proyecto" ng-model="responsableCodigoPro" class="form-control" required="required">
                             <option value="">Seleccione...</option>
                             <option value="{{responsable.id}}" ng-repeat="responsable in responsableProyectos">{{responsable.nombre}}</option>
                         </select>
 
-                        RESPONSABLE PUBLICACION:
+                        <label for="select-responsablePublicacion-proyecto">RESPONSABLE PUBLICACION:</label>
                         <select id="select-responsablePublicacion-proyecto" ng-model="responsablePublicacionPro" class="form-control" required="required">
                             <option value="">Seleccione...</option>
                             <option value="{{responsable.id}}" ng-repeat="responsable in responsableProyectos">{{responsable.nombre}}</option>
@@ -107,13 +101,13 @@
                     </div>
 
                     <div style="column-count: 2">
-                        RESPONSABLE ACCESO:
+                        <label for="select-responsableAcceso-proyecto">RESPONSABLE ACCESO:</label>
                         <select id="select-responsableAcceso-proyecto" ng-model="responsableAccesoPro" class="form-control" required="required">
                             <option value="">Seleccione...</option>
                             <option value="{{responsable.id}}" ng-repeat="responsable in responsableProyectos">{{responsable.nombre}}</option>
                         </select>
 
-                        LIDER PROYECTO:
+                        <label for="select-liderProyecto-proyecto">LIDER PROYECTO:</label>
                         <select id="select-liderProyecto-proyecto" ng-model="liderPro" class="form-control" required="required">
                             <option value="">Seleccione...</option>
                             <option value="{{lider.id}}" ng-repeat="lider in lideres">{{lider.nombre}}</option>
@@ -121,13 +115,13 @@
                     </div>
 
                     <div style="column-count: 2">
-                        VERSION DESARROLLO:
+                        <label for="select-versionDesarrollo-proyecto">VERSION DESARROLLO:</label>
                         <select id="select-versionDesarrollo-proyecto" ng-model="versioDesarrolloDPro" class="form-control" required="required">
                             <option value="">Seleccione...</option>
                             <option value="{{vD.id}}" ng-repeat="vD in versionDesarrollo">{{vD.nombre}}</option>
                         </select>
 
-                        VERSION BASE DATOS:
+                        <label for="select-versionBD-proyecto">VERSION BASE DATOS:</label>
                         <select id="select-versionBD-proyecto" ng-model="versionBDPro" class="form-control" required="required">
                             <option value="">Seleccione...</option>
                             <option value="{{vBS.id}}" ng-repeat="vBS in versionBD">{{vBS.nombre}}</option>
@@ -135,17 +129,15 @@
                     </div>
 
                     <div style="column-count: 2">
-                        REPOSITORIO:
+                        <label for="select-repositorio-proyecto">REPOSITORIO:</label>
                         <select id="select-repositorio-proyecto" ng-model="repositoriosPro" class="form-control" required="required">
                             <option value="">Seleccione...</option>
                             <option value="{{repo.id}}" ng-repeat="repo in repositorios">{{repo.nombre}}</option>
                         </select>
 
-                        <div class="div-info-ticket">
-                            FECHA SALIDA:
-                            <div class='input-group date'>
-                                <input id="fecha-salida-proyecto" ng-model="fechaSalidaPro" class="form-control" ng-required="true" autocomplete="off" />
-                            </div>
+                        <label for="fecha-salida-proyecto">FECHA SALIDA:</label>
+                        <div class='input-group date'>
+                            <input id="fecha-salida-proyecto" ng-model="fechaSalidaPro" class="form-control" ng-required="true" autocomplete="off" />
                         </div>
                     </div>
 
@@ -187,9 +179,11 @@
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="left">
+                            <label class="label-data-proyecto">IDE de desarrollo: </label><span>  {{versionDesarrollo}}</span><br />
+                            <label class="label-data-proyecto">Versión Base de Datos: </label><span>  {{versionBD}}</span><br />
+                            <label class="label-data-proyecto">Tiene código fuente: </label><span>  {{tieneSolucionProxies}}</span><br />
                             <label class="label-data-proyecto">Lider del Proyecto: </label><span>  {{lider}}</span><br />
                             <label class="label-data-proyecto">Gestor del Servicio: </label><span>  {{gestor}}</span><br />
-                            <label class="label-data-proyecto">Tiene soluciones proxies: </label><span>  {{tieneSolucionProxies}}</span><br />
                             <label class="label-data-proyecto">Fecha salida a producción: </label><span>  {{fechaProduccion}}</span><br />
 
                         </div>
@@ -207,71 +201,78 @@
 <div class="modal fade" id="modal-etapas-proyecto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content" style="overflow:hidden">
-            <div class="modal-header">
+            <div class="modal-header" style="padding: 10px, 10px">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Gestión de etapas de proyecto </h4>
             </div>
-            <div>
-                <button class="btn btn-primary" ng-click="windowAgregarEtapasProyecto(proyectoId)">Nueva Etapa</button>
-                <input type="text" ng-keyup="cargarEtapas()" ng-model="filtroEtapas" class="form-control right filtro" placeholder="Filtrar..." />
-                <div class="clear"></div>
+            
+            <div class="modal-body">
+                <div style="padding: 10px, 10px">
+                    <button class="btn btn-primary" ng-click="windowAgregarEtapasProyecto(proyectoId)">Nueva Etapa</button>
+                    <input type="text" ng-keyup="cargarEtapas()" ng-model="filtroEtapas" class="form-control right filtro" placeholder="Filtrar..." />
+                    <div class="clear"></div>
+                </div>
+
+                <div id="div-user-etapas-proyectos">
+                    <table id="tabla-user-etapas-proyectos" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Descripción</th>
+                                <th>Duración</th>
+                                <th>Fecha Inicio</th>
+                                <th>Fecha Fin</th>
+                                <th>% Cumplimiento</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr ng-repeat="etapa in etapas" ng-dblclick="mostrarWindowEtapasProyectos(etapa)">
+                                <td>{{etapa.descripcion | strLimit: 75}}</td>
+                                <td>{{etapa.duracion}}</td>
+                                <td>{{etapa.fechaInicio}}</td>
+                                <td>{{etapa.fechaFin}}</td>
+                                <td>{{etapa.descripcion }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-xs btn-success" ng-click="abrirModalAgregarSubTarea(etapa.id)"><span class="glyphicon glyphicon-ok"></span> Agregar Subetapa</button>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-xs btn-danger" ng-click="EliminarEtapaProyecto(etapa.id)"><span class="glyphicon glyphicon-ok"></span> Eliminar </button>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <tfoot>
+                            <tr>
+                                <th colspan="10">
+
+                                    <nav>
+                                        <ul class="pagination">
+                                            <li ng-click="atrazarPagina()">
+                                                <a href="#" aria-label="Previous">
+                                                    <span aria-hidden="true">&laquo;</span>
+                                                </a>
+                                            </li>
+                                            <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
+                                            <li ng-click="avanzarPagina()">
+                                                <a href="#" aria-label="Next">
+                                                    <span aria-hidden="true">&raquo;</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+
+                                </th>
+                            </tr>
+                        </tfoot>
+
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
             </div>
-
-            <div id="div-user-etapas-proyectos">
-                <table id="tabla-user-etapas-proyectos" class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Descripción</th>
-                            <th>Fecha Inicio</th>
-                            <th>Fecha Fin</th>
-                            <th>% Cumplimiento</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr ng-repeat="etapa in etapas" ng-dblclick="mostrarWindowEtapasProyectos(etapa)">
-                            <td>{{etapa.descripcion | strLimit: 75}}</td>
-                            <td>{{etapa.fechaInicio}}</td>
-                            <td>{{etapa.fechaFin}}</td>
-                            <td>{{etapa.descripcion }}</td>
-                            <td>
-                                <button type="button" class="btn btn-xs btn-success" ng-click="abrirModalAgregarSubTarea(etapa.id)"><span class="glyphicon glyphicon-ok"></span> Agregar Subetapa</button>
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-xs btn-danger" ng-click="EliminarEtapaProyecto(etapa.id)"><span class="glyphicon glyphicon-ok"></span> Eliminar </button>
-                            </td>
-                        </tr>
-                    </tbody>
-
-                    <tfoot>
-                        <tr>
-                            <th colspan="10">
-
-                                <nav>
-                                    <ul class="pagination">
-                                        <li ng-click="atrazarPagina()">
-                                            <a href="#" aria-label="Previous">
-                                                <span aria-hidden="true">&laquo;</span>
-                                            </a>
-                                        </li>
-                                        <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
-                                        <li ng-click="avanzarPagina()">
-                                            <a href="#" aria-label="Next">
-                                                <span aria-hidden="true">&raquo;</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </nav>
-
-                            </th>
-                        </tr>
-                    </tfoot>
-
-                </table>
             </div>
-            <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
         </div>
-    </div>
 </div>
 
 @*MODAL NUEVA ETAPA*@
@@ -287,7 +288,7 @@
                     <div>
                         <input hidden ng-model="proyectoId" />
 
-                        ETAPA:
+                        <label for="select-etapas-cliente-proyecto">ETAPA:</label>
                         <select id="select-etapas-cliente-proyecto" ng-model="etapasPro" class="form-control" required="required">
                             <option value="">Seleccione...</option>
                             <option value="{{etapa.id}}" ng-repeat="etapa in etapasCat">{{etapa.nombre}}</option>
@@ -295,14 +296,14 @@
 
                         <div style="column-count: 2">
                             <div class="div-info-ticket">
-                                FECHA INICIO:
+                                <label for="fecha-inicio-etapa">FECHA INICIO:</label>
                                 <div class='input-group date'>
                                     <input id="fecha-inicio-etapa" ng-model="fechaIniEta" class="form-control" ng-required="true" autocomplete="off" />
                                 </div>
                             </div>
 
                             <div class="div-info-ticket">
-                                FECHA FIN:
+                                <label for="fecha-fin-etapa">FECHA FIN:</label>
                                 <div class='input-group date'>
                                     <input id="fecha-fin-etapa" ng-model="fechaFinEta" class="form-control" ng-required="true" autocomplete="off" />
                                 </div>
@@ -311,8 +312,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" id="enviar-modal-etapas-proyectos-btn" class="btn btn-primary">Guardar</button>
-                    <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </form>
         </div>
@@ -327,65 +327,69 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Gestión de subetapas</h4>
             </div>
-            <div>
-                <button class="btn btn-primary" ng-click="windowAgregarSubEtapasProyecto(etapaId)">Nueva Subetapa</button>
-                <input type="text" ng-keyup="cargarSubEtapas()" ng-model="filtroSubEtapas" class="form-control right filtro" placeholder="Filtrar..." />
-                <div class="clear"></div>
+            <div class="modal-body">
+                <div>
+                    <button class="btn btn-primary" ng-click="windowAgregarSubEtapasProyecto(etapaId)">Nueva Subetapa</button>
+                    <input type="text" ng-keyup="cargarSubEtapas()" ng-model="filtroSubEtapas" class="form-control right filtro" placeholder="Filtrar..." />
+                    <div class="clear"></div>
+                </div>
+
+                <div id="div-user-etapas-proyectos">
+                    <table id="tabla-user-sub-etapas-proyectos" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Descripción</th>
+                                <th>Fecha Inicio</th>
+                                <th>Fecha Fin</th>
+                                <th>Recurso</th>
+                                <th>% Cumplimiento</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr ng-repeat="subetapa in subEtapas" ng-dblclick="mostrarWindowSubEtapasProyectos(etapa)">
+                                <td>{{subetapa.descripcion | strLimit: 75}}</td>
+                                <td>{{subetapa.fechaInicio}}</td>
+                                <td>{{subetapa.fechaFin}}</td>
+                                <td>{{subetapa.descripcion }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-xs btn-danger" ng-click="EliminarSubEtapaProyecto(subetapa.id)"><span class="glyphicon glyphicon-ok"></span> Eliminar </button>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <tfoot>
+                            <tr>
+                                <th colspan="10">
+
+                                    <nav>
+                                        <ul class="pagination">
+                                            <li ng-click="atrazarPagina()">
+                                                <a href="#" aria-label="Previous">
+                                                    <span aria-hidden="true">&laquo;</span>
+                                                </a>
+                                            </li>
+                                            <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
+                                            <li ng-click="avanzarPagina()">
+                                                <a href="#" aria-label="Next">
+                                                    <span aria-hidden="true">&raquo;</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+
+                                </th>
+                            </tr>
+                        </tfoot>
+
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
             </div>
-
-            <div id="div-user-etapas-proyectos">
-                <table id="tabla-user-sub-etapas-proyectos" class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Descripción</th>
-                            <th>Fecha Inicio</th>
-                            <th>Fecha Fin</th>
-                            <th>Recurso</th>
-                            <th>% Cumplimiento</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr ng-repeat="subetapa in subEtapas" ng-dblclick="mostrarWindowSubEtapasProyectos(etapa)">
-                            <td>{{subetapa.descripcion | strLimit: 75}}</td>
-                            <td>{{subetapa.fechaInicio}}</td>
-                            <td>{{subetapa.fechaFin}}</td>
-                            <td>{{subetapa.descripcion }}</td>
-                            <td>
-                                <button type="button" class="btn btn-xs btn-danger" ng-click="EliminarSubEtapaProyecto(subetapa.id)"><span class="glyphicon glyphicon-ok"></span> Eliminar </button>
-                            </td>
-                        </tr>
-                    </tbody>
-
-                    <tfoot>
-                        <tr>
-                            <th colspan="10">
-
-                                <nav>
-                                    <ul class="pagination">
-                                        <li ng-click="atrazarPagina()">
-                                            <a href="#" aria-label="Previous">
-                                                <span aria-hidden="true">&laquo;</span>
-                                            </a>
-                                        </li>
-                                        <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
-                                        <li ng-click="avanzarPagina()">
-                                            <a href="#" aria-label="Next">
-                                                <span aria-hidden="true">&raquo;</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </nav>
-
-                            </th>
-                        </tr>
-                    </tfoot>
-
-                </table>
             </div>
-            <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
         </div>
-    </div>
 </div>
 
 <div id="modal-agregar-sub-etapas-proyecto" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -399,11 +403,10 @@
                 <div class="modal-body">
                     <div>
                         <input hidden ng-model="etapaId" />
-
-                        DESCRIPCION:
+                        <label for="textarea-descripcion">DESCRIPCION:</label>
                         <textarea type="text" class="form-control" ng-model="descripcionSubE" ng-required="true"></textarea>
 
-                        RECURSO:
+                        <label for="select-recursos-sub-etapas">RECURSO:</label>
                         <select id="select-recursos-sub-etapas" ng-model="recursosSubE" class="form-control" required="required">
                             <option value="">Seleccione...</option>
                             <option value="{{recurso.id}}" ng-repeat="recurso in recursosSubEtapas">{{recurso.nombre}}</option>
@@ -411,14 +414,14 @@
 
                         <div style="column-count: 2">
                             <div class="div-info-ticket">
-                                FECHA INICIO:
+                                <label for="fecha-inicio-subetapa">FECHA INICIO:</label>
                                 <div class='input-group date'>
                                     <input id="fecha-inicio-subetapa" ng-model="fechaIniSubE" class="form-control" ng-required="true" autocomplete="off" />
                                 </div>
                             </div>
 
                             <div class="div-info-ticket">
-                                FECHA FIN:
+                                <label for="fecha-fin-subetapa">FECHA FIN:</label>
                                 <div class='input-group date'>
                                     <input id="fecha-fin-subetapa" ng-model="fechaFinSubE" class="form-control" ng-required="true" autocomplete="off" />
                                 </div>

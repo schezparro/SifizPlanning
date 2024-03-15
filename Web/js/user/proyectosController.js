@@ -225,8 +225,10 @@
 
         $scope.lider = proyecto.lider;
         $scope.gestor = proyecto.gestor;
-        $scope.tieneSolucionProxies = proyecto.tieneSolucionProxies;
         $scope.fechaProduccion = proyecto.fechaProduccion;
+        $scope.versionDesarrollo = proyecto.versionDesarrollo;
+        $scope.tieneSolucionProxies = proyecto.tieneSolucionProxies;
+        $scope.versionBD = proyecto.versionBaseDatos;
 
         angular.element("#modal-proyectos").modal('show');
     };
@@ -427,6 +429,9 @@
         formData.append('fechaIni', fechaInicioEta);
         formData.append('fechaFin', fechaFinEta);
 
+
+        console.log("recurso " + recurso);
+
         var ajaxEnvioDatos = $http({
             method: 'POST',
             url: "user/guardar-sub-etapas-proyecto",
@@ -449,7 +454,7 @@
     $scope.EliminarEtapaProyecto = function (etapaId) {
         var qMsgDialog = new questionMsgDialog();
 
-        console.log(subEtapasId);
+        console.log(etapaId);
 
         qMsgDialog.show('Información', 'Está seguro de querer eliminar la etapa del proyecto.', 'Si, estoy seguro', function () {
             waitingDialog.show('Eliminando...', { dialogSize: 'sm', progressType: 'success' });
