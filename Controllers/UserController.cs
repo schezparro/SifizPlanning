@@ -3388,13 +3388,19 @@ r in db.Rol on ur.rol equals r
         {
             try
             {
+                var subEtapas = db.SUBETAPASPROYECTOSCLIENTE
+                                    .Where(se => se.SecuencialEtapaProyecto == idEtapa);
+                db.SUBETAPASPROYECTOSCLIENTE.RemoveRange(subEtapas);
+
                 var item = db.EtapasProyectoCliente.Find(idEtapa);
                 db.EtapasProyectoCliente.Remove(item);
-                db.SaveChanges();
+
+                db.SaveChanges(); ;
 
                 var resp = new
                 {
                     success = true,
+                    msg = "Se ha eliminado correctamente la etapa del proyecto."
                 };
                 return Json(resp);
             }
@@ -3422,6 +3428,7 @@ r in db.Rol on ur.rol equals r
                 var resp = new
                 {
                     success = true,
+                    msg = "Se ha eliminado correctamente la subetapa."
                 };
                 return Json(resp);
             }
@@ -3873,6 +3880,7 @@ r in db.Rol on ur.rol equals r
                     descripcion = c.descripcion,
                     fechaInicio = c.fechaInicio.ToString("dd/MM/yyy"),
                     fechaFin = c.fechaFin.ToString("dd/MM/yyy"),
+                    duracion = (c.fechaFin - c.fechaInicio).Days
                 }).ToList();
 
                 if (filtro != "")

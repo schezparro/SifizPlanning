@@ -1081,13 +1081,13 @@ namespace SifizPlanning
             routes.MapRoute(
                 name: "EliminarEtapaProyecto",
                 url: "user/eliminar-etapa-proyecto/{id}",
-                defaults: new { controller = "Admin", action = "EliminarEtapaProyecto", id = UrlParameter.Optional }
+                defaults: new { controller = "User", action = "EliminarEtapaProyecto", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(
                 name: "EliminarSubEtapaProyecto",
                 url: "user/eliminar-sub-etapa-proyecto/{id}",
-                defaults: new { controller = "Admin", action = "EliminarSubEtapaProyecto", id = UrlParameter.Optional }
+                defaults: new { controller = "User", action = "EliminarSubEtapaProyecto", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(

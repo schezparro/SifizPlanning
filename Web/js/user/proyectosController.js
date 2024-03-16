@@ -86,6 +86,14 @@
         forceParse: false
     });
 
+    $scope.updateMinDateEtapa = function () {
+        angular.element('#fecha-fin-etapa').datepicker('setStartDate', $scope.fechaIniEta);
+    };
+
+    $scope.updateMinDateSubEtapa = function () {
+        angular.element('#fecha-fin-subetapa').datepicker('setStartDate', $scope.fechaIniSubE);
+    };
+
     $scope.windowAgregarProyecto = function () {
         $scope.ubicacionPro = '';
         $scope.codigoFuentePro = false;
@@ -251,31 +259,31 @@
             if (data.success === true) {
                 var posPagin = pagina;
                 $scope.etapas = data.etapas;
-                $scope.cantPaginas = Math.ceil(data.total / numerosPorPagina);
-                if ($scope.cantPaginas === 0) {
-                    $scope.cantPaginas = 1;
+                $scope.cantPaginasE = Math.ceil(data.total / numerosPorPagina);
+                if ($scope.cantPaginasE === 0) {
+                    $scope.cantPaginasE = 1;
                 }
 
-                $scope.listaPaginas = [];
-                if ($scope.cantPaginas > 5 && pagina <= 5) {
+                $scope.listaPaginasE = [];
+                if ($scope.cantPaginasE > 5 && pagina <= 5) {
                     for (var i = 1; i <= 5; i++) {
-                        $scope.listaPaginas.push(i);
+                        $scope.listaPaginasE.push(i);
                     }
                 }
-                else if ($scope.cantPaginas < 5) {
-                    for (var i = 1; i <= $scope.cantPaginas; i++) {
-                        $scope.listaPaginas.push(i);
+                else if ($scope.cantPaginasE < 5) {
+                    for (var i = 1; i <= $scope.cantPaginasE; i++) {
+                        $scope.listaPaginasE.push(i);
                     }
                 }
-                else if ($scope.cantPaginas > 5) {
+                else if ($scope.cantPaginasE > 5) {
                     for (var i = pagina - 4; i <= pagina; i++) {
-                        $scope.listaPaginas.push(i);
+                        $scope.listaPaginasE.push(i);
                     }
                     posPagin = 5;
                 }
 
-                if (pagina > $scope.cantPaginas) {
-                    pagina = $scope.cantPaginas;
+                if (pagina > $scope.cantPaginasE) {
+                    pagina = $scope.cantPaginasE;
                     posPagin = pagina;
                 }
 
@@ -300,6 +308,12 @@
         //var cliAux = proyectoId;
         var fechaInicioEta = angular.element("#fecha-inicio-etapa")[0].value;
         var fechaFinEta = angular.element("#fecha-fin-etapa")[0].value;
+
+        console.log(fechaInicioEta);
+        if (fechaInicioEta > fechaFinEta) {
+            $scope.informacion = "La fecha de inicio no puede ser mayor que la fecha final"
+            angular.element("#modal-info-proyectos").modal("show");
+        };
 
         var formData = new FormData();
         formData.append('etapa', etapa);
@@ -372,33 +386,33 @@
             $scope.loading.hide();
             if (data.success === true) {
                 var posPagin = pagina;
-                console.log(data.subetapas);
+
                 $scope.subEtapas = data.subetapas;
-                $scope.cantPaginas = Math.ceil(data.total / numerosPorPagina);
-                if ($scope.cantPaginas === 0) {
-                    $scope.cantPaginas = 1;
+                $scope.cantPaginasSE = Math.ceil(data.total / numerosPorPagina);
+                if ($scope.cantPaginasSE === 0) {
+                    $scope.cantPaginasSE = 1;
                 }
 
-                $scope.listaPaginas = [];
-                if ($scope.cantPaginas > 5 && pagina <= 5) {
+                $scope.listaPaginasSE = [];
+                if ($scope.cantPaginasSE > 5 && pagina <= 5) {
                     for (var i = 1; i <= 5; i++) {
-                        $scope.listaPaginas.push(i);
+                        $scope.listaPaginasSE.push(i);
                     }
                 }
-                else if ($scope.cantPaginas < 5) {
-                    for (var i = 1; i <= $scope.cantPaginas; i++) {
-                        $scope.listaPaginas.push(i);
+                else if ($scope.cantPaginasSE < 5) {
+                    for (var i = 1; i <= $scope.cantPaginasSE; i++) {
+                        $scope.listaPaginasSE.push(i);
                     }
                 }
-                else if ($scope.cantPaginas > 5) {
+                else if ($scope.cantPaginasSE > 5) {
                     for (var i = pagina - 4; i <= pagina; i++) {
-                        $scope.listaPaginas.push(i);
+                        $scope.listaPaginasSE.push(i);
                     }
                     posPagin = 5;
                 }
 
-                if (pagina > $scope.cantPaginas) {
-                    pagina = $scope.cantPaginas;
+                if (pagina > $scope.cantPaginasSE) {
+                    pagina = $scope.cantPaginasSE;
                     posPagin = pagina;
                 }
 
@@ -429,9 +443,6 @@
         formData.append('fechaIni', fechaInicioEta);
         formData.append('fechaFin', fechaFinEta);
 
-
-        console.log("recurso " + recurso);
-
         var ajaxEnvioDatos = $http({
             method: 'POST',
             url: "user/guardar-sub-etapas-proyecto",
@@ -454,9 +465,7 @@
     $scope.EliminarEtapaProyecto = function (etapaId) {
         var qMsgDialog = new questionMsgDialog();
 
-        console.log(etapaId);
-
-        qMsgDialog.show('Información', 'Está seguro de querer eliminar la etapa del proyecto.', 'Si, estoy seguro', function () {
+        qMsgDialog.show('Información', 'Está seguro de querer eliminar la etapa del proyecto. Al eliminar la etapa se eliminarán todas las subetapas de esta etapa.', 'Si, estoy seguro', function () {
             waitingDialog.show('Eliminando...', { dialogSize: 'sm', progressType: 'success' });
             var eliminarEtapa = $http.post("user/eliminar-etapa-proyecto", {
                 idEtapa: etapaId
@@ -466,7 +475,7 @@
                 qMsgDialog.hide();
                 if (data.success === true) {
                     messageDialog.show('Información', data.msg);
-                    cargarEtapas();
+                    $scope.cargarEtapas();
                 }
                 else {
                     messageDialog.show('Información', data.msg);
@@ -489,7 +498,7 @@
                 qMsgDialog.hide();
                 if (data.success === true) {
                     messageDialog.show('Información', data.msg);
-                    cargarSubEtapas();
+                    $scope.cargarSubEtapas();
                 }
                 else {
                     messageDialog.show('Información', data.msg);
@@ -505,13 +514,13 @@
         $scope.cargarProyectos(start, lenght);
     };
 
-    $scope.paginar = function () {
+    $scope.paginarEtapas = function () {
         var start = (pagina - 1) * numerosPorPagina;
         var lenght = numerosPorPagina;
         $scope.cargarEtapas(start, lenght);
     };
 
-    $scope.paginar = function () {
+    $scope.paginarSubEtapas = function () {
         var start = (pagina - 1) * numerosPorPagina;
         var lenght = numerosPorPagina;
         $scope.cargarSubEtapas(start, lenght);
@@ -532,6 +541,44 @@
         if (pagina < $scope.cantPaginas) {
             pagina++;
             $scope.paginar();
+        }
+    };
+
+    $scope.cambiarPaginaEtapas = function (pag) {
+        pagina = pag;
+        $scope.paginarEtapas();
+    };
+
+    $scope.atrazarPaginaEtapas = function () {
+        if (pagina > 1) {
+            pagina--;
+            $scope.paginarEtapas();
+        }
+    };
+
+    $scope.avanzarPaginaEtapas = function () {
+        if (pagina < $scope.cantPaginas) {
+            pagina++;
+            $scope.paginarEtapas();
+        }
+    };
+
+    $scope.cambiarPaginaSubEtapas = function (pag) {
+        pagina = pag;
+        $scope.paginarSubEtapas();
+    };
+
+    $scope.atrazarPaginaSubEtapas = function () {
+        if (pagina > 1) {
+            pagina--;
+            $scope.paginarSubEtapas();
+        }
+    };
+
+    $scope.avanzarPaginaSubEtapas = function () {
+        if (pagina < $scope.cantPaginas) {
+            pagina++;
+            $scope.paginarSubEtapas();
         }
     };
 }]);

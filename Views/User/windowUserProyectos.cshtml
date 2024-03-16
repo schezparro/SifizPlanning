@@ -28,7 +28,7 @@
                 <td>{{proyecto.responsableCodigo}}</td>
                 <td>{{proyecto.responsablePublicacion}}</td>
                 <td>
-                    <button type="button" class="btn btn-xs btn-success" ng-click="abrirModalGenerarInforme(proyecto.id)"><span class="glyphicon glyphicon-ok"></span> Registrar cronograma</button>
+                    <button type="button" class="btn btn-xs btn-success" ng-click="abrirModalGenerarInforme(proyecto.id)"><span class="glyphicon glyphicon-calendar"></span> Registrar cronograma</button>
                 </td>
                 <td>
                     <button type="button" class="btn btn-xs btn-success" ng-click="abrirModalGenerarReporte(proyecto.id)"><span class="glyphicon glyphicon-ok"></span> Generar informe</button>
@@ -205,7 +205,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Gestión de etapas de proyecto </h4>
             </div>
-            
+
             <div class="modal-body">
                 <div style="padding: 10px, 10px">
                     <button class="btn btn-primary" ng-click="windowAgregarEtapasProyecto(proyectoId)">Nueva Etapa</button>
@@ -247,13 +247,13 @@
 
                                     <nav>
                                         <ul class="pagination">
-                                            <li ng-click="atrazarPagina()">
+                                            <li ng-click="atrazarPaginaEtapas()">
                                                 <a href="#" aria-label="Previous">
                                                     <span aria-hidden="true">&laquo;</span>
                                                 </a>
                                             </li>
-                                            <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
-                                            <li ng-click="avanzarPagina()">
+                                            <li ng-repeat="pagina in listaPaginasE" ng-click="cambiarPaginaEtapas(pagina)"><a href="#">{{pagina}}</a></li>
+                                            <li ng-click="avanzarPaginaEtapas()">
                                                 <a href="#" aria-label="Next">
                                                     <span aria-hidden="true">&raquo;</span>
                                                 </a>
@@ -271,8 +271,8 @@
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </div>
-            </div>
         </div>
+    </div>
 </div>
 
 @*MODAL NUEVA ETAPA*@
@@ -298,7 +298,7 @@
                             <div class="div-info-ticket">
                                 <label for="fecha-inicio-etapa">FECHA INICIO:</label>
                                 <div class='input-group date'>
-                                    <input id="fecha-inicio-etapa" ng-model="fechaIniEta" class="form-control" ng-required="true" autocomplete="off" />
+                                    <input id="fecha-inicio-etapa" ng-model="fechaIniEta" class="form-control" ng-required="true" autocomplete="off" ng-change="updateMinDateEtapa()" />
                                 </div>
                             </div>
 
@@ -312,6 +312,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="submit" id="enviar-modal-etapas-btn" class="btn btn-primary">Guardar</button>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </form>
@@ -339,6 +340,7 @@
                         <thead>
                             <tr>
                                 <th>Descripción</th>
+                                <th>Duración</th>
                                 <th>Fecha Inicio</th>
                                 <th>Fecha Fin</th>
                                 <th>Recurso</th>
@@ -349,6 +351,7 @@
                         <tbody>
                             <tr ng-repeat="subetapa in subEtapas" ng-dblclick="mostrarWindowSubEtapasProyectos(etapa)">
                                 <td>{{subetapa.descripcion | strLimit: 75}}</td>
+                                <td>{{subetapa.duracion}}</td>
                                 <td>{{subetapa.fechaInicio}}</td>
                                 <td>{{subetapa.fechaFin}}</td>
                                 <td>{{subetapa.descripcion }}</td>
@@ -364,13 +367,13 @@
 
                                     <nav>
                                         <ul class="pagination">
-                                            <li ng-click="atrazarPagina()">
+                                            <li ng-click="atrazarPaginaSubEtapas()">
                                                 <a href="#" aria-label="Previous">
                                                     <span aria-hidden="true">&laquo;</span>
                                                 </a>
                                             </li>
-                                            <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
-                                            <li ng-click="avanzarPagina()">
+                                            <li ng-repeat="pagina in listaPaginasSE" ng-click="cambiarPaginaSubEtapas(pagina)"><a href="#">{{pagina}}</a></li>
+                                            <li ng-click="avanzarPaginaSubEtapas()">
                                                 <a href="#" aria-label="Next">
                                                     <span aria-hidden="true">&raquo;</span>
                                                 </a>
@@ -388,8 +391,8 @@
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </div>
-            </div>
         </div>
+    </div>
 </div>
 
 <div id="modal-agregar-sub-etapas-proyecto" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -416,14 +419,14 @@
                             <div class="div-info-ticket">
                                 <label for="fecha-inicio-subetapa">FECHA INICIO:</label>
                                 <div class='input-group date'>
-                                    <input id="fecha-inicio-subetapa" ng-model="fechaIniSubE" class="form-control" ng-required="true" autocomplete="off" />
+                                    <input id="fecha-inicio-subetapa" ng-model="fechaIniSubE" class="form-control" ng-required="true" autocomplete="off"  ng-change="updateMinDateSubEtapa()"/>
                                 </div>
                             </div>
 
                             <div class="div-info-ticket">
                                 <label for="fecha-fin-subetapa">FECHA FIN:</label>
                                 <div class='input-group date'>
-                                    <input id="fecha-fin-subetapa" ng-model="fechaFinSubE" class="form-control" ng-required="true" autocomplete="off" />
+                                    <input id="fecha-fin-subetapa" ng-model="fechaFinSubE" class="form-control" ng-required="true" autocomplete="off"/>
                                 </div>
                             </div>
                         </div>
@@ -437,4 +440,3 @@
         </div>
     </div>
 </div>
-
