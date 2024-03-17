@@ -419,14 +419,14 @@
                             <div class="div-info-ticket">
                                 <label for="fecha-inicio-subetapa">FECHA INICIO:</label>
                                 <div class='input-group date'>
-                                    <input id="fecha-inicio-subetapa" ng-model="fechaIniSubE" class="form-control" ng-required="true" autocomplete="off"  ng-change="updateMinDateSubEtapa()"/>
+                                    <input id="fecha-inicio-subetapa" ng-model="fechaIniSubE" class="form-control" ng-required="true" autocomplete="off" ng-change="updateMinDateSubEtapa()" />
                                 </div>
                             </div>
 
                             <div class="div-info-ticket">
                                 <label for="fecha-fin-subetapa">FECHA FIN:</label>
                                 <div class='input-group date'>
-                                    <input id="fecha-fin-subetapa" ng-model="fechaFinSubE" class="form-control" ng-required="true" autocomplete="off"/>
+                                    <input id="fecha-fin-subetapa" ng-model="fechaFinSubE" class="form-control" ng-required="true" autocomplete="off" />
                                 </div>
                             </div>
                         </div>
@@ -437,6 +437,74 @@
                     <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Informe -->
+<div class="modal fade" id="modal-informe-proyecto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" style="overflow:hidden">
+            <div class="modal-header" style="padding: 10px, 10px">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Gestión de etapas de proyecto </h4>
+            </div>
+
+            <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
+               
+                <div id="div-user-informe-proyecto">
+                    <table id="tabla-user-informe-proyecto" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" ng-model="selectAll" ng-click="toggleAll()"></th>
+                                <th>Descripción</th>
+                                <th>Duración</th>
+                                <th>Fecha Inicio</th>
+                                <th>Fecha Fin</th>
+                                <th>Recurso</th>
+                                <th>% Cumplimiento</th>
+                                <th>Detalle</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr ng-repeat="item in datosAplanados" ng-style="item.tipo === 'etapa' ? {'background-color': '#d0e0f0'} : {}" ng-class="{'etapa-row': item.tipo === 'etapa', 'subetapa-row': item.tipo === 'subetapa'}">
+                                <td ng-if="item.tipo === 'etapa'">
+                                    <input type="checkbox" ng-model="item.selected" ng-click="toggleSubEtapas(item)">
+                                </td>
+                                <td ng-if="item.tipo === 'etapa'">{{item.descripcion | strLimit: 75}}</td>
+                                <td ng-if="item.tipo === 'etapa'">{{item.duracion}}</td>
+                                <td ng-if="item.tipo === 'etapa'">{{item.fechaInicio}}</td>
+                                <td ng-if="item.tipo === 'etapa'">{{item.fechaFin}}</td>
+                                <td ng-if="item.tipo === 'etapa'"></td>
+                                <td ng-if="item.tipo === 'etapa'">
+                                    <input type="text" style="width: 50px; height: 20px; resize: none;" ng-model="item.porciento" ng-blur="GuardarValor(item, 'porciento')">
+                                </td>
+                                <td ng-if="item.tipo === 'etapa'">
+                                    <input type="text" ng-model="item.mensaje" ng-blur="GuardarValor(item, 'mensaje')">
+                                </td>
+                                <td ng-if="item.tipo === 'subetapa'">
+                                    <input type="checkbox" ng-model="item.selected" ng-checked="item.selected">
+                                </td>
+                                <td ng-if="item.tipo === 'subetapa'">{{item.descripcion | strLimit: 75}}</td>
+                                <td ng-if="item.tipo === 'subetapa'">{{item.duracion}}</td>
+                                <td ng-if="item.tipo === 'subetapa'">{{item.fechaInicio}}</td>
+                                <td ng-if="item.tipo === 'subetapa'">{{item.fechaFin}}</td>
+                                <td ng-if="item.tipo === 'subetapa'">{{item.recurso}}</td>
+                                <td ng-if="item.tipo === 'subetapa'">
+                                    <input type="text" style="width: 50px; height: 20px; resize: none;" ng-model="item.porciento" ng-blur="GuardarValor(item, 'porciento')">
+                                </td>
+                                <td ng-if="item.tipo === 'subetapa'">
+                                    <input type="text" ng-model="item.mensaje" ng-blur="GuardarValor(item, 'mensaje')">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>

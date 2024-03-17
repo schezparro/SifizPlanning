@@ -1109,6 +1109,12 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "DarDatosProyectos",
+                url: "user/dar-datos-proyecto/{id}",
+                defaults: new { controller = "User", action = "DarDatosProyectos", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "GuardarRecurso",
                 url: "user/guardar-recurso/{id}",
                 defaults: new { controller = "User", action = "GuardarRecurso", id = UrlParameter.Optional }

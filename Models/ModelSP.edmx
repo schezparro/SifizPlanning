@@ -1438,6 +1438,9 @@
           <Property Name="FECHAFIN" Type="date" Nullable="false" />
           <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="SECUENCIALCLIENTEAUXILIAR" Type="int" />
+          <Property Name="DETALLE" Type="varchar" MaxLength="255" />
+          <Property Name="SELECCIONADO" Type="numeric" Precision="1" Scale="0" />
+          <Property Name="PORCIENTO" Type="float" />
         </EntityType>
         <EntityType Name="FLUJOESTADOTICKET">
           <Key>
@@ -1756,6 +1759,9 @@
           <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="FECHACOMIENZO" Type="date" Nullable="false" />
           <Property Name="FECHAFIN" Type="date" Nullable="false" />
+          <Property Name="DETALLE" Type="varchar" MaxLength="255" />
+          <Property Name="SELECCIONADO" Type="numeric" Precision="1" Scale="0" />
+          <Property Name="PORCIENTO" Type="float" />
         </EntityType>
         <EntityType Name="TICKET">
           <Key>
@@ -12417,6 +12423,9 @@
           <Property Name="SecuencialClienteAuxiliar" Type="Int32" />
           <NavigationProperty Name="clienteAuxiliar" Relationship="SifizPlanningModel.FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1" FromRole="ETAPASPROYECTOCLIENTE" ToRole="ClienteAuxiliar" />
           <NavigationProperty Name="subEtapasProyectosCliente" Relationship="SifizPlanningModel.FK_SUBETAPASPROYECTOSCLIENTE_ETAPASPROYECTOCLIENTE" FromRole="ETAPASPROYECTOCLIENTE" ToRole="SUBETAPASPROYECTOSCLIENTE" />
+          <Property Name="Detalle" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Seleccionado" Type="Decimal" Precision="1" Scale="0" />
+          <Property Name="Porciento" Type="Double" />
         </EntityType>
         <EntityType Name="RecursosSubEtapasProyecto">
           <Key>
@@ -12442,6 +12451,9 @@
           <Property Name="FechaFin" Type="DateTime" Nullable="false" Precision="0" />
           <NavigationProperty Name="etapasProyectosCliente" Relationship="SifizPlanningModel.FK_SUBETAPASPROYECTOSCLIENTE_ETAPASPROYECTOCLIENTE" FromRole="SUBETAPASPROYECTOSCLIENTE" ToRole="ETAPASPROYECTOCLIENTE" />
           <NavigationProperty Name="recursosSubEtapasProyecto" Relationship="SifizPlanningModel.FK_SUBETAPASPROYECTOSCLIENTE_RECURSOSSUBETAPASPROYECTO" FromRole="SUBETAPASPROYECTOSCLIENTE" ToRole="RECURSOSSUBETAPASPROYECTO" />
+          <Property Name="Detalle" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Seleccionado" Type="Decimal" Precision="1" Scale="0" />
+          <Property Name="Porciento" Type="Double" />
         </EntityType>
         <Association Name="FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1">
           <End Type="SifizPlanningModel.ClienteAuxiliar" Role="ClienteAuxiliar" Multiplicity="0..1" />
@@ -14620,6 +14632,9 @@
           <EntitySetMapping Name="EtapasProyectoCliente">
             <EntityTypeMapping TypeName="SifizPlanningModel.EtapasProyectoCliente">
               <MappingFragment StoreEntitySet="ETAPASPROYECTOCLIENTE">
+                <ScalarProperty Name="Porciento" ColumnName="PORCIENTO" />
+                <ScalarProperty Name="Seleccionado" ColumnName="SELECCIONADO" />
+                <ScalarProperty Name="Detalle" ColumnName="DETALLE" />
                 <ScalarProperty Name="SecuencialClienteAuxiliar" ColumnName="SECUENCIALCLIENTEAUXILIAR" />
                 <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
                 <ScalarProperty Name="FechaFin" ColumnName="FECHAFIN" />
@@ -14643,6 +14658,9 @@
           <EntitySetMapping Name="SUBETAPASPROYECTOSCLIENTE">
             <EntityTypeMapping TypeName="SifizPlanningModel.SubEtapasProyectosCliente">
               <MappingFragment StoreEntitySet="SUBETAPASPROYECTOSCLIENTE">
+                <ScalarProperty Name="Porciento" ColumnName="PORCIENTO" />
+                <ScalarProperty Name="Seleccionado" ColumnName="SELECCIONADO" />
+                <ScalarProperty Name="Detalle" ColumnName="DETALLE" />
                 <ScalarProperty Name="FechaFin" ColumnName="FECHAFIN" />
                 <ScalarProperty Name="FechaComienzo" ColumnName="FECHACOMIENZO" />
                 <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />

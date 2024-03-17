@@ -33,6 +33,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Configuration;
+using System.Data.Entity;
 
 namespace SifizPlanning.Controllers
 {
@@ -3156,6 +3157,73 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult DarDatosProyectos(int idProyecto)
+        {
+            var datos = (from epc in db.EtapasProyectoCliente
+                         join ep in db.EtapasProyecto on epc.SecuencialEtapaProyecto equals ep.Secuencial
+                         where epc.SecuencialClienteAuxiliar == idProyecto
+                         orderby epc.Secuencial
+                         select new
+                         {
+                             idEtapa = epc.Secuencial,
+                             descripcion = ep.Descripcion,
+                             fechaInicio = epc.FechaInicio,
+                             fechaFin = epc.FechaFin,
+                             detalle = epc.Detalle,
+                             porciento = epc.Porciento,
+                             seleccionado = epc.Seleccionado,
+                             subEtapas = (from sep2 in db.SUBETAPASPROYECTOSCLIENTE
+                                          join r in db.RecursosSubEtapasProyecto on sep2.SecuencialRecuros equals r.Secuencial
+                                          where sep2.SecuencialEtapaProyecto == epc.Secuencial
+                                          select new
+                                          {
+                                              idEtapaSE = sep2.Secuencial,                                            
+                                              descripcionSE = sep2.Descripcion,
+                                              fechaInicioSE = sep2.FechaComienzo,
+                                              fechaFinSE = sep2.FechaFin,
+                                              recursoSE = r.Descripcion,
+                                              idRecurso = r.Secuencial,
+                                              detalle = sep2.Detalle,
+                                              porciento = sep2.Porciento,
+                                              seleccionado = sep2.Seleccionado
+                                          }).ToList()
+                         }).ToList();
+
+            // Realiza la conversión de las fechas y el cálculo de la duración para las etapas
+            var etapasSubEtapas = datos.Select(d => new
+            {
+                idEtapa = d.idEtapa,
+                descripcion = d.descripcion,
+                fechaInicio = d.fechaInicio.ToString("dd/MM/yyyy"),
+                fechaFin = d.fechaFin.ToString("dd/MM/yyyy"),
+                duracion = (d.fechaFin - d.fechaInicio).Days,
+                detalle = d.detalle,
+                porciento = d.porciento,
+                selected = d.seleccionado,
+                subEtapas = d.subEtapas.Select(se => new
+                {
+                    idEtapaSE = se.idEtapaSE,
+                    descripcionSE = se.descripcionSE,
+                    fechaInicioSE = se.fechaInicioSE.ToString("dd/MM/yyyy"),
+                    fechaFinSE = se.fechaFinSE.ToString("dd/MM/yyyy"),
+                    recursoSE = se.recursoSE,
+                    idRecurso = se.idRecurso,
+                    duracionSE = (se.fechaFinSE - se.fechaInicioSE).Days,
+                    detalle = se.detalle,
+                    porciento = se.porciento,
+                    selected = se.seleccionado
+                }).ToList()
+            }).ToList();
+
+            return Json(new
+            {
+                success = true,
+                datosInforme = etapasSubEtapas
+            });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
         public ActionResult DarTipoRecursosSubEtapas()
         {
             var datos = (from tm in db.RecursosSubEtapasProyecto
@@ -3792,13 +3860,14 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult EtapasProyectosUsuario(int start, int lenght, string filtro = "")
+        public ActionResult EtapasProyectosUsuario(int idProyecto, int start, int lenght, string filtro = "")
         {
             try
             {
+
                var etapasProyectosUsuario = (from c in db.EtapasProyectoCliente
                                              join ca in db.EtapasProyecto on c.SecuencialEtapaProyecto equals ca.Secuencial
-                                        where c.EstaActivo == 1
+                                        where c.EstaActivo == 1 && c.SecuencialClienteAuxiliar == idProyecto
                                         orderby c.Secuencial
                                         select new
                                         {
@@ -3854,13 +3923,13 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult SubEtapasProyectosUsuario(int start, int lenght, string filtro = "")
+        public ActionResult SubEtapasProyectosUsuario(int idEtapa, int start, int lenght, string filtro = "")
         {
             try
             {
                 var subEtapasProyectosUsuario = (from c in db.SUBETAPASPROYECTOSCLIENTE
                                               join ca in db.RecursosSubEtapasProyecto on c.SecuencialRecuros equals ca.Secuencial
-                                              where c.EstaActivo == 1
+                                              where c.EstaActivo == 1 && c.SecuencialEtapaProyecto == idEtapa
                                               orderby c.Secuencial
                                               select new
                                               {
