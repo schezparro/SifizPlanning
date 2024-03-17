@@ -26,6 +26,8 @@
     <script type="text/javascript" src="~/Web/js/jquery.json-list.js"></script>
     <script type="text/javascript" src="~/Web/js/jspdf.min.js"></script>
     <script type="text/javascript" src="~/Web/js/jspdf.debug.js"></script>
+    <script type="text/javascript" src="~/Web/js/jspdf.umd.min.js"></script>
+
 
 </head>
 <body ng-controller="rrhhController">
@@ -70,7 +72,7 @@
                 <div id="panel-permisos" class="invisible" ng-controller="solicitudesController">
                     @{Html.RenderPartial("windowControlVacaciones");}
                 </div>
-                
+
                 <div id="panel-feriados" class="invisible" ng-controller="feriadosController">
                     @{Html.RenderPartial("windowFeriados");}
                 </div>
@@ -145,8 +147,7 @@
     <script type="text/javascript" src="~/Web/js/rrhh/rrhh.js"></script>
     <script type="text/javascript" src="~/Web/js/rrhh/solicitudesController.js"></script>
     <script type="text/javascript" src="~/Web/js/rrhh/feriadosController.js"></script>
-    <script type="text/javascript" src="~/Web/js/jspdf.min.js"></script>
-    <script type="text/javascript" src="~/Web/js/jspdf.debug.js"></script>
+    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
 
 </body>
 </html>

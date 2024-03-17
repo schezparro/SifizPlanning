@@ -1,6 +1,4 @@
-﻿<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<div>
+﻿<div>
     <input type="text" id="filtro-permisos" placeholder="Filtrar..." ng-model="filtroPermisos" class="form-control right filtro" />
 </div>
 <div class="left">
@@ -10,7 +8,7 @@
     </div>
 </div>
 <div class="clear"></div>
-<div ng-show="esVacaciones" style="height: calc(100vh - 175px); width: 100%; overflow-y: auto; overflow-x: no-display;">
+<div ng-show="esVacaciones" style="height: calc(100vh - 175px); width: 100%; overflow-y: auto;">
     <table class="table table-striped table-condensed">
         <thead>
             <tr>
@@ -282,7 +280,6 @@
                         <tr>
                             <td colspan="4">
                                 <strong>OBSERVACIONES:</strong>
-                                <span>{{solicitudVacacionesUsuario.Observaciones}}</span>
                             </td>
                             <td colspan="8">
                                 <span>{{solicitudVacacionesUsuario.Observaciones}}</span>
@@ -298,7 +295,7 @@
                         <tr>
                             <td colspan="12">
                                 <strong>APELLIDOS Y NOMBRES JEFE (A) INMEDIATO:</strong>
-                                <span>{{solicitudPerUsuario.Jefe}}</span>
+                                <span>{{solicitudVacacionesUsuario.Jefe}}</span>
                             </td>
                         </tr>
 
@@ -411,7 +408,7 @@
                         <tr>
                             <td colspan="6">
                                 <strong>Apellidos y Nombres:</strong>
-                                <span>{{solicitudVacacionesUsuario.ApellidosNombres}}</span>
+                                <span>{{solicitudPerUsuario.ApellidosNombres}}</span>
                             </td>
 
                             <td colspan="6">
@@ -423,7 +420,7 @@
                         <tr>
                             <td colspan="6">
                                 <strong>Cargo:</strong>
-                                <span>{{solicitudVacacionesUsuario.Cargo}}</span>
+                                <span>{{solicitudPerUsuario.Cargo}}</span>
                             </td>
 
                             <td colspan="6">
@@ -435,12 +432,12 @@
                         <tr>
                             <td colspan="6">
                                 <strong>Fecha de Ingreso de la Solicitud:</strong>
-                                <span>{{solicitudVacacionesUsuario.FechaIngresoSolicitud | strDateToStr}}</span>
+                                <span>{{solicitudPerUsuario.FechaIngresoSolicitud | strDateToStr}}</span>
                             </td>
 
                             <td colspan="6">
                                 <strong>Empresa:</strong>
-                                <span>{{solicitudVacacionesUsuario.Empresa}}</span>
+                                <span>{{solicitudPerUsuario.Empresa}}</span>
                             </td>
                         </tr>
 
