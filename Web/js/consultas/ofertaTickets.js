@@ -4,6 +4,8 @@
 
     var numerosPorPagina = 10;
     var pagina = 1;
+    var start = 0;
+    var length = 10;
 
     $scope.cambiarPagina = function (pag) {
         pagina = pag;
@@ -30,10 +32,10 @@
     };
 
     $scope.paginar = function () {
-        var start = (pagina - 1) * numerosPorPagina;
-        var lenght = numerosPorPagina;
+        start = (pagina - 1) * numerosPorPagina;
+        length = numerosPorPagina; 
 
-        $scope.recargarDatosOfertas(start, lenght);
+        $scope.recargarDatosOfertas();
     };
 
     $scope.editarOferta = function (oferta, index) {
@@ -172,7 +174,7 @@
         });
     };
 
-    $scope.recargarDatosOfertas = function (start, length) {
+    $scope.recargarDatosOfertas = function () {
 
         var ajaxOfertas = $http.post("consultas/dar-ofertas-tickets", {
             start: start,
