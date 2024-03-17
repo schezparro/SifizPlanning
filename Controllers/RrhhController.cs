@@ -228,6 +228,7 @@ namespace SifizPlanning.Controllers
                     solPermisos.Paternidad = solicitud.Paternidad ? "SI" : "NO";
                     solPermisos.Personal = solicitud.Personal ? "SI" : "NO";
                     solPermisos.Estado = solicitud.Estado != null ? solicitud.Estado == 1 ? "APROBADA" : "RECHAZADA" : "PENDIENTE";
+                    solPermisos.TotalHoras = (solicitud.FechaHasta.Add(solicitud.HoraRetorno) - solicitud.FechaDesde.Add(solicitud.HoraSalida)).TotalHours;
                     solicitudesPermisosDTO.Add(solPermisos);
                 }
 

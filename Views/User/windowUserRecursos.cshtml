@@ -4,7 +4,10 @@
     <input style="vertical-align: -2px;" type="checkbox" ng-click="cargarRecursos()" ng-model="mostrarTodosRecursos" ng-init="mostrarTodosRecursos=false" />
 </label>
  -->
-<button class="btn btn-primary" ng-click="windowAgregarRecursos()">Nueva Capacitación</button>
+@if (Roles.IsUserInRole("ADMIN") || Roles.IsUserInRole("OPERACIONES"))
+{
+    <button class="btn btn-primary" ng-click="windowAgregarRecursos()">Nueva Capacitación</button>
+}
 <input type="text" ng-keyup="cargarRecursos()" ng-model="filtroRecursos" class="form-control right filtro" placeholder="Filtrar..." />
 <div class="clear"></div>
 <div id="tabla-user-recursos">

@@ -2393,7 +2393,7 @@ r in db.Rol on ur.rol equals r
             try
             {
                 string emailUser = User.Identity.Name;
-                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser && x.EstaActivo == 1);
                 Persona persona = user.persona;
                 Colaborador colaborador = db.Colaborador.FirstOrDefault(x => x.persona.Secuencial == persona.Secuencial);
 
@@ -3612,7 +3612,7 @@ r in db.Rol on ur.rol equals r
 
         //Guardar modal nuevos recursos
         [HttpPost]
-        [Authorize(Roles = "USER, ADMIN")]
+        [Authorize(Roles = "OPERACIONES, ADMIN")]
         public ActionResult GuardarRecurso(string titulo, string detalle, DateTime fecha, int modulo, int tiempo, HttpPostedFileBase[] adjuntos = null, HttpPostedFileBase[] adjuntoAsistencia = null)
         {
             try

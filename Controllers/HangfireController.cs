@@ -2233,7 +2233,9 @@ namespace SifizPlanning.Controllers
                                               }).ToList();
 
                         var cliente = db.Cliente.FirstOrDefault(s => s.Secuencial == personaCliente.SecuencialCliente && s.EstaActivo == 1);
-                        string emailUser = cliente.persona_cliente.FirstOrDefault().persona.usuario.FirstOrDefault().Email;
+                        //string emailUser = cliente.persona_cliente.FirstOrDefault().persona.usuario.FirstOrDefault().Email;
+                        string emailUser = System.Configuration.ConfigurationManager.AppSettings["emailComercial"];
+                        emailUser += "@sifizsoft.com";
 
                         foreach (var ticket in ticketsCliente)
                         {
