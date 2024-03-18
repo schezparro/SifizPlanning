@@ -3452,6 +3452,58 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult GuardarValorInforme(string tabla, string tipo, int secuencial, string valorGuardar)
+        {
+            try
+            {
+                int valor;
+                if (tabla == "etapa") {
+                    var item = db.EtapasProyectoCliente.FirstOrDefault(t => t.Secuencial == secuencial);
+
+                    if (tipo == "mensaje")
+                    {
+                        item.Detalle = valorGuardar;
+                    } else if (tipo == "porciento")
+                    {
+                        valor = int.Parse(valorGuardar);
+                        item.Porciento = valor;
+                    }
+
+                } else if (tabla == "subetapa")
+                {
+                    var item = db.SUBETAPASPROYECTOSCLIENTE.FirstOrDefault(t => t.Secuencial == secuencial);
+
+                    if (tipo == "mensaje")
+                    {
+                        item.Detalle = valorGuardar;
+                    }
+                    else if (tipo == "porciento")
+                    {
+                        valor = int.Parse(valorGuardar);
+                        item.Porciento = valor;
+                    }
+                }
+
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
         public ActionResult EliminarEtapaProyecto(int idEtapa)
         {
             try
