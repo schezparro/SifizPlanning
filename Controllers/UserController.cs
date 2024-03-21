@@ -3352,7 +3352,7 @@ r in db.Rol on ur.rol equals r
         //Guardar modal nuevas incidencias
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult GuardarEtapasProyecto(string etapa, string cliAux, string fechaInicioEta, string fechaFinEta)
+        public ActionResult GuardarEtapasProyecto(int id, string etapa, string cliAux, string fechaInicioEta, string fechaFinEta)
         {
             try
             {
@@ -3371,16 +3371,28 @@ r in db.Rol on ur.rol equals r
                 int annoF = Int32.Parse(fechaF[2]);
                 DateTime fechaFin = new DateTime(annoF, mesF, diaF);
 
-                EtapasProyectoCliente nuevaEtapaProyecto = new EtapasProyectoCliente
+                if (id == 0)
                 {
-                    SecuencialEtapaProyecto = etapaId,
-                    SecuencialClienteAuxiliar = cliAuxId,
-                    FechaInicio = fechaInicio,
-                    FechaFin = fechaFin,
-                    EstaActivo = 1
-                };
+                    EtapasProyectoCliente nuevaEtapaProyecto = new EtapasProyectoCliente
+                    {
+                        SecuencialEtapaProyecto = etapaId,
+                        SecuencialClienteAuxiliar = cliAuxId,
+                        FechaInicio = fechaInicio,
+                        FechaFin = fechaFin,
+                        EstaActivo = 1
+                    };
 
-                db.EtapasProyectoCliente.Add(nuevaEtapaProyecto);
+                    db.EtapasProyectoCliente.Add(nuevaEtapaProyecto);
+                } else
+                {
+                    EtapasProyectoCliente editarEtapaProyecto = db.EtapasProyectoCliente.Find(id);
+                    editarEtapaProyecto.SecuencialEtapaProyecto = etapaId;
+                    editarEtapaProyecto.SecuencialClienteAuxiliar = cliAuxId;
+                    editarEtapaProyecto.FechaInicio = fechaInicio;
+                    editarEtapaProyecto.FechaFin = fechaFin;
+                    editarEtapaProyecto.EstaActivo = 1;
+                }
+                
                 db.SaveChanges();
 
                 return Json(new
@@ -3402,7 +3414,7 @@ r in db.Rol on ur.rol equals r
         //Guardar modal nuevas incidencias
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult GuardarSubEtapasProyecto(string descripcion, string recurso, string etapaId, string fechaIni, string fechaFin)
+        public ActionResult GuardarSubEtapasProyecto(int secuencial, string descripcion, string recurso, string etapaId, string fechaIni, string fechaFin)
         {
             try
             {
@@ -3421,17 +3433,30 @@ r in db.Rol on ur.rol equals r
                 int annoF = Int32.Parse(fechaF[2]);
                 DateTime fechaFinal = new DateTime(annoF, mesF, diaF);
 
-                SubEtapasProyectosCliente nuevaSubEtapaProyecto = new SubEtapasProyectosCliente
+                if (secuencial == 0)
                 {
-                    SecuencialEtapaProyecto = etap,
-                    SecuencialRecuros = recursoId,
-                    FechaComienzo = fechaInic,
-                    FechaFin = fechaFinal,
-                    Descripcion = descripcion,
-                    EstaActivo = 1
-                };
+                    SubEtapasProyectosCliente nuevaSubEtapaProyecto = new SubEtapasProyectosCliente
+                    {
+                        SecuencialEtapaProyecto = etap,
+                        SecuencialRecuros = recursoId,
+                        FechaComienzo = fechaInic,
+                        FechaFin = fechaFinal,
+                        Descripcion = descripcion,
+                        EstaActivo = 1
+                    };
 
-                db.SUBETAPASPROYECTOSCLIENTE.Add(nuevaSubEtapaProyecto);
+                    db.SUBETAPASPROYECTOSCLIENTE.Add(nuevaSubEtapaProyecto);
+                } else
+                {
+                    SubEtapasProyectosCliente editarSubEtapaProyecto = db.SUBETAPASPROYECTOSCLIENTE.Find(secuencial);
+                    editarSubEtapaProyecto.SecuencialEtapaProyecto = etap;
+                    editarSubEtapaProyecto.SecuencialRecuros = recursoId;
+                    editarSubEtapaProyecto.FechaComienzo = fechaInic;
+                    editarSubEtapaProyecto.FechaFin = fechaFinal;
+                    editarSubEtapaProyecto.Descripcion = descripcion;
+                    editarSubEtapaProyecto.EstaActivo = 1;
+                }
+                
                 db.SaveChanges();
 
                 return Json(new
@@ -3988,7 +4013,8 @@ r in db.Rol on ur.rol equals r
                                                   id = c.Secuencial,
                                                   secuencialEtapa = c.SecuencialEtapaProyecto,
                                                   descripcion = c.Descripcion,
-                                                  recurso =ca.Descripcion,
+                                                  recurso = ca.Descripcion,
+                                                  recursoId = ca.Secuencial,
                                                   fechaInicio = c.FechaComienzo,
                                                   fechaFin = c.FechaFin
                                               }).ToList();
@@ -3998,6 +4024,7 @@ r in db.Rol on ur.rol equals r
                     id = c.id,
                     secuencialEtapa = c.secuencialEtapa,
                     recurso = c.recurso,
+                    recursoId = c.recursoId,
                     descripcion = c.descripcion,
                     fechaInicio = c.fechaInicio.ToString("dd/MM/yyy"),
                     fechaFin = c.fechaFin.ToString("dd/MM/yyy"),

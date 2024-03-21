@@ -411,8 +411,9 @@
         angular.element("#modal-agregar-etapas-proyecto").modal("show");
     };
 
-    $scope.windowAgregarSubEtapasProyecto = function (etapaId) {
-        $scope.etapaId = etapaId;
+    $scope.windowAgregarSubEtapasProyecto = function () {
+        $scope.subEtapaId = 0;
+        $scope.etapaId = $scope.etapasPro;
         $scope.descripcionSubE = '';
         $scope.recursosSubE = '';
         $scope.fechaIniSubE = '';
@@ -488,9 +489,14 @@
         var fechaInicioEta = angular.element("#fecha-inicio-subetapa")[0].value;
         var fechaFinEta = angular.element("#fecha-fin-subetapa")[0].value;
 
-        console.log("etapa id " + $scope.etapaId);
+        console.log(" sub etapa id " + $scope.etapaId);
 
         var formData = new FormData();
+        if ($scope.subEtapaId != undefined)
+            formData.append('secuencial', $scope.subEtapaId);
+        else 
+            formData.append('secuencial', 0);
+       
         formData.append('descripcion', $scope.descripcionSubE);
         formData.append('recurso', recurso);
         formData.append('etapaId', $scope.etapaId);
@@ -499,7 +505,7 @@
 
         var ajaxEnvioDatos = $http({
             method: 'POST',
-            url: "user/guardar-sub-etapas-proyecto",
+            url: "user/guardar-sub-etapas-proyecto/",
             data: formData,
             headers: { 'Content-Type': undefined },
             transformRequest: angular.identity
@@ -514,6 +520,18 @@
                 messageDialog.show("Información", data.msg);
             }
         });
+    };
+
+    $scope.editarSubEtapasProyectos = function (subetapa) {
+        console.log(subetapa);
+        $scope.etapaId = subetapa.idEtapa;
+        $scope.subEtapaId = subetapa.id;
+        $scope.descripcionSubE = subetapa.descripcion;
+        $scope.recursosSubE = subetapa.recursoId;
+        $scope.fechaIniSubE = subetapa.fechaInicio;
+        $scope.fechaFinSubE = subetapa.fechaFin;
+
+        angular.element("#modal-agregar-sub-etapas-proyecto").modal("show");
     };
 
     $scope.EliminarEtapaProyecto = function (etapaId) {

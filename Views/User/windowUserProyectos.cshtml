@@ -349,7 +349,7 @@
                         </thead>
 
                         <tbody>
-                            <tr ng-repeat="subetapa in subEtapas" ng-dblclick="mostrarWindowSubEtapasProyectos(etapa)">
+                            <tr ng-repeat="subetapa in subEtapas" ng-dblclick="editarSubEtapasProyectos(subetapa)">
                                 <td>{{subetapa.descripcion | strLimit: 75}}</td>
                                 <td>{{subetapa.duracion}}</td>
                                 <td>{{subetapa.fechaInicio}}</td>
