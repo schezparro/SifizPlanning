@@ -221,19 +221,17 @@
                                 <th>Duración</th>
                                 <th>Fecha Inicio</th>
                                 <th>Fecha Fin</th>
-                                <th>% Cumplimiento</th>
                             </tr>
                         </thead>
 
                         <tbody>
-                            <tr ng-repeat="etapa in etapas" ng-dblclick="mostrarWindowEtapasProyectos(etapa)">
+                            <tr ng-repeat="etapa in etapas" ng-dblclick="editarEtapasProyectos(etapa)">
                                 <td>{{etapa.descripcion | strLimit: 75}}</td>
                                 <td>{{etapa.duracion}}</td>
                                 <td>{{etapa.fechaInicio}}</td>
                                 <td>{{etapa.fechaFin}}</td>
-                                <td>{{etapa.descripcion }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-xs btn-success" ng-click="abrirModalAgregarSubTarea(etapa.id)"><span class="glyphicon glyphicon-ok"></span> Agregar Subetapa</button>
+                                    <button type="button" class="btn btn-xs btn-success" ng-click="abrirModalAgregarSubTarea(etapa)"><span class="glyphicon glyphicon-ok"></span> Agregar Subetapa</button>
                                 </td>
                                 <td>
                                     <button type="button" class="btn btn-xs btn-danger" ng-click="EliminarEtapaProyecto(etapa.id)"><span class="glyphicon glyphicon-ok"></span> Eliminar </button>
@@ -298,7 +296,7 @@
                             <div class="div-info-ticket">
                                 <label for="fecha-inicio-etapa">FECHA INICIO:</label>
                                 <div class='input-group date'>
-                                    <input id="fecha-inicio-etapa" ng-model="fechaIniEta" class="form-control" ng-required="true" autocomplete="off" ng-change="updateMinDateEtapa()" />
+                                    <input id="fecha-inicio-etapa" ng-model="fechaIniEta" class="form-control" ng-required="true" autocomplete="off" />
                                 </div>
                             </div>
 
@@ -330,7 +328,7 @@
             </div>
             <div class="modal-body">
                 <div>
-                    <button class="btn btn-primary" ng-click="windowAgregarSubEtapasProyecto(etapaId)">Nueva Subetapa</button>
+                    <button class="btn btn-primary" ng-click="windowAgregarSubEtapasProyecto()">Nueva Subetapa</button>
                     <input type="text" ng-keyup="cargarSubEtapas()" ng-model="filtroSubEtapas" class="form-control right filtro" placeholder="Filtrar..." />
                     <div class="clear"></div>
                 </div>
@@ -344,7 +342,6 @@
                                 <th>Fecha Inicio</th>
                                 <th>Fecha Fin</th>
                                 <th>Recurso</th>
-                                <th>% Cumplimiento</th>
                             </tr>
                         </thead>
 
@@ -354,7 +351,7 @@
                                 <td>{{subetapa.duracion}}</td>
                                 <td>{{subetapa.fechaInicio}}</td>
                                 <td>{{subetapa.fechaFin}}</td>
-                                <td>{{subetapa.descripcion }}</td>
+                                <td>{{subetapa.recurso}}</td>
                                 <td>
                                     <button type="button" class="btn btn-xs btn-danger" ng-click="EliminarSubEtapaProyecto(subetapa.id)"><span class="glyphicon glyphicon-ok"></span> Eliminar </button>
                                 </td>
@@ -426,7 +423,7 @@
                             <div class="div-info-ticket">
                                 <label for="fecha-fin-subetapa">FECHA FIN:</label>
                                 <div class='input-group date'>
-                                    <input id="fecha-fin-subetapa" ng-model="fechaFinSubE" class="form-control" ng-required="true" autocomplete="off" />
+                                    <input id="fecha-fin-subetapa" ng-model="fechaFinSubE" class="form-control" ng-required="true" autocomplete="off" ng-change="updateMinDateSubEtapa()"/>
                                 </div>
                             </div>
                         </div>
