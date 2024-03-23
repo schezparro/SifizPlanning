@@ -1427,6 +1427,12 @@ namespace SifizPlanning
                 defaults: new { controller = "User", action = "Sistema", id = UrlParameter.Optional }
             );
 
+            routes.MapRoute(
+               name: "DarEntregableTrabajo",
+               url: "user/dar-entregables-trabajo/{id}",
+               defaults: new { controller = "User", action = "DarEntregableTrabajo", id = UrlParameter.Optional }
+           );
+
             //--------------------- RUTAS DEL FTP -------------------------
             routes.MapRoute(
                 name: "DarFTP",

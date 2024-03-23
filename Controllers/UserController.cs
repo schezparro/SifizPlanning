@@ -33,6 +33,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Configuration;
+using System.Diagnostics.Contracts;
 
 namespace SifizPlanning.Controllers
 {
@@ -1565,6 +1566,42 @@ namespace SifizPlanning.Controllers
             }
         }
 
+        //ENTREGABLES(MOTIVO DE TRABAJO) DE LAS TAREAS
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult DarEntregableTrabajo(int idTarea)
+        {
+            try
+            {
+                var tarea = db.Tarea.Find(idTarea);
+                var idCliente = tarea.SecuencialCliente;
+
+                var datos = (from emt in db.EntregableMotivoTrabajo
+                             where emt.EstaActivo == 1 && emt.motivoTrabajo.SecuencialCliente == idCliente && emt.Avance != 100
+                             select new
+                             {
+                                 id = emt.Secuencial,
+                                 nombre = emt.motivoTrabajo.Codigo + "-" + emt.Nombre
+                             }).ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    datos = datos
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
         public ActionResult guardarComentarioNoTerminacionTarea(int idTarea, int proximaActividad, int causaNT, string comentario)
@@ -1624,7 +1661,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult AdicionarActividadTarea(int idTarea, int tipoTarea, string fecha, string horaInicio, string horaFin)
+        public ActionResult AdicionarActividadTarea(int idTarea, int tipoTarea, string fecha, string horaInicio, string horaFin, int ticketTarea = 0, int referencia = 0)
         {
             try
             {
@@ -1632,6 +1669,51 @@ namespace SifizPlanning.Controllers
                 if (tar == null)
                 {
                     throw new Exception("No se encontró la tarea, contacte el admin del sistema");
+                }
+
+                var tieneContrato = false;
+                if (referencia != 0)
+                {
+                    if (tar.entregableMotivoTrabajo == null)
+                    {
+                        EntregableMotivoTrabajo entregable = db.EntregableMotivoTrabajo.Find(referencia);
+                        if (entregable != null)
+                        {
+                            tar.entregableMotivoTrabajo = entregable;
+                            db.SaveChanges();
+                            tieneContrato = true;
+                        }
+                        else
+                        {
+                            throw new Exception("No se encontró el motivo trabajo");
+                        }
+                    }
+                }
+
+
+                var tieneTicket = false;
+                if (ticketTarea != 0)
+                {
+                    Ticket t = db.Ticket.Where(s => s.Secuencial == ticketTarea).FirstOrDefault();
+                    if (t != null)
+                    {
+                        TicketTarea tt = db.TicketTarea.Where(s => s.SecuencialTarea == tar.Secuencial && s.EstaActiva == 1).FirstOrDefault();
+                        if (tt == null)
+                        {
+                            db.TicketTarea.Add(new TicketTarea
+                            {
+                                SecuencialTarea = tar.Secuencial,
+                                SecuencialTicket = ticketTarea,
+                                EstaActiva = 1
+                            });
+                            db.SaveChanges();
+                            tieneTicket = true;
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("No se encontró el ticket");
+                    }
                 }
 
                 DateTime diaTarea = new System.DateTime(tar.FechaInicio.Year, tar.FechaInicio.Month, tar.FechaInicio.Day);
@@ -1768,7 +1850,9 @@ namespace SifizPlanning.Controllers
                 {
                     success = true,
                     actividadesTarea = actividadesListTarea,
-                    totalHoras = horasTarea + ":" + strMinutosRestaTarea
+                    totalHoras = horasTarea + ":" + strMinutosRestaTarea,
+                    tieneContrato = tieneContrato,
+                    tieneTicket = tieneTicket
                 };
                 return Json(resp);
             }
@@ -1937,6 +2021,19 @@ namespace SifizPlanning.Controllers
                     tareaPropia = true;
                 }
 
+                bool tieneContrato = false;
+                if (tar.entregableMotivoTrabajo != null)
+                {
+                    tieneContrato = true;
+                }
+
+                bool tieneTicket = false;
+                var ticketTarea = db.TicketTarea.Where(s => s.SecuencialTarea == idTarea).FirstOrDefault();
+                if (ticketTarea != null)
+                {
+                    tieneTicket = true;
+                }
+
                 var actividadesTarea = (from tActRel in db.TareaActividadRealizada
                                         where tActRel.SecuencialTarea == idTarea
                                         orderby tActRel.HoraInicio
@@ -1984,7 +2081,9 @@ namespace SifizPlanning.Controllers
                     success = true,
                     actividadesTarea = actividadesListTarea,
                     totalHoras = horasTarea + ":" + strMinutosRestaTarea,
-                    tareaPropia = tareaPropia
+                    tareaPropia = tareaPropia,
+                    tieneContrato = tieneContrato,
+                    tieneTicket = tieneTicket
                 };
                 return Json(resp);
             }

@@ -669,26 +669,24 @@
         $scope.$apply(function () {
             $scope.idTareaTerminar = parseInt(angular.element(obj).attr('data-id-tarea'));
         });       
-        
-        var ajaxActividadRealizadaTarea = $http.post("user/dar-actividades-segun-actividad-tarea",
-                                    {
-                                        idTarea: $scope.idTareaTerminar
-                                    });
-        ajaxActividadRealizadaTarea.success(function (data) {
+
+        var ajaxMotivosTrabajo = $http.post("user/dar-entregables-trabajo",
+            {
+                idTarea: $scope.idTareaTerminar
+            });
+        ajaxMotivosTrabajo.success(function (data) {
             if (data.success === true) {
-                $scope.actividadesTarea = data.actividadesTarea;
-                angular.element("#modal-final-tarea").modal("show");
+                $scope.referencias = data.datos;
             }
             else {
-                angular.element("#modal-final-tarea").modal("hide");
                 messageDialog.show('Información', data.msg);
             }
         });
 
         var ajaxActividades = $http.post("user/dar-actividades-tarea",
-                                    {
-                                        idTarea: $scope.idTareaTerminar
-                                    });
+            {
+                idTarea: $scope.idTareaTerminar
+            });
         ajaxActividades.success(function (data) {
             if (data.success === true) {
                 $scope.actividadesRealizadas = data.actividadesTarea;
@@ -699,8 +697,27 @@
                 else {
                     $scope.diasActividadTarea = $scope.diasActividad;
                 }
+                $scope.tieneContrato = data.tieneContrato;
+                $scope.tieneTicket = data.tieneTicket;
             }
             else {
+                messageDialog.show('Información', data.msg);
+            }
+        });
+        
+        var ajaxActividadRealizadaTarea = $http.post("user/dar-actividades-segun-actividad-tarea",
+                                    {
+                                        idTarea: $scope.idTareaTerminar
+                                    });
+        ajaxActividadRealizadaTarea.success(function (data) {
+            if (data.success === true) {
+                $scope.actividadesTarea = data.actividadesTarea;
+                $scope.numeroTicket = "";
+                $scope.entregable = "";
+                angular.element("#modal-final-tarea").modal("show");
+            }
+            else {
+                angular.element("#modal-final-tarea").modal("hide");
                 messageDialog.show('Información', data.msg);
             }
         });
@@ -822,7 +839,9 @@
                                         tipoTarea: $scope.tipoActividadTarea,
                                         fecha: $scope.diaActividadTara,
                                         horaInicio: $('[ng-model="horaInicioActividadTarea"]').val(),
-                                        horaFin: $('[ng-model="horaFinActividadTarea"]').val()
+                                        horaFin: $('[ng-model="horaFinActividadTarea"]').val(),
+                                        ticketTarea: $scope.numeroTicket,
+                                        referencia: $scope.entregable
                                     });
         adicionar.success(function (data) {
             waitingDialog.hide();
@@ -834,6 +853,8 @@
 
                 $scope.actividadesRealizadas = data.actividadesTarea;
                 $scope.tiempoUtilizado = data.totalHoras;
+                $scope.tieneTicket = data.tieneTicket;
+                $scope.tieneContrato = data.tieneContrato;
             }
             else {
                 messageDialog.show('Información', data.msg);

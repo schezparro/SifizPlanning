@@ -177,6 +177,22 @@
 
                 <form method="post" id="frm-modal-final-tarea" ng-submit="adicionarActividadTarea()">
                     <div id="new-actividad-tarea" class="fila">
+                        <div ng-hide="tieneContrato || tieneTicket">
+                            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" ng-init="ticketSeleccionado=true" ng-model="ticketSeleccionado" ng-disabled="contratoSeleccionado" ng-required="ticketSeleccionado" ng-change="contratoSeleccionado = !ticketSeleccionado" /> Ticket
+                                    <input type="text" class="form-control" ng-model="numeroTicket" ng-show="ticketSeleccionado" ng-required="ticketSeleccionado" placeholder="Número de Ticket" style="width: 150px;" />
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" ng-model="contratoSeleccionado" ng-disabled="ticketSeleccionado" ng-required="contratoSeleccionado" ng-change="ticketSeleccionado = !contratoSeleccionado" /> Contrato
+                                    <select id="select-contrato-tarea" class="form-control" ng-model="entregable" ng-show="contratoSeleccionado" ng-required="contratoSeleccionado" style="width: 150px;">
+                                        <option value="">Seleccione...</option>
+                                        <option ng-repeat="ref in referencias" value="{{ref.id}}">{{ref.nombre}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="left">
                             <label>Tipo de Actividad:</label>
                             <select class="form-control tipo-actividad-tarea" ng-model="tipoActividadTarea" ng-required="true">
@@ -205,16 +221,16 @@
                             </div>
 
                             <!--
-                            <select class="form-control left" ng-model="horaInicioActividadTarea" ng-required="true">
-                                <option value="">Seleccione...</option>
-                                <option ng-repeat="hInicio in horas" value="{{hInicio}}">{{hInicio}}</option>
-                            </select>
-                            <div class="left dos-puntos">:</div>
-                            <select class="form-control left" ng-model="minutoInicioActividadTarea" ng-required="true">
-                                <option value="">Seleccione...</option>
-                                <option ng-repeat="mInicio in minutos" value="{{mInicio}}">{{mInicio}}</option>
-                            </select>
-                            -->
+        <select class="form-control left" ng-model="horaInicioActividadTarea" ng-required="true">
+            <option value="">Seleccione...</option>
+            <option ng-repeat="hInicio in horas" value="{{hInicio}}">{{hInicio}}</option>
+        </select>
+        <div class="left dos-puntos">:</div>
+        <select class="form-control left" ng-model="minutoInicioActividadTarea" ng-required="true">
+            <option value="">Seleccione...</option>
+            <option ng-repeat="mInicio in minutos" value="{{mInicio}}">{{mInicio}}</option>
+        </select>
+        -->
                         </div>
                         <div class="left campos-hora">
                             <label>Hora Fin:</label>
@@ -227,18 +243,18 @@
                                 </div>
                             </div>
                             <!--
-                            <div>
-                                <select class="form-control left" ng-model="horaFinActividadTarea" ng-required="true">
-                                    <option value="">Seleccione...</option>
-                                    <option ng-repeat="hInicio in horas" value="{{hInicio}}">{{hInicio}}</option>
-                                </select>
-                                <div class="left dos-puntos">:</div>
-                                <select class="form-control left" ng-model="minutoFinActividadTarea" ng-required="true">
-                                    <option value="">Seleccione...</option>
-                                    <option ng-repeat="mInicio in minutos" value="{{mInicio}}">{{mInicio}}</option>
-                                </select>
-                            </div>
-                            -->
+        <div>
+            <select class="form-control left" ng-model="horaFinActividadTarea" ng-required="true">
+                <option value="">Seleccione...</option>
+                <option ng-repeat="hInicio in horas" value="{{hInicio}}">{{hInicio}}</option>
+            </select>
+            <div class="left dos-puntos">:</div>
+            <select class="form-control left" ng-model="minutoFinActividadTarea" ng-required="true">
+                <option value="">Seleccione...</option>
+                <option ng-repeat="mInicio in minutos" value="{{mInicio}}">{{mInicio}}</option>
+            </select>
+        </div>
+        -->
                         </div>
                         <button type="submit" class="left btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Adicionar</button>
                         <div class="clear"></div>
