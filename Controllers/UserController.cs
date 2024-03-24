@@ -3167,25 +3167,27 @@ r in db.Rol on ur.rol equals r
                          {
                              idEtapa = epc.Secuencial,
                              descripcion = ep.Descripcion,
+                             idCatEtapa = ep.Secuencial,
                              fechaInicio = epc.FechaInicio,
                              fechaFin = epc.FechaFin,
                              detalle = epc.Detalle,
-                             porciento = epc.Porciento,
-                             seleccionado = epc.Seleccionado,
+                             porciento = epc.Porciento != null ? epc.Porciento : 0,
+                             seleccionado = epc.Seleccionado != null ? epc.Seleccionado : 0,
                              subEtapas = (from sep2 in db.SUBETAPASPROYECTOSCLIENTE
                                           join r in db.RecursosSubEtapasProyecto on sep2.SecuencialRecuros equals r.Secuencial
                                           where sep2.SecuencialEtapaProyecto == epc.Secuencial
                                           select new
                                           {
-                                              idEtapaSE = sep2.Secuencial,                                            
+                                              idSubEtapa = sep2.Secuencial,
+                                              idEtapaSE = sep2.SecuencialEtapaProyecto,                                            
                                               descripcionSE = sep2.Descripcion,
                                               fechaInicioSE = sep2.FechaComienzo,
                                               fechaFinSE = sep2.FechaFin,
                                               recursoSE = r.Descripcion,
                                               idRecurso = r.Secuencial,
                                               detalle = sep2.Detalle,
-                                              porciento = sep2.Porciento,
-                                              seleccionado = sep2.Seleccionado
+                                              porciento = sep2.Porciento != null ? sep2.Porciento : 0,
+                                              seleccionado = sep2.Seleccionado != null ? sep2.Seleccionado : 0
                                           }).ToList()
                          }).ToList();
 
@@ -3193,6 +3195,7 @@ r in db.Rol on ur.rol equals r
             var etapasSubEtapas = datos.Select(d => new
             {
                 idEtapa = d.idEtapa,
+                idCatEtapa = d.idCatEtapa,
                 descripcion = d.descripcion,
                 fechaInicio = d.fechaInicio.ToString("dd/MM/yyyy"),
                 fechaFin = d.fechaFin.ToString("dd/MM/yyyy"),
@@ -3202,6 +3205,7 @@ r in db.Rol on ur.rol equals r
                 selected = d.seleccionado,
                 subEtapas = d.subEtapas.Select(se => new
                 {
+                    idSubEtapa = se.idSubEtapa,
                     idEtapaSE = se.idEtapaSE,
                     descripcionSE = se.descripcionSE,
                     fechaInicioSE = se.fechaInicioSE.ToString("dd/MM/yyyy"),
@@ -3477,36 +3481,129 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult GuardarValorInforme(string tabla, string tipo, int secuencial, string valorGuardar)
+        public ActionResult GuardarValorInforme(string tipo, string seleccionado, string secuencialEtapaId, string secuencialSubEtapaId, 
+            string secuencialCatalogoEtapa, string descripcion, string fechaInicio, string fechaFin, string porciento, string detalle, string recurso)
         {
             try
             {
-                int valor;
-                if (tabla == "etapa") {
-                    var item = db.EtapasProyectoCliente.FirstOrDefault(t => t.Secuencial == secuencial);
+                int selected = 0;
+                double porcentaje = 0;
 
-                    if (tipo == "mensaje")
-                    {
-                        item.Detalle = valorGuardar;
-                    } else if (tipo == "porciento")
-                    {
-                        valor = int.Parse(valorGuardar);
-                        item.Porciento = valor;
-                    }
+                if (seleccionado != null && seleccionado == "true")
+                    selected = 1;
 
-                } else if (tabla == "subetapa")
+                string[] fechaI = fechaInicio.Split(new Char[] { '/' });
+                int dia = Int32.Parse(fechaI[0]);
+                int mes = Int32.Parse(fechaI[1]);
+                int anno = Int32.Parse(fechaI[2]);
+                DateTime fechaInic = new DateTime(anno, mes, dia);
+
+                string[] fechaF = fechaFin.Split(new Char[] { '/' });
+                int diaF = Int32.Parse(fechaF[0]);
+                int mesF = Int32.Parse(fechaF[1]);
+                int annoF = Int32.Parse(fechaF[2]);
+                DateTime fechaFinal = new DateTime(annoF, mesF, diaF);
+
+                if(porciento != null)
+                    porcentaje = Double.Parse(porciento);
+
+                if (tipo == "etapa") {
+                    int etapa = int.Parse(secuencialEtapaId);
+                    int etapaCatalogo = int.Parse(secuencialCatalogoEtapa);
+
+                    var item = db.EtapasProyectoCliente.FirstOrDefault(t => t.Secuencial == etapa);
+
+                    item.SecuencialEtapaProyecto = etapaCatalogo;
+                    item.FechaInicio = fechaInic;
+                    item.FechaFin = fechaFinal;
+                    item.Porciento = porcentaje;
+                    item.Detalle = detalle;
+                    item.Seleccionado = selected;
+
+
+                } else if (tipo == "subetapa")
                 {
-                    var item = db.SUBETAPASPROYECTOSCLIENTE.FirstOrDefault(t => t.Secuencial == secuencial);
+                    int recursoId = int.Parse(recurso);
+                    int subetapa = int.Parse(secuencialSubEtapaId);
 
-                    if (tipo == "mensaje")
+                    var item = db.SUBETAPASPROYECTOSCLIENTE.FirstOrDefault(t => t.Secuencial == subetapa);
+
+                    item.SecuencialRecuros = recursoId;
+                    item.Descripcion = descripcion;
+                    item.FechaComienzo = fechaInic;
+                    item.FechaFin = fechaFinal;
+                    item.Porciento = porcentaje;
+                    item.Detalle = detalle;
+                    item.Seleccionado = selected;
+
+                }
+
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult ActualizarSeleccionInforme(string tipo, string seleccionado, string secuencial)
+        {
+            try
+            {
+                int selected = 0;
+                int id = 0;
+
+                if (seleccionado != null && seleccionado == "true")
+                    selected = 1;
+
+                if (secuencial != null)
+                    id = int.Parse(secuencial);
+
+                if (tipo == "etapa")
+                {
+                    var item = db.EtapasProyectoCliente.FirstOrDefault(t => t.Secuencial == id);
+                    item.Seleccionado = selected;
+                    db.SaveChanges();
+
+                    if (item != null)
                     {
-                        item.Detalle = valorGuardar;
+                        var subetapas = db.SUBETAPASPROYECTOSCLIENTE.Where(t => t.SecuencialEtapaProyecto == id);
+                        foreach (var subetapa in subetapas)
+                        {
+                            subetapa.Seleccionado = selected;
+                        }
+                        
                     }
-                    else if (tipo == "porciento")
-                    {
-                        valor = int.Parse(valorGuardar);
-                        item.Porciento = valor;
-                    }
+                }
+                else if (tipo == "subetapa")
+                {
+                    var item = db.SUBETAPASPROYECTOSCLIENTE.FirstOrDefault(t => t.Secuencial == id);
+                    item.Seleccionado = selected;
+
+                    var idEtapa = item.SecuencialEtapaProyecto;
+                    var etapa = db.EtapasProyectoCliente.FirstOrDefault(t => t.Secuencial == idEtapa);
+                    if (etapa.Seleccionado != 1)
+                        etapa.Seleccionado = 1;
+                }
+                else if (tipo == "all")
+                {
+                    foreach (var etapa in db.EtapasProyectoCliente)
+                        etapa.Seleccionado = selected;
+
+                    foreach (var subetapa in db.SUBETAPASPROYECTOSCLIENTE)
+                        subetapa.Seleccionado = selected;
                 }
 
                 db.SaveChanges();

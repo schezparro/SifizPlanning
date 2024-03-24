@@ -423,7 +423,7 @@
                             <div class="div-info-ticket">
                                 <label for="fecha-fin-subetapa">FECHA FIN:</label>
                                 <div class='input-group date'>
-                                    <input id="fecha-fin-subetapa" ng-model="fechaFinSubE" class="form-control" ng-required="true" autocomplete="off" ng-change="updateMinDateSubEtapa()"/>
+                                    <input id="fecha-fin-subetapa" ng-model="fechaFinSubE" class="form-control" ng-required="true" autocomplete="off" ng-change="updateMinDateSubEtapa()" />
                                 </div>
                             </div>
                         </div>
@@ -448,7 +448,7 @@
             </div>
 
             <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
-               
+
                 <div id="div-user-informe-proyecto">
                     <table id="tabla-user-informe-proyecto" class="table table-striped">
                         <thead>
@@ -461,47 +461,164 @@
                                 <th>Recurso</th>
                                 <th>% Cumplimiento</th>
                                 <th>Detalle</th>
+                                <th></th>
                             </tr>
                         </thead>
 
                         <tbody>
-                            <tr ng-repeat="item in datosAplanados" ng-style="item.tipo === 'etapa' ? {'background-color': '#d0e0f0'} : {}" ng-class="{'etapa-row': item.tipo === 'etapa', 'subetapa-row': item.tipo === 'subetapa'}">
+                            <tr ng-repeat="item in datosInforme" ng-style="item.tipo === 'etapa' ? {'background-color': '#d0e0f0'} : {}" ng-class="{'etapa-row': item.tipo === 'etapa', 'subetapa-row': item.tipo === 'subetapa'}"
+                                ng-dblclick="abrirModalEditarItem(item)">
                                 <td ng-if="item.tipo === 'etapa'">
-                                    <input type="checkbox" ng-model="item.selected" ng-click="toggleSubEtapas(item)">
+                                    <input type="checkbox" ng-model="item.selected" ng-checked="item.selected" ng-click="toggleEtapas(item)">
                                 </td>
                                 <td ng-if="item.tipo === 'etapa'">{{item.descripcion | strLimit: 75}}</td>
                                 <td ng-if="item.tipo === 'etapa'">{{item.duracion}}</td>
                                 <td ng-if="item.tipo === 'etapa'">{{item.fechaInicio}}</td>
                                 <td ng-if="item.tipo === 'etapa'">{{item.fechaFin}}</td>
                                 <td ng-if="item.tipo === 'etapa'"></td>
+                                <td ng-if="item.tipo === 'etapa'">{{item.porciento}}</td>
+                                <td ng-if="item.tipo === 'etapa'">{{item.detalle}}</td>
                                 <td ng-if="item.tipo === 'etapa'">
-                                    <input type="text" style="width: 50px; height: 20px; resize: none;" ng-model="item.porciento" ng-blur="GuardarValor(item, 'porciento')">
+                                    <span ng-style="getSemaforoStyle(item)" style="display: inline-block;"></span>
                                 </td>
-                                <td ng-if="item.tipo === 'etapa'">
-                                    <input type="text" ng-model="item.detalle" ng-blur="GuardarValor(item, 'mensaje')">
-                                </td>
+
                                 <td ng-if="item.tipo === 'subetapa'">
-                                    <input type="checkbox" ng-model="item.selected" ng-checked="item.selected">
+                                    <input type="checkbox" ng-model="item.selected" ng-checked="item.selected" ng-click="toggleSubEtapas(item)">
                                 </td>
                                 <td ng-if="item.tipo === 'subetapa'">{{item.descripcion | strLimit: 75}}</td>
                                 <td ng-if="item.tipo === 'subetapa'">{{item.duracion}}</td>
                                 <td ng-if="item.tipo === 'subetapa'">{{item.fechaInicio}}</td>
                                 <td ng-if="item.tipo === 'subetapa'">{{item.fechaFin}}</td>
                                 <td ng-if="item.tipo === 'subetapa'">{{item.recurso}}</td>
+                                <td ng-if="item.tipo === 'subetapa'">{{item.porciento}}</td>
+                                <td ng-if="item.tipo === 'subetapa'">{{item.detalle}}</td>
                                 <td ng-if="item.tipo === 'subetapa'">
-                                    <input type="text" style="width: 50px; height: 20px; resize: none;" ng-model="item.porciento" ng-blur="GuardarValor(item, 'porciento')">
-                                </td>
-                                <td ng-if="item.tipo === 'subetapa'">
-                                    <input type="text" ng-model="item.detalle" ng-blur="GuardarValor(item, 'mensaje')">
+                                    <span ng-style="getSemaforoStyle(item)" style="display: inline-block;"></span>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" id="enviar-informe-btn" class="btn btn-success">Enviar por correo</button>
+                    <button type="button" id="previsualizar-informe-btn" class="btn btn-primary">Previsualizar Informe</button>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal editar fila reporte, etapa -->
+<div id="modal-editar-etapas-proyecto" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <form ng-submit="GuardarValor('etapa')">
+                <div class="modal-header" style="padding: 10px, 10px">
+                    <label>EDITANDO ETAPA</label>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Sección de Etapa -->
+                    <div>
+                        <input hidden ng-model="proyectoIdInfo" />
+
+                        <label for="select-etapas-cliente-proyecto">ETAPA:</label>
+                        <select id="select-etapas-cliente-proyecto-info" ng-model="etapasProInfo" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{etapa.id}}" ng-repeat="etapa in etapasCat">{{etapa.nombre}}</option>
+                        </select>
+
+                        <div style="column-count: 2">
+                            <div class="div-info-ticket">
+                                <label for="fecha-inicio-etapa">FECHA INICIO:</label>
+                                <div class='input-group date'>
+                                    <input id="fecha-inicio-etapa-info" ng-model="fechaIniEtaInfo" class="form-control" ng-required="true" autocomplete="off" />
+                                </div>
+                            </div>
+
+                            <div class="div-info-ticket">
+                                <label for="fecha-fin-etapa">FECHA FIN:</label>
+                                <div class='input-group date'>
+                                    <input id="fecha-fin-etapa-info" ng-model="fechaFinEtaInfo" class="form-control" ng-required="true" autocomplete="off" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="div-info-ticket">
+                            <label for="porcentaje-etapa">PORCENTAJE:</label>
+                            <input id="porcentaje-etapa-info" type="number" ng-model="porcentajeEtaInfo" class="form-control" ng-required="true" min="0" max="100" step="1" />
+                        </div>
+
+                        <div class="div-info-ticket">
+                            <label for="detalle-etapa">DETALLE:</label>
+                            <textarea id="detalle-etapa-info" ng-model="detalleEtaInfo" class="form-control" ng-required="true" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <!-- Fin de la sección de Etapa -->
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" id="enviar-modal-etapas-info-btn" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal editar fila reporte, subetapa -->
+<div id="modal-agregar-subetapas-proyecto" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <form ng-submit="GuardarValor('subetapa')">
+                <div class="modal-header" style="padding: 10px, 10px">
+                    <label>EDITANDO SUBETAPA</label>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <input hidden ng-model="etapaId" />
+                        <label for="textarea-descripcion">DESCRIPCION:</label>
+                        <textarea type="text" class="form-control" ng-model="descripcionSubEInfo" ng-required="true"></textarea>
+
+                        <label for="select-recursos-sub-etapas">RECURSO:</label>
+                        <select id="select-recursos-sub-etapas-info" ng-model="recursosSubEInfo" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{recurso.id}}" ng-repeat="recurso in recursosSubEtapas">{{recurso.nombre}}</option>
+                        </select>
+
+                        <div style="column-count: 2">
+                            <div class="div-info-ticket">
+                                <label for="fecha-inicio-subetapa-info">FECHA INICIO:</label>
+                                <div class='input-group date'>
+                                    <input id="fecha-inicio-subetapa-info" ng-model="fechaIniSubEInfo" class="form-control" ng-required="true" autocomplete="off" ng-change="updateMinDateSubEtapa()" />
+                                </div>
+                            </div>
+
+                            <div class="div-info-ticket">
+                                <label for="fecha-fin-subetapa-info">FECHA FIN:</label>
+                                <div class='input-group date'>
+                                    <input id="fecha-fin-subetapa-info" ng-model="fechaFinSubEInfo" class="form-control" ng-required="true" autocomplete="off" ng-change="updateMinDateSubEtapa()" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="div-info-ticket">
+                            <label for="porcentaje-subetapa">PORCENTAJE:</label>
+                            <input id="porcentaje-subetapa-info" type="number" ng-model="porcentajeSubEInfo" class="form-control" ng-required="true" min="0" max="100" step="1" />
+                        </div>
+
+                        <div class="div-info-ticket">
+                            <label for="detalle-subetapa">DETALLE:</label>
+                            <textarea id="detalle-subetapa-info" ng-model="detalleSubEInfo" class="form-control" ng-required="true" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" id="enviar-modal-subetapas-btn" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
