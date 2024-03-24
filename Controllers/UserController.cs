@@ -1566,10 +1566,9 @@ namespace SifizPlanning.Controllers
             }
         }
 
-        //ENTREGABLES(MOTIVO DE TRABAJO) DE LAS TAREAS
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult DarEntregableTrabajo(int idTarea)
+        public ActionResult DarEntregableTarea(int idTarea)
         {
             try
             {

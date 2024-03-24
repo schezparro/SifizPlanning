@@ -670,7 +670,7 @@
             $scope.idTareaTerminar = parseInt(angular.element(obj).attr('data-id-tarea'));
         });       
 
-        var ajaxMotivosTrabajo = $http.post("user/dar-entregables-trabajo",
+        var ajaxMotivosTrabajo = $http.post("user/dar-entregable-tarea",
             {
                 idTarea: $scope.idTareaTerminar
             });
@@ -714,6 +714,8 @@
                 $scope.actividadesTarea = data.actividadesTarea;
                 $scope.numeroTicket = "";
                 $scope.entregable = "";
+                $scope.ticketSeleccionado = true;
+                $scope.contratoSeleccionado = false;
                 angular.element("#modal-final-tarea").modal("show");
             }
             else {

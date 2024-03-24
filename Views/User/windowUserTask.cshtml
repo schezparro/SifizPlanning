@@ -179,12 +179,12 @@
                     <div id="new-actividad-tarea" class="fila">
                         <div ng-hide="tieneContrato || tieneTicket">
                             <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <input type="checkbox" ng-init="ticketSeleccionado=true" ng-model="ticketSeleccionado" ng-disabled="contratoSeleccionado" ng-required="ticketSeleccionado" ng-change="contratoSeleccionado = !ticketSeleccionado" /> Ticket
+                                <div style="display: flex; align-items: center; gap: 10px;" ng-hide="contratoSeleccionado">
+                                    <input type="checkbox" ng-model="ticketSeleccionado" ng-required="ticketSeleccionado" ng-change="contratoSeleccionado = !ticketSeleccionado" /> Ticket
                                     <input type="text" class="form-control" ng-model="numeroTicket" ng-show="ticketSeleccionado" ng-required="ticketSeleccionado" placeholder="Número de Ticket" style="width: 150px;" />
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <input type="checkbox" ng-model="contratoSeleccionado" ng-disabled="ticketSeleccionado" ng-required="contratoSeleccionado" ng-change="ticketSeleccionado = !contratoSeleccionado" /> Contrato
+                                <div style="display: flex; align-items: center; gap: 10px;" ng-hide="ticketSeleccionado">
+                                    <input type="checkbox" ng-model="contratoSeleccionado" ng-required="contratoSeleccionado" ng-change="ticketSeleccionado = !contratoSeleccionado" /> Contrato
                                     <select id="select-contrato-tarea" class="form-control" ng-model="entregable" ng-show="contratoSeleccionado" ng-required="contratoSeleccionado" style="width: 150px;">
                                         <option value="">Seleccione...</option>
                                         <option ng-repeat="ref in referencias" value="{{ref.id}}">{{ref.nombre}}</option>

@@ -1422,16 +1422,17 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+               name: "DarEntregableTarea",
+               url: "user/dar-entregable-tarea/{id}",
+               defaults: new { controller = "User", action = "DarEntregableTarea", id = UrlParameter.Optional }
+            );
+            
+            routes.MapRoute(
                 name: "sistema",
                 url: "user/{id}",
                 defaults: new { controller = "User", action = "Sistema", id = UrlParameter.Optional }
             );
 
-            routes.MapRoute(
-               name: "DarEntregableTrabajo",
-               url: "user/dar-entregables-trabajo/{id}",
-               defaults: new { controller = "User", action = "DarEntregableTrabajo", id = UrlParameter.Optional }
-           );
 
             //--------------------- RUTAS DEL FTP -------------------------
             routes.MapRoute(
