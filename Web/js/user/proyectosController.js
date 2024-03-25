@@ -425,7 +425,7 @@
 
                 if (tipo === 'etapa')
                     angular.element("#modal-editar-etapas-proyecto").modal("hide");
-                else 
+                else
                     angular.element("#modal-agregar-subetapas-proyecto").modal("hide");
 
                 $scope.cargarDatosInforme();
@@ -445,7 +445,7 @@
 
     $scope.windowAgregarEtapasProyecto = function (proyectoId) {
         $scope.proyectoId = proyectoId,
-        $scope.etapasPro = '';
+            $scope.etapasPro = '';
         $scope.fechaIniEta = '';
         $scope.fechaFinEta = '';
 
@@ -539,9 +539,9 @@
         var formData = new FormData();
         if ($scope.subEtapaId != undefined)
             formData.append('secuencial', $scope.subEtapaId);
-        else 
+        else
             formData.append('secuencial', 0);
-       
+
         formData.append('descripcion', $scope.descripcionSubE);
         formData.append('recurso', recurso);
         formData.append('etapaId', $scope.etapaId);
@@ -571,13 +571,13 @@
     $scope.editarEtapasProyectos = function (etapa) {
         $scope.itemModificado = etapa;
         $scope.proyectoId = etapa.secuencialClienteAux,
-        $scope.etapaId = etapa.id,
-        $scope.etapasPro = etapa.secuencialEtapa;
+            $scope.etapaId = etapa.id,
+            $scope.etapasPro = etapa.secuencialEtapa;
         $scope.fechaIniEta = etapa.fechaInicio;
         $scope.fechaFinEta = etapa.fechaFin;
 
         angular.element("#modal-agregar-etapas-proyecto").modal("show");
-        
+
     };
 
     $scope.editarSubEtapasProyectos = function (subetapa) {
@@ -639,6 +639,70 @@
                 }
             });
         });
+    };
+
+    $scope.PrevisualizarInforme = function (subEtapasId) {
+        var subInforme = $http.post("user/dar-cronograma-proyecto", {
+            idProyecto: $scope.proyectoId
+        });
+        subInforme.success(function (data) {
+            if (data.success === true) {
+
+                var datosInforme = [];
+                data.datosCronograma.forEach(function (etapa) {
+                    // Agrega la etapa al arreglo aplanado
+                    datosInforme.push({
+                        tipo: 'etapa',
+                        descripcion: etapa.descripcion,
+                        duracion: etapa.duracion,
+                        fechaInicio: etapa.fechaInicio,
+                        fechaFin: etapa.fechaFin,
+                        detalle: etapa.detalle,
+                        idEtapa: etapa.idEtapa,
+                        idCatEtapa: etapa.idCatEtapa,
+                        porciento: etapa.porciento,
+                        selected: etapa.selected
+                    });
+
+                    // Agrega cada subetapa al arreglo aplanado
+                    etapa.subEtapas.forEach(function (subetapa) {
+                        datosInforme.push({
+                            tipo: 'subetapa',
+                            descripcion: subetapa.descripcionSE,
+                            duracion: subetapa.duracionSE,
+                            fechaInicio: subetapa.fechaInicioSE,
+                            fechaFin: subetapa.fechaFinSE,
+                            recurso: subetapa.recursoSE,
+                            idRecurso: subetapa.idRecurso,
+                            idEtapa: subetapa.idEtapaSE,
+                            idSubEtapa: subetapa.idSubEtapa,
+                            detalle: subetapa.detalle,
+                            porciento: subetapa.porciento,
+                            selected: subetapa.selected
+                        });
+                    });
+                });
+
+                $scope.datosCronograma = datosInforme;
+                angular.element("#cronogramaModal").modal("show");
+            }
+            else {
+                messageDialog.show('Información', data.msg);
+            }
+        });
+    };
+
+    $scope.exportarPdf = function () {
+        var doc = new jsPDF();
+        var element = document.getElementById('tabla-cronograma-proyecto');
+        var opt = {
+            margin: 1,
+            filename: 'cronograma.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
     };
 
     //El Paginador
@@ -733,7 +797,7 @@
         angular.forEach($scope.datosInforme, function (item) {
             if (item.tipo === 'subetapa' && item.idEtapa === etapa.idEtapa) {
                 item.selected = etapa.selected;
-            } 
+            }
         });
 
         $scope.actualizarSeleccionInforme("etapa", etapa.selected, etapa.idEtapa);

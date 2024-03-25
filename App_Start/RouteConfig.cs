@@ -1115,6 +1115,12 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "DarCronogramaProyecto",
+                url: "user/dar-cronograma-proyecto/{id}",
+                defaults: new { controller = "User", action = "DarCronogramaProyecto", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "ActualizarSeleccionInforme",
                 url: "user/actualizar-seleccion-informe/{id}",
                 defaults: new { controller = "User", action = "ActualizarSeleccionInforme", id = UrlParameter.Optional }

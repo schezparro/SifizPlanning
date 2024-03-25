@@ -214,7 +214,7 @@
                 </div>
 
                 <div id="div-user-etapas-proyectos">
-                    <table id="tabla-user-etapas-proyectos" class="table table-striped">
+                    <table id="tabla-user-etapas-proyectos" class="table table-striped table-condensed table-sm">
                         <thead>
                             <tr>
                                 <th>Descripción</th>
@@ -501,7 +501,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" id="enviar-informe-btn" class="btn btn-success">Enviar por correo</button>
-                    <button type="button" id="previsualizar-informe-btn" class="btn btn-primary">Previsualizar Informe</button>
+                    <button type="button" id="previsualizar-informe-btn" ng-click="PrevisualizarInforme()" class="btn btn-primary">Previsualizar Informe</button>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </div>
@@ -622,3 +622,61 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="cronogramaModal" tabindex="-1" role="dialog" aria-labelledby="cronogramaModalLabel">
+    <div class="modal-dialog" role="document" style="width: 80%; max-width: 90%; margin: auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="cronogramaModalLabel">Cronograma del Proyecto</h4>
+            </div>
+            <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
+                <table id="tabla-cronograma-proyecto" class="table table-striped" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Descripción</th>
+                            <th>Duración</th>
+                            <th>Fecha Inicio</th>
+                            <th>Fecha Fin</th>
+                            <th>Recurso</th>
+                            <th>% Cumplimiento</th>
+                            <th>Detalle</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in datosCronograma" ng-style="item.tipo === 'etapa' ? {'background-color': '#d0e0f0', 'font-weight': 'bold'} : {}" ng-class="{'etapa-row': item.tipo === 'etapa', 'subetapa-row': item.tipo === 'subetapa'}"
+                            ng-dblclick="abrirModalEditarItem(item)">
+                            <td ng-if="item.tipo === 'etapa'">{{item.descripcion | strLimit: 75}}</td>
+                            <td ng-if="item.tipo === 'etapa'">{{item.duracion}}</td>
+                            <td ng-if="item.tipo === 'etapa'">{{item.fechaInicio}}</td>
+                            <td ng-if="item.tipo === 'etapa'">{{item.fechaFin}}</td>
+                            <td ng-if="item.tipo === 'etapa'"></td>
+                            <td ng-if="item.tipo === 'etapa'">{{item.porciento}}</td>
+                            <td ng-if="item.tipo === 'etapa'">{{item.detalle}}</td>
+                            <td ng-if="item.tipo === 'etapa'">
+                                <span ng-style="getSemaforoStyle(item)" style="display: inline-block;"></span>
+                            </td>
+
+                            <td ng-if="item.tipo === 'subetapa'" ng-style="{'padding-left': '30px'}">{{item.descripcion | strLimit: 75}}</td>
+                            <td ng-if="item.tipo === 'subetapa'">{{item.duracion}}</td>
+                            <td ng-if="item.tipo === 'subetapa'">{{item.fechaInicio}}</td>
+                            <td ng-if="item.tipo === 'subetapa'">{{item.fechaFin}}</td>
+                            <td ng-if="item.tipo === 'subetapa'">{{item.recurso}}</td>
+                            <td ng-if="item.tipo === 'subetapa'">{{item.porciento}}</td>
+                            <td ng-if="item.tipo === 'subetapa'">{{item.detalle}}</td>
+                            <td ng-if="item.tipo === 'subetapa'">
+                                <span ng-style="getSemaforoStyle(item)" style="display: inline-block;"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" ng-click="exportarPdf()">Exportar a PDF</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+

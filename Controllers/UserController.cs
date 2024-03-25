@@ -3226,6 +3226,84 @@ r in db.Rol on ur.rol equals r
             });
         }
 
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult DarCronogramaProyecto(int idProyecto)
+        {
+            try
+            {
+                var datos = (from epc in db.EtapasProyectoCliente
+                             join ep in db.EtapasProyecto on epc.SecuencialEtapaProyecto equals ep.Secuencial
+                             where epc.SecuencialClienteAuxiliar == idProyecto && epc.Seleccionado == 1
+                             orderby epc.Secuencial
+                             select new
+                             {
+                                 idEtapa = epc.Secuencial,
+                                 descripcion = ep.Descripcion,
+                                 idCatEtapa = ep.Secuencial,
+                                 fechaInicio = epc.FechaInicio,
+                                 fechaFin = epc.FechaFin,
+                                 detalle = epc.Detalle,
+                                 porciento = epc.Porciento != null ? epc.Porciento : 0,
+                                 seleccionado = epc.Seleccionado != null ? epc.Seleccionado : 0,
+                                 subEtapas = (from sep2 in db.SUBETAPASPROYECTOSCLIENTE
+                                              join r in db.RecursosSubEtapasProyecto on sep2.SecuencialRecuros equals r.Secuencial
+                                              where sep2.SecuencialEtapaProyecto == epc.Secuencial && sep2.Seleccionado == 1
+                                              select new
+                                              {
+                                                  idSubEtapa = sep2.Secuencial,
+                                                  idEtapaSE = sep2.SecuencialEtapaProyecto,
+                                                  descripcionSE = sep2.Descripcion,
+                                                  fechaInicioSE = sep2.FechaComienzo,
+                                                  fechaFinSE = sep2.FechaFin,
+                                                  recursoSE = r.Descripcion,
+                                                  idRecurso = r.Secuencial,
+                                                  detalle = sep2.Detalle,
+                                                  porciento = sep2.Porciento != null ? sep2.Porciento : 0,
+                                                  seleccionado = sep2.Seleccionado != null ? sep2.Seleccionado : 0
+                                              }).ToList()
+                             }).ToList();
+
+                var etapasSubEtapas = datos.Select(d => new
+                {
+                    idEtapa = d.idEtapa,
+                    idCatEtapa = d.idCatEtapa,
+                    descripcion = d.descripcion,
+                    fechaInicio = d.fechaInicio.ToString("dd/MM/yyyy"),
+                    fechaFin = d.fechaFin.ToString("dd/MM/yyyy"),
+                    duracion = (d.fechaFin - d.fechaInicio).Days,
+                    detalle = d.detalle,
+                    porciento = d.porciento,
+                    selected = d.seleccionado,
+                    subEtapas = d.subEtapas.Select(se => new
+                    {
+                        idSubEtapa = se.idSubEtapa,
+                        idEtapaSE = se.idEtapaSE,
+                        descripcionSE = se.descripcionSE,
+                        fechaInicioSE = se.fechaInicioSE.ToString("dd/MM/yyyy"),
+                        fechaFinSE = se.fechaFinSE.ToString("dd/MM/yyyy"),
+                        recursoSE = se.recursoSE,
+                        idRecurso = se.idRecurso,
+                        duracionSE = (se.fechaFinSE - se.fechaInicioSE).Days,
+                        detalle = se.detalle,
+                        porciento = se.porciento,
+                        selected = se.seleccionado
+                    }).ToList()
+                }).ToList();
+
+                return Json(new
+                {
+                    success = true,
+                    datosCronograma = etapasSubEtapas
+                });
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
         public ActionResult DarTipoRecursosSubEtapas()
