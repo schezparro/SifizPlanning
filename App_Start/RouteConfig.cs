@@ -1127,6 +1127,12 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "GenerarExcelInformeProyecto",
+                url: "user/dar-excel-informe-proyecto/{id}",
+                defaults: new { controller = "User", action = "GenerarExcelInformeProyecto", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "GuardarRecurso",
                 url: "user/guardar-recurso/{id}",
                 defaults: new { controller = "User", action = "GuardarRecurso", id = UrlParameter.Optional }

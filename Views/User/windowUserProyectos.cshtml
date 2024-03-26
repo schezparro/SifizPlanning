@@ -28,10 +28,10 @@
                 <td>{{proyecto.responsableCodigo}}</td>
                 <td>{{proyecto.responsablePublicacion}}</td>
                 <td>
-                    <button type="button" class="btn btn-xs btn-success" ng-click="abrirModalGenerarInforme(proyecto.id)"><span class="glyphicon glyphicon-calendar"></span> Registrar cronograma</button>
+                    <button type="button" class="btn btn-xs btn-primary" ng-click="abrirModalGenerarInforme(proyecto.id)"><span class="glyphicon glyphicon-calendar"></span> Registrar cronograma</button>
                 </td>
                 <td>
-                    <button type="button" class="btn btn-xs btn-success" ng-click="abrirModalGenerarReporte(proyecto.id)"><span class="glyphicon glyphicon-ok"></span> Generar informe</button>
+                    <button type="button" class="btn btn-xs btn-primary" ng-click="abrirModalGenerarReporte(proyecto.id)"><span class="glyphicon glyphicon-ok"></span> Generar informe</button>
                 </td>
             </tr>
         </tbody>
@@ -441,7 +441,7 @@
 <!-- Modal Informe -->
 <div class="modal fade" id="modal-informe-proyecto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content" style="overflow:hidden">
+        <div class="modal-content">
             <div class="modal-header" style="padding: 10px, 10px">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Gestión de etapas de proyecto </h4>
@@ -466,7 +466,7 @@
                         </thead>
 
                         <tbody>
-                            <tr ng-repeat="item in datosInforme" ng-style="item.tipo === 'etapa' ? {'background-color': '#d0e0f0'} : {}" ng-class="{'etapa-row': item.tipo === 'etapa', 'subetapa-row': item.tipo === 'subetapa'}"
+                            <tr ng-repeat="item in datosInforme" ng-style="item.tipo === 'etapa' ? {'background-color': '#d0e0f0'} : item.tipo === 'subetapa' ? {'padding-left': '30px'} : {}" ng-class="{'etapa-row': item.tipo === 'etapa', 'subetapa-row': item.tipo === 'subetapa'}"
                                 ng-dblclick="abrirModalEditarItem(item)">
                                 <td ng-if="item.tipo === 'etapa'">
                                     <input type="checkbox" ng-model="item.selected" ng-checked="item.selected" ng-click="toggleEtapas(item)">
@@ -477,7 +477,7 @@
                                 <td ng-if="item.tipo === 'etapa'">{{item.fechaFin}}</td>
                                 <td ng-if="item.tipo === 'etapa'"></td>
                                 <td ng-if="item.tipo === 'etapa'">{{item.porciento}}</td>
-                                <td ng-if="item.tipo === 'etapa'">{{item.detalle}}</td>
+                                <td ng-if="item.tipo === 'etapa'">{{item.detalle | strLimit: 75}}</td>
                                 <td ng-if="item.tipo === 'etapa'">
                                     <span ng-style="getSemaforoStyle(item)" style="display: inline-block;"></span>
                                 </td>
@@ -491,7 +491,7 @@
                                 <td ng-if="item.tipo === 'subetapa'">{{item.fechaFin}}</td>
                                 <td ng-if="item.tipo === 'subetapa'">{{item.recurso}}</td>
                                 <td ng-if="item.tipo === 'subetapa'">{{item.porciento}}</td>
-                                <td ng-if="item.tipo === 'subetapa'">{{item.detalle}}</td>
+                                <td ng-if="item.tipo === 'subetapa'">{{item.detalle | strLimit: 75}}</td>
                                 <td ng-if="item.tipo === 'subetapa'">
                                     <span ng-style="getSemaforoStyle(item)" style="display: inline-block;"></span>
                                 </td>
@@ -499,11 +499,10 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" id="enviar-informe-btn" class="btn btn-success">Enviar por correo</button>
-                    <button type="button" id="previsualizar-informe-btn" ng-click="PrevisualizarInforme()" class="btn btn-primary">Previsualizar Informe</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="previsualizar-informe-btn" ng-click="PrevisualizarInforme()" class="btn btn-primary">Previsualizar Informe</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
@@ -577,6 +576,7 @@
                 </div>
                 <div class="modal-body">
                     <div>
+                        <input hidden ng-model="proyectoIdInfo" />
                         <input hidden ng-model="etapaId" />
                         <label for="textarea-descripcion">DESCRIPCION:</label>
                         <textarea type="text" class="form-control" ng-model="descripcionSubEInfo" ng-required="true"></textarea>
@@ -631,6 +631,7 @@
                 <h4 class="modal-title" id="cronogramaModalLabel">Cronograma del Proyecto</h4>
             </div>
             <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
+                <input hidden ng-model="proyectoIdInfo" />
                 <table id="tabla-cronograma-proyecto" class="table table-striped" style="width: 100%;">
                     <thead>
                         <tr>
@@ -645,8 +646,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="item in datosCronograma" ng-style="item.tipo === 'etapa' ? {'background-color': '#d0e0f0', 'font-weight': 'bold'} : {}" ng-class="{'etapa-row': item.tipo === 'etapa', 'subetapa-row': item.tipo === 'subetapa'}"
-                            ng-dblclick="abrirModalEditarItem(item)">
+                        <tr ng-repeat="item in datosCronograma" ng-style="item.tipo === 'etapa' ? {'background-color': '#d0e0f0', 'font-weight': 'bold'} : {}" ng-class="{'etapa-row': item.tipo === 'etapa', 'subetapa-row': item.tipo === 'subetapa'}">
                             <td ng-if="item.tipo === 'etapa'">{{item.descripcion | strLimit: 75}}</td>
                             <td ng-if="item.tipo === 'etapa'">{{item.duracion}}</td>
                             <td ng-if="item.tipo === 'etapa'">{{item.fechaInicio}}</td>
@@ -673,8 +673,10 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" ng-click="exportarPdf()">Exportar a PDF</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+
+                <button type="button" id="enviar-informe-btn" class="btn btn-success">Enviar por correo</button>
+                <button type="button" class="btn btn-primary" ng-click="generarInforme()">Exportar</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>

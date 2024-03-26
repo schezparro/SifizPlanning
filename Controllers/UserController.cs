@@ -1294,7 +1294,7 @@ namespace SifizPlanning.Controllers
                     List<string> correosDestinos = new List<string>();
                     correosDestinos.Add(emailUser);
                     correosDestinos.AddRange(Utiles.CorreoPorGrupoEmail("COORD"));
-                    
+
                     string asuntoEmail = personaCliente.cliente.Codigo + " HESO " + string.Format("{0:000000}", ticket.Secuencial) + " - Ticket Resuelto (" + ticket.Asunto + ")";
                     Utiles.EnviarEmailSistema(new string[] { emailCliente }, textoEmailCliente, asuntoEmail, listaPathFicheros.ToArray(), string.Format("{0:000000}", ticket.Secuencial));
                     Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmail, asuntoEmail, listaPathFicheros.ToArray(), string.Format("{0:000000}", ticket.Secuencial));
@@ -3179,7 +3179,7 @@ r in db.Rol on ur.rol equals r
                                           select new
                                           {
                                               idSubEtapa = sep2.Secuencial,
-                                              idEtapaSE = sep2.SecuencialEtapaProyecto,                                            
+                                              idEtapaSE = sep2.SecuencialEtapaProyecto,
                                               descripcionSE = sep2.Descripcion,
                                               fechaInicioSE = sep2.FechaComienzo,
                                               fechaFinSE = sep2.FechaFin,
@@ -3368,9 +3368,9 @@ r in db.Rol on ur.rol equals r
         //Guardar modal nuevas incidencias
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult GuardarProyecto(string ubicacion, string liderProyecto, string responsableCodigo, string versionDesarrollo, 
+        public ActionResult GuardarProyecto(string ubicacion, string liderProyecto, string responsableCodigo, string versionDesarrollo,
             string cliente, string responsablePublicacion, string salidaProduccion, string responsableAcceso, string repositorio,
-            string versionBD, bool codigoFuente, bool estaActivo, bool solucionProxies  )
+            string versionBD, bool codigoFuente, bool estaActivo, bool solucionProxies)
         {
             try
             {
@@ -3384,7 +3384,7 @@ r in db.Rol on ur.rol equals r
                 int responsableAccesoId = int.Parse(responsableAcceso);
                 int repositorioId = int.Parse(repositorio);
                 int versionBDId = int.Parse(versionBD);
-                int codigoFuenteId= codigoFuente == true ? 1 : 0;
+                int codigoFuenteId = codigoFuente == true ? 1 : 0;
                 int estaActivoId = estaActivo == true ? 1 : 0;
                 int solucionProxiesId = solucionProxies == true ? 1 : 0;
 
@@ -3415,7 +3415,7 @@ r in db.Rol on ur.rol equals r
                 db.ClienteAuxiliar.Add(nuevoProyecto);
                 db.SaveChanges();
 
-               return Json(new
+                return Json(new
                 {
                     success = true,
                     msg = "Se ha realizado la operación correctamente."
@@ -3440,7 +3440,7 @@ r in db.Rol on ur.rol equals r
             {
                 int etapaId = int.Parse(etapa);
                 int cliAuxId = int.Parse(cliAux);
-                
+
                 string[] fechaIni = fechaInicioEta.Split(new Char[] { '/' });
                 int dia = Int32.Parse(fechaIni[0]);
                 int mes = Int32.Parse(fechaIni[1]);
@@ -3465,7 +3465,8 @@ r in db.Rol on ur.rol equals r
                     };
 
                     db.EtapasProyectoCliente.Add(nuevaEtapaProyecto);
-                } else
+                }
+                else
                 {
                     EtapasProyectoCliente editarEtapaProyecto = db.EtapasProyectoCliente.Find(secuencial);
                     editarEtapaProyecto.SecuencialEtapaProyecto = etapaId;
@@ -3474,7 +3475,7 @@ r in db.Rol on ur.rol equals r
                     editarEtapaProyecto.FechaFin = fechaFin;
                     editarEtapaProyecto.EstaActivo = 1;
                 }
-                
+
                 db.SaveChanges();
 
                 return Json(new
@@ -3528,7 +3529,8 @@ r in db.Rol on ur.rol equals r
                     };
 
                     db.SUBETAPASPROYECTOSCLIENTE.Add(nuevaSubEtapaProyecto);
-                } else
+                }
+                else
                 {
                     SubEtapasProyectosCliente editarSubEtapaProyecto = db.SUBETAPASPROYECTOSCLIENTE.Find(secuencial);
                     editarSubEtapaProyecto.SecuencialEtapaProyecto = etap;
@@ -3538,7 +3540,7 @@ r in db.Rol on ur.rol equals r
                     editarSubEtapaProyecto.Descripcion = descripcion;
                     editarSubEtapaProyecto.EstaActivo = 1;
                 }
-                
+
                 db.SaveChanges();
 
                 return Json(new
@@ -3559,7 +3561,7 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult GuardarValorInforme(string tipo, string seleccionado, string secuencialEtapaId, string secuencialSubEtapaId, 
+        public ActionResult GuardarValorInforme(string tipo, string seleccionado, string secuencialEtapaId, string secuencialSubEtapaId,
             string secuencialCatalogoEtapa, string descripcion, string fechaInicio, string fechaFin, string porciento, string detalle, string recurso)
         {
             try
@@ -3582,10 +3584,11 @@ r in db.Rol on ur.rol equals r
                 int annoF = Int32.Parse(fechaF[2]);
                 DateTime fechaFinal = new DateTime(annoF, mesF, diaF);
 
-                if(porciento != null)
+                if (porciento != null)
                     porcentaje = Double.Parse(porciento);
 
-                if (tipo == "etapa") {
+                if (tipo == "etapa")
+                {
                     int etapa = int.Parse(secuencialEtapaId);
                     int etapaCatalogo = int.Parse(secuencialCatalogoEtapa);
 
@@ -3599,7 +3602,8 @@ r in db.Rol on ur.rol equals r
                     item.Seleccionado = selected;
 
 
-                } else if (tipo == "subetapa")
+                }
+                else if (tipo == "subetapa")
                 {
                     int recursoId = int.Parse(recurso);
                     int subetapa = int.Parse(secuencialSubEtapaId);
@@ -3646,7 +3650,7 @@ r in db.Rol on ur.rol equals r
                 if (seleccionado != null && seleccionado == "true")
                     selected = 1;
 
-                if (secuencial != null)
+                if (secuencial != null || secuencial != "0")
                     id = int.Parse(secuencial);
 
                 if (tipo == "etapa")
@@ -3662,7 +3666,7 @@ r in db.Rol on ur.rol equals r
                         {
                             subetapa.Seleccionado = selected;
                         }
-                        
+
                     }
                 }
                 else if (tipo == "subetapa")
@@ -4117,20 +4121,20 @@ r in db.Rol on ur.rol equals r
             try
             {
 
-               var etapasProyectosUsuario = (from c in db.EtapasProyectoCliente
-                                             join ca in db.EtapasProyecto on c.SecuencialEtapaProyecto equals ca.Secuencial
-                                        where c.EstaActivo == 1 && c.SecuencialClienteAuxiliar == idProyecto
-                                        orderby c.Secuencial
-                                        select new
-                                        {
-                                            id = c.Secuencial,
-                                            secuencialEtapa = c.SecuencialEtapaProyecto,
-                                            secuencialClienteAux = c.SecuencialClienteAuxiliar,
-                                            descripcion = ca.Descripcion,
-                                            fechaInicio = c.FechaInicio,
-                                            fechaFin = c.FechaFin,
-                                            porciento = c.Porciento
-                                        }).ToList();
+                var etapasProyectosUsuario = (from c in db.EtapasProyectoCliente
+                                              join ca in db.EtapasProyecto on c.SecuencialEtapaProyecto equals ca.Secuencial
+                                              where c.EstaActivo == 1 && c.SecuencialClienteAuxiliar == idProyecto
+                                              orderby c.Secuencial
+                                              select new
+                                              {
+                                                  id = c.Secuencial,
+                                                  secuencialEtapa = c.SecuencialEtapaProyecto,
+                                                  secuencialClienteAux = c.SecuencialClienteAuxiliar,
+                                                  descripcion = ca.Descripcion,
+                                                  fechaInicio = c.FechaInicio,
+                                                  fechaFin = c.FechaFin,
+                                                  porciento = c.Porciento
+                                              }).ToList();
 
                 var etapas = etapasProyectosUsuario.Select(c => new
                 {
@@ -4182,20 +4186,20 @@ r in db.Rol on ur.rol equals r
             try
             {
                 var subEtapasProyectosUsuario = (from c in db.SUBETAPASPROYECTOSCLIENTE
-                                              join ca in db.RecursosSubEtapasProyecto on c.SecuencialRecuros equals ca.Secuencial
-                                              where c.EstaActivo == 1 && c.SecuencialEtapaProyecto == idEtapa
-                                              orderby c.Secuencial
-                                              select new
-                                              {
-                                                  id = c.Secuencial,
-                                                  secuencialEtapa = c.SecuencialEtapaProyecto,
-                                                  descripcion = c.Descripcion,
-                                                  recurso = ca.Descripcion,
-                                                  recursoId = ca.Secuencial,
-                                                  fechaInicio = c.FechaComienzo,
-                                                  fechaFin = c.FechaFin,
-                                                  porciento = c.Porciento
-                                              }).ToList();
+                                                 join ca in db.RecursosSubEtapasProyecto on c.SecuencialRecuros equals ca.Secuencial
+                                                 where c.EstaActivo == 1 && c.SecuencialEtapaProyecto == idEtapa
+                                                 orderby c.Secuencial
+                                                 select new
+                                                 {
+                                                     id = c.Secuencial,
+                                                     secuencialEtapa = c.SecuencialEtapaProyecto,
+                                                     descripcion = c.Descripcion,
+                                                     recurso = ca.Descripcion,
+                                                     recursoId = ca.Secuencial,
+                                                     fechaInicio = c.FechaComienzo,
+                                                     fechaFin = c.FechaFin,
+                                                     porciento = c.Porciento
+                                                 }).ToList();
 
                 var subetapas = subEtapasProyectosUsuario.Select(c => new
                 {
@@ -7072,6 +7076,206 @@ r in db.Rol on ur.rol equals r
                 db.AdjuntoTicket.Add(adjTicket);
                 db.SaveChanges();
                 return newNameFile;
+            }
+        }
+
+
+        [HttpPost]
+        [Authorize]
+        public ActionResult GenerarExcelInformeProyecto(int secuencial)
+        {
+            try
+            {
+                using (SLDocument sl = new SLDocument())
+                {
+                    var proyecto = db.ClienteAuxiliar.Find(secuencial);
+                    var cliente = db.Cliente.Find(proyecto.SecuencialCliente);
+
+                    sl.SetColumnWidth(1, 30.22);
+                    sl.SetColumnWidth(2, 50.67);
+                    sl.SetColumnWidth(3, 15.78);
+                    sl.SetColumnWidth(4, 10.78);
+
+                    SLStyle style8 = sl.CreateStyle();
+                    style8.SetHorizontalAlignment(HorizontalAlignmentValues.Left);
+                    style8.SetVerticalAlignment(VerticalAlignmentValues.Justify);
+                    style8.Font.FontSize = 10;
+
+                    SLStyle style1 = sl.CreateStyle();
+                    style1.SetHorizontalAlignment(HorizontalAlignmentValues.Center);
+                    style1.Font.Bold = true;
+                    style1.Font.FontSize = 12;
+                    style1.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.LightSteelBlue, System.Drawing.Color.Blue);
+                    sl.SetCellStyle(1, 1, style1);
+                    sl.SetCellValue("A1", "INFORME AVANCE DE PROYECTO");
+                    sl.MergeWorksheetCells("A1", "D1");
+
+                    SLStyle style3 = sl.CreateStyle();
+                    style3.SetHorizontalAlignment(HorizontalAlignmentValues.Justify);
+                    style3.SetVerticalAlignment(VerticalAlignmentValues.Distributed);
+                    style3.Font.Bold = true;
+                    sl.SetCellStyle(2, 5, style3);
+                    sl.SetCellStyle(3, 5, style3);
+                    sl.SetCellStyle(4, 5, style3);
+
+                    SLStyle style4 = sl.CreateStyle();
+                    style4.SetHorizontalAlignment(HorizontalAlignmentValues.Justify);
+                    style4.SetVerticalAlignment(VerticalAlignmentValues.Distributed);
+                    style4.Font.FontSize = 10;
+
+                    sl.SetCellValue("A2", "CLIENTE:");
+                    sl.SetCellStyle(2, 1, style3);
+                    sl.SetCellValue("B2", cliente.Descripcion);
+
+                    sl.SetCellValue("A3", "RESPONSABLE - LIDER PROYECTO:");
+                    sl.SetCellStyle(3, 1, style3);
+
+                    string responsable = (from ca in db.ClienteAuxiliar
+                                          join lp in db.ResponsableProyectos on ca.SecuencialLiderProyecto equals lp.Secuencial
+                                          where ca.Secuencial == secuencial
+                                          select lp.Nombre).FirstOrDefault();
+                    sl.SetCellValue("B3", responsable);
+
+                    sl.SetCellValue("A4", "FECHA:");
+                    sl.SetCellStyle(4, 1, style3);
+                    sl.SetCellValue("B4", DateTime.Now.ToString());
+
+                    SLStyle headerStyle = sl.CreateStyle();
+                    headerStyle.SetHorizontalAlignment(HorizontalAlignmentValues.Center);
+                    headerStyle.SetVerticalAlignment(VerticalAlignmentValues.Distributed);
+                    headerStyle.Font.Bold = true;
+                    headerStyle.Font.FontSize = 10;
+                    headerStyle.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.LightSteelBlue, System.Drawing.Color.LightBlue);
+
+                    SLStyle etapaStyle = sl.CreateStyle();
+                    etapaStyle.SetHorizontalAlignment(HorizontalAlignmentValues.Justify);
+                    etapaStyle.SetVerticalAlignment(VerticalAlignmentValues.Distributed);
+                    etapaStyle.Font.Bold = true;
+                    etapaStyle.Font.FontSize = 10;
+                    etapaStyle.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.LightSteelBlue, System.Drawing.Color.LightBlue);
+
+                    sl.SetCellStyle(6, 1, headerStyle);
+                    sl.SetCellStyle(6, 2, headerStyle);
+                    sl.SetCellStyle(6, 3, headerStyle);
+                    sl.SetCellStyle(6, 4, headerStyle);
+
+                    sl.SetCellValue(6, 1, "ETAPA");
+                    sl.SetCellValue(6, 2, "DETALLE");
+                    sl.SetCellValue(6, 3, "FECHA DE CULMINACIÓN");
+                    sl.SetCellValue(6, 4, "ESTADO");
+
+                    SLStyle styleRed = sl.CreateStyle();
+                    styleRed.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.Red, System.Drawing.Color.Red);
+
+                    SLStyle styleYellow = sl.CreateStyle();
+                    styleYellow.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.Yellow, System.Drawing.Color.Yellow);
+
+                    SLStyle styleGreen = sl.CreateStyle();
+                    styleGreen.Fill.SetPattern(PatternValues.Solid, System.Drawing.Color.Green, System.Drawing.Color.Green);
+
+                    var datos = (from epc in db.EtapasProyectoCliente
+                                 join ep in db.EtapasProyecto on epc.SecuencialEtapaProyecto equals ep.Secuencial
+                                 where epc.SecuencialClienteAuxiliar == secuencial && epc.Seleccionado == 1
+                                 orderby epc.Secuencial
+                                 select new
+                                 {
+                                     descripcion = ep.Descripcion,
+                                     fechaFin = epc.FechaFin,
+                                     detalle = epc.Detalle,
+                                     porciento = epc.Porciento != null ? epc.Porciento : 0,
+                                     subEtapas = (from sep2 in db.SUBETAPASPROYECTOSCLIENTE
+                                                  join r in db.RecursosSubEtapasProyecto on sep2.SecuencialRecuros equals r.Secuencial
+                                                  where sep2.SecuencialEtapaProyecto == epc.Secuencial && sep2.Seleccionado == 1
+                                                  select new
+                                                  {
+                                                      descripcionSE = sep2.Descripcion,
+                                                      fechaFinSE = sep2.FechaFin,
+                                                      detalle = sep2.Detalle,
+                                                      porciento = sep2.Porciento != null ? sep2.Porciento : 0,
+                                                  }).ToList()
+                                 }).ToList();
+
+
+                    // Iteración sobre los datos para escribir en el Excel
+                    int rowIndex = 7; // Comenzar desde la fila 6 para dejar espacio para los encabezados
+                    foreach (var item in datos)
+                    {
+
+                        sl.SetCellStyle(rowIndex, 1, etapaStyle);
+                        sl.SetCellStyle(rowIndex, 2, etapaStyle);
+                        sl.SetCellStyle(rowIndex, 3, etapaStyle);
+
+                        sl.SetCellValue(rowIndex, 1, item.descripcion);
+                        sl.SetCellValue(rowIndex, 2, item.detalle);
+                        sl.SetCellValue(rowIndex, 3, item.fechaFin.ToString("dd/MM/yyyy")); // Asegurarse de que la fecha esté en el formato correcto
+                        SLStyle stylePorciento;
+                        if (item.porciento >= 0 && item.porciento <= 39)
+                        {
+                            stylePorciento = styleRed;
+                        }
+                        else if (item.porciento >= 40 && item.porciento <= 79)
+                        {
+                            stylePorciento = styleYellow;
+                        }
+                        else // 80 a 100
+                        {
+                            stylePorciento = styleGreen;
+                        }
+
+                        sl.SetCellStyle(rowIndex, 4, stylePorciento);
+
+                        // Manejo de las subetapas
+                        foreach (var subEtapa in item.subEtapas)
+                        {
+                            rowIndex++; // Incrementar el índice de fila para las subetapas
+                            sl.SetCellStyle(rowIndex, 1, style4);
+                            sl.SetCellStyle(rowIndex, 2, style4);
+                            sl.SetCellStyle(rowIndex, 3, style4);
+
+                            sl.SetCellValue(rowIndex, 1, subEtapa.descripcionSE);
+                            sl.SetCellValue(rowIndex, 2, subEtapa.detalle);
+                            sl.SetCellValue(rowIndex, 3, subEtapa.fechaFinSE.ToString("dd/MM/yyyy"));
+
+                            SLStyle stylePorcientoSubEtapa;
+                            if (subEtapa.porciento >= 0 && subEtapa.porciento <= 39)
+                            {
+                                stylePorcientoSubEtapa = styleRed;
+                            }
+                            else if (subEtapa.porciento >= 40 && subEtapa.porciento <= 79)
+                            {
+                                stylePorcientoSubEtapa = styleYellow;
+                            }
+                            else // 80 a 100
+                            {
+                                stylePorcientoSubEtapa = styleGreen;
+                            }
+
+                            sl.SetCellStyle(rowIndex, 4, stylePorcientoSubEtapa);
+                        }
+
+                        rowIndex++; // Incrementar el índice de fila para separar las etapas
+                    }
+
+                    string newNameFile = "Informe proyecto " + Utiles.RandomString(10) + ".xlsx";
+                    string path = Path.Combine(Server.MapPath("~/Web/resources/proyectos"), newNameFile);
+                    sl.SaveAs(path);
+
+                    var resp = new
+                    {
+                        success = true,
+                        mensaje = path
+                    };
+                    return Json(resp);
+                }
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
             }
         }
     }

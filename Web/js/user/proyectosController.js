@@ -692,6 +692,32 @@
         });
     };
 
+
+    $scope.generarInforme = function () {
+        console.log($scope.proyectoId);
+        var subInforme = $http.post("user/dar-excel-informe-proyecto", {
+            secuencial: $scope.proyectoId
+        });
+        subInforme.success(function (data) {
+            if (data.success === true) {
+
+                console.log("excel generado correctamente" + data.mensaje);
+
+                // Crear un Blob con los datos del archivo Excel
+                var blob = new Blob([data.mensaje], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
+
+                // Crear un enlace y simular un clic en el enlace para iniciar la descarga
+                var link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = "Informe proyecto.xlsx"; // Nombre del archivo Excel
+                link.click();
+            }
+            else {
+                messageDialog.show('Información', data.msg);
+            }
+        });
+    };
+
     $scope.exportarPdf = function () {
         var doc = new jsPDF();
         var element = document.getElementById('tabla-cronograma-proyecto');
@@ -787,7 +813,7 @@
             item.selected = $scope.selectAll;
         });
 
-        $scope.actualizarSeleccionInforme("all", null, null);
+        $scope.actualizarSeleccionInforme("all", $scope.selectAll, "0");
     };
     $scope.toggleSubEtapas = function (etapa) {
         $scope.actualizarSeleccionInforme("subetapa", etapa.selected, etapa.idSubEtapa);
@@ -804,7 +830,6 @@
     };
 
     $scope.actualizarSeleccionInforme = function (tipo, seleccionado, secuencial) {
-        console.log("tipo: " + tipo + " seleccionado: " + seleccionado + " secuencial: " + secuencial);
 
         var formData = new FormData();
         formData.append('tipo', tipo);
@@ -836,7 +861,7 @@
             $scope.fechaIniEtaInfo = item.fechaInicio;
             $scope.fechaFinEtaInfo = item.fechaFin;
             $scope.porcentajeEtaInfo = item.porciento;
-            $scope.detalleSubEInfo = item.detalle;
+            $scope.detalleEtaInfo = item.detalle;
 
             angular.element("#modal-editar-etapas-proyecto").modal("show");
         } else if (item.tipo === 'subetapa') {
@@ -855,7 +880,6 @@
 
             angular.element("#modal-agregar-subetapas-proyecto").modal("show");
         }
-
     };
 
     $scope.cargarDatosInforme = function () {
