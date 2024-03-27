@@ -34,6 +34,7 @@ using Newtonsoft.Json;
 using System.Net.Http;
 using System.Configuration;
 using System.Data.Entity;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
 
 namespace SifizPlanning.Controllers
 {
@@ -3767,6 +3768,51 @@ r in db.Rol on ur.rol equals r
             }
         }
 
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult EnviarCorreoInforme(string nombreFichero)
+        {
+            try
+            {
+
+                List<string> destinatarios = new List<string>();
+                destinatarios.Add("melizzabatistamartinez@gmail.com");
+
+                //string comercial = System.Configuration.ConfigurationManager.AppSettings["emailComercial"];
+                //comercial += "@sifizsoft.com";
+                //destinatarios.Add(comercial);
+                destinatarios = destinatarios.Distinct().ToList();
+                destinatarios.Remove("gerencia@sifizsoft.com");
+                string asunto = "Informe de proyecto";
+
+
+                string htmlMail = "Ha recibido un Informe de proyecto";
+
+                List<string> listaPathFicheros = new List<string>();
+                string pathExcel = nombreFichero;
+                string pathAdjuntoExcel = Path.Combine(Server.MapPath("~/Web/resources/proyectos/"), pathExcel);
+                listaPathFicheros.Add(pathAdjuntoExcel);
+
+                Utiles.EnviarEmailSistema(destinatarios.ToArray(), htmlMail, asunto, listaPathFicheros.ToArray(), "");
+
+                var resp = new
+                {
+                    success = true,
+                    msg = "Se ha enviado correctamente el email."
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
         //Guardar modal nuevas incidencias
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
@@ -7263,7 +7309,8 @@ r in db.Rol on ur.rol equals r
                     var resp = new
                     {
                         success = true,
-                        mensaje = path
+                        mensaje = path,
+                        nombreFichero = newNameFile
                     };
                     return Json(resp);
                 }

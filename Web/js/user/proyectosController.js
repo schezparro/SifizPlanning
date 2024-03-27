@@ -692,8 +692,10 @@
         });
     };
 
-
+    $scope.nombreFichero;
+    $scope.pathFichero;
     $scope.generarInforme = function () {
+
         console.log($scope.proyectoId);
         var subInforme = $http.post("user/dar-excel-informe-proyecto", {
             secuencial: $scope.proyectoId
@@ -701,21 +703,57 @@
         subInforme.success(function (data) {
             if (data.success === true) {
 
-                console.log("excel generado correctamente" + data.mensaje);
-
-                // Crear un Blob con los datos del archivo Excel
-                var blob = new Blob([data.mensaje], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
-
-                // Crear un enlace y simular un clic en el enlace para iniciar la descarga
-                var link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = "Informe proyecto.xlsx"; // Nombre del archivo Excel
-                link.click();
+                console.log("excel generado correctamente " + data.mensaje + "  ---  " + data.nombreFichero);
+                $scope.nombreFichero = data.nombreFichero;
+                $scope.pathFichero = data.mensaje
             }
             else {
                 messageDialog.show('Información', data.msg);
             }
         });
+    };
+
+    $scope.enviarInforme = function () {
+
+        if ($scope.nombreFichero != null) {
+            var envioCorreo = $http.post("user/enviar-correo-informe", {
+                nombreFichero: $scope.nombreFichero
+            });
+            envioCorreo.success(function (data) {
+                if (data.success === true) {
+
+                    messageDialog.show('Información', data.msg);
+
+                }
+            });
+
+        } else {
+            var subInforme = $http.post("user/dar-excel-informe-proyecto", {
+                secuencial: $scope.proyectoId
+            });
+            subInforme.success(function (data) {
+                if (data.success === true) {
+
+                    console.log("excel generado correctamente " + data.mensaje + "  ---  " + data.nombreFichero);
+                    $scope.nombreFichero = data.nombreFichero;
+                    $scope.pathFichero = data.mensaje;
+
+                    var envioCorreo = $http.post("user/enviar-correo-informe", {
+                        nombreFichero: $scope.nombreFichero
+                    });
+                    envioCorreo.success(function (data) {
+                        if (data.success === true) {
+
+                            messageDialog.show('Información', data.msg);
+
+                        }
+                    });
+                }
+                else {
+                    messageDialog.show('Información', data.msg);
+                }
+            });
+        }
     };
 
     $scope.exportarPdf = function () {
