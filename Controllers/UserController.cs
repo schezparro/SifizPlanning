@@ -2518,7 +2518,14 @@ r in db.Rol on ur.rol equals r
 				SolicitudPermisos solPermisos = new SolicitudPermisos();
 				if (solicitud.ID == null)
 				{
-					solPermisos.ApellidosNombres = persona.Nombre1 + " " + persona.Apellido1;
+					TimeSpan horaRetor = DateTime.ParseExact(solicitud.HoraRetorno, @"h:mm tt", CultureInfo.InvariantCulture).TimeOfDay;
+                    TimeSpan horaSal = DateTime.ParseExact(solicitud.HoraSalida, @"h:mm tt", CultureInfo.InvariantCulture).TimeOfDay;
+                    if (solicitud.FechaHasta.AddMinutes(horaRetor.TotalMinutes) <=  solicitud.FechaDesde.AddMinutes(horaSal.TotalMinutes))
+                    {
+                        throw new Exception("Error, la fecha de inicio del permiso debe ser menor que la fecha fin del permiso");
+                    }
+
+                    solPermisos.ApellidosNombres = persona.Nombre1 + " " + persona.Apellido1;
 					solPermisos.Area = solicitud.Area;
 					solPermisos.Cargo = solicitud.Cargo;
 					solPermisos.Cedula = solicitud.Cedula;
@@ -2572,11 +2579,6 @@ r in db.Rol on ur.rol equals r
 
 					if (solicitud.Estado == "APROBADA")
 					{
-						if (fechaHasta <= fechaDesde)
-						{
-							throw new Exception("Error, la fecha de inicio del permiso debe ser menor que la fecha fin del permiso");
-						}
-
 						//Buscando no se solapen los permisos
 						int cant = (from p in db.Permiso
 									where
