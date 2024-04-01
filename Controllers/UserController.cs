@@ -1218,7 +1218,7 @@ namespace SifizPlanning.Controllers
 					string linksConcatenados = linkAceptar + ", " + linkRechazar;
 
 					var client = new HttpClient();
-					var requestUrl = "https://api-publicaciones.sifizsoft.com/api/asignacion/asignar-feature";
+					var requestUrl = "https://api-publicaciones.sifizsoft.com/api/AsignacionPublicacion/AsignarTareaDePublicacion";
 
 					var data = new MultipartFormDataContent();
 
@@ -1233,7 +1233,7 @@ namespace SifizPlanning.Controllers
 					data.Add(new StringContent(linksConcatenados), "URLSifizPlanning");
 					data.Add(new StringContent(key), "Key");
 
-					if (adjuntos != null)
+					if (adjuntoPublicacion != null)
 					{
 						foreach (var adjunto in adjuntoPublicacion)
 						{
