@@ -54,6 +54,7 @@ rrhhApp.controller('rrhhController', ['$scope', '$http', function ($scope, $http
         angular.element("#panel-marcas-electronicas").addClass('invisible');
         angular.element("#panel-permisos").addClass('invisible');
         angular.element("#panel-feriados").addClass('invisible');
+        angular.element("#panel-incidencias").addClass('invisible');
     };
 
     $scope.IrVacacionesPermisos = function () {
@@ -108,6 +109,12 @@ rrhhApp.controller('rrhhController', ['$scope', '$http', function ($scope, $http
         ocultar();
         angular.element("#panel-feriados").removeClass('invisible');
         $scope.funcionalidad = 'GESTIÓN DE FERIADOS';
+    };
+
+    $scope.IrIncidencias = function () {
+        ocultar();
+        angular.element("#panel-incidencias").removeClass('invisible');
+        $scope.funcionalidad = 'GESTIÓN DE INCIDENCIAS';
     };
 
     $scope.loadingAjax = function () {
@@ -823,4 +830,124 @@ $(window).resize(function () {
 
     recalcularHead();
 });
+
+rrhhApp.controller('incidenciasController', ['$scope', '$http', function ($scope, $http) {
+
+    //Funciones de carga de datos
+    $scope.cargarIncidencias = function (start, filtro) {
+        $scope.loading.show();
+        //Cargando las Incidencias
+        var ajaxIncidencias = $http.post("rrhh/incidencias-colaborador/", {
+            start: start,       
+            filtro: filtro
+        });
+        ajaxIncidencias.success(function (data) {
+            if (data.success === true) {
+                $scope.incidencias = data.incidencias;              
+            }
+            else {
+                messageDialog.show('Información', "Error en el acceso a los datos.");
+            }
+        });
+        $scope.loading.hide();
+
+    };
+    $scope.cargarIncidencias(0);
+
+    //filtrando las Incidencias
+    $scope.filtrarColaboradoresIncidencias = function () {
+        $scope.cargarIncidencias(0, $scope.filtroColaboradoresIncidencias);
+    };
+
+
+    angular.element('#fecha-incidencia').datepicker({
+        format: 'dd/mm/yyyy',
+        forceParse: false
+    });
+
+    //ABRIR MODAL NUEVA INCIDENCIA
+    $scope.modalNuevaIncidencia = function () {
+        $scope.estaActivo = true;
+        angular.element("#modal-agregar-incidencias").modal('show');        
+    };
+
+    var ajaxColaboradores = $http.post("rrhh/dar-colaboradores-modal-incidencias", {});
+
+    ajaxColaboradores.success(function (data) {
+        if (data.success === true) {
+            $scope.colaboradores = data.colaboradores;
+        }
+    });
+
+    $scope.GuardarIncidenciasColaboradores = function () {
+
+        
+        waitingDialog.show('Guardando las incidencias...', { dialogSize: 'sm', progressType: 'success' });
+        var ajaxIncidencias = $http.post("rrhh/guardar-incidencias-colaborador/", {
+            idColaborador: $scope.colaboradorSeleccionado,
+            incidencia: $scope.nuevoIncidente,
+            descripcion: $scope.descripcion,
+            fechaIncidencia: $scope.fechaIncidencia,
+            estaActivo: $scope.estaActivo,
+        });
+        ajaxIncidencias.success(function (data) {
+            waitingDialog.hide();
+            if (data.success === true) {
+                $scope.colaboradorSeleccionado = "";
+                $scope.nuevoIncidente = "";
+                $scope.descripcion = "";
+                $scope.fechaIncidencia = "";
+                angular.element("#modal-agregar-incidencias").modal('hide');
+                $scope.cargarIncidencias(0);
+            }
+            else {
+                messageDialog.show('Información', data.msg);
+            }
+        });
+    };
+
+    
+    //Filter de angular para las fechas
+    rrhhApp.filter("strDateToStr", function () {
+        return function (textDate) {
+            if (textDate !== undefined) {
+                var fecha = new Date(parseInt(textDate.replace('/Date(', '')));
+                return dateToStr(fecha);
+            }
+            return "";
+        }
+    });
+    function dateToStr(dateObj, format, separator) {
+        /**
+         * Convert a date object to a string
+         * @argument dateObj {Date} A date object
+         * @argument format {string} An string representation of the date format. Default: dd-mm-yyyy. More could be added as necessary
+         * @argument separator {string} Character used for join the parts of the date
+         * @returns {string} An string representation of a Date
+         */
+        var year = dateObj.getFullYear().toString();
+        var month = dateObj.getMonth() + 1;
+        var month = (month < 10) ? '0' + month : month;
+        var day = dateObj.getDate();
+        var day = (day < 10) ? '0' + day : day;
+        var sep = (separator) ? separator : '/';
+        switch (format) {
+            case 'mm/dd/yyyy':
+                var out = [month, day, year];
+                break;
+            case 'yyyy/mm/dd':
+                var out = [year, month, day];
+                break;
+            default: //dd/mm/yyyy
+                var out = [day, month, year];
+        }
+        return out.join(sep);
+    };
+
+}]);
+
+
+
+
+
 

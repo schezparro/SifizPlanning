@@ -1088,5 +1088,131 @@ namespace SifizPlanning.Controllers
                 return Json(resp);
             }
         }
+    //Dar colaboradores al modal Nueva Incidencia
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, RRHH")]
+        public ActionResult DarIncidenciasColaboradores()
+        {
+            try
+            {
+                var colaboradores = (from c in db.Colaborador
+                                     join p in db.Persona on c.SecuencialPersona equals p.Secuencial                                   
+                                     select new
+                                     {
+                                         id = c.Secuencial,
+                                         nombre = p.Nombre1 +" " + p.Nombre2 + " " + p.Apellido1 + " " + p.Apellido2 
+                                     }).ToList();
+                var resp = new
+                {
+                    success = true,
+                    colaboradores = colaboradores
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        //Guardar Incidencias del modal Nueva Incidencia
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, RRHH")]
+        public ActionResult GuardarIncidenciasColaboradores(string idColaborador, string incidencia, string descripcion, string fechaIncidencia, bool estaActivo)
+        {
+            try
+            {
+                int colaborador = int.Parse(idColaborador);
+
+                string[] fechas = fechaIncidencia.Split(new Char[] { '/' });
+                int dia = Int32.Parse(fechas[0]);
+                int mes = Int32.Parse(fechas[1]);
+                int anno = Int32.Parse(fechas[2]);
+                DateTime fecha = new DateTime(anno, mes, dia);
+
+                IncidenciasRecursos nuevaIncidencia = new IncidenciasRecursos
+                {
+                    SecuencialColaborador = colaborador,                  
+                    Incidencia = incidencia,
+                    Descripcion = descripcion,
+                    Fecha = fecha,
+                    EstaActivo = estaActivo ? 1 : 0                    
+                };
+
+                db.IncidenciasRecursos.Add(nuevaIncidencia);
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        //INCIDENCIAS DE LOS COLABORADORES
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, RRHH")]
+        public ActionResult IncidenciasColaboradores(int start , string filtro = "")
+        {
+
+            try
+            {
+                var incidenciasColaboradores = (from inc in db.IncidenciasRecursos
+                                          join c in db.Colaborador on inc.SecuencialColaborador equals c.Secuencial
+                                          join pe in db.Persona on c.SecuencialPersona equals pe.Secuencial                                        
+                                          select new
+                                          {
+                                              secuencial = inc.Secuencial,
+                                              nombre = pe.Nombre1 + " " + pe.Nombre2 + " " + pe.Apellido1 + " " + pe.Apellido2,
+                                              incidencia = inc.Incidencia,
+                                              descripcion = inc.Descripcion,
+                                              fecha = inc.Fecha,
+                                              estaActivo = inc.EstaActivo ==1 ? "SI" : "NO"                                            
+                                          }).ToList();
+
+
+               
+
+                if (filtro != "")
+                {
+                    incidenciasColaboradores = incidenciasColaboradores.Where(x =>
+                                            x.nombre.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.incidencia.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.descripcion.ToString().ToLower().Contains(filtro.ToLower())                                           
+                                          ).ToList();
+                }
+             
+                var result = new
+                {
+                    success = true,                   
+                    incidencias = incidenciasColaboradores
+                };
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+                var result = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(result);
+            }
+        }
     }
 }
