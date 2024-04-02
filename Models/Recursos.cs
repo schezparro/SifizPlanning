@@ -14,6 +14,11 @@ namespace SifizPlanning.Models
     
     public partial class Recursos
     {
+        public Recursos()
+        {
+            this.RECURSOSASISTENCIA = new HashSet<RecursosAsistencia>();
+        }
+    
         public int Secuencial { get; set; }
         public string Titulo { get; set; }
         public string Detalle { get; set; }
@@ -24,5 +29,6 @@ namespace SifizPlanning.Models
         public Nullable<int> TiempoCapacitacion { get; set; }
     
         public virtual Modulo modulo { get; set; }
+        public virtual ICollection<RecursosAsistencia> RECURSOSASISTENCIA { get; set; }
     }
 }

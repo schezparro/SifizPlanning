@@ -1708,6 +1708,17 @@
           <Property Name="ADJUNTOASISTENCIA" Type="varchar" MaxLength="255" />
           <Property Name="TIEMPOCAPACITACION" Type="int" />
         </EntityType>
+        <EntityType Name="RECURSOSASISTENCIA">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SECUENCIALRECURSO" Type="int" Nullable="false" />
+          <Property Name="SECUENCIALCOLABORADOR" Type="int" Nullable="false" />
+          <Property Name="ASISTENCIA" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="PUNTUACION" Type="float" Nullable="false" />
+          <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+        </EntityType>
         <EntityType Name="RECURSOSSUBETAPASPROYECTO">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
@@ -2693,6 +2704,30 @@
             </Principal>
             <Dependent Role="RECURSOS">
               <PropertyRef Name="SECUENCIALMODULO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RECURSOSASISTENCIA_COLABORADOR">
+          <End Role="COLABORADOR" Type="Self.COLABORADOR" Multiplicity="1" />
+          <End Role="RECURSOSASISTENCIA" Type="Self.RECURSOSASISTENCIA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="COLABORADOR">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="RECURSOSASISTENCIA">
+              <PropertyRef Name="SECUENCIALCOLABORADOR" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RECURSOSASISTENCIA_RECURSOS">
+          <End Role="RECURSOS" Type="Self.RECURSOS" Multiplicity="1" />
+          <End Role="RECURSOSASISTENCIA" Type="Self.RECURSOSASISTENCIA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="RECURSOS">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="RECURSOSASISTENCIA">
+              <PropertyRef Name="SECUENCIALRECURSO" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -5059,6 +5094,7 @@
           <EntitySet Name="PRIORIDADTICKET" EntityType="Self.PRIORIDADTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="PROXIMAACTIVIDAD" EntityType="Self.PROXIMAACTIVIDAD" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="RECURSOS" EntityType="Self.RECURSOS" Schema="TICKET" store:Type="Tables" />
+          <EntitySet Name="RECURSOSASISTENCIA" EntityType="Self.RECURSOSASISTENCIA" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="RECURSOSSUBETAPASPROYECTO" EntityType="Self.RECURSOSSUBETAPASPROYECTO" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="RENEGOCIACION" EntityType="Self.RENEGOCIACION" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="RESOLUCIONSEMAFOROPRIORIDAD" EntityType="Self.RESOLUCIONSEMAFOROPRIORIDAD" Schema="TICKET" store:Type="Tables" />
@@ -5312,6 +5348,14 @@
           <AssociationSet Name="FK_RECURSOS_MODULO" Association="Self.FK_RECURSOS_MODULO">
             <End Role="MODULO" EntitySet="MODULO" />
             <End Role="RECURSOS" EntitySet="RECURSOS" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RECURSOSASISTENCIA_COLABORADOR" Association="Self.FK_RECURSOSASISTENCIA_COLABORADOR">
+            <End Role="COLABORADOR" EntitySet="COLABORADOR" />
+            <End Role="RECURSOSASISTENCIA" EntitySet="RECURSOSASISTENCIA" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RECURSOSASISTENCIA_RECURSOS" Association="Self.FK_RECURSOSASISTENCIA_RECURSOS">
+            <End Role="RECURSOS" EntitySet="RECURSOS" />
+            <End Role="RECURSOSASISTENCIA" EntitySet="RECURSOSASISTENCIA" />
           </AssociationSet>
           <AssociationSet Name="FK_RESOLUCIONSEMAFOROPRIORIDAD_PRIORIDADTICKET" Association="Self.FK_RESOLUCIONSEMAFOROPRIORIDAD_PRIORIDADTICKET">
             <End Role="PRIORIDADTICKET" EntitySet="PRIORIDADTICKET" />
@@ -7195,6 +7239,15 @@
             <End Role="Colaborador" EntitySet="Colaborador" />
             <End Role="INCIDENCIASRECURSOS" EntitySet="IncidenciasRecursos" />
           </AssociationSet>
+          <EntitySet Name="RecursosAsistencia" EntityType="SifizPlanningModel.RecursosAsistencia" />
+          <AssociationSet Name="FK_RECURSOSASISTENCIA_COLABORADOR" Association="SifizPlanningModel.FK_RECURSOSASISTENCIA_COLABORADOR">
+            <End Role="Colaborador" EntitySet="Colaborador" />
+            <End Role="RECURSOSASISTENCIA" EntitySet="RecursosAsistencia" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RECURSOSASISTENCIA_RECURSOS" Association="SifizPlanningModel.FK_RECURSOSASISTENCIA_RECURSOS">
+            <End Role="Recursos" EntitySet="Recursos" />
+            <End Role="RECURSOSASISTENCIA" EntitySet="RecursosAsistencia" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="Rol">
           <Key>
@@ -7341,6 +7394,7 @@
           <NavigationProperty Name="NIVELCOLABORADORTECNOLOGIA" Relationship="SifizPlanningModel.FK_NIVELCOLABORADORTECNOLOGIA_COLABORADOR" FromRole="Colaborador" ToRole="NIVELCOLABORADORTECNOLOGIA" />
           <Property Name="FechaIngreso" Type="DateTime" Precision="0" />
           <NavigationProperty Name="incidencias" Relationship="SifizPlanningModel.FK_INCIDENCIAS_COLABORADOR" FromRole="Colaborador" ToRole="Incidencias" />
+          <NavigationProperty Name="RECURSOSASISTENCIA" Relationship="SifizPlanningModel.FK_RECURSOSASISTENCIA_COLABORADOR" FromRole="Colaborador" ToRole="RECURSOSASISTENCIA" />
           <NavigationProperty Name="INCIDENCIASRECURSOS" Relationship="SifizPlanningModel.FK_INCIDENCIASRECURSOS_COLABORADOR" FromRole="Colaborador" ToRole="INCIDENCIASRECURSOS" />
           </EntityType>
         <EntityType Name="Colaborador_JefeInmediato">
@@ -12288,6 +12342,7 @@
           <NavigationProperty Name="modulo" Relationship="SifizPlanningModel.FK_RECURSOS_MODULO" FromRole="RECURSOS" ToRole="Modulo" />
           <Property Name="AdjuntoAsistencia" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="TiempoCapacitacion" Type="Int32" />
+          <NavigationProperty Name="RECURSOSASISTENCIA" Relationship="SifizPlanningModel.FK_RECURSOSASISTENCIA_RECURSOS" FromRole="Recursos" ToRole="RECURSOSASISTENCIA" />
         </EntityType>
         <Association Name="FK_RECURSOS_MODULO">
           <End Type="SifizPlanningModel.Modulo" Role="Modulo" Multiplicity="1" />
@@ -12522,6 +12577,43 @@
             </Principal>
             <Dependent Role="SUBETAPASPROYECTOSCLIENTE">
               <PropertyRef Name="SecuencialRecuros" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="RecursosAsistencia">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SecuencialRecurso" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialColaborador" Type="Int32" Nullable="false" />
+          <Property Name="Asistencia" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <Property Name="Puntuacion" Type="Double" Nullable="false" />
+          <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <NavigationProperty Name="colaborador" Relationship="SifizPlanningModel.FK_RECURSOSASISTENCIA_COLABORADOR" FromRole="RECURSOSASISTENCIA" ToRole="Colaborador" />
+          <NavigationProperty Name="recursos" Relationship="SifizPlanningModel.FK_RECURSOSASISTENCIA_RECURSOS" FromRole="RECURSOSASISTENCIA" ToRole="Recursos" />
+        </EntityType>
+        <Association Name="FK_RECURSOSASISTENCIA_COLABORADOR">
+          <End Type="SifizPlanningModel.Colaborador" Role="Colaborador" Multiplicity="1" />
+          <End Type="SifizPlanningModel.RecursosAsistencia" Role="RECURSOSASISTENCIA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Colaborador">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="RECURSOSASISTENCIA">
+              <PropertyRef Name="SecuencialColaborador" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RECURSOSASISTENCIA_RECURSOS">
+          <End Type="SifizPlanningModel.Recursos" Role="Recursos" Multiplicity="1" />
+          <End Type="SifizPlanningModel.RecursosAsistencia" Role="RECURSOSASISTENCIA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Recursos">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="RECURSOSASISTENCIA">
+              <PropertyRef Name="SecuencialRecurso" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -14725,6 +14817,18 @@
                 <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
                 <ScalarProperty Name="SecuencialEtapaProyecto" ColumnName="SECUENCIALETAPASPROYECTOCLIENTE" />
                 <ScalarProperty Name="SecuencialRecuros" ColumnName="SECUENCIALRECURSOSSUBETAPASPROYECTO" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RecursosAsistencia">
+            <EntityTypeMapping TypeName="SifizPlanningModel.RecursosAsistencia">
+              <MappingFragment StoreEntitySet="RECURSOSASISTENCIA">
+                <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
+                <ScalarProperty Name="Puntuacion" ColumnName="PUNTUACION" />
+                <ScalarProperty Name="Asistencia" ColumnName="ASISTENCIA" />
+                <ScalarProperty Name="SecuencialColaborador" ColumnName="SECUENCIALCOLABORADOR" />
+                <ScalarProperty Name="SecuencialRecurso" ColumnName="SECUENCIALRECURSO" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
               </MappingFragment>
             </EntityTypeMapping>

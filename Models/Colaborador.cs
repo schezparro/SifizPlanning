@@ -46,6 +46,7 @@ namespace SifizPlanning.Models
             this.ofertas = new HashSet<Ofertas>();
             this.NIVELCOLABORADORTECNOLOGIA = new HashSet<NivelColaboradorTecnologia>();
             this.incidencias = new HashSet<Incidencias>();
+            this.RECURSOSASISTENCIA = new HashSet<RecursosAsistencia>();
             this.INCIDENCIASRECURSOS = new HashSet<IncidenciasRecursos>();
         }
     
@@ -94,5 +95,6 @@ namespace SifizPlanning.Models
         public virtual ICollection<NivelColaboradorTecnologia> NIVELCOLABORADORTECNOLOGIA { get; set; }
         public virtual ICollection<Incidencias> incidencias { get; set; }
         public virtual ICollection<IncidenciasRecursos> INCIDENCIASRECURSOS { get; set; }
+        public virtual ICollection<RecursosAsistencia> RECURSOSASISTENCIA { get; set; }
     }
 }

@@ -25,7 +25,6 @@
         recursos.success(function (data) {
             $scope.loading.hide();
             if (data.success === true) {
-                console.log(data);
                 var posPagin = pagina;
                 $scope.recursos = data.recursos;
                 $scope.cantPaginas = Math.ceil(data.total / numerosPorPagina);
@@ -69,6 +68,26 @@
     };
     $scope.cargarRecursos();
 
+    //COLABORADORES ASISTENCIA
+    var ajaxColaboradores = $http.post("catalogos/dar-colaboradores", {});
+    ajaxColaboradores.success(function (data) {
+        if (data.success === true) {
+
+            var datos = [];
+            data.colaboradores.forEach(function (item) {
+                // Agrega la etapa al arreglo aplanado
+                datos.push({
+                    id: item.id,
+                    nombre: item.nombre,
+                    asignado: false,
+                    asistencia: false,
+                    puntuacion: 0.0
+                });
+            });
+            $scope.datosAsistencia = datos;
+        }
+    });
+
     // Función para retroceder a la página anterior
     $scope.atrazarPagina = function () {
         if (pagina > 1) {
@@ -99,6 +118,41 @@
         angular.element("#modal-agregar-recursos").modal("show");
     };
 
+    $scope.abrirRegistroAsistencia = function () {
+        $scope.limpiarDatosAsistencia();
+        angular.element("#guardar-registro").hide();
+        angular.element("#modal-asistencia-recurso").modal("show");
+    };
+
+    $scope.mostrarRegistroAsistencia = function (secuencial) {
+
+        var ajaxObtenerRecurso = $http.post("user/dar-datos-asistencia-recursos",
+            {
+                secuencialRecurso: secuencial
+            });
+        ajaxObtenerRecurso.success(function (data) {
+            if (data.success === true) {
+                var datosPorId = {};
+                data.datos.forEach(function (item) {
+                    datosPorId[item.id] = item;
+                });
+
+                data.datos.forEach(function (itemData) {
+                    $scope.datosAsistencia.forEach(function (itemAsistencia) {
+                        if (itemAsistencia.id === itemData.idColaborador) {
+                            itemAsistencia.asistencia = itemData.asistencia;
+                            itemAsistencia.puntuacion = itemData.puntuacion;
+                            itemAsistencia.asignado = true;
+                        };
+                    });
+                });
+
+                $scope.secuencialRecurso = secuencial;
+                angular.element("#guardar-registro").show();
+                angular.element("#modal-asistencia-recurso").modal("show");
+            }
+        });      
+    };
 
     var ajaxTipoModulo = $http.post("user/tipo-modulo", {});
 
@@ -112,7 +166,6 @@
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
 
         var fileInput = angular.element('#uniqueFileInputIDRecursos')[0];
-        var fileInput2 = angular.element('#uniqueFileInputIDRecursos2')[0];
         var modulo = angular.element("#select-modulo-recursos")[0].value;
 
         var fechaSistema = new Date().toISOString();
@@ -123,7 +176,7 @@
         formData.append('fecha', fechaSistema);
         formData.append('modulo', modulo);
         formData.append('adjuntos', fileInput.files[0]);
-        formData.append('adjuntoAsistencia', fileInput2.files[0]);
+        formData.append('adjuntoAsistencia', JSON.stringify($scope.datosAsistencia));
 
         var tiempo = toTotalMinutes($scope.horas, $scope.minutos)
 
@@ -154,6 +207,49 @@
             waitingDialog.hide();
             console.log('Error: ' + data);
         });
+    };
+
+    $scope.registrarAsistencia = function () {
+        waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
+
+        var datosGuardar = [];
+
+            $scope.datosAsistencia.forEach(function (itemAsistencia) {
+                if (itemAsistencia.asignado === true) {
+                    if (itemAsistencia.asistencia === true || itemAsistencia.puntuacion != 0.0)
+                        datosGuardar.push(itemAsistencia);
+                };
+            });
+
+        var formData = new FormData();
+        formData.append('idRecurso', $scope.secuencialRecurso);
+        formData.append('adjuntoAsistencia', JSON.stringify($scope.datosAsistencia));
+
+        var ajaxEnvioDatos = $http({
+            method: 'POST',
+            url: "user/guardar-asistencia-recurso",
+            data: formData,
+            headers: { 'Content-Type': undefined },
+            transformRequest: angular.identity
+        });
+
+        ajaxEnvioDatos.success(function (data) {
+            waitingDialog.hide();
+            if (data.success === true) {
+                angular.element("#modal-asistencia-recurso").modal("hide");
+                $scope.cargarRecursos();
+            }
+        });
+    };
+
+    $scope.limpiarDatosAsistencia = function () {
+        if ($scope.datosAsistencia) {
+            $scope.datosAsistencia.forEach(function (item) {
+                item.asignado = false;
+                item.asistencia = false;
+                item.puntuacion = 0.0;
+            });
+        }
     };
 
     $scope.mostrarDetalleRecurso = function (secuencial) {

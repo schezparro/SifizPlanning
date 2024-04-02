@@ -37,8 +37,8 @@
                 </td>
 
                 <td>
-                    <a class="btn btn-success btn-xs" target="_blank" href="Web{{recurso.adjuntoAsistencia}}" ng-show="recurso.adjuntoAsistencia && recurso.adjuntoAsistencia != ''">
-                        <span class="glyphicon glyphicon-download"></span> Adjunto Asistencia
+                    <a class="btn btn-primary btn-xs" ng-click="mostrarRegistroAsistencia(recurso.secuencial)">
+                        <span class="glyphicon glyphicon-calendar"></span> Registro asistencia
                     </a>
                 </td>
 
@@ -106,9 +106,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="inputArchivoAsistencia">REGISTRO DE ASISTENCIA:</label>
-                        <div id="panel-add-adjuntorecursos2"></div>
-                        <div class="clear"></div>
+                        <button type="button" id="abrir-modal-registro-asistencia" ng-click="abrirRegistroAsistencia()" class="btn btn-primary">REGISTRO DE ASISTENCIA</button>
                     </div>
 
                     <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
@@ -170,6 +168,51 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Informe -->
+<div class="modal fade" id="modal-asistencia-recurso" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding: 10px, 10px">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Registro de asistencia </h4>
+            </div>
+
+            <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
+
+                <div id="div-user-informe-proyecto">
+                    <table id="tabla-registro-asistencia" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>PERSONAL SIFIZSOFT E INTESOFT</th>
+                                <th>ASIGNADO</th>
+                                <th>ASISTENCIA</th>
+                                <th>PUNTUACIÓN</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr ng-repeat="item in datosAsistencia track by $index">
+                                <td>{{$index + 1}}</td> <!-- Autoincremental -->
+                                <td>{{item.nombre}}</td> <!-- Nombre del colaborador -->
+                                <td><input type="checkbox" ng-model="item.asignado"></td> <!-- Checkbox para asignado -->
+                                <td><input type="checkbox" ng-model="item.asistencia"></td> <!-- Checkbox para asistencia -->
+                                <td><input type="number" ng-model="item.puntuacion" min="0" max="5"></td> <!-- Input para puntuación -->
+                                <td><input type="hidden" value="{{item.id}}"></td> <!-- Campo oculto con el ID -->
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="guardar-registro" ng-click="registrarAsistencia()" class="btn btn-primary" >Guardar</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>

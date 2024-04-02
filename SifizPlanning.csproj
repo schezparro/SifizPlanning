@@ -775,6 +775,9 @@
     <Compile Include="Models\Recursos.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\RecursosAsistencia.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\RecursosSubEtapasProyecto.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>

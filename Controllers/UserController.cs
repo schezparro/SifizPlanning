@@ -35,6 +35,7 @@ using System.Net.Http;
 using System.Configuration;
 using System.Data.Entity;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using DocumentFormat.OpenXml.Wordprocessing;
 using System.Diagnostics.Contracts;
 
 namespace SifizPlanning.Controllers
@@ -4086,18 +4087,59 @@ r in db.Rol on ur.rol equals r
 		}
 
 
+        //RECURSOS DE LOS USUARIOS
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult AsistenciaRecurso(int secuencialRecurso)
+        {
 
-		[HttpPost]
-		[Authorize(Roles = "USER, ADMIN")]
-		public ActionResult DarCategoriaRecurso()
-		{
-			var datos = (from cat in db.CategoriaRecursos
-						 orderby cat.Descripcion
-						 select new
-						 {
-							 id = cat.Secuencial,
-							 nombre = cat.Descripcion
-						 }).ToList();
+            try
+            {
+                var asistenciaRecurso = (from ra in db.RecursosAsistencia
+                                         join r in db.Recursos on ra.SecuencialRecurso equals r.Secuencial
+                                         join c in db.Colaborador on ra.SecuencialColaborador equals c.Secuencial
+                                         where ra.SecuencialRecurso == secuencialRecurso
+                                         orderby c.persona.Nombre1, c.persona.Apellido1
+                                         select new
+                                         {
+                                             id = ra.Secuencial,
+                                             idColaborador = ra.SecuencialColaborador,
+                                             nombre = c.persona.Nombre1 + " " + c.persona.Apellido1,
+                                             asignado = true,
+                                             asistencia = ra.Asistencia == 1 ? true : false,
+                                             puntuacion = ra.Puntuacion
+                                         }).ToList();
+                var result = new
+                {
+                    success = true,
+                    datos = asistenciaRecurso
+                };
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+                var result = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(result);
+            }
+        }
+
+
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult DarCategoriaRecurso()
+        {
+            var datos = (from cat in db.CategoriaRecursos
+                         orderby cat.Descripcion
+                         select new
+                         {
+                             id = cat.Secuencial,
+                             nombre = cat.Descripcion
+                         }).ToList();
 
 			return Json(new
 			{
@@ -4107,58 +4149,68 @@ r in db.Rol on ur.rol equals r
 		}
 
 
-		//Guardar modal nuevos recursos
-		[HttpPost]
-		[Authorize(Roles = "OPERACIONES, ADMIN")]
-		public ActionResult GuardarRecurso(string titulo, string detalle, DateTime fecha, int modulo, int tiempo, HttpPostedFileBase[] adjuntos = null, HttpPostedFileBase[] adjuntoAsistencia = null)
-		{
-			try
-			{
-				var s = new JavaScriptSerializer();
-				var Url = "";
-				if (adjuntos != null)
-				{
-					foreach (var adj in adjuntos.Where(adj => adj != null))
-					{
-						string extFile = Path.GetExtension(adj.FileName);
-						string newNameFile = Utiles.RandomString(10) + extFile;
-						newNameFile = System.IO.Path.GetRandomFileName() + extFile;
-						string path = Path.Combine(Server.MapPath("~/Web/resources/recursos"), newNameFile);
-						adj.SaveAs(path);
+        //Guardar modal nuevos recursos
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult GuardarRecurso(string titulo, string detalle, DateTime fecha, int modulo, int tiempo, HttpPostedFileBase[] adjuntos = null, string adjuntoAsistencia = null)
+        {
+            try
+            {
+                var s = new JavaScriptSerializer();
+                var Url = "";
+                if (adjuntos != null)
+                {
+                    foreach (var adj in adjuntos.Where(adj => adj != null))
+                    {
+                        string extFile = Path.GetExtension(adj.FileName);
+                        string newNameFile = Utiles.RandomString(10) + extFile;
+                        newNameFile = System.IO.Path.GetRandomFileName() + extFile;
+                        string path = Path.Combine(Server.MapPath("~/Web/resources/recursos"), newNameFile);
+                        adj.SaveAs(path);
 
 						Url = "/resources/recursos" + "/" + newNameFile;
 						break;
 					}
 				}
 
-				var adjuntoAsistenciaUrl = "";
-				if (adjuntoAsistencia != null)
-				{
-					foreach (var adj in adjuntoAsistencia.Where(adj => adj != null))
-					{
-						string extFile = Path.GetExtension(adj.FileName);
-						string newNameFile = Utiles.RandomString(10) + extFile;
-						newNameFile = System.IO.Path.GetRandomFileName() + extFile;
-						string path = Path.Combine(Server.MapPath("~/Web/resources/recursos"), newNameFile);
-						adj.SaveAs(path);
+                Recursos nuevoRecurso = new Recursos
+                {
+                    Titulo = titulo,
+                    Detalle = detalle,
+                    Fecha = fecha,
+                    SecuencialModulo = modulo,
+                    Adjunto = Url,
+                    TiempoCapacitacion = tiempo
+                };
+                db.Recursos.Add(nuevoRecurso);
+                db.SaveChanges();
 
-						adjuntoAsistenciaUrl = "/resources/recursos" + "/" + newNameFile;
-						break;
-					}
-				}
 
-				Recursos nuevoRecurso = new Recursos
-				{
-					Titulo = titulo,
-					Detalle = detalle,
-					Fecha = fecha,
-					SecuencialModulo = modulo,
-					Adjunto = Url,
-					TiempoCapacitacion = tiempo,
-					AdjuntoAsistencia = adjuntoAsistenciaUrl,
-				};
-				db.Recursos.Add(nuevoRecurso);
-				db.SaveChanges();
+                var s1 = new JavaScriptSerializer();
+                var datosAsistencia = s1.Deserialize<List<dynamic>>(adjuntoAsistencia);
+
+                foreach (var item in datosAsistencia)
+                {
+                    bool asignado = Convert.ToBoolean(item["asignado"]);
+                    int id = Convert.ToInt32(item["id"]);
+                    bool asistencia = Convert.ToBoolean(item["asistencia"]);
+                    double puntuacion = Convert.ToDouble(item["puntuacion"]);
+
+                    if (asignado == true)
+                    {
+                        RecursosAsistencia ra = new RecursosAsistencia
+                        {
+                            SecuencialColaborador = id,
+                            SecuencialRecurso = nuevoRecurso.Secuencial,
+                            Asistencia = asistencia == true ? 1 : 0,
+                            Puntuacion = puntuacion,
+                            EstaActivo = 1
+                        };
+
+                        db.RecursosAsistencia.Add(ra);
+                        db.SaveChanges();
+                    }
+                };
 
 				return Json(new
 				{
@@ -4176,6 +4228,58 @@ r in db.Rol on ur.rol equals r
 			}
 		}
 
+        //Guardar modal nuevos recursos
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult GuardarAsistenciaRecurso(int idRecurso, string adjuntoAsistencia = null)
+        {
+            try
+            {
+                if (idRecurso != 0)
+                {
+                    var s1 = new JavaScriptSerializer();
+                    var datosAsistencia = s1.Deserialize<List<dynamic>>(adjuntoAsistencia);
+
+                    foreach (var item in datosAsistencia)
+                    {
+                        int id = Convert.ToInt32(item["id"]);
+                        bool asistencia = Convert.ToBoolean(item["asistencia"]);
+                        bool asignado = Convert.ToBoolean(item["asignado"]);
+                        double puntuacion = Convert.ToDouble(item["puntuacion"]);
+
+                        if (asignado == true)
+                        {
+                            RecursosAsistencia ra = new RecursosAsistencia
+                            {
+                                SecuencialColaborador = id,
+                                SecuencialRecurso = idRecurso,
+                                Asistencia = asistencia == true ? 1 : 0,
+                                Puntuacion = puntuacion,
+                                EstaActivo = 1
+                            };
+
+                            db.RecursosAsistencia.Add(ra);
+                            db.SaveChanges();
+                        };
+
+                    }
+                };
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
 
 
 		//ESTIMACIONES DE LOS USUARIOS
