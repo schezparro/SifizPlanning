@@ -9,11 +9,11 @@
     <table class="table table-striped">
         <thead id="thead-incidencias">
             <tr>
-                <th>Nombre</th>
+                <th>Colaborador</th>
                 <th>Incidencia</th>
                 <th>Descripción</th>
                 <th>Fecha</th>
-                <th>Está Activo</th>
+                @*<th>Está Activo</th>*@
             </tr>
         </thead>
 
@@ -23,7 +23,7 @@
                 <td class="col-md-2">{{ inc.incidencia }}</td>
                 <td class="col-md-2">{{ inc.descripcion }}</td>
                 <td class="col-md-2">{{ inc.fecha | strDateToStr }}</td>
-                <td class="col-md-1">{{ inc.estaActivo }}</td>
+                @*<td class="col-md-1">{{ inc.estaActivo }}</td>*@
             </tr>
         </tbody>
     </table>
@@ -48,9 +48,9 @@
                         </div>
                         <div>
                             <label>INCIDENCIA:</label>
-                            <textarea type="text" class="form-control" ng-model="nuevoIncidente" ng-required="true"></textarea>
+                            <input type="text" class="form-control" ng-model="nuevoIncidente" ng-required="true" />
 
-                            <label>DESCRIPCIÓN DEL TICKET:</label>
+                            <label>DESCRIPCIÓN</label>
                             <textarea type="text" class="form-control" ng-model="descripcion" ng-required="true"></textarea>
                         </div>
                         <br />
