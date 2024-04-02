@@ -80,6 +80,17 @@
           <Property Name="SECUENCIALUSUARIO" Type="int" Nullable="false" />
           <Property Name="FECHAOPERACION" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
+        <EntityType Name="INCIDENCIASRECURSOS">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SECUENCIALCOLABORADOR" Type="int" Nullable="false" />
+          <Property Name="INCIDENCIA" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="DESCRIPCION" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="FECHA" Type="date" Nullable="false" />
+          <Property Name="ESTAACTIVO" Type="decimal" Precision="1" Scale="0" Nullable="false" />
+        </EntityType>
         <EntityType Name="MARCAELECTRONICA">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
@@ -2412,6 +2423,18 @@
             </Principal>
             <Dependent Role="INCIDENCIAS">
               <PropertyRef Name="SECUENCIALMODULO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_INCIDENCIASRECURSOS_COLABORADOR">
+          <End Role="COLABORADOR" Type="Self.COLABORADOR" Multiplicity="1" />
+          <End Role="INCIDENCIASRECURSOS" Type="Self.INCIDENCIASRECURSOS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="COLABORADOR">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="INCIDENCIASRECURSOS">
+              <PropertyRef Name="SECUENCIALCOLABORADOR" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -4884,6 +4907,7 @@
           <EntitySet Name="ESTADOPERMISO" EntityType="Self.ESTADOPERMISO" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="FERIADOS" EntityType="Self.FERIADOS" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="GESTIONPERMISO" EntityType="Self.GESTIONPERMISO" Schema="RRHH" store:Type="Tables" />
+          <EntitySet Name="INCIDENCIASRECURSOS" EntityType="Self.INCIDENCIASRECURSOS" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="MARCAELECTRONICA" EntityType="Self.MARCAELECTRONICA" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="PERMISO" EntityType="Self.PERMISO" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="TIPOPERMISO" EntityType="Self.TIPOPERMISO" Schema="RRHH" store:Type="Tables" />
@@ -5194,6 +5218,10 @@
           <AssociationSet Name="FK_INCIDENCIAS_MODULO" Association="Self.FK_INCIDENCIAS_MODULO">
             <End Role="MODULO" EntitySet="MODULO" />
             <End Role="INCIDENCIAS" EntitySet="INCIDENCIAS" />
+          </AssociationSet>
+          <AssociationSet Name="FK_INCIDENCIASRECURSOS_COLABORADOR" Association="Self.FK_INCIDENCIASRECURSOS_COLABORADOR">
+            <End Role="COLABORADOR" EntitySet="COLABORADOR" />
+            <End Role="INCIDENCIASRECURSOS" EntitySet="INCIDENCIASRECURSOS" />
           </AssociationSet>
           <AssociationSet Name="FK_ITEMESPECIAL_ESTIMACIONTICKET" Association="Self.FK_ITEMESPECIAL_ESTIMACIONTICKET">
             <End Role="ESTIMACIONTICKET" EntitySet="ESTIMACIONTICKET" />
@@ -7156,6 +7184,11 @@
             <End Role="RECURSOSSUBETAPASPROYECTO" EntitySet="RecursosSubEtapasProyecto" />
             <End Role="SUBETAPASPROYECTOSCLIENTE" EntitySet="SUBETAPASPROYECTOSCLIENTE" />
           </AssociationSet>
+          <EntitySet Name="IncidenciasRecursos" EntityType="SifizPlanningModel.IncidenciasRecursos" />
+          <AssociationSet Name="FK_INCIDENCIASRECURSOS_COLABORADOR" Association="SifizPlanningModel.FK_INCIDENCIASRECURSOS_COLABORADOR">
+            <End Role="Colaborador" EntitySet="Colaborador" />
+            <End Role="INCIDENCIASRECURSOS" EntitySet="IncidenciasRecursos" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="Rol">
           <Key>
@@ -7302,6 +7335,7 @@
           <NavigationProperty Name="NIVELCOLABORADORTECNOLOGIA" Relationship="SifizPlanningModel.FK_NIVELCOLABORADORTECNOLOGIA_COLABORADOR" FromRole="Colaborador" ToRole="NIVELCOLABORADORTECNOLOGIA" />
           <Property Name="FechaIngreso" Type="DateTime" Precision="0" />
           <NavigationProperty Name="incidencias" Relationship="SifizPlanningModel.FK_INCIDENCIAS_COLABORADOR" FromRole="Colaborador" ToRole="Incidencias" />
+          <NavigationProperty Name="INCIDENCIASRECURSOS" Relationship="SifizPlanningModel.FK_INCIDENCIASRECURSOS_COLABORADOR" FromRole="Colaborador" ToRole="INCIDENCIASRECURSOS" />
           </EntityType>
         <EntityType Name="Colaborador_JefeInmediato">
           <Key>
@@ -12479,6 +12513,30 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="IncidenciasRecursos">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialColaborador" Type="Int32" Nullable="false" />
+          <Property Name="Incidencia" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Descripcion" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <NavigationProperty Name="Colaborador" Relationship="SifizPlanningModel.FK_INCIDENCIASRECURSOS_COLABORADOR" FromRole="INCIDENCIASRECURSOS" ToRole="Colaborador" />
+        </EntityType>
+        <Association Name="FK_INCIDENCIASRECURSOS_COLABORADOR">
+          <End Type="SifizPlanningModel.Colaborador" Role="Colaborador" Multiplicity="1" />
+          <End Type="SifizPlanningModel.IncidenciasRecursos" Role="INCIDENCIASRECURSOS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Colaborador">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="INCIDENCIASRECURSOS">
+              <PropertyRef Name="SecuencialColaborador" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -14649,6 +14707,18 @@
                 <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
                 <ScalarProperty Name="SecuencialEtapaProyecto" ColumnName="SECUENCIALETAPASPROYECTOCLIENTE" />
                 <ScalarProperty Name="SecuencialRecuros" ColumnName="SECUENCIALRECURSOSSUBETAPASPROYECTO" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="IncidenciasRecursos">
+            <EntityTypeMapping TypeName="SifizPlanningModel.IncidenciasRecursos">
+              <MappingFragment StoreEntitySet="INCIDENCIASRECURSOS">
+                <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
+                <ScalarProperty Name="Fecha" ColumnName="FECHA" />
+                <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
+                <ScalarProperty Name="Incidencia" ColumnName="INCIDENCIA" />
+                <ScalarProperty Name="SecuencialColaborador" ColumnName="SECUENCIALCOLABORADOR" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
               </MappingFragment>
             </EntityTypeMapping>

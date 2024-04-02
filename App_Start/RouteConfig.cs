@@ -2029,6 +2029,24 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "DarIncidenciasColaboradores",
+                url: "rrhh/dar-colaboradores-modal-incidencias/{id}",
+                defaults: new { controller = "Rrhh", action = "DarIncidenciasColaboradores", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "GuardarIncidenciasColaboradores",
+                url: "rrhh/guardar-incidencias-colaborador/{id}",
+                defaults: new { controller = "Rrhh", action = "GuardarIncidenciasColaboradores", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "IncidenciasColaboradores",
+                url: "rrhh/incidencias-colaborador/{id}",
+                defaults: new { controller = "Rrhh", action = "IncidenciasColaboradores", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "DarVacacionesTrabajador",
                 url: "rrhh/ver-vacaciones-colaborador/{id}",
                 defaults: new { controller = "Rrhh", action = "DarVacacionesTrabajador", id = UrlParameter.Optional }

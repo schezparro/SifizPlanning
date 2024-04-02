@@ -419,6 +419,8 @@
         <AssociationConnector Association="SifizPlanningModel.FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1" />
         <AssociationConnector Association="SifizPlanningModel.FK_SUBETAPASPROYECTOSCLIENTE_ETAPASPROYECTOCLIENTE" />
         <AssociationConnector Association="SifizPlanningModel.FK_SUBETAPASPROYECTOSCLIENTE_RECURSOSSUBETAPASPROYECTO" />
+        <EntityTypeShape EntityType="SifizPlanningModel.IncidenciasRecursos" Width="1.5" PointX="17.5" PointY="60.5" />
+        <AssociationConnector Association="SifizPlanningModel.FK_INCIDENCIASRECURSOS_COLABORADOR" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
