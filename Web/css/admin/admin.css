@@ -372,12 +372,11 @@ table td{
 }
 
 #modal-final-tarea .modal-dialog{
-    width: 815px;    
+    min-width: 815px;    
 }
 
 #modal-final-tarea .modal-body{
-    max-height: 400px;
-    height: 400px;
+    min-height: 250px;
 }
 
 #modal-cambio-horario-actividad .modal-dialog{

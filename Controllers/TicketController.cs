@@ -4821,7 +4821,7 @@ namespace SifizPlanning.Controllers
                 ticket.SecuencialProximaActividad = 18;//NA
 
                 //Adicionando el histórico del ticket                               
-                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser && x.EstaActivo == 1);
                 Cliente cliente = ticket.persona_cliente.cliente;
                 int numeroVersion = db.TicketHistorico.Where(x => x.SecuencialTicket == ticket.Secuencial).Count();
 

@@ -1458,10 +1458,17 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+               name: "DarEntregableTarea",
+               url: "user/dar-entregable-tarea/{id}",
+               defaults: new { controller = "User", action = "DarEntregableTarea", id = UrlParameter.Optional }
+            );
+            
+            routes.MapRoute(
                 name: "sistema",
                 url: "user/{id}",
                 defaults: new { controller = "User", action = "Sistema", id = UrlParameter.Optional }
             );
+
 
             //--------------------- RUTAS DEL FTP -------------------------
             routes.MapRoute(
@@ -2055,6 +2062,24 @@ namespace SifizPlanning
                 name: "GuardarPermiso",
                 url: "rrhh/guardar-permiso/{id}",
                 defaults: new { controller = "Rrhh", action = "GuardarPermiso", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarIncidenciasColaboradores",
+                url: "rrhh/dar-colaboradores-modal-incidencias/{id}",
+                defaults: new { controller = "Rrhh", action = "DarIncidenciasColaboradores", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "GuardarIncidenciasColaboradores",
+                url: "rrhh/guardar-incidencias-colaborador/{id}",
+                defaults: new { controller = "Rrhh", action = "GuardarIncidenciasColaboradores", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "IncidenciasColaboradores",
+                url: "rrhh/incidencias-colaborador/{id}",
+                defaults: new { controller = "Rrhh", action = "IncidenciasColaboradores", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(

@@ -42,5 +42,6 @@ namespace SifizPlanning.Models.ViewModel
 		[Required]
 		public string Jefe { get; set; }
 		public string Estado { get; set; }
-	}
+		public double TotalHoras { get; set; }
+    }
 }

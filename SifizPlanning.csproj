@@ -661,6 +661,9 @@
     <Compile Include="Models\Incidencias.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\IncidenciasRecursos.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\InfoTickets.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
@@ -1189,6 +1192,7 @@
     <Content Include="Views\User\windowUserRecursos.cshtml" />
     <Content Include="Views\User\windowUserIncidencias.cshtml" />
     <Content Include="Views\Report\VerReporteCliente.cshtml" />
+    <Content Include="Views\Rrhh\windowIncidencias.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1211,6 +1215,7 @@
     <Content Include="Web\js\highcharts-more.js" />
     <Content Include="Web\js\jspdf.debug.js" />
     <Content Include="Web\js\jspdf.min.js" />
+    <Content Include="Web\js\jspdf.umd.min.js" />
     <Content Include="Web\js\pdf.min.js" />
     <Content Include="Web\js\pdf.worker.min.js" />
     <Content Include="Web\js\rrhh\feriadosController.js" />
@@ -1628,6 +1633,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Properties\PublishProfiles\" />
+    <Folder Include="Views\incidencias\" />
     <Folder Include="Web\files\asignaciones\" />
     <Folder Include="Web\images\chat\" />
     <Folder Include="Web\images\logFBSError\" />

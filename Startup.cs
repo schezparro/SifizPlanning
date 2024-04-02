@@ -39,10 +39,10 @@ namespace SifizPlanning
             var hubConfiguration = new HubConfiguration();
             hubConfiguration.EnableDetailedErrors = true;
             app.MapSignalR(hubConfiguration);
-            app.UseHangfireAspNet(GetHangfireServers);
+            //app.UseHangfireAspNet(GetHangfireServers);
 
-            if (System.Configuration.ConfigurationManager.AppSettings["hangfire"] == "true")
-                app.UseHangfireDashboard();
+            //if (System.Configuration.ConfigurationManager.AppSettings["hangfire"] == "true")
+            //    app.UseHangfireDashboard();
             //Hangfire hangfire = new Hangfire();
             //hangfire.Start();
         }

@@ -26,6 +26,8 @@
     <script type="text/javascript" src="~/Web/js/jquery.json-list.js"></script>
     <script type="text/javascript" src="~/Web/js/jspdf.min.js"></script>
     <script type="text/javascript" src="~/Web/js/jspdf.debug.js"></script>
+    <script type="text/javascript" src="~/Web/js/jspdf.umd.min.js"></script>
+
 
 </head>
 <body ng-controller="rrhhController">
@@ -42,6 +44,7 @@
                 }
 
                 <li role="presentation"><a href="#" ng-click="IrFeriados()">Gestión de Feriados</a></li>
+                <li role="presentation"><a href="#" ng-click="IrIncidencias()">Gestión de Incidencias</a></li>
 
                 <a href="cerrar/sesion/" class="right btn btn-danger"><span class="glyphicon glyphicon-off"></span>Cerrar Sesión</a>
                 <a href="main-menu" style="margin-right: 4px;" class="right btn btn-warning"><span class="glyphicon glyphicon-menu-hamburger"></span> Menú Principal</a>
@@ -70,9 +73,13 @@
                 <div id="panel-permisos" class="invisible" ng-controller="solicitudesController">
                     @{Html.RenderPartial("windowControlVacaciones");}
                 </div>
-                
+
                 <div id="panel-feriados" class="invisible" ng-controller="feriadosController">
                     @{Html.RenderPartial("windowFeriados");}
+                </div>
+
+                <div id="panel-incidencias" class="invisible" ng-controller="incidenciasController">
+                    @{Html.RenderPartial("windowIncidencias");}
                 </div>
 
                 <div id="loadingDiv">
@@ -145,8 +152,7 @@
     <script type="text/javascript" src="~/Web/js/rrhh/rrhh.js"></script>
     <script type="text/javascript" src="~/Web/js/rrhh/solicitudesController.js"></script>
     <script type="text/javascript" src="~/Web/js/rrhh/feriadosController.js"></script>
-    <script type="text/javascript" src="~/Web/js/jspdf.min.js"></script>
-    <script type="text/javascript" src="~/Web/js/jspdf.debug.js"></script>
+  
 
 </body>
 </html>

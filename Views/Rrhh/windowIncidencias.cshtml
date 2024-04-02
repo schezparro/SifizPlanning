@@ -1,0 +1,72 @@
+﻿<div>
+    <button type="button" class="btn btn-primary" ng-click="modalNuevaIncidencia()">
+        <span class="glyphicon glyphicon-time" aria-hidden="true"></span> Nueva Incidencia
+    </button>
+
+    <input type="text" id="filtro-colaboradores-incidencias" placeholder="Filtrar..." ng-model="filtroColaboradoresIncidencias" class="form-control right filtro" ng-keyup="filtrarColaboradoresIncidencias()" />
+</div>
+<div class="panel-body" style="height: 400px; overflow-y: auto;">
+    <table class="table table-striped">
+        <thead id="thead-incidencias">
+            <tr>
+                <th>Nombre</th>
+                <th>Incidencia</th>
+                <th>Descripción</th>
+                <th>Fecha</th>
+                <th>Está Activo</th>
+            </tr>
+        </thead>
+
+        <tbody id="tbody-incidencias">
+            <tr class="table-tr" ng-repeat="inc in incidencias">
+                <td class="col-md-2">{{ inc.nombre }}</td>
+                <td class="col-md-2">{{ inc.incidencia }}</td>
+                <td class="col-md-2">{{ inc.descripcion }}</td>
+                <td class="col-md-2">{{ inc.fecha | strDateToStr }}</td>
+                <td class="col-md-1">{{ inc.estaActivo }}</td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+
+    <!-- Modal Nueva Incidencia -->
+    <div id="modal-agregar-incidencias" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form ng-submit="GuardarIncidenciasColaboradores()">
+                    <div class="modal-header" style="padding: 10px, 10px">
+                        <label>NUEVA INCIDENCIA</label>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <label style="margin-right: 10px;">COLABORADOR:</label>
+                            <select id="select-colaborador-incidencias" ng-model="colaboradorSeleccionado" class="form-control" required="required" style="width: 120px;">
+                                <option value="">Seleccione...</option>
+                                <option value="{{colaborador.id}}" ng-repeat="colaborador in colaboradores">{{colaborador.nombre}}</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>INCIDENCIA:</label>
+                            <textarea type="text" class="form-control" ng-model="nuevoIncidente" ng-required="true"></textarea>
+
+                            <label>DESCRIPCIÓN DEL TICKET:</label>
+                            <textarea type="text" class="form-control" ng-model="descripcion" ng-required="true"></textarea>
+                        </div>
+                        <br />
+
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <label style="margin-right: 10px;">FECHA INCIDENCIA:</label>
+                            <div class='input-group date' style="flex: 1;">
+                                <input id="fecha-incidencia" ng-model="fechaIncidencia" class="form-control" ng-required="true" autocomplete="off" style="width: 120px;" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" id="enviar-modal-incidencias-btn" class="btn btn-primary">Guardar</button>
+                        <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>

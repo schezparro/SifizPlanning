@@ -4,6 +4,7 @@
         solicitudes.success(function (data) {
             waitingDialog.hide();
             if (data.success === true) {
+                console.log(data);
                 $scope.vacaciones = data.solicitudes;
             }
             else {
@@ -19,6 +20,7 @@
             waitingDialog.hide();
             if (data.success === true) {
                 $scope.permisos = data.solicitudes;
+                console.log($scope.permisos)
             }
             else {
                 messageDialog.show('Información', data.msg);
@@ -153,44 +155,42 @@
     };
 
     $scope.generarVacacionesPDF = function () {
-        var table = document.getElementById("table-show-vacaciones");
+        var table = document.getElementById("table-show-vacaciones").cloneNode(true);
         var newWin = window.open("");
-        newWin.document.write("<html><head><style>");
-        newWin.document.write(".table {width: 100%;margin-bottom: 1rem;color: #212529;background-color: transparent;border-collapse: collapse;}");
-        newWin.document.write(".table-sm th, .table-sm td {padding: .3rem;border: 1px solid black;}");
-        newWin.document.write("</style></head><body>");
-        newWin.document.write(table.outerHTML);
-        newWin.document.write("</body></html>");
-        newWin.print();
-        newWin.close();
+
+        table.setAttribute('style', 'width: 100%; margin-bottom: 1rem; color: #212529; background-color: transparent; border-collapse: collapse;');
+        Array.from(table.querySelectorAll("th, td")).forEach(function (cell) {
+            cell.setAttribute('style', 'padding: .3rem; border: 1px solid black;');
+        });
+
+        newWin.addEventListener('load', function () {
+            newWin.document.body.appendChild(table);
+            newWin.focus();
+            newWin.print();
+            newWin.addEventListener('afterprint', function () {
+                newWin.close();
+            });
+        });
     };
 
     $scope.generarPermisoPDF = function () {
-        var table = document.getElementById("table-show-permiso");
+        var table = document.getElementById("table-show-permiso").cloneNode(true);
         var newWin = window.open("");
-        newWin.document.write("<html><head><style>");
-        newWin.document.write(".table {width: 100%;margin-bottom: 1rem;color: #212529;background-color: transparent;border-collapse: collapse;}");
-        newWin.document.write(".table-sm th, .table-sm td {padding: .3rem;border: 1px solid black;}");
-        newWin.document.write("</style></head><body>");
-        newWin.document.write(table.outerHTML);
-        newWin.document.write("</body></html>");
-        newWin.print();
-        newWin.close();
+
+        table.setAttribute('style', 'width: 100%; margin-bottom: 1rem; color: #212529; background-color: transparent; border-collapse: collapse;');
+        Array.from(table.querySelectorAll("th, td")).forEach(function (cell) {
+            cell.setAttribute('style', 'padding: .3rem; border: 1px solid black;');
+        });
+
+        newWin.addEventListener('load', function () {
+            newWin.document.body.appendChild(table);
+            newWin.focus();
+            newWin.print();
+            newWin.addEventListener('afterprint', function () {
+                newWin.close();
+            });
+        });
     };
-
-    /*
-    $scope.printTable = function () {
-        var table = document.getElementById("table-show-vacaciones");
-        var newWin = window.open("");
-        newWin.document.write("<html><head><title>Print Page</title></head><body>");
-        newWin.document.write("<h1>My Table</h1>");
-        newWin.document.write(table.outerHTML);
-        newWin.document.write("</body></html>");
-        newWin.print();
-        newWin.close();
-
-    };*/
-
 
 }]);
 
