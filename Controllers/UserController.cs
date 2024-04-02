@@ -3898,6 +3898,8 @@ r in db.Rol on ur.rol equals r
 
                 List<string> destinatarios = new List<string>();
                 destinatarios.Add("melizzabatistamartinez@gmail.com");
+                destinatarios.Add("rlandave@sifizsoft.com");
+                destinatarios.Add("vhidalgo@sifizsoft.com");
 
                 //string comercial = System.Configuration.ConfigurationManager.AppSettings["emailComercial"];
                 //comercial += "@sifizsoft.com";
