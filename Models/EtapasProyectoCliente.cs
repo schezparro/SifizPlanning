@@ -25,6 +25,9 @@ namespace SifizPlanning.Models
         public System.DateTime FechaFin { get; set; }
         public decimal EstaActivo { get; set; }
         public Nullable<int> SecuencialClienteAuxiliar { get; set; }
+        public string Detalle { get; set; }
+        public Nullable<decimal> Seleccionado { get; set; }
+        public Nullable<double> Porciento { get; set; }
     
         public virtual ClienteAuxiliar clienteAuxiliar { get; set; }
         public virtual ICollection<SubEtapasProyectosCliente> subEtapasProyectosCliente { get; set; }

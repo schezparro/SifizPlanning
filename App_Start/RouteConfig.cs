@@ -1081,13 +1081,13 @@ namespace SifizPlanning
             routes.MapRoute(
                 name: "EliminarEtapaProyecto",
                 url: "user/eliminar-etapa-proyecto/{id}",
-                defaults: new { controller = "Admin", action = "EliminarEtapaProyecto", id = UrlParameter.Optional }
+                defaults: new { controller = "User", action = "EliminarEtapaProyecto", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(
                 name: "EliminarSubEtapaProyecto",
                 url: "user/eliminar-sub-etapa-proyecto/{id}",
-                defaults: new { controller = "Admin", action = "EliminarSubEtapaProyecto", id = UrlParameter.Optional }
+                defaults: new { controller = "User", action = "EliminarSubEtapaProyecto", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(
@@ -1109,6 +1109,36 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "DarDatosProyectos",
+                url: "user/dar-datos-proyecto/{id}",
+                defaults: new { controller = "User", action = "DarDatosProyectos", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarCronogramaProyecto",
+                url: "user/dar-cronograma-proyecto/{id}",
+                defaults: new { controller = "User", action = "DarCronogramaProyecto", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "ActualizarSeleccionInforme",
+                url: "user/actualizar-seleccion-informe/{id}",
+                defaults: new { controller = "User", action = "ActualizarSeleccionInforme", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "EnviarCorreoInforme",
+                url: "user/enviar-correo-informe/{id}",
+                defaults: new { controller = "User", action = "EnviarCorreoInforme", id = UrlParameter.Optional }
+            );
+            
+            routes.MapRoute(
+                name: "GenerarExcelInformeProyecto",
+                url: "user/dar-excel-informe-proyecto/{id}",
+                defaults: new { controller = "User", action = "GenerarExcelInformeProyecto", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "GuardarRecurso",
                 url: "user/guardar-recurso/{id}",
                 defaults: new { controller = "User", action = "GuardarRecurso", id = UrlParameter.Optional }
@@ -1124,6 +1154,12 @@ namespace SifizPlanning
                 name: "GuardarEtapasProyecto",
                 url: "user/guardar-etapas-proyecto/{id}",
                 defaults: new { controller = "User", action = "GuardarEtapasProyecto", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "GuardarValorInforme",
+                url: "user/guardar-valor-informe/{id}",
+                defaults: new { controller = "User", action = "GuardarValorInforme", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(

@@ -86,6 +86,42 @@
         forceParse: false
     });
 
+    angular.element('#fecha-inicio-etapa-info').datepicker({
+        format: 'dd/mm/yyyy',
+        forceParse: false
+    });
+
+    angular.element('#fecha-fin-etapa-info').datepicker({
+        format: 'dd/mm/yyyy',
+        forceParse: false
+    });
+
+    angular.element('#fecha-inicio-subetapa-info').datepicker({
+        format: 'dd/mm/yyyy',
+        forceParse: false
+    });
+
+    angular.element('#fecha-fin-subetapa-info').datepicker({
+        format: 'dd/mm/yyyy',
+        forceParse: false
+    });
+
+    $scope.updateMinDateSubEtapa = function () {
+
+        if ($scope.fechaIniSubE < $scope.fechaInicioEtapa) {
+            $scope.fechaIniSubE = $scope.fechaInicioEtapa;
+        }
+
+        if ($scope.fechaFinSubE > $scope.fechaFinEtapa) {
+            $scope.fechaFinSubE = $scope.fechaFinEtapa;
+        }
+
+        angular.element('#fecha-inicio-subetapa').datepicker('setStartDate', $scope.fechaInicioEtapa);
+        angular.element('#fecha-inicio-subetapa').datepicker('setEndDate', $scope.fechaFinEtapa);
+        angular.element('#fecha-fin-subetapa').datepicker('setStartDate', $scope.fechaIniSubE);
+        angular.element('#fecha-fin-subetapa').datepicker('setEndDate', $scope.fechaFinEtapa);
+    };
+
     $scope.windowAgregarProyecto = function () {
         $scope.ubicacionPro = '';
         $scope.codigoFuentePro = false;
@@ -147,8 +183,6 @@
     var ajaxetapas = $http.post("user/tipo-etapas", {});
     ajaxetapas.success(function (data) {
         if (data.success === true) {
-
-            console.log(data.etapasCat);
             $scope.etapasCat = data.etapasCat;
         }
     });
@@ -157,8 +191,6 @@
     var ajaxrecursosSubEtapas = $http.post("user/tipo-recursos-subetapas", {});
     ajaxrecursosSubEtapas.success(function (data) {
         if (data.success === true) {
-
-            console.log("subetapas " + data.recursosSubEtapas);
             $scope.recursosSubEtapas = data.recursosSubEtapas;
         }
     });
@@ -176,7 +208,7 @@
 
         var ubicacion = angular.element("#select-ubicacion-proyecto")[0].value;
         var responsableCodigo = angular.element("#select-responsableCodigo-proyecto")[0].value;
-        var versionDesarrollo = angular.element("#select-versionDesarrollo-proyecto")[0].value;   
+        var versionDesarrollo = angular.element("#select-versionDesarrollo-proyecto")[0].value;
         var cliente = angular.element("#select-cliente-proyecto")[0].value;
         var responsablePublicacion = angular.element("#select-responsablePublicacion-proyecto")[0].value;
         var salidaProduccion = angular.element("#fecha-salida-proyecto")[0].value;
@@ -225,8 +257,10 @@
 
         $scope.lider = proyecto.lider;
         $scope.gestor = proyecto.gestor;
-        $scope.tieneSolucionProxies = proyecto.tieneSolucionProxies;
         $scope.fechaProduccion = proyecto.fechaProduccion;
+        $scope.versionDesarrollo = proyecto.versionDesarrollo;
+        $scope.tieneSolucionProxies = proyecto.tieneSolucionProxies;
+        $scope.versionBD = proyecto.versionBaseDatos;
 
         angular.element("#modal-proyectos").modal('show');
     };
@@ -242,38 +276,39 @@
             {
                 start: start,
                 lenght: lenght,
-                filtro: $scope.filtroEtapas
+                filtro: $scope.filtroEtapas,
+                idProyecto: $scope.proyectoId
             });
         etapas.success(function (data) {
             $scope.loading.hide();
             if (data.success === true) {
                 var posPagin = pagina;
                 $scope.etapas = data.etapas;
-                $scope.cantPaginas = Math.ceil(data.total / numerosPorPagina);
-                if ($scope.cantPaginas === 0) {
-                    $scope.cantPaginas = 1;
+                $scope.cantPaginasE = Math.ceil(data.total / numerosPorPagina);
+                if ($scope.cantPaginasE === 0) {
+                    $scope.cantPaginasE = 1;
                 }
 
-                $scope.listaPaginas = [];
-                if ($scope.cantPaginas > 5 && pagina <= 5) {
+                $scope.listaPaginasE = [];
+                if ($scope.cantPaginasE > 5 && pagina <= 5) {
                     for (var i = 1; i <= 5; i++) {
-                        $scope.listaPaginas.push(i);
+                        $scope.listaPaginasE.push(i);
                     }
                 }
-                else if ($scope.cantPaginas < 5) {
-                    for (var i = 1; i <= $scope.cantPaginas; i++) {
-                        $scope.listaPaginas.push(i);
+                else if ($scope.cantPaginasE < 5) {
+                    for (var i = 1; i <= $scope.cantPaginasE; i++) {
+                        $scope.listaPaginasE.push(i);
                     }
                 }
-                else if ($scope.cantPaginas > 5) {
+                else if ($scope.cantPaginasE > 5) {
                     for (var i = pagina - 4; i <= pagina; i++) {
-                        $scope.listaPaginas.push(i);
+                        $scope.listaPaginasE.push(i);
                     }
                     posPagin = 5;
                 }
 
-                if (pagina > $scope.cantPaginas) {
-                    pagina = $scope.cantPaginas;
+                if (pagina > $scope.cantPaginasE) {
+                    pagina = $scope.cantPaginasE;
                     posPagin = pagina;
                 }
 
@@ -288,7 +323,6 @@
             }
         });
     };
-    $scope.cargarEtapas();
 
     $scope.GuardarNuevaEtapa = function () {
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
@@ -299,7 +333,19 @@
         var fechaInicioEta = angular.element("#fecha-inicio-etapa")[0].value;
         var fechaFinEta = angular.element("#fecha-fin-etapa")[0].value;
 
+        if (fechaInicioEta > fechaFinEta) {
+            $scope.informacion = "La fecha de inicio no puede ser mayor que la fecha final"
+            angular.element("#modal-info-proyectos").modal("show");
+        };
+
+        console.log("id etapa par guardar en el editar de etapas " + $scope.etapaId);
+
         var formData = new FormData();
+        if ($scope.etapaId != undefined)
+            formData.append('secuencial', $scope.etapaId);
+        else
+            formData.append('secuencial', 0);
+
         formData.append('etapa', etapa);
         formData.append('cliAux', $scope.proyectoId);
         formData.append('fechaInicioEta', fechaInicioEta);
@@ -323,34 +369,104 @@
             }
         });
     };
-    
+
     $scope.abrirModalGenerarInforme = function (proyectoId) {
-        $scope.proyectoId = proyectoId,
-            angular.element("#modal-etapas-proyecto").modal("show");
+        $scope.proyectoId = proyectoId
+        $scope.cargarEtapas();
+        angular.element("#modal-etapas-proyecto").modal("show");
     };
 
-    $scope.abrirModalAgregarSubTarea = function (etapaId) {
-        $scope.etapaId = etapaId,
-            angular.element("#modal-sub-etapas-proyecto").modal("show");
+    $scope.abrirModalGenerarReporte = function (proyectoId) {
+        $scope.proyectoId = proyectoId;
+
+        $scope.cargarDatosInforme();
+    };
+
+    $scope.GuardarValor = function (tipo) {
+
+        console.log('Guardando valor para', $scope.itemModificado, 'tipo:', tipo);
+
+        var formData = new FormData();
+        formData.append('tipo', tipo);
+
+        if (tipo === 'etapa') {
+
+            formData.append('seleccionado', $scope.itemModificado.selected);
+            formData.append('secuencialEtapaId', $scope.itemModificado.idEtapa);
+            formData.append('secuencialCatalogoEtapa', $scope.etapasProInfo);
+            formData.append('fechaInicio', $scope.fechaIniEtaInfo);
+            formData.append('fechaFin', $scope.fechaFinEtaInfo);
+            formData.append('porciento', $scope.porcentajeEtaInfo);
+            formData.append('detalle', $scope.detalleEtaInfo);
+
+        } else if (tipo === 'subetapa') {
+
+            formData.append('seleccionado', $scope.itemModificado.selected);
+            formData.append('secuencialSubEtapaId', $scope.itemModificado.idSubEtapa);
+            formData.append('recurso', $scope.recursosSubEInfo);
+            formData.append('descripcion', $scope.descripcionSubEInfo);
+            formData.append('fechaInicio', $scope.fechaIniSubEInfo);
+            formData.append('fechaFin', $scope.fechaFinSubEInfo);
+            formData.append('porciento', $scope.porcentajeSubEInfo);
+            formData.append('detalle', $scope.detalleSubEInfo);
+        }
+
+        var ajaxEnvioDatos = $http({
+            method: 'POST',
+            url: "user/guardar-valor-informe",
+            data: formData,
+            headers: { 'Content-Type': undefined },
+            transformRequest: angular.identity
+        });
+
+        ajaxEnvioDatos.success(function (data) {
+            waitingDialog.hide();
+            if (data.success === true) {
+
+                if (tipo === 'etapa')
+                    angular.element("#modal-editar-etapas-proyecto").modal("hide");
+                else
+                    angular.element("#modal-agregar-subetapas-proyecto").modal("hide");
+
+                $scope.cargarDatosInforme();
+            } else {
+                messageDialog.show("Información", data.msg);
+            }
+        });
+    };
+
+    $scope.abrirModalAgregarSubTarea = function (etapa) {
+        $scope.etapaId = etapa.id;
+        $scope.fechaInicioEtapa = etapa.fechaInicio;
+        $scope.fechaFinEtapa = etapa.fechaFin;
+        $scope.cargarSubEtapas();
+        angular.element("#modal-sub-etapas-proyecto").modal("show");
     };
 
     $scope.windowAgregarEtapasProyecto = function (proyectoId) {
         $scope.proyectoId = proyectoId,
-        $scope.etapasPro = '';
+            $scope.etapasPro = '';
         $scope.fechaIniEta = '';
         $scope.fechaFinEta = '';
 
         angular.element("#modal-agregar-etapas-proyecto").modal("show");
     };
 
-    $scope.windowAgregarSubEtapasProyecto = function (etapaId) {
-        $scope.etapaId = etapaId,
-        $scope.descripcionSubE = '',
+    $scope.windowAgregarSubEtapasProyecto = function () {
+        $scope.subEtapaId = 0;
+        $scope.etapaId = $scope.etapaId;
+        $scope.descripcionSubE = '';
         $scope.recursosSubE = '';
         $scope.fechaIniSubE = '';
         $scope.fechaFinSubE = '';
 
+        angular.element('#fecha-inicio-subetapa').datepicker('setStartDate', $scope.fechaInicioEtapa);
+        angular.element('#fecha-inicio-subetapa').datepicker('setEndDate', $scope.fechaFinEtapa);
+        angular.element('#fecha-fin-subetapa').datepicker('setStartDate', $scope.fechaInicioEtapa);
+        angular.element('#fecha-fin-subetapa').datepicker('setEndDate', $scope.fechaFinEtapa);
+
         angular.element("#modal-agregar-sub-etapas-proyecto").modal("show");
+
     };
 
     $scope.cargarSubEtapas = function (start, lenght) {
@@ -364,39 +480,40 @@
             {
                 start: start,
                 lenght: lenght,
-                filtro: $scope.filtroSubEtapas
+                filtro: $scope.filtroSubEtapas,
+                idEtapa: $scope.etapaId
             });
         subetapas.success(function (data) {
             $scope.loading.hide();
             if (data.success === true) {
                 var posPagin = pagina;
-                console.log(data.subetapas);
+
                 $scope.subEtapas = data.subetapas;
-                $scope.cantPaginas = Math.ceil(data.total / numerosPorPagina);
-                if ($scope.cantPaginas === 0) {
-                    $scope.cantPaginas = 1;
+                $scope.cantPaginasSE = Math.ceil(data.total / numerosPorPagina);
+                if ($scope.cantPaginasSE === 0) {
+                    $scope.cantPaginasSE = 1;
                 }
 
-                $scope.listaPaginas = [];
-                if ($scope.cantPaginas > 5 && pagina <= 5) {
+                $scope.listaPaginasSE = [];
+                if ($scope.cantPaginasSE > 5 && pagina <= 5) {
                     for (var i = 1; i <= 5; i++) {
-                        $scope.listaPaginas.push(i);
+                        $scope.listaPaginasSE.push(i);
                     }
                 }
-                else if ($scope.cantPaginas < 5) {
-                    for (var i = 1; i <= $scope.cantPaginas; i++) {
-                        $scope.listaPaginas.push(i);
+                else if ($scope.cantPaginasSE < 5) {
+                    for (var i = 1; i <= $scope.cantPaginasSE; i++) {
+                        $scope.listaPaginasSE.push(i);
                     }
                 }
-                else if ($scope.cantPaginas > 5) {
+                else if ($scope.cantPaginasSE > 5) {
                     for (var i = pagina - 4; i <= pagina; i++) {
-                        $scope.listaPaginas.push(i);
+                        $scope.listaPaginasSE.push(i);
                     }
                     posPagin = 5;
                 }
 
-                if (pagina > $scope.cantPaginas) {
-                    pagina = $scope.cantPaginas;
+                if (pagina > $scope.cantPaginasSE) {
+                    pagina = $scope.cantPaginasSE;
                     posPagin = pagina;
                 }
 
@@ -411,7 +528,6 @@
             }
         });
     };
-    $scope.cargarSubEtapas();
 
     $scope.GuardarNuevaSubEtapa = function () {
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
@@ -421,6 +537,11 @@
         var fechaFinEta = angular.element("#fecha-fin-subetapa")[0].value;
 
         var formData = new FormData();
+        if ($scope.subEtapaId != undefined)
+            formData.append('secuencial', $scope.subEtapaId);
+        else
+            formData.append('secuencial', 0);
+
         formData.append('descripcion', $scope.descripcionSubE);
         formData.append('recurso', recurso);
         formData.append('etapaId', $scope.etapaId);
@@ -429,7 +550,7 @@
 
         var ajaxEnvioDatos = $http({
             method: 'POST',
-            url: "user/guardar-sub-etapas-proyecto",
+            url: "user/guardar-sub-etapas-proyecto/",
             data: formData,
             headers: { 'Content-Type': undefined },
             transformRequest: angular.identity
@@ -446,12 +567,40 @@
         });
     };
 
+    $scope.itemModificado = null;
+    $scope.editarEtapasProyectos = function (etapa) {
+        $scope.itemModificado = etapa;
+        $scope.proyectoId = etapa.secuencialClienteAux,
+            $scope.etapaId = etapa.id,
+            $scope.etapasPro = etapa.secuencialEtapa;
+        $scope.fechaIniEta = etapa.fechaInicio;
+        $scope.fechaFinEta = etapa.fechaFin;
+
+        angular.element("#modal-agregar-etapas-proyecto").modal("show");
+
+    };
+
+    $scope.editarSubEtapasProyectos = function (subetapa) {
+        $scope.itemModificado = subetapa;
+        $scope.etapaId = subetapa.secuencialEtapa;
+        $scope.subEtapaId = subetapa.id;
+        $scope.descripcionSubE = subetapa.descripcion;
+        $scope.recursosSubE = subetapa.recursoId;
+        $scope.fechaIniSubE = subetapa.fechaInicio;
+        $scope.fechaFinSubE = subetapa.fechaFin;
+
+        angular.element('#fecha-inicio-subetapa').datepicker('setStartDate', $scope.fechaInicioEtapa);
+        angular.element('#fecha-inicio-subetapa').datepicker('setEndDate', $scope.fechaFinEtapa);
+        angular.element('#fecha-fin-subetapa').datepicker('setStartDate', $scope.fechaInicioEtapa);
+        angular.element('#fecha-fin-subetapa').datepicker('setEndDate', $scope.fechaFinEtapa);
+
+        angular.element("#modal-agregar-sub-etapas-proyecto").modal("show");
+    };
+
     $scope.EliminarEtapaProyecto = function (etapaId) {
         var qMsgDialog = new questionMsgDialog();
 
-        console.log(subEtapasId);
-
-        qMsgDialog.show('Información', 'Está seguro de querer eliminar la etapa del proyecto.', 'Si, estoy seguro', function () {
+        qMsgDialog.show('Información', 'Está seguro de querer eliminar la etapa del proyecto. Al eliminar la etapa se eliminarán todas las subetapas de esta etapa.', 'Si, estoy seguro', function () {
             waitingDialog.show('Eliminando...', { dialogSize: 'sm', progressType: 'success' });
             var eliminarEtapa = $http.post("user/eliminar-etapa-proyecto", {
                 idEtapa: etapaId
@@ -461,7 +610,7 @@
                 qMsgDialog.hide();
                 if (data.success === true) {
                     messageDialog.show('Información', data.msg);
-                    cargarEtapas();
+                    $scope.cargarEtapas();
                 }
                 else {
                     messageDialog.show('Información', data.msg);
@@ -473,7 +622,6 @@
     $scope.EliminarSubEtapaProyecto = function (subEtapasId) {
         var qMsgDialog = new questionMsgDialog();
 
-        console.log(subEtapasId);
         qMsgDialog.show('Información', 'Está seguro de querer eliminar la subetapa.', 'Si, estoy seguro', function () {
             waitingDialog.show('Eliminando...', { dialogSize: 'sm', progressType: 'success' });
             var eliminarSubEtapa = $http.post("user/eliminar-sub-etapa-proyecto", {
@@ -484,13 +632,141 @@
                 qMsgDialog.hide();
                 if (data.success === true) {
                     messageDialog.show('Información', data.msg);
-                    cargarSubEtapas();
+                    $scope.cargarSubEtapas();
                 }
                 else {
                     messageDialog.show('Información', data.msg);
                 }
             });
         });
+    };
+
+    $scope.PrevisualizarInforme = function (subEtapasId) {
+        var subInforme = $http.post("user/dar-cronograma-proyecto", {
+            idProyecto: $scope.proyectoId
+        });
+        subInforme.success(function (data) {
+            if (data.success === true) {
+
+                var datosInforme = [];
+                data.datosCronograma.forEach(function (etapa) {
+                    // Agrega la etapa al arreglo aplanado
+                    datosInforme.push({
+                        tipo: 'etapa',
+                        descripcion: etapa.descripcion,
+                        duracion: etapa.duracion,
+                        fechaInicio: etapa.fechaInicio,
+                        fechaFin: etapa.fechaFin,
+                        detalle: etapa.detalle,
+                        idEtapa: etapa.idEtapa,
+                        idCatEtapa: etapa.idCatEtapa,
+                        porciento: etapa.porciento,
+                        selected: etapa.selected
+                    });
+
+                    // Agrega cada subetapa al arreglo aplanado
+                    etapa.subEtapas.forEach(function (subetapa) {
+                        datosInforme.push({
+                            tipo: 'subetapa',
+                            descripcion: subetapa.descripcionSE,
+                            duracion: subetapa.duracionSE,
+                            fechaInicio: subetapa.fechaInicioSE,
+                            fechaFin: subetapa.fechaFinSE,
+                            recurso: subetapa.recursoSE,
+                            idRecurso: subetapa.idRecurso,
+                            idEtapa: subetapa.idEtapaSE,
+                            idSubEtapa: subetapa.idSubEtapa,
+                            detalle: subetapa.detalle,
+                            porciento: subetapa.porciento,
+                            selected: subetapa.selected
+                        });
+                    });
+                });
+
+                $scope.datosCronograma = datosInforme;
+                angular.element("#cronogramaModal").modal("show");
+            }
+            else {
+                messageDialog.show('Información', data.msg);
+            }
+        });
+    };
+
+    $scope.nombreFichero;
+    $scope.pathFichero;
+    $scope.generarInforme = function () {
+
+        console.log($scope.proyectoId);
+        var subInforme = $http.post("user/dar-excel-informe-proyecto", {
+            secuencial: $scope.proyectoId
+        });
+        subInforme.success(function (data) {
+            if (data.success === true) {
+
+                console.log("excel generado correctamente " + data.mensaje + "  ---  " + data.nombreFichero);
+                $scope.nombreFichero = data.nombreFichero;
+                $scope.pathFichero = data.mensaje
+            }
+            else {
+                messageDialog.show('Información', data.msg);
+            }
+        });
+    };
+
+    $scope.enviarInforme = function () {
+
+        if ($scope.nombreFichero != null) {
+            var envioCorreo = $http.post("user/enviar-correo-informe", {
+                nombreFichero: $scope.nombreFichero
+            });
+            envioCorreo.success(function (data) {
+                if (data.success === true) {
+
+                    messageDialog.show('Información', data.msg);
+
+                }
+            });
+
+        } else {
+            var subInforme = $http.post("user/dar-excel-informe-proyecto", {
+                secuencial: $scope.proyectoId
+            });
+            subInforme.success(function (data) {
+                if (data.success === true) {
+
+                    console.log("excel generado correctamente " + data.mensaje + "  ---  " + data.nombreFichero);
+                    $scope.nombreFichero = data.nombreFichero;
+                    $scope.pathFichero = data.mensaje;
+
+                    var envioCorreo = $http.post("user/enviar-correo-informe", {
+                        nombreFichero: $scope.nombreFichero
+                    });
+                    envioCorreo.success(function (data) {
+                        if (data.success === true) {
+
+                            messageDialog.show('Información', data.msg);
+
+                        }
+                    });
+                }
+                else {
+                    messageDialog.show('Información', data.msg);
+                }
+            });
+        }
+    };
+
+    $scope.exportarPdf = function () {
+        var doc = new jsPDF();
+        var element = document.getElementById('tabla-cronograma-proyecto');
+        var opt = {
+            margin: 1,
+            filename: 'cronograma.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
     };
 
     //El Paginador
@@ -500,13 +776,13 @@
         $scope.cargarProyectos(start, lenght);
     };
 
-    $scope.paginar = function () {
+    $scope.paginarEtapas = function () {
         var start = (pagina - 1) * numerosPorPagina;
         var lenght = numerosPorPagina;
         $scope.cargarEtapas(start, lenght);
     };
 
-    $scope.paginar = function () {
+    $scope.paginarSubEtapas = function () {
         var start = (pagina - 1) * numerosPorPagina;
         var lenght = numerosPorPagina;
         $scope.cargarSubEtapas(start, lenght);
@@ -528,6 +804,196 @@
             pagina++;
             $scope.paginar();
         }
+    };
+
+    $scope.cambiarPaginaEtapas = function (pag) {
+        pagina = pag;
+        $scope.paginarEtapas();
+    };
+
+    $scope.atrazarPaginaEtapas = function () {
+        if (pagina > 1) {
+            pagina--;
+            $scope.paginarEtapas();
+        }
+    };
+
+    $scope.avanzarPaginaEtapas = function () {
+        if (pagina < $scope.cantPaginas) {
+            pagina++;
+            $scope.paginarEtapas();
+        }
+    };
+
+    $scope.cambiarPaginaSubEtapas = function (pag) {
+        pagina = pag;
+        $scope.paginarSubEtapas();
+    };
+
+    $scope.atrazarPaginaSubEtapas = function () {
+        if (pagina > 1) {
+            pagina--;
+            $scope.paginarSubEtapas();
+        }
+    };
+
+    $scope.avanzarPaginaSubEtapas = function () {
+        if (pagina < $scope.cantPaginas) {
+            pagina++;
+            $scope.paginarSubEtapas();
+        }
+    };
+
+    $scope.selectAll = false;
+
+    $scope.toggleAll = function () {
+        angular.forEach($scope.datosInforme, function (item) {
+            item.selected = $scope.selectAll;
+        });
+
+        $scope.actualizarSeleccionInforme("all", $scope.selectAll, "0");
+    };
+    $scope.toggleSubEtapas = function (etapa) {
+        $scope.actualizarSeleccionInforme("subetapa", etapa.selected, etapa.idSubEtapa);
+    };
+
+    $scope.toggleEtapas = function (etapa) {
+        angular.forEach($scope.datosInforme, function (item) {
+            if (item.tipo === 'subetapa' && item.idEtapa === etapa.idEtapa) {
+                item.selected = etapa.selected;
+            }
+        });
+
+        $scope.actualizarSeleccionInforme("etapa", etapa.selected, etapa.idEtapa);
+    };
+
+    $scope.actualizarSeleccionInforme = function (tipo, seleccionado, secuencial) {
+
+        var formData = new FormData();
+        formData.append('tipo', tipo);
+        formData.append('seleccionado', seleccionado);
+        formData.append('secuencial', secuencial);
+
+        var actualizarSeleccion = $http({
+            method: 'POST',
+            url: "user/actualizar-seleccion-informe",
+            data: formData,
+            headers: { 'Content-Type': undefined },
+            transformRequest: angular.identity
+        });
+        actualizarSeleccion.success(function (data) {
+            if (data.success === true) {
+                console.log("prueba entrar despues del metodo ");
+                $scope.cargarDatosInforme();
+            }
+        });
+    }
+
+    $scope.abrirModalEditarItem = function (item) {
+        $scope.itemModificado = item;
+
+        if (item.tipo === 'etapa') {
+            $scope.proyectoIdInfo = item.secuencialClienteAux;
+            $scope.etapaId = item.etapaId;
+            $scope.etapasProInfo = item.idCatEtapa;
+            $scope.fechaIniEtaInfo = item.fechaInicio;
+            $scope.fechaFinEtaInfo = item.fechaFin;
+            $scope.porcentajeEtaInfo = item.porciento;
+            $scope.detalleEtaInfo = item.detalle;
+
+            angular.element("#modal-editar-etapas-proyecto").modal("show");
+        } else if (item.tipo === 'subetapa') {
+            $scope.etapaId = item.etapaId;
+            $scope.descripcionSubEInfo = item.descripcion;
+            $scope.recursosSubEInfo = item.idRecurso;
+            $scope.fechaIniSubEInfo = item.fechaInicio;
+            $scope.fechaFinSubEInfo = item.fechaFin;
+            $scope.porcentajeSubEInfo = item.porciento;
+            $scope.detalleSubEInfo = item.detalle;
+
+            angular.element('#fecha-inicio-subetapa').datepicker('setStartDate', $scope.fechaInicioEtapa);
+            angular.element('#fecha-inicio-subetapa').datepicker('setEndDate', $scope.fechaFinEtapa);
+            angular.element('#fecha-fin-subetapa').datepicker('setStartDate', $scope.fechaInicioEtapa);
+            angular.element('#fecha-fin-subetapa').datepicker('setEndDate', $scope.fechaFinEtapa);
+
+            angular.element("#modal-agregar-subetapas-proyecto").modal("show");
+        }
+    };
+
+    $scope.cargarDatosInforme = function () {
+        var obtenerDatosInforme = $http.post("user/dar-datos-proyecto", {
+            idProyecto: $scope.proyectoId
+        });
+        obtenerDatosInforme.success(function (data) {
+            if (data.success === true) {
+
+                var datosInforme = [];
+                data.datosInforme.forEach(function (etapa) {
+                    // Agrega la etapa al arreglo aplanado
+                    datosInforme.push({
+                        tipo: 'etapa',
+                        descripcion: etapa.descripcion,
+                        duracion: etapa.duracion,
+                        fechaInicio: etapa.fechaInicio,
+                        fechaFin: etapa.fechaFin,
+                        detalle: etapa.detalle,
+                        idEtapa: etapa.idEtapa,
+                        idCatEtapa: etapa.idCatEtapa,
+                        porciento: etapa.porciento,
+                        selected: etapa.selected
+                    });
+
+                    // Agrega cada subetapa al arreglo aplanado
+                    etapa.subEtapas.forEach(function (subetapa) {
+                        datosInforme.push({
+                            tipo: 'subetapa',
+                            descripcion: subetapa.descripcionSE,
+                            duracion: subetapa.duracionSE,
+                            fechaInicio: subetapa.fechaInicioSE,
+                            fechaFin: subetapa.fechaFinSE,
+                            recurso: subetapa.recursoSE,
+                            idRecurso: subetapa.idRecurso,
+                            idEtapa: subetapa.idEtapaSE,
+                            idSubEtapa: subetapa.idSubEtapa,
+                            detalle: subetapa.detalle,
+                            porciento: subetapa.porciento,
+                            selected: subetapa.selected
+                        });
+                    });
+                });
+
+                $scope.datosInforme = datosInforme;
+                angular.element("#modal-informe-proyecto").modal("show");
+            }
+            else {
+                messageDialog.show('Información', "No existen etapas ni subetapas registradas en el proyecto.");
+            }
+        });
+    };
+
+    $scope.getSemaforoStyle = function (item) {
+        var style = {};
+        var porciento = parseFloat(item.porciento);
+        var diasRestantes = item.duracion;
+
+        if ((diasRestantes <= 0 && porciento < 100) || (porciento >= 0 && porciento < 40)) {
+            style.backgroundColor = 'red';
+            style.width = '10px';
+            style.height = '10px';
+            style.borderRadius = '50%';
+        } else if (porciento >= 80 && porciento <= 100) {
+            style.backgroundColor = 'green';
+            style.width = '10px';
+            style.height = '10px';
+            style.borderRadius = '50%';
+        } else if (porciento >= 40 && porciento < 80) {
+            style.backgroundColor = 'yellow';
+            style.width = '10px';
+            style.height = '10px';
+            style.borderRadius = '50%';
+        }
+
+        return style;
     };
 }]);
 
