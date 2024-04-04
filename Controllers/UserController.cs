@@ -2022,27 +2022,27 @@ namespace SifizPlanning.Controllers
             {
                 var tar = db.Tarea.Find(idTarea);
 
-                //List<string> elementos = new List<string>
-                //	{
-                //		"PROGRAMACIÓN",
-                //		"CORRECCION",
-                //		"ENTREGA",
-                //		"LEVANTAMIENTO REQUERIMIENTOS",
-                //		"TESTEO",
-                //		"MIGRACIÓN",
-                //		"CERTIFICACIÓN",
-                //		"REVISIÓN",
-                //		"SALIDA PRODUCCIÓN",
-                //		"PARAMETRIZACIÓN",
-                //		"PARALELOS"
-                //	};
+                List<string> elementos = new List<string>
+                    {
+                        "PROGRAMACIÓN",
+                        "CORRECCION",
+                        "ENTREGA",
+                        "LEVANTAMIENTO REQUERIMIENTOS",
+                        "TESTEO",
+                        "MIGRACIÓN",
+                        "CERTIFICACIÓN",
+                        "REVISIÓN",
+                        "SALIDA PRODUCCIÓN",
+                        "PARAMETRIZACIÓN",
+                        "PARALELOS"
+                    };
                 bool tieneContrato = false;
                 bool tieneTicket = false;
 
-                //if (elementos.Contains(tar.actividad.Descripcion))
-                //{
-                //	tieneContrato = true;
-                //}
+                if (!elementos.Contains(tar.actividad.Descripcion))
+                {
+                    tieneContrato = true;
+                }
 
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
