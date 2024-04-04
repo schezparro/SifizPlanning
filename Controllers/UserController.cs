@@ -1125,19 +1125,19 @@ namespace SifizPlanning.Controllers
                         }
                     }
 
-				var mensajeDevops = "Devops no se consumió";
+                var mensajeDevops = "Devops no se consumió";
 
-				if (publicar)
-				{
-					Ticket_RequierePublicacion ticketRQ = db.Ticket_RequierePublicacion.Find(ticket.Secuencial);
-					if (ticketRQ == null)
-					{
-						ticketRQ = new Ticket_RequierePublicacion
-						{
-							ticket = ticket
-						};
-						db.Ticket_RequierePublicacion.Add(ticketRQ);
-					}
+                if (publicar)
+                {
+                    Ticket_RequierePublicacion ticketRQ = db.Ticket_RequierePublicacion.Find(ticket.Secuencial);
+                    if (ticketRQ == null)
+                    {
+                        ticketRQ = new Ticket_RequierePublicacion
+                        {
+                            ticket = ticket
+                        };
+                        db.Ticket_RequierePublicacion.Add(ticketRQ);
+                    }
 
                     bool financial25 = false;
                     if (ticket.SecuencialTicketVersionCliente != null)
@@ -1238,35 +1238,35 @@ namespace SifizPlanning.Controllers
                     data.Add(new StringContent(linksConcatenados), "URLSifizPlanning");
                     data.Add(new StringContent(key), "Key");
 
-					
 
-					if (adjuntoPublicacion != null)
-					{
-						foreach (var adjunto in adjuntoPublicacion)
-						{
-							var stream = adjunto.InputStream;
-							data.Add(new StreamContent(stream), "ArchivoAdjunto", adjunto.FileName);
-						}
-					}
+
+                    if (adjuntoPublicacion != null)
+                    {
+                        foreach (var adjunto in adjuntoPublicacion)
+                        {
+                            var stream = adjunto.InputStream;
+                            data.Add(new StreamContent(stream), "ArchivoAdjunto", adjunto.FileName);
+                        }
+                    }
 
                     var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUrl);
                     requestMessage.Content = data;
 
                     var response = await client.SendAsync(requestMessage);
 
-					
-					if (response.IsSuccessStatusCode)
-					{
-						mensajeDevops = "Devops se consumió correctamente";
-					}
-				}
-				else
-				{
-					Ticket_RequierePublicacion ticketRQ = db.Ticket_RequierePublicacion.Find(ticket.Secuencial);
-					if (ticketRQ != null)
-					{
-						db.Ticket_RequierePublicacion.Remove(ticketRQ);
-					}
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        mensajeDevops = "Devops se consumió correctamente";
+                    }
+                }
+                else
+                {
+                    Ticket_RequierePublicacion ticketRQ = db.Ticket_RequierePublicacion.Find(ticket.Secuencial);
+                    if (ticketRQ != null)
+                    {
+                        db.Ticket_RequierePublicacion.Remove(ticketRQ);
+                    }
 
                     string textoEmail = @"<div class='textoCuerpo'><br/>";
                     textoEmail += texto;
@@ -1340,34 +1340,34 @@ namespace SifizPlanning.Controllers
                     db.HistoricoInformacionTicket.Add(historicoCorreoTicket);
                     db.SaveChanges();
 
-					//Adicionando los adjuntos
-					foreach (string url in listaFicheros)
-					{
-						HistoricoAdjunto historicoAdjunto = new HistoricoAdjunto();
-						historicoAdjunto.historicoInformacionTicket = historicoCorreoTicket;
-						historicoAdjunto.Url = url;
-						db.HistoricoAdjunto.Add(historicoAdjunto);
-					}
-					db.SaveChanges();
-				}				
+                    //Adicionando los adjuntos
+                    foreach (string url in listaFicheros)
+                    {
+                        HistoricoAdjunto historicoAdjunto = new HistoricoAdjunto();
+                        historicoAdjunto.historicoInformacionTicket = historicoCorreoTicket;
+                        historicoAdjunto.Url = url;
+                        db.HistoricoAdjunto.Add(historicoAdjunto);
+                    }
+                    db.SaveChanges();
+                }
 
-				var result = new
-				{
-					success = true,
-					devopsmsj = mensajeDevops
-				};
-				return Json(result);
-			}
-			catch (Exception e)
-			{
-				var result = new
-				{
-					success = false,
-					msg = e.Message
-				};
-				return Json(result);
-			}
-		}
+                var result = new
+                {
+                    success = true,
+                    devopsmsj = mensajeDevops
+                };
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+                var result = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(result);
+            }
+        }
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
@@ -2631,11 +2631,6 @@ r in db.Rol on ur.rol equals r
                     }
                     else if (solicitud.Estado == "RECHAZADA")
                     {
-                        if (fechaHasta <= fechaDesde)
-                        {
-                            throw new Exception("Error, la fecha de inicio del permiso debe ser menor que la fecha fin del permiso");
-                        }
-
                         int tipoPermiso = solPermisos.Personal ? 1 : solPermisos.Matrimonio ? 2 : solPermisos.Comida ? 4 : solPermisos.Paternidad ? 5 : 2;
                         Permiso permiso = db.Permiso.Where(s =>
                             s.SecuencialTipoPermiso == tipoPermiso &&
