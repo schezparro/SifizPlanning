@@ -154,42 +154,63 @@
         angular.element("#modal-show-solicitud").modal('show');
     };
 
-    $scope.generarVacacionesPDF = function () {
-        var table = document.getElementById("table-show-vacaciones").cloneNode(true);
-        var newWin = window.open("");
+   
 
+    $scope.generarVacacionesPDF = function () {
+        // Obtener la tabla original
+        var table = document.getElementById("table-show-vacaciones").cloneNode(true);
+
+        // Crear un iframe oculto
+        var iframe = document.createElement('iframe');
+        iframe.style.display = 'none'; // Ocultar el iframe
+        document.body.appendChild(iframe);
+
+        // Configurar el estilo de la tabla
         table.setAttribute('style', 'width: 100%; margin-bottom: 1rem; color: #212529; background-color: transparent; border-collapse: collapse;');
         Array.from(table.querySelectorAll("th, td")).forEach(function (cell) {
             cell.setAttribute('style', 'padding: .3rem; border: 1px solid black;');
         });
 
-        newWin.addEventListener('load', function () {
-            newWin.document.body.appendChild(table);
-            newWin.focus();
-            newWin.print();
-            newWin.addEventListener('afterprint', function () {
-                newWin.close();
-            });
-        });
+        // Cargar el contenido del PDF en el iframe
+        iframe.contentDocument.body.appendChild(table);
+
+        // Imprimir el contenido del iframe
+        iframe.contentWindow.print();
+
+        // Opcional: Eliminar el iframe después de imprimir
+        iframe.onload = function () {
+            setTimeout(function () {
+                document.body.removeChild(iframe);
+            }, 0);
+        };
     };
+
+   
 
     $scope.generarPermisoPDF = function () {
         var table = document.getElementById("table-show-permiso").cloneNode(true);
-        var newWin = window.open("");
+        var iframe = document.createElement('iframe');
+        iframe.style.display = 'none'; // Ocultar el iframe
+        document.body.appendChild(iframe);
 
+        // Configurar el estilo de la tabla
         table.setAttribute('style', 'width: 100%; margin-bottom: 1rem; color: #212529; background-color: transparent; border-collapse: collapse;');
         Array.from(table.querySelectorAll("th, td")).forEach(function (cell) {
             cell.setAttribute('style', 'padding: .3rem; border: 1px solid black;');
         });
 
-        newWin.addEventListener('load', function () {
-            newWin.document.body.appendChild(table);
-            newWin.focus();
-            newWin.print();
-            newWin.addEventListener('afterprint', function () {
-                newWin.close();
-            });
-        });
+        // Cargar el contenido del PDF en el iframe
+        iframe.contentDocument.body.appendChild(table);
+
+        // Imprimir el contenido del iframe
+        iframe.contentWindow.print();
+
+        // Opcional: Eliminar el iframe después de imprimir
+        iframe.onload = function () {
+            setTimeout(function () {
+                document.body.removeChild(iframe);
+            }, 0);
+        };
     };
 
 }]);

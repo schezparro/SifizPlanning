@@ -1140,6 +1140,7 @@
             informacionFinTicket.success(function (data) {
                 waitingDialog.hide();
                 if (data.success === true) {
+                    $scope.Errormsj = data.devopsmsj;
                     $scope.requierePublicacion = false;
                     $scope.cambioRequierePublicacion();
                     angular.element("#modal-email-fin-ticket").modal("hide");

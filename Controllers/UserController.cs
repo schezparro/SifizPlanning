@@ -1125,6 +1125,8 @@ namespace SifizPlanning.Controllers
 						}
 					}
 
+				var mensajeDevops = "Devops no se consumió";
+
 				if (publicar)
 				{
 					Ticket_RequierePublicacion ticketRQ = db.Ticket_RequierePublicacion.Find(ticket.Secuencial);
@@ -1236,6 +1238,8 @@ namespace SifizPlanning.Controllers
 					data.Add(new StringContent(linksConcatenados), "URLSifizPlanning");
 					data.Add(new StringContent(key), "Key");
 
+					
+
 					if (adjuntoPublicacion != null)
 					{
 						foreach (var adjunto in adjuntoPublicacion)
@@ -1250,6 +1254,11 @@ namespace SifizPlanning.Controllers
 
 					var response = await client.SendAsync(requestMessage);
 
+					
+					if (response.IsSuccessStatusCode)
+					{
+						mensajeDevops = "Devops se consumió correctamente";
+					}
 				}
 				else
 				{
@@ -1340,11 +1349,12 @@ namespace SifizPlanning.Controllers
 						db.HistoricoAdjunto.Add(historicoAdjunto);
 					}
 					db.SaveChanges();
-				}
+				}				
 
 				var result = new
 				{
-					success = true
+					success = true,
+					devopsmsj = mensajeDevops
 				};
 				return Json(result);
 			}
