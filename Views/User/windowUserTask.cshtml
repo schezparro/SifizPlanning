@@ -4,8 +4,8 @@
 
 <div class="task-controles">
     <div class="left">
-        <button class="btn btn-primary" ng-click="filtrarTareas()"><span class="glyphicon glyphicon-filter Aceptar aria-hidden=" true"></span> Aplicar Filtro</button>
-        <button class="btn btn-primary" ng-click="windowSolicitarTarea()"><span class="glyphicon glyphicon-plus aria-hidden=" true"></span> Solicitud de Tarea</button>
+        <button class="btn btn-primary" ng-click="filtrarTareas()"><span class="glyphicon glyphicon-filter Aceptar" aria-hidden="true"></span> Aplicar Filtro</button>
+        <button class="btn btn-primary" ng-click="windowSolicitarTarea()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Solicitud de Tarea</button>
     </div>
 
     <div id="control-filtrar">
@@ -50,8 +50,7 @@
                     </div>
                 </td>
 
-                <td class="td-tareas {{tareas.claseDia}}" ng-repeat="tareas in trab.tareasPorDia" style="width:{{anchoCeldaTarea}};">
-
+                <td class="td-tareas {{tareas.claseDia}}" ng-repeat="tareas in trab.tareasPorDia">
                     <div data-id-tarea="{{tarea.id}}" class="content-tarea {{tarea.clase}}" ng-repeat="tarea in tareas.tareas"
                          data-container="#task-container" data-toggle="popover" data-placement="right"
                          data-title="{{tarea.dCliente}}"
@@ -176,21 +175,22 @@
             <div class="modal-body">
                 <form method="post" id="frm-modal-final-tarea" ng-submit="adicionarActividadTarea()">
                     <div id="new-actividad-tarea" class="fila">
-                        @*<div ng-hide="tieneContrato || tieneTicket">
+                        <div ng-if="!tieneContrato && !tieneTicket">
                             <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                                <div style="display: flex; align-items: center; gap: 10px;" ng-hide="contratoSeleccionado">
+                                <div style="display: flex; align-items: center; gap: 10px;" ng-if="!contratoSeleccionado">
                                     <input type="checkbox" ng-model="ticketSeleccionado" ng-required="ticketSeleccionado" ng-change="contratoSeleccionado = !ticketSeleccionado" /> Ticket
-                                    <input type="text" class="form-control" ng-model="numeroTicket" ng-show="ticketSeleccionado" ng-required="ticketSeleccionado" placeholder="Número de Ticket" style="width: 150px;" />
+                                    <input type="text" class="form-control" ng-model="numeroTicket" ng-if="ticketSeleccionado" ng-required="ticketSeleccionado" placeholder="Número de Ticket" style="width: 150px;" />
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 10px;" ng-hide="ticketSeleccionado">
+                                <div style="display: flex; align-items: center; gap: 10px;" ng-if="!ticketSeleccionado">
                                     <input type="checkbox" ng-model="contratoSeleccionado" ng-required="contratoSeleccionado" ng-change="ticketSeleccionado = !contratoSeleccionado" /> Contrato
-                                    <select id="select-contrato-tarea" class="form-control" ng-model="entregable" ng-show="contratoSeleccionado" ng-required="contratoSeleccionado" style="width: 150px;">
+                                    <select id="select-contrato-tarea" class="form-control" ng-model="entregable" ng-if="contratoSeleccionado" ng-required="contratoSeleccionado" style="width: 150px;">
                                         <option value="">Seleccione...</option>
                                         <option ng-repeat="ref in referencias" value="{{ref.id}}">{{ref.nombre}}</option>
                                     </select>
                                 </div>
                             </div>
-                        </div>*@
+                        </div>
+
 
                         <div class="left">
                             <label>Tipo de Actividad:</label>
@@ -503,7 +503,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary" ><span class="glyphicon glyphicon-envelope"></span> Enviar</button>
+                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Enviar</button>
                 </div>
             </form>
         </div>

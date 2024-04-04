@@ -852,7 +852,8 @@
                 $scope.diaActividadTara = "";
                 $scope.horaInicioActividadTarea = "";
                 $scope.horaFinActividadTarea = "";
-
+                console.log(data.tieneTicket);
+                console.log(data.tieneContrato);
                 $scope.actividadesRealizadas = data.actividadesTarea;
                 $scope.tiempoUtilizado = data.totalHoras;
                 $scope.tieneTicket = data.tieneTicket;
