@@ -676,6 +676,7 @@
             });
         ajaxMotivosTrabajo.success(function (data) {
             if (data.success === true) {
+                console.log(data.datos);
                 $scope.referencias = data.datos;
             }
             else {
@@ -714,8 +715,7 @@
                 $scope.actividadesTarea = data.actividadesTarea;
                 $scope.numeroTicket = "";
                 $scope.entregable = "";
-                $scope.ticketSeleccionado = true;
-                $scope.contratoSeleccionado = false;
+                $scope.esTicket = true;
                 angular.element("#modal-final-tarea").modal("show");
             }
             else {
@@ -852,8 +852,6 @@
                 $scope.diaActividadTara = "";
                 $scope.horaInicioActividadTarea = "";
                 $scope.horaFinActividadTarea = "";
-                console.log(data.tieneTicket);
-                console.log(data.tieneContrato);
                 $scope.actividadesRealizadas = data.actividadesTarea;
                 $scope.tiempoUtilizado = data.totalHoras;
                 $scope.tieneTicket = data.tieneTicket;

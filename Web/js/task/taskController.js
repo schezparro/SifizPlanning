@@ -824,25 +824,16 @@
         formData.append('minutos', $scope.numero_horas_minutos);
         formData.append('horasEstimadas', $scope.numero_horas_estimadas);
         formData.append('minutosEstimados', $scope.numero_minutos_estimados);
-        const detalleString = JSON.stringify($scope.detalle);
-        let detalleNew = detalleString.replace(/</g, '%3C').replace(/>/g, '%3E');
-        formData.append('detalle', detalleNew);
-        console.log(detalleString);
-
-
+        formData.append('detalle', $scope.detalle);
         formData.append('referencia', $scope.referencia);
-
         formData.append('coordinador', $scope.coordinador);
-
         formData.append('repetir', $scope.tarea_repetir);
         formData.append('finSemana', $scope.fin_semana);
-
         formData.append('repetirTipoFin', $scope.repetirTipoFin);
         formData.append('numVeces', $scope.numVeces);
         formData.append('fechaHasta', $scope.fechaHasta);
         formData.append('extraordinaria', $scope.extraordinaria);
         formData.append('ticketTarea', $scope.ticketTarea != '' ? $scope.ticketTarea : 0);
-
         formData.append('idTarea', $scope.idTarea);
         formData.append('verificador', $scope.verificadorTarea);
 

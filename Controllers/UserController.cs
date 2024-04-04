@@ -1589,11 +1589,12 @@ namespace SifizPlanning.Controllers
                 var idCliente = tarea.SecuencialCliente;
 
                 var datos = (from emt in db.EntregableMotivoTrabajo
-                             where emt.EstaActivo == 1 && emt.motivoTrabajo.SecuencialCliente == idCliente && emt.Avance != 100
+                             join mt in db.MotivoTrabajo on emt.SecuencialMotivoTrabajo equals mt.Secuencial
+                             where emt.EstaActivo == 1 && mt.SecuencialCliente == idCliente && emt.Avance != 100
                              select new
                              {
                                  id = emt.Secuencial,
-                                 nombre = emt.motivoTrabajo.Codigo + "-" + emt.Nombre
+                                 nombre = mt.Codigo + "-" + emt.Nombre
                              }).ToList();
 
                 var resp = new

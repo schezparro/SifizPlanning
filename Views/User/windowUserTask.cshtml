@@ -175,19 +175,15 @@
             <div class="modal-body">
                 <form method="post" id="frm-modal-final-tarea" ng-submit="adicionarActividadTarea()">
                     <div id="new-actividad-tarea" class="fila">
-                        <div ng-if="!tieneContrato && !tieneTicket">
-                            <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                                <div style="display: flex; align-items: center; gap: 10px;" ng-if="!contratoSeleccionado">
-                                    <input type="checkbox" ng-model="ticketSeleccionado" ng-required="ticketSeleccionado" ng-change="contratoSeleccionado = !ticketSeleccionado" /> Ticket
-                                    <input type="text" class="form-control" ng-model="numeroTicket" ng-if="ticketSeleccionado" ng-required="ticketSeleccionado" placeholder="Número de Ticket" style="width: 150px;" />
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 10px;" ng-if="!ticketSeleccionado">
-                                    <input type="checkbox" ng-model="contratoSeleccionado" ng-required="contratoSeleccionado" ng-change="ticketSeleccionado = !contratoSeleccionado" /> Contrato
-                                    <select id="select-contrato-tarea" class="form-control" ng-model="entregable" ng-if="contratoSeleccionado" ng-required="contratoSeleccionado" style="width: 150px;">
-                                        <option value="">Seleccione...</option>
-                                        <option ng-repeat="ref in referencias" value="{{ref.id}}">{{ref.nombre}}</option>
-                                    </select>
-                                </div>
+                        <div ng-show="!tieneContrato && !tieneTicket">
+                            <div style="display: flex; justify-content: flex-end; gap: 10px; align-items: center" >
+                                <label>Ticket/Contrato</label>
+                                <input type="checkbox" ng-model="esTicket" />
+                                <input ng-show="esTicket" type="text" ng-required="esTicket" class="form-control" ng-model="numeroTicket" placeholder="Número de Ticket" style="width: 150px;" />
+                                <select ng-show="!esTicket" ng-required="!esTicket"  id="select-contrato-tarea" class="form-control" ng-model="entregable" style="width: 150px;">
+                                    <option value="">Seleccione...</option>
+                                    <option ng-repeat="ref in referencias" value="{{ref.id}}">{{ref.nombre}}</option>
+                                </select>
                             </div>
                         </div>
 
@@ -401,7 +397,7 @@
                 <h4 class="modal-title" id="modal-final-tarea-label">
                     <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
                     <span id="title-filter"><span class="glyphicon glyphicon-envelope"></span> Finalización de ticket - Email de información al cliente</span>
-                </h4>               
+                </h4>
             </div>
             <form id="form-enviar-email-fin-ticket" ng-submit="enviarInformacionFinTicket()">
                 <div class="modal-body">
@@ -622,9 +618,6 @@
                     <div class="full-height">
                         <div id="datos-historico-ticket" class="panel panel-default"></div>
                     </div>
-                    @*<div ng-repeat="comentario in comentariosResueltos track by $index">
-                            {{ comentario }}
-                        </div>*@
                     <div>
                         <label>Adjuntos:</label>
                         <div>
