@@ -4,10 +4,10 @@
 
     $scope.diasCalendar = [];
     $scope.numeroSemanas = 1;
-    var aplicarFiltro = false;    
+    var aplicarFiltro = false;
     $scope.coordinados = false;
     $scope.importanciaActividad = "Normal";
-        
+
     $scope.diasActividadTarea = [];
     $scope.diasActividad = [];
     $scope.diasActividadCord = [];
@@ -83,24 +83,24 @@
     };
 
     angular.element('#control-filtrar .datepicker-filtro').datepicker({
-                format: 'dd/mm/yyyy'
-            })
-            .on('changeDate', function (e) {
-                var sFecha = angular.element('#control-filtrar .datepicker-filtro').val();
-                var aFecha = sFecha.split('/');
-                var fecha = aFecha[2] + '/' + aFecha[1] + '/' + aFecha[0];
-                fecha = new Date(fecha);
-                var diaSemana = fecha.getDay();
-                var ndias = -6;//Por si es domingo
-                if (diaSemana !== 0)//Si no es domingo
-                    var ndias = 1 - diaSemana;
+        format: 'dd/mm/yyyy'
+    })
+        .on('changeDate', function (e) {
+            var sFecha = angular.element('#control-filtrar .datepicker-filtro').val();
+            var aFecha = sFecha.split('/');
+            var fecha = aFecha[2] + '/' + aFecha[1] + '/' + aFecha[0];
+            fecha = new Date(fecha);
+            var diaSemana = fecha.getDay();
+            var ndias = -6;//Por si es domingo
+            if (diaSemana !== 0)//Si no es domingo
+                var ndias = 1 - diaSemana;
 
-                $scope.fechaLunes = sumaFecha(ndias, sFecha);
-                if (!aplicarFiltro)
-                    actualizarDatosTarea($scope.fechaLunes);
-                else
-                    actualizarDatosTarea($scope.fechaLunes, angular.toJson(filtroTareas));
-            });
+            $scope.fechaLunes = sumaFecha(ndias, sFecha);
+            if (!aplicarFiltro)
+                actualizarDatosTarea($scope.fechaLunes);
+            else
+                actualizarDatosTarea($scope.fechaLunes, angular.toJson(filtroTareas));
+        });
 
     //Actualizar datosTarea
     actualizarDatosTarea = function (fechaLunes, jsonFiltro) {
@@ -112,11 +112,11 @@
         //Quitando los popuovers
         angular.element('[data-toggle="popover"]').popover('hide');
         var ajaxDatosTareas = $http.post("user/tareas-usuario", {
-                                    fechaLunes: fechaLunes,
-                                    semanas: numeroSemanas,
-                                    json: jsonFiltro,
-                                    coordinados: $scope.coordinados
-                                });
+            fechaLunes: fechaLunes,
+            semanas: numeroSemanas,
+            json: jsonFiltro,
+            coordinados: $scope.coordinados
+        });
         ajaxDatosTareas.success(function (data) {
             if (data.success === true) {
                 $scope.trabajadores = data.trabajadores;
@@ -527,7 +527,7 @@
 
     $scope.limpiarFiltroTareas = function () {
         aplicarFiltro = false;
-        $scope.coordinados = false;        
+        $scope.coordinados = false;
         actualizarDatosTarea($scope.fechaLunes);
         filtroTareas = {
             colaboradores: [],
@@ -616,13 +616,13 @@
         if ($scope.coordinados === false) {
             aplicarFiltro = true;
             $scope.coordinados = true;
-            
+
             var buscarCoordinados = $http.post("user/coordinados-usuario",
-                                    {
-                                        idTrabajador: idTrabajador,
-                                        fechaLunes: $scope.fechaLunes,
-                                        semanas: $scope.numeroSemanas
-                                    });            
+                {
+                    idTrabajador: idTrabajador,
+                    fechaLunes: $scope.fechaLunes,
+                    semanas: $scope.numeroSemanas
+                });
             buscarCoordinados.success(function (data) {
                 if (data.success === true) {
                     angular.element.each(data.dataFilter, function (key, obj) {
@@ -637,22 +637,22 @@
                 else {
                     messageDialog.show('Información', data.msg);
                 }
-            });            
+            });
         }
         else {
             $scope.coordinados = false;
             aplicarFiltro = false;
             actualizarDatosTarea($scope.fechaLunes);
-        }        
+        }
     };
 
     $scope.estiloSegunEstadoCoordinacion = function (id, index) {
-        if( index === 0 ){
+        if (index === 0) {
             if ($scope.coordinados === false)
                 return Array('btn-ver-coordinaciones-persona right glyphicon glyphicon-hand-right', 'Ver coordinados por el colaborador');
             else
                 return Array('btn-ver-coordinaciones-persona right glyphicon glyphicon-ban-circle', 'Quitar filtro de coordinados por el colaborador');
-        }            
+        }
         else
             return '';
     };
@@ -668,7 +668,7 @@
         var obj = this;
         $scope.$apply(function () {
             $scope.idTareaTerminar = parseInt(angular.element(obj).attr('data-id-tarea'));
-        });       
+        });
 
         var ajaxMotivosTrabajo = $http.post("user/dar-entregable-tarea",
             {
@@ -705,11 +705,11 @@
                 messageDialog.show('Información', data.msg);
             }
         });
-        
+
         var ajaxActividadRealizadaTarea = $http.post("user/dar-actividades-segun-actividad-tarea",
-                                    {
-                                        idTarea: $scope.idTareaTerminar
-                                    });
+            {
+                idTarea: $scope.idTareaTerminar
+            });
         ajaxActividadRealizadaTarea.success(function (data) {
             if (data.success === true) {
                 $scope.actividadesTarea = data.actividadesTarea;
@@ -741,7 +741,7 @@
         var idTarea = angular.element(parent).attr('data-id-tarea');
         $scope.idTareaTicket = idTarea;
 
-        var buscarTiposNotificacion = $http.post("user/tipo-notificacion-ticket",{
+        var buscarTiposNotificacion = $http.post("user/tipo-notificacion-ticket", {
             idTarea: idTarea
         });
         buscarTiposNotificacion.success(function (data) {
@@ -762,9 +762,9 @@
 
         $scope.loading.show();
         var adicionar = $http.post("user/ver-datos-desarrollo-ticket",
-                                    {
-                                        idTarea: idTarea
-                                    });
+            {
+                idTarea: idTarea
+            });
         adicionar.success(function (data) {
             $scope.loading.hide();
             if (data.success === true) {
@@ -789,7 +789,7 @@
             tipoNotificacion: $scope.motivoNotificacionDevTicket,
             detalle: $scope.notificacionDevTicket
         });
-        enviarNotificacion.success( function (data) {
+        enviarNotificacion.success(function (data) {
             waitingDialog.hide();
             if (data.success === true) {
                 $scope.motivoNotificacionDevTicket = "";
@@ -833,18 +833,29 @@
     });
 
     $scope.adicionarActividadTarea = function () {
+        if (!$scope.tieneContrato && !$scope.tieneTicket) {
+            if ($scope.esTicket && !$scope.numeroTicket) {
+                alert('El número de ticket es requerido.');
+                return;
+            }
+            if (!$scope.esTicket && !$scope.entregable) {
+                alert('Seleccione un contrato.');
+                return;
+            }
+        }
+
         waitingDialog.show('Adicionando Actividad...', { dialogSize: 'sm', progressType: 'success' });
 
         var adicionar = $http.post("user/adicionar-actividad-tarea",
-                                    {
-                                        idTarea: $scope.idTareaTerminar,
-                                        tipoTarea: $scope.tipoActividadTarea,
-                                        fecha: $scope.diaActividadTara,
-                                        horaInicio: $('[ng-model="horaInicioActividadTarea"]').val(),
-                                        horaFin: $('[ng-model="horaFinActividadTarea"]').val(),
-                                        ticketTarea: $scope.numeroTicket,
-                                        referencia: $scope.entregable
-                                    });
+            {
+                idTarea: $scope.idTareaTerminar,
+                tipoTarea: $scope.tipoActividadTarea,
+                fecha: $scope.diaActividadTara,
+                horaInicio: $('[ng-model="horaInicioActividadTarea"]').val(),
+                horaFin: $('[ng-model="horaFinActividadTarea"]').val(),
+                ticketTarea: $scope.numeroTicket,
+                referencia: $scope.entregable
+            });
         adicionar.success(function (data) {
             waitingDialog.hide();
             if (data.success === true) {
@@ -862,10 +873,10 @@
             }
         });
     };
-    
+
     $scope.idActividadTarea = "";
     $scope.editarHoraActividad = function (id) {
-        $scope.idActividadTarea = id;        
+        $scope.idActividadTarea = id;
         $scope.cambioHoraInicioActividadTarea = this.actividad.horaInicio;
         $scope.cambioHoraFinActividadTarea = this.actividad.horaFin;
         angular.element("#modal-cambio-horario-actividad").modal('show');
@@ -875,16 +886,16 @@
         waitingDialog.show('Actualizando Horarios de Actividad...', { dialogSize: 'sm', progressType: 'success' });
 
         var actualizar = $http.post("user/actualizar-hora-actividad-tarea",
-                                    {
-                                        idActividadTarea: $scope.idActividadTarea,
-                                        horaInicio: $('[ng-model="cambioHoraInicioActividadTarea"]').val(),
-                                        horaFin: $('[ng-model="cambioHoraFinActividadTarea"]').val()
-                                    });
+            {
+                idActividadTarea: $scope.idActividadTarea,
+                horaInicio: $('[ng-model="cambioHoraInicioActividadTarea"]').val(),
+                horaFin: $('[ng-model="cambioHoraFinActividadTarea"]').val()
+            });
         actualizar.success(function (data) {
             waitingDialog.hide();
             if (data.success === true) {
                 $scope.horaInicioActividadTarea = "";
-                $scope.horaFinActividadTarea = "";                
+                $scope.horaFinActividadTarea = "";
 
                 $scope.actividadesRealizadas = data.actividadesTarea;
                 $scope.tiempoUtilizado = data.totalHoras;
@@ -907,9 +918,9 @@
             waitingDialog.hide();
             if (data.success === true) {
                 var ajaxActividades = $http.post("user/dar-actividades-tarea",
-                                    {
-                                        idTarea: $scope.idTareaTerminar
-                                    });
+                    {
+                        idTarea: $scope.idTareaTerminar
+                    });
                 ajaxActividades.success(function (data) {
                     if (data.success === true) {
                         $scope.actividadesRealizadas = data.actividadesTarea;
@@ -920,8 +931,8 @@
                     }
                 });
             }
-            else{
-                    messageDialog.show('Información', data.msg);
+            else {
+                messageDialog.show('Información', data.msg);
             }
         });
     };
@@ -932,8 +943,8 @@
     $scope.tipoTarea = "";
     $scope.finalizarTarea = function () {//PERTENECE A TICKETS O CONTRATOS
         waitingDialog.show('Verificando la tarea...', { dialogSize: 'sm', progressType: 'success' });
-        var finalizar = $http.post("user/tarea-pertenece-ticket", 
-                                    { idTarea: $scope.idTareaTerminar, estado: 3 });
+        var finalizar = $http.post("user/tarea-pertenece-ticket",
+            { idTarea: $scope.idTareaTerminar, estado: 3 });
         finalizar.success(function (data) {
             waitingDialog.hide();
             if (data.success === true) {
@@ -942,22 +953,22 @@
                     $scope.wind3Opciones.show("Confirmación de Finalización", "La presente tarea termina la asignación referente a un ticket, proyecto o contrato, si esta tarea termina completamente la asignación, seleccione 'EL TRABAJO ESTÁ REALIZADO'; en caso contrario si no ha terminado o el trabajo necesita TESTING seleccione 'EL TRABAJO ESTA POR TERMINAR'.", 'EL TRABAJO ESTÁ REALIZADO', 'EL TRABAJO ESTA POR TERMINAR',
                         function () {
                             $scope.wind3Opciones.hide();
-                            if($scope.tipoTarea === "ticket"){
+                            if ($scope.tipoTarea === "ticket") {
                                 angular.element("#modal-email-fin-ticket").modal('show');
                             }
                             else if ($scope.tipoTarea === "contrato") {
                                 $scope.tipoTarea = "";
                                 $scope.ejecutarFinalizarTarea();
-                            }                            
+                            }
                         },
                         function () {
-                            $scope.wind3Opciones.hide();                            
+                            $scope.wind3Opciones.hide();
                             if ($scope.tipoTarea === "ticket") {
                                 angular.element("#modal-comentario-no-terminacion").modal('show');
                             }
                             else if ($scope.tipoTarea === "contrato") {
                                 angular.element("#modal-comentario-no-terminacion-tarea-contrato").modal('show');
-                            }                            
+                            }
                         }
                     );
                 }
@@ -971,13 +982,13 @@
             }
         });
     };
-    
-    $scope.ejecutarFinalizarTarea = function ( fn ) {
+
+    $scope.ejecutarFinalizarTarea = function (fn) {
         waitingDialog.show('Cambiando estado de tarea la tarea...', { dialogSize: 'sm', progressType: 'success' });
         var idTarea = $scope.idTareaTerminar;
         var finalizar = $http.post("user/actualizar-tarea-usuario",
-                                    { idTarea: $scope.idTareaTerminar, estado: 3, publicar: $scope.requierePublicacion });
-        finalizar.success(function (data) {            
+            { idTarea: $scope.idTareaTerminar, estado: 3, publicar: $scope.requierePublicacion });
+        finalizar.success(function (data) {
             if (data.success === true) {
                 $scope.wind3Opciones.hide();
                 angular.element("#modal-final-tarea").modal("hide");
@@ -1007,12 +1018,12 @@
     $scope.enviarComentarioNoTerminacion = function () {
         waitingDialog.show('Enviando comentario de no terminación...', { dialogSize: 'sm', progressType: 'success' });
         var finalizar = $http.post("user/guardar-comentario-no-terminacion",
-                                    {
-                                        idTarea: $scope.idTareaTerminar,
-                                        proximaActividad: $scope.actividadNoTerminacion,
-                                        causaNT: $scope.causaNoTerminacion,
-                                        comentario: $scope.comentarioNoTerminacion
-                                    });
+            {
+                idTarea: $scope.idTareaTerminar,
+                proximaActividad: $scope.actividadNoTerminacion,
+                causaNT: $scope.causaNoTerminacion,
+                comentario: $scope.comentarioNoTerminacion
+            });
         finalizar.success(function (data) {
             waitingDialog.hide();
             if (data.success === true) {
@@ -1038,12 +1049,12 @@
     $scope.enviarComentarioNoTerminacionTarea = function () {
         waitingDialog.show('Enviando comentario de no terminación...', { dialogSize: 'sm', progressType: 'success' });
         var finalizar = $http.post("user/guardar-comentario-no-terminacion-tarea",
-                                    {
-                                        idTarea: $scope.idTareaTerminar,
-                                        proximaActividad: $scope.actividadNoTerminacionTarea,
-                                        causaNT: $scope.causaNoTerminacionTarea,
-                                        comentario: $scope.comentarioNoTerminacionTarea
-                                    });
+            {
+                idTarea: $scope.idTareaTerminar,
+                proximaActividad: $scope.actividadNoTerminacionTarea,
+                causaNT: $scope.causaNoTerminacionTarea,
+                comentario: $scope.comentarioNoTerminacionTarea
+            });
         finalizar.success(function (data) {
             waitingDialog.hide();
             if (data.success === true) {
@@ -1075,7 +1086,7 @@
             jQ('#deleteInputFileAnterior').prop('disabled', false);
         }
     };
-    
+
     $scope.deleteFileAnterior = function () {
         var jQ = angular.element;
         var divAdjuntos = jQ('#deleteInputFileAnterior').parent().parent();
@@ -1122,7 +1133,7 @@
             formData.append('publicar', $scope.requierePublicacion);
             angular.element.each(angular.element('#form-enviar-email-fin-ticket').find('[type="file"]'), function (pos, fileInput) {
                 formData.append('adjuntos', fileInput.files[0]);
-            });            
+            });
 
             formData.append('titulo', $scope.titulo);
             formData.append('rama', $scope.rama);
@@ -1130,12 +1141,12 @@
             formData.append('requiereQA', $scope.requiereQA);
             formData.append('tagsJson', JSON.stringify(tags));
             formData.append('adjuntoPublicacion', filePub.files[0]);
-            
+
             var informacionFinTicket = $http.post("user/enviar-email-fin-ticket",
-                                                  formData,
-                                                  {
-                                                    headers: { 'Content-Type': undefined }
-                                                  });
+                formData,
+                {
+                    headers: { 'Content-Type': undefined }
+                });
             informacionFinTicket.success(function (data) {
                 waitingDialog.hide();
                 if (data.success === true) {
@@ -1166,7 +1177,7 @@
 
     function cambiarEstadoDeTarea(id, estado) {
         var anular = $http.post("user/actualizar-tarea-usuario",
-                                    { idTarea: id, estado: estado });
+            { idTarea: id, estado: estado });
         anular.success(function (data) {
             angular.element.connection.hub.start().done(function () {
                 taskProxie.server.actualizarTareas();
@@ -1195,11 +1206,11 @@
         $scope.idActividadTarea = id;
         angular.element("#modal-comentario-actividad").modal("show");
         var verComentarios = $http.post("user/dar-comentarios",
-                                    {
-                                        idActividad: $scope.idActividadTarea
-                                    });
+            {
+                idActividad: $scope.idActividadTarea
+            });
         verComentarios.success(function (data) {
-            if (data.success === true) {                
+            if (data.success === true) {
                 $scope.comentarios = data.comentarios;
             }
             else {
@@ -1211,17 +1222,17 @@
     angular.element("#modal-comentario-actividad").on('hidden.bs.modal', function (e) {
         $scope.$apply(function () {
             $scope.comentarios = [];
-        });        
+        });
     });
 
     $scope.adicionarComentario = function () {
         waitingDialog.show('Adicionando comentario...', { dialogSize: 'sm', progressType: 'success' });
         var addComentario = $http.post("user/adicionar-comentario",
-                                    {
-                                        idActividad : $scope.idActividadTarea,
-                                        descripcion: $scope.descripcionComentario,
-                                        importancia: $scope.importanciaActividad
-                                    });
+            {
+                idActividad: $scope.idActividadTarea,
+                descripcion: $scope.descripcionComentario,
+                importancia: $scope.importanciaActividad
+            });
         addComentario.success(function (data) {
             waitingDialog.hide();
             if (data.success === true) {
@@ -1237,12 +1248,12 @@
     $scope.eliminarComentario = function (id) {
         waitingDialog.show('Eliminando comentario...', { dialogSize: 'sm', progressType: 'success' });
         var removeComentario = $http.post("user/eliminar-comentario",
-                                    {
-                                        idComentario: id
-                                    });
+            {
+                idComentario: id
+            });
         removeComentario.success(function (data) {
             waitingDialog.hide();
-            if (data.success === true) {                
+            if (data.success === true) {
                 $scope.comentarios = data.comentarios;
             }
             else {
@@ -1259,9 +1270,9 @@
     $scope.solicitarTarea = function () {
         waitingDialog.show('Solicitando tarea...', { dialogSize: 'sm', progressType: 'success' });
         var solicitudtarea = $http.post("user/solicitar-tarea",
-                                    {
-                                        descripcion: $scope.descripcionTarea
-                                    });
+            {
+                descripcion: $scope.descripcionTarea
+            });
         solicitudtarea.success(function (data) {
             waitingDialog.hide();
             if (data.success === true) {

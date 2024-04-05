@@ -179,8 +179,8 @@
                             <div style="display: flex; justify-content: flex-end; gap: 10px; align-items: center" >
                                 <label>Ticket/Contrato</label>
                                 <input type="checkbox" ng-model="esTicket" />
-                                <input ng-show="esTicket" type="text" ng-required="esTicket" class="form-control" ng-model="numeroTicket" placeholder="Número de Ticket" style="width: 150px;" />
-                                <select ng-show="!esTicket" ng-required="!esTicket"  id="select-contrato-tarea" class="form-control" ng-model="entregable" style="width: 150px;">
+                                <input ng-show="esTicket" type="text" class="form-control" ng-model="numeroTicket" placeholder="Número de Ticket" style="width: 150px;" />
+                                <select ng-show="!esTicket" id="select-contrato-tarea" class="form-control" ng-model="entregable" style="width: 150px;">
                                     <option value="">Seleccione...</option>
                                     <option ng-repeat="ref in referencias" value="{{ref.id}}">{{ref.nombre}}</option>
                                 </select>
