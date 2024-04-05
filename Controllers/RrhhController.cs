@@ -143,11 +143,19 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "RRHH, ADMIN")]
-        public ActionResult VacacionesUsuarios()
+        public ActionResult VacacionesUsuarios(string filtro = "")
         {
             try
             {
                 var solicitudes = db.SolicitudVacaciones.AsNoTracking().ToList();
+
+                if (filtro != "")
+                {
+                    solicitudes = solicitudes.Where(s =>
+                                            //s.FechaIngresoSolicitud.Date.ToString("dd/MM/YYY").Equals(filtro) ||
+                                            s.Cargo.ToString().ToUpper().Contains(filtro.ToUpper())
+                                        ).ToList();
+                }
 
                 List<SolicitudVacacionesDTO> solicitudesVacacionesDTO = new List<SolicitudVacacionesDTO>();
 

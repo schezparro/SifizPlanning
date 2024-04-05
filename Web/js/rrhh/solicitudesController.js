@@ -1,6 +1,8 @@
 ﻿rrhhApp.controller('solicitudesController', ['$scope', '$http', function ($scope, $http) {
     $scope.recargarVacaciones = function () {
-        var solicitudes = $http.post("rrhh/vacaciones-usuarios", {});
+        var solicitudes = $http.post("rrhh/vacaciones-usuarios", {
+            filtro: $scope.filtroPermisos
+        });
         solicitudes.success(function (data) {
             waitingDialog.hide();
             if (data.success === true) {

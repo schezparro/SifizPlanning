@@ -1,5 +1,5 @@
 ﻿<div>
-    <input type="text" id="filtro-permisos" placeholder="Filtrar..." ng-model="filtroPermisos" class="form-control right filtro" />
+    <input type="text" id="filtro-permisos" placeholder="Filtrar..." ng-model-options='{ debounce: 1000 }' ng-change="recargarVacaciones()" ng-model="filtroPermisos" class="form-control right filtro" />
 </div>
 <div class="left">
     <div style="display: flex; align-items: center">
