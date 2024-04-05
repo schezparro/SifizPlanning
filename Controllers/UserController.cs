@@ -1254,10 +1254,30 @@ namespace SifizPlanning.Controllers
 
                     var response = await client.SendAsync(requestMessage);
 
-
                     if (response.IsSuccessStatusCode)
                     {
                         mensajeDevops = "Devops se consumió correctamente";
+                    }
+                    else
+                    {
+                        string textoEmailDevops = @"<div class='textoCuerpo'><br/>";
+                        textoEmailDevops += @"<br/>";
+                        textoEmailDevops += @"<br/><i>Ha ocurrido un error en el consumo de la api de devops.</i>";
+                        textoEmailDevops += @"<br/><i>La funcionalidad AsignarTareaDePublicacion del APISifizOps tuvo un error por favor revisar</i>";
+                        textoEmailDevops += @"<br/><i>Detalles:</i>";
+                        textoEmailDevops += @"<br/>";
+                        textoEmailDevops += response.StatusCode.ToString() + ": " + response.ReasonPhrase.ToString();
+                        textoEmailDevops += @"</div>";
+
+                        string emailClienteDevops = "sfzdevops@sifizsoft.com";
+
+                        List<string> correosDestinosDevops = new List<string>();
+                        correosDestinosDevops.Add(emailClienteDevops);
+                        correosDestinosDevops.Add(emailUser);
+                        correosDestinosDevops.Add("rsanchez@sifizsoft.com");
+
+                        string asuntoEmailDevops = "Notificación error Api Devops";
+                        Utiles.EnviarEmailSistema(correosDestinosDevops.ToArray(), textoEmailDevops, asuntoEmailDevops);
                     }
                 }
                 else
