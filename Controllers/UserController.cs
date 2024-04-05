@@ -1273,7 +1273,6 @@ namespace SifizPlanning.Controllers
 
                         List<string> correosDestinosDevops = new List<string>();
                         correosDestinosDevops.Add(emailClienteDevops);
-                        correosDestinosDevops.Add(emailUser);
                         correosDestinosDevops.Add("rsanchez@sifizsoft.com");
 
                         string asuntoEmailDevops = "Notificación error Api Devops";
