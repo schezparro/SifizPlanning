@@ -328,7 +328,7 @@ namespace SifizPlanning.Util
 
             //using(var smtp = new SmtpClient())
             //{
-            //    smtp.Connect("sifizsoft.com", 465, true);
+            //    smtp.Connect("email.sifizsoft.com", 465, true);
             //    smtp.Authenticate(emailFuente, password);
 
             //    bool enviado = false;
