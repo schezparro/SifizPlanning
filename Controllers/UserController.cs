@@ -1609,7 +1609,7 @@ namespace SifizPlanning.Controllers
 
                 var datos = (from emt in db.EntregableMotivoTrabajo
                              join mt in db.MotivoTrabajo on emt.SecuencialMotivoTrabajo equals mt.Secuencial
-                             where emt.EstaActivo == 1 && mt.SecuencialCliente == idCliente && emt.Avance != 100
+                             where emt.EstaActivo == 1 && mt.SecuencialCliente == idCliente && emt.Avance != 100 && mt.EstaActivo == 1 && mt.Avance != 100 && mt.SecuencialEstadoContrato != 3  
                              select new
                              {
                                  id = emt.Secuencial,
