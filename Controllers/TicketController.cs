@@ -2151,6 +2151,7 @@ namespace SifizPlanning.Controllers
 
                             db.AdjuntoTicket.Add(adjTicket);
                             db.HistoricoAdjunto.Add(histAdj);
+                            db.SaveChanges();
                         }
                     }
                 }
@@ -2163,18 +2164,21 @@ namespace SifizPlanning.Controllers
                     Ofertas oferta = new Ofertas();
                     oferta.cliente = ticket.persona_cliente.cliente;
                     oferta.colaborador = col;
-                    oferta.Detalle = "Estimación del ticket: " + ticket.Secuencial +" - "+ ticket.Asunto;
+                    oferta.Detalle = "Estimación del ticket: " + ticket.Secuencial + " - " + ticket.Asunto;
                     oferta.HorasEstimacion = ticket.Estimacion;
                     oferta.FechaDisponibilidad = new DateTime(0001 / 01 / 01);
                     oferta.FechaProduccion = new DateTime(0001 / 01 / 01);
                     oferta.FechaRegistro = DateTime.Now;
 
                     //Agregar el ultimo adjunot del ticket a la oferta
-                    var lastAdj = db.AdjuntoTicket.Where(adj => adj.SecuencialTicket == ticket.Secuencial && adj.Url.Contains("est_"))
-                        .OrderByDescending(adj => adj.Secuencial).FirstOrDefault();
-                    if (lastAdj != null)
+                    if (adjuntos != null)
                     {
-                        oferta.Adjunto = lastAdj.Url;
+                        var lastAdj = db.AdjuntoTicket.Where(adj => adj.SecuencialTicket == ticket.Secuencial)
+                            .OrderByDescending(adj => adj.Secuencial).FirstOrDefault();
+                        if (lastAdj != null)
+                        {
+                            oferta.Adjunto = lastAdj.Url;
+                        }
                     }
 
                     db.Ofertas.Add(oferta);
