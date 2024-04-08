@@ -1609,7 +1609,7 @@ namespace SifizPlanning.Controllers
 
                 var datos = (from emt in db.EntregableMotivoTrabajo
                              join mt in db.MotivoTrabajo on emt.SecuencialMotivoTrabajo equals mt.Secuencial
-                             where emt.EstaActivo == 1 && mt.SecuencialCliente == idCliente && emt.Avance != 100 && mt.EstaActivo == 1 && mt.Avance != 100 && mt.SecuencialEstadoContrato != 3  
+                             where emt.EstaActivo == 1 && mt.SecuencialCliente == idCliente && emt.Avance != 100 && mt.EstaActivo == 1 && mt.Avance != 100 && mt.SecuencialEstadoContrato != 3
                              select new
                              {
                                  id = emt.Secuencial,
@@ -4175,26 +4175,11 @@ r in db.Rol on ur.rol equals r
         //Guardar modal nuevos recursos
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult GuardarRecurso(string titulo, string detalle, DateTime fecha, int modulo, int tiempo, HttpPostedFileBase[] adjuntos = null, string adjuntoAsistencia = null)
+        public ActionResult GuardarRecurso(string titulo, string detalle, DateTime fecha, int modulo, int tiempo, string url, string adjuntoAsistencia = null)
         {
             try
             {
                 var s = new JavaScriptSerializer();
-                var Url = "";
-                if (adjuntos != null)
-                {
-                    foreach (var adj in adjuntos.Where(adj => adj != null))
-                    {
-                        string extFile = Path.GetExtension(adj.FileName);
-                        string newNameFile = Utiles.RandomString(10) + extFile;
-                        newNameFile = System.IO.Path.GetRandomFileName() + extFile;
-                        string path = Path.Combine(Server.MapPath("~/Web/resources/recursos"), newNameFile);
-                        adj.SaveAs(path);
-
-                        Url = "/resources/recursos" + "/" + newNameFile;
-                        break;
-                    }
-                }
 
                 Recursos nuevoRecurso = new Recursos
                 {
@@ -4202,7 +4187,7 @@ r in db.Rol on ur.rol equals r
                     Detalle = detalle,
                     Fecha = fecha,
                     SecuencialModulo = modulo,
-                    Adjunto = Url,
+                    Adjunto = url,
                     TiempoCapacitacion = tiempo
                 };
                 db.Recursos.Add(nuevoRecurso);

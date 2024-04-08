@@ -18,7 +18,7 @@
                 <th width="20">Detalle</th>
                 <th width="8">Fecha</th>
                 <th width="20">Modulo</th>
-                <th width="15">Adjunto</th>
+                <th width="15">Url</th>
                 <th width="15">Registro Asistencia</th>
                 <th width="8">Tiempo Capacitacion</th>
             </tr>
@@ -31,8 +31,8 @@
                 <td>{{recurso.fecha | strDateToStr}}</td>
                 <td>{{recurso.modulo}}</td>
                 <td>
-                    <a class="btn btn-success btn-xs" target="_blank" href="Web{{recurso.adjunto}}" ng-show="recurso.adjunto != ''">
-                        <span class="glyphicon glyphicon-download"></span> Adjunto
+                    <a class="btn btn-success btn-xs" target="_blank" href="{{recurso.adjunto}}" ng-show="recurso.adjunto != ''">
+                        <span class="glyphicon glyphicon-link"></span> Url 
                     </a>
                 </td>
 
@@ -75,7 +75,7 @@
 <div id="modal-agregar-recursos" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form ng-submit="GuardarNuevoRecurso()">
+            <form ng-submit="GuardarNuevoRecurso()" name="nuevoRecurso">
                 <div class="modal-header">
                     <h5 class="modal-title">NUEVA CAPACITACION</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -99,10 +99,11 @@
                             <option value="{{tipo.id}}" ng-repeat="tipo in tipoModulo">{{tipo.nombre}}</option>
                         </select>
                     </div>
+
                     <div class="form-group">
-                        <label for="inputArchivo">ADJUNTO:</label>
-                        <div id="panel-add-adjuntorecursos"></div>
-                        <div class="clear"></div>
+                        <label for="inputArchivo">URL:</label>
+                        <input type="text" class="form-control" ng-model="url" ng-required="true" placeholder="Url">
+                        <span style="color: red;" ng-show="urlNoValida">La URL no es válida.</span>
                     </div>
 
                     <div class="form-group">
@@ -154,10 +155,10 @@
                     <div class="col-sm-8">{{fechaV | strDateToStr}}</div>
                 </div>
                 <div class="row" ng-show="adjuntoV != ''">
-                    <div class="col-sm-4"><strong>Adjunto:</strong></div>
+                    <div class="col-sm-4"><strong>Url:</strong></div>
                     <div class="col-sm-8">
-                        <a class="btn btn-success btn-xs" target="_blank" href="Web{{adjuntoV}}">
-                            <span class="glyphicon glyphicon-download"></span> Adjunto
+                        <a class="btn btn-success btn-xs" target="_blank" href="{{adjuntoV}}">
+                            <span class="glyphicon glyphicon-link"></span> Url 
                         </a>
                     </div>
                 </div>
@@ -211,7 +212,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" id="guardar-registro" ng-click="registrarAsistencia()" class="btn btn-primary" >Guardar</button>
+                <button type="button" id="guardar-registro" ng-click="registrarAsistencia()" class="btn btn-primary">Guardar</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
             </div>
         </div>

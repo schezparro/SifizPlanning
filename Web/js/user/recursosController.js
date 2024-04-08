@@ -113,6 +113,7 @@
     $scope.windowAgregarRecursos = function () {
         $scope.newTitulo = '';
         $scope.newDetalle = '';
+        $scope.url = '';
         $scope.moduloSeleccionado = '';
         
         angular.element("#modal-agregar-recursos").modal("show");
@@ -162,20 +163,27 @@
         }
     });
 
+    $scope.urlNoValida = false;
     $scope.GuardarNuevoRecurso = function () {
-        waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
-
-        var fileInput = angular.element('#uniqueFileInputIDRecursos')[0];
         var modulo = angular.element("#select-modulo-recursos")[0].value;
-
         var fechaSistema = new Date().toISOString();
+
+        if ($scope.url != null) {
+            if (validarURL($scope.url) == false) {
+                $scope.urlNoValida = true;
+                return;
+            } else {
+                $scope.urlNoValida = false;
+            };
+        };
+        waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
 
         var formData = new FormData();
         formData.append('titulo', $scope.newTitulo);
         formData.append('detalle', $scope.newDetalle);
         formData.append('fecha', fechaSistema);
         formData.append('modulo', modulo);
-        formData.append('adjuntos', fileInput.files[0]);
+        formData.append('url', $scope.url);
         formData.append('adjuntoAsistencia', JSON.stringify($scope.datosAsistencia));
 
         var tiempo = toTotalMinutes($scope.horas, $scope.minutos)
@@ -198,6 +206,7 @@
 
                 $scope.horas = 0;
                 $scope.minutos = 0;
+                $scope.urlNoValida = false;
             } else {
                 messageDialog.show("Información", data.msg);
             }
@@ -278,16 +287,6 @@
         });
     };
 
-    // Obtén la plantilla y añade un ID único
-    var fileInputTemplate = angular.element("#htmlFile").html();
-    var uniqueId = "uniqueFileInputIDRecursos"; // Genera un ID único de alguna manera
-    var uniqueId2 = "uniqueFileInputIDRecursos2"; // Genera un ID único de alguna manera
-    var fileInputWithId = fileInputTemplate.replace('<input type="file"', '<input type="file" id="' + uniqueId + '"');
-    var fileInputWithId2 = fileInputTemplate.replace('<input type="file"', '<input type="file" id="' + uniqueId2 + '"');
-
-    // Añade la plantilla modificada al DOM
-    angular.element("#panel-add-adjuntorecursos").append(fileInputWithId);
-    angular.element("#panel-add-adjuntorecursos2").append(fileInputWithId2);
 }]);
 
 //Servicio del filtrado para limpiar los filtros
@@ -319,6 +318,17 @@ devApp.filter('toHoursAndMinutes', function () {
 
 function toTotalMinutes(hours, minutes) {
     return (hours * 60) + minutes;
+}
+
+function validarURL(url) {
+    // Expresión regular para validar una URL
+    var regex = new RegExp("^((https?|ftp):\\/\\/)?" + // Protocolo
+        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // Dominio
+        "((\\d{1,3}\\.){3}\\d{1,3}))" + // O dirección IP
+        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // Puerto y ruta
+        "(\\?[;&a-z\\d%_.~+=-]*)?" + // Parámetros de consulta
+        "(\\#[-a-z\\d_]*)?$", "i"); // Fragmento
+    return regex.test(url);
 }
 
 
