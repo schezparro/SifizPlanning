@@ -697,9 +697,11 @@
                 }
                 else {
                     $scope.diasActividadTarea = $scope.diasActividad;
-                }
+                }               
                 $scope.tieneContrato = data.tieneContrato;
                 $scope.tieneTicket = data.tieneTicket;
+                $scope.clienteSifiz = data.clienteSifiz;
+
             }
             else {
                 messageDialog.show('Información', data.msg);

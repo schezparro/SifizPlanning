@@ -175,7 +175,7 @@
             <div class="modal-body">
                 <form method="post" id="frm-modal-final-tarea" ng-submit="adicionarActividadTarea()">
                     <div id="new-actividad-tarea" class="fila">
-                        <div ng-show="!tieneContrato && !tieneTicket">
+                        <div ng-show="!tieneContrato && !tieneTicket && !clienteSifiz">
                             <div style="display: flex; justify-content: flex-end; gap: 10px; align-items: center" >
                                 <label>Ticket/Contrato</label>
                                 <input type="checkbox" ng-model="esTicket" />
