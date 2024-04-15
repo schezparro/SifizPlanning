@@ -94,7 +94,7 @@ namespace SifizPlanning.Models
         public virtual ICollection<Ofertas> ofertas { get; set; }
         public virtual ICollection<NivelColaboradorTecnologia> NIVELCOLABORADORTECNOLOGIA { get; set; }
         public virtual ICollection<Incidencias> incidencias { get; set; }
-        public virtual ICollection<IncidenciasRecursos> INCIDENCIASRECURSOS { get; set; }
         public virtual ICollection<RecursosAsistencia> RECURSOSASISTENCIA { get; set; }
+        public virtual ICollection<IncidenciasRecursos> INCIDENCIASRECURSOS { get; set; }
     }
 }

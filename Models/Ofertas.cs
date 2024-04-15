@@ -23,6 +23,7 @@ namespace SifizPlanning.Models
         public int HorasEstimacion { get; set; }
         public Nullable<System.DateTime> FechaProduccion { get; set; }
         public string Adjunto { get; set; }
+        public Nullable<System.DateTime> FechaAprobacion { get; set; }
     
         public virtual Cliente cliente { get; set; }
         public virtual Colaborador colaborador { get; set; }

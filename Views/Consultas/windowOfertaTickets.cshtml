@@ -11,6 +11,7 @@
                 <th>Horas Estimación</th>
                 <th>Colaborador</th>
                 <th>Fecha Disponibilidad</th>
+                <th>Fecha Aprobación</th>
                 <th>Adjunto</th>
                 <th>Acciones</th>
             </tr>
@@ -91,6 +92,9 @@
                     <input id="fecha-disponibilidad" ng-class="'form-control'" ng-model="nuevaOferta.FechaDisponibilidad">
                 </td>
                 <td>
+                    <input id="fecha-aprobacion" ng-class="'form-control'" ng-model="nuevaOferta.FechaAprobacion">
+                </td>
+                <td>
                     <button id="btn-add-adjunto-oferta" name="{{ adjuntoName }}" ng-class="'form-control'" class="btn btn-success btn-xs" onclick="document.getElementById('add-adjunto-oferta').click();">
                         <span id="adjunto-oferta-icon" class="glyphicon glyphicon-plus"></span>
                     </button>
@@ -142,6 +146,10 @@
                     <span ng-hide="oferta.editable" class="badge" style="background-color:seagreen">&nbsp;</span>
                     <span ng-hide="oferta.editable">&nbsp;{{ oferta.FechaDisponibilidad !== null ? (oferta.FechaDisponibilidad | strDateToStr) : "" }}</span>
                     <input id="fecha-disponibilidad-{{$index}}" ng-class="'form-control'" ng-show="oferta.editable" ng-model="oferta.FechaDisponibilidad">
+                </td>
+                <td>
+                    <span ng-hide="oferta.editable">{{ oferta.FechaAprobacion !== null ? (oferta.FechaAprobacion | strDateToStr) : ""}}</span>
+                    <input id="fecha-aprobacion-{{$index}}" type="text" ng-class="'form-control'" ng-show="oferta.editable" ng-model="oferta.FechaAprobacion">
                 </td>
                 <td>
                     <a ng-hide="oferta.editable || oferta.adjunto === '' || oferta.adjunto === null" href="Web{{oferta.adjunto}}" target="_blank" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-paperclip"></span>{{ oferta.adjunto | getFileName }}</a>

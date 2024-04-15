@@ -736,6 +736,7 @@ namespace SifizPlanning.Controllers
                                    FechaRegistro = o.FechaRegistro.Year != 1 ? o.FechaRegistro : (DateTime?)null,
                                    FechaProduccion = o.FechaProduccion.HasValue ? o.FechaProduccion.Value.Year != 1 ? o.FechaProduccion.Value : (DateTime?)null : (DateTime?)null,
                                    FechaDisponibilidad = o.FechaDisponibilidad.Year != 1 ? o.FechaDisponibilidad : (DateTime?)null,
+                                   FechaAprobacion = o.FechaAprobacion.HasValue ? o.FechaAprobacion : (DateTime?)null,
                                    Detalle = o.Detalle,
                                    semaforo = o.FechaDisponibilidad < fechaHoy ? "ROJO" : o.FechaDisponibilidad <= fechaPermisible ? "AMARILLO" : "VERDE",
                                    HorasEstimacion = o.HorasEstimacion,
@@ -768,6 +769,7 @@ namespace SifizPlanning.Controllers
                                             s.colaborador.nombre.ToString().ToUpper().Contains(filtro.ToUpper()) ||
                                             s.Detalle.ToString().ToUpper().Contains(filtro.ToUpper()) ||
                                             s.FechaDisponibilidad.ToString().ToUpper().Contains(filtro.ToUpper()) ||
+                                            s.FechaAprobacion.ToString().ToUpper().Contains(filtro.ToUpper()) ||
                                             s.FechaProduccion.ToString().ToUpper().Contains(filtro.ToUpper()) ||
                                             s.FechaRegistro.ToString().ToUpper().Contains(filtro.ToUpper()) ||
                                             s.HorasEstimacion.ToString().ToUpper().Contains(filtro.ToUpper())
@@ -797,7 +799,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, GESTOR")]
-        public ActionResult AgregarOfertaTickets(string fechaRegistro, string fechaProduccion, string fechaDisponibilidad, string detalle, int? horasEstimacion, int? cliente, int? colaborador, HttpPostedFileBase adjunto = null)
+        public ActionResult AgregarOfertaTickets(string fechaRegistro, string fechaProduccion, string fechaDisponibilidad, string fechaAprobacion, string detalle, int? horasEstimacion, int? cliente, int? colaborador, HttpPostedFileBase adjunto = null)
         {
             try
             {
@@ -813,6 +815,7 @@ namespace SifizPlanning.Controllers
                 DateTime dateRegistro = new DateTime(0001 / 01 / 01);
                 DateTime dateProduccion = new DateTime(0001 / 01 / 01);
                 DateTime dateDisponibilidad = new DateTime(0001 / 01 / 01);
+                DateTime? dateAprobacion = null;
                 string format = "ddd MMM dd yyyy HH:mm:ss 'GMT'K";
 
                 if (fechaRegistro != "null")
@@ -830,11 +833,17 @@ namespace SifizPlanning.Controllers
                     fechaDisponibilidad = fechaDisponibilidad.Split(new[] { " (" }, StringSplitOptions.None)[0];
                     dateDisponibilidad = DateTime.ParseExact(fechaDisponibilidad, format, CultureInfo.InvariantCulture);
                 }
+                if (fechaAprobacion != "null")
+                {
+                    fechaAprobacion = fechaAprobacion.Split(new[] { " (" }, StringSplitOptions.None)[0];
+                    dateAprobacion = DateTime.ParseExact(fechaAprobacion, format, CultureInfo.InvariantCulture);
+                }
 
                 Ofertas oferta = new Ofertas();
                 oferta.FechaRegistro = dateRegistro.Date;
                 oferta.FechaProduccion = dateProduccion.Date;
                 oferta.FechaDisponibilidad = dateDisponibilidad.Date;
+                oferta.FechaAprobacion = dateAprobacion.HasValue ? dateAprobacion.Value.Date : (DateTime?)null;
                 oferta.Detalle = detalle;
                 oferta.HorasEstimacion = horasEstimacion ?? 0;
                 oferta.cliente = cliente != null ? db.Cliente.Find(cliente) : db.Cliente.Find(78);
@@ -862,7 +871,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, GESTOR")]
-        public ActionResult EditarOfertaTickets(int ID, string FechaRegistro, string FechaProduccion, string FechaDisponibilidad, string Detalle, int HorasEstimacion, int cliente, int colaborador, HttpPostedFileBase adjunto = null)
+        public ActionResult EditarOfertaTickets(int ID, string FechaRegistro, string FechaProduccion, string FechaDisponibilidad, string FechaAprobacion, string Detalle, int HorasEstimacion, int cliente, int colaborador, HttpPostedFileBase adjunto = null)
         {
             try
             {
@@ -872,6 +881,7 @@ namespace SifizPlanning.Controllers
                     DateTime dateRegistro = new DateTime(0001 / 01 / 01);
                     DateTime dateProduccion = new DateTime(0001 / 01 / 01);
                     DateTime dateDisponibilidad = new DateTime(0001 / 01 / 01);
+                    DateTime? dateAprobacion = null;
                     string format = "ddd MMM dd yyyy HH:mm:ss 'GMT'K";
 
                     if (FechaRegistro != "null")
@@ -889,10 +899,16 @@ namespace SifizPlanning.Controllers
                         FechaDisponibilidad = FechaDisponibilidad.Split(new[] { " (" }, StringSplitOptions.None)[0];
                         dateDisponibilidad = DateTime.ParseExact(FechaDisponibilidad, format, CultureInfo.InvariantCulture);
                     }
+                    if (FechaAprobacion != "null")
+                    {
+                        FechaAprobacion = FechaAprobacion.Split(new[] { " (" }, StringSplitOptions.None)[0];
+                        dateAprobacion = DateTime.ParseExact(FechaAprobacion, format, CultureInfo.InvariantCulture);
+                    }
 
                     oferta.FechaRegistro = dateRegistro.Date;
                     oferta.FechaProduccion = dateProduccion.Date;
                     oferta.FechaDisponibilidad = dateDisponibilidad.Date;
+                    oferta.FechaAprobacion = dateAprobacion.HasValue ? dateAprobacion.Value.Date : (DateTime?)null;
                     oferta.Detalle = Detalle;
                     oferta.HorasEstimacion = HorasEstimacion;
                     oferta.cliente = db.Cliente.Find(cliente);

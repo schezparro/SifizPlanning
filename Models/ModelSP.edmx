@@ -1665,6 +1665,7 @@
           <Property Name="HORASESTIMACION" Type="int" Nullable="false" />
           <Property Name="FECHAPRODUCCION" Type="date" />
           <Property Name="ADJUNTO" Type="varchar" MaxLength="255" />
+          <Property Name="FECHAAPROBACION" Type="date" />
         </EntityType>
         <EntityType Name="PERSONA_CLIENTE">
           <Key>
@@ -12065,6 +12066,7 @@
           <NavigationProperty Name="colaborador" Relationship="SifizPlanningModel.FK_OFERTAS_COLABORADOR" FromRole="OFERTAS" ToRole="Colaborador" />
           <Property Name="FechaProduccion" Type="DateTime" Precision="0" />
           <Property Name="Adjunto" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="FechaAprobacion" Type="DateTime" Precision="0" />
         </EntityType>
         <Association Name="FK_OFERTAS_CLIENTE">
           <End Type="SifizPlanningModel.Cliente" Role="Cliente" Multiplicity="1" />
@@ -14539,6 +14541,7 @@
           <EntitySetMapping Name="Ofertas">
             <EntityTypeMapping TypeName="SifizPlanningModel.Ofertas">
               <MappingFragment StoreEntitySet="OFERTAS">
+                <ScalarProperty Name="FechaAprobacion" ColumnName="FECHAAPROBACION" />
                 <ScalarProperty Name="Adjunto" ColumnName="ADJUNTO" />
                 <ScalarProperty Name="FechaProduccion" ColumnName="FECHAPRODUCCION" />
                 <ScalarProperty Name="HorasEstimacion" ColumnName="HORASESTIMACION" />

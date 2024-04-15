@@ -1,6 +1,6 @@
 ﻿consultasApp.controller('ofertaTicketsController', ['$scope', '$http', '$sce', function ($scope, $http, $sce) {
 
-    $scope.nuevaOferta = { FechaRegistro: '', FechaProduccion: '', FechaDisponibilidad: '', Detalle: '', HorasEstimacion: '', cliente: '', colaborador: '' };
+    $scope.nuevaOferta = { FechaRegistro: '', FechaProduccion: '', FechaDisponibilidad: '', FechaAprobacion: '', Detalle: '', HorasEstimacion: '', cliente: '', colaborador: '' };
 
     var numerosPorPagina = 10;
     var pagina = 1;
@@ -43,6 +43,7 @@
         oferta.FechaRegistro = '';
         oferta.FechaProduccion = '';
         oferta.FechaDisponibilidad = '';
+        oferta.FechaAprobacion = '';
 
         angular.element('#fecha-registro-' + index).datepicker({
             format: 'dd/mm/yyyy',
@@ -57,12 +58,20 @@
             format: 'dd/mm/yyyy',
             language: 'es'
         });
+        angular.element('#fecha-aprobacion-' + index).datepicker({
+            format: 'dd/mm/yyyy',
+            language: 'es'
+        });
     };
 
     $scope.guardarCambios = function (oferta) {
         angular.element('#fecha-registro-' + oferta.id).datepicker('destroy');
         angular.element('#fecha-produccion-' + oferta.id).datepicker('destroy');
         angular.element('#fecha-disponibilidad-' + oferta.id).datepicker('destroy');
+        angular.element('#fecha-aprobacion-' + oferta.id).datepicker('destroy');
+
+        console.log("oferta.fechaaprobacion  " + oferta.FechaAprobacion);
+
 
         oferta.editable = false;
         var adjunto = $scope.adjunto;
@@ -72,6 +81,7 @@
         formData.append("FechaRegistro", new Date(...oferta.FechaRegistro.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)));
         formData.append("FechaProduccion", new Date(...oferta.FechaProduccion.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)));
         formData.append("FechaDisponibilidad", new Date(...oferta.FechaDisponibilidad.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)));
+        formData.append("FechaAprobacion", new Date(...oferta.FechaAprobacion.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)));
         formData.append("Detalle", oferta.Detalle);
         formData.append("HorasEstimacion", oferta.HorasEstimacion);
         formData.append("cliente", oferta.cliente.id);
@@ -122,6 +132,9 @@
             FechaDisponibilidad: $scope.nuevaOferta.FechaDisponibilidad ?
                 new Date(...$scope.nuevaOferta.FechaDisponibilidad.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)) :
                 null,
+            FechaAprobacion: $scope.nuevaOferta.FechaAprobacion ?
+                new Date(...$scope.nuevaOferta.FechaAprobacion.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)) :
+                null,
             Detalle: $scope.nuevaOferta.Detalle,
             HorasEstimacion: $scope.nuevaOferta.HorasEstimacion || 0,
             cliente: clienteSeleccionado,
@@ -129,12 +142,20 @@
             editable: false
         };
 
+        if (nuevaOferta.FechaRegistro == null || nuevaOferta.FechaProduccion == null ||
+            nuevaOferta.cliente == null || nuevaOferta.Detalle == null || nuevaOferta.HorasEstimacion == null || nuevaOferta.colaborador == null) {
+            messageDialog.show("Información", "Complete el formulario, existen campos vacíos que son obligatorios.");
+        };
+
         var adjunto = $scope.adjunto;
+
+        console.log("fecha de aprobacion " + nuevaOferta.FechaAprobacion);
 
         var formData = new FormData();
         formData.append("fechaRegistro", nuevaOferta.FechaRegistro);
         formData.append("fechaProduccion", nuevaOferta.FechaProduccion);
         formData.append("fechaDisponibilidad", nuevaOferta.FechaDisponibilidad);
+        formData.append("fechaAprobacion", nuevaOferta.FechaAprobacion);
         formData.append("detalle", nuevaOferta.Detalle);
         formData.append("horasEstimacion", nuevaOferta.HorasEstimacion);
         formData.append("cliente", nuevaOferta.cliente.id);
@@ -167,7 +188,7 @@
 
         ajaxOfertas.success(function (data) {
             if (data.success === true) {
-                $scope.cargarDatosOfertas()
+                $scope.recargarDatosOfertas()
             } else {
                 messageDialog.show("Información", data.msg);
             }
