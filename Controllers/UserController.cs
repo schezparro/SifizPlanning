@@ -2036,7 +2036,7 @@ namespace SifizPlanning.Controllers
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
         public ActionResult DarActividadesTarea(int idTarea)
-        {
+           {
             try
             {
                 var tar = db.Tarea.Find(idTarea);
@@ -2081,6 +2081,17 @@ namespace SifizPlanning.Controllers
                 //{
                 //    tieneTicket = true;
                 //}
+
+                //var cliente = (from c in db.Cliente 
+                //               join t in db.Tarea on c.Secuencial equals t.SecuencialCliente
+                //               where t.Secuencial == idTarea && c.Descripcion.ToLower().Contains("sifizsoft")
+                //               select c).FirstOrDefault();
+
+                //if (cliente != null)
+                //{
+                //    clienteSifiz = true;
+                //}
+
 
                 var actividadesTarea = (from tActRel in db.TareaActividadRealizada
                                         where tActRel.SecuencialTarea == idTarea
