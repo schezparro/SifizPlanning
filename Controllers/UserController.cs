@@ -3717,6 +3717,229 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult DarCatalogoTiemposProyecto()
+        {
+            var datos = (from s in db.ServicioImplantacionCore
+                         orderby s.Descripcion
+                         select new
+                         {
+                             id = s.Secuencial,
+                             descripcion = s.Descripcion
+                         }).ToList();
+
+            return Json(new
+            {
+                success = true,
+                servicios = datos
+            });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult DarColaboradoresTiemposProyecto()
+        {
+            var datos = (from c in db.Colaborador
+                         join p in db.Persona on c.SecuencialPersona equals p.Secuencial
+                         select new
+                         {
+                             id = c.Secuencial,
+                             nombre = p.Nombre1 + " " + p.Apellido1
+                         }).ToList();
+
+            return Json(new
+            {
+                success = true,
+                colaboradores = datos
+            });
+        }
+
+        //Guardar datos del modal Tiempos del Proyecto
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult AgregarTiemposProyecto(string cliAux, string servicio, int? horasServicio, string rp, int? horasConsumidas, string detalle, string colaborador, string fechaRegistro )
+        {
+            try
+            {
+                int catalogoServicio = int.Parse(servicio);
+                int colaboradorTiempo = int.Parse(colaborador);
+                int idProyecto = int.Parse(cliAux);
+
+                DateTime dateRegistro = new DateTime(0001 / 01 / 01);               
+                string format = "ddd MMM dd yyyy HH:mm:ss 'GMT'K";
+
+                if (fechaRegistro != "null")
+                {
+                    fechaRegistro = fechaRegistro.Split(new[] { " (" }, StringSplitOptions.None)[0];
+                    dateRegistro = DateTime.ParseExact(fechaRegistro, format, CultureInfo.InvariantCulture);
+                }
+                
+                TiemposProyecto tiempoProj = new TiemposProyecto();
+                tiempoProj.SecuencialServicioImplantacionCore = catalogoServicio;
+                tiempoProj.HorasServicio = horasServicio ?? 0;
+                tiempoProj.Rp = rp;
+                tiempoProj.HorasConsumidas = horasConsumidas ?? 0;
+                tiempoProj.Detalle = detalle;
+                tiempoProj.SecuencialColaborador = colaboradorTiempo;
+                tiempoProj.Fecha = dateRegistro.Date;
+                tiempoProj.SecuencialClienteAuxiliar = idProyecto;
+
+                db.TiemposProyecto.Add(tiempoProj);
+                db.SaveChanges();
+
+                var resp = new
+                {
+                    success = true,
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult CargarTiemposProyecto(int idProyecto, int start, int length, string filtro = "")
+        {
+            try
+            {
+                           
+                var tiemposPrj = (from t in db.TiemposProyecto
+                               join s in db.ServicioImplantacionCore on t.SecuencialServicioImplantacionCore equals s.Secuencial
+                               join col in db.Colaborador on t.SecuencialColaborador equals col.Secuencial
+                               join p in db.Persona on col.SecuencialPersona equals p.Secuencial
+                               where t.SecuencialClienteAuxiliar == idProyecto
+                               select new
+                               {
+                                   id = t.Secuencial,
+                                   servicio =  new {
+                                       id = s.Secuencial,
+                                       descripcion = s.Descripcion                                      
+                                   },
+                                   horasServicio = t.HorasServicio,
+                                   rp = t.Rp,
+                                   horasConsumidas = t.HorasConsumidas,
+                                   detalle = t.Detalle,
+                                   colaborador = new {
+                                       id = col.Secuencial,
+                                       nombre = p.Nombre1 + " " + p.Apellido1
+                                   },
+                                   fechaRegistro =t.Fecha,                                  
+                                   editable = false,
+                               }).ToList();
+
+                if (filtro != "")
+                {
+                    tiemposPrj = tiemposPrj.Where(t =>
+                                            t.servicio.ToString().ToUpper().Contains(filtro.ToUpper()) ||
+                                            t.colaborador.ToString().ToUpper().Contains(filtro.ToUpper()) ||
+                                            t.detalle.ToString().ToUpper().Contains(filtro.ToUpper())                                             
+                                        ).ToList();
+                }
+
+                var cantidad = tiemposPrj.Count;
+                tiemposPrj = tiemposPrj.Skip(start).Take(length).ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    tiempoProyecto = tiemposPrj,
+                    cantidad = cantidad
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult ElimnarTiemposProyecto(int ID)
+        {
+            try
+            {
+                TiemposProyecto tiempo = db.TiemposProyecto.Find(ID);
+                db.TiemposProyecto.Remove(tiempo);
+                db.SaveChanges();
+
+                var resp = new
+                {
+                    success = true,
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult EditarTiemposProyecto(int ID, string servicio, int horasServicio, string rp, int horasConsumidas, string detalle, string colaborador, string fechaRegistro)
+        {
+            try
+            {
+                TiemposProyecto tiempo = db.TiemposProyecto.FirstOrDefault(s => s.Secuencial == ID);
+                if (tiempo != null)
+                {
+                    int catalogoServicio = int.Parse(servicio);
+                    int colaboradorTiempo = int.Parse(colaborador);
+
+                    DateTime dateRegistro = new DateTime(0001 / 01 / 01);                  
+                    string format = "ddd MMM dd yyyy HH:mm:ss 'GMT'K";
+
+                    if (fechaRegistro != "null")
+                    {
+                        fechaRegistro = fechaRegistro.Split(new[] { " (" }, StringSplitOptions.None)[0];
+                        dateRegistro = DateTime.ParseExact(fechaRegistro, format, CultureInfo.InvariantCulture);
+                    }
+
+                    tiempo.SecuencialServicioImplantacionCore = catalogoServicio;
+                    tiempo.HorasServicio = horasServicio;
+                    tiempo.Rp = rp;
+                    tiempo.HorasConsumidas = horasConsumidas;
+                    tiempo.Detalle = detalle;
+                    tiempo.SecuencialColaborador = colaboradorTiempo;
+                    tiempo.Fecha = dateRegistro.Date;  
+                    
+                }
+                db.SaveChanges();
+
+                var resp = new
+                {
+                    success = true,
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
         public ActionResult GuardarValorInforme(string tipo, string seleccionado, string secuencialEtapaId, string secuencialSubEtapaId,
             string secuencialCatalogoEtapa, string descripcion, string fechaInicio, string fechaFin, string porciento, string detalle, string recurso)
         {

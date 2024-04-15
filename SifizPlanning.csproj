@@ -811,6 +811,9 @@
     <Compile Include="Models\SemaforoPrioridad.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ServicioImplantacionCore.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ServidorTFS.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
@@ -920,6 +923,9 @@
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\TiempoCerradoTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TiemposProyecto.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\TipoActa.cs">

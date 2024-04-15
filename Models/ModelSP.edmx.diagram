@@ -424,6 +424,11 @@
         <AssociationConnector Association="SifizPlanningModel.FK_RECURSOSASISTENCIA_RECURSOS" />
         <EntityTypeShape EntityType="SifizPlanningModel.IncidenciasRecursos" Width="1.5" PointX="17.5" PointY="60.5" />
         <AssociationConnector Association="SifizPlanningModel.FK_INCIDENCIASRECURSOS_COLABORADOR" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ServicioImplantacionCore" Width="1.5" PointX="8.375" PointY="38.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.TiemposProyecto" Width="1.5" PointX="41.125" PointY="1" />
+        <AssociationConnector Association="SifizPlanningModel.FK_TIEMPOSPROYECTO_COLABORADOR" />
+        <AssociationConnector Association="SifizPlanningModel.FK_TIEMPOSPROYECTO_SERVICIOIMPLANTACIONCORE" />
+        <AssociationConnector Association="SifizPlanningModel.FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

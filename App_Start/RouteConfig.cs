@@ -1199,6 +1199,42 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+               name: "DarCatalogoTiemposProyecto",
+               url: "user/dar-catalogo-servicio-proyectos/{id}",
+               defaults: new { controller = "User", action = "DarCatalogoTiemposProyecto", id = UrlParameter.Optional }
+           );
+
+            routes.MapRoute(
+               name: "DarColaboradoresTiemposProyecto",
+               url: "user/dar-colaboradores-tiempo-proyectos/{id}",
+               defaults: new { controller = "User", action = "DarColaboradoresTiemposProyecto", id = UrlParameter.Optional }
+           );
+
+            routes.MapRoute(
+               name: "AgregarTiemposProyecto",
+               url: "user/agregar-tiempo-proyecto/{id}",
+               defaults: new { controller = "User", action = "AgregarTiemposProyecto", id = UrlParameter.Optional }
+           );
+
+            routes.MapRoute(
+              name: "CargarTiemposProyecto",
+              url: "user/cargar-tiempo-proyecto/{id}",
+              defaults: new { controller = "User", action = "CargarTiemposProyecto", id = UrlParameter.Optional }
+          );
+
+            routes.MapRoute(
+              name: "EliminarTiemposProyecto",
+              url: "user/eliminar-tiempos-proyecto/{id}",
+              defaults: new { controller = "User", action = "ElimnarTiemposProyecto", id = UrlParameter.Optional }
+          );
+
+            routes.MapRoute(
+              name: "EditarTiemposProyecto",
+              url: "user/editar-tiempos-proyecto/{id}",
+              defaults: new { controller = "User", action = "EditarTiemposProyecto", id = UrlParameter.Optional }
+          );
+
+            routes.MapRoute(
                 name: "TicketsUsuario",
                 url: "user/tickets-usuario/{id}",
                 defaults: new { controller = "User", action = "TicketsUsuario", id = UrlParameter.Optional }
