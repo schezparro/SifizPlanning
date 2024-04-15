@@ -698,8 +698,8 @@
                 else {
                     $scope.diasActividadTarea = $scope.diasActividad;
                 }
-                $scope.tieneContrato = data.tieneContrato;
-                $scope.tieneTicket = data.tieneTicket;
+                //$scope.tieneContrato = data.tieneContrato;
+                //$scope.tieneTicket = data.tieneTicket;
             }
             else {
                 messageDialog.show('Información', data.msg);
@@ -713,9 +713,9 @@
         ajaxActividadRealizadaTarea.success(function (data) {
             if (data.success === true) {
                 $scope.actividadesTarea = data.actividadesTarea;
-                $scope.numeroTicket = "";
-                $scope.entregable = "";
-                $scope.esTicket = true;
+                //$scope.numeroTicket = "";
+                //$scope.entregable = "";
+                //$scope.esTicket = true;
                 angular.element("#modal-final-tarea").modal("show");
             }
             else {
@@ -833,16 +833,16 @@
     });
 
     $scope.adicionarActividadTarea = function () {
-        if (!$scope.tieneContrato && !$scope.tieneTicket) {
-            if ($scope.esTicket && !$scope.numeroTicket) {
-                alert('El número de ticket es requerido.');
-                return;
-            }
-            if (!$scope.esTicket && !$scope.entregable) {
-                alert('Seleccione un contrato.');
-                return;
-            }
-        }
+        //if (!$scope.tieneContrato && !$scope.tieneTicket) {
+        //    if ($scope.esTicket && !$scope.numeroTicket) {
+        //        alert('El número de ticket es requerido.');
+        //        return;
+        //    }
+        //    if (!$scope.esTicket && !$scope.entregable) {
+        //        alert('Seleccione un contrato.');
+        //        return;
+        //    }
+        //}
 
         waitingDialog.show('Adicionando Actividad...', { dialogSize: 'sm', progressType: 'success' });
 
@@ -853,8 +853,8 @@
                 fecha: $scope.diaActividadTara,
                 horaInicio: $('[ng-model="horaInicioActividadTarea"]').val(),
                 horaFin: $('[ng-model="horaFinActividadTarea"]').val(),
-                ticketTarea: $scope.numeroTicket,
-                referencia: $scope.entregable
+                //ticketTarea: $scope.numeroTicket,
+                //referencia: $scope.entregable
             });
         adicionar.success(function (data) {
             waitingDialog.hide();
@@ -865,8 +865,8 @@
                 $scope.horaFinActividadTarea = "";
                 $scope.actividadesRealizadas = data.actividadesTarea;
                 $scope.tiempoUtilizado = data.totalHoras;
-                $scope.tieneTicket = data.tieneTicket;
-                $scope.tieneContrato = data.tieneContrato;
+                //$scope.tieneTicket = data.tieneTicket;
+                //$scope.tieneContrato = data.tieneContrato;
             }
             else {
                 messageDialog.show('Información', data.msg);
@@ -1135,10 +1135,8 @@
                 formData.append('adjuntos', fileInput.files[0]);
             });
 
-            formData.append('titulo', $scope.titulo);
             formData.append('rama', $scope.rama);
             formData.append('descripcion', descripcion);
-            formData.append('requiereQA', $scope.requiereQA);
             formData.append('tagsJson', JSON.stringify(tags));
             formData.append('adjuntoPublicacion', filePub.files[0]);
 
