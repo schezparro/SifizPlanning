@@ -361,8 +361,18 @@
                     <div class="clear"></div>
 
                     <div class="fila">
-                        <label>Referencia Ticket:</label>
-                        <input type="text" onkeyup="this.value=this.value.replace(/[^\d]/,'')" id="secuencial-ticket" class="form-control control-left" ng-model="ticketTarea" />
+                        <div class="left">
+                            <label>Referencia Ticket:</label>
+                            <input type="text" onkeyup="this.value=this.value.replace(/[^\d]/,'')" id="secuencial-ticket" class="form-control control-left" ng-model="ticketTarea" />
+
+                        </div>
+                        <div class="left">
+                            <input style="margin-top: 35px;" type="checkbox" ng-model="reproceso" ng-checked="reproceso"/>
+                            <label>
+                                Reproceso
+                            </label>
+                        </div>
+
                     </div>
                     <div class="clear"></div>
                 </div>

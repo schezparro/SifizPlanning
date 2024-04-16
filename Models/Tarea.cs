@@ -39,6 +39,7 @@ namespace SifizPlanning.Models
         public decimal HorasUtilizadas { get; set; }
         public int NumeroVerificador { get; set; }
         public Nullable<System.TimeSpan> TiempoEstimacion { get; set; }
+        public Nullable<decimal> EsReproceso { get; set; }
     
         public virtual Actividad actividad { get; set; }
         public virtual Cliente cliente { get; set; }
