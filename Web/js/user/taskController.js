@@ -1131,7 +1131,7 @@
             formData.append('idTarea', idTarea);
             formData.append('texto', $scope.textoEmail);
             formData.append('publicar', $scope.requierePublicacion);
-            angular.element.each(angular.element('#form-enviar-email-fin-ticket').find('[type="file"]'), function (pos, fileInput) {
+            angular.element.each(angular.element('#panel-adjuntos-email-ticket').find('[type="file"]'), function (pos, fileInput) {
                 formData.append('adjuntos', fileInput.files[0]);
             });
 
