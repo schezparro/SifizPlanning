@@ -4,6 +4,16 @@
     var start = 0;
     var length = 10;
 
+    $scope.nuevoTiempo = {
+        Servicio: "",
+        HorasServicio: "",
+        RP: "",
+        HorasConsumidas: "",
+        Detalle: "",
+        Colaborador: "",
+        FechaRegistro: ""        
+    };
+   
     $scope.cargarProyectos = function (start, lenght) {
         if (start === undefined)
             start = 0;
@@ -1045,7 +1055,7 @@
         formData.append("fechaRegistro", nuevoTiempo.FechaRegistro);
         formData.append('cliAux', $scope.projId);
                                                    
-        var ajaxOfertas = $http({
+        var ajaxTiempos = $http({
             method: 'POST',
             url: "user/agregar-tiempo-proyecto",
             data: formData,
@@ -1054,15 +1064,24 @@
             transformRequest: angular.identity
         });
 
-        ajaxOfertas.success(function (data) {
+        ajaxTiempos.success(function (data) {
             if (data.success === true) {
                 $scope.paginar()
+                $scope.nuevoTiempo = {
+                    catalogoServicio: "",
+                    horasServicio: "",
+                    Rp: "",
+                    horasConsumidas: "",
+                    detalle: "",
+                    colaborador: "",
+                    fechaRegistro: "",
+                    editable: false
+                };
 
             } else {
                 messageDialog.show("Información", data.msg);
             }
         });
-        $scope.adjunto = null;
     };
 
     var ajaxCatalogoServicios = $http.post("user/dar-catalogo-servicio-proyectos", {});
@@ -1151,7 +1170,7 @@
         formData.append("fechaRegistro", new Date(...tiempo.fechaRegistro.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)));
         
 
-        var ajaxOfertas = $http({
+        var ajaxTiemposPrj = $http({
             method: 'POST',
             url: "user/editar-tiempos-proyecto",
             data: formData,
@@ -1159,16 +1178,14 @@
             transformRequest: angular.identity
         });
 
-        ajaxOfertas.success(function (data) {
+        ajaxTiemposPrj.success(function (data) {
             if (data.success === true) {
                 $scope.paginar()
 
             } else {
                 messageDialog.show("Información", data.msg);
             }
-        });
-
-        $scope.adjunto = null;
+        });       
     };
 
     $scope.atrazarPagina = function () {
