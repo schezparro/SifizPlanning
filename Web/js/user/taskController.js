@@ -30,9 +30,12 @@
     var fileInputTemplate = angular.element("#htmlFile").html();
     var uniqueId = "adjunto-publicacion"; // Genera un ID único de alguna manera
     var fileInputWithId = fileInputTemplate.replace('<input type="file"', '<input type="file" id="' + uniqueId + '"');
+    var uniqueId2 = "adjunto-no-finalizado"; // Genera un ID único de alguna manera
+    var fileInputWithId2 = fileInputTemplate.replace('<input type="file"', '<input type="file" id="' + uniqueId2 + '"');
 
     // Añade la plantilla modificada al DOM
     angular.element("#panel-adjunto-publicacion").append(fileInputWithId);
+    angular.element("#panel-adjunto-no-finalizado").append(fileInputWithId2);
 
 
     angular.element(document).on('click', '[data-toggle="popover"]', function () {
@@ -1017,6 +1020,7 @@
 
     $scope.enviarComentarioNoTerminacion = function () {
         waitingDialog.show('Enviando comentario de no terminación...', { dialogSize: 'sm', progressType: 'success' });
+
         var finalizar = $http.post("user/guardar-comentario-no-terminacion",
             {
                 idTarea: $scope.idTareaTerminar,
@@ -1027,6 +1031,7 @@
         finalizar.success(function (data) {
             waitingDialog.hide();
             if (data.success === true) {
+                console.log($scope.causaNoTerminacion);
                 $scope.wind3Opciones.hide();
                 angular.element("#modal-comentario-no-terminacion").modal('hide');
                 //$scope.ejecutarFinalizarTarea();
