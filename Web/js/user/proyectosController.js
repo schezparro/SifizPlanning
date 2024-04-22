@@ -1092,8 +1092,9 @@
         }
     });
 
-    var ajaxCatalogoServicios = $http.post("user/dar-colaboradores-tiempo-proyectos", {});
+    //var ajaxCatalogoServicios = $http.post("user/dar-colaboradores-tiempo-proyectos", {});
 
+    var ajaxCatalogoServicios = $http.post("catalogos/dar-colaboradores", {});
     ajaxCatalogoServicios.success(function (data) {
         if (data.success === true) {
             $scope.colaboradores = data.colaboradores;
