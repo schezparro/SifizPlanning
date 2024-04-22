@@ -505,43 +505,86 @@
                         </select>
                     </div>
                     @*<div ng-show="actividadNoTerminacion == '2'">
-                        <label>Requiere Publicación:</label>
-                        <input type="checkbox" ng-model="requierePublicacion" ng-change="cambioRequierePublicacion()" />
-                    </div>
-                    <div ng-show="requierePublicacion">
-                        <div style="display: flex; align-items: center; vertical-align: middle">
-                            <label for="titulo">Nombre de la Rama:</label>
-                            <input type="text" style="min-width: 250px" class="form-control" ng-model="rama" ng-required="requierePublicacion">
+                            <label>Requiere Publicación:</label>
+                            <input type="checkbox" ng-model="requierePublicacion" ng-change="cambioRequierePublicacion()" />
                         </div>
-                        <div style="display: flex; align-items: center; vertical-align: middle">
-                            <label style="margin-top: 8px">Publicar Cliente:</label>
-                            <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="publicarCliente">
-                            <label style="margin-top: 8px" ng-show="publicarCliente">Actualizar Distribuidos:</label>
-                            <input style="margin-left: 8px; margin-right: 20px" ng-show="publicarCliente" type="checkbox" ng-model="actualizarDistribuidos">
-                        </div>
-
-                        <div style="display: flex; align-items: center; vertical-align: middle">
-                            <label style="margin-top: 8px">Publicar Servidor:</label>
-                            <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="publicarServidor">
-                            <label ng-show="publicarServidor">Servicios a actualizar:</label>
-                            <textarea ng-show="publicarServidor" style="min-width: 300px" type="text" class="form-control" ng-model="serviciosAActualizar"></textarea>
-                        </div>
-
-                        <div style="display: flex; align-items: center; vertical-align: middle">
-                            <label style="margin-top: 8px">Actualizar Base de Datos:</label>
-                            <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="actualizarDB">
-                            <label style="margin-top: 8px" ng-show="actualizarDB">ADJUNTO:</label>
-                            <div style="margin-left: 8px; margin-right: 20px; min-width: 150px;" ng-show="actualizarDB" id="panel-adjunto-publicacion">
-                                <span ng-show="actualizarDB" style="font-weight: bold; color: darkgoldenrod;">Más de uno, comprimir en uno solo archivo.</span>
+                        <div ng-show="requierePublicacion">
+                            <div style="display: flex; align-items: center; vertical-align: middle">
+                                <label for="titulo">Nombre de la Rama:</label>
+                                <input type="text" style="min-width: 250px" class="form-control" ng-model="rama" ng-required="requierePublicacion">
                             </div>
-                        </div>
-                    </div>*@
+                            <div style="display: flex; align-items: center; vertical-align: middle">
+                                <label style="margin-top: 8px">Publicar Cliente:</label>
+                                <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="publicarCliente">
+                                <label style="margin-top: 8px" ng-show="publicarCliente">Actualizar Distribuidos:</label>
+                                <input style="margin-left: 8px; margin-right: 20px" ng-show="publicarCliente" type="checkbox" ng-model="actualizarDistribuidos">
+                            </div>
+
+                            <div style="display: flex; align-items: center; vertical-align: middle">
+                                <label style="margin-top: 8px">Publicar Servidor:</label>
+                                <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="publicarServidor">
+                                <label ng-show="publicarServidor">Servicios a actualizar:</label>
+                                <textarea ng-show="publicarServidor" style="min-width: 300px" type="text" class="form-control" ng-model="serviciosAActualizar"></textarea>
+                            </div>
+
+                            <div style="display: flex; align-items: center; vertical-align: middle">
+                                <label style="margin-top: 8px">Actualizar Base de Datos:</label>
+                                <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="actualizarDB">
+                                <label style="margin-top: 8px" ng-show="actualizarDB">ADJUNTO:</label>
+                                <div style="margin-left: 8px; margin-right: 20px; min-width: 150px;" ng-show="actualizarDB" id="panel-adjunto-publicacion">
+                                    <span ng-show="actualizarDB" style="font-weight: bold; color: darkgoldenrod;">Más de uno, comprimir en uno solo archivo.</span>
+                                </div>
+                            </div>
+                        </div>*@
                     <div>
                         <label>Causa de la no terminación:</label>
                         <select class="form-control" ng-model="causaNoTerminacion" ng-required="true">
                             <option ng-repeat="causa in causasNoTerminacion" value="{{causa.id}}">{{causa.nombre}}</option>
                         </select>
                     </div>
+                    <div ng-show="causaNoTerminacion == 6">
+                        <label>Requiere Publicación:</label>
+                        <input type="checkbox" ng-model="requierePublicacionNT" />
+                    </div>
+                    <div ng-show="requierePublicacionNT">
+                        <div style="display: flex; align-items: center; vertical-align: middle">
+                            <label for="titulo">Nombre de la Rama:</label>
+                            <input type="text" style="min-width: 250px" class="form-control" ng-model="ramaNT" ng-required="requierePublicacionNT">
+                        </div>
+                        <div style="display: flex; align-items: center; vertical-align: middle">
+                            <label style="margin-top: 8px">Publicar Cliente:</label>
+                            <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="publicarClienteNT">
+                            <label style="margin-top: 8px" ng-show="publicarClienteNT">Actualizar Distribuidos:</label>
+                            <input style="margin-left: 8px; margin-right: 20px" ng-show="publicarClienteNT" type="checkbox" ng-model="actualizarDistribuidosNT">
+                        </div>
+
+                        <div style="display: flex; align-items: center; vertical-align: middle">
+                            <label style="margin-top: 8px">Publicar Servidor:</label>
+                            <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="publicarServidorNT">
+                            <label ng-show="publicarServidorNT">Servicios a actualizar:</label>
+                            <textarea ng-show="publicarServidorNT" style="min-width: 300px" type="text" class="form-control" ng-model="serviciosAActualizarNT"></textarea>
+                        </div>
+
+                        <div style="display: flex; align-items: center; vertical-align: middle">
+                            <label style="margin-top: 8px">Actualizar Base de Datos:</label>
+                            <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="actualizarDBNT">
+                            <label style="margin-top: 8px" ng-show="actualizarDBNT">ADJUNTO:</label>
+                            <div style="margin-left: 8px; margin-right: 20px; min-width: 150px;" ng-show="actualizarDBNT" id="panel-adjunto-no-finalizado">
+                                <span ng-show="actualizarDBNT" style="font-weight: bold; color: darkgoldenrod;">Más de uno, comprimir en uno solo archivo.</span>
+                            </div>
+                        </div>
+
+                        <div id="htmlFile2" class="invisible">
+                            <div class="file-adj-contrato">
+                                <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                                    <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
+                                    <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
+                                    <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div>
                         <label>Comentario:</label>
                         <textarea class="form-control" ng-model="comentarioNoTerminacion" rows="12" ng-required="true"></textarea>

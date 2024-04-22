@@ -30,10 +30,12 @@
     var fileInputTemplate = angular.element("#htmlFile").html();
     var uniqueId = "adjunto-publicacion"; // Genera un ID único de alguna manera
     var fileInputWithId = fileInputTemplate.replace('<input type="file"', '<input type="file" id="' + uniqueId + '"');
-
-    // Añade la plantilla modificada al DOM
     angular.element("#panel-adjunto-publicacion").append(fileInputWithId);
 
+    var fileInputTemplate2 = angular.element("#htmlFile2").html();
+    var uniqueId2 = "adjunto-no-finalizado"; // Genera un ID único de alguna manera
+    var fileInputWithId2 = fileInputTemplate.replace('<input type="file"', '<input type="file" id="' + uniqueId2 + '"');
+    angular.element("#panel-adjunto-no-finalizado").append(fileInputWithId2);
 
     angular.element(document).on('click', '[data-toggle="popover"]', function () {
         var obj = this;
@@ -1017,12 +1019,46 @@
 
     $scope.enviarComentarioNoTerminacion = function () {
         waitingDialog.show('Enviando comentario de no terminación...', { dialogSize: 'sm', progressType: 'success' });
+
+        var descripcion = '';
+        var tags = [];
+
+        if ($scope.publicarClienteNT) {
+            descripcion += 'Se va a publicar el cliente. ';
+            tags.push('CLIENTE');
+            if ($scope.actualizarDistribuidos) {
+                descripcion += 'Se va a actualizar los distribuidos. ';
+            }
+        }
+
+        if ($scope.publicarServidorNT) {
+            descripcion += 'Se va a publicar el servidor. ';
+            tags.push('SERVIDOR');
+            descripcion += 'Los servicios a publicar son: ' + $scope.serviciosAActualizarNT + '. ';
+        }
+
+        if ($scope.actualizarDBNT) {
+            descripcion += 'Se va a actualizar la base de datos. ';
+            tags.push('BASE DE DATOS');
+        }
+        var filePub = angular.element('#adjunto-no-finalizado')[0];
+
+        var formData = new FormData();
+        formData.append('idTarea', $scope.idTareaTerminar);
+        formData.append('proximaActividad', $scope.actividadNoTerminacion);
+        formData.append('causaNT', $scope.causaNoTerminacion);
+        formData.append('comentario', $scope.comentarioNoTerminacion);
+        formData.append('publicar', $scope.requierePublicacionNT);
+        formData.append('rama', $scope.ramaNT);
+        formData.append('descripcion', descripcion);
+        formData.append('tagsJson', JSON.stringify(tags));
+        formData.append('adjuntoPublicacion', filePub.files[0]);
+
+
         var finalizar = $http.post("user/guardar-comentario-no-terminacion",
+            formData,
             {
-                idTarea: $scope.idTareaTerminar,
-                proximaActividad: $scope.actividadNoTerminacion,
-                causaNT: $scope.causaNoTerminacion,
-                comentario: $scope.comentarioNoTerminacion
+                headers: { 'Content-Type': undefined }
             });
         finalizar.success(function (data) {
             waitingDialog.hide();
@@ -1035,6 +1071,7 @@
                     taskProxie.server.actualizarTareas();
                 });
                 $scope.tiempoUtilizado = '';
+
                 if (!aplicarFiltro)
                     actualizarDatosTarea($scope.fechaLunes);
                 else

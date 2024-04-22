@@ -1390,7 +1390,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult guardarComentarioNoTerminacion(int idTarea, int proximaActividad, int causaNT, string comentario)
+        public async Task<ActionResult> guardarComentarioNoTerminacion(int idTarea, int proximaActividad, int causaNT, string comentario, bool publicar = false, string rama = "", string descripcion = "", string tagsJson = "", HttpPostedFileBase[] adjuntoPublicacion = null)
         {
             try
             {
@@ -1531,6 +1531,74 @@ namespace SifizPlanning.Controllers
                 };
                 db.HistoricoInformacionTicket.Add(historicoCorreoTicket);
                 db.SaveChanges();
+
+                if (publicar)
+                {
+                    string tituloP = "TCK-" + ticket.Secuencial;
+                    string ramaP = rama;
+                    string requiereQAP = "SI";
+                    string clienteP = personaCliente.persona_cliente.cliente.Codigo;
+                    string colaboradorP = user.persona.Nombre1 + " " + user.persona.Apellido1;
+                    string descripcionP = descripcion;
+                    string[] tagsP = JsonConvert.DeserializeObject<string[]>(tagsJson);
+                    string key = ConfigurationManager.AppSettings.Get("Devops");
+
+                    var client = new HttpClient();
+                    var requestUrl = "https://api-publicaciones.sifizsoft.com/api/AsignacionPublicacion/AsignarTareaDePublicacion";
+
+                    var data = new MultipartFormDataContent();
+
+                    data.Add(new StringContent(clienteP), "Cliente");
+                    data.Add(new StringContent(tituloP), "Titulo");
+                    data.Add(new StringContent(descripcionP), "Descripcion");
+                    data.Add(new StringContent(colaboradorP), "NombreSolicitante");
+                    data.Add(new StringContent(string.Join(",", tagsP)), "Tags");
+                    data.Add(new StringContent(destinos), "NotificarA");
+                    data.Add(new StringContent(ramaP), "NombreRama");
+                    data.Add(new StringContent(requiereQAP), "RequiereQA");
+                    data.Add(new StringContent(""), "URLSifizPlanning");
+                    data.Add(new StringContent(key), "Key");
+
+                    if (adjuntoPublicacion != null)
+                    {
+                        foreach (var adjunto in adjuntoPublicacion)
+                        {
+                            var stream = adjunto.InputStream;
+                            data.Add(new StreamContent(stream), "ArchivoAdjunto", adjunto.FileName);
+                        }
+                    }
+
+                    var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+                    requestMessage.Content = data;
+
+                    var response = await client.SendAsync(requestMessage);
+
+                    string mensajeDevops;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        mensajeDevops = "Devops se consumió correctamente";
+                    }
+                    else
+                    {
+                        string textoEmailDevops = @"<div class='textoCuerpo'><br/>";
+                        textoEmailDevops += @"<br/>";
+                        textoEmailDevops += @"<br/><i>Ha ocurrido un error en el consumo de la api de devops.</i>";
+                        textoEmailDevops += @"<br/><i>La funcionalidad AsignarTareaDePublicacion del APISifizOps tuvo un error por favor revisar</i>";
+                        textoEmailDevops += @"<br/><i>Detalles:</i>";
+                        textoEmailDevops += @"<br/>";
+                        textoEmailDevops += response.StatusCode.ToString() + ": " + response.ReasonPhrase.ToString();
+                        textoEmailDevops += @"</div>";
+
+                        string emailClienteDevops = "sfzdevops@sifizsoft.com";
+
+                        List<string> correosDestinosDevops = new List<string>();
+                        correosDestinosDevops.Add(emailClienteDevops);
+                        correosDestinosDevops.Add("rsanchez@sifizsoft.com");
+
+                        string asuntoEmailDevops = "Notificación error Api Devops";
+                        Utiles.EnviarEmailSistema(correosDestinosDevops.ToArray(), textoEmailDevops, asuntoEmailDevops);
+                    }
+                }
 
                 var resp = new
                 {
@@ -2036,7 +2104,7 @@ namespace SifizPlanning.Controllers
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
         public ActionResult DarActividadesTarea(int idTarea)
-           {
+        {
             try
             {
                 var tar = db.Tarea.Find(idTarea);
