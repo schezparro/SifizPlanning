@@ -41,6 +41,7 @@
     $scope.diasActividadTarea = [];
     $scope.diasActividad = [];
     $scope.diasActividadCord = [];
+    $scope.reproceso = null;
     //Cargando los dias de tareas desde el negocio
     var ajaxDiasDeTareas = $http.post("task/dias-actividades-tareas", {});
     ajaxDiasDeTareas.success(function (data) {
@@ -237,6 +238,7 @@
                 $scope.nuevaTareaExtraordinaria = data.extraordinaria;
                 $scope.ticketTarea = data.ticketTarea != 0 ? data.ticketTarea : '';
                 $scope.edicionTareaExtraordinaria = true;
+                $scope.reproceso = data.tarea.esReproceso;
 
                 $scope.cargarMotivosTrabajo(function () {
                     setTimeout(function () {
@@ -704,6 +706,7 @@
         $scope.nuevaTareaExtraordinaria = true;
         $scope.edicionTareaExtraordinaria = false;
         $scope.ticketTarea = "";
+        $scope.reproceso = false;
         angular.element("#modalNewTask").modal('show');
     };
 
@@ -836,6 +839,7 @@
         formData.append('ticketTarea', $scope.ticketTarea != '' ? $scope.ticketTarea : 0);
         formData.append('idTarea', $scope.idTarea);
         formData.append('verificador', $scope.verificadorTarea);
+        formData.append('esReproceso', $scope.reproceso);
 
         var newTask = $http.post("task/nueva-tarea",
             formData,

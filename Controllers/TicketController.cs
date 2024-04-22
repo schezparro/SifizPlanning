@@ -2168,6 +2168,7 @@ namespace SifizPlanning.Controllers
                     oferta.HorasEstimacion = ticket.Estimacion;
                     oferta.FechaDisponibilidad = new DateTime(0001 / 01 / 01);
                     oferta.FechaProduccion = new DateTime(0001 / 01 / 01);
+                    oferta.FechaAprobacion = new DateTime(0001 / 01 / 01);
                     oferta.FechaRegistro = DateTime.Now;
 
                     //Agregar el ultimo adjunot del ticket a la oferta
