@@ -8,14 +8,16 @@
     <table id="tabla-user-proyectos" class="table table-striped">
         <thead>
             <tr>
-                <th>CLIENTE</th>
-                <th>SIGLAS</th>
-                <th>REPOSITORIO</th>
-                <th>UBICACIÓN</th>
-                <th>RESPONSABLE OTORGAR ACCESO</th>
-                <th>RESPONSABLE INTEGRAR CÓDIGO</th>
-                <th>RESPONSABLE GENERAR PUBLICACIÓN</th>
-                <th>TIEMPOS</th>
+                <th>Cliente</th>
+                <th>Siglas</th>
+                <th>Repositorio</th>
+                <th>Ubicación</th>
+                <th>Resp. dar Acceso</th>
+                <th>Resp. Integrar Cód.</th>
+                <th>Resp. Generar Pub.</th>
+                <th>Tiempos</th>
+                <th>Cronograma</th>
+                <th>Informe</th>
             </tr>
         </thead>
 
@@ -29,13 +31,13 @@
                 <td>{{proyecto.responsableCodigo}}</td>
                 <td>{{proyecto.responsablePublicacion}}</td>
                 <td>
-                    <button type="button" class="btn btn-xs btn-primary" ng-click="abrirModalTiemposProyecto(proyecto.id)"><span class="glyphicon glyphicon-time"></span> Tiempos Proyecto</button>
+                    <button type="button" class="btn btn-xs btn-primary center-block" ng-click="abrirModalTiemposProyecto(proyecto.id)"><span class="glyphicon glyphicon-time"></span></button>
                 </td>
                 <td>
-                    <button type="button" class="btn btn-xs btn-primary" ng-click="abrirModalGenerarInforme(proyecto.id)"><span class="glyphicon glyphicon-calendar"></span> Registrar cronograma</button>
+                    <button type="button" class="btn btn-xs btn-primary center-block" ng-click="abrirModalGenerarInforme(proyecto.id)"><span class="glyphicon glyphicon-calendar"></span></button>
                 </td>
                 <td>
-                    <button type="button" class="btn btn-xs btn-primary" ng-click="abrirModalGenerarReporte(proyecto.id)"><span class="glyphicon glyphicon-ok"></span> Generar informe</button>
+                    <button type="button" class="btn btn-xs btn-primary center-block" ng-click="abrirModalGenerarReporte(proyecto.id)"><span class="glyphicon glyphicon-book"></span></button>
                 </td>
             </tr>
         </tbody>
@@ -750,7 +752,7 @@
                                         </div>
                                         <div class="right gestion-lista-ticket" style="padding: 22px 0px 0px 0px">
                                             <div>
-                                                <label>Total de Ofertas: </label>{{totalTiempos}}
+                                                <label>Total de Tiempos: </label>{{totalTiempos}}
                                             </div>
                                         </div>
 
