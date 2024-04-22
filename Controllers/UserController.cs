@@ -1077,7 +1077,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public async Task<ActionResult> EnviarEmailFinTicket(int idTarea, string texto, bool publicar = false, HttpPostedFileBase[] adjuntos = null, string titulo = "", string rama = "", string descripcion = "", bool requiereQA = false, string tagsJson = "", HttpPostedFileBase[] adjuntoPublicacion = null)
+        public async Task<ActionResult> EnviarEmailFinTicket(int idTarea, string texto, bool publicar = false, HttpPostedFileBase[] adjuntos = null, string rama = "", string descripcion = "", string tagsJson = "", HttpPostedFileBase[] adjuntoPublicacion = null)
         {
             try
             {
@@ -1208,9 +1208,9 @@ namespace SifizPlanning.Controllers
                     }
                     db.SaveChanges();
 
-                    string tituloP = titulo;
+                    string tituloP = "TCK-" + ticket.Secuencial;
                     string ramaP = rama;
-                    string requiereQAP = requiereQA ? "SI" : "NO";
+                    string requiereQAP = "NO";
                     string clienteP = personaCliente.cliente.Codigo;
                     string colaboradorP = user.persona.Nombre1 + " " + user.persona.Apellido1;
                     string descripcionP = descripcion;
@@ -1390,7 +1390,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult guardarComentarioNoTerminacion(int idTarea, int proximaActividad, int causaNT, string comentario)
+        public async Task<ActionResult> guardarComentarioNoTerminacion(int idTarea, int proximaActividad, int causaNT, string comentario, bool publicar = false, string rama = "", string descripcion = "", string tagsJson = "", HttpPostedFileBase[] adjuntoPublicacion = null)
         {
             try
             {
@@ -1531,6 +1531,74 @@ namespace SifizPlanning.Controllers
                 };
                 db.HistoricoInformacionTicket.Add(historicoCorreoTicket);
                 db.SaveChanges();
+
+                if (publicar)
+                {
+                    string tituloP = "TCK-" + ticket.Secuencial;
+                    string ramaP = rama;
+                    string requiereQAP = "SI";
+                    string clienteP = personaCliente.persona_cliente.cliente.Codigo;
+                    string colaboradorP = user.persona.Nombre1 + " " + user.persona.Apellido1;
+                    string descripcionP = descripcion;
+                    string[] tagsP = JsonConvert.DeserializeObject<string[]>(tagsJson);
+                    string key = ConfigurationManager.AppSettings.Get("Devops");
+
+                    var client = new HttpClient();
+                    var requestUrl = "https://api-publicaciones.sifizsoft.com/api/AsignacionPublicacion/AsignarTareaDePublicacion";
+
+                    var data = new MultipartFormDataContent();
+
+                    data.Add(new StringContent(clienteP), "Cliente");
+                    data.Add(new StringContent(tituloP), "Titulo");
+                    data.Add(new StringContent(descripcionP), "Descripcion");
+                    data.Add(new StringContent(colaboradorP), "NombreSolicitante");
+                    data.Add(new StringContent(string.Join(",", tagsP)), "Tags");
+                    data.Add(new StringContent(destinos), "NotificarA");
+                    data.Add(new StringContent(ramaP), "NombreRama");
+                    data.Add(new StringContent(requiereQAP), "RequiereQA");
+                    data.Add(new StringContent(""), "URLSifizPlanning");
+                    data.Add(new StringContent(key), "Key");
+
+                    if (adjuntoPublicacion != null)
+                    {
+                        foreach (var adjunto in adjuntoPublicacion)
+                        {
+                            var stream = adjunto.InputStream;
+                            data.Add(new StreamContent(stream), "ArchivoAdjunto", adjunto.FileName);
+                        }
+                    }
+
+                    var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+                    requestMessage.Content = data;
+
+                    var response = await client.SendAsync(requestMessage);
+
+                    string mensajeDevops;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        mensajeDevops = "Devops se consumió correctamente";
+                    }
+                    else
+                    {
+                        string textoEmailDevops = @"<div class='textoCuerpo'><br/>";
+                        textoEmailDevops += @"<br/>";
+                        textoEmailDevops += @"<br/><i>Ha ocurrido un error en el consumo de la api de devops.</i>";
+                        textoEmailDevops += @"<br/><i>La funcionalidad AsignarTareaDePublicacion del APISifizOps tuvo un error por favor revisar</i>";
+                        textoEmailDevops += @"<br/><i>Detalles:</i>";
+                        textoEmailDevops += @"<br/>";
+                        textoEmailDevops += response.StatusCode.ToString() + ": " + response.ReasonPhrase.ToString();
+                        textoEmailDevops += @"</div>";
+
+                        string emailClienteDevops = "sfzdevops@sifizsoft.com";
+
+                        List<string> correosDestinosDevops = new List<string>();
+                        correosDestinosDevops.Add(emailClienteDevops);
+                        correosDestinosDevops.Add("rsanchez@sifizsoft.com");
+
+                        string asuntoEmailDevops = "Notificación error Api Devops";
+                        Utiles.EnviarEmailSistema(correosDestinosDevops.ToArray(), textoEmailDevops, asuntoEmailDevops);
+                    }
+                }
 
                 var resp = new
                 {
@@ -1703,44 +1771,44 @@ namespace SifizPlanning.Controllers
                     throw new Exception("No se encontró la tarea, contacte el admin del sistema");
                 }
 
-                if (referencia != 0)
-                {
-                    EntregableMotivoTrabajo entregable = db.EntregableMotivoTrabajo.Find(referencia);
-                    if (entregable != null)
-                    {
-                        tar.entregableMotivoTrabajo = entregable;
-                        db.SaveChanges();
-                    }
-                }
+                //if (referencia != 0)
+                //{
+                //    EntregableMotivoTrabajo entregable = db.EntregableMotivoTrabajo.Find(referencia);
+                //    if (entregable != null)
+                //    {
+                //        tar.entregableMotivoTrabajo = entregable;
+                //        db.SaveChanges();
+                //    }
+                //}
 
-                var tieneContrato = false;
-                if (tar.entregableMotivoTrabajo != null)
-                {
-                    tieneContrato = true;
-                }
+                //var tieneContrato = false;
+                //if (tar.entregableMotivoTrabajo != null)
+                //{
+                //    tieneContrato = true;
+                //}
 
-                if (ticketTarea != 0)
-                {
-                    Ticket t = db.Ticket.Where(s => s.Secuencial == ticketTarea).FirstOrDefault();
-                    if (t != null)
-                    {
-                        db.TicketTarea.Add(new TicketTarea
-                        {
-                            SecuencialTarea = tar.Secuencial,
-                            SecuencialTicket = ticketTarea,
-                            EstaActiva = 1
-                        });
-                        db.SaveChanges();
-                    }
-                }
+                //if (ticketTarea != 0)
+                //{
+                //    Ticket t = db.Ticket.Where(s => s.Secuencial == ticketTarea).FirstOrDefault();
+                //    if (t != null)
+                //    {
+                //        db.TicketTarea.Add(new TicketTarea
+                //        {
+                //            SecuencialTarea = tar.Secuencial,
+                //            SecuencialTicket = ticketTarea,
+                //            EstaActiva = 1
+                //        });
+                //        db.SaveChanges();
+                //    }
+                //}
 
-                TicketTarea tt = db.TicketTarea.Where(s => s.SecuencialTarea == tar.Secuencial && s.EstaActiva == 1).FirstOrDefault();
+                //TicketTarea tt = db.TicketTarea.Where(s => s.SecuencialTarea == tar.Secuencial && s.EstaActiva == 1).FirstOrDefault();
 
-                var tieneTicket = false;
-                if (tt != null)
-                {
-                    tieneTicket = true;
-                }
+                //var tieneTicket = false;
+                //if (tt != null)
+                //{
+                //    tieneTicket = true;
+                //}
 
 
 
@@ -1878,9 +1946,9 @@ namespace SifizPlanning.Controllers
                 {
                     success = true,
                     actividadesTarea = actividadesListTarea,
-                    totalHoras = horasTarea + ":" + strMinutosRestaTarea,
-                    tieneContrato = tieneContrato,
-                    tieneTicket = tieneTicket
+                    totalHoras = horasTarea + ":" + strMinutosRestaTarea
+                    //tieneContrato = tieneContrato,
+                    //tieneTicket = tieneTicket
                 };
                 return Json(resp);
             }
@@ -2036,33 +2104,32 @@ namespace SifizPlanning.Controllers
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
         public ActionResult DarActividadesTarea(int idTarea)
-           {
+        {
             try
             {
                 var tar = db.Tarea.Find(idTarea);
 
-                List<string> elementos = new List<string>
-                    {
-                        "PROGRAMACIÓN",
-                        "CORRECCION",
-                        "ENTREGA",
-                        "LEVANTAMIENTO REQUERIMIENTOS",
-                        "TESTEO",
-                        "MIGRACIÓN",
-                        "CERTIFICACIÓN",
-                        "REVISIÓN",
-                        "SALIDA PRODUCCIÓN",
-                        "PARAMETRIZACIÓN",
-                        "PARALELOS"
-                    };
-                bool tieneContrato = false;
-                bool tieneTicket = false;
-                bool clienteSifiz = false;
+                //List<string> elementos = new List<string>
+                //    {
+                //        "PROGRAMACIÓN",
+                //        "CORRECCION",
+                //        "ENTREGA",
+                //        "LEVANTAMIENTO REQUERIMIENTOS",
+                //        "TESTEO",
+                //        "MIGRACIÓN",
+                //        "CERTIFICACIÓN",
+                //        "REVISIÓN",
+                //        "SALIDA PRODUCCIÓN",
+                //        "PARAMETRIZACIÓN",
+                //        "PARALELOS"
+                //    };
+                //bool tieneContrato = false;
+                //bool tieneTicket = false;
 
-                if (!elementos.Contains(tar.actividad.Descripcion))
-                {
-                    tieneContrato = true;
-                }
+                //if (!elementos.Contains(tar.actividad.Descripcion))
+                //{
+                //    tieneContrato = true;
+                //}
 
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
@@ -2072,26 +2139,26 @@ namespace SifizPlanning.Controllers
                     tareaPropia = true;
                 }
 
-                if (tar.entregableMotivoTrabajo != null)
-                {
-                    tieneContrato = true;
-                }
+                //if (tar.entregableMotivoTrabajo != null)
+                //{
+                //    tieneContrato = true;
+                //}
 
-                var ticketTarea = db.TicketTarea.Where(s => s.SecuencialTarea == idTarea).FirstOrDefault();
-                if (ticketTarea != null)
-                {
-                    tieneTicket = true;
-                }
+                //var ticketTarea = db.TicketTarea.Where(s => s.SecuencialTarea == idTarea).FirstOrDefault();
+                //if (ticketTarea != null)
+                //{
+                //    tieneTicket = true;
+                //}
 
-                var cliente = (from c in db.Cliente 
-                               join t in db.Tarea on c.Secuencial equals t.SecuencialCliente
-                               where t.Secuencial == idTarea && c.Descripcion.ToLower().Contains("sifizsoft")
-                               select c).FirstOrDefault();
+                //var cliente = (from c in db.Cliente 
+                //               join t in db.Tarea on c.Secuencial equals t.SecuencialCliente
+                //               where t.Secuencial == idTarea && c.Descripcion.ToLower().Contains("sifizsoft")
+                //               select c).FirstOrDefault();
 
-                if (cliente != null)
-                {
-                    clienteSifiz = true;
-                }
+                //if (cliente != null)
+                //{
+                //    clienteSifiz = true;
+                //}
 
 
                 var actividadesTarea = (from tActRel in db.TareaActividadRealizada
@@ -2141,10 +2208,9 @@ namespace SifizPlanning.Controllers
                     success = true,
                     actividadesTarea = actividadesListTarea,
                     totalHoras = horasTarea + ":" + strMinutosRestaTarea,
-                    tareaPropia = tareaPropia,
-                    tieneContrato = tieneContrato,
-                    tieneTicket = tieneTicket,
-                    clienteSifiz = clienteSifiz               
+                    tareaPropia = tareaPropia
+                    //tieneContrato = tieneContrato,
+                    //tieneTicket = tieneTicket
                 };
                 return Json(resp);
             }

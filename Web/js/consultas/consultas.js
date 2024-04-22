@@ -666,6 +666,11 @@ consultasApp.controller('mainConsultasController', ['$scope', '$http', function 
         language: 'es'
     });
 
+    angular.element('#fecha-aprobacion').datepicker({
+        format: 'dd/mm/yyyy',
+        language: 'es'
+    });
+
     angular.element('#adenda-fechaVencimiento').datepicker({
         format: 'dd/mm/yyyy'
     });

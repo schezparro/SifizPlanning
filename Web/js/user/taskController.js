@@ -30,10 +30,12 @@
     var fileInputTemplate = angular.element("#htmlFile").html();
     var uniqueId = "adjunto-publicacion"; // Genera un ID único de alguna manera
     var fileInputWithId = fileInputTemplate.replace('<input type="file"', '<input type="file" id="' + uniqueId + '"');
-
-    // Añade la plantilla modificada al DOM
     angular.element("#panel-adjunto-publicacion").append(fileInputWithId);
 
+    var fileInputTemplate2 = angular.element("#htmlFile2").html();
+    var uniqueId2 = "adjunto-no-finalizado"; // Genera un ID único de alguna manera
+    var fileInputWithId2 = fileInputTemplate.replace('<input type="file"', '<input type="file" id="' + uniqueId2 + '"');
+    angular.element("#panel-adjunto-no-finalizado").append(fileInputWithId2);
 
     angular.element(document).on('click', '[data-toggle="popover"]', function () {
         var obj = this;
@@ -697,11 +699,9 @@
                 }
                 else {
                     $scope.diasActividadTarea = $scope.diasActividad;
-                }               
-                $scope.tieneContrato = data.tieneContrato;
-                $scope.tieneTicket = data.tieneTicket;
-                $scope.clienteSifiz = data.clienteSifiz;
-
+                }
+                //$scope.tieneContrato = data.tieneContrato;
+                //$scope.tieneTicket = data.tieneTicket;
             }
             else {
                 messageDialog.show('Información', data.msg);
@@ -715,9 +715,9 @@
         ajaxActividadRealizadaTarea.success(function (data) {
             if (data.success === true) {
                 $scope.actividadesTarea = data.actividadesTarea;
-                $scope.numeroTicket = "";
-                $scope.entregable = "";
-                $scope.esTicket = true;
+                //$scope.numeroTicket = "";
+                //$scope.entregable = "";
+                //$scope.esTicket = true;
                 angular.element("#modal-final-tarea").modal("show");
             }
             else {
@@ -835,16 +835,16 @@
     });
 
     $scope.adicionarActividadTarea = function () {
-        if (!$scope.tieneContrato && !$scope.tieneTicket) {
-            if ($scope.esTicket && !$scope.numeroTicket) {
-                alert('El número de ticket es requerido.');
-                return;
-            }
-            if (!$scope.esTicket && !$scope.entregable) {
-                alert('Seleccione un contrato.');
-                return;
-            }
-        }
+        //if (!$scope.tieneContrato && !$scope.tieneTicket) {
+        //    if ($scope.esTicket && !$scope.numeroTicket) {
+        //        alert('El número de ticket es requerido.');
+        //        return;
+        //    }
+        //    if (!$scope.esTicket && !$scope.entregable) {
+        //        alert('Seleccione un contrato.');
+        //        return;
+        //    }
+        //}
 
         waitingDialog.show('Adicionando Actividad...', { dialogSize: 'sm', progressType: 'success' });
 
@@ -855,8 +855,8 @@
                 fecha: $scope.diaActividadTara,
                 horaInicio: $('[ng-model="horaInicioActividadTarea"]').val(),
                 horaFin: $('[ng-model="horaFinActividadTarea"]').val(),
-                ticketTarea: $scope.numeroTicket,
-                referencia: $scope.entregable
+                //ticketTarea: $scope.numeroTicket,
+                //referencia: $scope.entregable
             });
         adicionar.success(function (data) {
             waitingDialog.hide();
@@ -867,8 +867,8 @@
                 $scope.horaFinActividadTarea = "";
                 $scope.actividadesRealizadas = data.actividadesTarea;
                 $scope.tiempoUtilizado = data.totalHoras;
-                $scope.tieneTicket = data.tieneTicket;
-                $scope.tieneContrato = data.tieneContrato;
+                //$scope.tieneTicket = data.tieneTicket;
+                //$scope.tieneContrato = data.tieneContrato;
             }
             else {
                 messageDialog.show('Información', data.msg);
@@ -1019,12 +1019,46 @@
 
     $scope.enviarComentarioNoTerminacion = function () {
         waitingDialog.show('Enviando comentario de no terminación...', { dialogSize: 'sm', progressType: 'success' });
+
+        var descripcion = '';
+        var tags = [];
+
+        if ($scope.publicarClienteNT) {
+            descripcion += 'Se va a publicar el cliente. ';
+            tags.push('CLIENTE');
+            if ($scope.actualizarDistribuidos) {
+                descripcion += 'Se va a actualizar los distribuidos. ';
+            }
+        }
+
+        if ($scope.publicarServidorNT) {
+            descripcion += 'Se va a publicar el servidor. ';
+            tags.push('SERVIDOR');
+            descripcion += 'Los servicios a publicar son: ' + $scope.serviciosAActualizarNT + '. ';
+        }
+
+        if ($scope.actualizarDBNT) {
+            descripcion += 'Se va a actualizar la base de datos. ';
+            tags.push('BASE DE DATOS');
+        }
+        var filePub = angular.element('#adjunto-no-finalizado')[0];
+
+        var formData = new FormData();
+        formData.append('idTarea', $scope.idTareaTerminar);
+        formData.append('proximaActividad', $scope.actividadNoTerminacion);
+        formData.append('causaNT', $scope.causaNoTerminacion);
+        formData.append('comentario', $scope.comentarioNoTerminacion);
+        formData.append('publicar', $scope.requierePublicacionNT);
+        formData.append('rama', $scope.ramaNT);
+        formData.append('descripcion', descripcion);
+        formData.append('tagsJson', JSON.stringify(tags));
+        formData.append('adjuntoPublicacion', filePub.files[0]);
+
+
         var finalizar = $http.post("user/guardar-comentario-no-terminacion",
+            formData,
             {
-                idTarea: $scope.idTareaTerminar,
-                proximaActividad: $scope.actividadNoTerminacion,
-                causaNT: $scope.causaNoTerminacion,
-                comentario: $scope.comentarioNoTerminacion
+                headers: { 'Content-Type': undefined }
             });
         finalizar.success(function (data) {
             waitingDialog.hide();
@@ -1037,6 +1071,7 @@
                     taskProxie.server.actualizarTareas();
                 });
                 $scope.tiempoUtilizado = '';
+
                 if (!aplicarFiltro)
                     actualizarDatosTarea($scope.fechaLunes);
                 else
@@ -1133,14 +1168,12 @@
             formData.append('idTarea', idTarea);
             formData.append('texto', $scope.textoEmail);
             formData.append('publicar', $scope.requierePublicacion);
-            angular.element.each(angular.element('#form-enviar-email-fin-ticket').find('[type="file"]'), function (pos, fileInput) {
+            angular.element.each(angular.element('#panel-adjuntos-email-ticket').find('[type="file"]'), function (pos, fileInput) {
                 formData.append('adjuntos', fileInput.files[0]);
             });
 
-            formData.append('titulo', $scope.titulo);
             formData.append('rama', $scope.rama);
             formData.append('descripcion', descripcion);
-            formData.append('requiereQA', $scope.requiereQA);
             formData.append('tagsJson', JSON.stringify(tags));
             formData.append('adjuntoPublicacion', filePub.files[0]);
 

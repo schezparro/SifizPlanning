@@ -1451,7 +1451,7 @@ namespace SifizPlanning.Controllers
 
 		[HttpPost]
 		[Authorize(Roles = "ADMIN")]
-		public JsonResult NuevaTarea(int idTrabajador, string fecha, int cliente, int ubicacion, int modulo, int actividad, int horas, int minutos, int horasEstimadas, int minutosEstimados, string detalle, int referencia = 0, int coordinador = 0, string repetir = "", int finSemana = 0, int repetirTipoFin = 0, int numVeces = 0, string fechaHasta = "", bool extraordinaria = false, int ticketTarea = 0, int idTarea = 0, int verificador = 0)
+		public JsonResult NuevaTarea(int idTrabajador, string fecha, int cliente, int ubicacion, int modulo, int actividad, int horas, int minutos, int horasEstimadas, int minutosEstimados, string detalle, int referencia = 0, int coordinador = 0, string repetir = "", int finSemana = 0, int repetirTipoFin = 0, int numVeces = 0, string fechaHasta = "", bool extraordinaria = false, int ticketTarea = 0, int idTarea = 0, int verificador = 0, bool esReproceso = false)
 		{
 			try
 			{
@@ -1494,8 +1494,10 @@ namespace SifizPlanning.Controllers
 						return Json(resp);
 					}
 
-					//Verificando si han cambiado o no al colaborador o la fecha
-					if(tarea.SecuencialColaborador != idTrabajador || diaTarea != tarea.FechaInicio.Date)//Hay un cambio en la asignacion de la tarea
+					tarea.EsReproceso = esReproceso == true ? 1 : 0;
+
+                    //Verificando si han cambiado o no al colaborador o la fecha
+                    if (tarea.SecuencialColaborador != idTrabajador || diaTarea != tarea.FechaInicio.Date)//Hay un cambio en la asignacion de la tarea
 					{
 						DateTime diaAnteriorTarea = tarea.FechaInicio.Date;
 						DateTime diaSiguienteTarea = diaAnteriorTarea.AddDays(1);
@@ -1652,7 +1654,7 @@ namespace SifizPlanning.Controllers
 						tarea.Detalle = detalle.ToUpper();
 						tarea.NumeroVerificador = verificador;
 						tarea.TiempoEstimacion = new TimeSpan(horasEstimadas, minutosEstimados, 0);
-
+						
 						if(referencia != 0)//Actualizar la referencia
 						{
 							if((tarea.entregableMotivoTrabajo != null && tarea.entregableMotivoTrabajo.Secuencial != referencia) || tarea.entregableMotivoTrabajo == null)
@@ -1904,12 +1906,14 @@ namespace SifizPlanning.Controllers
 								FechaFin = fechaFin,
 								HorasUtilizadas = 0,
 								NumeroVerificador = 1,
-								TiempoEstimacion = new TimeSpan(horasEstimadas, minutosEstimados, 0)
+								TiempoEstimacion = new TimeSpan(horasEstimadas, minutosEstimados, 0),
+								EsReproceso = esReproceso == true ? 1 : 0
 							};
 						}
 						else
 						{
-							return NuevaTarea(idTrabajador, diaSiguiente.ToString("dd/MM/yyyy"), cliente, ubicacion, modulo, actividad, horas, minutos, horasEstimadas, minutosEstimados, detalle, referencia, coordinador, repetir, finSemana, repetirTipoFin, numVeces, fechaHasta, extraordinaria, idTarea, verificador);
+							var esRepro = esReproceso == true ? 1 : 0;
+                            return NuevaTarea(idTrabajador, diaSiguiente.ToString("dd/MM/yyyy"), cliente, ubicacion, modulo, actividad, horas, minutos, horasEstimadas, minutosEstimados, detalle, referencia, coordinador, repetir, finSemana, repetirTipoFin, numVeces, fechaHasta, extraordinaria, idTarea, verificador, esRepro);
 						}
 					}
 					else
@@ -1955,8 +1959,9 @@ namespace SifizPlanning.Controllers
 							FechaFin = fechaFinExtra,
 							HorasUtilizadas = 0,
 							NumeroVerificador = 1,
-							TiempoEstimacion = new TimeSpan(horasEstimadas, minutosEstimados, 0)
-						};
+							TiempoEstimacion = new TimeSpan(horasEstimadas, minutosEstimados, 0),
+                            EsReproceso = esReproceso == true ? 1 : 0
+                        };
 					}
 
 					if(referencia != 0)//Actualizar la referencia
@@ -3962,6 +3967,7 @@ namespace SifizPlanning.Controllers
 							 estado = t.SecuencialEstadoTarea,
 							 verificador = t.NumeroVerificador,
 							 ubicacion = t.SecuencialLugarTarea,
+							 esReproceso = t.EsReproceso == 1 ? true : false,
 							 coordinador = (from tc in db.Tarea_Coordinador
 											where tc.SecuencialTarea == t.Secuencial && tc.EstaActivo == 1
 											select tc.SecuencialColaborador).FirstOrDefault()

@@ -916,6 +916,7 @@
           <Property Name="HORASUTILIZADAS" Type="decimal" Precision="18" Scale="2" Nullable="false" />
           <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
           <Property Name="TiempoEstimacion" Type="time" Precision="0" />
+          <Property Name="ESREPROCESO" Type="numeric" Precision="1" Scale="0" />
         </EntityType>
         <EntityType Name="TAREA_COORDINADOR">
           <Key>
@@ -1691,6 +1692,7 @@
           <Property Name="HORASESTIMACION" Type="int" Nullable="false" />
           <Property Name="FECHAPRODUCCION" Type="date" />
           <Property Name="ADJUNTO" Type="varchar" MaxLength="255" />
+          <Property Name="FECHAAPROBACION" Type="date" />
         </EntityType>
         <EntityType Name="PERSONA_CLIENTE">
           <Key>
@@ -9211,6 +9213,7 @@
           <NavigationProperty Name="tareaMantenimiento" Relationship="SifizPlanningModel.FK_TAREAMANTENIMIENTO_TAREA" FromRole="Tarea" ToRole="TAREAMANTENIMIENTO" />
           <NavigationProperty Name="TAREAMANTENIMIENTOBORRAR" Relationship="SifizPlanningModel.FK_TAREAMANTENIMIENTOBORRAR_TAREA" FromRole="Tarea" ToRole="TAREAMANTENIMIENTOBORRAR" />
           <Property Name="TiempoEstimacion" Type="Time" Precision="0" />
+          <Property Name="EsReproceso" Type="Decimal" Precision="1" Scale="0" />
         </EntityType>
         <Association Name="RefACTIVIDAD22">
           <End Type="SifizPlanningModel.Actividad" Role="Actividad" Multiplicity="1" />
@@ -12159,6 +12162,7 @@
           <NavigationProperty Name="colaborador" Relationship="SifizPlanningModel.FK_OFERTAS_COLABORADOR" FromRole="OFERTAS" ToRole="Colaborador" />
           <Property Name="FechaProduccion" Type="DateTime" Precision="0" />
           <Property Name="Adjunto" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="FechaAprobacion" Type="DateTime" Precision="0" />
         </EntityType>
         <Association Name="FK_OFERTAS_CLIENTE">
           <End Type="SifizPlanningModel.Cliente" Role="Cliente" Multiplicity="1" />
@@ -13601,6 +13605,7 @@
           <EntitySetMapping Name="Tarea">
             <EntityTypeMapping TypeName="SifizPlanningModel.Tarea">
               <MappingFragment StoreEntitySet="TAREA">
+                <ScalarProperty Name="EsReproceso" ColumnName="ESREPROCESO" />
                 <ScalarProperty Name="TiempoEstimacion" ColumnName="TiempoEstimacion" />
                 <ScalarProperty Name="NumeroVerificador" ColumnName="NUMEROVERIFICADOR" />
                 <ScalarProperty Name="HorasUtilizadas" ColumnName="HORASUTILIZADAS" />
@@ -14699,6 +14704,7 @@
           <EntitySetMapping Name="Ofertas">
             <EntityTypeMapping TypeName="SifizPlanningModel.Ofertas">
               <MappingFragment StoreEntitySet="OFERTAS">
+                <ScalarProperty Name="FechaAprobacion" ColumnName="FECHAAPROBACION" />
                 <ScalarProperty Name="Adjunto" ColumnName="ADJUNTO" />
                 <ScalarProperty Name="FechaProduccion" ColumnName="FECHAPRODUCCION" />
                 <ScalarProperty Name="HorasEstimacion" ColumnName="HORASESTIMACION" />
