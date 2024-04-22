@@ -202,5 +202,7 @@ namespace SifizPlanning.Models
         public virtual DbSet<SubEtapasProyectosCliente> SUBETAPASPROYECTOSCLIENTE { get; set; }
         public virtual DbSet<IncidenciasRecursos> IncidenciasRecursos { get; set; }
         public virtual DbSet<RecursosAsistencia> RecursosAsistencia { get; set; }
+        public virtual DbSet<ServicioImplantacionCore> ServicioImplantacionCore { get; set; }
+        public virtual DbSet<TiemposProyecto> TiemposProyecto { get; set; }
     }
 }

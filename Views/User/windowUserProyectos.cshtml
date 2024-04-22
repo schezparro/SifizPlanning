@@ -15,6 +15,7 @@
                 <th>RESPONSABLE OTORGAR ACCESO</th>
                 <th>RESPONSABLE INTEGRAR CÓDIGO</th>
                 <th>RESPONSABLE GENERAR PUBLICACIÓN</th>
+                <th>TIEMPOS</th>
             </tr>
         </thead>
 
@@ -27,6 +28,9 @@
                 <td>{{proyecto.responsableAcceso}}</td>
                 <td>{{proyecto.responsableCodigo}}</td>
                 <td>{{proyecto.responsablePublicacion}}</td>
+                <td>
+                    <button type="button" class="btn btn-xs btn-primary" ng-click="abrirModalTiemposProyecto(proyecto.id)"><span class="glyphicon glyphicon-time"></span> Tiempos Proyecto</button>
+                </td>
                 <td>
                     <button type="button" class="btn btn-xs btn-primary" ng-click="abrirModalGenerarInforme(proyecto.id)"><span class="glyphicon glyphicon-calendar"></span> Registrar cronograma</button>
                 </td>
@@ -681,4 +685,170 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de Tiempos Proyecto -->
+<div class="modal fade" id="modal-tiempos-proyecto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
+    <div class="modal-dialog modal-lg" modal-fullscreen" role="document" style="width: 100%; height: 100%; margin: 0; padding: 0; max-width: none;" role="document">
+        <div class="modal-content" style="overflow:hidden">
+            <div class="modal-header" style="padding: 10px, 10px">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><span class="glyphicon glyphicon-time" aria-hidden="true"></span> Gestión de tiempos del proyecto </h4>
+            </div>
+
+            <div class="modal-body">             
+                <div class="panel-body" style="max-height: 490px; overflow-y: auto;">
+                    <input hidden ng-model="projId" />
+                    <input type="text" ng-model-options='{ debounce: 1000 }' ng-change="cargarTiemposProyecto()" ng-model="filtroTiempos" class="form-control right filtro" placeholder="Filtrar..." />
+                    <table id="tabla-tiempos-proyecto" class="table table-striped table-hover table-condensed" style=" width: 100% ">
+                        <thead>
+                            <tr>
+                                <th>Servicio</th>
+                                <th>Horas Servicio</th>
+                                <th>R/P</th>
+                                <th>Horas Consumidas</th>
+                                <th>Detalle</th>
+                                <th>Colaborador</th>
+                                <th>Fecha</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th colspan="9">
+                                    <div class="padding-lr-10">
+                                        <div class="left">
+                                            <nav>
+                                                <ul class="pagination">
+                                                    <li ng-click="atrazarPagina()">
+                                                        <a href="#" aria-label="Previous">
+                                                            <span aria-hidden="true">&laquo;</span>
+                                                        </a>
+                                                    </li>
+                                                    <li ng-repeat="pagina in listaPaginasTiempos" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
+                                                    <li ng-click="avanzarPagina()">
+                                                        <a href="#" aria-label="Next">
+                                                            <span aria-hidden="true">&raquo;</span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </nav>
+                                        </div>
+
+                                        <div class="left form-inline gestion-lista-ticket" ng-init="cantidadMostrarPorPagina = 10" style="padding: 22px 0px 0px 0px">
+                                            <label>Cantidad Por Página:</label>
+                                            <select class="form-control" ng-model="cantidadMostrarPorPagina" ng-change="actualizarCantidadMostrar()">
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="50">50</option>
+                                                <option value="100">100</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="right gestion-lista-ticket" style="padding: 22px 0px 0px 0px">
+                                            <div>
+                                                <label>Total de Páginas: </label>{{cantPaginasTiempos}}
+                                            </div>
+                                        </div>
+                                        <div class="right gestion-lista-ticket" style="padding: 22px 0px 0px 0px">
+                                            <div>
+                                                <label>Total de Ofertas: </label>{{totalTiempos}}
+                                            </div>
+                                        </div>
+
+                                        <div class="clear"></div>
+                                    </div>
+                                </th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            <tr>                               
+                                <td>
+                                    <select id="catalogo-servicio" ng-class="'form-control'" ng-model="nuevoTiempo.catalogoServicio" ng-options="servicio.id as (servicio.descripcion | limitTo: 30) for servicio in servicios">
+                                        <option value="">Seleccione...</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input id="hora-servicio" ng-class="'form-control'" type="number" ng-model="nuevoTiempo.horasServicio">
+                                </td>
+                                <td>
+                                    <select id="RP" ng-class="'form-control'" ng-model="nuevoTiempo.Rp">
+                                        <option value="">Seleccione...</option>
+                                        <option value="R">R</option>
+                                        <option value="P">P</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input id="horas-consumidas" ng-class="'form-control'" type="number" ng-model="nuevoTiempo.horasConsumidas">
+                                </td>
+                                <td>
+                                    <input id="detalle-nuevo-tiempo" ng-class="'form-control'" type="text" ng-model="nuevoTiempo.detalle">
+                                </td>
+                                <td>
+                                    <select id="colaborador-nuevo-tiempo" ng-class="'form-control'" ng-model="nuevoTiempo.colaborador" ng-options="colaborador.id as (colaborador.nombre | limitTo: 30) for colaborador in colaboradores">
+                                        <option value="">Seleccione...</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input id="fecha-registro" ng-class="'form-control'" ng-model="nuevoTiempo.fechaRegistro">
+                                </td>
+
+                                <td>
+                                    <Button class="form-control btn btn-primary" ng-click="agregarTiempos()">Añadir</Button>
+                                </td>
+                            </tr>
+                            <tr ng-repeat="tiempo in tmpProyecto">
+                                <td hidden>
+                                    <input type="text" ng-model="tiempo.id">
+                                </td>
+                                <td>
+                                    <span ng-hide="tiempo.editable">{{ tiempo.servicio.descripcion}}</span>
+                                    <select id="catalogo-servicio-tiempo" ng-class="'form-control'" ng-show="tiempo.editable" ng-model="tiempo.servicio.id" ng-options="servicio.id as (servicio.descripcion | limitTo: 30) for servicio in servicios"></select>
+                                </td>
+                                <td>
+                                    <span ng-hide="tiempo.editable">{{ tiempo.horasServicio}}</span>
+                                    <input id="hora-servicio-tiempo" ng-class="'form-control'" type="number" ng-show="tiempo.editable" ng-model="tiempo.horasServicio">
+                                </td>
+                                <td>
+                                    <span ng-hide="tiempo.editable">{{ tiempo.rp}}</span>
+                                    <select id="RP-tiempo" ng-class="'form-control'" ng-show="tiempo.editable" ng-model="tiempo.rp">
+                                        <option value="">Seleccione...</option>
+                                        <option value="R">R</option>
+                                        <option value="P">P</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <span ng-hide="tiempo.editable">{{ tiempo.horasConsumidas}}</span>
+                                    <input id="horas-consumidas-tiempo" ng-class="'form-control'" type="number" ng-show="tiempo.editable" ng-model="tiempo.horasConsumidas">
+                                </td>
+                                <td>
+                                    <span ng-hide="tiempo.editable">{{ tiempo.detalle}}</span>
+                                    <input id="detalle-tiempo" ng-class="'form-control'" type="text" ng-show="tiempo.editable" ng-model="tiempo.detalle">
+                                </td>
+                                <td>
+                                    <span ng-hide="tiempo.editable">{{ tiempo.colaborador.nombre}}</span>
+                                    <select id="colaborador-tiempo" ng-class="'form-control'" ng-show="tiempo.editable" ng-model="tiempo.colaborador.id" ng-options="colaborador.id as (colaborador.nombre | limitTo: 30) for colaborador in colaboradores"></select>
+                                </td>
+                                <td>
+                                    <span ng-hide="tiempo.editable">{{ tiempo.fechaRegistro | strDateToStr}}</span>
+                                    <input id="fecha-registro-{{$index}}" ng-class="'form-control'" ng-model="tiempo.fechaRegistro" ng-show="tiempo.editable">
+                                </td>
+                                <td>
+                                    <span style="margin-right: 10px;" ng-click="editarTiemposProyecto(tiempo, $index)" ng-hide="tiempo.editable">
+                                        <i class="glyphicon glyphicon-pencil"></i>
+                                    </span>
+                                    <span style="margin-right: 10px;" ng-click="guardarCambiosTiempo(tiempo)" ng-show="tiempo.editable">
+                                        <i class="glyphicon glyphicon-floppy-disk"></i>
+                                    </span>
+                                    <span style="margin-right: 10px;" ng-click="eliminarTiemposProyecto(tiempo.id)" ng-hide="oferta.editable">
+                                        <i class="glyphicon glyphicon-trash"></i>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+       </div>
+   </div>
+</div>
+
 

@@ -17,6 +17,7 @@ namespace SifizPlanning.Models
         public ClienteAuxiliar()
         {
             this.etapasProyectoCliente = new HashSet<EtapasProyectoCliente>();
+            this.TIEMPOSPROYECTO = new HashSet<TiemposProyecto>();
         }
     
         public int Secuencial { get; set; }
@@ -45,5 +46,6 @@ namespace SifizPlanning.Models
         public virtual VersionDesarrollo versionDesarrollo { get; set; }
         public virtual Cliente cliente { get; set; }
         public virtual ICollection<EtapasProyectoCliente> etapasProyectoCliente { get; set; }
+        public virtual ICollection<TiemposProyecto> TIEMPOSPROYECTO { get; set; }
     }
 }

@@ -138,6 +138,12 @@ devApp.controller('desarrolladoresController', ['$scope', '$http', 'filtroServic
         });
     };
 
+    //MANEJO DE LA FECHA EN EL MODAL DE TIEMPOS DEL PROYECTO
+    angular.element('#fecha-registro').datepicker({
+        format: 'dd/mm/yyyy',
+        language: 'es'
+    });
+
     //FIN DE LAS FUNCIONES DEL MENU
 
     //Funciones generales

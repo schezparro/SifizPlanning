@@ -1,7 +1,19 @@
 ﻿devApp.controller('proyectosController', ['$scope', '$http', function ($scope, $http) {
     var numerosPorPagina = 10;
     var pagina = 1;
+    var start = 0;
+    var length = 10;
 
+    $scope.nuevoTiempo = {
+        Servicio: "",
+        HorasServicio: "",
+        RP: "",
+        HorasConsumidas: "",
+        Detalle: "",
+        Colaborador: "",
+        FechaRegistro: ""        
+    };
+   
     $scope.cargarProyectos = function (start, lenght) {
         if (start === undefined)
             start = 0;
@@ -370,6 +382,12 @@
         });
     };
 
+    $scope.abrirModalTiemposProyecto = function (proyectoId) {
+        $scope.projId = proyectoId
+        $scope.cargarTiemposProyecto();
+        angular.element("#modal-tiempos-proyecto").modal("show");
+    };
+
     $scope.abrirModalGenerarInforme = function (proyectoId) {
         $scope.proyectoId = proyectoId
         $scope.cargarEtapas();
@@ -381,6 +399,7 @@
 
         $scope.cargarDatosInforme();
     };
+
 
     $scope.GuardarValor = function (tipo) {
 
@@ -692,6 +711,8 @@
         });
     };
 
+
+
     $scope.nombreFichero;
     $scope.pathFichero;
     $scope.generarInforme = function () {
@@ -995,6 +1016,230 @@
 
         return style;
     };
+
+    $scope.agregarTiempos = function () {
+        var servicioSeleccionado = 0;
+        var colaboradorSeleccionado = 0;
+        if ($scope.nuevoTiempo.catalogoServicio !== "") {
+            servicioSeleccionado = $scope.servicios.find(function (servicio) {
+                return servicio.id === $scope.nuevoTiempo.catalogoServicio;
+            });
+        }
+        if ($scope.nuevoTiempo.colaborador !== "") {
+            colaboradorSeleccionado = $scope.colaboradores.find(function (colaborador) {
+                return colaborador.id === $scope.nuevoTiempo.colaborador;
+            });
+        }
+
+             
+        var nuevoTiempo = {
+            Servicio: servicioSeleccionado,
+            HorasServicio: $scope.nuevoTiempo.horasServicio || 0,
+            RP: $scope.nuevoTiempo.Rp,
+            HorasConsumidas: $scope.nuevoTiempo.horasConsumidas || 0,
+            Detalle: $scope.nuevoTiempo.detalle,
+            Colaborador: colaboradorSeleccionado,
+            FechaRegistro: $scope.nuevoTiempo.fechaRegistro ?
+                new Date(...$scope.nuevoTiempo.fechaRegistro.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)) :
+                null,                                                   
+            editable: false
+        };
+      
+        var formData = new FormData();
+        formData.append("servicio", nuevoTiempo.Servicio.id);
+        formData.append("horasServicio", nuevoTiempo.HorasServicio);
+        formData.append("rp", nuevoTiempo.RP);
+        formData.append("horasConsumidas", nuevoTiempo.HorasConsumidas);
+        formData.append("detalle", nuevoTiempo.Detalle);
+        formData.append("colaborador", nuevoTiempo.Colaborador.id);
+        formData.append("fechaRegistro", nuevoTiempo.FechaRegistro);
+        formData.append('cliAux', $scope.projId);
+                                                   
+        var ajaxTiempos = $http({
+            method: 'POST',
+            url: "user/agregar-tiempo-proyecto",
+            data: formData,
+
+            headers: { 'Content-Type': undefined },
+            transformRequest: angular.identity
+        });
+
+        ajaxTiempos.success(function (data) {
+            if (data.success === true) {
+                $scope.paginar()
+                $scope.nuevoTiempo = {
+                    catalogoServicio: "",
+                    horasServicio: "",
+                    Rp: "",
+                    horasConsumidas: "",
+                    detalle: "",
+                    colaborador: "",
+                    fechaRegistro: "",
+                    editable: false
+                };
+
+            } else {
+                messageDialog.show("Información", data.msg);
+            }
+        });
+    };
+
+    var ajaxCatalogoServicios = $http.post("user/dar-catalogo-servicio-proyectos", {});
+
+    ajaxCatalogoServicios.success(function (data) {
+        if (data.success === true) {
+            $scope.servicios = data.servicios;
+        }
+    });
+
+    var ajaxCatalogoServicios = $http.post("user/dar-colaboradores-tiempo-proyectos", {});
+
+    ajaxCatalogoServicios.success(function (data) {
+        if (data.success === true) {
+            $scope.colaboradores = data.colaboradores;
+        }
+    });
+
+    $scope.cargarTiemposProyecto = function () {
+        var ajaxTiempo = $http.post("user/cargar-tiempo-proyecto", {
+            start: start,
+            length: length,
+            filtro: $scope.filtroTiempos,
+            idProyecto: $scope.projId
+        });
+
+        ajaxTiempo.success(function (data) {
+            if (data.success === true) {
+
+                $scope.tmpProyecto = data.tiempoProyecto;
+                $scope.totalTiempos = data.cantidad;
+
+                var posPagin = pagina;
+                $scope.cantPaginasTiempos = Math.ceil($scope.totalTiempos / numerosPorPagina);
+
+                if ($scope.cantPaginasTiempos === 0 || $scope.cantPaginasTiempos === undefined) {
+                    $scope.cantPaginasTiempos = 1;
+                }
+
+                $scope.listaPaginasTiempos = [];
+                if ($scope.cantPaginasTiempos > 5 && pagina <= 5) {
+                    for (var i = 1; i <= 5; i++) {
+                        $scope.listaPaginasTiempos.push(i);
+                    }
+                }
+                else if ($scope.cantPaginasTiempos <= 5) {
+                    for (var i = 1; i <= $scope.cantPaginasTiempos; i++) {
+                        $scope.listaPaginasTiempos.push(i);
+                    }
+                }
+                else if ($scope.cantPaginasTiempos > 5) {
+                    for (var i = pagina - 4; i <= pagina; i++) {
+                        $scope.listaPaginasTiempos.push(i);
+                    }
+                    posPagin = 5;
+                }
+
+                if (pagina > $scope.cantPaginasTiempos) {
+                    pagina = $scope.cantPaginasTiempos;
+                    posPagin = pagina;
+                }
+
+                setTimeout(function () {
+                    var listaPaginador = angular.element("#tabla-tiempos-proyecto .pagination li a");
+                    angular.element(listaPaginador).removeClass('pagSelect');
+                    angular.element(listaPaginador[posPagin]).addClass('pagSelect');
+                }, 300);
+            } else {
+                messageDialog.show("Información", data.msg);
+            }
+        })
+    };
+
+    $scope.guardarCambiosTiempo = function (tiempo) {
+        angular.element('#fecha-registro-' + tiempo.id).datepicker('destroy');
+        tiempo.editable = false;
+        
+        var formData = new FormData();
+        formData.append("ID", tiempo.id);
+        formData.append("servicio", tiempo.servicio.id);
+        formData.append("horasServicio", tiempo.horasServicio);
+        formData.append("rp", tiempo.rp);
+        formData.append("horasConsumidas", tiempo.horasConsumidas);
+        formData.append("detalle", tiempo.detalle);
+        formData.append("colaborador", tiempo.colaborador.id);
+        formData.append("fechaRegistro", new Date(...tiempo.fechaRegistro.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)));
+        
+
+        var ajaxTiemposPrj = $http({
+            method: 'POST',
+            url: "user/editar-tiempos-proyecto",
+            data: formData,
+            headers: { 'Content-Type': undefined },
+            transformRequest: angular.identity
+        });
+
+        ajaxTiemposPrj.success(function (data) {
+            if (data.success === true) {
+                $scope.paginar()
+
+            } else {
+                messageDialog.show("Información", data.msg);
+            }
+        });       
+    };
+
+    $scope.atrazarPagina = function () {
+        if (pagina > 1) {
+            pagina--;
+            $scope.paginar();
+        }
+    };
+
+    $scope.avanzarPagina = function () {
+        if (pagina < $scope.cantPaginasTiempos) {
+            pagina++;
+            $scope.paginar();
+        }
+    };
+
+    $scope.actualizarCantidadMostrar = function () {
+        numerosPorPagina = $scope.cantidadMostrarPorPagina;
+        $scope.paginar();
+    };
+
+    $scope.paginar = function () {
+        start = (pagina - 1) * numerosPorPagina;
+        length = numerosPorPagina;
+
+        $scope.cargarTiemposProyecto();
+    };
+
+
+    $scope.eliminarTiemposProyecto = function (id) {
+        var ajaxTmpProyecto = $http.post("user/eliminar-tiempos-proyecto", {
+            id: id
+        });
+
+        ajaxTmpProyecto.success(function (data) {
+            if (data.success === true) {
+                $scope.cargarTiemposProyecto()
+            } else {
+                messageDialog.show("Información", data.msg);
+            }
+        });
+    };
+
+
+    $scope.editarTiemposProyecto = function (tiempo, index) {
+        tiempo.editable = true;
+        tiempo.fechaRegistro = '';
+        angular.element('#fecha-registro-' + index).datepicker({
+            format: 'dd/mm/yyyy',
+            language: 'es'
+        });
+    };
+
+   
 }]);
 
 //Filters
@@ -1045,4 +1290,6 @@ devApp.filter("strLimit", ['$filter', function ($filter) {
         }
         return $filter('limitTo')(input, limit) + '...';
     };
+
+
 }]);

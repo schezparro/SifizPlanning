@@ -811,6 +811,9 @@
     <Compile Include="Models\SemaforoPrioridad.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ServicioImplantacionCore.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ServidorTFS.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
@@ -920,6 +923,9 @@
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\TiempoCerradoTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TiemposProyecto.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\TipoActa.cs">
@@ -1152,6 +1158,9 @@
     <Content Include="SCRIPTSDATABASE\TEMPSCRIPTS\NUEVOS CAMPOS - ETAPASPROYECTOCLIENTE.sql" />
     <Content Include="SCRIPTSDATABASE\TEMPSCRIPTS\NUEVOS CAMPOS - SUBETAPASPROYECTOSCLIENTE.sql" />
     <Content Include="SCRIPTSDATABASE\TEMPSCRIPTS\OFERTAMASIVATICKET.sql" />
+    <Content Include="SCRIPTSDATABASE\TEMPSCRIPTS\SERVICIOIMPLANTACIONCORE.sql" />
+    <Content Include="SCRIPTSDATABASE\TEMPSCRIPTS\TIEMPOSPROYECTO.sql" />
+    <Content Include="SCRIPTSDATABASE\TEMPSCRIPTS\TIEMPOSPROYECTO2.sql" />
     <Content Include="SCRIPTSDATABASE\TEMPSCRIPTS\OFERTAS_CAMPO_FECHAAPROBACION.sql" />
     <Content Include="SCRIPTSDATABASE\TEMPSCRIPTS\TAREAS_CAMPO_ESREPROCESO.sql" />
     <Content Include="Scripts\jquery-1.10.2.js" />

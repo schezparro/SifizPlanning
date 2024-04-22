@@ -796,6 +796,16 @@
           <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="SERVICIOIMPLANTACIONCORE">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CODIGO" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="DESCRIPCION" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="ESTAACTVO" Type="decimal" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="SOLICITUDPERMISOS">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
@@ -951,6 +961,8 @@
           <Property Name="HORAINICIO" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="HORAFIN" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="HORAOPERACION" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="SECUENCIALTICKET" Type="int" />
+          <Property Name="SECUENCIALCONTRATO" Type="int" />
         </EntityType>
         <EntityType Name="TAREACOMPENSATORIA">
           <Key>
@@ -1010,6 +1022,20 @@
           <Property Name="DESCRIPCION" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="TIEMPOSPROYECTO">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SECUENCIALSERVICIOIMPLANTACIONCORE" Type="int" Nullable="false" />
+          <Property Name="HORASSERVICIO" Type="int" Nullable="false" />
+          <Property Name="RP" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="HORASCONSUMIDAS" Type="int" Nullable="false" />
+          <Property Name="DETALLE" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="SECUENCIALCOLABORADOR" Type="int" Nullable="false" />
+          <Property Name="FECHA" Type="date" Nullable="false" />
+          <Property Name="SECUENCIALCLIENTEAUXILIAR" Type="int" />
         </EntityType>
         <EntityType Name="TipoActa">
           <Key>
@@ -1451,8 +1477,8 @@
           <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="SECUENCIALCLIENTEAUXILIAR" Type="int" />
           <Property Name="DETALLE" Type="varchar" MaxLength="255" />
-          <Property Name="SELECCIONADO" Type="numeric" Precision="1" Scale="0" />
           <Property Name="PORCIENTO" Type="float" />
+          <Property Name="SELECCIONADO" Type="numeric" Precision="1" Scale="0" />
         </EntityType>
         <EntityType Name="FLUJOESTADOTICKET">
           <Key>
@@ -1784,8 +1810,8 @@
           <Property Name="FECHACOMIENZO" Type="date" Nullable="false" />
           <Property Name="FECHAFIN" Type="date" Nullable="false" />
           <Property Name="DETALLE" Type="varchar" MaxLength="255" />
-          <Property Name="SELECCIONADO" Type="numeric" Precision="1" Scale="0" />
           <Property Name="PORCIENTO" Type="float" />
+          <Property Name="SELECCIONADO" Type="numeric" Precision="1" Scale="0" />
         </EntityType>
         <EntityType Name="TICKET">
           <Key>
@@ -2922,6 +2948,42 @@
             </Principal>
             <Dependent Role="TIEMPOCERRADOTICKET">
               <PropertyRef Name="SECUENCIALCLIENTE" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR">
+          <End Role="CLIENTEAUXILIAR" Type="Self.CLIENTEAUXILIAR" Multiplicity="0..1" />
+          <End Role="TIEMPOSPROYECTO" Type="Self.TIEMPOSPROYECTO" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CLIENTEAUXILIAR">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="TIEMPOSPROYECTO">
+              <PropertyRef Name="SECUENCIALCLIENTEAUXILIAR" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TIEMPOSPROYECTO_COLABORADOR1">
+          <End Role="COLABORADOR" Type="Self.COLABORADOR" Multiplicity="1" />
+          <End Role="TIEMPOSPROYECTO" Type="Self.TIEMPOSPROYECTO" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="COLABORADOR">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="TIEMPOSPROYECTO">
+              <PropertyRef Name="SECUENCIALCOLABORADOR" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TIEMPOSPROYECTO_SERVICIOIMPLANTACIONCORE">
+          <End Role="SERVICIOIMPLANTACIONCORE" Type="Self.SERVICIOIMPLANTACIONCORE" Multiplicity="1" />
+          <End Role="TIEMPOSPROYECTO" Type="Self.TIEMPOSPROYECTO" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SERVICIOIMPLANTACIONCORE">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="TIEMPOSPROYECTO">
+              <PropertyRef Name="SECUENCIALSERVICIOIMPLANTACIONCORE" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -5013,6 +5075,7 @@
           <EntitySet Name="Reporte" EntityType="Self.Reporte" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="RESPONSABLEPROYECTOS" EntityType="Self.RESPONSABLEPROYECTOS" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="SEDE" EntityType="Self.SEDE" Schema="TAREAS" store:Type="Tables" />
+          <EntitySet Name="SERVICIOIMPLANTACIONCORE" EntityType="Self.SERVICIOIMPLANTACIONCORE" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="SOLICITUDPERMISOS" EntityType="Self.SOLICITUDPERMISOS" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="SOLICITUDTAREA" EntityType="Self.SOLICITUDTAREA" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="SOLICITUDVACACIONES" EntityType="Self.SOLICITUDVACACIONES" Schema="TAREAS" store:Type="Tables" />
@@ -5031,6 +5094,7 @@
           <EntitySet Name="TAREAMANTENIMIENTO" EntityType="Self.TAREAMANTENIMIENTO" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="TAREAMANTENIMIENTOBORRAR" EntityType="Self.TAREAMANTENIMIENTOBORRAR" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="TECNOLOGIASYPROCESOS" EntityType="Self.TECNOLOGIASYPROCESOS" Schema="TAREAS" store:Type="Tables" />
+          <EntitySet Name="TIEMPOSPROYECTO" EntityType="Self.TIEMPOSPROYECTO" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="TipoActa" EntityType="Self.TipoActa" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="TIPOCAMPO" EntityType="Self.TIPOCAMPO" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="TIPOERROR" EntityType="Self.TIPOERROR" Schema="TAREAS" store:Type="Tables" />
@@ -5422,6 +5486,18 @@
           <AssociationSet Name="FK_TIEMPOCERRADOTICKET_CLIENTE" Association="Self.FK_TIEMPOCERRADOTICKET_CLIENTE">
             <End Role="CLIENTE" EntitySet="CLIENTE" />
             <End Role="TIEMPOCERRADOTICKET" EntitySet="TIEMPOCERRADOTICKET" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR" Association="Self.FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR">
+            <End Role="CLIENTEAUXILIAR" EntitySet="CLIENTEAUXILIAR" />
+            <End Role="TIEMPOSPROYECTO" EntitySet="TIEMPOSPROYECTO" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TIEMPOSPROYECTO_COLABORADOR1" Association="Self.FK_TIEMPOSPROYECTO_COLABORADOR1">
+            <End Role="COLABORADOR" EntitySet="COLABORADOR" />
+            <End Role="TIEMPOSPROYECTO" EntitySet="TIEMPOSPROYECTO" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TIEMPOSPROYECTO_SERVICIOIMPLANTACIONCORE" Association="Self.FK_TIEMPOSPROYECTO_SERVICIOIMPLANTACIONCORE">
+            <End Role="SERVICIOIMPLANTACIONCORE" EntitySet="SERVICIOIMPLANTACIONCORE" />
+            <End Role="TIEMPOSPROYECTO" EntitySet="TIEMPOSPROYECTO" />
           </AssociationSet>
           <AssociationSet Name="RefACTIVIDAD22" Association="Self.RefACTIVIDAD22">
             <End Role="ACTIVIDAD" EntitySet="ACTIVIDAD" />
@@ -7250,6 +7326,20 @@
             <End Role="Recursos" EntitySet="Recursos" />
             <End Role="RECURSOSASISTENCIA" EntitySet="RecursosAsistencia" />
           </AssociationSet>
+          <EntitySet Name="ServicioImplantacionCore" EntityType="SifizPlanningModel.ServicioImplantacionCore" />
+          <EntitySet Name="TiemposProyecto" EntityType="SifizPlanningModel.TiemposProyecto" />
+          <AssociationSet Name="FK_TIEMPOSPROYECTO_COLABORADOR" Association="SifizPlanningModel.FK_TIEMPOSPROYECTO_COLABORADOR">
+            <End Role="Colaborador" EntitySet="Colaborador" />
+            <End Role="TIEMPOSPROYECTO" EntitySet="TiemposProyecto" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TIEMPOSPROYECTO_SERVICIOIMPLANTACIONCORE" Association="SifizPlanningModel.FK_TIEMPOSPROYECTO_SERVICIOIMPLANTACIONCORE">
+            <End Role="ServicioImplantacionCore" EntitySet="ServicioImplantacionCore" />
+            <End Role="TIEMPOSPROYECTO" EntitySet="TiemposProyecto" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR" Association="SifizPlanningModel.FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR">
+            <End Role="ClienteAuxiliar" EntitySet="ClienteAuxiliar" />
+            <End Role="TiemposProyecto" EntitySet="TiemposProyecto" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="Rol">
           <Key>
@@ -7398,6 +7488,7 @@
           <NavigationProperty Name="incidencias" Relationship="SifizPlanningModel.FK_INCIDENCIAS_COLABORADOR" FromRole="Colaborador" ToRole="Incidencias" />
           <NavigationProperty Name="RECURSOSASISTENCIA" Relationship="SifizPlanningModel.FK_RECURSOSASISTENCIA_COLABORADOR" FromRole="Colaborador" ToRole="RECURSOSASISTENCIA" />
           <NavigationProperty Name="INCIDENCIASRECURSOS" Relationship="SifizPlanningModel.FK_INCIDENCIASRECURSOS_COLABORADOR" FromRole="Colaborador" ToRole="INCIDENCIASRECURSOS" />
+          <NavigationProperty Name="TIEMPOSPROYECTO" Relationship="SifizPlanningModel.FK_TIEMPOSPROYECTO_COLABORADOR" FromRole="Colaborador" ToRole="TIEMPOSPROYECTO" />
           </EntityType>
         <EntityType Name="Colaborador_JefeInmediato">
           <Key>
@@ -8838,6 +8929,8 @@
           <NavigationProperty Name="actividadRealizada" Relationship="SifizPlanningModel.RefACTIVIDADREALIZADA116" FromRole="TAREAACTIVIDADREALIZADA" ToRole="ACTIVIDADREALIZADA" />
           <NavigationProperty Name="comentarioTarea" Relationship="SifizPlanningModel.RefTAREAACTIVIDADREALIZADA125" FromRole="TareaActividadRealizada" ToRole="COMENTARIOTAREA" />
           <NavigationProperty Name="tarea" Relationship="SifizPlanningModel.RefTAREA115" FromRole="TareaActividadRealizada" ToRole="TAREA" />
+          <Property Name="SECUENCIALTICKET" Type="Int32" />
+          <Property Name="SECUENCIALCONTRATO" Type="Int32" />
         </EntityType>
         <Association Name="RefUSUARIO117">
           <End Type="SifizPlanningModel.Usuario" Role="Usuario" Multiplicity="1" />
@@ -11820,6 +11913,7 @@
           <NavigationProperty Name="versionDesarrollo" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_VERSIONDESARROLLO" FromRole="CLIENTEAUXILIAR" ToRole="VersionDesarrollo" />
           <NavigationProperty Name="cliente" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_CLIENTE" FromRole="ClienteAuxiliar" ToRole="Cliente" />
           <NavigationProperty Name="etapasProyectoCliente" Relationship="SifizPlanningModel.FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1" FromRole="ClienteAuxiliar" ToRole="ETAPASPROYECTOCLIENTE" />
+          <NavigationProperty Name="TIEMPOSPROYECTO" Relationship="SifizPlanningModel.FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR" FromRole="ClienteAuxiliar" ToRole="TiemposProyecto" />
         </EntityType>
         <EntityType Name="ResponsableProyectos">
           <Key>
@@ -12645,6 +12739,70 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="ServicioImplantacionCore">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Codigo" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Descripcion" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <Property Name="NumeroVerificador" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="TIEMPOSPROYECTO" Relationship="SifizPlanningModel.FK_TIEMPOSPROYECTO_SERVICIOIMPLANTACIONCORE" FromRole="ServicioImplantacionCore" ToRole="TIEMPOSPROYECTO" />
+        </EntityType>
+        <EntityType Name="TiemposProyecto">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SecuencialServicioImplantacionCore" Type="Int32" Nullable="false" />
+          <Property Name="HorasServicio" Type="Int32" Nullable="false" />
+          <Property Name="Rp" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="HorasConsumidas" Type="Int32" Nullable="false" />
+          <Property Name="Detalle" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="SecuencialColaborador" Type="Int32" Nullable="false" />
+          <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
+          <NavigationProperty Name="Colaborador" Relationship="SifizPlanningModel.FK_TIEMPOSPROYECTO_COLABORADOR" FromRole="TIEMPOSPROYECTO" ToRole="Colaborador" />
+          <NavigationProperty Name="ServicioImplantacionCore" Relationship="SifizPlanningModel.FK_TIEMPOSPROYECTO_SERVICIOIMPLANTACIONCORE" FromRole="TIEMPOSPROYECTO" ToRole="ServicioImplantacionCore" />
+          <Property Name="SecuencialClienteAuxiliar" Type="Int32" />
+          <NavigationProperty Name="clienteAuxiliar" Relationship="SifizPlanningModel.FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR" FromRole="TiemposProyecto" ToRole="ClienteAuxiliar" />
+        </EntityType>
+        <Association Name="FK_TIEMPOSPROYECTO_COLABORADOR">
+          <End Type="SifizPlanningModel.Colaborador" Role="Colaborador" Multiplicity="1" />
+          <End Type="SifizPlanningModel.TiemposProyecto" Role="TIEMPOSPROYECTO" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Colaborador">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="TIEMPOSPROYECTO">
+              <PropertyRef Name="SecuencialColaborador" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TIEMPOSPROYECTO_SERVICIOIMPLANTACIONCORE">
+          <End Type="SifizPlanningModel.ServicioImplantacionCore" Role="ServicioImplantacionCore" Multiplicity="1" />
+          <End Type="SifizPlanningModel.TiemposProyecto" Role="TIEMPOSPROYECTO" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ServicioImplantacionCore">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="TIEMPOSPROYECTO">
+              <PropertyRef Name="SecuencialServicioImplantacionCore" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR">
+          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="ClienteAuxiliar" Multiplicity="0..1" />
+          <End Type="SifizPlanningModel.TiemposProyecto" Role="TiemposProyecto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClienteAuxiliar">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="TiemposProyecto">
+              <PropertyRef Name="SecuencialClienteAuxiliar" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -13334,6 +13492,8 @@
           <EntitySetMapping Name="TareaActividadRealizada">
             <EntityTypeMapping TypeName="SifizPlanningModel.TareaActividadRealizada">
               <MappingFragment StoreEntitySet="TAREAACTIVIDADREALIZADA">
+                <ScalarProperty Name="SECUENCIALCONTRATO" ColumnName="SECUENCIALCONTRATO" />
+                <ScalarProperty Name="SECUENCIALTICKET" ColumnName="SECUENCIALTICKET" />
                 <ScalarProperty Name="HoraOperacion" ColumnName="HORAOPERACION" />
                 <ScalarProperty Name="HoraFin" ColumnName="HORAFIN" />
                 <ScalarProperty Name="HoraInicio" ColumnName="HORAINICIO" />
@@ -14847,6 +15007,32 @@
                 <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
                 <ScalarProperty Name="Incidencia" ColumnName="INCIDENCIA" />
                 <ScalarProperty Name="SecuencialColaborador" ColumnName="SECUENCIALCOLABORADOR" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ServicioImplantacionCore">
+            <EntityTypeMapping TypeName="SifizPlanningModel.ServicioImplantacionCore">
+              <MappingFragment StoreEntitySet="SERVICIOIMPLANTACIONCORE">
+                <ScalarProperty Name="NumeroVerificador" ColumnName="NUMEROVERIFICADOR" />
+                <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTVO" />
+                <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
+                <ScalarProperty Name="Codigo" ColumnName="CODIGO" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TiemposProyecto">
+            <EntityTypeMapping TypeName="SifizPlanningModel.TiemposProyecto">
+              <MappingFragment StoreEntitySet="TIEMPOSPROYECTO">
+                <ScalarProperty Name="SecuencialClienteAuxiliar" ColumnName="SECUENCIALCLIENTEAUXILIAR" />
+                <ScalarProperty Name="Fecha" ColumnName="FECHA" />
+                <ScalarProperty Name="SecuencialColaborador" ColumnName="SECUENCIALCOLABORADOR" />
+                <ScalarProperty Name="Detalle" ColumnName="DETALLE" />
+                <ScalarProperty Name="HorasConsumidas" ColumnName="HORASCONSUMIDAS" />
+                <ScalarProperty Name="Rp" ColumnName="RP" />
+                <ScalarProperty Name="HorasServicio" ColumnName="HORASSERVICIO" />
+                <ScalarProperty Name="SecuencialServicioImplantacionCore" ColumnName="SECUENCIALSERVICIOIMPLANTACIONCORE" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
               </MappingFragment>
             </EntityTypeMapping>
