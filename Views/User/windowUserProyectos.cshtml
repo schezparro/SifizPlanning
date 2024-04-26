@@ -769,7 +769,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <input id="hora-servicio" ng-class="'form-control'" type="number" ng-model="nuevoTiempo.horasServicio">
+                                    <input id="hora-servicio" ng-class="'form-control'" type="number" ng-model="nuevoTiempo.horasServicio" min="0" >
                                 </td>
                                 <td>
                                     <select id="RP" ng-class="'form-control'" ng-model="nuevoTiempo.Rp">
@@ -779,7 +779,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <input id="horas-consumidas" ng-class="'form-control'" type="number" ng-model="nuevoTiempo.horasConsumidas">
+                                    <input id="horas-consumidas" ng-class="'form-control'" type="number" ng-model="nuevoTiempo.horasConsumidas" min="0">
                                 </td>
                                 <td>
                                     <input id="detalle-nuevo-tiempo" ng-class="'form-control'" type="text" ng-model="nuevoTiempo.detalle">
@@ -807,7 +807,7 @@
                                 </td>
                                 <td>
                                     <span ng-hide="tiempo.editable">{{ tiempo.horasServicio}}</span>
-                                    <input id="hora-servicio-tiempo" ng-class="'form-control'" type="number" ng-show="tiempo.editable" ng-model="tiempo.horasServicio">
+                                    <input id="hora-servicio-tiempo" ng-class="'form-control'" type="number" ng-show="tiempo.editable" ng-model="tiempo.horasServicio" min="0">
                                 </td>
                                 <td>
                                     <span ng-hide="tiempo.editable">{{ tiempo.rp}}</span>
@@ -819,7 +819,7 @@
                                 </td>
                                 <td>
                                     <span ng-hide="tiempo.editable">{{ tiempo.horasConsumidas}}</span>
-                                    <input id="horas-consumidas-tiempo" ng-class="'form-control'" type="number" ng-show="tiempo.editable" ng-model="tiempo.horasConsumidas">
+                                    <input id="horas-consumidas-tiempo" ng-class="'form-control'" type="number" ng-show="tiempo.editable" ng-model="tiempo.horasConsumidas" min="0">
                                 </td>
                                 <td>
                                     <span ng-hide="tiempo.editable">{{ tiempo.detalle}}</span>
