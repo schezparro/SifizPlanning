@@ -733,9 +733,9 @@ namespace SifizPlanning.Controllers
                                select new
                                {
                                    id = o.Secuencial,
-                                   FechaRegistro = o.FechaRegistro.Year != 1 ? o.FechaRegistro : (DateTime?)null,
+                                   FechaRegistro = o.FechaRegistro.HasValue ? o.FechaRegistro.Value.Year != 1 ? o.FechaRegistro : (DateTime?)null : (DateTime?)null,
                                    FechaProduccion = o.FechaProduccion.HasValue ? o.FechaProduccion.Value.Year != 1 ? o.FechaProduccion.Value : (DateTime?)null : (DateTime?)null,
-                                   FechaDisponibilidad = o.FechaDisponibilidad.Year != 1 ? o.FechaDisponibilidad : (DateTime?)null,
+                                   FechaDisponibilidad = o.FechaDisponibilidad.HasValue ? o.FechaDisponibilidad.Value.Year != 1 ? o.FechaDisponibilidad : (DateTime?)null : (DateTime?)null,
                                    FechaAprobacion = o.FechaAprobacion.HasValue ? o.FechaAprobacion : (DateTime?)null,
                                    Detalle = o.Detalle,
                                    semaforo = o.FechaDisponibilidad < fechaHoy ? "ROJO" : o.FechaDisponibilidad <= fechaPermisible ? "AMARILLO" : "VERDE",
@@ -776,7 +776,7 @@ namespace SifizPlanning.Controllers
                                         ).ToList();
                 }
 
-                var cantidad = ofertas.Count;
+                var cantidad = ofertas?.Count;
                 ofertas = ofertas.Skip(start).Take(length).ToList();
 
                 var resp = new
@@ -884,31 +884,31 @@ namespace SifizPlanning.Controllers
                     DateTime? dateAprobacion = null;
                     string format = "ddd MMM dd yyyy HH:mm:ss 'GMT'K";
 
-                    if (FechaRegistro != "null")
+                    if (FechaRegistro != "null" && FechaRegistro != "Invalid Date")
                     {
                         FechaRegistro = FechaRegistro.Split(new[] { " (" }, StringSplitOptions.None)[0];
                         dateRegistro = DateTime.ParseExact(FechaRegistro, format, CultureInfo.InvariantCulture);
+                        oferta.FechaRegistro = dateRegistro.Date;
                     }
-                    if (FechaProduccion != "null")
+                    if (FechaProduccion != "null" && FechaProduccion != "Invalid Date")
                     {
                         FechaProduccion = FechaProduccion.Split(new[] { " (" }, StringSplitOptions.None)[0];
                         dateProduccion = DateTime.ParseExact(FechaProduccion, format, CultureInfo.InvariantCulture);
+                        oferta.FechaProduccion = dateProduccion.Date;
                     }
-                    if (FechaDisponibilidad != "null")
+                    if (FechaDisponibilidad != "null" && FechaDisponibilidad != "Invalid Date")
                     {
                         FechaDisponibilidad = FechaDisponibilidad.Split(new[] { " (" }, StringSplitOptions.None)[0];
                         dateDisponibilidad = DateTime.ParseExact(FechaDisponibilidad, format, CultureInfo.InvariantCulture);
+                        oferta.FechaDisponibilidad = dateDisponibilidad.Date;
                     }
-                    if (FechaAprobacion != "null")
+                    if (FechaAprobacion != "null" && FechaAprobacion != "Invalid Date")
                     {
                         FechaAprobacion = FechaAprobacion.Split(new[] { " (" }, StringSplitOptions.None)[0];
                         dateAprobacion = DateTime.ParseExact(FechaAprobacion, format, CultureInfo.InvariantCulture);
+                        oferta.FechaAprobacion = dateAprobacion.HasValue ? dateAprobacion.Value.Date : (DateTime?)null;
                     }
 
-                    oferta.FechaRegistro = dateRegistro.Date;
-                    oferta.FechaProduccion = dateProduccion.Date;
-                    oferta.FechaDisponibilidad = dateDisponibilidad.Date;
-                    oferta.FechaAprobacion = dateAprobacion.HasValue ? dateAprobacion.Value.Date : (DateTime?)null;
                     oferta.Detalle = Detalle;
                     oferta.HorasEstimacion = HorasEstimacion;
                     oferta.cliente = db.Cliente.Find(cliente);

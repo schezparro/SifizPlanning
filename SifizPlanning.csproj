@@ -1160,6 +1160,7 @@
     <Content Include="SCRIPTSDATABASE\4\OFERTAMASIVATICKET.sql" />
     <Content Include="SCRIPTSDATABASE\4\SERVICIOIMPLANTACIONCORE.sql" />
     <Content Include="SCRIPTSDATABASE\4\TIEMPOSPROYECTO.sql" />
+    <Content Include="SCRIPTSDATABASE\TEMPSCRIPTS\OFERTAS.sql" />
     <Content Include="SCRIPTSDATABASE\4\TIEMPOSPROYECTO2.sql" />
     <Content Include="SCRIPTSDATABASE\4\OFERTAS_CAMPO_FECHAAPROBACION.sql" />
     <Content Include="SCRIPTSDATABASE\4\TAREAS_CAMPO_ESREPROCESO.sql" />
@@ -1653,7 +1654,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Properties\PublishProfiles\" />
-    <Folder Include="SCRIPTSDATABASE\TEMPSCRIPTS\" />
     <Folder Include="Views\incidencias\" />
     <Folder Include="Web\files\asignaciones\" />
     <Folder Include="Web\images\chat\" />

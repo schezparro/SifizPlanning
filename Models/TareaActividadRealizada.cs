@@ -27,8 +27,6 @@ namespace SifizPlanning.Models
         public System.DateTime HoraInicio { get; set; }
         public System.DateTime HoraFin { get; set; }
         public System.DateTime HoraOperacion { get; set; }
-        public Nullable<int> SECUENCIALTICKET { get; set; }
-        public Nullable<int> SECUENCIALCONTRATO { get; set; }
     
         public virtual Usuario usuario { get; set; }
         public virtual ActividadRealizada actividadRealizada { get; set; }

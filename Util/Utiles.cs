@@ -298,14 +298,14 @@ namespace SifizPlanning.Util
             //email.From.Add(new MailboxAddress(emailFuente));
             //email.Subject = asunto;
 
-            //foreach(string emailDestino in emailsDestinos)
+            //foreach (string emailDestino in emailsDestinos)
             //{
             //    email.To.Add(new MailboxAddress(emailDestino));
             //}
             //var builder = new BodyBuilder();
-            //if(adjuntarimagen)
+            //if (adjuntarimagen)
             //{
-            //    foreach(string imagen in imagenes)
+            //    foreach (string imagen in imagenes)
             //    {
             //        string[] path = new string[2] { HostingEnvironment.MapPath("~/Web/images/email"), imagen };
             //        string imagePath = Path.Combine(path);
@@ -317,16 +317,16 @@ namespace SifizPlanning.Util
             //{
             //    builder.HtmlBody = emailBody;
             //}
-            //if(adjuntos != null && adjuntos.Length > 0)
+            //if (adjuntos != null && adjuntos.Length > 0)
             //{
-            //    foreach(var adj in adjuntos)
+            //    foreach (var adj in adjuntos)
             //    {
             //        builder.Attachments.Add(adj);
             //    }
             //}
             //email.Body = builder.ToMessageBody();
 
-            //using(var smtp = new SmtpClient())
+            //using (var smtp = new SmtpClient())
             //{
             //    smtp.Connect("email.sifizsoft.com", 465, true);
             //    smtp.Authenticate(emailFuente, password);
@@ -339,7 +339,7 @@ namespace SifizPlanning.Util
             //        smtp.Send(email);
             //        enviado = true;
             //    }
-            //    catch(Exception e)
+            //    catch (Exception e)
             //    {
             //        mensaje = e.Message;
             //    }
@@ -347,10 +347,10 @@ namespace SifizPlanning.Util
             //    smtp.Disconnect(true);
 
             //    // The rest of your code related to database operations and error handling remains the same.
-            //    if(!enviado)
+            //    if (!enviado)
             //    {
             //        //Si no se pudo enviar y es un correo nuevo, se guarda en la BD
-            //        if(idCorreo <= 0)
+            //        if (idCorreo <= 0)
             //        {
             //            CorreoNoEnviado objCorreoNoEnviado = new CorreoNoEnviado()
             //            {
@@ -372,7 +372,7 @@ namespace SifizPlanning.Util
             //                db.CorreoNoEnviado.Add(objCorreoNoEnviado);
             //                db.SaveChanges();
             //            }
-            //            catch(Exception)
+            //            catch (Exception)
             //            {
             //                throw new Exception(mensaje);
             //            }
@@ -382,16 +382,16 @@ namespace SifizPlanning.Util
             //    else
             //    {
             //        //Si se pudo enviar y no es un correo nuevo, se elimina de la BD
-            //        if(idCorreo > 0)
+            //        if (idCorreo > 0)
             //        {
             //            CorreoNoEnviado objCorreoNoEnviado = db.CorreoNoEnviado.Find(idCorreo);
-            //            if(objCorreoNoEnviado != null)
+            //            if (objCorreoNoEnviado != null)
             //                objCorreoNoEnviado.EstaActivo = false;
             //            try
             //            {
             //                db.SaveChanges();
             //            }
-            //            catch(Exception)
+            //            catch (Exception)
             //            {
             //                throw new Exception(mensaje);
             //            }

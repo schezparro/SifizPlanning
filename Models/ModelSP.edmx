@@ -961,8 +961,6 @@
           <Property Name="HORAINICIO" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="HORAFIN" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="HORAOPERACION" Type="datetime2" Precision="7" Nullable="false" />
-          <Property Name="SECUENCIALTICKET" Type="int" />
-          <Property Name="SECUENCIALCONTRATO" Type="int" />
         </EntityType>
         <EntityType Name="TAREACOMPENSATORIA">
           <Key>
@@ -1477,8 +1475,8 @@
           <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="SECUENCIALCLIENTEAUXILIAR" Type="int" />
           <Property Name="DETALLE" Type="varchar" MaxLength="255" />
-          <Property Name="PORCIENTO" Type="float" />
           <Property Name="SELECCIONADO" Type="numeric" Precision="1" Scale="0" />
+          <Property Name="PORCIENTO" Type="float" />
         </EntityType>
         <EntityType Name="FLUJOESTADOTICKET">
           <Key>
@@ -1686,8 +1684,8 @@
           <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="SECUENCIALCLIENTE" Type="int" Nullable="false" />
           <Property Name="SECUENCIALCOLABORADOR" Type="int" Nullable="false" />
-          <Property Name="FECHAREGISTRO" Type="date" Nullable="false" />
-          <Property Name="FECHADISPONIBILIDAD" Type="date" Nullable="false" />
+          <Property Name="FECHAREGISTRO" Type="date" />
+          <Property Name="FECHADISPONIBILIDAD" Type="date" />
           <Property Name="DETALLE" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="HORASESTIMACION" Type="int" Nullable="false" />
           <Property Name="FECHAPRODUCCION" Type="date" />
@@ -1810,8 +1808,8 @@
           <Property Name="FECHACOMIENZO" Type="date" Nullable="false" />
           <Property Name="FECHAFIN" Type="date" Nullable="false" />
           <Property Name="DETALLE" Type="varchar" MaxLength="255" />
-          <Property Name="PORCIENTO" Type="float" />
           <Property Name="SELECCIONADO" Type="numeric" Precision="1" Scale="0" />
+          <Property Name="PORCIENTO" Type="float" />
         </EntityType>
         <EntityType Name="TICKET">
           <Key>
@@ -2876,6 +2874,18 @@
             </Principal>
             <Dependent Role="TICKET_COMPLEMENTO">
               <PropertyRef Name="SECUENCIALTICKET" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TICKET_MODULO">
+          <End Role="MODULO" Type="Self.MODULO" Multiplicity="0..1" />
+          <End Role="TICKET" Type="Self.TICKET" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MODULO">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="TICKET">
+              <PropertyRef Name="SECUENCIALMODULO" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -5462,6 +5472,10 @@
           <AssociationSet Name="FK_TICKET_ACTIVIDAD_TICKET_ACTIVIDAD" Association="Self.FK_TICKET_ACTIVIDAD_TICKET_ACTIVIDAD">
             <End Role="TICKET" EntitySet="TICKET" />
             <End Role="TICKET_COMPLEMENTO" EntitySet="TICKET_COMPLEMENTO" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TICKET_MODULO" Association="Self.FK_TICKET_MODULO">
+            <End Role="MODULO" EntitySet="MODULO" />
+            <End Role="TICKET" EntitySet="TICKET" />
           </AssociationSet>
           <AssociationSet Name="FK_TICKET_TICKETVERSIONCLIENTE" Association="Self.FK_TICKET_TICKETVERSIONCLIENTE">
             <End Role="TICKETVERSIONCLIENTE" EntitySet="TICKETVERSIONCLIENTE" />
@@ -8929,8 +8943,6 @@
           <NavigationProperty Name="actividadRealizada" Relationship="SifizPlanningModel.RefACTIVIDADREALIZADA116" FromRole="TAREAACTIVIDADREALIZADA" ToRole="ACTIVIDADREALIZADA" />
           <NavigationProperty Name="comentarioTarea" Relationship="SifizPlanningModel.RefTAREAACTIVIDADREALIZADA125" FromRole="TareaActividadRealizada" ToRole="COMENTARIOTAREA" />
           <NavigationProperty Name="tarea" Relationship="SifizPlanningModel.RefTAREA115" FromRole="TareaActividadRealizada" ToRole="TAREA" />
-          <Property Name="SECUENCIALTICKET" Type="Int32" />
-          <Property Name="SECUENCIALCONTRATO" Type="Int32" />
         </EntityType>
         <Association Name="RefUSUARIO117">
           <End Type="SifizPlanningModel.Usuario" Role="Usuario" Multiplicity="1" />
@@ -12154,8 +12166,8 @@
           <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="SecuencialCliente" Type="Int32" Nullable="false" />
           <Property Name="SecuencialColaborador" Type="Int32" Nullable="false" />
-          <Property Name="FechaRegistro" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="FechaDisponibilidad" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="FechaRegistro" Type="DateTime" Precision="0" />
+          <Property Name="FechaDisponibilidad" Type="DateTime" Precision="0" />
           <Property Name="Detalle" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="HorasEstimacion" Type="Int32" Nullable="false" />
           <NavigationProperty Name="cliente" Relationship="SifizPlanningModel.FK_OFERTAS_CLIENTE" FromRole="OFERTAS" ToRole="Cliente" />
@@ -13492,8 +13504,6 @@
           <EntitySetMapping Name="TareaActividadRealizada">
             <EntityTypeMapping TypeName="SifizPlanningModel.TareaActividadRealizada">
               <MappingFragment StoreEntitySet="TAREAACTIVIDADREALIZADA">
-                <ScalarProperty Name="SECUENCIALCONTRATO" ColumnName="SECUENCIALCONTRATO" />
-                <ScalarProperty Name="SECUENCIALTICKET" ColumnName="SECUENCIALTICKET" />
                 <ScalarProperty Name="HoraOperacion" ColumnName="HORAOPERACION" />
                 <ScalarProperty Name="HoraFin" ColumnName="HORAFIN" />
                 <ScalarProperty Name="HoraInicio" ColumnName="HORAINICIO" />

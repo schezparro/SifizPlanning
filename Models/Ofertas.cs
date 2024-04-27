@@ -17,8 +17,8 @@ namespace SifizPlanning.Models
         public int Secuencial { get; set; }
         public int SecuencialCliente { get; set; }
         public int SecuencialColaborador { get; set; }
-        public System.DateTime FechaRegistro { get; set; }
-        public System.DateTime FechaDisponibilidad { get; set; }
+        public Nullable<System.DateTime> FechaRegistro { get; set; }
+        public Nullable<System.DateTime> FechaDisponibilidad { get; set; }
         public string Detalle { get; set; }
         public int HorasEstimacion { get; set; }
         public Nullable<System.DateTime> FechaProduccion { get; set; }
