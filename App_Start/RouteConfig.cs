@@ -1137,7 +1137,13 @@ namespace SifizPlanning
                 url: "user/enviar-correo-informe/{id}",
                 defaults: new { controller = "User", action = "EnviarCorreoInforme", id = UrlParameter.Optional }
             );
-            
+
+            routes.MapRoute(
+                name: "UsuarioEsLider",
+                url: "user/usuario-es-lider/{id}",
+                defaults: new { controller = "User", action = "UsuarioEsLider", id = UrlParameter.Optional }
+            );
+
             routes.MapRoute(
                 name: "GenerarExcelInformeProyecto",
                 url: "user/dar-excel-informe-proyecto/{id}",

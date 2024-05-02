@@ -199,21 +199,42 @@
                         </thead>
 
                         <tbody>
-                            <tr ng-repeat="item in datosAsistencia track by $index">
-                                <td>{{$index + 1}}</td> <!-- Autoincremental -->
-                                <td>{{item.nombre}}</td> <!-- Nombre del colaborador -->
-                                <td><input type="checkbox" ng-model="item.asignado"></td> <!-- Checkbox para asignado -->
-                                <td><input type="checkbox" ng-model="item.asistencia"></td> <!-- Checkbox para asistencia -->
-                                <td><input type="number" ng-model="item.puntuacion" min="0" max="5"></td> <!-- Input para puntuación -->
-                                <td><input type="hidden" value="{{item.id}}"></td> <!-- Campo oculto con el ID -->
-                            </tr>
+                            @if (Roles.IsUserInRole("ADMIN") || Roles.IsUserInRole("OPERACIONES"))
+                            {
+                                <tr ng-repeat="item in datosAsistencia track by $index">
+                                    <td>{{$index + 1}}</td> <!-- Autoincremental -->
+                                    <td>{{item.nombre}}</td> <!-- Nombre del colaborador -->
+                                    <td><input type="checkbox" ng-model="item.asignado"></td> <!-- Checkbox para asignado -->
+                                    <td><input type="checkbox" ng-model="item.asistencia"></td> <!-- Checkbox para asistencia -->
+                                    <td><input type="number" ng-model="item.puntuacion" min="0" max="5"></td> <!-- Input para puntuación -->
+                                    <td><input type="hidden" value="{{item.id}}"></td> <!-- Campo oculto con el ID -->
+                                </tr>
+                            }
+                            else 
+                            {
+                                <tr ng-repeat="item in datosAsistencia track by $index">
+                                    <td>{{$index + 1}}</td> <!-- Autoincremental -->
+                                    <td>{{item.nombre}}</td> <!-- Nombre del colaborador -->
+                                    <td><input type="checkbox" ng-disabled="true" ng-model="item.asignado"></td> <!-- Checkbox para asignado -->
+                                    <td><input type="checkbox" ng-disabled="true" ng-model="item.asistencia"></td> <!-- Checkbox para asistencia -->
+                                    <td><input type="number" ng-disabled="true" ng-model="item.puntuacion" min="0" max="5"></td> <!-- Input para puntuación -->
+                                    <td><input type="hidden" value="{{item.id}}"></td> <!-- Campo oculto con el ID -->
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" id="guardar-registro" ng-click="registrarAsistencia()" class="btn btn-primary">Guardar</button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                @if (Roles.IsUserInRole("ADMIN") || Roles.IsUserInRole("OPERACIONES"))
+                {
+                    <button type="button" id="guardar-registro" ng-click="registrarAsistencia()" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                }
             </div>
         </div>
     </div>

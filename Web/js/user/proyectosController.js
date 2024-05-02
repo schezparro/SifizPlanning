@@ -11,9 +11,9 @@
         HorasConsumidas: "",
         Detalle: "",
         Colaborador: "",
-        FechaRegistro: ""        
+        FechaRegistro: ""
     };
-   
+
     $scope.cargarProyectos = function (start, lenght) {
         if (start === undefined)
             start = 0;
@@ -273,6 +273,19 @@
         $scope.versionDesarrollo = proyecto.versionDesarrollo;
         $scope.tieneSolucionProxies = proyecto.tieneSolucionProxies;
         $scope.versionBD = proyecto.versionBaseDatos;
+        $scope.proyectoModal = proyecto;
+
+        var esLider = $http.post("user/usuario-es-lider",
+            {
+                secuencialProyecto: proyecto.id
+            });
+        esLider.success(function (data) {
+            if (data.success === true || data.esAdmin === true) {
+                $scope.mostrarBotones = true;
+            } else {
+                $scope.mostrarBotones = false;
+            }
+        });
 
         angular.element("#modal-proyectos").modal('show');
     };
@@ -412,20 +425,12 @@
 
             formData.append('seleccionado', $scope.itemModificado.selected);
             formData.append('secuencialEtapaId', $scope.itemModificado.idEtapa);
-            formData.append('secuencialCatalogoEtapa', $scope.etapasProInfo);
-            formData.append('fechaInicio', $scope.fechaIniEtaInfo);
-            formData.append('fechaFin', $scope.fechaFinEtaInfo);
-            formData.append('porciento', $scope.porcentajeEtaInfo);
             formData.append('detalle', $scope.detalleEtaInfo);
 
         } else if (tipo === 'subetapa') {
 
             formData.append('seleccionado', $scope.itemModificado.selected);
             formData.append('secuencialSubEtapaId', $scope.itemModificado.idSubEtapa);
-            formData.append('recurso', $scope.recursosSubEInfo);
-            formData.append('descripcion', $scope.descripcionSubEInfo);
-            formData.append('fechaInicio', $scope.fechaIniSubEInfo);
-            formData.append('fechaFin', $scope.fechaFinSubEInfo);
             formData.append('porciento', $scope.porcentajeSubEInfo);
             formData.append('detalle', $scope.detalleSubEInfo);
         }
@@ -667,8 +672,36 @@
         subInforme.success(function (data) {
             if (data.success === true) {
 
+                $scope.cliente = data.datosGenerales.cliente;
+                $scope.lider = data.datosGenerales.liderProyecto;
+                $scope.responsable = data.datosGenerales.responsableProyecto;
+                $scope.fecha = (function () {
+                    var fechaActual = new Date();
+                    var dia = fechaActual.getDate();
+                    var mes = fechaActual.getMonth() + 1;
+                    var año = fechaActual.getFullYear();
+
+                    dia = (dia < 10) ? '0' + dia : dia;
+                    mes = (mes < 10) ? '0' + mes : mes;
+
+                    return dia + '/' + mes + '/' + año;
+                })();
+
                 var datosInforme = [];
                 data.datosCronograma.forEach(function (etapa) {
+
+                    var colorEstado = "";
+                    var porciento = parseFloat(etapa.porciento);
+                    var diasRestantes = etapa.duracion;
+
+                    if ((diasRestantes <= 0 && porciento < 100) || (porciento >= 0 && porciento <= 39)) {
+                        colorEstado = 'red';
+                    } else if (porciento >= 80 && porciento <= 100) {
+                        colorEstado = 'green';
+                    } else if (porciento >= 40 && porciento < 80) {
+                        colorEstado = 'yellow';
+                    }
+
                     // Agrega la etapa al arreglo aplanado
                     datosInforme.push({
                         tipo: 'etapa',
@@ -680,11 +713,25 @@
                         idEtapa: etapa.idEtapa,
                         idCatEtapa: etapa.idCatEtapa,
                         porciento: etapa.porciento,
-                        selected: etapa.selected
+                        selected: etapa.selected,
+                        colorEstado: colorEstado
                     });
 
                     // Agrega cada subetapa al arreglo aplanado
                     etapa.subEtapas.forEach(function (subetapa) {
+
+                        var colorEstado = "";
+                        var porciento = parseFloat(subetapa.porciento);
+                        var diasRestantes = subetapa.duracion;
+
+                        if ((diasRestantes <= 0 && porciento < 100) || (porciento >= 0 && porciento <= 39)) {
+                            colorEstado = 'red';
+                        } else if (porciento >= 80 && porciento <= 100) {
+                            colorEstado = 'green';
+                        } else if (porciento >= 40 && porciento < 80) {
+                            colorEstado = 'yellow';
+                        }
+
                         datosInforme.push({
                             tipo: 'subetapa',
                             descripcion: subetapa.descripcionSE,
@@ -697,7 +744,8 @@
                             idSubEtapa: subetapa.idSubEtapa,
                             detalle: subetapa.detalle,
                             porciento: subetapa.porciento,
-                            selected: subetapa.selected
+                            selected: subetapa.selected,
+                            colorEstado: colorEstado
                         });
                     });
                 });
@@ -711,22 +759,71 @@
         });
     };
 
+    $scope.generarInformePDF = function () {
+        // Crear una nueva instancia de jsPDF
+        const { jsPDF } = window.jspdf;
+        var doc = new jsPDF();
 
+        // Crear un objeto de mapeo para convertir nombres de colores a valores hexadecimales
+        var colorMapping = {
+            'red': '#FF0000',
+            'yellow': '#FFFF00',
+            'green': '#008000'
+            // Agrega más colores según sea necesario
+        };
+
+        // Obtener la tabla por su ID
+        var table = document.getElementById('tabla-cronograma-proyecto');
+
+        // Utilizar autoTable para añadir la tabla al documento PDF
+        doc.autoTable({
+            html: table,
+            head: 'INFORME AVANCE DE PROYECTO', // Agrega una fila de encabezado con el título
+            didParseCell: function (data) {
+                // Verificar si la celda es la última de su fila
+                if (data.column.index === data.table.columns.length - 1) {
+                    // Obtener el valor del color del input oculto
+                    var colorInput = data.cell.raw.getElementsByClassName('color-estado')[0];
+                    if (colorInput) {
+                        var colorName = colorInput.value;
+                        // Convertir el nombre del color a su valor hexadecimal usando el objeto de mapeo
+                        var color = colorMapping[colorName];
+                        if (color) {
+                            // Aplicar el color a la celda
+                            data.cell.styles.fillColor = color;
+                        }
+                    }
+                }
+            },
+            didDrawCell: function (data) {
+                // Verificar si la celda es una celda de encabezado
+                if (data.section === 'head') {
+                    // Verificar si la fila es una de las cuatro primeras filas de encabezado
+                    if (data.row.index < 4) {
+                        // Eliminar el color de fondo de la celda
+                        data.cell.styles.fillColor = null;
+                    }
+                }
+            }
+        });
+
+        // Guardar el PDF
+        doc.save('tabla-cronograma-proyecto.pdf');
+    };
 
     $scope.nombreFichero;
     $scope.pathFichero;
-    $scope.generarInforme = function () {
 
-        console.log($scope.proyectoId);
+    $scope.generarInforme = function () {
         var subInforme = $http.post("user/dar-excel-informe-proyecto", {
             secuencial: $scope.proyectoId
         });
         subInforme.success(function (data) {
             if (data.success === true) {
-
-                console.log("excel generado correctamente " + data.mensaje + "  ---  " + data.nombreFichero);
-                $scope.nombreFichero = data.nombreFichero;
-                $scope.pathFichero = data.mensaje
+                messageDialog.show('Información', "Excel generado correctamente.");
+                $scope.nombreFichero = data.newNameFile;
+                $scope.pathFichero = data.path;
+                window.open(data.path);
             }
             else {
                 messageDialog.show('Información', data.msg);
@@ -734,49 +831,138 @@
         });
     };
 
+    //$scope.enviarInforme = function () {
+    //    console.log($scope.nombreFichero);
+    //    if ($scope.nombreFichero != null) {
+    //        var envioCorreo = $http.post("user/enviar-correo-informe", {
+    //            nombreFichero: $scope.nombreFichero
+    //        });
+    //        envioCorreo.success(function (data) {
+    //            if (data.success === true) {
+
+    //                messageDialog.show('Información', data.msg);
+
+    //            }
+    //        });
+
+    //    } else {
+    //        var subInforme = $http.post("user/dar-excel-informe-proyecto", {
+    //            secuencial: $scope.proyectoId
+    //        });
+    //        subInforme.success(function (data) {
+    //            if (data.success === true) {
+    //                console.log("excel generado correctamente " + data.newNameFile + " --- " + data.path);
+    //                $scope.nombreFichero = data.newNameFile;
+    //                $scope.pathFichero = data.path;
+
+    //                // Abre el archivo Excel en una nueva pestaña del navegador
+    //                window.open($scope.pathFichero, '_blank');
+
+    //                var envioCorreo = $http.post("user/enviar-correo-informe", {
+    //                    nombreFichero: $scope.nombreFichero
+    //                });
+    //                envioCorreo.success(function (data) {
+    //                    if (data.success === true) {
+
+    //                        messageDialog.show('Información', data.msg);
+
+    //                    }
+    //                });
+    //            }
+    //            else {
+    //                messageDialog.show('Información', data.msg);
+    //            }
+    //        });
+    //    }
+    //};
+
+
     $scope.enviarInforme = function () {
+        // Crear una nueva instancia de jsPDF
+        const { jsPDF } = window.jspdf;
+        var doc = new jsPDF();
 
-        if ($scope.nombreFichero != null) {
-            var envioCorreo = $http.post("user/enviar-correo-informe", {
-                nombreFichero: $scope.nombreFichero
-            });
-            envioCorreo.success(function (data) {
-                if (data.success === true) {
+        // Crear un objeto de mapeo para convertir nombres de colores a valores hexadecimales
+        var colorMapping = {
+            'red': '#FF0000',
+            'yellow': '#FFFF00',
+            'green': '#008000'
+            // Agrega más colores según sea necesario
+        };
 
-                    messageDialog.show('Información', data.msg);
+        // Obtener la tabla por su ID
+        var table = document.getElementById('tabla-cronograma-proyecto');
 
-                }
-            });
-
-        } else {
-            var subInforme = $http.post("user/dar-excel-informe-proyecto", {
-                secuencial: $scope.proyectoId
-            });
-            subInforme.success(function (data) {
-                if (data.success === true) {
-
-                    console.log("excel generado correctamente " + data.mensaje + "  ---  " + data.nombreFichero);
-                    $scope.nombreFichero = data.nombreFichero;
-                    $scope.pathFichero = data.mensaje;
-
-                    var envioCorreo = $http.post("user/enviar-correo-informe", {
-                        nombreFichero: $scope.nombreFichero
-                    });
-                    envioCorreo.success(function (data) {
-                        if (data.success === true) {
-
-                            messageDialog.show('Información', data.msg);
-
+        // Utilizar autoTable para añadir la tabla al documento PDF
+        doc.autoTable({
+            html: table,
+            head: 'INFORME AVANCE DE PROYECTO', // Agrega una fila de encabezado con el título
+            didParseCell: function (data) {
+                // Verificar si la celda es la última de su fila
+                if (data.column.index === data.table.columns.length - 1) {
+                    // Obtener el valor del color del input oculto
+                    var colorInput = data.cell.raw.getElementsByClassName('color-estado')[0];
+                    if (colorInput) {
+                        var colorName = colorInput.value;
+                        // Convertir el nombre del color a su valor hexadecimal usando el objeto de mapeo
+                        var color = colorMapping[colorName];
+                        if (color) {
+                            // Aplicar el color a la celda
+                            data.cell.styles.fillColor = color;
                         }
-                    });
+                    }
                 }
-                else {
-                    messageDialog.show('Información', data.msg);
+            },
+            didDrawCell: function (data) {
+                // Verificar si la celda es una celda de encabezado
+                if (data.section === 'head') {
+                    // Verificar si la fila es una de las cuatro primeras filas de encabezado
+                    if (data.row.index < 4) {
+                        // Eliminar el color de fondo de la celda
+                        data.cell.styles.fillColor = null;
+                    }
                 }
-            });
-        }
-    };
+            }
+        });
 
+        // Guardar el PDF
+        doc.save('tabla-cronograma-proyecto.pdf');
+
+        // Obtener el PDF como un ArrayBuffer
+        var pdfArrayBuffer = doc.output('arraybuffer');
+
+        // Crear un Blob a partir del ArrayBuffer
+        var blob = new Blob([pdfArrayBuffer], { type: 'application/pdf' });
+
+        // Crear un objeto FormData
+        var formData = new FormData();
+        // Agregar el Blob del PDF al FormData
+        formData.append('pdf', blob, 'tabla-cronograma-proyecto.pdf');
+
+        console.log("pueba");
+
+        // Agregar cualquier otro dato que necesites enviar al servidor
+        // formData.append('otroDato', valor);
+
+        // Enviar el FormData mediante AJAX
+        var ajaxEnvioDatos = $http({
+            method: 'POST',
+            url: "user/enviar-correo-informe/",
+            data: formData,
+            headers: { 'Content-Type': undefined },
+            transformRequest: angular.identity
+        });
+
+        ajaxEnvioDatos.success(function (data) {
+            waitingDialog.hide();
+            if (data.success === true) {
+               
+            } else {
+                messageDialog.show("Información", data.msg);
+            }
+        });
+    };
+   
     $scope.exportarPdf = function () {
         var doc = new jsPDF();
         var element = document.getElementById('tabla-cronograma-proyecto');
@@ -916,6 +1102,7 @@
         if (item.tipo === 'etapa') {
             $scope.proyectoIdInfo = item.secuencialClienteAux;
             $scope.etapaId = item.etapaId;
+            $scope.etapaDescripcion = item.descripcion;
             $scope.etapasProInfo = item.idCatEtapa;
             $scope.fechaIniEtaInfo = item.fechaInicio;
             $scope.fechaFinEtaInfo = item.fechaFin;
@@ -927,6 +1114,7 @@
             $scope.etapaId = item.etapaId;
             $scope.descripcionSubEInfo = item.descripcion;
             $scope.recursosSubEInfo = item.idRecurso;
+            $scope.recursosDescSubEInfo = item.recurso;
             $scope.fechaIniSubEInfo = item.fechaInicio;
             $scope.fechaFinSubEInfo = item.fechaFin;
             $scope.porcentajeSubEInfo = item.porciento;
@@ -997,7 +1185,7 @@
         var porciento = parseFloat(item.porciento);
         var diasRestantes = item.duracion;
 
-        if ((diasRestantes <= 0 && porciento < 100) || (porciento >= 0 && porciento < 40)) {
+        if ((diasRestantes <= 0 && porciento < 100) || (porciento >= 0 && porciento <= 39)) {
             style.backgroundColor = 'red';
             style.width = '10px';
             style.height = '10px';
@@ -1017,6 +1205,23 @@
         return style;
     };
 
+    $scope.getBackgroundStyle = function (item) {
+        var style = {};
+        var porciento = parseFloat(item.porciento);
+        var diasRestantes = item.duracion;
+
+        if ((diasRestantes <= 0 && porciento < 100) || (porciento >= 0 && porciento <= 39)) {
+            style.backgroundColor = 'red';
+        } else if (porciento >= 80 && porciento <= 100) {
+            style.backgroundColor = 'green';
+        } else if (porciento >= 40 && porciento < 80) {
+            style.backgroundColor = 'yellow';
+        }
+
+        return style;
+    };
+
+
     $scope.agregarTiempos = function () {
         var servicioSeleccionado = 0;
         var colaboradorSeleccionado = 0;
@@ -1031,7 +1236,7 @@
             });
         }
 
-             
+
         var nuevoTiempo = {
             Servicio: servicioSeleccionado,
             HorasServicio: $scope.nuevoTiempo.horasServicio || 0,
@@ -1041,10 +1246,10 @@
             Colaborador: colaboradorSeleccionado,
             FechaRegistro: $scope.nuevoTiempo.fechaRegistro ?
                 new Date(...$scope.nuevoTiempo.fechaRegistro.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)) :
-                null,                                                   
+                null,
             editable: false
         };
-      
+
         var formData = new FormData();
         formData.append("servicio", nuevoTiempo.Servicio.id);
         formData.append("horasServicio", nuevoTiempo.HorasServicio);
@@ -1054,7 +1259,7 @@
         formData.append("colaborador", nuevoTiempo.Colaborador.id);
         formData.append("fechaRegistro", nuevoTiempo.FechaRegistro);
         formData.append('cliAux', $scope.projId);
-                                                   
+
         var ajaxTiempos = $http({
             method: 'POST',
             url: "user/agregar-tiempo-proyecto",
@@ -1091,8 +1296,6 @@
             $scope.servicios = data.servicios;
         }
     });
-
-    //var ajaxCatalogoServicios = $http.post("user/dar-colaboradores-tiempo-proyectos", {});
 
     var ajaxCatalogoServicios = $http.post("catalogos/dar-colaboradores", {});
     ajaxCatalogoServicios.success(function (data) {
@@ -1159,7 +1362,7 @@
     $scope.guardarCambiosTiempo = function (tiempo) {
         angular.element('#fecha-registro-' + tiempo.id).datepicker('destroy');
         tiempo.editable = false;
-        
+
         var formData = new FormData();
         formData.append("ID", tiempo.id);
         formData.append("servicio", tiempo.servicio.id);
@@ -1169,7 +1372,7 @@
         formData.append("detalle", tiempo.detalle);
         formData.append("colaborador", tiempo.colaborador.id);
         formData.append("fechaRegistro", new Date(...tiempo.fechaRegistro.split('/').reverse().map((v, i) => i === 1 ? v - 1 : v)));
-        
+
 
         var ajaxTiemposPrj = $http({
             method: 'POST',
@@ -1186,7 +1389,7 @@
             } else {
                 messageDialog.show("Información", data.msg);
             }
-        });       
+        });
     };
 
     $scope.atrazarPagina = function () {
@@ -1240,7 +1443,7 @@
         });
     };
 
-   
+
 }]);
 
 //Filters

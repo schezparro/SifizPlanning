@@ -3423,7 +3423,7 @@ r in db.Rol on ur.rol equals r
                 fechaFin = d.fechaFin.ToString("dd/MM/yyyy"),
                 duracion = (d.fechaFin - d.fechaInicio).Days,
                 detalle = d.detalle,
-                porciento = d.porciento,
+                porciento = d.subEtapas.Average(se => se.porciento),
                 selected = d.seleccionado,
                 subEtapas = d.subEtapas.Select(se => new
                 {
@@ -3496,7 +3496,7 @@ r in db.Rol on ur.rol equals r
                     fechaFin = d.fechaFin.ToString("dd/MM/yyyy"),
                     duracion = (d.fechaFin - d.fechaInicio).Days,
                     detalle = d.detalle,
-                    porciento = d.porciento,
+                    porciento = d.subEtapas.Average(se => se.porciento),
                     selected = d.seleccionado,
                     subEtapas = d.subEtapas.Select(se => new
                     {
@@ -3514,10 +3514,27 @@ r in db.Rol on ur.rol equals r
                     }).ToList()
                 }).ToList();
 
+                var datosGenerales = (from epc in db.EtapasProyectoCliente
+                                      join ca in db.ClienteAuxiliar on epc.SecuencialClienteAuxiliar equals ca.Secuencial
+                                      join cliente in db.Cliente on ca.SecuencialCliente equals cliente.Secuencial
+                                      join colab in db.Colaborador on ca.SecuencialLiderProyecto equals colab.Secuencial
+                                      join liderProyecto in db.Persona on colab.SecuencialPersona equals liderProyecto.Secuencial
+                                      join rpro in db.ResponsableProyectos on ca.SecuencialResponsableAcceso equals rpro.Secuencial
+                                      join responsableProyecto in db.Persona on rpro.Secuencial equals responsableProyecto.Secuencial
+                                      where epc.SecuencialClienteAuxiliar == idProyecto && epc.Seleccionado == 1
+                                      orderby epc.Secuencial
+                                      select new
+                                      {
+                                        cliente = cliente.Descripcion,
+                                        liderProyecto = liderProyecto.Nombre1 + " " + liderProyecto.Apellido1,
+                                        responsableProyecto = responsableProyecto.Nombre1 + " " + responsableProyecto.Apellido1
+                                      }).FirstOrDefault();
+
                 return Json(new
                 {
                     success = true,
-                    datosCronograma = etapasSubEtapas
+                    datosCronograma = etapasSubEtapas,
+                    datosGenerales = datosGenerales
                 });
             }
             catch (Exception)
@@ -4007,58 +4024,33 @@ r in db.Rol on ur.rol equals r
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
         public ActionResult GuardarValorInforme(string tipo, string seleccionado, string secuencialEtapaId, string secuencialSubEtapaId,
-            string secuencialCatalogoEtapa, string descripcion, string fechaInicio, string fechaFin, string porciento, string detalle, string recurso)
+            string porciento, string detalle)
         {
             try
             {
                 int selected = 0;
                 double porcentaje = 0;
 
-                if (seleccionado != null && seleccionado == "true")
-                    selected = 1;
-
-                string[] fechaI = fechaInicio.Split(new Char[] { '/' });
-                int dia = Int32.Parse(fechaI[0]);
-                int mes = Int32.Parse(fechaI[1]);
-                int anno = Int32.Parse(fechaI[2]);
-                DateTime fechaInic = new DateTime(anno, mes, dia);
-
-                string[] fechaF = fechaFin.Split(new Char[] { '/' });
-                int diaF = Int32.Parse(fechaF[0]);
-                int mesF = Int32.Parse(fechaF[1]);
-                int annoF = Int32.Parse(fechaF[2]);
-                DateTime fechaFinal = new DateTime(annoF, mesF, diaF);
-
-                if (porciento != null)
-                    porcentaje = Double.Parse(porciento);
+                if (seleccionado != null && seleccionado == "1")
+                    selected = 1;                
 
                 if (tipo == "etapa")
                 {
                     int etapa = int.Parse(secuencialEtapaId);
-                    int etapaCatalogo = int.Parse(secuencialCatalogoEtapa);
 
                     var item = db.EtapasProyectoCliente.FirstOrDefault(t => t.Secuencial == etapa);
-
-                    item.SecuencialEtapaProyecto = etapaCatalogo;
-                    item.FechaInicio = fechaInic;
-                    item.FechaFin = fechaFinal;
-                    item.Porciento = porcentaje;
                     item.Detalle = detalle;
-                    item.Seleccionado = selected;
-
-
+                    item.Seleccionado = selected;   
                 }
                 else if (tipo == "subetapa")
                 {
-                    int recursoId = int.Parse(recurso);
                     int subetapa = int.Parse(secuencialSubEtapaId);
+
+                    if (porciento != null)
+                        porcentaje = Double.Parse(porciento);
 
                     var item = db.SUBETAPASPROYECTOSCLIENTE.FirstOrDefault(t => t.Secuencial == subetapa);
 
-                    item.SecuencialRecuros = recursoId;
-                    item.Descripcion = descripcion;
-                    item.FechaComienzo = fechaInic;
-                    item.FechaFin = fechaFinal;
                     item.Porciento = porcentaje;
                     item.Detalle = detalle;
                     item.Seleccionado = selected;
@@ -4214,30 +4206,41 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult EnviarCorreoInforme(string nombreFichero)
+        public ActionResult EnviarCorreoInforme(HttpPostedFileBase[] pdf = null)
         {
             try
             {
 
                 List<string> destinatarios = new List<string>();
-                destinatarios.Add("melizzabatistamartinez@gmail.com");
+                destinatarios.Add("mbatista@sifizsoft.com");
                 destinatarios.Add("rlandave@sifizsoft.com");
                 destinatarios.Add("vhidalgo@sifizsoft.com");
+                destinatarios.Add("operaciones@sifizsoft.com");
 
                 //string comercial = System.Configuration.ConfigurationManager.AppSettings["emailComercial"];
                 //comercial += "@sifizsoft.com";
                 //destinatarios.Add(comercial);
-                destinatarios = destinatarios.Distinct().ToList();
-                destinatarios.Remove("gerencia@sifizsoft.com");
+                //destinatarios = destinatarios.Distinct().ToList();
+                //destinatarios.Remove("gerencia@sifizsoft.com");
                 string asunto = "Informe de proyecto";
-
-
                 string htmlMail = "Ha recibido un Informe de proyecto";
 
                 List<string> listaPathFicheros = new List<string>();
-                string pathExcel = nombreFichero;
-                string pathAdjuntoExcel = Path.Combine(Server.MapPath("~/Web/resources/proyectos/"), pathExcel);
-                listaPathFicheros.Add(pathAdjuntoExcel);
+                if (pdf != null)
+                {
+                    foreach (HttpPostedFileBase adj in pdf)
+                    {
+                        if (adj != null)
+                        {
+                            string extFile = Path.GetExtension(adj.FileName);
+                            string newNameFile = "inf_" + System.IO.Path.GetRandomFileName() + extFile;
+                            string path = Path.Combine(Server.MapPath("~/Web/resources/proyectos"), newNameFile);
+                            adj.SaveAs(path);
+
+                            listaPathFicheros.Add(path);
+                        }
+                    }
+                }
 
                 Utiles.EnviarEmailSistema(destinatarios.ToArray(), htmlMail, asunto, listaPathFicheros.ToArray(), "");
 
@@ -4254,6 +4257,61 @@ r in db.Rol on ur.rol equals r
                 {
                     success = false,
                     msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult UsuarioEsLider(int secuencialProyecto)
+        {
+            try
+            {
+                string emailUsuario = User.Identity.Name;
+                bool rolUsuarioAdmin = User.IsInRole("ADMIN");
+
+                var datos = (from ca in db.ClienteAuxiliar
+                             join colab in db.Colaborador on ca.SecuencialLiderProyecto equals colab.Secuencial
+                             join pe in db.Persona on colab.SecuencialPersona equals pe.Secuencial
+                             join usu in db.Usuario on pe.Secuencial equals usu.SecuencialPersona
+                             where usu.EstaActivo == 1 && ca.Secuencial == secuencialProyecto
+                             select new
+                             {
+                                 id = colab.Secuencial,
+                                 nombre = pe.Nombre1 + " " + pe.Apellido1,
+                                 email = usu.Email,
+                             }).FirstOrDefault();
+
+                if (datos != null)
+                {
+                    // Compara el nombre del usuario autenticado con el nombre del líder del proyecto
+                    bool esElLider = emailUsuario.Equals(datos.email, StringComparison.OrdinalIgnoreCase);
+
+                    var resp = new
+                    {
+                        success = esElLider,
+                        esAdmin = rolUsuarioAdmin
+                    };
+                    return Json(resp);
+                }
+                else
+                {
+
+                    var resp = new
+                    {
+                        success = false,
+                        message = "No se encontró un líder de proyecto para el proyecto especificado."
+                    };
+                    return Json(resp);
+                }
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    message = e.Message
                 };
                 return Json(resp);
             }
@@ -4704,7 +4762,7 @@ r in db.Rol on ur.rol equals r
                 var etapasProyectosUsuario = (from c in db.EtapasProyectoCliente
                                               join ca in db.EtapasProyecto on c.SecuencialEtapaProyecto equals ca.Secuencial
                                               where c.EstaActivo == 1 && c.SecuencialClienteAuxiliar == idProyecto
-                                              orderby c.Secuencial
+                                              orderby c.FechaInicio
                                               select new
                                               {
                                                   id = c.Secuencial,
@@ -7837,17 +7895,12 @@ r in db.Rol on ur.rol equals r
                         rowIndex++; // Incrementar el índice de fila para separar las etapas
                     }
 
-                    string newNameFile = "Informe proyecto " + Utiles.RandomString(10) + ".xlsx";
+                    string newNameFile = "Informe proyecto " + cliente.Descripcion + " " + Utiles.RandomString(10) + ".xlsx";
                     string path = Path.Combine(Server.MapPath("~/Web/resources/proyectos"), newNameFile);
                     sl.SaveAs(path);
 
-                    var resp = new
-                    {
-                        success = true,
-                        mensaje = path,
-                        nombreFichero = newNameFile
-                    };
-                    return Json(resp);
+                    // Devolver la ruta al archivo como una respuesta
+                    return Json(new { success = true, path = "/Web/resources/proyectos/" + newNameFile, newNameFile });
                 }
             }
             catch (Exception e)
@@ -7862,3 +7915,4 @@ r in db.Rol on ur.rol equals r
         }
     }
 }
+    

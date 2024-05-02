@@ -15,9 +15,7 @@
                 <th>Resp. dar Acceso</th>
                 <th>Resp. Integrar Cód.</th>
                 <th>Resp. Generar Publ.</th>
-                <th>Tiempos</th>
-                <th>Cronograma</th>
-                <th>Informe</th>
+                <th></th>
             </tr>
         </thead>
 
@@ -30,15 +28,7 @@
                 <td>{{proyecto.responsableAcceso}}</td>
                 <td>{{proyecto.responsableCodigo}}</td>
                 <td>{{proyecto.responsablePublicacion}}</td>
-                <td>
-                    <button type="button" class="btn btn-xs btn-primary center-block" ng-click="abrirModalTiemposProyecto(proyecto.id)"><span class="glyphicon glyphicon-time"></span></button>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-xs btn-primary center-block" ng-click="abrirModalGenerarInforme(proyecto.id)"><span class="glyphicon glyphicon-calendar"></span></button>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-xs btn-primary center-block" ng-click="abrirModalGenerarReporte(proyecto.id)"><span class="glyphicon glyphicon-book"></span></button>
-                </td>
+                <td ng-click="mostrarWindowProyectos(proyecto)"><a href="#"><b>Ver</b></a></td>
             </tr>
         </tbody>
 
@@ -184,16 +174,21 @@
             <div class="modal-body">
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        <div class="left">
+                        <div class="center-block">
+                            <input type="hidden" ng-model="proyectoModal" />
                             <label class="label-data-proyecto">IDE de desarrollo: </label><span>  {{versionDesarrollo}}</span><br />
                             <label class="label-data-proyecto">Versión Base de Datos: </label><span>  {{versionBD}}</span><br />
                             <label class="label-data-proyecto">Tiene código fuente: </label><span>  {{tieneSolucionProxies}}</span><br />
                             <label class="label-data-proyecto">Lider del Proyecto: </label><span>  {{lider}}</span><br />
                             <label class="label-data-proyecto">Gestor del Servicio: </label><span>  {{gestor}}</span><br />
                             <label class="label-data-proyecto">Fecha salida a producción: </label><span>  {{fechaProduccion}}</span><br />
-
                         </div>
                     </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap;" ng-show="mostrarBotones">
+                    <button type="button" class="btn btn-sm btn-primary center-block" ng-click="abrirModalTiemposProyecto(proyectoModal.id)"><span class="glyphicon glyphicon-time"></span> TIEMPOS</button>
+                    <button type="button" class="btn btn-sm btn-primary center-block" ng-click="abrirModalGenerarInforme(proyectoModal.id)"><span class="glyphicon glyphicon-calendar"></span> CRONOGRAMA</button>
+                    <button type="button" class="btn btn-sm btn-primary center-block" ng-click="abrirModalGenerarReporte(proyectoModal.id)"><span class="glyphicon glyphicon-book"></span> INFORME</button>
                 </div>
             </div>
             <div class="modal-footer">
@@ -231,7 +226,7 @@
                         </thead>
 
                         <tbody>
-                            <tr ng-repeat="etapa in etapas" ng-dblclick="editarEtapasProyectos(etapa)">
+                            <tr ng-repeat="etapa in etapas">
                                 <td>{{etapa.descripcion | strLimit: 75}}</td>
                                 <td>{{etapa.duracion}}</td>
                                 <td>{{etapa.fechaInicio}}</td>
@@ -446,7 +441,7 @@
 
 <!-- Modal Informe -->
 <div class="modal fade" id="modal-informe-proyecto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog" role="document" style="width: 80%; max-width: 90%; margin: auto;">
         <div class="modal-content">
             <div class="modal-header" style="padding: 10px, 10px">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -520,47 +515,26 @@
         <div class="modal-content">
             <form ng-submit="GuardarValor('etapa')">
                 <div class="modal-header" style="padding: 10px, 10px">
-                    <label>EDITANDO ETAPA</label>
+                    <label>EDITAR DETALLE DE ETAPA</label>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Sección de Etapa -->
-                    <div>
-                        <input hidden ng-model="proyectoIdInfo" />
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="center-block">
+                                <input type="hidden" ng-model="proyectoIdInfo" />
 
-                        <label for="select-etapas-cliente-proyecto">ETAPA:</label>
-                        <select id="select-etapas-cliente-proyecto-info" ng-model="etapasProInfo" class="form-control" required="required">
-                            <option value="">Seleccione...</option>
-                            <option value="{{etapa.id}}" ng-repeat="etapa in etapasCat">{{etapa.nombre}}</option>
-                        </select>
-
-                        <div style="column-count: 2">
-                            <div class="div-info-ticket">
-                                <label for="fecha-inicio-etapa">FECHA INICIO:</label>
-                                <div class='input-group date'>
-                                    <input id="fecha-inicio-etapa-info" ng-model="fechaIniEtaInfo" class="form-control" ng-required="true" autocomplete="off" />
-                                </div>
+                                <label class="label-data-proyecto">Etapa: </label><span> {{etapaDescripcion}}</span><br />
+                                <label class="label-data-proyecto">Fecha Inicio: </label><span> {{fechaIniEtaInfo}}</span><br />
+                                <label class="label-data-proyecto">Fecha Fin: </label><span> {{fechaFinEtaInfo}}</span><br />
+                                <label class="label-data-proyecto">Porcentaje: </label><span> {{porcentajeEtaInfo}}%</span><br />
                             </div>
-
-                            <div class="div-info-ticket">
-                                <label for="fecha-fin-etapa">FECHA FIN:</label>
-                                <div class='input-group date'>
-                                    <input id="fecha-fin-etapa-info" ng-model="fechaFinEtaInfo" class="form-control" ng-required="true" autocomplete="off" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="div-info-ticket">
-                            <label for="porcentaje-etapa">PORCENTAJE:</label>
-                            <input id="porcentaje-etapa-info" type="number" ng-model="porcentajeEtaInfo" class="form-control" ng-required="true" min="0" max="100" step="1" />
-                        </div>
-
-                        <div class="div-info-ticket">
-                            <label for="detalle-etapa">DETALLE:</label>
-                            <textarea id="detalle-etapa-info" ng-model="detalleEtaInfo" class="form-control" ng-required="true" rows="3"></textarea>
                         </div>
                     </div>
-                    <!-- Fin de la sección de Etapa -->
+                    <div class="div-info-ticket">
+                        <label for="detalle-etapa">DETALLE:</label>
+                        <textarea id="detalle-etapa-info" ng-model="detalleEtaInfo" class="form-control" ng-required="true" rows="3"></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" id="enviar-modal-etapas-info-btn" class="btn btn-primary">Guardar</button>
@@ -584,27 +558,16 @@
                     <div>
                         <input hidden ng-model="proyectoIdInfo" />
                         <input hidden ng-model="etapaId" />
-                        <label for="textarea-descripcion">DESCRIPCION:</label>
-                        <textarea type="text" class="form-control" ng-model="descripcionSubEInfo" ng-required="true"></textarea>
 
-                        <label for="select-recursos-sub-etapas">RECURSO:</label>
-                        <select id="select-recursos-sub-etapas-info" ng-model="recursosSubEInfo" class="form-control" required="required">
-                            <option value="">Seleccione...</option>
-                            <option value="{{recurso.id}}" ng-repeat="recurso in recursosSubEtapas">{{recurso.nombre}}</option>
-                        </select>
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="center-block">
+                                    <input type="hidden" ng-model="proyectoIdInfo" />
 
-                        <div style="column-count: 2">
-                            <div class="div-info-ticket">
-                                <label for="fecha-inicio-subetapa-info">FECHA INICIO:</label>
-                                <div class='input-group date'>
-                                    <input id="fecha-inicio-subetapa-info" ng-model="fechaIniSubEInfo" class="form-control" ng-required="true" autocomplete="off" ng-change="updateMinDateSubEtapa()" />
-                                </div>
-                            </div>
-
-                            <div class="div-info-ticket">
-                                <label for="fecha-fin-subetapa-info">FECHA FIN:</label>
-                                <div class='input-group date'>
-                                    <input id="fecha-fin-subetapa-info" ng-model="fechaFinSubEInfo" class="form-control" ng-required="true" autocomplete="off" ng-change="updateMinDateSubEtapa()" />
+                                    <label class="label-data-proyecto">Subetapa: </label><span> {{descripcionSubEInfo}}</span><br />
+                                    <label class="label-data-proyecto">Recurso: </label><span> {{recursosDescSubEInfo}}</span><br />
+                                    <label class="label-data-proyecto">Fecha Inicio: </label><span> {{fechaIniSubEInfo}}</span><br />
+                                    <label class="label-data-proyecto">Fecha Fin: </label><span> {{fechaFinSubEInfo}}</span><br />
                                 </div>
                             </div>
                         </div>
@@ -630,49 +593,55 @@
 </div>
 
 <div class="modal fade" id="cronogramaModal" tabindex="-1" role="dialog" aria-labelledby="cronogramaModalLabel">
-    <div class="modal-dialog" role="document" style="width: 80%; max-width: 90%; margin: auto;">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="cronogramaModalLabel">Cronograma del Proyecto</h4>
+                <h4 class="modal-title" id="cronogramaModalLabel">Informe avances del proyecto</h4>
             </div>
             <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
                 <input hidden ng-model="proyectoIdInfo" />
                 <table id="tabla-cronograma-proyecto" class="table table-striped" style="width: 100%;">
                     <thead>
                         <tr>
-                            <th>Descripción</th>
-                            <th>Duración</th>
-                            <th>Fecha Inicio</th>
-                            <th>Fecha Fin</th>
-                            <th>Recurso</th>
-                            <th>% Cumplimiento</th>
-                            <th>Detalle</th>
-                            <th></th>
+                            <th colspan="4" class="text-left">
+                                <label class="label-data-proyecto">CLIENTE: </label><span>  {{cliente}}</span><br />
+                            </th>
+                        </tr>
+
+                        <tr>
+                            <th colspan="4" class="text-left">
+                                <label class="label-data-proyecto">RESPONSABLE - LIDER PROYECTO: </label><span>  {{responsable}}  -  {{lider}}</span><br />
+                            </th>
+                        </tr>
+
+                        <tr>
+                            <th colspan="4" class="text-left">
+                                <label class="label-data-proyecto">FECHA: </label><span>  {{fecha}}</span><br />
+                            </th>
+                        </tr>
+                        <tr></tr>
+                        <tr>
+                            <th>ETAPA</th>
+                            <th>DETALLE</th>
+                            <th>FECHA CULMINACION</th>
+                            <th>ESTADO</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr ng-repeat="item in datosCronograma" ng-style="item.tipo === 'etapa' ? {'background-color': '#d0e0f0', 'font-weight': 'bold'} : {}" ng-class="{'etapa-row': item.tipo === 'etapa', 'subetapa-row': item.tipo === 'subetapa'}">
                             <td ng-if="item.tipo === 'etapa'">{{item.descripcion | strLimit: 75}}</td>
-                            <td ng-if="item.tipo === 'etapa'">{{item.duracion}}</td>
-                            <td ng-if="item.tipo === 'etapa'">{{item.fechaInicio}}</td>
-                            <td ng-if="item.tipo === 'etapa'">{{item.fechaFin}}</td>
-                            <td ng-if="item.tipo === 'etapa'"></td>
-                            <td ng-if="item.tipo === 'etapa'">{{item.porciento}}</td>
                             <td ng-if="item.tipo === 'etapa'">{{item.detalle}}</td>
-                            <td ng-if="item.tipo === 'etapa'">
-                                <span ng-style="getSemaforoStyle(item)" style="display: inline-block;"></span>
+                            <td ng-if="item.tipo === 'etapa'">{{item.fechaFin}}</td>
+                            <td ng-if="item.tipo === 'etapa'" ng-style="getBackgroundStyle(item)">
+                                <input type="hidden" class="color-estado" value="{{item.colorEstado}}">
                             </td>
 
                             <td ng-if="item.tipo === 'subetapa'" ng-style="{'padding-left': '30px'}">{{item.descripcion | strLimit: 75}}</td>
-                            <td ng-if="item.tipo === 'subetapa'">{{item.duracion}}</td>
-                            <td ng-if="item.tipo === 'subetapa'">{{item.fechaInicio}}</td>
-                            <td ng-if="item.tipo === 'subetapa'">{{item.fechaFin}}</td>
-                            <td ng-if="item.tipo === 'subetapa'">{{item.recurso}}</td>
-                            <td ng-if="item.tipo === 'subetapa'">{{item.porciento}}</td>
                             <td ng-if="item.tipo === 'subetapa'">{{item.detalle}}</td>
-                            <td ng-if="item.tipo === 'subetapa'">
-                                <span ng-style="getSemaforoStyle(item)" style="display: inline-block;"></span>
+                            <td ng-if="item.tipo === 'subetapa'">{{item.fechaFin}}</td>
+                            <td ng-if="item.tipo === 'subetapa'" ng-style="getBackgroundStyle(item)">
+                                <input type="hidden" class="color-estado" value="{{item.colorEstado}}">
                             </td>
                         </tr>
                     </tbody>
@@ -680,8 +649,9 @@
             </div>
             <div class="modal-footer">
 
-                <button type="button" id="enviar-informe-btn" class="btn btn-success">Enviar por correo</button>
-                <button type="button" class="btn btn-primary" ng-click="generarInforme()">Exportar</button>
+                <button type="button" id="enviar-informe-btn" class="btn btn-success" ng-click="enviarInforme()">Enviar por correo</button>
+                <button type="button" class="btn btn-primary" ng-click="generarInforme()">Exportar Excel</button>
+                <button type="button" class="btn btn-primary" ng-click="generarInformePDF()">Exportar PDF</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
@@ -689,7 +659,7 @@
 </div>
 
 <!-- Modal de Tiempos Proyecto -->
-<div class="modal fade" id="modal-tiempos-proyecto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
+<div class="modal fade" id="modal-tiempos-proyecto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" modal-fullscreen" role="document" style="width: 100%; height: 100%; margin: 0; padding: 0; max-width: none;" role="document">
         <div class="modal-content" style="overflow:hidden">
             <div class="modal-header" style="padding: 10px, 10px">
@@ -697,7 +667,7 @@
                 <h4 class="modal-title"><span class="glyphicon glyphicon-time" aria-hidden="true"></span> Gestión de tiempos del proyecto </h4>
             </div>
 
-            <div class="modal-body">             
+            <div class="modal-body">
                 <div class="panel-body" style="max-height: 490px; overflow-y: auto;">
                     <input hidden ng-model="projId" />
                     <input type="text" ng-model-options='{ debounce: 1000 }' ng-change="cargarTiemposProyecto()" ng-model="filtroTiempos" class="form-control right filtro" placeholder="Filtrar..." />
@@ -708,7 +678,7 @@
                                 <th width="100px">Horas Servicio</th>
                                 <th width="150px">R/P</th>
                                 <th width="100px">Horas Consumidas</th>
-                                <th >Detalle</th>
+                                <th>Detalle</th>
                                 <th width="150px">Colaborador</th>
                                 <th width="150px">Fecha</th>
                             </tr>
@@ -762,7 +732,7 @@
                             </tr>
                         </tfoot>
                         <tbody>
-                            <tr>                               
+                            <tr>
                                 <td>
                                     <select id="catalogo-servicio" ng-class="'form-control'" ng-model="nuevoTiempo.catalogoServicio" ng-options="servicio.id as (servicio.descripcion | limitTo: 30) for servicio in servicios">
                                         <option value="">Seleccione...</option>
@@ -849,8 +819,6 @@
                     </table>
                 </div>
             </div>
-       </div>
-   </div>
+        </div>
+    </div>
 </div>
-
-
