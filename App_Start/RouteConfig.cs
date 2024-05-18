@@ -2181,6 +2181,21 @@ namespace SifizPlanning
 
             //------------------ FIN DE RUTAS DEL MODULO DE RRHH -------------------
 
+            //------------------ RUTAS DEL MODULO DE INDICADORES -------------------
+            routes.MapRoute(
+                name: "DarInfotickets",
+                url: "indicadores/dar-infotickets/{id}",
+                defaults: new { controller = "Indicadores", action = "DarInfotickets", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "INDICADORES",
+                url: "indicadores/{id}",
+                defaults: new { controller = "Indicadores", action = "Index", id = UrlParameter.Optional }
+            );
+
+            //------------------ FIN DE RUTAS DEL MODULO DE INDICADORES -------------------
+
             //--------------- RUTAS DEL MODULO DE GESTION DE ERRORES ---------------
 
             routes.MapRoute(

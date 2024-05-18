@@ -420,6 +420,7 @@
     <Compile Include="Controllers\GestionErroresController.cs" />
     <Compile Include="Controllers\HangfireController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\IndicadoresController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\RrhhController.cs" />
     <Compile Include="Controllers\ServiciosController.cs" />
@@ -1214,6 +1215,9 @@
     <Content Include="Views\User\windowUserIncidencias.cshtml" />
     <Content Include="Views\Report\VerReporteCliente.cshtml" />
     <Content Include="Views\Rrhh\windowIncidencias.cshtml" />
+    <Content Include="Views\Indicadores\Index.cshtml" />
+    <Content Include="Views\Indicadores\windowIndicadoresTickets.cshtml" />
+    <Content Include="Views\Indicadores\windowIndicadoresGestores.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1240,6 +1244,9 @@
     <Content Include="Web\js\jspdf.umd.min.js" />
     <Content Include="Web\js\pdf.min.js" />
     <Content Include="Web\js\pdf.worker.min.js" />
+    <Content Include="Web\js\indicadores\indicadoresGestores.js" />
+    <Content Include="Web\js\indicadores\indicadores.js" />
+    <Content Include="Web\js\indicadores\indicadoresTickets.js" />
     <Content Include="Web\js\rrhh\feriadosController.js" />
     <Content Include="Web\js\rrhh\solicitudesController.js" />
     <Content Include="Web\js\solid-gauge.js" />
@@ -1655,7 +1662,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Properties\PublishProfiles\" />
-    <Folder Include="Views\incidencias\" />
     <Folder Include="Web\files\asignaciones\" />
     <Folder Include="Web\images\chat\" />
     <Folder Include="Web\images\logFBSError\" />

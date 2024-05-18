@@ -1223,7 +1223,7 @@ namespace SifizPlanning.Controllers
                     string linksConcatenados = linkAceptar + ", " + linkRechazar;
 
                     var client = new HttpClient();
-                    var requestUrl = "https://api-publicaciones.sifizsoft.com/api/AsignacionPublicacion/AsignarTareaDePublicacion";
+                    var requestUrl = "https://api-sifizops.sifizsoft.com/api/AsignacionPublicacion/AsignarTareaDePublicacion";
 
                     var data = new MultipartFormDataContent();
 
