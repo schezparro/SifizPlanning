@@ -1466,10 +1466,12 @@ namespace SifizPlanning.Controllers
                     data.Add(new StringContent(descripcionP), "Descripcion");
                     data.Add(new StringContent(colaboradorP), "NombreSolicitante");
                     data.Add(new StringContent(string.Join(",", tagsP)), "Tags");
-                    data.Add(new StringContent(destinos), "NotificarA");
+                    data.Add(new StringContent(destinosCliente), "NotificarCliente");
+                    data.Add(new StringContent(destinosTecnico), "NotificarTecnico");
                     data.Add(new StringContent(ramaP), "NombreRama");
                     data.Add(new StringContent(requiereQAP), "RequiereQA");
-                    data.Add(new StringContent(string.Empty), "URLSifizPlanning");
+                    data.Add(new StringContent(linkAceptar), "URLSifizPlanningAceptar");
+                    data.Add(new StringContent(linkRechazar), "URLSifizPlanningRechazar");
                     data.Add(new StringContent(key), "Key");
 
                     if (adjuntoPublicacion != null)
