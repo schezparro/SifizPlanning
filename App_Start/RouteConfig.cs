@@ -995,6 +995,12 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "EnviarPublicacion",
+                url: "user/enviar-publicacion/{id}",
+                defaults: new { controller = "User", action = "EnviarPublicacion", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "DarCoordinadosUsuario",
                 url: "user/coordinados-usuario/{id}",
                 defaults: new { controller = "User", action = "DarCoordinadosUsuario", id = UrlParameter.Optional }
