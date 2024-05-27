@@ -1508,20 +1508,20 @@
             formData.append("tagsJson", JSON.stringify(tags));
             formData.append("adjuntoPublicacion", filePub.files[0]);
 
-            var informacionFinTicket = $http.post(
+            var enviarPublicacion = $http.post(
                 "user/enviar-publicacion",
                 formData,
                 {
                     headers: { "Content-Type": undefined },
                 }
             );
-            informacionFinTicket.success(function (data) {
+            enviarPublicacion.success(function (data) {
                 waitingDialog.hide();
                 if (data.success === true) {
-                    $scope.Errormsj = data.devopsmsj;
-                    $scope.requierePublicacion = false;
-                    $scope.cambioRequierePublicacion();
-                    angular.element("#modal-email-fin-ticket").modal("hide");
+                    //$scope.Errormsj = data.devopsmsj;
+                    //$scope.requierePublicacion = false;
+                    //$scope.cambioRequierePublicacion();
+                    //angular.element("#modal-email-fin-ticket").modal("hide");
                 } else {
                     messageDialog.show("Información", data.msg);
                 }

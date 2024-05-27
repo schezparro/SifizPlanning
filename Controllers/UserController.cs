@@ -1422,6 +1422,14 @@ namespace SifizPlanning.Controllers
                     string emailCliente = "";
                     string tituloP = "";
                     string clienteP = "";
+                    List<string> notCli = new List<string>();
+                    List<string> notTec = new List<string>();
+                    notCli.Add(emailCliente);
+                    notTec.Add(emailUser);
+                    notTec.AddRange(Utiles.CorreoPorGrupoEmail("COORD"));
+                    notTec.AddRange(Utiles.CorreoPorGrupoEmail("TFS"));
+                    string destinosCliente = String.Join(", ", notCli.ToArray());
+                    string destinosTecnico = String.Join(", ", notTec.ToArray());
                     if (tarea.entregableMotivoTrabajo != null)
                     {
                         var mt = db.MotivoTrabajo.Where(s => s.Secuencial == tarea.entregableMotivoTrabajo.SecuencialMotivoTrabajo).FirstOrDefault();
@@ -1438,14 +1446,12 @@ namespace SifizPlanning.Controllers
                         emailCliente = persona.usuario.FirstOrDefault().Email;
                         tituloP = "TCK-" + ticket.Secuencial;
                         clienteP = personaCliente.cliente.Codigo;
+                        var gestores = ticket.persona_cliente.cliente.gestorServicios.ToList();
+                        foreach (var g in gestores)
+                        {
+                            notTec.Add(g.colaborador.persona.usuario.FirstOrDefault().Email);
+                        }
                     }
-
-                    List<string> correosDestinos = new List<string>();
-                    correosDestinos.Add(emailCliente);
-                    correosDestinos.Add(emailUser);
-                    correosDestinos.AddRange(Utiles.CorreoPorGrupoEmail("COORD"));
-                    correosDestinos.AddRange(Utiles.CorreoPorGrupoEmail("TFS"));
-                    string destinos = String.Join(", ", correosDestinos.ToArray());
 
                     string ramaP = rama;
                     string requiereQAP = "NO";
@@ -1466,12 +1472,12 @@ namespace SifizPlanning.Controllers
                     data.Add(new StringContent(descripcionP), "Descripcion");
                     data.Add(new StringContent(colaboradorP), "NombreSolicitante");
                     data.Add(new StringContent(string.Join(",", tagsP)), "Tags");
-                    data.Add(new StringContent(destinosCliente), "NotificarCliente");
+                    data.Add(new StringContent(""), "NotificarCliente");
                     data.Add(new StringContent(destinosTecnico), "NotificarTecnico");
                     data.Add(new StringContent(ramaP), "NombreRama");
                     data.Add(new StringContent(requiereQAP), "RequiereQA");
-                    data.Add(new StringContent(linkAceptar), "URLSifizPlanningAceptar");
-                    data.Add(new StringContent(linkRechazar), "URLSifizPlanningRechazar");
+                    data.Add(new StringContent(""), "URLSifizPlanningAceptar");
+                    data.Add(new StringContent(""), "URLSifizPlanningRechazar");
                     data.Add(new StringContent(key), "Key");
 
                     if (adjuntoPublicacion != null)
