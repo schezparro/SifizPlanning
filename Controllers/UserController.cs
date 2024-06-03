@@ -1208,6 +1208,20 @@ namespace SifizPlanning.Controllers
                     }
                     db.SaveChanges();
 
+                    List<string> notCli = new List<string>();
+                    List<string> notTec = new List<string>();
+                    notCli.Add(emailCliente);
+                    notTec.Add(emailUser);
+                    notTec.AddRange(Utiles.CorreoPorGrupoEmail("COORD"));
+                    notTec.AddRange(Utiles.CorreoPorGrupoEmail("TFS"));
+                    var gestores = ticket.persona_cliente.cliente.gestorServicios.ToList();
+                    foreach (var g in gestores)
+                    {
+                        notTec.Add(g.colaborador.persona.usuario.FirstOrDefault().Email);
+                    }
+                    string destinosCliente = String.Join(", ", notCli.ToArray());
+                    string destinosTecnico = String.Join(", ", notTec.ToArray());
+
                     string tituloP = "TCK-" + ticket.Secuencial;
                     string ramaP = rama;
                     string requiereQAP = "NO";
@@ -1220,7 +1234,7 @@ namespace SifizPlanning.Controllers
                     string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
                     string linkAceptar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO"));
                     string linkRechazar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":NOACEPTADO"));
-                    string linksConcatenados = linkAceptar + ", " + linkRechazar;
+                    //string linksConcatenados = linkAceptar + ", " + linkRechazar;
 
                     var client = new HttpClient();
                     var requestUrl = "https://api-sifizops.sifizsoft.com/api/AsignacionPublicacion/AsignarTareaDePublicacion";
@@ -1232,13 +1246,13 @@ namespace SifizPlanning.Controllers
                     data.Add(new StringContent(descripcionP), "Descripcion");
                     data.Add(new StringContent(colaboradorP), "NombreSolicitante");
                     data.Add(new StringContent(string.Join(",", tagsP)), "Tags");
-                    data.Add(new StringContent(destinos), "NotificarA");
+                    data.Add(new StringContent(destinosCliente), "NotificarCliente");
+                    data.Add(new StringContent(destinosTecnico), "NotificarTecnico");
                     data.Add(new StringContent(ramaP), "NombreRama");
                     data.Add(new StringContent(requiereQAP), "RequiereQA");
-                    data.Add(new StringContent(linksConcatenados), "URLSifizPlanning");
+                    data.Add(new StringContent(linkAceptar), "URLSifizPlanningAceptar");
+                    data.Add(new StringContent(linkRechazar), "URLSifizPlanningRechazar");
                     data.Add(new StringContent(key), "Key");
-
-
 
                     if (adjuntoPublicacion != null)
                     {
@@ -1376,6 +1390,146 @@ namespace SifizPlanning.Controllers
                     devopsmsj = mensajeDevops
                 };
                 return Json(result);
+            }
+            catch (Exception e)
+            {
+                var result = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(result);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public async Task<ActionResult> EnviarPublicacion(int idTarea, string rama = "", string descripcion = "", string tagsJson = "", HttpPostedFileBase[] adjuntoPublicacion = null)
+        {
+            try
+            {
+                string emailUser = User.Identity.Name;
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+
+                List<string> listaFicheros = new List<string>();
+                List<string> listaPathFicheros = new List<string>();
+
+                Tarea tarea = db.Tarea.Find(idTarea);
+                if (tarea.entregableMotivoTrabajo != null || tarea.ticketTarea != null)
+                {
+                    var mensajeDevops = "Devops no se consumió";
+                    string emailCliente = "";
+                    string tituloP = "";
+                    string clienteP = "";
+                    List<string> notCli = new List<string>();
+                    List<string> notTec = new List<string>();
+                    notCli.Add(emailCliente);
+                    notTec.Add(emailUser);
+                    notTec.AddRange(Utiles.CorreoPorGrupoEmail("COORD"));
+                    notTec.AddRange(Utiles.CorreoPorGrupoEmail("TFS"));
+                    string destinosCliente = String.Join(", ", notCli.ToArray());
+                    string destinosTecnico = String.Join(", ", notTec.ToArray());
+                    if (tarea.entregableMotivoTrabajo != null)
+                    {
+                        var mt = db.MotivoTrabajo.Where(s => s.Secuencial == tarea.entregableMotivoTrabajo.SecuencialMotivoTrabajo).FirstOrDefault();
+                        Persona persona = mt.cliente.persona_cliente.First().persona;
+                        emailCliente = persona.usuario.FirstOrDefault().Email;
+                        tituloP = "Contrato-" + mt.Codigo;
+                        clienteP = mt.cliente.persona_cliente.First().cliente.Codigo;
+                    }
+                    else
+                    {
+                        Ticket ticket = tarea.ticketTarea.FirstOrDefault().ticket;
+                        Persona_Cliente personaCliente = db.Persona_Cliente.Find(ticket.SecuencialPersona_Cliente);
+                        Persona persona = personaCliente.persona;
+                        emailCliente = persona.usuario.FirstOrDefault().Email;
+                        tituloP = "TCK-" + ticket.Secuencial;
+                        clienteP = personaCliente.cliente.Codigo;
+                        var gestores = ticket.persona_cliente.cliente.gestorServicios.ToList();
+                        foreach (var g in gestores)
+                        {
+                            notTec.Add(g.colaborador.persona.usuario.FirstOrDefault().Email);
+                        }
+                    }
+
+                    string ramaP = rama;
+                    string requiereQAP = "NO";
+                    string colaboradorP = user.persona.Nombre1 + " " + user.persona.Apellido1;
+                    string descripcionP = descripcion;
+                    string[] tagsP = JsonConvert.DeserializeObject<string[]>(tagsJson);
+                    string key = ConfigurationManager.AppSettings.Get("Devops");
+
+                    string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
+
+                    var client = new HttpClient();
+                    var requestUrl = "https://api-sifizops.sifizsoft.com/api/AsignacionPublicacion/AsignarTareaDePublicacion";
+
+                    var data = new MultipartFormDataContent();
+
+                    data.Add(new StringContent(clienteP), "Cliente");
+                    data.Add(new StringContent(tituloP), "Titulo");
+                    data.Add(new StringContent(descripcionP), "Descripcion");
+                    data.Add(new StringContent(colaboradorP), "NombreSolicitante");
+                    data.Add(new StringContent(string.Join(",", tagsP)), "Tags");
+                    data.Add(new StringContent(""), "NotificarCliente");
+                    data.Add(new StringContent(destinosTecnico), "NotificarTecnico");
+                    data.Add(new StringContent(ramaP), "NombreRama");
+                    data.Add(new StringContent(requiereQAP), "RequiereQA");
+                    data.Add(new StringContent(""), "URLSifizPlanningAceptar");
+                    data.Add(new StringContent(""), "URLSifizPlanningRechazar");
+                    data.Add(new StringContent(key), "Key");
+
+                    if (adjuntoPublicacion != null)
+                    {
+                        foreach (var adjunto in adjuntoPublicacion)
+                        {
+                            var stream = adjunto.InputStream;
+                            data.Add(new StreamContent(stream), "ArchivoAdjunto", adjunto.FileName);
+                        }
+                    }
+
+                    var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+                    requestMessage.Content = data;
+
+                    var response = await client.SendAsync(requestMessage);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        mensajeDevops = "Devops se consumió correctamente";
+                    }
+                    else
+                    {
+                        string textoEmailDevops = @"<div class='textoCuerpo'><br/>";
+                        textoEmailDevops += @"<br/>";
+                        textoEmailDevops += @"<br/><i>Ha ocurrido un error en el consumo de la api de devops.</i>";
+                        textoEmailDevops += @"<br/><i>La funcionalidad AsignarTareaDePublicacion del APISifizOps tuvo un error por favor revisar</i>";
+                        textoEmailDevops += @"<br/><i>Detalles:</i>";
+                        textoEmailDevops += @"<br/>";
+                        textoEmailDevops += response.StatusCode.ToString() + ": " + response.ReasonPhrase.ToString();
+                        textoEmailDevops += "________" + requestMessage.ToString();
+                        textoEmailDevops += @"</div>";
+
+                        string emailClienteDevops = "sfzdevops@sifizsoft.com";
+
+                        List<string> correosDestinosDevops = new List<string>();
+                        correosDestinosDevops.Add(emailClienteDevops);
+                        correosDestinosDevops.Add("rsanchez@sifizsoft.com");
+
+                        string asuntoEmailDevops = "Notificación error Api Devops";
+                        Utiles.EnviarEmailSistema(correosDestinosDevops.ToArray(), textoEmailDevops, asuntoEmailDevops);
+                    }
+
+                    var result = new
+                    {
+                        success = true,
+                        devopsmsj = mensajeDevops
+                    };
+                    return Json(result);
+                }
+                else
+                {
+                    throw new Exception("Esta tarea no está asociada ni a un ticket ni a un contrato.");
+                }
             }
             catch (Exception e)
             {
@@ -3525,9 +3679,9 @@ r in db.Rol on ur.rol equals r
                                       orderby epc.Secuencial
                                       select new
                                       {
-                                        cliente = cliente.Descripcion,
-                                        liderProyecto = liderProyecto.Nombre1 + " " + liderProyecto.Apellido1,
-                                        responsableProyecto = responsableProyecto.Nombre1 + " " + responsableProyecto.Apellido1
+                                          cliente = cliente.Descripcion,
+                                          liderProyecto = liderProyecto.Nombre1 + " " + liderProyecto.Apellido1,
+                                          responsableProyecto = responsableProyecto.Nombre1 + " " + responsableProyecto.Apellido1
                                       }).FirstOrDefault();
 
                 return Json(new
@@ -3839,7 +3993,7 @@ r in db.Rol on ur.rol equals r
         //Guardar datos del modal Tiempos del Proyecto
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult AgregarTiemposProyecto(string cliAux, string servicio, int? horasServicio, string rp, int? horasConsumidas, string detalle, string colaborador, string fechaRegistro )
+        public ActionResult AgregarTiemposProyecto(string cliAux, string servicio, int? horasServicio, string rp, int? horasConsumidas, string detalle, string colaborador, string fechaRegistro)
         {
             try
             {
@@ -3847,7 +4001,7 @@ r in db.Rol on ur.rol equals r
                 int colaboradorTiempo = int.Parse(colaborador);
                 int idProyecto = int.Parse(cliAux);
 
-                DateTime dateRegistro = new DateTime(0001 / 01 / 01);               
+                DateTime dateRegistro = new DateTime(0001 / 01 / 01);
                 string format = "ddd MMM dd yyyy HH:mm:ss 'GMT'K";
 
                 if (fechaRegistro != "null")
@@ -3855,7 +4009,7 @@ r in db.Rol on ur.rol equals r
                     fechaRegistro = fechaRegistro.Split(new[] { " (" }, StringSplitOptions.None)[0];
                     dateRegistro = DateTime.ParseExact(fechaRegistro, format, CultureInfo.InvariantCulture);
                 }
-                
+
                 TiemposProyecto tiempoProj = new TiemposProyecto();
                 tiempoProj.SecuencialServicioImplantacionCore = catalogoServicio;
                 tiempoProj.HorasServicio = horasServicio ?? 0;
@@ -3892,37 +4046,39 @@ r in db.Rol on ur.rol equals r
         {
             try
             {
-                           
+
                 var tiemposPrj = (from t in db.TiemposProyecto
-                               join s in db.ServicioImplantacionCore on t.SecuencialServicioImplantacionCore equals s.Secuencial
-                               join col in db.Colaborador on t.SecuencialColaborador equals col.Secuencial
-                               join p in db.Persona on col.SecuencialPersona equals p.Secuencial
-                               where t.SecuencialClienteAuxiliar == idProyecto
-                               select new
-                               {
-                                   id = t.Secuencial,
-                                   servicio =  new {
-                                       id = s.Secuencial,
-                                       descripcion = s.Descripcion                                      
-                                   },
-                                   horasServicio = t.HorasServicio,
-                                   rp = t.Rp,
-                                   horasConsumidas = t.HorasConsumidas,
-                                   detalle = t.Detalle,
-                                   colaborador = new {
-                                       id = col.Secuencial,
-                                       nombre = p.Nombre1 + " " + p.Apellido1
-                                   },
-                                   fechaRegistro =t.Fecha,                                  
-                                   editable = false,
-                               }).ToList();
+                                  join s in db.ServicioImplantacionCore on t.SecuencialServicioImplantacionCore equals s.Secuencial
+                                  join col in db.Colaborador on t.SecuencialColaborador equals col.Secuencial
+                                  join p in db.Persona on col.SecuencialPersona equals p.Secuencial
+                                  where t.SecuencialClienteAuxiliar == idProyecto
+                                  select new
+                                  {
+                                      id = t.Secuencial,
+                                      servicio = new
+                                      {
+                                          id = s.Secuencial,
+                                          descripcion = s.Descripcion
+                                      },
+                                      horasServicio = t.HorasServicio,
+                                      rp = t.Rp,
+                                      horasConsumidas = t.HorasConsumidas,
+                                      detalle = t.Detalle,
+                                      colaborador = new
+                                      {
+                                          id = col.Secuencial,
+                                          nombre = p.Nombre1 + " " + p.Apellido1
+                                      },
+                                      fechaRegistro = t.Fecha,
+                                      editable = false,
+                                  }).ToList();
 
                 if (filtro != "")
                 {
                     tiemposPrj = tiemposPrj.Where(t =>
                                             t.servicio.ToString().ToUpper().Contains(filtro.ToUpper()) ||
                                             t.colaborador.ToString().ToUpper().Contains(filtro.ToUpper()) ||
-                                            t.detalle.ToString().ToUpper().Contains(filtro.ToUpper())                                             
+                                            t.detalle.ToString().ToUpper().Contains(filtro.ToUpper())
                                         ).ToList();
                 }
 
@@ -3985,7 +4141,7 @@ r in db.Rol on ur.rol equals r
                     int catalogoServicio = int.Parse(servicio);
                     int colaboradorTiempo = int.Parse(colaborador);
 
-                    DateTime dateRegistro = new DateTime(0001 / 01 / 01);                  
+                    DateTime dateRegistro = new DateTime(0001 / 01 / 01);
                     string format = "ddd MMM dd yyyy HH:mm:ss 'GMT'K";
 
                     if (fechaRegistro != "null")
@@ -4000,8 +4156,8 @@ r in db.Rol on ur.rol equals r
                     tiempo.HorasConsumidas = horasConsumidas;
                     tiempo.Detalle = detalle;
                     tiempo.SecuencialColaborador = colaboradorTiempo;
-                    tiempo.Fecha = dateRegistro.Date;  
-                    
+                    tiempo.Fecha = dateRegistro.Date;
+
                 }
                 db.SaveChanges();
 
@@ -4032,7 +4188,7 @@ r in db.Rol on ur.rol equals r
                 double porcentaje = 0;
 
                 if (seleccionado != null && seleccionado == "1")
-                    selected = 1;                
+                    selected = 1;
 
                 if (tipo == "etapa")
                 {
@@ -4040,7 +4196,7 @@ r in db.Rol on ur.rol equals r
 
                     var item = db.EtapasProyectoCliente.FirstOrDefault(t => t.Secuencial == etapa);
                     item.Detalle = detalle;
-                    item.Seleccionado = selected;   
+                    item.Seleccionado = selected;
                 }
                 else if (tipo == "subetapa")
                 {
@@ -7915,4 +8071,3 @@ r in db.Rol on ur.rol equals r
         }
     }
 }
-    

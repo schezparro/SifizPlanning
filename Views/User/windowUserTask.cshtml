@@ -4,8 +4,12 @@
 
 <div class="task-controles">
     <div class="left">
-        <button class="btn btn-primary" ng-click="filtrarTareas()"><span class="glyphicon glyphicon-filter Aceptar" aria-hidden="true"></span> Aplicar Filtro</button>
-        <button class="btn btn-primary" ng-click="windowSolicitarTarea()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Solicitud de Tarea</button>
+        <button class="btn btn-primary" ng-click="filtrarTareas()">
+            <span class="glyphicon glyphicon-filter Aceptar" aria-hidden="true"></span> Aplicar Filtro
+        </button>
+        <button class="btn btn-primary" ng-click="windowSolicitarTarea()">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Solicitud de Tarea
+        </button>
     </div>
 
     <div id="control-filtrar">
@@ -18,9 +22,13 @@
             <option value="2">2 Semanas</option>
             <option value="3">3 Semanas</option>
         </select>
-        <button class="btn btn-primary" ng-click="semanaAtras()"><span class="glyphicon glyphicon-chevron-left"></span></button>
+        <button class="btn btn-primary" ng-click="semanaAtras()">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+        </button>
         <button class="btn btn-success" ng-click="diaHoy()"><span class="glyphicon glyphicon-home"></span></button>
-        <button class="btn btn-primary" ng-click="semanaProxima()"><span class="glyphicon glyphicon-chevron-right"></span></button>
+        <button class="btn btn-primary" ng-click="semanaProxima()">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+        </button>
     </div>
 </div>
 
@@ -40,7 +48,9 @@
                     <div class="colaborador-panel" data-id="{{trab.trab.id}}">
                         <div>
                             {{paso+1}}
-                            <span class="{{estiloSegunEstadoCoordinacion(trab.trab.id, paso)[0]}}" ng-click="verCoordinadosPersona(trab.trab.id)" title="{{estiloSegunEstadoCoordinacion(trab.trab.id, paso)[1]}}"></span>
+                            <span class="{{estiloSegunEstadoCoordinacion(trab.trab.id, paso)[0]}}"
+                                  ng-click="verCoordinadosPersona(trab.trab.id)"
+                                  title="{{estiloSegunEstadoCoordinacion(trab.trab.id, paso)[1]}}"></span>
                         </div>
                         <div class="img-worker-task">
                             <img ng-src="Web/images/{{trab.trab.url}}">
@@ -51,9 +61,9 @@
                 </td>
 
                 <td class="td-tareas {{tareas.claseDia}}" ng-repeat="tareas in trab.tareasPorDia">
-                    <div data-id-tarea="{{tarea.id}}" class="content-tarea {{tarea.clase}}" ng-repeat="tarea in tareas.tareas"
-                         data-container="#task-container" data-toggle="popover" data-placement="right"
-                         data-title="{{tarea.dCliente}}"
+                    <div data-id-tarea="{{tarea.id}}" class="content-tarea {{tarea.clase}}"
+                         ng-repeat="tarea in tareas.tareas" data-container="#task-container" data-toggle="popover"
+                         data-placement="right" data-title="{{tarea.dCliente}}"
                          ng-init="data = tarea.detalle.indexOf('CORRESPONDIENTE AL TICKET:') !== -1 ? '&lt;span class=&quot;glyphicon glyphicon-envelope btn-mensaje-ticket&quot; title=&quot;Mensaje desarrollo del ticket&quot;&gt;&lt;/span&gt;&nbsp;&nbsp;&lt;span class=&quot;glyphicon glyphicon-wrench btn-info-ticket&quot; title=&quot;Informaci&#243;n resolución de ticket&quot;&gt;&lt;/span&gt;' : ''; "
                          data-content="{{tarea.tipo === &quot;t&quot; ?
                                             &quot;Actividad:&quot; + tarea.dActividad + &quot;<br>&quot; +
@@ -68,6 +78,8 @@
                                                     &quot; + data + &quot;
                                                 </div>
                                                 <div class='right estado-tarea'>
+                                                    <span class='glyphicon glyphicon-file btn-tarea-publicar' data-id-tarea='&quot; + tarea.id + &quot;' title='Publicación'></span>
+                                                    &nbsp;
                                                     <span class='glyphicon glyphicon-cog btn-tarea-desarrollo' data-id-tarea='&quot; + tarea.id + &quot;' title='En desarrollo'></span>
                                                     &nbsp;
                                                     <span class='glyphicon glyphicon-pause btn-tarea-pausa' data-id-tarea='&quot; + tarea.id + &quot;' title='En pausa'></span>
@@ -80,8 +92,7 @@
                                             &quot;Motivo:&quot; + tarea.detalle + &quot;<br>&quot; +
                                             &quot;Hora Inicio:&quot; + tarea.finicio + &quot;<br>&quot; +
                                             &quot;Hora Fin:&quot; + tarea.ffin + &quot;<br>&quot;
-}}"
-                         data-html="true" data-trigger="manual">
+}}" data-html="true" data-trigger="manual">
 
                         <div class="cabecera-tarea">
                             <div class="nombre-cliente">{{tarea.cliente}}</div>
@@ -90,14 +101,17 @@
                         </div>
                         <div class="body-tarea">
                             <div>
-                                <div class="codigo-actividad-tarea">{{tarea.tipo === 't'?'('+tarea.actividad+')':''}}</div>
+                                <div class="codigo-actividad-tarea">
+                                    {{tarea.tipo === 't'?'('+tarea.actividad+')':''}}
+                                </div>
                                 <div class="modulo-actividad-tarea">{{tarea.modulo}}</div>
                             </div>
                             <div class="clear"></div>
                             <div class="detalle-tarea">
                                 {{tarea.sdetalle}}
                             </div>
-                            <div class="horas-tarea">{{tarea.horas}}</div><div class="clear"></div>
+                            <div class="horas-tarea">{{tarea.horas}}</div>
+                            <div class="clear"></div>
                         </div>
                     </div>
 
@@ -109,11 +123,14 @@
 </div>
 
 <!-- Filtro de las Tarea -->
-<div class="modal fade" id="modalNewFilter" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="modalNewFilter" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog .filter">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
                 <h4 class="modal-title" id="myModalLabel">
                     <span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
                     <span id="title-filter">Filtrar tareas</span>
@@ -125,9 +142,14 @@
                     <div class="filtro-panel">
                         <div class="left menu-tipo-filtro">
                             <div class="btn-group-vertical" role="group">
-                                <button class="btn btn-default" ng-click="anadirFiltroColaboradores()">Colaboradores</button>
+                                <button class="btn btn-default" ng-click="anadirFiltroColaboradores()">
+                                    Colaboradores
+                                </button>
                                 <button class="btn btn-default" ng-click="anadirFiltroClientes()">Clientes</button>
-                                <button class="btn btn-default" ng-click="anadirFiltroEstadoTarea()">Estado Tarea</button>
+                                <button class="btn btn-default" ng-click="anadirFiltroEstadoTarea()">
+                                    Estado
+                                    Tarea
+                                </button>
                                 <button class="btn btn-default" ng-click="anadirFiltroLugarTarea()">Lugar Tarea</button>
                                 <button class="btn btn-default" ng-click="anadirFiltroModulo()">Módulo</button>
                                 <button class="btn btn-default" ng-click="anadirFiltroSede()">Sede</button>
@@ -135,8 +157,13 @@
                         </div>
 
                         <div class="left descripcion-filtro">
-                            <button ng-click="desmarcarTodosValores()" class="btn btn-danger btn-xs right botones-filtro">Desmarcar Todos</button>
-                            <button ng-click="marcarTodosValores()" class="btn btn-primary btn-xs right botones-filtro">Marcar Todos</button>
+                            <button ng-click="desmarcarTodosValores()"
+                                    class="btn btn-danger btn-xs right botones-filtro">
+                                Desmarcar Todos
+                            </button>
+                            <button ng-click="marcarTodosValores()" class="btn btn-primary btn-xs right botones-filtro">
+                                Marcar Todos
+                            </button>
 
                             <div class="panel panel-default panel-valores-filtro">
                                 Por favor seleccione un campo de filtrado
@@ -161,11 +188,14 @@
 </div>
 
 <!-- Modal de finalizar la tarea -->
-<div class="modal fade" id="modal-final-tarea" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal-final-tarea" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
                 <h4 class="modal-title" id="modal-final-tarea-label">
                     <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
                     <span id="title-filter">Actividades Realizadas</span>
@@ -176,28 +206,34 @@
                 <form method="post" id="frm-modal-final-tarea" ng-submit="adicionarActividadTarea()">
                     <div id="new-actividad-tarea" class="fila">
                         @*<div ng-show="!tieneContrato && !tieneTicket">
-                                <div style="display: flex; justify-content: flex-end; gap: 10px; align-items: center" >
-                                    <label>Ticket/Contrato</label>
-                                    <input type="checkbox" ng-model="esTicket" />
-                                    <input ng-show="esTicket" type="text" class="form-control" ng-model="numeroTicket" placeholder="Número de Ticket" style="width: 150px;" />
-                                    <select ng-show="!esTicket" id="select-contrato-tarea" class="form-control" ng-model="entregable" style="width: 150px;">
-                                        <option value="">Seleccione...</option>
-                                        <option ng-repeat="ref in referencias" value="{{ref.id}}">{{ref.nombre}}</option>
-                                    </select>
-                                </div>
+                            <div style="display: flex; justify-content: flex-end; gap: 10px; align-items: center" >
+                            <label>Ticket/Contrato</label>
+                            <input type="checkbox" ng-model="esTicket" />
+                            <input ng-show="esTicket" type="text" class="form-control" ng-model="numeroTicket"
+                            placeholder="Número de Ticket" style="width: 150px;" />
+                            <select ng-show="!esTicket" id="select-contrato-tarea" class="form-control"
+                            ng-model="entregable" style="width: 150px;">
+                            <option value="">Seleccione...</option>
+                            <option ng-repeat="ref in referencias" value="{{ref.id}}">{{ref.nombre}}</option>
+                            </select>
+                            </div>
                             </div>*@
 
 
                         <div class="left">
                             <label>Tipo de Actividad:</label>
-                            <select class="form-control tipo-actividad-tarea" ng-model="tipoActividadTarea" ng-required="true">
+                            <select class="form-control tipo-actividad-tarea" ng-model="tipoActividadTarea"
+                                    ng-required="true">
                                 <option value="">Seleccione...</option>
-                                <option ng-repeat="actividadTarea in actividadesTarea" value="{{actividadTarea.id}}">{{actividadTarea.nombre}}</option>
+                                <option ng-repeat="actividadTarea in actividadesTarea" value="{{actividadTarea.id}}">
+                                    {{actividadTarea.nombre}}
+                                </option>
                             </select>
                         </div>
                         <div class="left" ng-date="">
                             <label>Fecha:</label>
-                            <select class="form-control dia-actividad-tarea" ng-model="diaActividadTara" ng-required="true">
+                            <select class="form-control dia-actividad-tarea" ng-model="diaActividadTara"
+                                    ng-required="true">
                                 <option value="">Seleccione...</option>
                                 <option ng-repeat="dia in diasActividadTarea" value="{{dia}}">{{dia}}</option>
                             </select>
@@ -207,7 +243,8 @@
                             <div class="clear">
                                 <div class="form-group">
                                     <div class='input-group date' id='dtpk-hora-inicio-actividad-tarea'>
-                                        <input type='text' class="form-control" ng-model="horaInicioActividadTarea" ng-required="true" />
+                                        <input type='text' class="form-control" ng-model="horaInicioActividadTarea"
+                                               ng-required="true" />
                                         <span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
                                         </span>
@@ -219,14 +256,17 @@
                             <label>Hora Fin:</label>
                             <div class="form-group">
                                 <div class='input-group date' id='dtpk-hora-fin-actividad-tarea'>
-                                    <input type='text' class="form-control" ng-model="horaFinActividadTarea" ng-required="true" />
+                                    <input type='text' class="form-control" ng-model="horaFinActividadTarea"
+                                           ng-required="true" />
                                     <span class="input-group-addon">
                                         <span class="glyphicon glyphicon-calendar"></span>
                                     </span>
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" class="left btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Adicionar</button>
+                        <button type="submit" class="left btn btn-primary">
+                            <span class="glyphicon glyphicon-plus"></span> Adicionar
+                        </button>
                         <div class="clear"></div>
                     </div>
                     <input type="hidden" ng-model="idTareaTerminar" />
@@ -253,9 +293,18 @@
                                 <td>{{actividad.horaInicio}}</td>
                                 <td>{{actividad.horaFin}}</td>
                                 <td>{{actividad.horas}}</td>
-                                <td><span class="glyphicon glyphicon-edit" title="Editar Horarios" ng-click="editarHoraActividad(actividad.id)"></span></td>
-                                <td><span class="glyphicon glyphicon-comment" title="Comentarios" ng-click="verComentarios(actividad.id)"></span></td>
-                                <td><span class="glyphicon glyphicon-remove" title="Eliminar" ng-click="eliminarActividad(actividad.id)"></span></td>
+                                <td>
+                                    <span class="glyphicon glyphicon-edit" title="Editar Horarios"
+                                          ng-click="editarHoraActividad(actividad.id)"></span>
+                                </td>
+                                <td>
+                                    <span class="glyphicon glyphicon-comment" title="Comentarios"
+                                          ng-click="verComentarios(actividad.id)"></span>
+                                </td>
+                                <td>
+                                    <span class="glyphicon glyphicon-remove" title="Eliminar"
+                                          ng-click="eliminarActividad(actividad.id)"></span>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -273,11 +322,14 @@
 </div>
 
 <!-- Modal cambios de horarios de las actividades -->
-<div class="modal fade" id="modal-cambio-horario-actividad" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal-cambio-horario-actividad" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog .filter">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
                 <h4 class="modal-title" id="modal-cambio-horario-actividad-label">
                     <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
                     <span id="title-comentario-actividades">Horarios de la actividad</span>
@@ -289,7 +341,8 @@
                         <div>
                             <label>Hora Inicio:</label><br />
                             <div class='input-group date' id='dtpk-cambio-hora-inicio-actividad-tarea'>
-                                <input type='text' class="form-control" ng-model="cambioHoraInicioActividadTarea" ng-required="true" />
+                                <input type='text' class="form-control" ng-model="cambioHoraInicioActividadTarea"
+                                       ng-required="true" />
                                 <span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>
@@ -298,7 +351,8 @@
                         <div>
                             <label>Hora Fin:</label><br />
                             <div class='input-group date' id='dtpk-cambio-hora-fin-actividad-tarea'>
-                                <input type='text' class="form-control" ng-model="cambioHoraFinActividadTarea" ng-required="true" />
+                                <input type='text' class="form-control" ng-model="cambioHoraFinActividadTarea"
+                                       ng-required="true" />
                                 <span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>
@@ -317,11 +371,14 @@
 </div>
 
 <!-- Modal comentarios de las actividades -->
-<div class="modal fade" id="modal-comentario-actividad" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal-comentario-actividad" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog .filter">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
                 <h4 class="modal-title" id="modal-solicitud-tareas-label">
                     <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
                     <span id="title-comentario-actividades">Comentarios de Actividad</span>
@@ -332,7 +389,8 @@
                     <div class="fila">
                         <div>
                             <label>Descripción:</label><br />
-                            <textarea class="form-control descripcion-comentario-actividad" ng-model="descripcionComentario" ng-required="true"></textarea>
+                            <textarea class="form-control descripcion-comentario-actividad"
+                                      ng-model="descripcionComentario" ng-required="true"></textarea>
                         </div>
                         <div class="form-inline" style="text-align: center;">
                             <span><b>Importancia:</b></span>
@@ -348,7 +406,17 @@
                 <div class="clear"></div>
                 <div id="panel-comentarios" class="panel panel-default">
                     <div ng-repeat="comentario in comentarios" class="comentario-actividad-{{comentario.importancia}}">
-                        <div><div class="left"><b>{{comentario.usuario | userEmail}}</b> : {{comentario.fecha | strDateToStrTime}}</div> <div class="right"> <span class="glyphicon glyphicon-remove eliminar-comentario" title="Eliminar Comentario" ng-click="eliminarComentario(comentario.id)"></span> </div> <div class="clear"></div></div>
+                        <div>
+                            <div class="left">
+                                <b>{{comentario.usuario | userEmail}}</b> : {{comentario.fecha |
+                                strDateToStrTime}}
+                            </div>
+                            <div class="right">
+                                <span class="glyphicon glyphicon-remove eliminar-comentario" title="Eliminar Comentario"
+                                      ng-click="eliminarComentario(comentario.id)"></span>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
                         <div>{{comentario.texto}}</div>
                     </div>
                 </div>
@@ -361,11 +429,14 @@
 </div>
 
 <!-- Solicitud de Tareas-->
-<div class="modal fade" id="modal-solicitud-tareas" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal-solicitud-tareas" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog .filter">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
                 <h4 class="modal-title" id="modal-solicitud-tareas-label">
                     <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
                     <span id="title-filter">Solicitud de Tarea</span>
@@ -375,7 +446,8 @@
                 <div class="modal-body">
                     <div class="fila">
                         <label>Descripción:</label><br />
-                        <textarea class="form-control descripcion-peticion-tarea" ng-model="descripcionTarea"></textarea>
+                        <textarea class="form-control descripcion-peticion-tarea"
+                                  ng-model="descripcionTarea"></textarea>
                     </div>
                     <div class="clear"></div>
                 </div>
@@ -389,14 +461,20 @@
 </div>
 
 <!-- Modal de envio al cliente de ticket terminado -->
-<div class="modal fade" id="modal-email-fin-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal-email-fin-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
                 <h4 class="modal-title" id="modal-final-tarea-label">
                     <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
-                    <span id="title-filter"><span class="glyphicon glyphicon-envelope"></span> Finalización de ticket - Email de información al cliente</span>
+                    <span id="title-filter">
+                        <span class="glyphicon glyphicon-envelope"></span> Finalización de ticket -
+                        Email de información al cliente
+                    </span>
                 </h4>
             </div>
             <form id="form-enviar-email-fin-ticket" ng-submit="enviarInformacionFinTicket()">
@@ -408,42 +486,54 @@
                     <div ng-show="requierePublicacion">
                         <div style="display: flex; align-items: center; vertical-align: middle">
                             <label for="titulo">Nombre de la Rama:</label>
-                            <input type="text" style="min-width: 250px" class="form-control" ng-model="rama" ng-required="requierePublicacion">
+                            <input type="text" style="min-width: 250px" class="form-control" ng-model="rama"
+                                   ng-required="requierePublicacion">
                         </div>
                         <div style="display: flex; align-items: center; vertical-align: middle">
                             <label style="margin-top: 8px">Publicar Cliente:</label>
-                            <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="publicarCliente">
+                            <input style="margin-left: 8px; margin-right: 20px" type="checkbox"
+                                   ng-model="publicarCliente">
                             <label style="margin-top: 8px" ng-show="publicarCliente">Actualizar Distribuidos:</label>
-                            <input style="margin-left: 8px; margin-right: 20px" ng-show="publicarCliente" type="checkbox" ng-model="actualizarDistribuidos">
+                            <input style="margin-left: 8px; margin-right: 20px" ng-show="publicarCliente"
+                                   type="checkbox" ng-model="actualizarDistribuidos">
                         </div>
 
                         <div style="display: flex; align-items: center; vertical-align: middle">
                             <label style="margin-top: 8px">Publicar Servidor:</label>
-                            <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="publicarServidor">
+                            <input style="margin-left: 8px; margin-right: 20px" type="checkbox"
+                                   ng-model="publicarServidor">
                             <label ng-show="publicarServidor">Servicios a actualizar:</label>
-                            <textarea ng-show="publicarServidor" style="min-width: 300px" type="text" class="form-control" ng-model="serviciosAActualizar"></textarea>
+                            <textarea ng-show="publicarServidor" style="min-width: 300px" type="text"
+                                      class="form-control" ng-model="serviciosAActualizar"></textarea>
                         </div>
 
                         <div style="display: flex; align-items: center; vertical-align: middle">
                             <label style="margin-top: 8px">Actualizar Base de Datos:</label>
                             <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="actualizarDB">
                             <label style="margin-top: 8px" ng-show="actualizarDB">ADJUNTO:</label>
-                            <div style="margin-left: 8px; margin-right: 20px; min-width: 150px;" ng-show="actualizarDB" id="panel-adjunto-publicacion">
-                                <span ng-show="actualizarDB" style="font-weight: bold; color: darkgoldenrod;">Más de uno, comprimir en uno solo archivo.</span>
+                            <div style="margin-left: 8px; margin-right: 20px; min-width: 150px;" ng-show="actualizarDB"
+                                 id="panel-adjunto-publicacion">
+                                <span ng-show="actualizarDB" style="font-weight: bold; color: darkgoldenrod;">
+                                    Más de uno, comprimir en uno solo archivo.
+                                </span>
                             </div>
                         </div>
                     </div>
                     <div>
                         <label>Texto Email:</label>
                         <div id="div-texto-finalizacion-ticket">
-                            <textarea class="form-control" ng-model="textoEmail" rows="6" required="required"></textarea>
+                            <textarea class="form-control" ng-model="textoEmail" rows="6"
+                                      required="required"></textarea>
                             <div>
                                 <i class="texto-finalizacion-ticket" style="display: none;">
-                                    La presente actividad concluyó la implementación del TICKET y se dispone a pasar el mismo a la actividad <b>PUBLICAR</b>.
+                                    La presente actividad concluyó la implementación del TICKET y se dispone a pasar el
+                                    mismo a la actividad <b>PUBLICAR</b>.
                                 </i>
                                 <i class="texto-finalizacion-ticket">
-                                    El presente correo concluye la resolución de este requerimiento, formalmente solicitamos la certificación del mismo o sus
-                                    observaciones. Si dentro de los próximos 5 días laborables no recibimos su respuesta, procederemos a cerrar el ticket.
+                                    El presente correo concluye la resolución de este requerimiento, formalmente
+                                    solicitamos la certificación del mismo o sus
+                                    observaciones. Si dentro de los próximos 5 días laborables no recibimos su
+                                    respuesta, procederemos a cerrar el ticket.
                                     En caso de requerir correcciones será necesario que ingrese otro ticket.
                                 </i>
                             </div>
@@ -454,21 +544,36 @@
 
                         <div class="file-adj-contrato">
                             <div class="fileinput fileinput-new input-group" data-provides="fileinput">
-                                <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
-                                <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
-                                <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+                                <div class="form-control" data-trigger="fileinput">
+                                    <i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span>
+                                </div>
+                                <span class="input-group-addon btn btn-default btn-file">
+                                    <span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]">
+                                </span>
+                                <a href="#" class="input-group-addon btn btn-default fileinput-exists"
+                                   data-dismiss="fileinput">Eliminar</a>
                             </div>
                         </div>
 
                         <div id="barra-botones-file">
-                            <button id="addInputFileAnterior" ng-click="adicionarFileAnterior()" type="button" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-plus"></span> Adicionar</button>
-                            <button id="deleteInputFileAnterior" disabled="disabled" ng-click="deleteFileAnterior()" type="button" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-minus"></span> Eliminar</button>
+                            <button id="addInputFileAnterior" ng-click="adicionarFileAnterior()" type="button"
+                                    class="btn btn-primary btn-xs">
+                                <span class="glyphicon glyphicon-plus"></span>
+                                Adicionar
+                            </button>
+                            <button id="deleteInputFileAnterior" disabled="disabled" ng-click="deleteFileAnterior()"
+                                    type="button" class="btn btn-danger btn-xs">
+                                <span class="glyphicon glyphicon-minus"></span> Eliminar
+                            </button>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Enviar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-envelope"></span>
+                        Enviar
+                    </button>
                 </div>
             </form>
         </div>
@@ -476,9 +581,14 @@
         <div id="htmlFile" class="invisible">
             <div class="file-adj-contrato">
                 <div class="fileinput fileinput-new input-group" data-provides="fileinput">
-                    <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
-                    <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
-                    <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+                    <div class="form-control" data-trigger="fileinput">
+                        <i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span>
+                    </div>
+                    <span class="input-group-addon btn btn-default btn-file">
+                        <span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]">
+                    </span>
+                    <a href="#" class="input-group-addon btn btn-default fileinput-exists"
+                       data-dismiss="fileinput">Eliminar</a>
                 </div>
             </div>
         </div>
@@ -486,14 +596,20 @@
 </div>
 
 <!-- Modal comentario de no terminacion de un ticket -->
-<div class="modal fade" id="modal-comentario-no-terminacion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal-comentario-no-terminacion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
                 <h4 class="modal-title" id="modal-mensaje-desarrollo-ticket-label">
                     <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
-                    <span id="title-filter"><span class="glyphicon glyphicon-envelope"></span> Notificación de no terminación de ticket</span>
+                    <span id="title-filter">
+                        <span class="glyphicon glyphicon-envelope"></span> Notificación de no
+                        terminación de ticket
+                    </span>
                 </h4>
             </div>
             <form ng-submit="enviarComentarioNoTerminacion()">
@@ -505,41 +621,48 @@
                         </select>
                     </div>
                     @*<div ng-show="actividadNoTerminacion == '2'">
-                            <label>Requiere Publicación:</label>
-                            <input type="checkbox" ng-model="requierePublicacion" ng-change="cambioRequierePublicacion()" />
+                        <label>Requiere Publicación:</label>
+                        <input type="checkbox" ng-model="requierePublicacion" ng-change="cambioRequierePublicacion()" />
                         </div>
                         <div ng-show="requierePublicacion">
-                            <div style="display: flex; align-items: center; vertical-align: middle">
-                                <label for="titulo">Nombre de la Rama:</label>
-                                <input type="text" style="min-width: 250px" class="form-control" ng-model="rama" ng-required="requierePublicacion">
-                            </div>
-                            <div style="display: flex; align-items: center; vertical-align: middle">
-                                <label style="margin-top: 8px">Publicar Cliente:</label>
-                                <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="publicarCliente">
-                                <label style="margin-top: 8px" ng-show="publicarCliente">Actualizar Distribuidos:</label>
-                                <input style="margin-left: 8px; margin-right: 20px" ng-show="publicarCliente" type="checkbox" ng-model="actualizarDistribuidos">
-                            </div>
+                        <div style="display: flex; align-items: center; vertical-align: middle">
+                        <label for="titulo">Nombre de la Rama:</label>
+                        <input type="text" style="min-width: 250px" class="form-control" ng-model="rama"
+                        ng-required="requierePublicacion">
+                        </div>
+                        <div style="display: flex; align-items: center; vertical-align: middle">
+                        <label style="margin-top: 8px">Publicar Cliente:</label>
+                        <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="publicarCliente">
+                        <label style="margin-top: 8px" ng-show="publicarCliente">Actualizar Distribuidos:</label>
+                        <input style="margin-left: 8px; margin-right: 20px" ng-show="publicarCliente" type="checkbox"
+                        ng-model="actualizarDistribuidos">
+                        </div>
 
-                            <div style="display: flex; align-items: center; vertical-align: middle">
-                                <label style="margin-top: 8px">Publicar Servidor:</label>
-                                <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="publicarServidor">
-                                <label ng-show="publicarServidor">Servicios a actualizar:</label>
-                                <textarea ng-show="publicarServidor" style="min-width: 300px" type="text" class="form-control" ng-model="serviciosAActualizar"></textarea>
-                            </div>
+                        <div style="display: flex; align-items: center; vertical-align: middle">
+                        <label style="margin-top: 8px">Publicar Servidor:</label>
+                        <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="publicarServidor">
+                        <label ng-show="publicarServidor">Servicios a actualizar:</label>
+                        <textarea ng-show="publicarServidor" style="min-width: 300px" type="text" class="form-control"
+                        ng-model="serviciosAActualizar"></textarea>
+                        </div>
 
-                            <div style="display: flex; align-items: center; vertical-align: middle">
-                                <label style="margin-top: 8px">Actualizar Base de Datos:</label>
-                                <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="actualizarDB">
-                                <label style="margin-top: 8px" ng-show="actualizarDB">ADJUNTO:</label>
-                                <div style="margin-left: 8px; margin-right: 20px; min-width: 150px;" ng-show="actualizarDB" id="panel-adjunto-publicacion">
-                                    <span ng-show="actualizarDB" style="font-weight: bold; color: darkgoldenrod;">Más de uno, comprimir en uno solo archivo.</span>
-                                </div>
-                            </div>
+                        <div style="display: flex; align-items: center; vertical-align: middle">
+                        <label style="margin-top: 8px">Actualizar Base de Datos:</label>
+                        <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="actualizarDB">
+                        <label style="margin-top: 8px" ng-show="actualizarDB">ADJUNTO:</label>
+                        <div style="margin-left: 8px; margin-right: 20px; min-width: 150px;" ng-show="actualizarDB"
+                        id="panel-adjunto-publicacion">
+                        <span ng-show="actualizarDB" style="font-weight: bold; color: darkgoldenrod;">Más de uno, comprimir
+                        en uno solo archivo.</span>
+                        </div>
+                        </div>
                         </div>*@
                     <div>
                         <label>Causa de la no terminación:</label>
                         <select class="form-control" ng-model="causaNoTerminacion" ng-required="true">
-                            <option ng-repeat="causa in causasNoTerminacion" value="{{causa.id}}">{{causa.nombre}}</option>
+                            <option ng-repeat="causa in causasNoTerminacion" value="{{causa.id}}">
+                                {{causa.nombre}}
+                            </option>
                         </select>
                     </div>
                     <div ng-show="causaNoTerminacion == 6">
@@ -549,37 +672,52 @@
                     <div ng-show="requierePublicacionNT">
                         <div style="display: flex; align-items: center; vertical-align: middle">
                             <label for="titulo">Nombre de la Rama:</label>
-                            <input type="text" style="min-width: 250px" class="form-control" ng-model="ramaNT" ng-required="requierePublicacionNT">
+                            <input type="text" style="min-width: 250px" class="form-control" ng-model="ramaNT"
+                                   ng-required="requierePublicacionNT">
                         </div>
                         <div style="display: flex; align-items: center; vertical-align: middle">
                             <label style="margin-top: 8px">Publicar Cliente:</label>
-                            <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="publicarClienteNT">
+                            <input style="margin-left: 8px; margin-right: 20px" type="checkbox"
+                                   ng-model="publicarClienteNT">
                             <label style="margin-top: 8px" ng-show="publicarClienteNT">Actualizar Distribuidos:</label>
-                            <input style="margin-left: 8px; margin-right: 20px" ng-show="publicarClienteNT" type="checkbox" ng-model="actualizarDistribuidosNT">
+                            <input style="margin-left: 8px; margin-right: 20px" ng-show="publicarClienteNT"
+                                   type="checkbox" ng-model="actualizarDistribuidosNT">
                         </div>
 
                         <div style="display: flex; align-items: center; vertical-align: middle">
                             <label style="margin-top: 8px">Publicar Servidor:</label>
-                            <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="publicarServidorNT">
+                            <input style="margin-left: 8px; margin-right: 20px" type="checkbox"
+                                   ng-model="publicarServidorNT">
                             <label ng-show="publicarServidorNT">Servicios a actualizar:</label>
-                            <textarea ng-show="publicarServidorNT" style="min-width: 300px" type="text" class="form-control" ng-model="serviciosAActualizarNT"></textarea>
+                            <textarea ng-show="publicarServidorNT" style="min-width: 300px" type="text"
+                                      class="form-control" ng-model="serviciosAActualizarNT"></textarea>
                         </div>
 
                         <div style="display: flex; align-items: center; vertical-align: middle">
                             <label style="margin-top: 8px">Actualizar Base de Datos:</label>
-                            <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="actualizarDBNT">
+                            <input style="margin-left: 8px; margin-right: 20px" type="checkbox"
+                                   ng-model="actualizarDBNT">
                             <label style="margin-top: 8px" ng-show="actualizarDBNT">ADJUNTO:</label>
-                            <div style="margin-left: 8px; margin-right: 20px; min-width: 150px;" ng-show="actualizarDBNT" id="panel-adjunto-no-finalizado">
-                                <span ng-show="actualizarDBNT" style="font-weight: bold; color: darkgoldenrod;">Más de uno, comprimir en uno solo archivo.</span>
+                            <div style="margin-left: 8px; margin-right: 20px; min-width: 150px;"
+                                 ng-show="actualizarDBNT" id="panel-adjunto-no-finalizado">
+                                <span ng-show="actualizarDBNT" style="font-weight: bold; color: darkgoldenrod;">
+                                    Más de
+                                    uno, comprimir en uno solo archivo.
+                                </span>
                             </div>
                         </div>
 
                         <div id="htmlFile2" class="invisible">
                             <div class="file-adj-contrato">
                                 <div class="fileinput fileinput-new input-group" data-provides="fileinput">
-                                    <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
-                                    <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]"></span>
-                                    <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+                                    <div class="form-control" data-trigger="fileinput">
+                                        <i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span>
+                                    </div>
+                                    <span class="input-group-addon btn btn-default btn-file">
+                                        <span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]">
+                                    </span>
+                                    <a href="#" class="input-group-addon btn btn-default fileinput-exists"
+                                       data-dismiss="fileinput">Eliminar</a>
                                 </div>
                             </div>
                         </div>
@@ -587,12 +725,18 @@
 
                     <div>
                         <label>Comentario:</label>
-                        <textarea class="form-control" ng-model="comentarioNoTerminacion" rows="12" ng-required="true"></textarea>
+                        <textarea class="form-control" ng-model="comentarioNoTerminacion" rows="12"
+                                  ng-required="true"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Enviar </button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-envelope"></span>
+                        Enviar
+                    </button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                        <span class="glyphicon glyphicon-remove"></span> Cerrar
+                    </button>
                 </div>
             </form>
         </div>
@@ -600,14 +744,20 @@
 </div>
 
 <!-- Modal comentario de no terminacion de una tarea -->
-<div class="modal fade" id="modal-comentario-no-terminacion-tarea-contrato" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal-comentario-no-terminacion-tarea-contrato" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
                 <h4 class="modal-title" id="modal-mensaje-desarrollo-ticket-label">
                     <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
-                    <span id="title-filter"><span class="glyphicon glyphicon-envelope"></span> Notificación de no terminación de tarea</span>
+                    <span id="title-filter">
+                        <span class="glyphicon glyphicon-envelope"></span> Notificación de no
+                        terminación de tarea
+                    </span>
                 </h4>
             </div>
             <form ng-submit="enviarComentarioNoTerminacionTarea()">
@@ -621,17 +771,25 @@
                     <div>
                         <label>Causa de la no terminación:</label>
                         <select class="form-control" ng-model="causaNoTerminacionTarea" ng-required="true">
-                            <option ng-repeat="causa in causasNoTerminacion" value="{{causa.id}}">{{causa.nombre}}</option>
+                            <option ng-repeat="causa in causasNoTerminacion" value="{{causa.id}}">
+                                {{causa.nombre}}
+                            </option>
                         </select>
                     </div>
                     <div>
                         <label>Comentario:</label>
-                        <textarea class="form-control" ng-model="comentarioNoTerminacionTarea" rows="12" ng-required="true"></textarea>
+                        <textarea class="form-control" ng-model="comentarioNoTerminacionTarea" rows="12"
+                                  ng-required="true"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Enviar </button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-envelope"></span>
+                        Enviar
+                    </button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                        <span class="glyphicon glyphicon-remove"></span> Cerrar
+                    </button>
                 </div>
             </form>
         </div>
@@ -639,14 +797,20 @@
 </div>
 
 <!-- Modal informacion de desarrollo del ticket, muestra la informacion para que el desarrollador pueda ver como desarrollar-->
-<div class="modal fade" id="modal-info-dev-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal-info-dev-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
                 <h4 class="modal-title" id="modal-info-dev-ticket-label">
                     <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
-                    <span id="title-filter"><span class="glyphicon glyphicon-envelope"></span> Información de desarrollo de ticket</span>
+                    <span id="title-filter">
+                        <span class="glyphicon glyphicon-envelope"></span> Información de desarrollo
+                        de ticket
+                    </span>
                 </h4>
             </div>
             <div class="modal-body">
@@ -665,7 +829,8 @@
                     <div>
                         <label>Adjuntos:</label>
                         <div>
-                            <a class="btn btn-default btn-xs" ng-repeat="adj in adjuntosTicket" target="_blank" href="~/Web{{adj}}"><span></span> Adjunto {{$index+1}} </a>
+                            <a class="btn btn-default btn-xs" ng-repeat="adj in adjuntosTicket" target="_blank"
+                               href="~/Web{{adj}}"><span></span>Adjunto{{$index+1}}</a>
                             <div class="clear"></div>
                         </div>
                     </div>
@@ -679,14 +844,20 @@
 </div>
 
 <!-- Modal mensaje de desarrollo del ticket -->
-<div class="modal fade" id="modal-mensaje-desarrollo-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal-mensaje-desarrollo-ticket" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
                 <h4 class="modal-title" id="modal-mensaje-desarrollo-ticket-label">
                     <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
-                    <span id="title-filter"><span class="glyphicon glyphicon-envelope"></span> Notificación en resolución de ticket</span>
+                    <span id="title-filter">
+                        <span class="glyphicon glyphicon-envelope"></span> Notificación en
+                        resolución de ticket
+                    </span>
                 </h4>
             </div>
             <form ng-submit="enviarNotificacionTicket()">
@@ -699,12 +870,94 @@
                     </div>
                     <div>
                         <label>Detalle:</label>
-                        <textarea class="form-control" ng-model="notificacionDevTicket" rows="12" ng-required="true"></textarea>
+                        <textarea class="form-control" ng-model="notificacionDevTicket" rows="12"
+                                  ng-required="true"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Enviar</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-envelope"></span>
+                        Enviar
+                    </button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                        <span class="glyphicon glyphicon-remove"></span> Cerrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal publicacion tareas -->
+<div class="modal fade" id="modal-publicacion-tarea" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">
+                    <span class="glyphicon glyphicon-task" aria-hidden="true"></span>
+                    <span id="title-filter">
+                        <span class="glyphicon glyphicon-envelope"></span> Solicitud de
+                        Publicación
+                    </span>
+                </h4>
+            </div>
+            <form ng-submit="publicarDatos()">
+                <div class="modal-body">
+                    <div style="display: flex; align-items: center; vertical-align: middle">
+                        <label for="titulo">Nombre de la Rama:</label>
+                        <input type="text" style="min-width: 250px" class="form-control" ng-model="ramaTarea">
+                    </div>
+                    <div style="display: flex; align-items: center; vertical-align: middle">
+                        <label style="margin-top: 8px">Publicar Cliente:</label>
+                        <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="publicarClienteTarea">
+                        <label style="margin-top: 8px" ng-show="publicarClienteTarea">Actualizar Distribuidos:</label>
+                        <input style="margin-left: 8px; margin-right: 20px" ng-show="publicarClienteTarea" type="checkbox"
+                               ng-model="actualizarDistribuidosTarea">
+                    </div>
+                    <div style="display: flex; align-items: center; vertical-align: middle">
+                        <label style="margin-top: 8px">Publicar Servidor:</label>
+                        <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="publicarServidorTarea">
+                        <label ng-show="publicarServidorTarea">Servicios a actualizar:</label>
+                        <textarea ng-show="publicarServidorTarea" style="min-width: 300px" type="text" class="form-control"
+                                  ng-model="serviciosAActualizarTarea"></textarea>
+                    </div>
+                    <div style="display: flex; align-items: center; vertical-align: middle">
+                        <label style="margin-top: 8px">Actualizar Base de Datos:</label>
+                        <input style="margin-left: 8px; margin-right: 20px" type="checkbox" ng-model="actualizarDBTarea">
+                        <label style="margin-top: 8px" ng-show="actualizarDBTarea">ADJUNTO:</label>
+                        <div style="margin-left: 8px; margin-right: 20px; min-width: 150px;" ng-show="actualizarDBTarea"
+                             id="panel-adjunto-publicacion-tarea">
+                            <span ng-show="actualizarDBTarea" style="font-weight: bold; color: darkgoldenrod;">
+                                Más de uno, comprimir en uno solo archivo.
+                            </span>
+                        </div>
+                    </div>
+                    <div id="htmlFiles" class="invisible">
+                        <div class="file-adj-contrato">
+                            <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                                <div class="form-control" data-trigger="fileinput">
+                                    <i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span>
+                                </div>
+                                <span class="input-group-addon btn btn-default btn-file">
+                                    <span class="fileinput-new">Buscar</span><span class="fileinput-exists">Cambiar</span><input type="file" name="file[]">
+                                </span>
+                                <a href="#" class="input-group-addon btn btn-default fileinput-exists"
+                                   data-dismiss="fileinput">Eliminar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-envelope"></span> Publicar
+                    </button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                        <span class="glyphicon glyphicon-remove"></span> Cerrar
+                    </button>
                 </div>
             </form>
         </div>
