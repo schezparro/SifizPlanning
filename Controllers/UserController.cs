@@ -1242,6 +1242,7 @@ namespace SifizPlanning.Controllers
 
                     var data = new MultipartFormDataContent();
 
+                    data.Add(new StringContent(idTarea.ToString()), "Identifier");
                     data.Add(new StringContent(clienteP), "Cliente");
                     data.Add(new StringContent(tituloP), "Titulo");
                     data.Add(new StringContent(descripcionP), "Descripcion");
@@ -1467,6 +1468,7 @@ namespace SifizPlanning.Controllers
 
                     var data = new MultipartFormDataContent();
 
+                    data.Add(new StringContent(idTarea.ToString()), "Identifier");
                     data.Add(new StringContent(clienteP), "Cliente");
                     data.Add(new StringContent(tituloP), "Titulo");
                     data.Add(new StringContent(descripcionP), "Descripcion");
