@@ -1238,7 +1238,6 @@ namespace SifizPlanning.Controllers
 
                     var client = new HttpClient();
                     var requestUrl = "https://api-sifizops.sifizsoft.com/api/AsignacionPublicacion/AsignarTareaDePublicacion";
-                    //var requestUrl = "https://3a63-190-110-202-13.ngrok-free.app/api/AsignacionPublicacion/AsignarTareaDePublicacion";
 
                     var data = new MultipartFormDataContent();
 
