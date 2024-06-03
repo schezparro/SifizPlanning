@@ -1516,7 +1516,7 @@ namespace SifizPlanning
                url: "user/dar-entregable-tarea/{id}",
                defaults: new { controller = "User", action = "DarEntregableTarea", id = UrlParameter.Optional }
             );
-            
+
             routes.MapRoute(
                 name: "sistema",
                 url: "user/{id}",
@@ -2186,6 +2186,54 @@ namespace SifizPlanning
                 name: "DarInfotickets",
                 url: "indicadores/dar-infotickets/{id}",
                 defaults: new { controller = "Indicadores", action = "DarInfotickets", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarTicketsPorGarantia",
+                url: "indicadores/dar-tickets-por-garantia/{id}",
+                defaults: new { controller = "Indicadores", action = "DarTicketsPorGarantia", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarTicketsPorMantenimiento",
+                url: "indicadores/dar-tickets-por-mantenimiento/{id}",
+                defaults: new { controller = "Indicadores", action = "DarTicketsPorMantenimiento", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarTicketsPorAplica",
+                url: "indicadores/dar-tickets-por-aplica/{id}",
+                defaults: new { controller = "Indicadores", action = "DarTicketsPorAplica", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarTicketsPorEstados",
+                url: "indicadores/dar-tickets-por-estados/{id}",
+                defaults: new { controller = "Indicadores", action = "DarTicketsPorEstados", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarTicketsPorCategorias",
+                url: "indicadores/dar-tickets-por-categorias/{id}",
+                defaults: new { controller = "Indicadores", action = "DarTicketsPorCategorias", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarTicketsEnGestion",
+                url: "indicadores/dar-tickets-en-gestion/{id}",
+                defaults: new { controller = "Indicadores", action = "DarTicketsEnGestion", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarTicketsCerrados",
+                url: "indicadores/dar-tickets-cerrados/{id}",
+                defaults: new { controller = "Indicadores", action = "DarTicketsCerrados", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarNuevosTickets",
+                url: "indicadores/dar-cantidadTickets/{id}",
+                defaults: new { controller = "Indicadores", action = "DarNuevosTickets", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(

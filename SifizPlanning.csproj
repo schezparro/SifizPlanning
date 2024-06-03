@@ -1229,6 +1229,9 @@
     <Content Include="Web\images\Reports-icon.png" />
     <Content Include="Web\js\admin\correosNoEnviadosController.js" />
     <Content Include="Web\js\angular-bootstrap-multiselect.js" />
+    <Content Include="Web\js\chart.js" />
+    <Content Include="Web\js\chartjs-plugin-datalabels%40latest.js" />
+    <Content Include="Web\js\chartjs-plugin-datalabels.js" />
     <Content Include="Web\js\client\clientNewTicket.js" />
     <Content Include="Web\js\client\clientSeguimiento.js" />
     <Content Include="Web\js\consultas\ofertaTickets.js" />
