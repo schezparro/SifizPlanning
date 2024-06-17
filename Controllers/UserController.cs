@@ -1283,6 +1283,9 @@ namespace SifizPlanning.Controllers
                         textoEmailDevops += @"<br/><i>Detalles:</i>";
                         textoEmailDevops += @"<br/>";
                         textoEmailDevops += response.StatusCode.ToString() + ": " + response.ReasonPhrase.ToString();
+                        textoEmailDevops += @"<br/><i>Data:</i>";
+                        textoEmailDevops += data.ToString();
+                        textoEmailDevops += @"<br/>";
                         textoEmailDevops += @"</div>";
 
                         string emailClienteDevops = "sfzdevops@sifizsoft.com";
@@ -1514,6 +1517,8 @@ namespace SifizPlanning.Controllers
                         textoEmailDevops += @"<br/>";
                         textoEmailDevops += response.StatusCode.ToString() + ": " + response.ReasonPhrase.ToString();
                         textoEmailDevops += "________" + requestMessage.ToString();
+                        textoEmailDevops += @"<br/><i>Data:</i>";
+                        textoEmailDevops += data.ToString();
                         textoEmailDevops += @"</div>";
 
                         string emailClienteDevops = "sfzdevops@sifizsoft.com";
@@ -1753,6 +1758,8 @@ namespace SifizPlanning.Controllers
                         textoEmailDevops += @"<br/><i>Detalles:</i>";
                         textoEmailDevops += @"<br/>";
                         textoEmailDevops += response.StatusCode.ToString() + ": " + response.ReasonPhrase.ToString();
+                        textoEmailDevops += @"<br/><i>Data:</i>";
+                        textoEmailDevops += data.ToString();
                         textoEmailDevops += @"</div>";
 
                         string emailClienteDevops = "sfzdevops@sifizsoft.com";

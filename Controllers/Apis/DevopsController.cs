@@ -333,8 +333,6 @@ namespace SifizPlanning.Controllers
     public class TicketRequest
     {
         public string identifier{ get; set; }
-        public string publicacionClienteServidor { get; set; }
-        public string publicacionPruebasProd { get; set; }
     }
     public class AceptarTicketRequest
     {
