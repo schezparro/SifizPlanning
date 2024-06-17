@@ -1,3 +1,38 @@
-<div>
-    <h4>INDICADORES GESTORES</h4>
+<div style="column-count: 4">
+    @*<div>
+        <label>GESTOR</label>
+        <select class="form-control" style="max-width: 200px" ng-model="gestorSeleccionado" ng-options="gestor.idColaborador as (gestor.nombre | limitTo: 30) for gestor in gestores"></select>
+    </div>
+    <div>
+        <label>FECHA INICIO</label>
+        <div class='input-group date'>
+            <input id="fecha-inicio-gestores" ng-model="finicioGestores" format-date class="form-control" ng-required="true" autocomplete="off" />
+        </div>
+    </div>
+
+    <div>
+        <label>FECHA FIN</label>
+        <div class='input-group date'>
+            <input id="fecha-fin-gestores" ng-model="ffinGestores" format-date class="form-control" ng-required="true" autocomplete="off" />
+        </div>
+    </div>
+    <div>
+        <button id="buscar-btn" class="btn btn-primary" ng-click="refrech()">Actualizar</button>
+    </div>*@
 </div>
+
+@*<table class="table">
+    <thead>
+        <tr>
+            <th>Cliente</th>
+            <th ng-repeat="ticket in infoTickets">{{ ticket.mes }}-{{ ticket.anio }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="cliente in infoTickets">
+            <td>{{ cliente.cliente }}</td>
+            <td ng-repeat="ticket in infoTickets">{{ ticket.cantidad }}</td>
+        </tr>
+    </tbody>
+</table>*@
+

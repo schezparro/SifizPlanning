@@ -995,6 +995,12 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "EnviarPublicacion",
+                url: "user/enviar-publicacion/{id}",
+                defaults: new { controller = "User", action = "EnviarPublicacion", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "DarCoordinadosUsuario",
                 url: "user/coordinados-usuario/{id}",
                 defaults: new { controller = "User", action = "DarCoordinadosUsuario", id = UrlParameter.Optional }
@@ -2183,6 +2189,12 @@ namespace SifizPlanning
 
             //------------------ RUTAS DEL MODULO DE INDICADORES -------------------
             routes.MapRoute(
+                name: "DarGestores",
+                url: "catalogos/dar-gestores/{id}",
+                defaults: new { controller = "Admin", action = "DarGestores", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "DarInfotickets",
                 url: "indicadores/dar-infotickets/{id}",
                 defaults: new { controller = "Indicadores", action = "DarInfotickets", id = UrlParameter.Optional }
@@ -2192,6 +2204,12 @@ namespace SifizPlanning
                 name: "DarTicketsPorClientesPorEstado",
                 url: "indicadores/dar-tickets-por-cliente-estado/{id}",
                 defaults: new { controller = "Indicadores", action = "DarTicketsPorClientesPorEstado", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarTicketsPorGestor",
+                url: "indicadores/dar-tickets-por-gestor/{id}",
+                defaults: new { controller = "Indicadores", action = "DarTicketsPorGestor", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(
