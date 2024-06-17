@@ -3888,5 +3888,41 @@ te in db.TipoError on tei.tipoError equals te
                 return Json(resp);
             }
         }
+
+        [HttpPost]
+        [Authorize]
+        public ActionResult DarGestores()
+        {
+            try
+            {
+                var gestores = db.GestorServicios.Where(s => s.EstaActivo == 1)
+                            .GroupBy(s => new
+                            {
+                                s.colaborador.Secuencial,
+                                Nombre = s.colaborador.persona.Nombre1 + " " + s.colaborador.persona.Apellido1
+                            })
+                            .Select(g => new
+                            {
+                                idColaborador = g.Key.Secuencial,
+                                nombre = g.Key.Nombre
+                            }).ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    gestores = gestores
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
     }
 }

@@ -1241,7 +1241,7 @@ namespace SifizPlanning.Controllers
 
                     var data = new MultipartFormDataContent();
 
-                    data.Add(new StringContent(idTarea.ToString()), "Identifier");
+                    data.Add(new StringContent(ticket.Secuencial.ToString()), "Identifier");
                     data.Add(new StringContent(clienteP), "Cliente");
                     data.Add(new StringContent(tituloP), "Titulo");
                     data.Add(new StringContent(descripcionP), "Descripcion");
@@ -1253,6 +1253,7 @@ namespace SifizPlanning.Controllers
                     data.Add(new StringContent(requiereQAP), "RequiereQA");
                     data.Add(new StringContent(linkAceptar), "URLSifizPlanningAceptar");
                     data.Add(new StringContent(linkRechazar), "URLSifizPlanningRechazar");
+                    data.Add(new StringContent("NO"), "PruebaDesarrollo");
                     data.Add(new StringContent(key), "Key");
 
                     if (adjuntoPublicacion != null)
@@ -1430,6 +1431,7 @@ namespace SifizPlanning.Controllers
                     notTec.AddRange(Utiles.CorreoPorGrupoEmail("TFS"));
                     string destinosCliente = String.Join(", ", notCli.ToArray());
                     string destinosTecnico = String.Join(", ", notTec.ToArray());
+                    var identifier = "";
                     if (tarea.entregableMotivoTrabajo != null)
                     {
                         var mt = db.MotivoTrabajo.Where(s => s.Secuencial == tarea.entregableMotivoTrabajo.SecuencialMotivoTrabajo).FirstOrDefault();
@@ -1437,6 +1439,7 @@ namespace SifizPlanning.Controllers
                         emailCliente = persona.usuario.FirstOrDefault().Email;
                         tituloP = "Contrato-" + mt.Codigo;
                         clienteP = mt.cliente.persona_cliente.First().cliente.Codigo;
+                        identifier = mt.Codigo;
                     }
                     else
                     {
@@ -1445,6 +1448,7 @@ namespace SifizPlanning.Controllers
                         Persona persona = personaCliente.persona;
                         emailCliente = persona.usuario.FirstOrDefault().Email;
                         tituloP = "TCK-" + ticket.Secuencial;
+                        identifier = ticket.Secuencial.ToString();
                         clienteP = personaCliente.cliente.Codigo;
                         var gestores = ticket.persona_cliente.cliente.gestorServicios.ToList();
                         foreach (var g in gestores)
@@ -1467,7 +1471,7 @@ namespace SifizPlanning.Controllers
 
                     var data = new MultipartFormDataContent();
 
-                    data.Add(new StringContent(idTarea.ToString()), "Identifier");
+                    data.Add(new StringContent(identifier), "Identifier");
                     data.Add(new StringContent(clienteP), "Cliente");
                     data.Add(new StringContent(tituloP), "Titulo");
                     data.Add(new StringContent(descripcionP), "Descripcion");
@@ -1479,6 +1483,7 @@ namespace SifizPlanning.Controllers
                     data.Add(new StringContent(requiereQAP), "RequiereQA");
                     data.Add(new StringContent(""), "URLSifizPlanningAceptar");
                     data.Add(new StringContent(""), "URLSifizPlanningRechazar");
+                    data.Add(new StringContent("SI"), "PruebaDesarrollo");
                     data.Add(new StringContent(key), "Key");
 
                     if (adjuntoPublicacion != null)
@@ -1698,21 +1703,26 @@ namespace SifizPlanning.Controllers
                     string descripcionP = descripcion;
                     string[] tagsP = JsonConvert.DeserializeObject<string[]>(tagsJson);
                     string key = ConfigurationManager.AppSettings.Get("Devops");
+                    string destinosTecnico = String.Join(", ", destinatarioCorreos.ToArray());
 
                     var client = new HttpClient();
                     var requestUrl = "https://api-publicaciones.sifizsoft.com/api/AsignacionPublicacion/AsignarTareaDePublicacion";
 
                     var data = new MultipartFormDataContent();
 
+                    data.Add(new StringContent(ticket.Secuencial.ToString()), "Identifier");
                     data.Add(new StringContent(clienteP), "Cliente");
                     data.Add(new StringContent(tituloP), "Titulo");
                     data.Add(new StringContent(descripcionP), "Descripcion");
                     data.Add(new StringContent(colaboradorP), "NombreSolicitante");
+                    data.Add(new StringContent(""), "NotificarCliente");
                     data.Add(new StringContent(string.Join(",", tagsP)), "Tags");
-                    data.Add(new StringContent(destinos), "NotificarA");
+                    data.Add(new StringContent(destinosTecnico), "NotificarTecnico");
                     data.Add(new StringContent(ramaP), "NombreRama");
                     data.Add(new StringContent(requiereQAP), "RequiereQA");
-                    data.Add(new StringContent(""), "URLSifizPlanning");
+                    data.Add(new StringContent(""), "URLSifizPlanningAceptar");
+                    data.Add(new StringContent(""), "URLSifizPlanningRechazar");
+                    data.Add(new StringContent("NO"), "PruebaDesarrollo");
                     data.Add(new StringContent(key), "Key");
 
                     if (adjuntoPublicacion != null)

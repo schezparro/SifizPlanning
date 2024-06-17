@@ -30,7 +30,7 @@ namespace SifizPlanning.Controllers
                 return BadRequest("Usuario no encontrado.");
             }
 
-            var ticket = db.Ticket.Find(ticketReq.idTicket);
+            var ticket = db.Ticket.Find(Int32.Parse(ticketReq.identifier));
             if (ticket == null)
             {
                 return NotFound();
@@ -74,43 +74,7 @@ namespace SifizPlanning.Controllers
 
             db.SaveChanges(); // Salvando los cambios
 
-            // Enviando los emails
-            //string saludo = user.persona.Sexo == "F" ? "Estimada:" : "Estimado:";
-            //string textoEmail = $"<div class='textoCuerpo'><br/>{saludo}<br/>El motivo de este correo es para hacerle llegar la publicación de {ticketReq.publicacionClienteServidor} de {ticketReq.publicacionPruebasProd} solicitada.<br/><br/>";
-            //string baseUrl = Request.RequestUri.GetLeftPart(UriPartial.Authority);
-            //string linkAceptar = $"{baseUrl}/clientes/respuesta-resolucion?cod={HttpUtility.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO"))}";
-            //string linkRechazar = $"{baseUrl}/clientes/respuesta-resolucion?cod={HttpUtility.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":NOACEPTADO"))}";
-            //textoEmail += $"<a href='{linkAceptar}'><i>{linkAceptar}</i></a><br/><br/>";
-            //textoEmail += $"<a href='{linkRechazar}'><i>{linkRechazar}</i></a><br/><br/>";
-            //textoEmail += "El presente correo concluye la resolución de este requerimiento, formalmente solicitamos la certificación del mismo o sus observaciones. Si dentro de los próximos 5 días laborables no recibimos su respuesta, procederemos a cerrar el ticket. En caso de requerir correcciones será necesario que ingrese otro ticket.<br/>";
-            //var personaCliente = db.Persona_Cliente.Find(ticket.SecuencialPersona_Cliente);
-            //var emailCliente = personaCliente?.persona?.usuario?.FirstOrDefault()?.Email;
-            //textoEmail += $"Se ha enviado una copia de este email al cliente. Email: {emailCliente}</i><br/></div>";
-
-            //var correosDestinos = new List<string> { emailUser };
-            //if (financial25)
-            //{
-            //    correosDestinos.Add("publicacionesdoscinco@sifizsoft.com");
-            //}
-            //correosDestinos.AddRange(Utiles.CorreoPorGrupoEmail("COORD"));
-
-            //var asuntoEmail = $"{personaCliente.cliente.Codigo} HESO {ticket.Secuencial:000000} - Ticket Publicado ({ticket.Asunto})";
-            //Utiles.EnviarEmailSistema(new[] { emailCliente }, textoEmail, asuntoEmail, null, $"{ticket.Secuencial:000000}");
-            //Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmail, asuntoEmail, null, $"{ticket.Secuencial:000000}");
-
-            //var destinos = string.Join(", ", correosDestinos);
-            //var textoHistoricoCorreo = $"<b>Correo de información, Ticket Publicado</b><br/><b>Destinos:</b> {destinos}<br/><b>Asunto:</b> {asuntoEmail}<br/><b>Texto del correo:</b> <br/>{textoEmail}";
-            //var historicoCorreoTicket = new HistoricoInformacionTicket
-            //{
-            //    SecuencialTicketHistorico = ticketHistorico.SecuencialTicket,
-            //    VersionTicketHistorico = ticketHistorico.Version,
-            //    Fecha = DateTime.Now,
-            //    Texto = textoHistoricoCorreo
-            //};
-            //db.HistoricoInformacionTicket.Add(historicoCorreoTicket);
-            //db.SaveChanges();
-
-            return Ok($"Se informó la publicación del ticket {ticketReq.idTicket}. La próxima actividad ha sido actualizada a 'CERTIFICAR', el ticket ha sido sacado de la lista de publicaciones y se ha dejado en el histórico la acción de 'publicar'.");
+            return Ok($"Se informó la publicación del ticket {ticketReq.identifier}. La próxima actividad ha sido actualizada a 'CERTIFICAR', el ticket ha sido sacado de la lista de publicaciones y se ha dejado en el histórico la acción de 'publicar'.");
         }
 
 
@@ -368,7 +332,7 @@ namespace SifizPlanning.Controllers
 
     public class TicketRequest
     {
-        public int idTicket { get; set; }
+        public string identifier{ get; set; }
         public string publicacionClienteServidor { get; set; }
         public string publicacionPruebasProd { get; set; }
     }

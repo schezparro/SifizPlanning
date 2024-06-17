@@ -294,11 +294,11 @@ namespace SifizPlanning.Controllers
                 }
 
                 var ticketsQueryTEG = from ticket in db.InfoTickets
-                                   where ticket.FechaIngreso != null
-                                      && ticket.FechaIngreso.Value >= fInicioTEG
-                                      && ticket.FechaIngreso.Value <= fFinTEG
-                                      && ticket.Estado == "EN DESARROLLO"
-                                   select ticket;
+                                      where ticket.FechaIngreso != null
+                                         && ticket.FechaIngreso.Value >= fInicioTEG
+                                         && ticket.FechaIngreso.Value <= fFinTEG
+                                         && ticket.Estado == "EN DESARROLLO"
+                                      select ticket;
 
                 // Convertir la consulta a una lista para trabajar con ella en memoria
                 List<InfoTickets> ticketsListTEG = ticketsQueryTEG.ToList();
@@ -643,7 +643,7 @@ namespace SifizPlanning.Controllers
                 var ticketsQuery = from ticket in db.InfoTickets
                                    where ticket.FechaIngreso != null
                                       && ticket.FechaIngreso.Value >= fInicio
-                                      && ticket.FechaIngreso.Value <= fFin 
+                                      && ticket.FechaIngreso.Value <= fFin
                                       && ticket.Tipo == "MANTENIMIENTO"
                                    select ticket;
 
@@ -752,6 +752,77 @@ namespace SifizPlanning.Controllers
                     success = true,
                     infoTickets = groupedTickets,
                     totalCantidades = totalCantidades
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public ActionResult DarTicketsPorGestor(string fechaInicio, string fechaFin, string gestor)
+        {
+            try
+            {
+                DateTime fInicio = new DateTime();
+                DateTime fFin = new DateTime();
+
+                if (!string.IsNullOrEmpty(fechaInicio))
+                {
+                    string[] fechas = fechaInicio.Split(new Char[] { '/' });
+                    int dia = Int32.Parse(fechas[0]);
+                    int mes = Int32.Parse(fechas[1]);
+                    int anno = Int32.Parse(fechas[2]);
+                    fInicio = new DateTime(anno, mes, dia);
+                }
+                else
+                {
+                    fInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                }
+
+                if (!string.IsNullOrEmpty(fechaFin))
+                {
+                    string[] fechasFin = fechaFin.Split(new Char[] { '/' });
+                    int dia = Int32.Parse(fechasFin[0]);
+                    int mes = Int32.Parse(fechasFin[1]);
+                    int anno = Int32.Parse(fechasFin[2]);
+                    fFin = new DateTime(anno, mes, dia);
+                }
+                else
+                {
+                    fFin = DateTime.Now;
+                }
+
+                int gestorServicio = Int32.Parse(gestor);
+                List<string> clientes = db.GestorServicios
+                                        .Where(s => s.SecuencialColaborador == gestorServicio)
+                                        .Select(s => s.cliente.Descripcion)
+                                        .ToList();
+
+                var ticketsList = (from ticket in db.InfoTickets
+                                   where ticket.FechaIngreso != null
+                                      && ticket.FechaIngreso.Value >= fInicio
+                                      && ticket.FechaIngreso.Value <= fFin
+                                      && clientes.Contains(ticket.Cliente)
+                                   select ticket).ToList();
+
+                var ticketsAgrupados = ticketsList
+                    .GroupBy(ticket => new { Anio = ticket.FechaIngreso.Value.Year, Mes = ticket.FechaIngreso.Value.Month, ticket.Cliente  })
+                    .Select(group => new { cliente = group.Key.Cliente, mes = group.Key.Mes, anio = group.Key.Anio, cantidad = group.Count() })
+                    .ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    tickets = ticketsAgrupados
                 };
                 return Json(resp);
             }
