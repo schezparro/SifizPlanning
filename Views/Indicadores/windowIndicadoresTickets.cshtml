@@ -291,13 +291,17 @@
                 <!-- Card para el gráfico de pastel -->
                 <div class="card">
                     <div class="card-header">
-                        Gráfico de pastel de Tickets por Estado
+                        Gráfico de Porciento por Estado
                     </div>
                     <div class="card-body">
                         <canvas id="ticketPorEstadoPastelChart" width="400" height="400"></canvas>
                     </div>
                 </div>
 
+            </div>
+
+            <div>
+                <label>No existen datos disponibles en el rango de fecha seleccionado.</label>
             </div>
         </div>
 
@@ -370,8 +374,8 @@
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th style="background-color: #008aff; color: black;">Cliente</th>
-                                    <th style="background-color: #008aff; color: black;">Cantidad</th>
+                                    <th style="background-color: #f58e8e; color: black;">Cliente</th>
+                                    <th style="background-color: #f58e8e; color: black;">Cantidad</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -380,8 +384,8 @@
                                     <td>{{ticket.Cantidad}}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="1" style="text-align: center; background-color: #008aff; color: black; font-weight: bold;">Total</td>
-                                    <td style="text-align: center; background-color: #008aff; color: black; font-size: 20px;">{{totalCantidadesTicketsPorMantenimiento | number:0}}</td>
+                                    <td colspan="1" style="text-align: center; background-color: #f58e8e; color: black; font-weight: bold;">Total</td>
+                                    <td style="text-align: center; background-color: #f58e8e; color: black; font-size: 20px;">{{totalCantidadesTicketsPorMantenimiento | number:0}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -420,8 +424,8 @@
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th style="background-color: #008aff; color: black;">Cliente</th>
-                                    <th style="background-color: #008aff; color: black;">Cantidad</th>
+                                    <th style="background-color: #ee59da; color: black;">Cliente</th>
+                                    <th style="background-color: #ee59da; color: black;">Cantidad</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -430,8 +434,8 @@
                                     <td>{{ticket.Cantidad}}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="1" style="text-align: center; background-color: #008aff; color: black; font-weight: bold;">Total</td>
-                                    <td style="text-align: center; background-color: #008aff; color: black; font-size: 20px;">{{totalCantidadesTicketsPorGarantia | number:0}}</td>
+                                    <td colspan="1" style="text-align: center; background-color: #ee59da; color: black; font-weight: bold;">Total</td>
+                                    <td style="text-align: center; background-color: #ee59da; color: black; font-size: 20px;">{{totalCantidadesTicketsPorGarantia | number:0}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -457,102 +461,103 @@
 
 
         @*Tickets por clientes y estados     *@
-    <div style="width: 100%; margin-bottom: 20px;">
-        <div style="text-align: center; margin-bottom: 10px;">
-            <label for="select-cliente-proyecto">TICKETS POR CLIENTES Y ESTADOS: </label>
-        </div>
-        <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;">
-            <!-- Card para la tabla -->
+        <div style="width: 100%; margin-bottom: 20px;">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <label for="select-cliente-proyecto">TICKETS POR CLIENTES Y ESTADOS: </label>
+            </div>
+            <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;">
+                <!-- Card para la tabla -->
+                <div class="card">
+                    <div class="card-header">
+                        Tickets por clientes y estados
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="background-color: #41f87d; color: black;">Cliente</th>
+                                    <!-- Crear una columna por cada estado identificado -->
+                                    <th ng-repeat="estado in Object.keys(estadosUnicos)" style="background-color: #41f87d; color: black;">{{estado}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Recorrer la lista de clientes -->
+                                <tr ng-repeat="(cliente, estados) in clientes1">
+                                    <td>{{cliente}}</td>
+                                    <!-- Mostrar la cantidad de tickets por cada estado -->
+                                    <td ng-repeat="estado in Object.keys(estadosUnicos)">{{estados[estado] || 0}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <div>
+                <br />
+            </div>
+
+
+            @*Card para el gráfico*@
             <div class="card">
                 <div class="card-header">
-                    Tickets por clientes y estados
+                    Gráfico de Tickets por garantía 1
                 </div>
                 <div class="card-body">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th style="background-color: #008aff; color: black;">Cliente</th>
-                                <!-- Crear una columna por cada estado identificado -->
-                                <th ng-repeat="estado in Object.keys(estadosUnicos)" style="background-color: #008aff; color: black;">{{estado}}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Recorrer la lista de clientes -->
-                            <tr ng-repeat="(cliente, estados) in clientes1">
-                                <td>{{cliente}}</td>
-                                <!-- Mostrar la cantidad de tickets por cada estado -->
-                                <td ng-repeat="estado in Object.keys(estadosUnicos)">{{estados[estado] || 0}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    @*Contenedor con desplazamiento horizontal*@
+                    <div style="overflow-x:auto;">
+                        <canvas id="ticketPorClienteEstadoBarrasChart1" width="800" height="400"></canvas>
+                    </div>
                 </div>
             </div>
 
-        </div>
-
-        <div>
-            <br />
-        </div>
-
-
-        @*Card para el gráfico*@
-        <div class="card">
-            <div class="card-header">
-                Gráfico de Tickets por garantía 1
+            <div>
+                <br />
             </div>
-            <div class="card-body">
-                @*Contenedor con desplazamiento horizontal*@
-                <div style="overflow-x:auto;">
-                    <canvas id="ticketPorClienteEstadoBarrasChart1" width="800" height="400"></canvas>
+
+            @*Card para el gráfico*@
+            <div class="card">
+                <div class="card-header">
+                    Gráfico de Tickets por garantía 2
+                </div>
+                <div class="card-body">
+                    @*Contenedor con desplazamiento horizontal*@
+                    <div style="overflow-x:auto;">
+                        <canvas id="ticketPorClienteEstadoBarrasChart2" width="800" height="400"></canvas>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div>
-            <br />
-        </div>
-
-        @*Card para el gráfico*@
-        <div class="card">
-            <div class="card-header">
-                Gráfico de Tickets por garantía 2
+            <div>
+                <br />
             </div>
-            <div class="card-body">
-                @*Contenedor con desplazamiento horizontal*@
-                <div style="overflow-x:auto;">
-                    <canvas id="ticketPorClienteEstadoBarrasChart2" width="800" height="400"></canvas>
-                </div>
-            </div>
+
         </div>
 
-        <div>
-            <br />
-        </div>
+        <div class="clear"></div>
+        <div class="clear"></div>
+        <div class="clear"></div>
+        <div class="clear"></div>
+        <div class="clear"></div>
+        <div class="clear"></div>
+        <div class="clear"></div>
+        <div class="clear"></div>
+        <div class="clear"></div>
+        <div class="clear"></div>
+        <div class="clear"></div>
+        <div class="clear"></div>
+        <div class="clear"></div>
+        <div class="clear"></div>
+        <div class="clear"></div>
+        <div class="clear"></div>
+        <div class="clear"></div>
+        <div class="clear"></div>
+        <div class="clear"></div>
+        <div class="clear"></div>
 
     </div>
+</div>
 
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-
-
-
-        <script type="text/javascript" src="~/Web/js/chart.js"></script>
-        <script type="text/javascript" src="~/Web/js/chartjs-plugin-datalabels.js"></script>
+<script type="text/javascript" src="~/Web/js/chart.js"></script>
+<script type="text/javascript" src="~/Web/js/chartjs-plugin-datalabels.js"></script>

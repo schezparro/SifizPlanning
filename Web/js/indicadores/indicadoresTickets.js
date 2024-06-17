@@ -21,7 +21,7 @@
 
         console.log($scope.fechaInicio);
         console.log($scope.fechaFin);
-        
+
         $scope.TicketsNuevos();
         $scope.TicketsCerrados();
         $scope.TicketsEnGestion();
@@ -59,7 +59,7 @@
 
                 // Llenar las etiquetas y los datos del gráfico con la información de las semanas y cantidades
                 $scope.infoTickets.forEach(function (ticket) {
-                    semanas.push('Semana ' + ticket.Semana);
+                    semanas.push(ticket.Descripcion);
                     cantidades.push(ticket.Cantidad);
                 });
 
@@ -132,7 +132,7 @@
 
                 // Llenar las etiquetas y los datos del gráfico con la información de las semanas y cantidades
                 $scope.infoTicketsCerrados.forEach(function (ticket) {
-                    semanas.push('Semana ' + ticket.Semana);
+                    semanas.push(ticket.Descripcion);
                     cantidades.push(ticket.Cantidad);
                 });
 
@@ -205,7 +205,7 @@
 
                 // Llenar las etiquetas y los datos del gráfico con la información de las semanas y cantidades
                 $scope.infoTicketsEnGestion.forEach(function (ticket) {
-                    semanas.push('Semana ' + ticket.Semana);
+                    semanas.push(ticket.Descripcion);
                     cantidades.push(ticket.Cantidad);
                 });
 
@@ -279,7 +279,6 @@
             fechaInicio: $scope.fechaInicio,
             fechaFin: $scope.fechaFin
         });
-
         infoTicketsPorCategorias.success(function (data) {
             $scope.loading.hide();
 
@@ -349,68 +348,51 @@
 
                 var tendenciaChartCtx1 = document.getElementById('ticketPorCategoriaPastelChart').getContext('2d');
                 var tendenciaChart = new Chart(tendenciaChartCtx1, {
-                    type: 'pie', // Tipo de gráfico
+                    type: 'doughnut',
                     data: {
-                        labels: porcentaje, // Usamos las categorías como etiquetas
+                        labels: cantidades,
                         datasets: [{
-                            label: 'Porcentaje por categorías',
-                            data: porcentaje, // Usamos los porcentajes como datos
-                            backgroundColor: coloresAleatorios, // Asignamos colores a cada segmento
-                            hoverOffset: 4
+                            backgroundColor: coloresAleatorios, // Usamos getRandomColor para generar colores aleatorios
+                            hoverBorderColor: 'white',
+                            data: cantidades,
+                            datalabels: {
+                                labels: {
+                                    name: {
+                                        align: 'center',
+                                        anchor: 'center',
+                                        color: function (ctx) {
+                                            return ctx.dataset.backgroundColor;
+                                        },
+                                        font: { size: 16 },
+                                        formatter: function (value, ctx) {
+                                            return categorias[ctx.dataIndex];
+                                        }
+                                    }
+                                }
+                            }
                         }]
                     },
                     options: {
                         plugins: {
-                            title: {
-                                display: true,
-                                text: 'Porcentaje por categorías', // El título de la leyenda
-                                font: {
-                                    size: 12
-                                },
-                                padding: {
-                                    top: 10,
-                                    bottom: 30
-                                },
-                                color: '#000' // Color del título
-                            },
-                            legend: {
-                                display: true,
-                                position: 'top', // Posición de la leyenda (top, bottom, left, right)
-                                labels: {
-                                    font: {
-                                        size: 14,
-                                        weight: 'bold'
-                                    },
-                                    color: '#808080' // Color de las etiquetas de la leyenda
-                                }
-                            },
                             datalabels: {
-                                display: true, // Mostrar las etiquetas permanentemente
-                                formatter: (value) => {
-                                    return value + "%"; // Mostrar el valor directamente con el signo de porcentaje
+                                color: 'white',
+                                display: function (ctx) {
+                                    return ctx.dataset.data[ctx.dataIndex] > 10;
                                 },
-                                color: '#fff',
                                 font: {
                                     weight: 'bold',
-                                    size: 16 // Tamaño de la fuente para las etiquetas de datos
                                 },
-                                anchor: 'end',
-                                align: 'start',
-                                offset: 10,
-                                padding: {
-                                    top: 10,
-                                    bottom: 10
-                                }
                             }
-                        }
-                    },
+                        },
+                        plugins: [ChartDataLabels]
+                    }
                 });
 
-                $scope.mostrarGraficos = true;
-            } else {
-                // Manejar el caso en que data.success es false
-                alert("Error: " + data.msg);
-            }
+
+
+
+            };
+
         });
     };
 
@@ -797,8 +779,6 @@
 
             if (data.success) {
 
-                console.log("entra");
-
                 $scope.infoTicketsPorClienteEstado = data.infoTickets;
                 $scope.totalCantidadesTicketsPorClientesEstado = data.totalCantidades;
                 $scope.mostrarGraficos = true; // Para mostrar la tabla y el gráfico
@@ -965,7 +945,7 @@
         });
     };
 
-    
+
 
     function getRandomColor() {
         var letters = '0123456789ABCDEF';

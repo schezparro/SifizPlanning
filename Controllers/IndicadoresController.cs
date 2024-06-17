@@ -207,9 +207,8 @@ namespace SifizPlanning.Controllers
                 }
 
                 var ticketsQuery = from ticket in db.InfoTickets
-                                   where ticket.FechaCierre != null
-                                      && ticket.FechaCierre.Value >= fInicio
-                                      && ticket.FechaCierre.Value <= fFin
+                                   where ticket.FechaIngreso.Value >= fInicio
+                                      && ticket.FechaIngreso.Value <= fFin
                                       && ticket.Estado == "CERRADO"
                                    select ticket;
 
@@ -229,7 +228,7 @@ namespace SifizPlanning.Controllers
                         Cantidad = g.Count(),
                         Descripcion = "AL " + g.Max(t => t.FechaCierre.Value).ToString("dd/MM/yyyy")
                     })
-                    .OrderBy(x => x.Semana)
+                    .OrderBy(x => x.Semana).Distinct()    
                     .ToList();
 
                 var totalCantidades = groupedTickets.Sum(ticket => ticket.Cantidad);
@@ -297,7 +296,7 @@ namespace SifizPlanning.Controllers
                                       where ticket.FechaIngreso != null
                                          && ticket.FechaIngreso.Value >= fInicioTEG
                                          && ticket.FechaIngreso.Value <= fFinTEG
-                                         && ticket.Estado == "EN DESARROLLO"
+                                         && ticket.Estado != "CERRADO"
                                       select ticket;
 
                 // Convertir la consulta a una lista para trabajar con ella en memoria
@@ -473,6 +472,7 @@ namespace SifizPlanning.Controllers
                                    where ticket.FechaIngreso != null
                                       && ticket.FechaIngreso.Value >= fInicio
                                       && ticket.FechaIngreso.Value <= fFin
+                                   where ticket.Estado != "CERRADO"
                                    select ticket;
 
                 // Convertir la consulta a una lista para trabajar con ella en memoria
@@ -659,7 +659,7 @@ namespace SifizPlanning.Controllers
                        Cliente = g.Key, // Obtiene el Tipo como clave del grupo
                        Cantidad = g.Count() // Cuenta la cantidad de tickets en cada grupo
                    })
-                   .OrderBy(x => x.Cliente) // Ordena por Tipo (opcional, dependiendo de tus necesidades)
+                   .OrderByDescending(x => x.Cantidad) // Ordena por Tipo (opcional, dependiendo de tus necesidades)
                    .ToList();
 
                 var totalCantidades = groupedTickets.Sum(ticket => ticket.Cantidad);
@@ -742,7 +742,7 @@ namespace SifizPlanning.Controllers
                        Cliente = g.Key, // Obtiene el Tipo como clave del grupo
                        Cantidad = g.Count() // Cuenta la cantidad de tickets en cada grupo
                    })
-                   .OrderBy(x => x.Cliente) // Ordena por Tipo (opcional, dependiendo de tus necesidades)
+                   .OrderByDescending(x => x.Cantidad) // Ordena por Tipo (opcional, dependiendo de tus necesidades)
                    .ToList();
 
                 var totalCantidades = groupedTickets.Sum(ticket => ticket.Cantidad);
