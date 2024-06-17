@@ -1,19 +1,19 @@
 ﻿indicadoresApp.controller('indicadoresTickets', ['$scope', '$http', function ($scope, $http) {
+    $scope.initDatepickersTickets = function () {
+        angular.element('#fecha-inicio-indicadores-tickets').datepicker({
+            format: 'dd/mm/yyyy',
+            locale: 'es'
+        }).datepicker('setDate', $scope.fechaInicio);
 
-    var hoy = new Date();
-    var primerDiaDelMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-    $scope.fechaInicio = primerDiaDelMes;
-    $scope.fechaFin = hoy;
-
-    angular.element('#fecha-inicio-indicadores-tickets').datepicker({
-        format: 'dd/mm/yyyy',
-        forceParse: false
-    });
-
-    angular.element('#fecha-fin-indicadores-tickets').datepicker({
-        format: 'dd/mm/yyyy',
-        forceParse: false
-    });
+        angular.element('#fecha-fin-indicadores-tickets').datepicker({
+            format: 'dd/mm/yyyy',
+            locale: 'es'
+        }).datepicker('setDate', $scope.fechaFin);
+    };
+    var fechaActual = new Date();
+    $scope.fechaInicio = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1);
+    $scope.fechaFin = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0);
+    $scope.initDatepickersTickets();
 
     $scope.mostrarGraficos = false;
 
