@@ -17,6 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http;
 using Hangfire;
+using System.Configuration;
 
 namespace SifizPlanning.Controllers
 {
@@ -1609,7 +1610,7 @@ namespace SifizPlanning.Controllers
 
 		//Funcion para la respuesta de la resolucion de un ticket
 		[Authorize(Roles = "CLIENTE")]
-		public ActionResult RespuestaResolucion(string cod)
+		public async Task<ActionResult> RespuestaResolucion(string cod)
 		{
 			try
 			{
@@ -1729,7 +1730,21 @@ namespace SifizPlanning.Controllers
 					ViewBag.nombre = personaCliente.Nombre1 + " " + personaCliente.Apellido1;
 					ViewBag.codTicket = cod;
 
-					return View("TicketDevuelto");
+                    var client = new HttpClient();
+                    string key = ConfigurationManager.AppSettings.Get("Devops");
+
+                    var requestUrl = "https://api-sifizops.sifizsoft.com/api/WorkItemStateNotification/ModificarCambioDeEstadoAsignacionTareaDePublicacionRechazada";
+                    var data = new MultipartFormDataContent();
+                    data.Add(new StringContent(idTicket.ToString()), "Identifier");
+                    data.Add(new StringContent("SI"), "CambiarEstadoRechazado");
+                    data.Add(new StringContent(key), "Key");
+
+                    var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+                    requestMessage.Content = data;
+
+                    var response = await client.SendAsync(requestMessage);
+
+                    return View("TicketDevuelto");
 				}
 
 				return View();

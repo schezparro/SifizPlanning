@@ -24,7 +24,7 @@ namespace SifizPlanning.Controllers
             }
 
             string emailUser = User.Identity.Name;
-            var user = db.Usuario.FirstOrDefault(x => x.Email == "sfzdevops@sifizsoft.com");
+            var user = db.Usuario.FirstOrDefault(x => x.Email == ticketReq.email);
             if (user == null)
             {
                 return BadRequest("Usuario no encontrado.");
@@ -332,7 +332,8 @@ namespace SifizPlanning.Controllers
 
     public class TicketRequest
     {
-        public string identifier{ get; set; }
+        public string identifier { get; set; }
+        public string email { get; set; }
     }
     public class AceptarTicketRequest
     {

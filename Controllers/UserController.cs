@@ -1711,7 +1711,8 @@ namespace SifizPlanning.Controllers
                     string destinosTecnico = String.Join(", ", destinatarioCorreos.ToArray());
 
                     var client = new HttpClient();
-                    var requestUrl = "https://api-publicaciones.sifizsoft.com/api/AsignacionPublicacion/AsignarTareaDePublicacion";
+
+                    var requestUrl = "https://api-sifizops.sifizsoft.com/api/AsignacionPublicacion/AsignarTareaDePublicacion";
 
                     var data = new MultipartFormDataContent();
 
