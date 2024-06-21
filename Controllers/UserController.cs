@@ -2728,10 +2728,10 @@ r in db.Rol on ur.rol equals r
                     }
                     else if (solicitud.Estado == "RECHAZADA")
                     {
-                        if (fechaDesde > fechaHasta)
-                        {
-                            throw new Exception("Error, la fecha de fin no debe ser menor a la fecha de inicio.");
-                        }
+                        //if (fechaDesde > fechaHasta)
+                        //{
+                        //    throw new Exception("Error, la fecha de fin no debe ser menor a la fecha de inicio.");
+                        //}
 
                         while (fechaDesde <= fechaHasta)
                         {
@@ -2764,6 +2764,71 @@ r in db.Rol on ur.rol equals r
                 {
                     success = true,
                     msg = "Se ha registrado correctamente la solicitud"
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message,
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult EditarSolicitudVacacionesUsuario([System.Web.Http.FromBody] SolicitudVacacionesDTO solicitud, string rechazoVacacionesComentario = "")
+        {
+            try
+            {
+                string emailUser = User.Identity.Name;
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser && x.EstaActivo == 1);
+                Persona persona = user.persona;
+                Colaborador colaborador = db.Colaborador.FirstOrDefault(x => x.persona.Secuencial == persona.Secuencial);
+
+                SolicitudVacaciones solVacaciones = null;
+                if (solicitud.ID != null)
+                {
+                    solVacaciones = db.SolicitudVacaciones.Find(solicitud.ID);
+                    if (solVacaciones == null)
+                    {
+                        return Json(new { success = false, msg = "Solicitud de vacaciones no encontrada." });
+                    }
+                }
+                else
+                {
+                    return Json(new { success = false, msg = "Debe proporcionar un ID de solicitud válido." });
+                }
+
+                // Actualizar los campos de la solicitud existente
+                solVacaciones.AlAnio = solicitud.AlAnio;
+                solVacaciones.FechaInicioVacaciones = solicitud.FechaInicioVacaciones;
+                solVacaciones.FechaFinVacaciones = solicitud.FechaFinVacaciones;
+                solVacaciones.FechaPresentarseTrabajar = solicitud.FechaPresentarseTrabajar;
+                solVacaciones.Cargo = solicitud.Cargo;
+                solVacaciones.Empresa = solicitud.Empresa;
+                solVacaciones.Cedula = solicitud.Cedula;
+                solVacaciones.AniosServicio = solicitud.AniosServicio;
+                solVacaciones.ApellidosNombres = persona.Nombre1 + " " + persona.Apellido1;
+                solVacaciones.DiasCorresponden = solicitud.DiasCorresponden;
+                solVacaciones.DiasDisfrutar = solicitud.DiasDisfrutar;
+                solVacaciones.DiasPendientes = solicitud.DiasPendientes;
+                solVacaciones.FechaIngresoInstitucion = solicitud.FechaPresentarseTrabajar;
+                solVacaciones.FechaIngresoSolicitud = solicitud.FechaIngresoSolicitud;
+                solVacaciones.Observaciones = solicitud.Observaciones;
+                solVacaciones.DelAnio = solicitud.DelAnio;
+                solVacaciones.Jefe = solicitud.Jefe;
+                solVacaciones.Estado = null;
+
+                db.SaveChanges();
+
+                var resp = new
+                {
+                    success = true,
+                    msg = "La solicitud de vacaciones ha sido actualizada correctamente."
                 };
                 return Json(resp);
             }
@@ -2941,6 +3006,78 @@ r in db.Rol on ur.rol equals r
                 {
                     success = false,
                     msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult EditarSolicitudPermisosUsuario([System.Web.Http.FromBody] SolicitudPermisosDTO solicitud, string rechazoPermisoComentario = "")
+        {
+            try
+            {
+                string emailUser = User.Identity.Name;
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser && x.EstaActivo == 1);
+                Persona persona = user.persona;
+                Colaborador colaborador = db.Colaborador.FirstOrDefault(x => x.persona.Secuencial == persona.Secuencial);
+
+                SolicitudPermisos solPermisos = null;
+                if (solicitud.ID != null)
+                {
+                    solPermisos = db.SolicitudPermisos.Find(solicitud.ID);
+                    if (solPermisos == null)
+                    {
+                        return Json(new { success = false, msg = "Solicitud de permisos no encontrada." });
+                    }
+                }
+                else
+                {
+                    return Json(new { success = false, msg = "Debe proporcionar un ID de solicitud válido." });
+                }
+
+                // Actualizar los campos del permiso existente
+                TimeSpan horaRetor = DateTime.ParseExact(solicitud.HoraRetorno, @"HH\:mm\:ss", CultureInfo.InvariantCulture).TimeOfDay;
+                TimeSpan horaSal = DateTime.ParseExact(solicitud.HoraSalida, @"HH\:mm\:ss", CultureInfo.InvariantCulture).TimeOfDay;
+                if (solicitud.FechaHasta.AddMinutes(horaRetor.TotalMinutes) <= solicitud.FechaDesde.AddMinutes(horaSal.TotalMinutes))
+                {
+                    throw new Exception("Error, la fecha de inicio del permiso debe ser menor que la fecha fin del permiso");
+                }
+
+                solPermisos.ApellidosNombres = persona.Nombre1 + " " + persona.Apellido1;
+                solPermisos.Area = solicitud.Area;
+                solPermisos.Cargo = solicitud.Cargo;
+                solPermisos.Cedula = solicitud.Cedula;
+                solPermisos.Comida = solicitud.Comida == "True" ? true : false;
+                solPermisos.Empresa = solicitud.Empresa;
+                solPermisos.FechaDesde = solicitud.FechaDesde;
+                solPermisos.FechaHasta = solicitud.FechaHasta;
+                solPermisos.FechaIngresoSolicitud = solicitud.FechaIngresoSolicitud;
+                solPermisos.HoraRetorno = DateTime.ParseExact(solicitud.HoraRetorno, @"HH\:mm\:ss", CultureInfo.InvariantCulture).TimeOfDay;
+                solPermisos.HoraSalida = DateTime.ParseExact(solicitud.HoraSalida, @"HH\:mm\:ss", CultureInfo.InvariantCulture).TimeOfDay;
+                solPermisos.Jefe = solicitud.Jefe;
+                solPermisos.Matrimonio = solicitud.Matrimonio == "True" ? true : false;
+                solPermisos.Motivo = solicitud.Motivo;
+                solPermisos.Otros = solicitud.Otros == "True" ? true : false;
+                solPermisos.Paternidad = solicitud.Paternidad == "True" ? true : false;
+                solPermisos.Personal = solicitud.Personal == "True" ? true : false;
+                solPermisos.Estado = null;
+
+                db.SaveChanges();
+
+                var resp = new
+                {
+                    success = true,
+                    msg = "La solicitud de permisos ha sido actualizada correctamente."
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message,
                 };
                 return Json(resp);
             }

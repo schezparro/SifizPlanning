@@ -69,7 +69,8 @@
         $scope.solVacaciones.apellidosNombres = $scope.datosUsuario.nombre;
         $scope.solVacaciones.cargo = $scope.datosUsuario.cargo;
         $scope.isEmpresaVacacionesSelectEditable = false;
-
+        
+       
         if ($scope.datosUsuario.empresa === "SIFIZSOFT") {
             $scope.solVacaciones.empresa = "SIFIZSOFT";
             $scope.isEmpresaVacacionesSelectEditable = true;
@@ -87,6 +88,27 @@
         waitingDialog.show('Solicitando vacaciones...', { dialogSize: 'sm', progressType: 'success' });
 
         var solicitudVacaciones = $http.post("user/solicitar-vacaciones",
+            {
+                solicitud: $scope.solVacaciones
+            });
+        solicitudVacaciones.success(function (data) {
+            waitingDialog.hide();
+            if (data.success === true) {
+                $scope.recargarVacaciones();
+                angular.element("#modal-solicitud-vacaciones").modal("hide");
+            }
+            else {
+                angular.element("#modal-solicitud-vacaciones").modal("hide");
+                messageDialog.show('Información', data.msg);
+            }
+        });
+    };
+
+    $scope.editarSolVacaciones = function () {
+        event.preventDefault();
+        waitingDialog.show('Solicitando vacaciones...', { dialogSize: 'sm', progressType: 'success' });
+
+        var solicitudVacaciones = $http.post("user/editar-solicitar-vacaciones",
             {
                 solicitud: $scope.solVacaciones
             });
@@ -212,6 +234,25 @@
         });
     };
 
+    $scope.editarSolPermisos = function () {
+        waitingDialog.show('Solicitando permisos...', { dialogSize: 'sm', progressType: 'success' });
+        var solicitudPermisos = $http.post("user/editar-solicitar-permisos",
+            {
+                solicitud: $scope.solicitudPer
+            });
+        solicitudPermisos.success(function (data) {
+            waitingDialog.hide();
+            if (data.success === true) {
+                $scope.recargarPermisos();
+                angular.element("#modal-solicitud-permisos").modal("hide");
+            }
+            else {
+                angular.element("#modal-solicitud-permisos").modal("hide");
+                messageDialog.show('Información', data.msg);
+            }
+        });
+    };
+
     $scope.fechaInicioPermisoChange = function (fechaInicioPermiso) {
         var coincide = $scope.feriados.some(f => f.fecha.getTime() === fechaInicioPermiso.getTime());
         $scope.hayFechaInicioPermiso = true;
@@ -299,7 +340,9 @@
             $scope.solVacaciones.fechaPresentarseTrabajar = convertDate(solVac.FechaPresentarseTrabajar);
             $scope.solVacaciones.observaciones = solVac.Observaciones;
             $scope.solVacaciones.jefe = solVac.Jefe;
-            $scope.windowSolicitarVacaciones();
+            $scope.solVacaciones.id = solVac.ID;
+            $scope.solVacaciones.estado = solVac.Estado;
+            $scope.windowSolicitarVacaciones();          
         }
     };
 
@@ -319,6 +362,8 @@
             $scope.solicitudPer.horaRetorno = solPer.HoraRetorno;
             $scope.solicitudPer.motivo = solPer.Motivo;
             $scope.solicitudPer.jefe = solPer.Jefe;
+            $scope.solicitudPer.id = solPer.ID;
+            $scope.solicitudPer.estado = solPer.Estado;           
             $scope.windowSolicitarPermiso();
         }
     };

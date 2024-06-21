@@ -1409,6 +1409,18 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+               name: "EditarSolicitudVacacionesUsuario",
+               url: "user/editar-solicitar-vacaciones/{id}",
+               defaults: new { controller = "User", action = "EditarSolicitudVacacionesUsuario", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+               name: "EditarSolicitudPermisosUsuario",
+               url: "user/editar-solicitar-permisos/{id}",
+               defaults: new { controller = "User", action = "EditarSolicitudPermisosUsuario", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                name: "VacacionesUsuario",
                url: "user/vacaciones-usuario/{id}",
                defaults: new { controller = "User", action = "VacacionesUsuario", id = UrlParameter.Optional }
