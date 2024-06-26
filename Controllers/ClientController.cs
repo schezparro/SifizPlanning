@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using Hangfire;
 using System.Configuration;
+using Newtonsoft.Json;
 
 namespace SifizPlanning.Controllers
 {
@@ -1733,16 +1734,22 @@ namespace SifizPlanning.Controllers
                     var client = new HttpClient();
                     string key = ConfigurationManager.AppSettings.Get("Devops");
 
-                    var requestUrl = "https://api-sifizops.sifizsoft.com/api/WorkItemStateNotification/ModificarCambioDeEstadoAsignacionTareaDePublicacionRechazada";
-                    var data = new MultipartFormDataContent();
-                    data.Add(new StringContent(idTicket.ToString()), "Identifier");
-                    data.Add(new StringContent("SI"), "CambiarEstadoRechazado");
-                    data.Add(new StringContent(key), "Key");
+                    var requestUrl = "https://d788-186-101-80-114.ngrok-free.app/api/WorkItemStateNotification/ModificarCambioDeEstadoAsignacionTareaDePublicacionRechazada";
+                    var data = new
+                    {
+                        Identifier = idTicket.ToString(),
+                        CambiarEstadoRechazado = "SI",
+                        Key = key
+                    };
+
+                    var json = JsonConvert.SerializeObject(data);
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
 
                     var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUrl);
-                    requestMessage.Content = data;
+                    requestMessage.Content = content;
 
                     var response = await client.SendAsync(requestMessage);
+
 
                     return View("TicketDevuelto");
 				}

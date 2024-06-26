@@ -1212,8 +1212,8 @@ namespace SifizPlanning.Controllers
                     List<string> notTec = new List<string>();
                     notCli.Add(emailCliente);
                     notTec.Add(emailUser);
-                    notTec.AddRange(Utiles.CorreoPorGrupoEmail("COORD"));
-                    notTec.AddRange(Utiles.CorreoPorGrupoEmail("TFS"));
+                    //notTec.AddRange(Utiles.CorreoPorGrupoEmail("COORD"));
+                    //notTec.AddRange(Utiles.CorreoPorGrupoEmail("TFS"));
                     var gestores = ticket.persona_cliente.cliente.gestorServicios.ToList();
                     foreach (var g in gestores)
                     {
@@ -1430,8 +1430,8 @@ namespace SifizPlanning.Controllers
                     List<string> notTec = new List<string>();
                     notCli.Add(emailCliente);
                     notTec.Add(emailUser);
-                    notTec.AddRange(Utiles.CorreoPorGrupoEmail("COORD"));
-                    notTec.AddRange(Utiles.CorreoPorGrupoEmail("TFS"));
+                    //notTec.AddRange(Utiles.CorreoPorGrupoEmail("COORD"));
+                    //notTec.AddRange(Utiles.CorreoPorGrupoEmail("TFS"));
                     string destinosCliente = String.Join(", ", notCli.ToArray());
                     string destinosTecnico = String.Join(", ", notTec.ToArray());
                     var identifier = "";
@@ -1641,6 +1641,7 @@ namespace SifizPlanning.Controllers
                 db.SaveChanges();//Salvando los cambios
 
                 //Enviando Email de no terminación de la tarea
+                List<string> destinosEmail = new List<string>();
                 List<string> destinatarioCorreos = Utiles.CorreoPorGrupoEmail("COORD");
                 List<string> nombresColaboradores = new List<string>();
                 Persona personaCliente = ticket.persona_cliente.persona;
@@ -1658,6 +1659,7 @@ namespace SifizPlanning.Controllers
                     Persona personaColaborador = db.Colaborador.Find(idColab).persona;
                     string email = personaColaborador.usuario.FirstOrDefault().Email;
                     destinatarioCorreos.Add(email);
+                    destinosEmail.Add(email);
                     nombresColaboradores.Add(personaColaborador.Nombre1 + " " + personaColaborador.Apellido1);
                 }
 
@@ -1708,7 +1710,7 @@ namespace SifizPlanning.Controllers
                     string descripcionP = descripcion;
                     string[] tagsP = JsonConvert.DeserializeObject<string[]>(tagsJson);
                     string key = ConfigurationManager.AppSettings.Get("Devops");
-                    string destinosTecnico = String.Join(", ", destinatarioCorreos.ToArray());
+                    string destinosTecnico = String.Join(", ", destinosEmail.ToArray());
 
                     var client = new HttpClient();
 
