@@ -69,6 +69,12 @@
         $scope.solVacaciones.apellidosNombres = $scope.datosUsuario.nombre;
         $scope.solVacaciones.cargo = $scope.datosUsuario.cargo;
         $scope.isEmpresaVacacionesSelectEditable = false;
+        $scope.btnEditar = false;
+        console.log($scope.solVacaciones.id);
+
+        if ($scope.solVacaciones.id != undefined) {
+            $scope.btnEditar = true;
+        }
         
        
         if ($scope.datosUsuario.empresa === "SIFIZSOFT") {
