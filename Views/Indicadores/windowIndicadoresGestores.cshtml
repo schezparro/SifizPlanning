@@ -1,5 +1,5 @@
 <div style="column-count: 4">
-    @*<div>
+    <div>
         <label>GESTOR</label>
         <select class="form-control" style="max-width: 200px" ng-model="gestorSeleccionado" ng-options="gestor.idColaborador as (gestor.nombre | limitTo: 30) for gestor in gestores"></select>
     </div>
@@ -18,10 +18,10 @@
     </div>
     <div>
         <button id="buscar-btn" class="btn btn-primary" ng-click="refrech()">Actualizar</button>
-    </div>*@
+    </div>
 </div>
 
-@*<table class="table">
+<table class="table">
     <thead>
         <tr>
             <th>Cliente</th>
@@ -34,5 +34,5 @@
             <td ng-repeat="ticket in infoTickets">{{ ticket.cantidad }}</td>
         </tr>
     </tbody>
-</table>*@
+</table>
 

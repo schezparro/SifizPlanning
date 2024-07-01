@@ -2201,6 +2201,30 @@ namespace SifizPlanning
 
             //------------------ RUTAS DEL MODULO DE INDICADORES -------------------
             routes.MapRoute(
+                name: "DarTicketsEnGestionAlDia",
+                url: "indicadores/dar-tickets-en-gestion-aldia/{id}",
+                defaults: new { controller = "Indicadores", action = "DarTicketsEnGestionAlDia", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarTicketsPorCategoriasAlDia",
+                url: "indicadores/dar-tickets-por-categorias-aldia/{id}",
+                defaults: new { controller = "Indicadores", action = "DarTicketsPorCategoriasAlDia", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarTicketsPorEstadosAlDia",
+                url: "indicadores/dar-tickets-por-estados-aldia/{id}",
+                defaults: new { controller = "Indicadores", action = "DarTicketsPorEstadosAlDia", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarTicketsPorClientesPorEstadoAlDia",
+                url: "indicadores/dar-tickets-por-cliente-estado-aldia/{id}",
+                defaults: new { controller = "Indicadores", action = "DarTicketsPorClientesPorEstadoAlDia", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "DarGestores",
                 url: "catalogos/dar-gestores/{id}",
                 defaults: new { controller = "Admin", action = "DarGestores", id = UrlParameter.Optional }
