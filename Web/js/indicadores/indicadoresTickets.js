@@ -40,28 +40,17 @@
         }
     });
 
-    $scope.mostrarGraficos = false;
+    $scope.mostrarPanelGraficos = false;
 
     $scope.buscarOtrosDatos = function () {
-
+        $scope.mostrarPanelGraficos = true;
         if (isSpecificDateFormat($scope.fechaInicio.toString())) {
             $scope.fechaInicio = dateToStr($scope.fechaInicio);
         }
 
-        // Haz lo mismo para otras fechas que necesites comprobar
         if (isSpecificDateFormat($scope.fechaFin.toString())) {
             $scope.fechaFin = dateToStr($scope.fechaFin);
         }
-
-        console.log($scope.fechaInicio);
-        console.log($scope.fechaFin);
-
-        // Convierte las fechas a string usando dateToStr
-       // $scope.fechaInicio = dateToStr(fechaInicio);
-       // $scope.fechaFin = dateToStr(fechaFin);
-
-        console.log("fecha inicio " + $scope.fechaInicio);
-        console.log("fecha fin " + $scope.fechaFin);
 
         if ($scope.tendenciaChart) {
             $scope.tendenciaChart.destroy();
@@ -69,26 +58,6 @@
 
         if ($scope.ticketCerradosChart) {
             $scope.ticketCerradosChart.destroy();
-        }
-
-        if ($scope.ticketEnGestionChart) {
-            $scope.ticketEnGestionChart.destroy();
-        }
-
-        if ($scope.ticketPorCategoriaBarrasChart) {
-            $scope.ticketPorCategoriaBarrasChart.destroy();
-        }
-
-        if ($scope.ticketPorCategoriaPastelChart) {
-            $scope.ticketPorCategoriaPastelChart.destroy();
-        }
-
-        if ($scope.ticketPorEstadoBarrasChart) {
-            $scope.ticketPorEstadoBarrasChart.destroy();
-        }
-
-        if ($scope.ticketPorEstadoPastelChart) {
-            $scope.ticketPorEstadoPastelChart.destroy();
         }
 
         if ($scope.ticketPorAplicaBarrasChart) {
@@ -103,28 +72,20 @@
             $scope.ticketPorGarantiaBarrasChart.destroy();
         }
 
-        if ($scope.ticketPorClienteEstadoBarrasChart1) {
-            $scope.ticketPorClienteEstadoBarrasChart1.destroy();
-        }
-
-        if ($scope.ticketPorClienteEstadoBarrasChart2) {
-            $scope.ticketPorClienteEstadoBarrasChart2.destroy();
-        }
-
         $scope.TicketsNuevos();
         $scope.TicketsCerrados();
-        //$scope.TicketsEnGestion();
-        //$scope.TicketsPorCategoria();
-        //$scope.TicketsPorEstados();
         $scope.TicketsAplica();
         $scope.TicketsPorMantenimiento();
         $scope.TicketsPorGarantia();
-        //$scope.TicketsPorClientesEstados();
 
     };
 
     //TICKETS NUEVOS
     $scope.TicketsNuevos = function () {
+
+        if ($scope.tendenciaChart) {
+            $scope.tendenciaChart.destroy();
+        }
 
         var infoTickets = $http.post("indicadores/dar-cantidadTickets/", {
             fechaInicio: $scope.fechaInicio,
@@ -135,58 +96,63 @@
             $scope.loading.hide();
 
             if (data.success) {
-                $scope.infoTickets = data.infoTickets;
-                $scope.totalCantidades = data.totalCantidades;
-                $scope.mostrarGraficos = true; // Para mostrar la tabla y el gráfico
 
-                // Preparar datos para el gráfico de líneas de tendencia temporal
-                var semanas = [];
-                var cantidades = [];
+                if (data.infoTickets.length === 0) {
 
-                // Llenar las etiquetas y los datos del gráfico con la información de las semanas y cantidades
-                $scope.infoTickets.forEach(function (ticket) {
-                    semanas.push(ticket.Descripcion);
-                    cantidades.push(ticket.Cantidad);
-                });
+                    $scope.mostrarGraficosNuevosTickets = false;
+                    $scope.mensajeNoDataNuevosTickets = 'No existen tickets nuevos en el período del ' + $scope.fechaInicio + ' al ' + $scope.fechaFin + '.';
 
-                // Gráfico de líneas para mostrar la tendencia de tickets a lo largo del tiempo
-                var tendenciaChartCtx = document.getElementById('tendenciaChart').getContext('2d');
-                var tendenciaChart = new Chart(tendenciaChartCtx, {
-                    type: 'line',
-                    data: {
-                        labels: semanas, // Etiquetas de las semanas
-                        datasets: [{
-                            label: 'Tickets ingresados',
-                            data: cantidades, // Datos de las cantidades
-                            fill: false,
-                            borderColor: '#add8e6',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        plugins: {
-                            datalabels: {
-                                display: true,
-                                align: 'top',
-                                backgroundColor: '#D3D3D3',
-                                borderRadius: 3,
-                                font: {
-                                    weight: 'bold'
+                } else {
+                    $scope.mensajeNoDataNuevosTickets = '';
+
+                    $scope.infoTickets = data.infoTickets;
+                    $scope.totalCantidades = data.totalCantidades;
+                    $scope.mostrarGraficos = true;
+
+                    var semanas = [];
+                    var cantidades = [];
+
+                    $scope.infoTickets.forEach(function (ticket) {
+                        semanas.push(ticket.Descripcion);
+                        cantidades.push(ticket.Cantidad);
+                    });
+
+                    var tendenciaChartCtx = document.getElementById('tendenciaChart').getContext('2d');
+                    $scope.tendenciaChart = new Chart(tendenciaChartCtx, {
+                        type: 'line',
+                        data: {
+                            labels: semanas,
+                            datasets: [{
+                                label: 'Tickets ingresados',
+                                data: cantidades,
+                                fill: false,
+                                borderColor: '#add8e6',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                datalabels: {
+                                    display: true,
+                                    align: 'top',
+                                    backgroundColor: '#D3D3D3',
+                                    borderRadius: 3,
+                                    font: {
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
                                 }
                             }
                         },
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    },
-                    plugins: [ChartDataLabels]
-                });
-
-                $scope.mostrarGraficos = true;
+                        plugins: [ChartDataLabels]
+                    });
+                    $scope.mostrarGraficosNuevosTickets = true;
+                }
             } else {
-                // Manejar el caso en que data.success es false
                 alert("Error: " + data.msg);
             }
         });
@@ -194,6 +160,10 @@
 
     //TICKETS CERRADOS
     $scope.TicketsCerrados = function () {
+
+        if ($scope.ticketCerradosChart) {
+            $scope.ticketCerradosChart.destroy();
+        }
 
         var infoTicketsCerrados = $http.post("indicadores/dar-tickets-cerrados/", {
             fechaInicio: $scope.fechaInicio,
@@ -204,67 +174,71 @@
             $scope.loading.hide();
 
             if (data.success) {
-                $scope.infoTicketsCerrados = data.infoTickets;
-                $scope.totalCantidadesCerrados = data.totalCantidades;
-                $scope.mostrarGraficos = true; // Para mostrar la tabla y el gráfico
 
-                // Preparar datos para el gráfico de líneas de tendencia temporal
-                var semanas = [];
-                var cantidades = [];
+                if (data.infoTickets.length === 0) {
+                    $scope.mostrarGraficoTicketsCerrados = false;
+                    $scope.mensajeNoDataTicketsCerrados = 'No existen tickets cerrados en el período del ' + $scope.fechaInicio + ' al ' + $scope.fechaFin + '.';
 
-                // Llenar las etiquetas y los datos del gráfico con la información de las semanas y cantidades
-                $scope.infoTicketsCerrados.forEach(function (ticket) {
-                    semanas.push(ticket.Descripcion);
-                    cantidades.push(ticket.Cantidad);
-                });
+                } else {
+                    $scope.infoTicketsCerrados = data.infoTickets;
+                    $scope.totalCantidadesCerrados = data.totalCantidades;
+                    var semanas = [];
+                    var cantidades = [];
+                    $scope.mensajeNoDataTicketsCerrados = '';
 
-                // Gráfico de líneas para mostrar la tendencia de tickets a lo largo del tiempo
-                var tendenciaChartCtx = document.getElementById('ticketCerradosChart').getContext('2d');
-                var tendenciaChart = new Chart(tendenciaChartCtx, {
-                    type: 'line',
-                    data: {
-                        labels: semanas, // Etiquetas de las semanas
-                        datasets: [{
-                            label: 'Tickets cerrados',
-                            data: cantidades, // Datos de las cantidades
-                            fill: true, // Habilita el relleno
-                            borderColor: '#ffc0cb', // Color del borde en rosado
-                            backgroundColor: '#ffc0cb', // Color de relleno en rosado
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        plugins: {
-                            datalabels: {
-                                display: true,
-                                align: 'top',
-                                backgroundColor: '#D3D3D3',
-                                borderRadius: 3,
-                                font: {
-                                    weight: 'bold'
+                    $scope.infoTicketsCerrados.forEach(function (ticket) {
+                        semanas.push(ticket.Descripcion);
+                        cantidades.push(ticket.Cantidad);
+                    });
+
+                    var tendenciaChartCtx = document.getElementById('ticketCerradosChart').getContext('2d');
+                    $scope.ticketCerradosChart = new Chart(tendenciaChartCtx, {
+                        type: 'line',
+                        data: {
+                            labels: semanas,
+                            datasets: [{
+                                label: 'Tickets cerrados',
+                                data: cantidades,
+                                fill: true,
+                                borderColor: '#ffc0cb',
+                                backgroundColor: '#ffc0cb',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                datalabels: {
+                                    display: true,
+                                    align: 'top',
+                                    backgroundColor: '#D3D3D3',
+                                    borderRadius: 3,
+                                    font: {
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
                                 }
                             }
                         },
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    },
-                    plugins: [ChartDataLabels]
-                });
+                        plugins: [ChartDataLabels]
+                    });
 
-                $scope.mostrarGraficos = true;
+                    $scope.mostrarGraficoTicketsCerrados = true;
+                }
             } else {
-                // Manejar el caso en que data.success es false
                 alert("Error: " + data.msg);
             }
+
+
         });
     };
 
     //TICKETS EN GESTION
     //$scope.TicketsEnGestion = function () {
-    
+
     //    var infoTicketsEnGestion = $http.post("indicadores/dar-tickets-en-gestion/", {
     //        fechaInicio: $scope.fechaInicio,
     //        fechaFin: $scope.fechaFin
@@ -587,6 +561,10 @@
     //RICKETS APLICADOS A:
     $scope.TicketsAplica = function () {
 
+        if ($scope.ticketPorAplicaBarrasChart) {
+            $scope.ticketPorAplicaBarrasChart.destroy();
+        }
+
         var infoTicketsPorAplica = $http.post("indicadores/dar-tickets-por-aplica/", {
             fechaInicio: $scope.fechaInicio,
             fechaFin: $scope.fechaFin
@@ -596,70 +574,76 @@
             $scope.loading.hide();
 
             if (data.success) {
-                $scope.infoTicketsPorAplica = data.infoTickets;
-                $scope.totalCantidadesTicketsPorAplica = data.totalCantidades;
-                $scope.mostrarGraficos = true; // Para mostrar la tabla y el gráfico
 
-                // Preparar datos para el gráfico de líneas de tendencia temporal
-                var aplica = [];
-                var cantidades = [];
+                if (data.infoTickets.length === 0) {
+                    $scope.mostrarGraficoTicketsAplica = false;
+                    $scope.mensajeNoDataTicketsAplica = 'No existen datos disponibles';
 
-                // Llenar las etiquetas y los datos del gráfico con la información de las semanas y cantidades
-                $scope.infoTicketsPorAplica.forEach(function (ticket) {
-                    aplica.push(ticket.Aplica);
-                    cantidades.push(ticket.Cantidad);
-                });
+                } else {
+                    $scope.infoTicketsPorAplica = data.infoTickets;
+                    $scope.totalCantidadesTicketsPorAplica = data.totalCantidades;
+                    $scope.mostrarGraficos = true;
+                    $scope.mensajeNoDataTicketsAplica = '';
+                    var aplica = [];
+                    var cantidades = [];
+                    $scope.infoTicketsPorAplica.forEach(function (ticket) {
+                        aplica.push(ticket.Aplica);
+                        cantidades.push(ticket.Cantidad);
+                    });
 
-                function getRandomColor() {
-                    var letters = '0123456789ABCDEF';
-                    var color = '#';
-                    for (var i = 0; i < 6; i++) {
-                        color += letters[Math.floor(Math.random() * 16)];
+                    function getRandomColor() {
+                        var letters = '0123456789ABCDEF';
+                        var color = '#';
+                        for (var i = 0; i < 6; i++) {
+                            color += letters[Math.floor(Math.random() * 16)];
+                        }
+                        return color;
                     }
-                    return color;
-                }
 
-                // Ahora puedes usar getRandomColor() sin problemas
-                var coloresAleatorios = cantidades.map(getRandomColor);
+                    var coloresAleatorios = cantidades.map(getRandomColor);
 
-                var tendenciaChartCtx = document.getElementById('ticketPorAplicaBarrasChart').getContext('2d');
-                var tendenciaChart = new Chart(tendenciaChartCtx, {
-                    type: 'bar', // Cambiado a 'bar'
-                    data: {
-                        labels: aplica, // Etiquetas de las semanas
-                        datasets: [{
-                            label: 'Cantidad de tickets aplicados a:',
-                            data: cantidades, // Datos de las cantidades
-                            backgroundColor: coloresAleatorios, // Asignar colores aleatorios a cada barra
-                            hoverBackgroundColor: coloresAleatorios, // Mantener el color al pasar el mouse
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        plugins: {
-                            datalabels: {
-                                display: true,
-                                align: 'top',
-                                backgroundColor: '#D3D3D3',
-                                borderRadius: 3,
-                                font: {
-                                    weight: 'bold'
+                    var tendenciaChartCtx = document.getElementById('ticketPorAplicaBarrasChart').getContext('2d');
+                    $scope.ticketPorAplicaBarrasChart = new Chart(tendenciaChartCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: aplica,
+                            datasets: [{
+                                label: 'Cantidad de tickets aplicados a:',
+                                data: cantidades,
+                                backgroundColor: coloresAleatorios,
+                                hoverBackgroundColor: coloresAleatorios,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                datalabels: {
+                                    display: true,
+                                    align: 'top',
+                                    backgroundColor: '#D3D3D3',
+                                    borderRadius: 3,
+                                    font: {
+                                        weight: 'bold'
+                                    }
                                 }
                             }
-                        }
-                    },
-                    plugins: [ChartDataLabels]
-                });
+                        },
+                        plugins: [ChartDataLabels]
+                    });
 
-                $scope.mostrarGraficos = true;
+                    $scope.mostrarGraficoTicketsAplica = true;
+                } 
             } else {
-                // Manejar el caso en que data.success es false
                 alert("Error: " + data.msg);
             }
         });
     };
 
     $scope.TicketsPorMantenimiento = function () {
+
+        if ($scope.ticketPorMttoBarrasChart) {
+            $scope.ticketPorMttoBarrasChart.destroy();
+        }
 
         var infoTicketsPorMantenimiento = $http.post("indicadores/dar-tickets-por-mantenimiento/", {
             fechaInicio: $scope.fechaInicio,
@@ -670,64 +654,67 @@
             $scope.loading.hide();
 
             if (data.success) {
-                $scope.infoTicketsPorMantenimiento = data.infoTickets;
-                $scope.totalCantidadesTicketsPorMantenimiento = data.totalCantidades;
-                $scope.mostrarGraficos = true; // Para mostrar la tabla y el gráfico
 
-                // Preparar datos para el gráfico de líneas de tendencia temporal
-                var clientes = [];
-                var cantidades = [];
+                if (data.infoTickets.length === 0) {
+                    $scope.mostrarGraficoTicketsMtto = false;
+                    $scope.mensajeNoDataTicketsMtto = 'No existen datos disponibles';
 
-                // Llenar las etiquetas y los datos del gráfico con la información de las semanas y cantidades
-                $scope.infoTicketsPorMantenimiento.forEach(function (ticket) {
-                    clientes.push(ticket.Cliente);
-                    cantidades.push(ticket.Cantidad);
-                });
+                } else {
+                    $scope.infoTicketsPorMantenimiento = data.infoTickets;
+                    $scope.totalCantidadesTicketsPorMantenimiento = data.totalCantidades;
+                    $scope.mostrarGraficos = true; 
+                    $scope.mensajeNoDataTicketsMtto = '';
+                    var clientes = [];
+                    var cantidades = [];
 
-                function getRandomColor() {
-                    var letters = '0123456789ABCDEF';
-                    var color = '#';
-                    for (var i = 0; i < 6; i++) {
-                        color += letters[Math.floor(Math.random() * 16)];
+                    $scope.infoTicketsPorMantenimiento.forEach(function (ticket) {
+                        clientes.push(ticket.Cliente);
+                        cantidades.push(ticket.Cantidad);
+                    });
+
+                    function getRandomColor() {
+                        var letters = '0123456789ABCDEF';
+                        var color = '#';
+                        for (var i = 0; i < 6; i++) {
+                            color += letters[Math.floor(Math.random() * 16)];
+                        }
+                        return color;
                     }
-                    return color;
-                }
 
-                // Ahora puedes usar getRandomColor() sin problemas
-                var coloresAleatorios = cantidades.map(getRandomColor);
+                    var coloresAleatorios = cantidades.map(getRandomColor);
 
-                var tendenciaChartCtx = document.getElementById('ticketPorMttoBarrasChart').getContext('2d');
-                var tendenciaChart = new Chart(tendenciaChartCtx, {
-                    type: 'bar', // Cambiado a 'bar'
-                    data: {
-                        labels: clientes, // Etiquetas de las semanas
-                        datasets: [{
-                            label: 'Cantidad de tickets por clientes en mantenimiento',
-                            data: cantidades, // Datos de las cantidades
-                            backgroundColor: coloresAleatorios, // Asignar colores aleatorios a cada barra
-                            hoverBackgroundColor: coloresAleatorios, // Mantener el color al pasar el mouse
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        plugins: {
-                            datalabels: {
-                                display: true,
-                                align: 'top',
-                                backgroundColor: '#D3D3D3',
-                                borderRadius: 3,
-                                font: {
-                                    weight: 'bold'
+                    var tendenciaChartCtx = document.getElementById('ticketPorMttoBarrasChart').getContext('2d');
+                    $scope.ticketPorMttoBarrasChart = new Chart(tendenciaChartCtx, {
+                        type: 'bar', 
+                        data: {
+                            labels: clientes, 
+                            datasets: [{
+                                label: 'Cantidad de tickets por clientes en mantenimiento',
+                                data: cantidades, 
+                                backgroundColor: coloresAleatorios, 
+                                hoverBackgroundColor: coloresAleatorios, 
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                datalabels: {
+                                    display: true,
+                                    align: 'top',
+                                    backgroundColor: '#D3D3D3',
+                                    borderRadius: 3,
+                                    font: {
+                                        weight: 'bold'
+                                    }
                                 }
                             }
-                        }
-                    },
-                    plugins: [ChartDataLabels]
-                });
+                        },
+                        plugins: [ChartDataLabels]
+                    });
 
-                $scope.mostrarGraficos = true;
+                    $scope.mostrarGraficoTicketsMtto = true;
+                }
             } else {
-                // Manejar el caso en que data.success es false
                 alert("Error: " + data.msg);
             }
         });
@@ -735,6 +722,10 @@
 
     //TICKET POR GARANTIA TECNICA
     $scope.TicketsPorGarantia = function () {
+
+        if ($scope.ticketPorGarantiaBarrasChart) {
+            $scope.ticketPorGarantiaBarrasChart.destroy();
+        }
 
         var infoTicketsPorGarantia = $http.post("indicadores/dar-tickets-por-garantia/", {
             fechaInicio: $scope.fechaInicio,
@@ -745,64 +736,67 @@
             $scope.loading.hide();
 
             if (data.success) {
-                $scope.infoTicketsPorGarantia = data.infoTickets;
-                $scope.totalCantidadesTicketsPorGarantia = data.totalCantidades;
-                $scope.mostrarGraficos = true; // Para mostrar la tabla y el gráfico
+                if (data.infoTickets.length === 0) {
 
-                // Preparar datos para el gráfico de líneas de tendencia temporal
-                var clientes = [];
-                var cantidades = [];
+                    $scope.mostrarGraficoTicketsGarantia = false;
+                    $scope.mensajeNoDataTicketsGarantia = 'No existen datos disponibles';
 
-                // Llenar las etiquetas y los datos del gráfico con la información de las semanas y cantidades
-                $scope.infoTicketsPorGarantia.forEach(function (ticket) {
-                    clientes.push(ticket.Cliente);
-                    cantidades.push(ticket.Cantidad);
-                });
+                } else {
+                    $scope.infoTicketsPorGarantia = data.infoTickets;
+                    $scope.totalCantidadesTicketsPorGarantia = data.totalCantidades;
+                    $scope.mostrarGraficos = true; 
+                    $scope.mensajeNoDataTicketsGarantia = '';
+                    var clientes = [];
+                    var cantidades = [];
 
-                function getRandomColor() {
-                    var letters = '0123456789ABCDEF';
-                    var color = '#';
-                    for (var i = 0; i < 6; i++) {
-                        color += letters[Math.floor(Math.random() * 16)];
+                    $scope.infoTicketsPorGarantia.forEach(function (ticket) {
+                        clientes.push(ticket.Cliente);
+                        cantidades.push(ticket.Cantidad);
+                    });
+
+                    function getRandomColor() {
+                        var letters = '0123456789ABCDEF';
+                        var color = '#';
+                        for (var i = 0; i < 6; i++) {
+                            color += letters[Math.floor(Math.random() * 16)];
+                        }
+                        return color;
                     }
-                    return color;
-                }
 
-                // Ahora puedes usar getRandomColor() sin problemas
-                var coloresAleatorios = cantidades.map(getRandomColor);
+                    var coloresAleatorios = cantidades.map(getRandomColor);
 
-                var tendenciaChartCtx = document.getElementById('ticketPorGarantiaBarrasChart').getContext('2d');
-                var tendenciaChart = new Chart(tendenciaChartCtx, {
-                    type: 'bar', // Cambiado a 'bar'
-                    data: {
-                        labels: clientes, // Etiquetas de las semanas
-                        datasets: [{
-                            label: 'Cantidad de tickets por clientes en garantía técnica',
-                            data: cantidades, // Datos de las cantidades
-                            backgroundColor: coloresAleatorios, // Asignar colores aleatorios a cada barra
-                            hoverBackgroundColor: coloresAleatorios, // Mantener el color al pasar el mouse
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        plugins: {
-                            datalabels: {
-                                display: true,
-                                align: 'top',
-                                backgroundColor: '#D3D3D3',
-                                borderRadius: 3,
-                                font: {
-                                    weight: 'bold'
+                    var tendenciaChartCtx = document.getElementById('ticketPorGarantiaBarrasChart').getContext('2d');
+                    $scope.ticketPorGarantiaBarrasChart = new Chart(tendenciaChartCtx, {
+                        type: 'bar', 
+                        data: {
+                            labels: clientes, 
+                            datasets: [{
+                                label: 'Cantidad de tickets por clientes en garantía técnica',
+                                data: cantidades, 
+                                backgroundColor: coloresAleatorios,
+                                hoverBackgroundColor: coloresAleatorios, 
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                datalabels: {
+                                    display: true,
+                                    align: 'top',
+                                    backgroundColor: '#D3D3D3',
+                                    borderRadius: 3,
+                                    font: {
+                                        weight: 'bold'
+                                    }
                                 }
                             }
-                        }
-                    },
-                    plugins: [ChartDataLabels]
-                });
+                        },
+                        plugins: [ChartDataLabels]
+                    });
 
-                $scope.mostrarGraficos = true;
+                    $scope.mostrarGraficoTicketsGarantia = true;
+                }
             } else {
-                // Manejar el caso en que data.success es false
                 alert("Error: " + data.msg);
             }
         });
