@@ -937,14 +937,6 @@ namespace SifizPlanning.Controllers
         //        return Json(resp);
         //    }
         //}
-
-        private static double CalcularPorcentage(double cantidad, double total)
-        {
-            double porcentaje = cantidad != 0 ? (cantidad / total) * 100 : 0;
-            return Math.Round(porcentaje);
-        }
-
-
         //*******************************************************************************TICKETS AL DIA********************************************************************************
 
         [HttpPost]
