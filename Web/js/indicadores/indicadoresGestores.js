@@ -1,16 +1,58 @@
 ﻿indicadoresApp.controller('indicadoresGestores', ['$scope', '$http', '$filter', function ($scope, $http, $filter) {
-
-    var gestores = $http.post("catalogos/dar-gestores/", {});
-    gestores.success(function (data) {
+    $http.post("catalogos/dar-gestores/", {}).success(function (data) {
         if (data.success) {
             $scope.gestores = data.gestores;
-            if ($scope.gestores.length > 0) {
-                $scope.gestorSeleccionado = $scope.gestores[0].idColaborador;
-            }
+            $scope.gestorSeleccionado = "MARITZA REINO";
+            $scope.darTicketsPorAnioGestor();
         } else {
             alert("No se pudieron cargar los datos");
         }
     });
+
+    $scope.anios = [2020, 2021, 2022, 2023, 2024]; // Ajusta según tus necesidades
+    $scope.meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+    $scope.anioSeleccionado = new Date().getFullYear();
+    function createOrUpdateChart(data) {
+        if ($scope.ticketsChart) $scope.ticketsChart.destroy();
+        var labels = data.map(item => item.Cliente);
+        var datasets = $scope.meses.map((mes, index) => {
+            var filteredData = data.filter(item => item.TicketsPorMes[index] > 0 && item.Total > 0);
+            return {
+                label: mes,
+                data: filteredData.map(item => item.TicketsPorMes[index]),
+                backgroundColor: '#' + Math.floor(Math.random() * 16777215).toString(16),
+                hidden: index >= 3,
+            };
+        });
+        $scope.ticketsChart = new Chart(document.getElementById('ticketsChart').getContext('2d'), {
+            type: 'bar',
+            data: { labels: labels, datasets: datasets },
+            options: {
+                responsive: true,
+                title: { display: true, text: 'Tickets por Cliente y Mes' },
+                scales: {
+                    x: { display: true, title: { display: true, text: 'Cliente' }, ticks: { autoSkip: true } },
+                    y: { display: true, title: { display: true, text: 'Cantidad de Tickets' }, ticks: { stepSize: 1, beginAtZero: true }, suggestedMax: 3 },
+                },
+                elements: { bar: { barThickness: 150 } }
+            }
+        });
+    }
+    $scope.darTicketsPorAnioGestor = function () {
+        $http.post('indicadores/dar-tickets-por-anio-gestor/', {
+            anio: $scope.anioSeleccionado,
+            gestor: $scope.gestorSeleccionado
+        }).success(function (data) {
+            if (data.success) {
+                $scope.datos = data.resumenTickets;
+                $scope.totalTickets = data.totalTickets;
+                createOrUpdateChart(data.resumenTickets);
+            } else {
+                alert('Error: ' + data.msg);
+            }
+        });
+    };
 
     $scope.initDatepickers = function () {
         angular.element('#fecha-inicio-gestores').datepicker({
@@ -22,31 +64,125 @@
             format: 'dd/mm/yyyy',
             locale: 'es'
         }).datepicker('setDate', $scope.ffinGestores);
+
+        angular.element('#finit-analizados').datepicker({
+            format: 'dd/mm/yyyy',
+            locale: 'es'
+        }).datepicker('setDate', $scope.finitAnalizados);
+
+        angular.element('#ffin-analizados').datepicker({
+            format: 'dd/mm/yyyy',
+            locale: 'es'
+        }).datepicker('setDate', $scope.ffinAnalizados);
     };
 
     var fechaActual = new Date();
     $scope.finicioGestores = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1);
     $scope.ffinGestores = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0);
+    $scope.finitAnalizados = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1);
+    $scope.ffinAnalizados = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0);
 
     $scope.initDatepickers();
 
-    $scope.refrech = function () {
+    $scope.darTicketIntervaloGestores = function () {
         $scope.loading.show();
         var data = {
             fechaInicio: $filter('date')($scope.finicioGestores, 'dd/MM/yyyy'),
-            fechaFin: $filter('date')($scope.ffinGestores, 'dd/MM/yyyy'),
-            gestor: $scope.gestorSeleccionado
+            fechaFin: $filter('date')($scope.ffinGestores, 'dd/MM/yyyy')
         };
-        $http.post("indicadores/dar-tickets-por-gestor/", data).then(function (response) {
+        var request = $http.post("indicadores/dar-tickets-intervalo-gestores/", data);
+        request.success(function (response) {
             $scope.loading.hide();
-            if (response.data.success) {
-                $scope.infoTickets = response.data.tickets;
+            if (response.success) {
+                $scope.ticketIntervaloGestores = response.ticketIntervaloGestores;
+                $scope.darTicketPorIntervalo($scope.ticketIntervaloGestores);
             } else {
-                alert("No se pudieron cargar los datos");
+                alert('Error: ' + response.msg);
             }
         });
     };
-    //$scope.refrech();
+
+    $scope.darTicketAnalizadosGestores = function () {
+        $scope.loading.show();
+        var data = {
+            fechaInicio: $filter('date')($scope.finitAnalizados, 'dd/MM/yyyy'),
+            fechaFin: $filter('date')($scope.ffinAnalizados, 'dd/MM/yyyy')
+        };
+        var request = $http.post("indicadores/dar-tickets-analizados-gestores/", data);
+        request.success(function (response) {
+            $scope.loading.hide();
+            if (response.success) {
+                $scope.ticketsAnalizados = response.ticketsAnalizados;
+                $scope.darTicketAnalizados($scope.ticketsAnalizados);
+            } else {
+                alert('Error: ' + response.msg);
+            }
+        });
+    };
+
+    $scope.darTicketAnalizados = function (data) {
+        if ($scope.ticketsAnalizadosChart) $scope.ticketsAnalizadosChart.destroy();
+        if (!data || data.length === 0) return alert('No hay datos para mostrar en el gráfico');
+        var ctx = document.getElementById('ticketsAnalizadosChart');
+        if (!ctx) return alert('No se pudo encontrar el elemento del gráfico');
+        $scope.ticketsAnalizadosChart = new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: data.map(item => item && item.Gestor && item.Anio && item.Mes ? item.Gestor + ' ' + item.Anio + '/' + item.Mes : 'Desconocido'),
+                datasets: [{
+                    label: 'Número de Tickets Analizados',
+                    data: data.map(item => item && item.NumeroTickets ? item.NumeroTickets : 0),
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                title: { display: true, text: 'Tickets Analizados por Mes y Gestor' },
+                scales: {
+                    x: {
+                        display: true, title: { display: true, text: 'Gestor y Mes' }, ticks: { autoSkip: true }
+                    },
+                    y: { display: true, title: { display: true, text: 'Cantidad' }, ticks: { beginAtZero: true } }
+                }
+            }
+        });
+    };
+
+    $scope.darTicketPorIntervalo = function (data) {
+        if ($scope.ticketsIntervaloChart) $scope.ticketsIntervaloChart.destroy();
+        var labels = data.map(item => item.Gestor);
+        var clientesData = data.map(item => item.ClientesAtendidos);
+        var carteraData = data.map(item => item.CarteraAsignada);
+        $scope.ticketsIntervaloChart = new Chart(document.getElementById('ticketsIntervaloChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Clientes Atendidos',
+                    data: clientesData,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Cartera Asignada',
+                    data: carteraData,
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                title: { display: true, text: 'Clientes Atendidos y Cartera Asignada por Gestor' },
+                scales: {
+                    x: { display: true, title: { display: true, text: 'Gestor' }, ticks: { autoSkip: true } },
+                    y: { display: true, title: { display: true, text: 'Cantidad' }, ticks: { beginAtZero: true } }
+                }
+            }
+        });
+    };
 
 }]);
 

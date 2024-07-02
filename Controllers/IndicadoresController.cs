@@ -3,6 +3,7 @@ using SifizPlanning.Security;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.SqlServer;
 using System.Globalization;
 using System.Linq;
 using System.Web;
@@ -228,7 +229,7 @@ namespace SifizPlanning.Controllers
                         Cantidad = g.Count(),
                         Descripcion = "AL " + g.Max(t => t.FechaCierre.Value).ToString("dd/MM/yyyy")
                     })
-                    .OrderBy(x => x.Semana).Distinct()    
+                    .OrderBy(x => x.Semana).Distinct()
                     .ToList();
 
                 var totalCantidades = groupedTickets.Sum(ticket => ticket.Cantidad);
@@ -766,7 +767,7 @@ namespace SifizPlanning.Controllers
                 return Json(resp);
             }
         }
-        
+
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
         public ActionResult DarTicketsPorGestor(string fechaInicio, string fechaFin, string gestor)
@@ -816,7 +817,7 @@ namespace SifizPlanning.Controllers
                                    select ticket).ToList();
 
                 var ticketsAgrupados = ticketsList
-                    .GroupBy(ticket => new { Anio = ticket.FechaIngreso.Value.Year, Mes = ticket.FechaIngreso.Value.Month, ticket.Cliente  })
+                    .GroupBy(ticket => new { Anio = ticket.FechaIngreso.Value.Year, Mes = ticket.FechaIngreso.Value.Month, ticket.Cliente })
                     .Select(group => new { cliente = group.Key.Cliente, mes = group.Key.Mes, anio = group.Key.Anio, cantidad = group.Count() })
                     .ToList();
 
@@ -920,11 +921,209 @@ namespace SifizPlanning.Controllers
             }
         }
 
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public ActionResult DarTicketsIntervaloGestores(string fechaInicio, string fechaFin)
+        {
+            try
+            {
+                // Crear objetos DateTime para almacenar las fechas
+                DateTime fInicio = DateTime.ParseExact(fechaInicio, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                DateTime fFin = DateTime.ParseExact(fechaFin, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+                var ticketsQuery = from ticket in db.InfoTickets
+                                   where ticket.FechaIngreso.HasValue &&
+                                         ticket.FechaIngreso.Value.Year >= fInicio.Year &&
+                                         ticket.FechaIngreso.Value.Month >= fInicio.Month &&
+                                         ticket.FechaIngreso.Value.Day >= fInicio.Day &&
+                                         ticket.FechaIngreso.Value.Year <= fFin.Year &&
+                                         ticket.FechaIngreso.Value.Month <= fFin.Month &&
+                                         ticket.FechaIngreso.Value.Day <= fFin.Day
+                                   select ticket;
+
+                List<InfoTickets> ticketsList = ticketsQuery.ToList();
+
+                var resumenTickets = ticketsList
+                    .GroupBy(ticket => ticket.AsignadoA)
+                    .Select(group => new
+                    {
+                        Gestor = group.Key,
+                        NumeroTickets = group.Count(),
+                        TiempoMinutos = Math.Round(group.Sum(ticket => ((ticket.HorasEmpleadas ?? DateTime.MinValue) - (ticket.HorasEmpleadas ?? DateTime.MinValue).Date).TotalMinutes), 2),
+                        TiempoHoras = Math.Round(group.Sum(ticket => ((ticket.HorasEmpleadas ?? DateTime.MinValue) - (ticket.HorasEmpleadas ?? DateTime.MinValue).Date).TotalHours), 2),
+                        ClientesAtendidos = group.Select(ticket => ticket.Cliente).Distinct().Count(),
+                        CarteraAsignada = group.Select(ticket => ticket.Cliente).Distinct().Count() // Ajusta según tus necesidades
+                    })
+                    .ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    ticketIntervaloGestores = resumenTickets
+                };
+
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public ActionResult DarTicketsAnalisadosGestores(string fechaInicio, string fechaFin)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(fechaInicio) || string.IsNullOrEmpty(fechaFin))
+                {
+                    return Json(new { success = false, msg = "Las fechas no pueden ser nulas" });
+                }
+
+                DateTime fInicio = DateTime.ParseExact(fechaInicio, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                DateTime fFin = DateTime.ParseExact(fechaFin, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+                var ticketsQuery = from ticket in db.InfoTickets
+                                   where ticket.FechaIngreso.HasValue &&
+                                         ticket.FechaIngreso.Value >= fInicio &&
+                                         ticket.FechaIngreso.Value <= fFin
+                                   select ticket;
+
+                List<InfoTickets> ticketsList = ticketsQuery.ToList();
+
+                var resumenTickets = ticketsList
+                    .Where(ticket => ticket.Cliente != null && ticket.FechaIngreso.HasValue)
+                    .GroupBy(ticket => new { ticket.Cliente, Año = ticket.FechaIngreso.Value.Year, Mes = ticket.FechaIngreso.Value.Month })
+                    .Select(group => {
+                        var gestorServicio = db.GestorServicios.FirstOrDefault(s => s.cliente != null && s.cliente.Descripcion == group.Key.Cliente);
+                        var nombreGestor = gestorServicio != null && gestorServicio.colaborador != null && gestorServicio.colaborador.persona != null ? gestorServicio.colaborador.persona.Nombre1 + " " + gestorServicio.colaborador.persona.Apellido1 : "Desconocido";
+                        return new
+                        {
+                            Gestor = nombreGestor,
+                            Anio = group.Key.Año,
+                            Mes = group.Key.Mes,
+                            NumeroTickets = group.Count()
+                        };
+                    })
+                    .ToList();
+
+                var resumenFinal = resumenTickets
+                    .GroupBy(resumen => new { resumen.Gestor, resumen.Anio, resumen.Mes })
+                    .Select(group => new
+                    {
+                        Gestor = group.Key.Gestor,
+                        Anio = group.Key.Anio,
+                        Mes = group.Key.Mes,
+                        NumeroTickets = group.Sum(resumen => resumen.NumeroTickets)
+                    })
+                    .ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    ticketsAnalizados = resumenFinal
+                };
+
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public ActionResult DarTicketsPorAnioGestor(int anio, string gestor)
+        {
+            try
+            {
+                if (anio <= 0)
+                    anio = DateTime.Now.Year; // Usar el año actual si no se proporciona uno válido
+
+                if (string.IsNullOrEmpty(gestor))
+                    throw new ArgumentException("El gestor no puede estar vacío.");
+
+                var gestorUpperCase = gestor.ToUpper();
+
+                var ticketsQuery = from ticket in db.InfoTickets
+                                   where ticket.FechaIngreso.HasValue &&
+                                         ticket.FechaIngreso.Value.Year == anio &&
+                                         ticket.AsignadoA.ToUpper() == gestorUpperCase
+                                   select ticket;
+
+                List<InfoTickets> ticketsList = ticketsQuery.ToList();
+
+                var groupedTickets = ticketsList
+                    .GroupBy(ticket => new
+                    {
+                        Cliente = ticket.Cliente.ToUpper(),
+                        Mes = ticket.FechaIngreso.Value.Month
+                    })
+                    .Select(group => new
+                    {
+                        Cliente = group.Key.Cliente,
+                        Mes = group.Key.Mes,
+                        CantidadTickets = group.Count()
+                    })
+                    .ToList();
+
+                var resumenFinal = groupedTickets
+                    .GroupBy(t => t.Cliente)
+                    .Select(g => new
+                    {
+                        Cliente = g.Key,
+                        TicketsPorMes = g.OrderBy(r => r.Mes).Select(r => r.CantidadTickets).ToList(),
+                        Total = g.Sum(r => r.CantidadTickets)
+                    })
+                    .OrderByDescending(r => r.Total)
+                    .ToList();
+
+                var totalTickets = resumenFinal.Sum(r => r.Total);
+
+                var resp = new
+                {
+                    success = true,
+                    resumenTickets = resumenFinal,
+                    totalTickets = totalTickets
+                };
+
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+
         private static double CalcularPorcentage(double cantidad, double total)
         {
             double porcentaje = cantidad != 0 ? (cantidad / total) * 100 : 0;
             return Math.Round(porcentaje);
         }
 
+    }
+    public class ClienteResumen
+    {
+        public string Cliente { get; set; }
+        public Dictionary<int, int> TicketsPorMes { get; set; }
+        public int Total { get; set; }
     }
 }

@@ -1,38 +1,183 @@
-<div style="column-count: 4">
-    @*<div>
-        <label>GESTOR</label>
-        <select class="form-control" style="max-width: 200px" ng-model="gestorSeleccionado" ng-options="gestor.idColaborador as (gestor.nombre | limitTo: 30) for gestor in gestores"></select>
-    </div>
-    <div>
-        <label>FECHA INICIO</label>
-        <div class='input-group date'>
-            <input id="fecha-inicio-gestores" ng-model="finicioGestores" format-date class="form-control" ng-required="true" autocomplete="off" />
-        </div>
-    </div>
+@{
+    ViewBag.Title = "Tickets por Año y Gestor";
+}
 
-    <div>
-        <label>FECHA FIN</label>
-        <div class='input-group date'>
-            <input id="fecha-fin-gestores" ng-model="ffinGestores" format-date class="form-control" ng-required="true" autocomplete="off" />
+<div ng-app="indicadores" ng-controller="indicadoresGestores">
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="active"><a href="#anio-gestor" role="tab" data-toggle="tab">Tickets por Cliente</a></li>
+        <li><a href="#mes-gestor" role="tab" data-toggle="tab">Por Fecha y Gestores</a></li>
+        <li><a href="#mes-gestor-analizados" role="tab" data-toggle="tab">Analizados</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="anio-gestor">
+            <div class="form-inline">
+                <div class="form-group">
+                    <label for="anio">Año:</label>
+                    <select id="anio" class="form-control" ng-model="anioSeleccionado" ng-change="darTicketsPorAnioGestor()" style="width: auto; margin-left: 10px;">
+                        <option ng-repeat="anio in anios" value="{{anio}}">{{anio}}</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-left: 20px;">
+                    <label for="gestor">Gestor:</label>
+                    <select id="gestor" class="form-control" ng-init="gestorSeleccionado = 'MARITZA REINO'" ng-model="gestorSeleccionado" ng-change="darTicketsPorAnioGestor()" style="width: auto; margin-left: 10px;">
+                        <option ng-repeat="gestor in gestores" value="{{gestor.nombre}}">{{gestor.nombre}}</option>
+                    </select>
+                </div>
+            </div>
+            <br>
+            <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="3000">
+                <div class="carousel-inner" role="listbox">
+                    <!-- Slide for Table -->
+                    <div class="item active">
+                        <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                            <table class="table table-bordered table-striped table-condensed" ng-if="datos.length > 0">
+                                <thead>
+                                    <tr>
+                                        <th>Cliente</th>
+                                        <th ng-repeat="mes in meses">{{mes}}</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="cliente in datos">
+                                        <td>{{cliente.Cliente}}</td>
+                                        <td ng-repeat="mes in meses">{{cliente.TicketsPorMes[($index + 1)] || 0}}</td>
+                                        <td>{{cliente.Total}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Slide for Chart -->
+                    <div class="item" style="overflow-y: auto; height: 60vh; width: 90vw">
+                        <canvas id="ticketsChart" style="width: 100%; height: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <!-- Tickets por Mes y Gestor -->
+        <div class="tab-pane" id="mes-gestor">
+            <div class="form-inline" style="display: flex; align-items: center; justify-content: flex-start;">
+                <div>
+                    <label>FECHA INICIO</label>
+                    <div class='input-group date'>
+                        <input id="fecha-inicio-gestores" ng-model="finicioGestores" format-date class="form-control" ng-required="true" autocomplete="off" />
+                    </div>
+                    <label>  </label>
+                </div>
+
+                <div>
+                    <label>FECHA FIN</label>
+                    <div class='input-group date'>
+                        <input id="fecha-fin-gestores" ng-model="ffinGestores" format-date class="form-control" ng-required="true" autocomplete="off" />
+                    </div>
+                </div>
+                <div>
+                    <label>  </label>
+                    <button id="buscar-btn" class="btn btn-primary" ng-click="darTicketIntervaloGestores()">Actualizar</button>
+                </div>
+            </div>
+            <br>
+            <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="3000">
+                <div class="carousel-inner" role="listbox">
+                    <div class="item active" style="height: 500px; overflow-y: auto">
+                        <table class="table table-bordered table-striped table-condensed" width="100%" ng-if="ticketIntervaloGestores.length > 0">
+                            <thead>
+                                <tr>
+                                    <th>Gestor</th>
+                                    <th>Número de Tickets analizados</th>
+                                    <th>Tiempo en Minutos invertido en Análisis</th>
+                                    <th>Tiempo en Horas invertido en Análisis</th>
+                                    <th>Clientes atendidos</th>
+                                    <th>Cartera Asignada</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="ticket in ticketIntervaloGestores">
+                                    <td>{{ticket.Gestor}}</td>
+                                    <td>{{ticket.NumeroTickets}}</td>
+                                    <td>{{ticket.TiempoMinutos}}</td>
+                                    <td>{{ticket.TiempoHoras}}</td>
+                                    <td>{{ticket.ClientesAtendidos}}</td>
+                                    <td>{{ticket.CarteraAsignada}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="item" style="overflow-y: auto; height: 60vh; width: 90vw">
+                        <canvas id="ticketsIntervaloChart" style="width: 100%; height: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tickets Analizados por Mes y Gestor -->
+        <div class="tab-pane" id="mes-gestor-analizados">
+            <div class="form-inline" style="display: flex; align-items: center; justify-content: flex-start;">
+                <div>
+                    <label>FECHA INICIO</label>
+                    <div class='input-group date'>
+                        <input id="finit-analizados" ng-model="finitAnalizados" format-date class="form-control" ng-required="true" autocomplete="off" />
+                    </div>
+                    <label>  </label>
+                </div>
+
+                <div>
+                    <label>FECHA FIN</label>
+                    <div class='input-group date'>
+                        <input id="ffin-analizados" ng-model="ffinAnalizados" format-date class="form-control" ng-required="true" autocomplete="off" />
+                    </div>
+                </div>
+                <div>
+                    <label>  </label>
+                    <button id="buscar-analizados-btn" class="btn btn-primary" ng-click="darTicketAnalizadosGestores()">Actualizar</button>
+                </div>
+            </div>
+            <br>
+            <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="3000">
+                <div class="carousel-inner" role="listbox">
+                    <div class="item active" style="height: 500px; overflow-y: auto">
+                        <table class="table table-bordered table-striped table-condensed" width="100%" ng-if="ticketsAnalizados.length > 0">
+                            <thead>
+                                <tr>
+                                    <th>Gestor</th>
+                                    <th>Mes</th>
+                                    <th>Número de Tickets Analizados</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="ticket in ticketsAnalizados">
+                                    <td>{{ticket.Gestor}}</td>
+                                    <td>{{ticket.Mes}} - {{ticket.Anio}}</td>
+                                    <td>{{ticket.NumeroTickets}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="item" style="overflow-y: auto; height: 60vh; width: 90vw">
+                        <canvas id="ticketsAnalizadosChart" style="width: 100%; height: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
-    <div>
-        <button id="buscar-btn" class="btn btn-primary" ng-click="refrech()">Actualizar</button>
-    </div>*@
 </div>
 
-@*<table class="table">
-    <thead>
-        <tr>
-            <th>Cliente</th>
-            <th ng-repeat="ticket in infoTickets">{{ ticket.mes }}-{{ ticket.anio }}</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr ng-repeat="cliente in infoTickets">
-            <td>{{ cliente.cliente }}</td>
-            <td ng-repeat="ticket in infoTickets">{{ ticket.cantidad }}</td>
-        </tr>
-    </tbody>
-</table>*@
+<script type="text/javascript" src="~/Web/js/chart.js"></script>
+<script type="text/javascript" src="~/Web/js/chartjs-plugin-datalabels.js"></script>
+<script>
+    // Asegúrate de tener jQuery y Bootstrap JavaScript cargados para que los tabs funcionen correctamente.
+    $(document).ready(function () {
+        $('[data-toggle="tab"]').on('click', function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+        });
 
+        $('.carousel').carousel();
+    });
+</script>
