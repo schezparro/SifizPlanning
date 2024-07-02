@@ -1,5 +1,5 @@
 @{
-    ViewBag.Title = "Tickets por Año y Gestor";
+    ViewBag.Title = "Tickets por AÃ±o y Gestor";
 }
 
 <div ng-app="indicadores" ng-controller="indicadoresGestores">
@@ -13,7 +13,7 @@
         <div class="tab-pane active" id="anio-gestor">
             <div class="form-inline">
                 <div class="form-group">
-                    <label for="anio">Año:</label>
+                    <label for="anio">AÃ±o:</label>
                     <select id="anio" class="form-control" ng-model="anioSeleccionado" ng-change="darTicketsPorAnioGestor()" style="width: auto; margin-left: 10px;">
                         <option ng-repeat="anio in anios" value="{{anio}}">{{anio}}</option>
                     </select>
@@ -89,9 +89,9 @@
                             <thead>
                                 <tr>
                                     <th>Gestor</th>
-                                    <th>Número de Tickets analizados</th>
-                                    <th>Tiempo en Minutos invertido en Análisis</th>
-                                    <th>Tiempo en Horas invertido en Análisis</th>
+                                    <th>NÃºmero de Tickets analizados</th>
+                                    <th>Tiempo en Minutos invertido en AnÃ¡lisis</th>
+                                    <th>Tiempo en Horas invertido en AnÃ¡lisis</th>
                                     <th>Clientes atendidos</th>
                                     <th>Cartera Asignada</th>
                                 </tr>
@@ -146,7 +146,7 @@
                                 <tr>
                                     <th>Gestor</th>
                                     <th>Mes</th>
-                                    <th>Número de Tickets Analizados</th>
+                                    <th>NÃºmero de Tickets Analizados</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -171,7 +171,7 @@
 <script type="text/javascript" src="~/Web/js/chart.js"></script>
 <script type="text/javascript" src="~/Web/js/chartjs-plugin-datalabels.js"></script>
 <script>
-    // Asegúrate de tener jQuery y Bootstrap JavaScript cargados para que los tabs funcionen correctamente.
+    // AsegÃºrate de tener jQuery y Bootstrap JavaScript cargados para que los tabs funcionen correctamente.
     $(document).ready(function () {
         $('[data-toggle="tab"]').on('click', function (e) {
             e.preventDefault();

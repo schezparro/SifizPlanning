@@ -1,558 +1,720 @@
-﻿<div style="display: flex; justify-content: center; width: 100%;">
-    <div class="panel panel-default" style="width: 700px;">
-        <div class="panel-body">
-            <div class="center-block">
-                <div style="column-count: 3">
-                    <div>
-                        <div class="div-info-ticket">
-                            <label for="fecha-inicio-etapa">FECHA INICIO</label>
-                            <div class='input-group date'>
-                                <input id="fecha-inicio-indicadores-tickets" ng-model="fechaInicio" format-date class="form-control" ng-required="true" autocomplete="off" />
-                            </div>
-                        </div>
+﻿<ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">INFORME DE TICKETS</a></li>
+    <li role="presentation"><a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab">INFORME DE TICKETS AL DÍA</a></li>
+    <li role="presentation"><a href="#tab3" aria-controls="tab3" role="tab" data-toggle="tab">INDICADORES</a></li>
+</ul>
 
-                        <div class="div-info-ticket">
-                            <label for="fecha-fin-etapa">FECHA FIN</label>
-                            <div class='input-group date'>
-                                <input id="fecha-fin-indicadores-tickets" ng-model="fechaFin" format-date class="form-control" ng-required="true" autocomplete="off" />
+<div class="tab-content">
+
+    <div role="tabpanel" class="tab-pane active" id="tab1">
+        <br />
+
+        <div style="display: flex; justify-content: center; width: 100%;">
+            <div class="panel panel-default" style="width: 700px;">
+                <div class="panel-body">
+                    <div class="center-block">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                            <div class="div-info-ticket">
+                                <label for="fecha-inicio-etapa">FECHA INICIO</label>
+                                <div class='input-group date'>
+                                    <input id="fecha-inicio-indicadores-tickets" ng-model="fechaInicio" format-date class="form-control" autocomplete="off" />
+                                </div>
+                            </div>
+                            <div class="div-info-ticket">
+                                <label for="fecha-fin-etapa">FECHA FIN</label>
+                                <div class='input-group date'>
+                                    <input id="fecha-fin-indicadores-tickets" ng-model="fechaFin" format-date class="form-control" autocomplete="off" />
+                                </div>
+                            </div>
+                            <div>
+                                <button id="buscar-btn" class="btn btn-primary" ng-click="buscarOtrosDatos()">Buscar datos</button>
                             </div>
                         </div>
                     </div>
-                    <div>
-                        <button id="buscar-btn" class="btn btn-primary" ng-click="buscarOtrosDatos()">Buscar datos</button>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin: 10px; overflow-y: auto;" >
+
+            <div style="display: flex; flex-direction: column; align-items: center; max-height: calc(100vh - 200px); overflow-y: auto;" ng-show="mostrarPanelGraficos">
+
+                <div class="container">
+                    <div class="row">
+                        <!-- Logo -->
+                        <div class="col-xs-3">
+                            <div class="text-center padding-10">
+                                <img src="~/Web/images/s_logo.png" class="img-responsive" />
+                            </div>
+                        </div>
+
+                        <!-- Título -->
+                        <div class="col-xs-6 text-center">
+                            <h3>INFORME DE TICKETS</h3>
+                            <h5>REPORTE DE ESTADO MENSUAL</h5>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de información -->
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <td><strong>Fecha de Reporte:</strong></td>
+                                    <td>{{formattedDate}}</td>
+                                    <td rowspan="4" class="small col-xs-4" style="vertical-align: top; background-color: #e6f2ff;">
+                                        <strong>Objetivo del informe:</strong><br>
+                                        1. Dar a conocer el estado global de los tickets, como resultado de la gestión semanal.<br>
+                                        2. Identificar datos de desempeño relevantes.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Realizado por:</strong></td>
+                                    <td>@User.Identity.Name</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Fecha de Inicio:</strong></td>
+                                    <td>{{fechaInicio}}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Fecha de Término:</strong></td>
+                                    <td>{{fechaFin}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                @*TICKETS NUEVOS*@
+            <div style="width: 100%; margin-bottom: 20px;">
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <label for="select-cliente-proyecto">NUEVOS TICKETS</label>
+                </div>
+                <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;" ng-show="mostrarGraficosNuevosTickets">
+                    <div class="card">
+                        <div class="card-header">
+                            Tickets Ingresados
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="background-color: #add8e6; color: black;">Semana</th>
+                                        <th style="background-color: #add8e6; color: black;">Descripción</th>
+                                        <th style="background-color: #add8e6; color: black;">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="ticket in infoTickets">
+                                        <td>{{ticket.Semana}}</td>
+                                        <td>{{ticket.Descripcion}}</td>
+                                        <td>{{ticket.Cantidad}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="text-align: center; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
+                                        <td style="text-align: center; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidades | number:0}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card" style="width: 400px; height: 400px;">
+                        <div class="card-body">
+                            <div class="chart">
+                                <canvas id="tendenciaChart" width="600" height="400"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="mensajeContenedor" style="text-align: center; margin-top: 20px;">
+                    <label id="mensajeLabel">{{mensajeNoDataNuevosTickets}}</label>
+                </div>
+
+            </div>
+
+                <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
+                    <br />
+                </div>
+
+                @*Tickets cerrados*@
+            <div style="width: 100%; margin-bottom: 20px;">
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <label for="select-cliente-proyecto">TICKETS CERRADOS</label>
+                </div>
+                <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;" ng-show="mostrarGraficoTicketsCerrados">
+                    <div class="card">
+                        <div class="card-header">
+                            Tickets Cerrados
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="background-color: #ffc0cb; color: black;">Semana</th>
+                                        <th style="background-color: #ffc0cb; color: black; ">Descripción</th>
+                                        <th style="background-color: #ffc0cb; color: black; ">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="ticket in infoTicketsCerrados">
+                                        <td>{{ticket.Semana}}</td>
+                                        <td>{{ticket.Descripcion}}</td>
+                                        <td>{{ticket.Cantidad}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="text-align: center; background-color: #ffc0cb; color: black; font-weight: bold;">Total</td>
+                                        <td style="text-align: center; background-color: #ffc0cb; color: black; font-size: 20px;">{{totalCantidadesCerrados | number:0}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card" style="width: 400px; height: 400px;">
+                        <div class="card-body">
+                            <div class="chart">
+                                <canvas id="ticketCerradosChart" width="600" height="400"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="mensajeContenedor" style="text-align: center; margin-top: 20px;">
+                    <label id="mensajeLabel">{{mensajeNoDataTicketsCerrados}}</label>
+                </div>
+
+            </div>
+
+                <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
+                    <br />
+                </div>
+
+                @*Tickets por aplica     *@
+            <div style="width: 100%; margin-bottom: 20px;">
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <label for="select-cliente-proyecto">TICKETS APLICADOS A: </label>
+                </div>
+                <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;" ng-show="mostrarGraficoTicketsAplica">
+                    <!-- Card para la tabla -->
+                    <div class="card">
+                        <div class="card-header">
+                            Tickets por Aplica
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="background-color: #008aff; color: black;">Aplica</th>
+                                        <th style="background-color: #008aff; color: black;">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="ticket in infoTicketsPorAplica">
+                                        <td>{{ticket.Aplica}}</td>
+                                        <td>{{ticket.Cantidad}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="1" style="text-align: center; background-color: #008aff; color: black; font-weight: bold;">Total</td>
+                                        <td style="text-align: center; background-color: #008aff; color: black; font-size: 20px;">{{totalCantidadesTicketsPorAplica | number:0}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Card para el gráfico -->
+                    <div class="card">
+                        <div class="card-header">
+                            Gráfico de Tickets por Aplica
+                        </div>
+                        <div class="card-body">
+                            <canvas id="ticketPorAplicaBarrasChart" width="600" height="400"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="mensajeContenedor" style="text-align: center; margin-top: 20px;">
+                    <label id="mensajeLabel">{{mensajeNoDataTicketsAplica}}</label>
+                </div>
+            </div>
+
+                <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
+                    <br />
+                </div>
+
+                @*Tickets por mantenimiento     *@
+            <div style="width: 100%; margin-bottom: 20px;">
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <label for="select-cliente-proyecto">TICKETS POR MANTENIMIENTOS: </label>
+                </div>
+                <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;" ng-show="mostrarGraficoTicketsMtto">
+                    <!-- Card para la tabla -->
+                    <div class="card">
+                        <div class="card-header">
+                            Tickets por mantenimiento
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="background-color: #f58e8e; color: black;">Cliente</th>
+                                        <th style="background-color: #f58e8e; color: black;">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="ticket in infoTicketsPorMantenimiento">
+                                        <td>{{ticket.Cliente}}</td>
+                                        <td>{{ticket.Cantidad}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="1" style="text-align: center; background-color: #f58e8e; color: black; font-weight: bold;">Total</td>
+                                        <td style="text-align: center; background-color: #f58e8e; color: black; font-size: 20px;">{{totalCantidadesTicketsPorMantenimiento | number:0}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Card para el gráfico -->
+                    <div class="card">
+                        <div class="card-header">
+                            Gráfico de Tickets por mantenimiento
+                        </div>
+                        <div class="card-body">
+                            <canvas id="ticketPorMttoBarrasChart" width="600" height="400"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="mensajeContenedor" style="text-align: center; margin-top: 20px;">
+                    <label id="mensajeLabel">{{mensajeNoDataTicketsMtto}}</label>
+                </div>
+
+            </div>
+
+                <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
+                    <br />
+                </div>
+
+                @*Tickets por garantía     *@
+            <div style="width: 100%; margin-bottom: 20px;">
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <label for="select-cliente-proyecto">TICKETS POR GARANTÍA: </label>
+                </div>
+                <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;" ng-show="mostrarGraficoTicketsGarantia">
+                    <!-- Card para la tabla -->
+                    <div class="card">
+                        <div class="card-header">
+                            Tickets por garantía
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="background-color: #ee59da; color: black;">Cliente</th>
+                                        <th style="background-color: #ee59da; color: black;">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="ticket in infoTicketsPorGarantia">
+                                        <td>{{ticket.Cliente}}</td>
+                                        <td>{{ticket.Cantidad}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="1" style="text-align: center; background-color: #ee59da; color: black; font-weight: bold;">Total</td>
+                                        <td style="text-align: center; background-color: #ee59da; color: black; font-size: 20px;">{{totalCantidadesTicketsPorGarantia | number:0}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Card para el gráfico -->
+                    <div class="card">
+                        <div class="card-header">
+                            Gráfico de Tickets por garantía
+                        </div>
+                        <div class="card-body">
+                            <canvas id="ticketPorGarantiaBarrasChart" width="600" height="400"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="mensajeContenedor" style="text-align: center; margin-top: 20px;">
+                    <label id="mensajeLabel">{{mensajeNoDataTicketsGarantia}}</label>
+                </div>
+
+            </div>
+
+                <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
+                    <br />
+                </div>
+
+                <div>
+                    <br />
+                </div>
+
+            </div>
+
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+
+        </div>
+    </div>
+
+    <div style="height:100px">
+        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+    </div>
+
+
+@*Tab hasta la fecha*@
+
+<div role="tabpanel" class="tab-pane" id="tab2">
+
+    <br />
+
+    <div style="display: flex; justify-content: center; width: 100%;">
+        <div class="panel panel-default" style="width: 700px;">
+            <div class="panel-body">
+                <div class="center-block">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+
+                        <div class="div-info-ticket" style="grid-column: 1 / 3; grid-row: 2;">
+                            <div class='input-group' style="column-count: 2">
+                                <label for="select-cliente-proyecto">CLIENTE:</label>
+                                <select id="select-cliente-indicadores-tickets-aldia" ng-model="cliente" class="form-control" required="required">
+                                    <option value="">Seleccione...</option>
+                                    <option value="{{cliente.nombre}}" ng-repeat="cliente in clientes">{{cliente.nombre}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="grid-column: 3; grid-row: 2; display: flex; align-items: flex-end; justify-content: center;">
+                            <button id="buscar-aldia-btn" class="btn btn-primary" ng-click="buscarDatosAlDia()">Buscar datos</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<div style="margin: 10px; overflow-y: auto;" ng-show="mostrarGraficos">
-    <div style="display: flex; flex-direction: column; align-items: center; max-height: calc(100vh - 200px); overflow-y: auto;">
-        <div style="width: 100%; margin-bottom: 20px;">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <label for="select-cliente-proyecto">NUEVOS TICKETS</label>
-            </div>
-            <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;">
-                <div class="card">
-                    <div class="card-header">
-                        Tickets en Gestión
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th style="background-color: #add8e6; color: black;">Semana</th>
-                                    <th style="background-color: #add8e6; color: black;">Descripción</th>
-                                    <th style="background-color: #add8e6; color: black;">Cantidad</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="ticket in infoTickets">
-                                    <td>{{ticket.Semana}}</td>
-                                    <td>{{ticket.Descripcion}}</td>
-                                    <td>{{ticket.Cantidad}}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" style="text-align: center; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
-                                    <td style="text-align: center; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidades | number:0}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+    <div style="margin: 10px; overflow-y: auto;" ng-show="mostrarGraficosAlDia">
+        <div style="display: flex; flex-direction: column; align-items: center; max-height: calc(100vh - 200px); overflow-y: auto;">
+
+            @*Tickets EN GESTION    *@
+            <div style="width: 100%; margin-bottom: 20px;">
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <label for="select-cliente-proyecto">TICKETS EN GESTION</label>
                 </div>
+                <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;">
+                    <!-- Card para la tabla -->
+                    <div class="card">
+                        <div class="card-header">
+                            Tickets en Gestión
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="background-color: #f1f167; color: black;">Semana</th>
+                                        <th style="background-color: #f1f167; color: black;">Descripción</th>
+                                        <th style="background-color: #f1f167; color: black;">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="ticket in infoTicketsEnGestionAlDia">
+                                        <td>{{ticket.Semana}}</td>
+                                        <td>{{ticket.Descripcion}}</td>
+                                        <td>{{ticket.Cantidad}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="text-align: center; background-color: #f1f167; color: black; font-weight: bold;">Total</td>
+                                        <td style="text-align: center; background-color: #f1f167; color: black; font-size: 20px;">{{totalCantidadesTicketsEnGestionAlDia | number:0}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
-                <div class="card" style="width: 400px; height: 400px;">
-                    <div class="card-body">
-                        <div class="chart">
-                            <canvas id="tendenciaChart" width="400" height="400"></canvas>
+                    <div class="card">
+                        <div class="card-header">
+                            Gráfico de Tickets en Gestión
+                        </div>
+                        <div class="card-body">
+                            <canvas id="ticketEnGestionChartAlDia" width="400" height="400"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
 
-        </div>
-
-        <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
-            <br />
-        </div>
-
-        @*Tickets cerrados*@
-        <div style="width: 100%; margin-bottom: 20px;">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <label for="select-cliente-proyecto">TICKETS CERRADOS</label>
+            <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
+                <br />
             </div>
-            <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;">
-                <div class="card">
-                    <div class="card-header">
-                        Tickets en Gestión
+
+
+            @*Tickets por categorias    *@
+            <div style="width: 100%; margin-bottom: 20px;">
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <label for="select-cliente-proyecto">TICKETS POR CATEGORIAS</label>
+                </div>
+                <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;">
+                    <!-- Card para la tabla -->
+                    <div class="card">
+                        <div class="card-header">
+                            Tickets por Categoría
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="background-color: #90F090; color: black;">Categoría</th>
+                                        <th style="background-color: #90F090; color: black;">Porciento</th>
+                                        <th style="background-color: #90F090; color: black;">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="ticket in infoTicketsPorCategoriasAlDia">
+                                        <td>{{ticket.Categoria}}</td>
+                                        <td>{{ticket.Porcentaje}}%</td>
+                                        <td>{{ticket.Cantidad}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="text-align: center; background-color: #90F090; color: black; font-weight: bold;">Total</td>
+                                        <td style="text-align: center; background-color: #90F090; color: black; font-size: 20px;">{{totalCantidadesTicketsPorCategoriaAlDia | number:0}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th style="background-color: #ffc0cb; color: black;">Semana</th>
-                                    <th style="background-color: #ffc0cb; color: black; ">Descripción</th>
-                                    <th style="background-color: #ffc0cb; color: black; ">Cantidad</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="ticket in infoTicketsCerrados">
-                                    <td>{{ticket.Semana}}</td>
-                                    <td>{{ticket.Descripcion}}</td>
-                                    <td>{{ticket.Cantidad}}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" style="text-align: center; background-color: #ffc0cb; color: black; font-weight: bold;">Total</td>
-                                    <td style="text-align: center; background-color: #ffc0cb; color: black; font-size: 20px;">{{totalCantidadesCerrados | number:0}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+
+                    <!-- Card para el gráfico de barras -->
+                    <div class="card">
+                        <div class="card-header">
+                            Gráfico de barras de Tickets por Categoría
+                        </div>
+                        <div class="card-body">
+                            <canvas id="ticketPorCategoriaBarrasChartAlDia" width="400" height="400"></canvas>
+                        </div>
                     </div>
+
+                    <!-- Card para el gráfico de pastel -->
+                    <div class="card">
+                        <div class="card-header">
+                            Gráfico de pastel de Tickets por Categoría
+                        </div>
+                        <div class="card-body">
+                            <canvas id="ticketPorCategoriaPastelChartAlDia" width="400" height="400"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
+                <br />
+            </div>
+
+            @*Tickets por estados    *@
+            <div style="width: 100%; margin-bottom: 20px;">
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <label for="select-cliente-proyecto">TICKETS POR ESTADOS</label>
+                </div>
+                <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;">
+                    <!-- Card para la tabla -->
+                    <div class="card">
+                        <div class="card-header">
+                            Tickets por Estado
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="background-color: #efa824; color: black;">Estado</th>
+                                        <th style="background-color: #efa824; color: black;">Porciento</th>
+                                        <th style="background-color: #efa824; color: black;">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="ticket in infoTicketsPorEstadosAlDia">
+                                        <td>{{ticket.Estado}}</td>
+                                        <td>{{ticket.Porcentaje}}%</td>
+                                        <td>{{ticket.Cantidad}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="text-align: center; background-color: #efa824; color: black; font-weight: bold;">Total</td>
+                                        <td style="text-align: center; background-color: #efa824; color: black; font-size: 20px;">{{totalCantidadesTicketsPorEstadosAlDia | number:0}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Card para el gráfico de barras -->
+                    <div class="card">
+                        <div class="card-header">
+                            Gráfico de barras de Tickets por Estado
+                        </div>
+                        <div class="card-body">
+                            <canvas id="ticketPorEstadoBarrasChartAlDia" width="400" height="400"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Card para el gráfico de pastel -->
+                    <div class="card">
+                        <div class="card-header">
+                            Gráfico de Porciento por Estado
+                        </div>
+                        <div class="card-body">
+                            <canvas id="ticketPorEstadoPastelChartAlDia" width="400" height="400"></canvas>
+                        </div>
+                    </div>
+
                 </div>
 
-                <div class="card" style="width: 400px; height: 400px;">
+                @*<div>
+                        <label>No existen datos disponibles en el rango de fecha seleccionado.</label>
+                    </div>*@
+            </div>
+
+            <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
+                <br />
+            </div>
+
+            @*Tickets por clientes y estados     *@
+            <div style="width: 100%; margin-bottom: 20px;">
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <label for="select-cliente-proyecto">TICKETS POR CLIENTES Y ESTADOS: </label>
+                </div>
+                <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;">
+                    <!-- Card para la tabla -->
+                    <div class="card">
+                        <div class="card-header">
+                            Tickets por clientes y estados
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="background-color: #41f87d; color: black;">Cliente</th>
+                                        <!-- Crear una columna por cada estado identificado -->
+                                        <th ng-repeat="estado in estados" style="background-color: #41f87d; color: black;">
+                                            {{ estado === 'TotalGeneral' ? 'Total General' : estado }}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Recorrer la lista de clientes y estados -->
+                                    <tr ng-repeat="(cliente, estadosCliente) in clientesEstados">
+                                        <td>{{ cliente }}</td>
+                                        <!-- Mostrar la cantidad de tickets por cada estado -->
+                                        <td ng-repeat="estado in estados">
+                                            {{ estadosCliente[estado] || 0 }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div>
+                    <br />
+                </div>
+
+
+                @*Card para el gráfico*@
+                <div class="card">
+                    <div class="card-header">
+                        Gráfico de Tickets por garantía 1
+                    </div>
                     <div class="card-body">
-                        <div class="chart">
-                            <canvas id="ticketCerradosChart" width="400" height="400"></canvas>
+                        @*Contenedor con desplazamiento horizontal*@
+                        <div style="overflow-x:auto;">
+                            <canvas id="ticketPorClienteEstadoBarrasChart1AlDia" width="800" height="400"></canvas>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
-            <br />
-        </div>
+                <div>
+                    <br />
+                </div>
 
-        @*Tickets EN GESTION    *@
-        <div style="width: 100%; margin-bottom: 20px;">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <label for="select-cliente-proyecto">TICKETS EN GESTION</label>
-            </div>
-            <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;">
-                <!-- Card para la tabla -->
+                @*Card para el gráfico*@
                 <div class="card">
                     <div class="card-header">
-                        Tickets en Gestión
+                        Gráfico de Tickets por garantía 2
                     </div>
                     <div class="card-body">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th style="background-color: #f1f167; color: black;">Semana</th>
-                                    <th style="background-color: #f1f167; color: black;">Descripción</th>
-                                    <th style="background-color: #f1f167; color: black;">Cantidad</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="ticket in infoTicketsEnGestion">
-                                    <td>{{ticket.Semana}}</td>
-                                    <td>{{ticket.Descripcion}}</td>
-                                    <td>{{ticket.Cantidad}}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" style="text-align: center; background-color: #f1f167; color: black; font-weight: bold;">Total</td>
-                                    <td style="text-align: center; background-color: #f1f167; color: black; font-size: 20px;">{{totalCantidadesTicketsEnGestion | number:0}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        @*Contenedor con desplazamiento horizontal*@
+                        <div style="overflow-x:auto;">
+                            <canvas id="ticketPorClienteEstadoBarrasChart2AlDia" width="800" height="400"></canvas>
+                        </div>
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        Gráfico de Tickets en Gestión
-                    </div>
-                    <div class="card-body">
-                        <canvas id="ticketEnGestionChart" width="400" height="400"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
-            <br />
-        </div>
-
-
-        @*Tickets por categorias    *@
-        <div style="width: 100%; margin-bottom: 20px;">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <label for="select-cliente-proyecto">TICKETS POR CATEGORIAS</label>
-            </div>
-            <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;">
-                <!-- Card para la tabla -->
-                <div class="card">
-                    <div class="card-header">
-                        Tickets por Categoría
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th style="background-color: #90F090; color: black;">Categoría</th>
-                                    <th style="background-color: #90F090; color: black;">Porciento</th>
-                                    <th style="background-color: #90F090; color: black;">Cantidad</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="ticket in infoTicketsPorCategorias">
-                                    <td>{{ticket.Categoria}}</td>
-                                    <td>{{ticket.Porcentaje}}%</td>
-                                    <td>{{ticket.Cantidad}}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" style="text-align: center; background-color: #90F090; color: black; font-weight: bold;">Total</td>
-                                    <td style="text-align: center; background-color: #90F090; color: black; font-size: 20px;">{{totalCantidadesTicketsPorCategoria | number:0}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Card para el gráfico de barras -->
-                <div class="card">
-                    <div class="card-header">
-                        Gráfico de barras de Tickets por Categoría
-                    </div>
-                    <div class="card-body">
-                        <canvas id="ticketPorCategoriaBarrasChart" width="400" height="400"></canvas>
-                    </div>
-                </div>
-
-                <!-- Card para el gráfico de pastel -->
-                <div class="card">
-                    <div class="card-header">
-                        Gráfico de pastel de Tickets por Categoría
-                    </div>
-                    <div class="card-body">
-                        <canvas id="ticketPorCategoriaPastelChart" width="400" height="400"></canvas>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
-            <br />
-        </div>
-
-        @*Tickets por estados    *@
-        <div style="width: 100%; margin-bottom: 20px;">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <label for="select-cliente-proyecto">TICKETS POR ESTADOS</label>
-            </div>
-            <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;">
-                <!-- Card para la tabla -->
-                <div class="card">
-                    <div class="card-header">
-                        Tickets por Estado
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th style="background-color: #efa824; color: black;">Estado</th>
-                                    <th style="background-color: #efa824; color: black;">Porciento</th>
-                                    <th style="background-color: #efa824; color: black;">Cantidad</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="ticket in infoTicketsPorEstados">
-                                    <td>{{ticket.Estado}}</td>
-                                    <td>{{ticket.Porcentaje}}%</td>
-                                    <td>{{ticket.Cantidad}}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" style="text-align: center; background-color: #efa824; color: black; font-weight: bold;">Total</td>
-                                    <td style="text-align: center; background-color: #efa824; color: black; font-size: 20px;">{{totalCantidadesTicketsPorEstados | number:0}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Card para el gráfico de barras -->
-                <div class="card">
-                    <div class="card-header">
-                        Gráfico de barras de Tickets por Estado
-                    </div>
-                    <div class="card-body">
-                        <canvas id="ticketPorEstadoBarrasChart" width="400" height="400"></canvas>
-                    </div>
-                </div>
-
-                <!-- Card para el gráfico de pastel -->
-                <div class="card">
-                    <div class="card-header">
-                        Gráfico de Porciento por Estado
-                    </div>
-                    <div class="card-body">
-                        <canvas id="ticketPorEstadoPastelChart" width="400" height="400"></canvas>
-                    </div>
+                <div>
+                    <br />
                 </div>
 
             </div>
 
-            <div>
-                <label>No existen datos disponibles en el rango de fecha seleccionado.</label>
-            </div>
-        </div>
-
-        <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
-            <br />
-        </div>
-
-        @*Tickets por aplica     *@
-        <div style="width: 100%; margin-bottom: 20px;">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <label for="select-cliente-proyecto">TICKETS APLICADOS A: </label>
-            </div>
-            <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;">
-                <!-- Card para la tabla -->
-                <div class="card">
-                    <div class="card-header">
-                        Tickets por Aplica
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th style="background-color: #008aff; color: black;">Aplica</th>
-                                    <th style="background-color: #008aff; color: black;">Cantidad</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="ticket in infoTicketsPorAplica">
-                                    <td>{{ticket.Aplica}}</td>
-                                    <td>{{ticket.Cantidad}}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="1" style="text-align: center; background-color: #008aff; color: black; font-weight: bold;">Total</td>
-                                    <td style="text-align: center; background-color: #008aff; color: black; font-size: 20px;">{{totalCantidadesTicketsPorAplica | number:0}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Card para el gráfico -->
-                <div class="card">
-                    <div class="card-header">
-                        Gráfico de Tickets por Aplica
-                    </div>
-                    <div class="card-body">
-                        <canvas id="ticketPorAplicaBarrasChart" width="400" height="400"></canvas>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
-            <br />
-        </div>
-
-        @*Tickets por mantenimiento     *@
-        <div style="width: 100%; margin-bottom: 20px;">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <label for="select-cliente-proyecto">TICKETS POR MANTENIMIENTOS: </label>
-            </div>
-            <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;">
-                <!-- Card para la tabla -->
-                <div class="card">
-                    <div class="card-header">
-                        Tickets por mantenimiento
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th style="background-color: #f58e8e; color: black;">Cliente</th>
-                                    <th style="background-color: #f58e8e; color: black;">Cantidad</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="ticket in infoTicketsPorMantenimiento">
-                                    <td>{{ticket.Cliente}}</td>
-                                    <td>{{ticket.Cantidad}}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="1" style="text-align: center; background-color: #f58e8e; color: black; font-weight: bold;">Total</td>
-                                    <td style="text-align: center; background-color: #f58e8e; color: black; font-size: 20px;">{{totalCantidadesTicketsPorMantenimiento | number:0}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Card para el gráfico -->
-                <div class="card">
-                    <div class="card-header">
-                        Gráfico de Tickets por mantenimiento
-                    </div>
-                    <div class="card-body">
-                        <canvas id="ticketPorMttoBarrasChart" width="400" height="400"></canvas>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
-            <br />
-        </div>
-
-        @*Tickets por garantía     *@
-        <div style="width: 100%; margin-bottom: 20px;">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <label for="select-cliente-proyecto">TICKETS POR GARANTÍA: </label>
-            </div>
-            <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;">
-                <!-- Card para la tabla -->
-                <div class="card">
-                    <div class="card-header">
-                        Tickets por garantía
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th style="background-color: #ee59da; color: black;">Cliente</th>
-                                    <th style="background-color: #ee59da; color: black;">Cantidad</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="ticket in infoTicketsPorGarantia">
-                                    <td>{{ticket.Cliente}}</td>
-                                    <td>{{ticket.Cantidad}}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="1" style="text-align: center; background-color: #ee59da; color: black; font-weight: bold;">Total</td>
-                                    <td style="text-align: center; background-color: #ee59da; color: black; font-size: 20px;">{{totalCantidadesTicketsPorGarantia | number:0}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Card para el gráfico -->
-                <div class="card">
-                    <div class="card-header">
-                        Gráfico de Tickets por garantía
-                    </div>
-                    <div class="card-body">
-                        <canvas id="ticketPorGarantiaBarrasChart" width="400" height="400"></canvas>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
-            <br />
-        </div>
-
-
-        @*Tickets por clientes y estados     *@
-        <div style="width: 100%; margin-bottom: 20px;">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <label for="select-cliente-proyecto">TICKETS POR CLIENTES Y ESTADOS: </label>
-            </div>
-            <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;">
-                <!-- Card para la tabla -->
-                <div class="card">
-                    <div class="card-header">
-                        Tickets por clientes y estados
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th style="background-color: #41f87d; color: black;">Cliente</th>
-                                    <!-- Crear una columna por cada estado identificado -->
-                                    <th ng-repeat="estado in Object.keys(estadosUnicos)" style="background-color: #41f87d; color: black;">{{estado}}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Recorrer la lista de clientes -->
-                                <tr ng-repeat="(cliente, estados) in clientes1">
-                                    <td>{{cliente}}</td>
-                                    <!-- Mostrar la cantidad de tickets por cada estado -->
-                                    <td ng-repeat="estado in Object.keys(estadosUnicos)">{{estados[estado] || 0}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-            </div>
-
-            <div>
-                <br />
-            </div>
-
-
-            @*Card para el gráfico*@
-            <div class="card">
-                <div class="card-header">
-                    Gráfico de Tickets por garantía 1
-                </div>
-                <div class="card-body">
-                    @*Contenedor con desplazamiento horizontal*@
-                    <div style="overflow-x:auto;">
-                        <canvas id="ticketPorClienteEstadoBarrasChart1" width="800" height="400"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <br />
-            </div>
-
-            @*Card para el gráfico*@
-            <div class="card">
-                <div class="card-header">
-                    Gráfico de Tickets por garantía 2
-                </div>
-                <div class="card-body">
-                    @*Contenedor con desplazamiento horizontal*@
-                    <div style="overflow-x:auto;">
-                        <canvas id="ticketPorClienteEstadoBarrasChart2" width="800" height="400"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <br />
-            </div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
 
         </div>
-
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-        <div class="clear"></div>
-
     </div>
+
+
 </div>
+
+<div role="tabpanel" class="tab-pane" id="tab3">
+
+
+</div>
+</div>
+
+
 
 <script type="text/javascript" src="~/Web/js/chart.js"></script>
 <script type="text/javascript" src="~/Web/js/chartjs-plugin-datalabels.js"></script>
