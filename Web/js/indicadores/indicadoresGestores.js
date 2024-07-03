@@ -102,6 +102,24 @@
         });
     };
 
+    $scope.darTicketTiempoGestores = function () {
+        $scope.loading.show();
+        var data = {
+            fechaInicio: $filter('date')($scope.fechaInicioInvertido, 'dd/MM/yyyy'),
+            fechaFin: $filter('date')($scope.fechaFinInvertido, 'dd/MM/yyyy')
+        };
+        var request = $http.post("indicadores/dar-tickets-tiempo-gestores/", data);
+        request.success(function (response) {
+            $scope.loading.hide();
+            if (response.success) {
+                $scope.ticketsTiempoInvertido = response.tiempoIntervaloGestores;
+                $scope.darTicketTiempoInvertido($scope.ticketsTiempoInvertido);
+            } else {
+                alert('Error: ' + response.msg);
+            }
+        });
+    };
+
     $scope.darTicketAnalizadosGestores = function () {
         $scope.loading.show();
         var data = {

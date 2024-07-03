@@ -1219,6 +1219,59 @@ namespace SifizPlanning.Controllers
                 return Json(resp);
             }
         }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public ActionResult DarTiempoInvertidoIntervaloGestores(string fechaInicio, string fechaFin)
+        {
+            try
+            {
+                // Crear objetos DateTime para almacenar las fechas
+                DateTime fInicio = DateTime.ParseExact(fechaInicio, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                DateTime fFin = DateTime.ParseExact(fechaFin, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+                var tiempoQuery = from tiempo in db.InfoTickets
+                                  where tiempo.FechaIngreso.HasValue &&
+                                        tiempo.FechaIngreso.Value.Year >= fInicio.Year &&
+                                        tiempo.FechaIngreso.Value.Month >= fInicio.Month &&
+                                        tiempo.FechaIngreso.Value.Day >= fInicio.Day &&
+                                        tiempo.FechaIngreso.Value.Year <= fFin.Year &&
+                                        tiempo.FechaIngreso.Value.Month <= fFin.Month &&
+                                        tiempo.FechaIngreso.Value.Day <= fFin.Day
+                                  select tiempo;
+
+                List<InfoTickets> tiempoList = tiempoQuery.ToList();
+
+                var resumenTiempo = tiempoList
+                    .GroupBy(tiempo => tiempo.AsignadoA)
+                    .Select(group => new
+                    {
+                        Gestor = group.Key,
+                        TiempoPorMes = group.GroupBy(item => item.FechaIngreso.Value.ToString("MMMM yyyy")).Select(g => new { Mes = g.Key, Tiempo = g.Sum(item => ((item.HorasEmpleadas ?? DateTime.MinValue) - (item.HorasEstimadas ?? DateTime.MinValue)).TotalHours) }).ToList(),
+                        TiempoTotal = group.Sum(tiempo => ((tiempo.HorasEmpleadas ?? DateTime.MinValue) - (tiempo.HorasEstimadas ?? DateTime.MinValue)).TotalHours)
+                    })
+                    .ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    tiempoIntervaloGestores = resumenTiempo
+                };
+
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
         public ActionResult DarTicketsAnalisadosGestores(string fechaInicio, string fechaFin)

@@ -7,6 +7,7 @@
         <li class="active"><a href="#anio-gestor" role="tab" data-toggle="tab">Tickets por Cliente</a></li>
         <li><a href="#mes-gestor" role="tab" data-toggle="tab">Por Fecha y Gestores</a></li>
         <li><a href="#mes-gestor-analizados" role="tab" data-toggle="tab">Analizados</a></li>
+        <li><a href="#mes-gestor-invertido" role="tab" data-toggle="tab">Tiempo Invertido</a></li>
     </ul>
 
     <div class="tab-content">
@@ -160,6 +161,55 @@
                     </div>
                     <div class="item" style="overflow-y: auto; height: 60vh; width: 90vw">
                         <canvas id="ticketsAnalizadosChart" style="width: 100%; height: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Tickets Analizados por Mes y Gestor -->
+        <div class="tab-pane" id="mes-gestor-invertido">
+            <div class="form-inline" style="display: flex; align-items: center; justify-content: flex-start;">
+                <div>
+                    <label>FECHA INICIO</label>
+                    <div class='input-group date'>
+                        <input id="fecha-inicio-invertido" ng-model="fechaInicioInvertido" format-date class="form-control" ng-required="true" autocomplete="off" />
+                    </div>
+                    <label>  </label>
+                </div>
+
+                <div>
+                    <label>FECHA FIN</label>
+                    <div class='input-group date'>
+                        <input id="fecha-fin-invertido" ng-model="fechaFinInvertido" format-date class="form-control" ng-required="true" autocomplete="off" />
+                    </div>
+                </div>
+                <div>
+                    <label>  </label>
+                    <button id="buscar-invertido-btn" class="btn btn-primary" ng-click="darTicketTiempoGestores()">Actualizar</button>
+                </div>
+            </div>
+            <br>
+            <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="3000">
+                <div class="carousel-inner" role="listbox">
+                    <div class="item active" style="height: 500px; overflow-y: auto">
+                        <table class="table table-bordered table-striped table-condensed" width="100%" ng-if="ticketsTiempoInvertido.length > 0">
+                            <thead>
+                                <tr>
+                                    <th>vGESTOR</th>
+                                    <th ng-repeat="mes in meses">{{mes}}</th>
+                                    <th>Tiempo invertido por Gestor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="tiempo in ticketsTiempoInvertido">
+                                    <td>{{tiempo.Gestor}}</td>
+                                    <td ng-repeat="mes in tiempo.TiempoPorMes">{{mes.Mes}}: {{mes.Tiempo}}</td>
+                                    <td>{{tiempo.TiempoTotal}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="item" style="overflow-y: auto; height: 60vh; width: 90vw">
+                        <canvas id="ticketsInvertidoChart" style="width: 100%; height: 100%;"></canvas>
                     </div>
                 </div>
             </div>
