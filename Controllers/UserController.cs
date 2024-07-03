@@ -2699,8 +2699,11 @@ r in db.Rol on ur.rol equals r
                 }
                 else
                 {
-                    var per = db.Persona.Where(s => s.Nombre1 + " " + s.Apellido1 == solVacaciones.ApellidosNombres).First();
-                    Colaborador col = db.Colaborador.FirstOrDefault(x => x.persona.Secuencial == per.Secuencial);
+                    var col = (from c in db.Colaborador
+                               join p in db.Persona on c.SecuencialPersona equals p.Secuencial
+                               join u in db.Usuario on p.Secuencial equals u.SecuencialPersona
+                               where u.EstaActivo == 1 && (p.Nombre1 + " " + p.Apellido1) == solVacaciones.ApellidosNombres 
+                               select new { c, p }).FirstOrDefault();
 
                     DateTime fechaDesde = solVacaciones.FechaInicioVacaciones;
                     DateTime fechaHasta = solVacaciones.FechaFinVacaciones;
@@ -2715,7 +2718,7 @@ r in db.Rol on ur.rol equals r
                         {
                             Vacaciones diaVacaciones = new Vacaciones
                             {
-                                colaborador = col,
+                                colaborador = col.c,
                                 Fecha = fechaDesde
                             };
                             db.Vacaciones.Add(diaVacaciones);
@@ -2723,7 +2726,7 @@ r in db.Rol on ur.rol equals r
                         }
 
                         //emails.AddRange(Utiles.CorreoPorGrupoEmail("RRHH"));
-                        emails.Add(per.usuario.First().Email);
+                        emails.Add(col.p.usuario.First().Email);
                         emails.Add("galvarez@sifizsoft.com"); emails.Add("asistenterrhh@sifizsoft.com");
 
                         string textoHtml = "<div class=\"textoCuerpo\">NOTIFICACIÓN VAPER: <br/>" +
@@ -2745,7 +2748,7 @@ r in db.Rol on ur.rol equals r
 
                         while (fechaDesde <= fechaHasta)
                         {
-                            Vacaciones vaca = db.Vacaciones.Where(x => x.SecuencialColaborador == col.Secuencial && x.Fecha == fechaDesde).FirstOrDefault();
+                            Vacaciones vaca = db.Vacaciones.Where(x => x.SecuencialColaborador == col.c.Secuencial && x.Fecha == fechaDesde).FirstOrDefault();
                             if (vaca != null)
                             {
                                 db.Vacaciones.Remove(vaca);
@@ -2756,7 +2759,7 @@ r in db.Rol on ur.rol equals r
 
                         //emails.AddRange(Utiles.CorreoPorGrupoEmail("RRHH"));
                         //emails.Add(emailUser);
-                        emails.Add(per.usuario.First().Email);
+                        emails.Add(col.p.usuario.First().Email);
                         emails.Add("galvarez@sifizsoft.com"); emails.Add("asistenterrhh@sifizsoft.com");
 
                         string textoHtml = "<div class=\"textoCuerpo\">Se ha rechazado la solicitud de vacaciones.<br/>";
