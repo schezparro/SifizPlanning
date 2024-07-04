@@ -41,6 +41,7 @@
     });
 
     $scope.mostrarPanelGraficos = false;
+    $scope.mostrarPanelGraficosAlDia = false;
 
     $scope.buscarOtrosDatos = function () {
         $scope.mostrarPanelGraficos = true;
@@ -632,7 +633,7 @@
                     });
 
                     $scope.mostrarGraficoTicketsAplica = true;
-                } 
+                }
             } else {
                 alert("Error: " + data.msg);
             }
@@ -662,7 +663,7 @@
                 } else {
                     $scope.infoTicketsPorMantenimiento = data.infoTickets;
                     $scope.totalCantidadesTicketsPorMantenimiento = data.totalCantidades;
-                    $scope.mostrarGraficos = true; 
+                    $scope.mostrarGraficos = true;
                     $scope.mensajeNoDataTicketsMtto = '';
                     var clientes = [];
                     var cantidades = [];
@@ -685,14 +686,14 @@
 
                     var tendenciaChartCtx = document.getElementById('ticketPorMttoBarrasChart').getContext('2d');
                     $scope.ticketPorMttoBarrasChart = new Chart(tendenciaChartCtx, {
-                        type: 'bar', 
+                        type: 'bar',
                         data: {
-                            labels: clientes, 
+                            labels: clientes,
                             datasets: [{
                                 label: 'Cantidad de tickets por clientes en mantenimiento',
-                                data: cantidades, 
-                                backgroundColor: coloresAleatorios, 
-                                hoverBackgroundColor: coloresAleatorios, 
+                                data: cantidades,
+                                backgroundColor: coloresAleatorios,
+                                hoverBackgroundColor: coloresAleatorios,
                                 borderWidth: 1
                             }]
                         },
@@ -744,7 +745,7 @@
                 } else {
                     $scope.infoTicketsPorGarantia = data.infoTickets;
                     $scope.totalCantidadesTicketsPorGarantia = data.totalCantidades;
-                    $scope.mostrarGraficos = true; 
+                    $scope.mostrarGraficos = true;
                     $scope.mensajeNoDataTicketsGarantia = '';
                     var clientes = [];
                     var cantidades = [];
@@ -767,14 +768,14 @@
 
                     var tendenciaChartCtx = document.getElementById('ticketPorGarantiaBarrasChart').getContext('2d');
                     $scope.ticketPorGarantiaBarrasChart = new Chart(tendenciaChartCtx, {
-                        type: 'bar', 
+                        type: 'bar',
                         data: {
-                            labels: clientes, 
+                            labels: clientes,
                             datasets: [{
                                 label: 'Cantidad de tickets por clientes en garantía técnica',
-                                data: cantidades, 
+                                data: cantidades,
                                 backgroundColor: coloresAleatorios,
-                                hoverBackgroundColor: coloresAleatorios, 
+                                hoverBackgroundColor: coloresAleatorios,
                                 borderWidth: 1
                             }]
                         },
@@ -959,8 +960,12 @@
 
     // *****************************************************************************************************************************************************************************
 
-    $scope.buscarDatosAlDia = function () {
+    let clienteSeleccionado;
 
+    $scope.buscarDatosAlDia = function () {
+        $scope.mostrarPanelGraficosAlDia = true;
+        $scope.verTodosClientes = false;
+        $scope.verUnCliente = false;
         $scope.cliente = angular.element("#select-cliente-indicadores-tickets-aldia")[0].value;
 
         if ($scope.ticketEnGestionChartAlDia) {
@@ -991,103 +996,113 @@
             $scope.ticketPorClienteEstadoBarrasChart2AlDia.destroy();
         }
 
+        if ($scope.ticketPendientesChartAlDia) {
+            $scope.ticketPendientesChartAlDia.destroy();
+        }
+
+        if ($scope.cliente == "")
+            clienteSeleccionado = 0
+        else
+            clienteSeleccionado = $scope.cliente
+
         $scope.TicketsEnGestionAlDia();
         $scope.TicketsPorCategoriaAlDia();
         $scope.TicketsPorEstadosAlDia();
         $scope.TicketsPorClientesEstadosAlDia();
+        $scope.TicketsPendientesAlDia();
 
     };
 
+
+
+    //Tickets en gestión
     $scope.TicketsEnGestionAlDia = function () {
         if ($scope.ticketEnGestionChartAlDia) {
             $scope.ticketEnGestionChartAlDia.destroy();
         }
 
-        console.log("entro a gestion al dia " + $scope.cliente);
-
         var infoTicketsEnGestionAlDia = $http.post("indicadores/dar-tickets-en-gestion-aldia/", {
-            cliente: $scope.cliente
+            cliente: clienteSeleccionado
         });
 
         infoTicketsEnGestionAlDia.success(function (data) {
             $scope.loading.hide();
 
-
-            console.log("entroooooooooooo");
-
             if (data.success) {
-                $scope.infoTicketsEnGestionAlDia = data.infoTickets;
-                $scope.totalCantidadesTicketsEnGestionAlDia = data.totalCantidades;
-                $scope.mostrarGraficos = true; // Para mostrar la tabla y el gráfico
 
-                console.log("entroooooooooooo 1111111111111111");
+                if (data.infoTickets.length === 0) {
 
-                // Preparar datos para el gráfico de líneas de tendencia temporal
-                var semanas = [];
-                var cantidades = [];
+                    $scope.mensajeNoDataTicketsEnGestionAlDia = 'No existen datos disponibles'
+                    $scope.mostrarGraficosTicketsEnGestionAlDia = false
 
-                // Llenar las etiquetas y los datos del gráfico con la información de las semanas y cantidades
-                $scope.infoTicketsEnGestionAlDia.forEach(function (ticket) {
-                    semanas.push(ticket.Descripcion);
-                    cantidades.push(ticket.Cantidad);
-                });
+                } else {
+                    $scope.infoTicketsEnGestionAlDia = data.infoTickets;
+                    $scope.totalCantidadesTicketsEnGestionAlDia = data.totalCantidades;
+                    $scope.mensajeNoDataTicketsEnGestionAlDia = '';
 
-                function getRandomColor() {
-                    var letters = '0123456789ABCDEF';
-                    var color = '#';
-                    for (var i = 0; i < 6; i++) {
-                        color += letters[Math.floor(Math.random() * 16)];
+                    var semanas = [];
+                    var cantidades = [];
+
+                    $scope.infoTicketsEnGestionAlDia.forEach(function (ticket) {
+                        semanas.push(ticket.Descripcion);
+                        cantidades.push(ticket.Cantidad);
+                    });
+
+                    function getRandomColor() {
+                        var letters = '0123456789ABCDEF';
+                        var color = '#';
+                        for (var i = 0; i < 6; i++) {
+                            color += letters[Math.floor(Math.random() * 16)];
+                        }
+                        return color;
                     }
-                    return color;
-                }
 
-                // Ahora puedes usar getRandomColor() sin problemas
-                var coloresAleatorios = cantidades.map(getRandomColor);
+                    var coloresAleatorios = cantidades.map(getRandomColor);
 
-                // Gráfico de líneas para mostrar la tendencia de tickets a lo largo del tiempo
-                var tendenciaChartCtx = document.getElementById('ticketEnGestionChartAlDia').getContext('2d');
-                var tendenciaChart = new Chart(tendenciaChartCtx, {
-                    type: 'bar', // Cambiado a 'bar'
-                    data: {
-                        labels: semanas, // Etiquetas de las semanas
-                        datasets: [{
-                            label: 'Tickets en gestión',
-                            data: cantidades, // Datos de las cantidades
-                            backgroundColor: coloresAleatorios, // Asignar colores aleatorios a cada barra
-                            hoverBackgroundColor: coloresAleatorios, // Mantener el color al pasar el mouse
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        plugins: {
-                            datalabels: {
-                                display: true,
-                                align: 'top',
-                                backgroundColor: '#D3D3D3',
-                                borderRadius: 3,
-                                font: {
-                                    weight: 'bold'
+                    var tendenciaChartCtx = document.getElementById('ticketEnGestionChartAlDia').getContext('2d');
+                    $scope.ticketEnGestionChartAlDia = new Chart(tendenciaChartCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: semanas,
+                            datasets: [{
+                                label: 'Tickets en gestión',
+                                data: cantidades,
+                                backgroundColor: coloresAleatorios,
+                                hoverBackgroundColor: coloresAleatorios,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                datalabels: {
+                                    display: true,
+                                    align: 'top',
+                                    backgroundColor: '#D3D3D3',
+                                    borderRadius: 3,
+                                    font: {
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
                                 }
                             }
                         },
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    },
-                    plugins: [ChartDataLabels]
-                });
+                        plugins: [ChartDataLabels]
+                    });
 
-                $scope.mostrarGraficosAlDia = true;
+                    $scope.mostrarGraficosTicketsEnGestionAlDia = true;
+                }
+
             } else {
-                // Manejar el caso en que data.success es false
                 alert("Error: " + data.msg);
             }
         });
     };
 
-
+    //Tickets por Categorias
     $scope.TicketsPorCategoriaAlDia = function () {
 
         if ($scope.ticketPorCategoriaBarrasChartAlDia) {
@@ -1099,122 +1114,130 @@
         }
 
         var infoTicketsPorCategoriasAlDia = $http.post("indicadores/dar-tickets-por-categorias-aldia/", {
-            cliente: $scope.cliente
+            cliente: clienteSeleccionado
         });
         infoTicketsPorCategoriasAlDia.success(function (data) {
             $scope.loading.hide();
 
             if (data.success) {
-                $scope.infoTicketsPorCategoriasAlDia = data.infoTickets;
-                $scope.totalCantidadesTicketsPorCategoriaAlDia = data.totalCantidades;
-                $scope.mostrarGraficosAlDia = true; // Para mostrar la tabla y el gráfico
 
-                // Preparar datos para el gráfico de líneas de tendencia temporal
-                var categorias = [];
-                var cantidades = [];
-                var porcentaje = [];
+                if (data.infoTickets.length === 0) {
 
-                // Llenar las etiquetas y los datos del gráfico con la información de las semanas y cantidades
-                $scope.infoTicketsPorCategoriasAlDia.forEach(function (ticket) {
-                    categorias.push(ticket.Categoria);
-                    cantidades.push(ticket.Cantidad);
-                    porcentaje.push(ticket.Porcentaje);
-                });
+                    $scope.mensajeNoDataTicketsEnGestionAlDia = 'No existen datos disponibles'
+                    $scope.mostrarGraficoTicketsPorCategoriaAlDia = false
 
-                function getRandomColor() {
-                    var letters = '0123456789ABCDEF';
-                    var color = '#';
-                    for (var i = 0; i < 6; i++) {
-                        color += letters[Math.floor(Math.random() * 16)];
-                    }
-                    return color;
-                }
+                } else {
 
-                // Ahora puedes usar getRandomColor() sin problemas
-                var coloresAleatorios = cantidades.map(getRandomColor);
+                    $scope.mensajeNoDataTicketsEnGestionAlDia = ''
+                    $scope.infoTicketsPorCategoriasAlDia = data.infoTickets;
+                    $scope.totalCantidadesTicketsPorCategoriaAlDia = data.totalCantidades;
 
-                // Gráfico de líneas para mostrar la tendencia de tickets a lo largo del tiempo
-                var tendenciaChartCtx = document.getElementById('ticketPorCategoriaBarrasChartAlDia').getContext('2d');
-                var tendenciaChart = new Chart(tendenciaChartCtx, {
-                    type: 'bar', // Cambiado a 'bar'
-                    data: {
-                        labels: categorias, // Etiquetas de las semanas
-                        datasets: [{
-                            label: 'Cantidades por categorías',
-                            data: cantidades, // Datos de las cantidades
-                            backgroundColor: coloresAleatorios, // Asignar colores aleatorios a cada barra
-                            hoverBackgroundColor: coloresAleatorios, // Mantener el color al pasar el mouse
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        plugins: {
-                            datalabels: {
-                                display: true,
-                                align: 'top',
-                                backgroundColor: '#D3D3D3',
-                                borderRadius: 3,
-                                font: {
-                                    weight: 'bold'
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
+                    var categorias = [];
+                    var cantidades = [];
+                    var porcentaje = [];
+                    $scope.infoTicketsPorCategoriasAlDia.forEach(function (ticket) {
+                        categorias.push(ticket.Categoria);
+                        cantidades.push(ticket.Cantidad);
+                        porcentaje.push(ticket.Porcentaje);
+                    });
+
+                    function getRandomColor() {
+                        var letters = '0123456789ABCDEF';
+                        var color = '#';
+                        for (var i = 0; i < 6; i++) {
+                            color += letters[Math.floor(Math.random() * 16)];
                         }
-                    },
-                    plugins: [ChartDataLabels]
-                });
+                        return color;
+                    }
 
-                var tendenciaChartCtx1 = document.getElementById('ticketPorCategoriaPastelChartAlDia').getContext('2d');
-                var tendenciaChart = new Chart(tendenciaChartCtx1, {
-                    type: 'doughnut',
-                    data: {
-                        labels: cantidades,
-                        datasets: [{
-                            backgroundColor: coloresAleatorios, // Usamos getRandomColor para generar colores aleatorios
-                            hoverBorderColor: 'white',
-                            data: cantidades,
-                            datalabels: {
-                                labels: {
-                                    name: {
-                                        align: 'center',
-                                        anchor: 'center',
-                                        color: function (ctx) {
-                                            return ctx.dataset.backgroundColor;
-                                        },
-                                        font: { size: 16 },
-                                        formatter: function (value, ctx) {
-                                            return categorias[ctx.dataIndex];
-                                        }
+                    var coloresAleatorios = cantidades.map(getRandomColor);
+                    //Grafico de barras
+                    var tendenciaChartCtx = document.getElementById('ticketPorCategoriaBarrasChartAlDia').getContext('2d');
+                    $scope.ticketPorCategoriaBarrasChartAlDia = new Chart(tendenciaChartCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: categorias,
+                            datasets: [{
+                                label: 'Cantidades por categorías',
+                                data: cantidades,
+                                backgroundColor: coloresAleatorios,
+                                hoverBackgroundColor: coloresAleatorios,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                datalabels: {
+                                    display: true,
+                                    align: 'top',
+                                    backgroundColor: '#D3D3D3',
+                                    borderRadius: 3,
+                                    font: {
+                                        weight: 'bold'
                                     }
                                 }
-                            }
-                        }]
-                    },
-                    options: {
-                        plugins: {
-                            datalabels: {
-                                color: 'white',
-                                display: function (ctx) {
-                                    return ctx.dataset.data[ctx.dataIndex] > 10;
-                                },
-                                font: {
-                                    weight: 'bold',
-                                },
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
                             }
                         },
                         plugins: [ChartDataLabels]
-                    }
-                });
+                    });
+
+                    //Grafico de pastel
+                    var tendenciaChartCtx1 = document.getElementById('ticketPorCategoriaPastelChartAlDia').getContext('2d');
+                    $scope.ticketPorCategoriaPastelChartAlDia = new Chart(tendenciaChartCtx1, {
+                        type: 'doughnut',
+                        data: {
+                            labels: cantidades,
+                            datasets: [{
+                                backgroundColor: coloresAleatorios,
+                                hoverBorderColor: 'white',
+                                data: cantidades,
+                                datalabels: {
+                                    labels: {
+                                        name: {
+                                            align: 'center',
+                                            anchor: 'center',
+                                            color: function (ctx) {
+                                                return ctx.dataset.backgroundColor;
+                                            },
+                                            font: { size: 16 },
+                                            formatter: function (value, ctx) {
+                                                return categorias[ctx.dataIndex];
+                                            }
+                                        }
+                                    }
+                                }
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                datalabels: {
+                                    color: 'white',
+                                    display: function (ctx) {
+                                        return ctx.dataset.data[ctx.dataIndex] > 10;
+                                    },
+                                    font: {
+                                        weight: 'bold',
+                                    },
+                                }
+                            },
+                            plugins: [ChartDataLabels]
+                        }
+                    });
+
+                    $scope.mostrarGraficoTicketsPorCategoriaAlDia = true;
+
+                }
             };
 
         });
     };
 
-
+    //Tickets por Estados
     $scope.TicketsPorEstadosAlDia = function () {
 
         if ($scope.ticketPorEstadoBarrasChartAlDia) {
@@ -1226,133 +1249,132 @@
         }
 
         var infoTicketsPorEstadosAlDia = $http.post("indicadores/dar-tickets-por-estados-aldia/", {
-            cliente: $scope.cliente
+            cliente: clienteSeleccionado
         });
 
         infoTicketsPorEstadosAlDia.success(function (data) {
             $scope.loading.hide();
 
             if (data.success) {
-                $scope.infoTicketsPorEstadosAlDia = data.infoTickets;
-                $scope.totalCantidadesTicketsPorEstadosAlDia = data.totalCantidades;
-                $scope.mostrarGraficosAlDia = true; // Para mostrar la tabla y el gráfico
 
-                // Preparar datos para el gráfico de líneas de tendencia temporal
-                var estados = [];
-                var cantidades = [];
-                var porcentaje = [];
+                if (data.infoTickets.length === 0) {
 
-                // Llenar las etiquetas y los datos del gráfico con la información de las semanas y cantidades
-                $scope.infoTicketsPorEstadosAlDia.forEach(function (ticket) {
-                    estados.push(ticket.Estado);
-                    cantidades.push(ticket.Cantidad);
-                    porcentaje.push(ticket.Porcentaje);
-                });
+                    $scope.mensajeNoDataTicketsPorEstadosAlDia = 'No existen datos disponibles'
+                    $scope.mostrarGraficoTicketsPorEstadosAlDia = false
 
-                function getRandomColor() {
-                    var letters = '0123456789ABCDEF';
-                    var color = '#';
-                    for (var i = 0; i < 6; i++) {
-                        color += letters[Math.floor(Math.random() * 16)];
+                } else {
+
+                    $scope.mensajeNoDataTicketsPorEstadosAlDia = ''
+                    $scope.infoTicketsPorEstadosAlDia = data.infoTickets;
+                    $scope.totalCantidadesTicketsPorEstadosAlDia = data.totalCantidades;
+
+                    var estados = [];
+                    var cantidades = [];
+                    var porcentaje = [];
+                    $scope.infoTicketsPorEstadosAlDia.forEach(function (ticket) {
+                        estados.push(ticket.Estado);
+                        cantidades.push(ticket.Cantidad);
+                        porcentaje.push(ticket.Porcentaje);
+                    });
+
+                    function getRandomColor() {
+                        var letters = '0123456789ABCDEF';
+                        var color = '#';
+                        for (var i = 0; i < 6; i++) {
+                            color += letters[Math.floor(Math.random() * 16)];
+                        }
+                        return color;
                     }
-                    return color;
+
+                    var coloresAleatorios = cantidades.map(getRandomColor);
+
+                    // Gráfico de Barras
+                    var tendenciaChartCtx = document.getElementById('ticketPorEstadoBarrasChartAlDia').getContext('2d');
+                    $scope.ticketPorEstadoBarrasChartAlDia = new Chart(tendenciaChartCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: estados,
+                            datasets: [{
+                                label: 'Cantidades por estados',
+                                data: cantidades,
+                                backgroundColor: coloresAleatorios,
+                                hoverBackgroundColor: coloresAleatorios,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                datalabels: {
+                                    display: true,
+                                    align: 'top',
+                                    backgroundColor: '#D3D3D3',
+                                    borderRadius: 3,
+                                    font: {
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+
+                    // Gráfico de Pastel
+                    var tendenciaChartCtx1 = document.getElementById('ticketPorEstadoPastelChartAlDia').getContext('2d');
+                    $scope.ticketPorEstadoPastelChartAlDia = new Chart(tendenciaChartCtx1, {
+                        type: 'bar',
+                        data: {
+                            labels: estados,
+                            datasets: [{
+                                label: 'Porciento por estados',
+                                data: porcentaje,
+                                backgroundColor: coloresAleatorios,
+                                hoverBackgroundColor: coloresAleatorios,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                datalabels: {
+                                    display: true,
+                                    align: 'top',
+                                    backgroundColor: '#D3D3D3',
+                                    borderRadius: 3,
+                                    font: {
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    beginAtZero: true
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+
+                    $scope.mostrarGraficoTicketsPorEstadosAlDia = true;
                 }
-
-                // Ahora puedes usar getRandomColor() sin problemas
-                var coloresAleatorios = cantidades.map(getRandomColor);
-
-                // Gráfico de líneas para mostrar la tendencia de tickets a lo largo del tiempo
-                var tendenciaChartCtx = document.getElementById('ticketPorEstadoBarrasChartAlDia').getContext('2d');
-                var tendenciaChart = new Chart(tendenciaChartCtx, {
-                    type: 'bar', // Cambiado a 'bar'
-                    data: {
-                        labels: estados, // Etiquetas de las semanas
-                        datasets: [{
-                            label: 'Cantidades por estados',
-                            data: cantidades, // Datos de las cantidades
-                            backgroundColor: coloresAleatorios, // Asignar colores aleatorios a cada barra
-                            hoverBackgroundColor: coloresAleatorios, // Mantener el color al pasar el mouse
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        plugins: {
-                            datalabels: {
-                                display: true,
-                                align: 'top',
-                                backgroundColor: '#D3D3D3',
-                                borderRadius: 3,
-                                font: {
-                                    weight: 'bold'
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    },
-                    plugins: [ChartDataLabels]
-                });
-
-                var tendenciaChartCtx1 = document.getElementById('ticketPorEstadoPastelChartAlDia').getContext('2d');
-                var tendenciaChart = new Chart(tendenciaChartCtx1, {
-                    type: 'bar', // Cambiado a 'horizontalBar' para barras horizontales
-                    data: {
-                        labels: estados, // Etiquetas de las semanas
-                        datasets: [{
-                            label: 'Porciento por estados',
-                            data: porcentaje, // Datos de las cantidades
-                            backgroundColor: coloresAleatorios, // Asignar colores aleatorios a cada barra
-                            hoverBackgroundColor: coloresAleatorios, // Mantener el color al pasar el mouse
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        plugins: {
-                            datalabels: {
-                                display: true,
-                                align: 'top',
-                                backgroundColor: '#D3D3D3',
-                                borderRadius: 3,
-                                font: {
-                                    weight: 'bold'
-                                }
-                            }
-                        },
-                        scales: {
-                            x: { // Cambiado de 'y' a 'x' para ajustar el eje horizontal
-                                beginAtZero: true
-                            }
-                        }
-                    },
-                    plugins: [ChartDataLabels]
-                });
-
-                $scope.mostrarGraficos = true;
             } else {
-                // Manejar el caso en que data.success es false
                 alert("Error: " + data.msg);
             }
         });
     };
 
-
+    //tickets de clientes por estados
     $scope.TicketsPorClientesEstadosAlDia = function () {
 
         if ($scope.ticketPorClienteEstadoBarrasChart1AlDia) {
             $scope.ticketPorClienteEstadoBarrasChart1AlDia.destroy();
         }
 
-        if ($scope.ticketPorClienteEstadoBarrasChart2AlDia) {
-            $scope.ticketPorClienteEstadoBarrasChart2AlDia.destroy();
-        }
-
         var infoTicketsPorClienteEstadoAlDia = $http.post("indicadores/dar-tickets-por-cliente-estado-aldia/", {
-            fechaInicio: $scope.fechaInicio,
-            fechaFin: $scope.fechaFin,
-            cliente: $scope.cliente
+            cliente: clienteSeleccionado
         });
 
         infoTicketsPorClienteEstadoAlDia.success(function (data) {
@@ -1360,139 +1382,306 @@
 
             if (data.success) {
 
-                $scope.infoTicketsPorClienteEstadoAlDia = data.infoTickets;
-                $scope.totalCantidadesTicketsPorClientesEstadoAlDia = data.totalCantidades;
-                $scope.mostrarGraficosAlDia = true; // Para mostrar la tabla y el gráfico
+                if (data.infoTickets.length === 0) {
 
-                // Crear una estructura para los datos de la tabla
-                $scope.clientesEstados = {};
-                var cantidades = [];
+                    $scope.mensajeNoDataTicketsClientesEstadosAldia = 'No existen datos disponibles'
+                    $scope.mostrarGraficoTicketsClientesEstadosAlDia = false
 
-                // Llenar los datos del objeto clientesEstados
-                angular.forEach($scope.infoTicketsPorClienteEstadoAlDia, function (ticket) {
-                    // Si el cliente no existe en el objeto, agrégalo
-                    if (!$scope.clientesEstados[ticket.Cliente]) {
-                        $scope.clientesEstados[ticket.Cliente] = {};
-                    }
+                } else {
+                    $scope.mensajeNoDataTicketsClientesEstadosAldia = ''
+                    $scope.mostrarGraficoTicketsClientesEstadosAlDia = true
+                    $scope.infoTicketsPorClienteEstadoAlDia = data.infoTickets;
+                    $scope.totalCantidadesTicketsPorClientesEstadoAlDia = data.totalCantidades;
+                    $scope.groupedTicketsPCEAD = data.infoTickets;
 
-                    // Agregar o actualizar la cantidad para el estado actual
-                    $scope.clientesEstados[ticket.Cliente][ticket.Estado] = ticket.Cantidad;
-                    cantidades.push(ticket.Cantidad);
-                });
+                    // Obtener estados únicos y ordenarlos
+                    $scope.estadosUnicos = [...new Set(data.infoTickets.map(ticket => ticket.Estado))].sort();
 
-                // Calcular el total general para cada cliente
-                angular.forEach($scope.clientesEstados, function (val, key) {
-                    var totalGeneral = 0;
-                    angular.forEach(val, function (value, estado) {
-                        totalGeneral += value;
+                    // Crear estructura de clientes
+                    $scope.clientesEstructurados = {};
+
+                    // Inicializar todos los clientes con todos los estados en 0
+                    data.infoTickets.forEach(ticket => {
+                        if (!$scope.clientesEstructurados[ticket.Cliente]) {
+                            $scope.clientesEstructurados[ticket.Cliente] = $scope.estadosUnicos.map(estado => ({
+                                Estado: estado,
+                                Cantidad: 0
+                            }));
+                        }
                     });
-                    $scope.clientesEstados[key].TotalGeneral = totalGeneral;
-                });
 
-                // Obtener la lista de estados disponibles
-                $scope.estados = Object.keys($scope.clientesEstados[$scope.infoTicketsPorClienteEstadoAlDia[0].Cliente]);
-
-
-                function getRandomColor() {
-                    var letters = '0123456789ABCDEF';
-                    var color = '#';
-                    for (var i = 0; i < 6; i++) {
-                        color += letters[Math.floor(Math.random() * 16)];
-                    }
-                    return color;
-                }
-
-                // Ahora puedes usar getRandomColor() sin problemas
-                var coloresAleatorios = cantidades.map(getRandomColor);
-
-                var clientes1 = {};
-                var ticketsPorEstado = {};
-                $scope.infoTicketsPorClienteEstadoAlDia.forEach(function (ticket) {
-                    if (!ticketsPorEstado[ticket.Estado]) {
-                        ticketsPorEstado[ticket.Estado] = [];
-                    }
-                    ticketsPorEstado[ticket.Estado].push(ticket);
-
-                    if (!clientes1[ticket.Cliente]) {
-                        clientes1[ticket.Cliente] = {};
-                    }
-                    clientes1[ticket.Cliente][ticket.Estado] = ticket.Cantidad;
-                });
-
-                // Obtén todos los estados únicos
-                let estadosUnicos = {};
-                for (let cliente in clientes1) {
-                    for (let estado in clientes1[cliente]) {
-                        estadosUnicos[estado] = estado;
-                    }
-                }
-
-                $scope.clientes1 = clientes1;
-                $scope.estadosUnicos = estadosUnicos;
-
-                console.log(clientes1);
-                console.log(estadosUnicos);
-
-                // Obtén la lista de clientes únicos
-                var clientes = [...new Set($scope.infoTicketsPorClienteEstadoAlDia.map(ticket => ticket.Cliente))];
-                console.log(clientes);
-
-                // Divide tus clientes en dos partes
-                var mitad = Math.ceil(clientes.length / 2); // Redondea hacia arriba para manejar números impares
-                var clientes1 = clientes.slice(0, mitad);
-                var clientes2 = clientes.slice(mitad);
-
-                // Crea un conjunto de datos para cada estado y cada grupo de clientes
-                var datasets1 = createDatasets(clientes1, ticketsPorEstado);
-                var datasets2 = createDatasets(clientes2, ticketsPorEstado);
-
-                // Crea los gráficos
-                createChart('ticketPorClienteEstadoBarrasChart1AlDia', clientes1, datasets1);
-                createChart('ticketPorClienteEstadoBarrasChart2AlDia', clientes2, datasets2);
-
-                function createDatasets(clientes, ticketsPorEstado) {
-                    return Object.keys(ticketsPorEstado).map(function (estado) {
-                        var data = clientes.map(function (cliente) {
-                            var ticket = ticketsPorEstado[estado].find(function (t) { return t.Cliente === cliente; });
-                            return ticket ? ticket.Cantidad : 0;
+                    // Actualizar las cantidades con los datos reales y calcular el total
+                    Object.keys($scope.clientesEstructurados).forEach(cliente => {
+                        let total = 0;
+                        $scope.clientesEstructurados[cliente].forEach(item => {
+                            const ticketEncontrado = data.infoTickets.find(t => t.Cliente === cliente && t.Estado === item.Estado);
+                            if (ticketEncontrado) {
+                                item.Cantidad = ticketEncontrado.Cantidad;
+                            }
+                            total += item.Cantidad;
                         });
-                        return {
-                            label: estado,
-                            data: data,
-                            backgroundColor: getRandomColor(),
-                            borderColor: 'rgba(255, 99, 132, 1)',
-                            borderWidth: 1
-                        };
+                        // Agregar el total al final del array de cada cliente
+                        $scope.clientesEstructurados[cliente].push({
+                            Estado: 'Total',
+                            Cantidad: total
+                        });
                     });
-                }
 
-                function createChart(canvasId, clientes, datasets) {
-                    var ctx = document.getElementById(canvasId).getContext('2d');
-                    new Chart(ctx, {
+                    // Calcular totales por estado
+                    $scope.totalesPorEstado = {};
+                    $scope.estadosUnicos.forEach(estado => {
+                        $scope.totalesPorEstado[estado] = 0;
+                    });
+
+                    Object.values($scope.clientesEstructurados).forEach(cliente => {
+                        cliente.forEach(item => {
+                            if (item.Estado !== 'Total') {
+                                $scope.totalesPorEstado[item.Estado] += item.Cantidad;
+                            }
+                        });
+                    });
+
+                    // Calcular gran total
+                    $scope.granTotal = Object.values($scope.totalesPorEstado).reduce((a, b) => a + b, 0);
+
+
+                    // Obtener la lista de clientes únicos y ordenarlos alfabéticamente
+                    var clientes = Object.keys($scope.clientesEstructurados).sort();
+                                     
+
+                    // Función para crear datasets
+                    function createDatasets(clientesGroup) {
+                        var mostrarTodosLosEstados = clientesGroup.length === 1;
+                        return $scope.estadosUnicos.map(function (estado, index) {
+                            var data = clientesGroup.map(function (cliente) {
+                                var estadoObj = $scope.clientesEstructurados[cliente].find(e => e.Estado === estado);
+                                return estadoObj ? estadoObj.Cantidad : 0;
+                            });
+
+                            return {
+                                label: estado,
+                                data: data,
+                                backgroundColor: getRandomColor(),
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 1,
+                                hidden: !mostrarTodosLosEstados && index >= 1
+                            };
+                        });
+                    }
+
+                    // Función para generar colores aleatorios
+                    function getRandomColor() {
+                        var letters = '0123456789ABCDEF';
+                        var color = '#';
+                        for (var i = 0; i < 6; i++) {
+                            color += letters[Math.floor(Math.random() * 16)];
+                        }
+                        return color;
+                    }
+
+                    function createChart(canvasId, clientes, datasets) {
+                        var ctx = document.getElementById(canvasId).getContext('2d');
+                        new Chart(ctx, {
+                            type: 'bar', // You can choose a different chart type here
+                            data: {
+                                labels: clientes,
+                                datasets: datasets
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: true,
+                                scales: {
+                                    x: { display: true, title: { display: true, text: 'Clientes' }, ticks: { autoSkip: true } },
+                                    y: { display: true, title: { display: true, text: 'Cantidad de Tickets' }, ticks: { stepSize: 1, beginAtZero: true }, suggestedMax: 3 },
+                                },
+                                plugins: {
+                                    title: {
+                                        display: true,
+                                        text: 'Tickets por Cliente y Estado'
+                                    },
+                                    datalabels: {
+                                        display: true,
+                                        align: 'top',
+                                        backgroundColor: '#D3D3D3',
+                                        borderRadius: 3,
+                                        font: {
+                                            weight: 'bold'
+                                        }
+                                    }
+                                },
+                                layout: {
+                                    padding: {
+                                        top: 20
+                                    }
+                                },
+                                barPercentage: 0.7, // Reduce bar width (adjust as needed)
+                                categoryPercentage: 0.8 // Adjust spacing between bars (optional)
+                            },
+                            plugins: [ChartDataLabels]
+                        });
+                    };
+
+                    var clientes1, clientes2;
+                    // Dividir clientes en dos partes
+                    if (clientes.length > 20) {
+                        $scope.verTodosClientes = true;
+                        var mitad = Math.ceil(clientes.length / 2);
+                        clientes1 = clientes.slice(0, mitad);
+                        clientes2 = clientes.slice(mitad);
+
+                        // Crear datasets para cada grupo de clientes
+                        var datasets1 = createDatasets(clientes1);
+                        var datasets2 = createDatasets(clientes2);
+
+                        if ($scope.ticketPorClienteEstadoBarrasChart1AlDia) {
+                            $scope.ticketPorClienteEstadoBarrasChart1AlDia.destroy();
+                        }
+
+                        if ($scope.ticketPorClienteEstadoBarrasChart2AlDia) {
+                            $scope.ticketPorClienteEstadoBarrasChart2AlDia.destroy();
+                        }
+
+                        // Crear los gráficos
+                        createChart('ticketPorClienteEstadoBarrasChart1AlDia', clientes1, datasets1);
+                        createChart('ticketPorClienteEstadoBarrasChart2AlDia', clientes2, datasets2);
+                    } else {
+                        $scope.verUnCliente = true;
+
+                        console.log(clientes);
+                        var datasets = createDatasets(clientes);
+
+                        if ($scope.ticketPorClienteEstadoBarrasChart3AlDia) {
+                            $scope.ticketPorClienteEstadoBarrasChart3AlDia.destroy(); // Asegúrate de que esta línea funcione
+                            $scope.ticketPorClienteEstadoBarrasChart3AlDia = null; // Limpiar la referencia
+                        }
+
+                        var ctx = document.getElementById("ticketPorClienteEstadoBarrasChart3AlDia").getContext('2d');
+                        $scope.ticketPorClienteEstadoBarrasChart3AlDia = new Chart(ctx, {
+                            type: 'bar', // You can choose a different chart type here
+                            data: {
+                                labels: clientes,
+                                datasets: datasets
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: true,
+                                scales: {
+                                    x: { display: true, title: { display: true, text: 'Clientes' }, ticks: { autoSkip: true } },
+                                    y: { display: true, title: { display: true, text: 'Cantidad de Tickets' }, ticks: { stepSize: 1, beginAtZero: true }, suggestedMax: 3 },
+                                },
+                                plugins: {
+                                    title: {
+                                        display: true,
+                                        text: 'Tickets por Cliente y Estado'
+                                    },
+                                    datalabels: {
+                                        display: true,
+                                        align: 'top',
+                                        backgroundColor: '#D3D3D3',
+                                        borderRadius: 3,
+                                        font: {
+                                            weight: 'bold'
+                                        }
+                                    }
+                                },
+                                layout: {
+                                    padding: {
+                                        top: 20
+                                    }
+                                },
+                                barPercentage: 0.7, // Reduce bar width (adjust as needed)
+                                categoryPercentage: 0.8 // Adjust spacing between bars (optional)
+                            },
+                            plugins: [ChartDataLabels]
+                        });
+                    };                   
+                }
+            }
+        });
+    };
+
+
+    $scope.TicketsPendientesAlDia = function () {
+        if ($scope.ticketPendientesChartAlDia) {
+            $scope.ticketPendientesChartAlDia.destroy();
+        }
+
+        var infoTicketsPendientesAlDia = $http.post("indicadores/dar-tickets-pendientes-aldia/", {
+            cliente: clienteSeleccionado
+        });
+
+        infoTicketsPendientesAlDia.success(function (data) {
+            $scope.loading.hide();
+
+            if (data.success) {
+
+                if (data.infoTickets.length === 0) {
+
+                    $scope.mensajeNoDataTicketPendientesAlDia = 'No existen datos disponibles'
+                    $scope.mostrarGraficosTicketsPendientesAlDia = false
+
+                } else {
+                    $scope.infoTicketsPendientesAlDia = data.infoTickets;
+                    $scope.totalCantidadesTicketsPendientesAlDia = data.totalCantidades;
+                    $scope.mensajeNoDataTicketPendientesAlDia = '';
+
+                    var semanas = [];
+                    var cantidades = [];
+
+                    $scope.infoTicketsPendientesAlDia.forEach(function (ticket) {
+                        semanas.push(ticket.Descripcion);
+                        cantidades.push(ticket.Cantidad);
+                    });
+
+                    function getRandomColor() {
+                        var letters = '0123456789ABCDEF';
+                        var color = '#';
+                        for (var i = 0; i < 6; i++) {
+                            color += letters[Math.floor(Math.random() * 16)];
+                        }
+                        return color;
+                    }
+
+                    var coloresAleatorios = cantidades.map(getRandomColor);
+
+                    var tendenciaChartCtx = document.getElementById('ticketPendientesChartAlDia').getContext('2d');
+                    $scope.ticketPendientesChartAlDia = new Chart(tendenciaChartCtx, {
                         type: 'bar',
                         data: {
-                            labels: clientes,
-                            datasets: datasets
+                            labels: semanas,
+                            datasets: [{
+                                label: 'Tickets pendientes',
+                                data: cantidades,
+                                backgroundColor: coloresAleatorios,
+                                hoverBackgroundColor: coloresAleatorios,
+                                borderWidth: 1
+                            }]
                         },
                         options: {
+                            plugins: {
+                                datalabels: {
+                                    display: true,
+                                    align: 'top',
+                                    backgroundColor: '#D3D3D3',
+                                    borderRadius: 3,
+                                    font: {
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
                             scales: {
                                 y: {
                                     beginAtZero: true
                                 }
-                            },
-                            plugins: {
-                                title: {
-                                    display: true,
-                                    text: 'Tickets por Cliente y Estado'
-                                }
                             }
-                        }
+                        },
+                        plugins: [ChartDataLabels]
                     });
+
+                    $scope.mostrarGraficosTicketsPendientesAlDia = true;
                 }
 
-                $scope.mostrarGraficos = true;
             } else {
-                // Manejar el caso en que data.success es false
                 alert("Error: " + data.msg);
             }
         });
