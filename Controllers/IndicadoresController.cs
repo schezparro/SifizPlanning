@@ -941,25 +941,26 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
-        public ActionResult DarTicketsEnGestionAlDia(string cliente)
+        public ActionResult DarTicketsEnGestionAlDia(int cliente)
         {
             try
             {
                 // Crear objetos DateTime para almacenar las fechas
                 DateTime fActual = DateTime.Today;
+                String nombreCliente = "";
 
+                if (cliente != 0)
+                {
+                    nombreCliente = (from cli in db.Cliente where cli.Secuencial == cliente select cli.Descripcion).FirstOrDefault();
+                }
 
                 var ticketsQueryTEGAD = (from ticket in db.InfoTickets
                                        where ticket.FechaIngreso != null
                                           && ticket.FechaIngreso.Value <= fActual
                                           && ticket.Estado != "CERRADO"
                                           && ticket.Estado != "ANULADO"
+                                          && (ticket.Cliente == nombreCliente || nombreCliente == "")
                                        select ticket).ToList();
-
-                if (!string.IsNullOrEmpty(cliente))
-                {
-                    ticketsQueryTEGAD = ticketsQueryTEGAD.Where(it => it.Cliente.Equals(cliente)).ToList();
-                }
 
                 List<InfoTickets> ticketsListTEGAD = ticketsQueryTEGAD.ToList();
 
@@ -1000,21 +1001,24 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
-        public ActionResult DarTicketsPorCategoriasAlDia(string cliente)
+        public ActionResult DarTicketsPorCategoriasAlDia(int cliente)
         {
             try
             {
                 DateTime fActual = DateTime.Today;
+                String nombreCliente = "";
+
+                if (cliente != 0)
+                {
+                    nombreCliente = (from cli in db.Cliente where cli.Secuencial == cliente select cli.Descripcion).FirstOrDefault();
+                }
 
                 var ticketsQueryPCAD = (from ticket in db.InfoTickets
                                     where ticket.FechaIngreso != null
                                        && ticket.FechaIngreso.Value <= fActual
-                                    select ticket).ToList();
+                                        && (ticket.Cliente == nombreCliente || nombreCliente == "")
+                                        select ticket).ToList();
 
-                if (!string.IsNullOrEmpty(cliente))
-                {
-                    ticketsQueryPCAD = ticketsQueryPCAD.Where(it => it.Cliente.Equals(cliente)).ToList();
-                }
 
                 List<InfoTickets> ticketsListPCAD = ticketsQueryPCAD.ToList();
 
@@ -1058,22 +1062,25 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
-        public ActionResult DarTicketsPorEstadosAlDia(string cliente)
+        public ActionResult DarTicketsPorEstadosAlDia(int cliente)
         {
             try
             {
                 DateTime fActual = DateTime.Today;
+                String nombreCliente = "";
+
+                if (cliente != 0)
+                {
+                    nombreCliente = (from cli in db.Cliente where cli.Secuencial == cliente select cli.Descripcion).FirstOrDefault();
+                }
 
                 var ticketsQueryPEAD = (from ticket in db.InfoTickets
                                     where ticket.FechaIngreso != null
                                        && ticket.FechaIngreso.Value <= fActual
-                                    where ticket.Estado != "CERRADO"
-                                    select ticket).ToList();
+                                        && ticket.Estado != "CERRADO"
+                                        && (ticket.Cliente == nombreCliente || nombreCliente == "")
+                                        select ticket).ToList();
 
-                if (!string.IsNullOrEmpty(cliente))
-                {
-                    ticketsQueryPEAD = ticketsQueryPEAD.Where(it => it.Cliente.Equals(cliente)).ToList();
-                }
 
                 List<InfoTickets> ticketsListPEAD = ticketsQueryPEAD.ToList();
 
@@ -1117,21 +1124,23 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
-        public ActionResult DarTicketsPorClientesPorEstadoAlDia( string cliente)
+        public ActionResult DarTicketsPorClientesPorEstadoAlDia(int cliente)
         {
             try
             {
                 DateTime fActual = DateTime.Today;
+                String nombreCliente = "";
+
+                if (cliente != 0)
+                {
+                    nombreCliente = (from cli in db.Cliente where cli.Secuencial == cliente select cli.Descripcion).FirstOrDefault();
+                }
 
                 var ticketsQueryPCEAD = (from ticket in db.InfoTickets
                                     where ticket.FechaIngreso != null
                                        && ticket.FechaIngreso.Value <= fActual
-                                    select ticket).ToList();
-
-                if (!string.IsNullOrEmpty(cliente))
-                {
-                    ticketsQueryPCEAD = ticketsQueryPCEAD.Where(it => it.Cliente.Equals(cliente)).ToList();
-                }
+                                       && (ticket.Cliente == nombreCliente || nombreCliente == "")
+                                         select ticket).ToList();
 
                 List<InfoTickets> ticketsListPCEAD = ticketsQueryPCEAD.ToList();
 
@@ -1165,7 +1174,65 @@ namespace SifizPlanning.Controllers
                 return Json(resp);
             }
         }
-        
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public ActionResult DarTicketsPendientesAlDia(int cliente)
+        {
+            try
+            {
+                DateTime fActual = DateTime.Today;
+                String nombreCliente = "";
+
+                if (cliente != 0)
+                {
+                    nombreCliente = (from cli in db.Cliente where cli.Secuencial == cliente select cli.Descripcion).FirstOrDefault();
+                }
+
+                var ticketsQueryTPAD = (from ticket in db.InfoTickets
+                                         where ticket.FechaIngreso != null
+                                            && ticket.FechaIngreso.Value <= fActual
+                                            && ticket.Estado == "PENDIENTE"
+                                            && (ticket.Cliente == nombreCliente || nombreCliente == "")
+                                         select ticket).ToList();
+
+                List<InfoTickets> ticketsListTPAD = ticketsQueryTPAD.ToList();
+
+                var groupedTicketsTPAD = ticketsListTPAD
+                    .GroupBy(ticket => CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(
+                        ticket.FechaIngreso.Value,
+                        CalendarWeekRule.FirstDay,
+                        DayOfWeek.Monday))
+                    .Select(g => new
+                    {
+                        Semana = g.Key,
+                        Cantidad = g.Count(),
+                        Descripcion = "AL " + g.Max(t => t.FechaIngreso.Value).ToString("dd/MM/yyyy")
+                    })
+                    .OrderBy(x => x.Semana)
+                    .ToList();
+
+                var totalCantidadesTPAD = groupedTicketsTPAD.Sum(ticket => ticket.Cantidad);
+
+                var resp = new
+                {
+                    success = true,
+                    infoTickets = groupedTicketsTPAD,
+                    totalCantidades = totalCantidadesTPAD
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
         public ActionResult DarTicketsIntervaloGestores(string fechaInicio, string fechaFin)
