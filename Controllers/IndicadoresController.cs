@@ -75,7 +75,8 @@ namespace SifizPlanning.Controllers
                     infoTickets = db.InfoTickets.AsNoTracking()
                                              .Where(it => it.FechaIngreso <= fHasta)
                                              .ToList();
-                } else
+                }
+                else
                 {
                     infoTickets = db.InfoTickets.AsNoTracking()
                                              .Where(it => it.FechaIngreso >= fInicio && it.FechaIngreso <= fFin)
@@ -578,10 +579,10 @@ namespace SifizPlanning.Controllers
                 }
 
                 var ticketsQueryPA = (from ticket in db.InfoTickets
-                                   where ticket.FechaIngreso != null
-                                      && ticket.FechaIngreso.Value >= fInicio
-                                      && ticket.FechaIngreso.Value <= fFin
-                                   select ticket).ToList();
+                                      where ticket.FechaIngreso != null
+                                         && ticket.FechaIngreso.Value >= fInicio
+                                         && ticket.FechaIngreso.Value <= fFin
+                                      select ticket).ToList();
 
                 // Convertir la consulta a una lista para trabajar con ella en memoria
                 List<InfoTickets> ticketsListPA = ticketsQueryPA.ToList();
@@ -660,11 +661,11 @@ namespace SifizPlanning.Controllers
                 }
 
                 var ticketsQueryPM = (from ticket in db.InfoTickets
-                                   where ticket.FechaIngreso != null
-                                      && ticket.FechaIngreso.Value >= fInicio
-                                      && ticket.FechaIngreso.Value <= fFin
-                                      && ticket.Tipo == "MANTENIMIENTO"
-                                   select ticket).ToList();
+                                      where ticket.FechaIngreso != null
+                                         && ticket.FechaIngreso.Value >= fInicio
+                                         && ticket.FechaIngreso.Value <= fFin
+                                         && ticket.Tipo == "MANTENIMIENTO"
+                                      select ticket).ToList();
 
                 // Convertir la consulta a una lista para trabajar con ella en memoria
                 List<InfoTickets> ticketsListPM = ticketsQueryPM.ToList();
@@ -743,11 +744,11 @@ namespace SifizPlanning.Controllers
                 }
 
                 var ticketsQueryPG = (from ticket in db.InfoTickets
-                                   where ticket.FechaIngreso != null
-                                      && ticket.FechaIngreso.Value >= fInicio
-                                      && ticket.FechaIngreso.Value <= fFin
-                                      && ticket.Tipo == "GARANTÍA TÉCNICA"
-                                   select ticket).ToList();
+                                      where ticket.FechaIngreso != null
+                                         && ticket.FechaIngreso.Value >= fInicio
+                                         && ticket.FechaIngreso.Value <= fFin
+                                         && ticket.Tipo == "GARANTÍA TÉCNICA"
+                                      select ticket).ToList();
 
                 // Convertir la consulta a una lista para trabajar con ella en memoria
                 List<InfoTickets> ticketsListPG = ticketsQueryPG.ToList();
@@ -784,7 +785,7 @@ namespace SifizPlanning.Controllers
                 return Json(resp);
             }
         }
-        
+
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
         public ActionResult DarTicketsPorGestor(string fechaInicio, string fechaFin, string gestor)
@@ -834,7 +835,7 @@ namespace SifizPlanning.Controllers
                                    select ticket).ToList();
 
                 var ticketsAgrupados = ticketsList
-                    .GroupBy(ticket => new { Anio = ticket.FechaIngreso.Value.Year, Mes = ticket.FechaIngreso.Value.Month, ticket.Cliente  })
+                    .GroupBy(ticket => new { Anio = ticket.FechaIngreso.Value.Year, Mes = ticket.FechaIngreso.Value.Month, ticket.Cliente })
                     .Select(group => new { cliente = group.Key.Cliente, mes = group.Key.Mes, anio = group.Key.Anio, cantidad = group.Count() })
                     .ToList();
 
@@ -955,12 +956,12 @@ namespace SifizPlanning.Controllers
                 }
 
                 var ticketsQueryTEGAD = (from ticket in db.InfoTickets
-                                       where ticket.FechaIngreso != null
-                                          && ticket.FechaIngreso.Value <= fActual
-                                          && ticket.Estado != "CERRADO"
-                                          && ticket.Estado != "ANULADO"
-                                          && (ticket.Cliente == nombreCliente || nombreCliente == "")
-                                       select ticket).ToList();
+                                         where ticket.FechaIngreso != null
+                                            && ticket.FechaIngreso.Value <= fActual
+                                            && ticket.Estado != "CERRADO"
+                                            && ticket.Estado != "ANULADO"
+                                            && (ticket.Cliente == nombreCliente || nombreCliente == "")
+                                         select ticket).ToList();
 
                 List<InfoTickets> ticketsListTEGAD = ticketsQueryTEGAD.ToList();
 
@@ -1014,9 +1015,9 @@ namespace SifizPlanning.Controllers
                 }
 
                 var ticketsQueryPCAD = (from ticket in db.InfoTickets
-                                    where ticket.FechaIngreso != null
-                                       && ticket.FechaIngreso.Value <= fActual
-                                        && (ticket.Cliente == nombreCliente || nombreCliente == "")
+                                        where ticket.FechaIngreso != null
+                                           && ticket.FechaIngreso.Value <= fActual
+                                            && (ticket.Cliente == nombreCliente || nombreCliente == "")
                                         select ticket).ToList();
 
 
@@ -1027,9 +1028,9 @@ namespace SifizPlanning.Controllers
                    .Select(g => new
                    {
                        Tipo = g.Key,
-                       Cantidad = g.Count() 
+                       Cantidad = g.Count()
                    })
-                   .OrderBy(x => x.Tipo) 
+                   .OrderBy(x => x.Tipo)
                    .ToList();
 
                 var totalCantidades = groupedTicketsPCAD.Sum(ticket => ticket.Cantidad);
@@ -1075,23 +1076,23 @@ namespace SifizPlanning.Controllers
                 }
 
                 var ticketsQueryPEAD = (from ticket in db.InfoTickets
-                                    where ticket.FechaIngreso != null
-                                       && ticket.FechaIngreso.Value <= fActual
-                                        && ticket.Estado != "CERRADO"
-                                        && (ticket.Cliente == nombreCliente || nombreCliente == "")
+                                        where ticket.FechaIngreso != null
+                                           && ticket.FechaIngreso.Value <= fActual
+                                            && ticket.Estado != "CERRADO"
+                                            && (ticket.Cliente == nombreCliente || nombreCliente == "")
                                         select ticket).ToList();
 
 
                 List<InfoTickets> ticketsListPEAD = ticketsQueryPEAD.ToList();
 
                 var groupedTicketsPEAD = ticketsListPEAD
-                   .GroupBy(t => t.Estado) 
+                   .GroupBy(t => t.Estado)
                    .Select(g => new
                    {
-                       Estado = g.Key, 
-                       Cantidad = g.Count() 
+                       Estado = g.Key,
+                       Cantidad = g.Count()
                    })
-                   .OrderBy(x => x.Estado) 
+                   .OrderBy(x => x.Estado)
                    .ToList();
 
                 var totalCantidades = groupedTicketsPEAD.Sum(ticket => ticket.Cantidad);
@@ -1137,9 +1138,9 @@ namespace SifizPlanning.Controllers
                 }
 
                 var ticketsQueryPCEAD = (from ticket in db.InfoTickets
-                                    where ticket.FechaIngreso != null
-                                       && ticket.FechaIngreso.Value <= fActual
-                                       && (ticket.Cliente == nombreCliente || nombreCliente == "")
+                                         where ticket.FechaIngreso != null
+                                            && ticket.FechaIngreso.Value <= fActual
+                                            && (ticket.Cliente == nombreCliente || nombreCliente == "")
                                          select ticket).ToList();
 
                 List<InfoTickets> ticketsListPCEAD = ticketsQueryPCEAD.ToList();
@@ -1190,11 +1191,11 @@ namespace SifizPlanning.Controllers
                 }
 
                 var ticketsQueryTPAD = (from ticket in db.InfoTickets
-                                         where ticket.FechaIngreso != null
-                                            && ticket.FechaIngreso.Value <= fActual
-                                            && ticket.Estado == "PENDIENTE"
-                                            && (ticket.Cliente == nombreCliente || nombreCliente == "")
-                                         select ticket).ToList();
+                                        where ticket.FechaIngreso != null
+                                           && ticket.FechaIngreso.Value <= fActual
+                                           && ticket.Estado == "PENDIENTE"
+                                           && (ticket.Cliente == nombreCliente || nombreCliente == "")
+                                        select ticket).ToList();
 
                 List<InfoTickets> ticketsListTPAD = ticketsQueryTPAD.ToList();
 
@@ -1364,7 +1365,8 @@ namespace SifizPlanning.Controllers
                 var resumenTickets = ticketsList
                     .Where(ticket => ticket.Cliente != null && ticket.FechaIngreso.HasValue)
                     .GroupBy(ticket => new { ticket.Cliente, Año = ticket.FechaIngreso.Value.Year, Mes = ticket.FechaIngreso.Value.Month })
-                    .Select(group => {
+                    .Select(group =>
+                    {
                         var gestorServicio = db.GestorServicios.FirstOrDefault(s => s.cliente != null && s.cliente.Descripcion == group.Key.Cliente);
                         var nombreGestor = gestorServicio != null && gestorServicio.colaborador != null && gestorServicio.colaborador.persona != null ? gestorServicio.colaborador.persona.Nombre1 + " " + gestorServicio.colaborador.persona.Apellido1 : "Desconocido";
                         return new
@@ -1421,11 +1423,15 @@ namespace SifizPlanning.Controllers
                     throw new ArgumentException("El gestor no puede estar vacío.");
 
                 var gestorUpperCase = gestor.ToUpper();
+                var clientes = (from c in db.Cliente
+                                join g in db.GestorServicios on c.Secuencial equals g.SecuencialCliente
+                                where g.colaborador.persona.Nombre1.ToUpper() + " " + g.colaborador.persona.Apellido1.ToUpper() == gestorUpperCase
+                                select c.Descripcion.ToUpper()).ToList();
 
                 var ticketsQuery = from ticket in db.InfoTickets
                                    where ticket.FechaIngreso.HasValue &&
                                          ticket.FechaIngreso.Value.Year == anio &&
-                                         ticket.AsignadoA.ToUpper() == gestorUpperCase
+                                         clientes.Contains(ticket.Cliente.ToUpper())
                                    select ticket;
 
                 List<InfoTickets> ticketsList = ticketsQuery.ToList();
