@@ -1233,6 +1233,90 @@ namespace SifizPlanning.Controllers
             }
         }
 
+        // Indicadores generales
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public ActionResult DarTicketsPorAplicaIndicadoresGenerales(List<string> annos, List<string> meses)
+        {
+            try
+            {
+                // Convertir los años y meses a enteros
+                var annosInt = annos.Select(int.Parse).ToList();
+                var mesesInt = meses.Select(int.Parse).ToList();
+
+                // Consulta base
+                var ticketsQuery = db.InfoTickets.Where(t => t.FechaIngreso != null).Select(t => new {
+                    AnnoFechaIngreso = t.FechaIngreso.Value.Year,
+                    MesFechaIngreso = t.FechaIngreso.Value.Month,
+                    Aplica = t.AplicaA
+                });
+
+                // Filtrar por años y meses seleccionados
+                ticketsQuery = ticketsQuery.Where(t =>
+                    annosInt.Contains(t.AnnoFechaIngreso) &&
+                    mesesInt.Contains(t.MesFechaIngreso)
+                );
+
+                // Ejecutar la consulta
+                var ticketsList = ticketsQuery.ToList();
+
+                // Filtrar los resultados en memoria para asegurar la correspondencia año-mes
+                ticketsList = ticketsList.Where(t =>
+                    annosInt.Contains(t.AnnoFechaIngreso) &&
+                    mesesInt.Contains(t.MesFechaIngreso)
+                ).ToList();
+
+                // Agrupar por año y AplicaA
+                var ticketsPorAnno = ticketsList
+                    .GroupBy(t => new { Anno = t.AnnoFechaIngreso, t.Aplica })
+                    .Select(g => new
+                    {
+                        Anno = g.Key.Anno,
+                        Aplica = g.Key.Aplica,
+                        Cantidad = g.Count()
+                    })
+                    .OrderBy(x => x.Anno)
+                    .ThenBy(x => x.Aplica)
+                    .ToList();
+
+                // Agrupar por año, mes y AplicaA
+                var ticketsPorAnnoMes = ticketsList
+                    .GroupBy(t => new {
+                        Anno = t.AnnoFechaIngreso,
+                        Mes = t.MesFechaIngreso,
+                        t.Aplica
+                    })
+                    .Select(g => new
+                    {
+                        Anno = g.Key.Anno,
+                        Mes = g.Key.Mes,
+                        Aplica = g.Key.Aplica,
+                        Cantidad = g.Count()
+                    })
+                    .OrderBy(x => x.Anno)
+                    .ThenBy(x => x.Mes)
+                    .ThenBy(x => x.Aplica)
+                    .ToList();
+
+                return Json(new
+                {
+                    success = true,
+                    ticketsPorAnno = ticketsPorAnno,
+                    ticketsPorAnnoMes = ticketsPorAnnoMes
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
         public ActionResult DarTicketsIntervaloGestores(string fechaInicio, string fechaFin)

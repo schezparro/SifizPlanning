@@ -962,6 +962,9 @@
 
     let clienteSeleccionado;
 
+    //******************************************************************************************************************************** */
+    //*******************************************   INDICADORES AL DIA   **************************************************************** */
+    //******************************************************************************************************************************** */
     $scope.buscarDatosAlDia = function () {
         $scope.mostrarPanelGraficosAlDia = true;
         $scope.verTodosClientes = false;
@@ -1012,8 +1015,6 @@
         $scope.TicketsPendientesAlDia();
 
     };
-
-
 
     //Tickets en gestión
     $scope.TicketsEnGestionAlDia = function () {
@@ -1447,7 +1448,7 @@
 
                     // Obtener la lista de clientes únicos y ordenarlos alfabéticamente
                     var clientes = Object.keys($scope.clientesEstructurados).sort();
-                                     
+
 
                     // Función para crear datasets
                     function createDatasets(clientesGroup) {
@@ -1594,12 +1595,11 @@
                             },
                             plugins: [ChartDataLabels]
                         });
-                    };                   
+                    };
                 }
             }
         });
     };
-
 
     $scope.TicketsPendientesAlDia = function () {
         if ($scope.ticketPendientesChartAlDia) {
@@ -1686,6 +1686,360 @@
             }
         });
     };
+
+
+    //******************************************************************************************************************************** */
+    //*******************************************   INDICADORES GENERALES   **************************************************************** */
+    //******************************************************************************************************************************** */
+
+    $('#select-annos-indicadores-tickets').select2({
+        placeholder: "Seleccione...",
+        allowClear: true, // Permite borrar la selección
+        maximumSelectionLength: 3,
+        language: {
+            maximumSelected: function (e) {
+                return "Solo puedes seleccionar " + e.maximum + " meses";
+            }
+        },
+        closeOnSelect: false,
+        theme: "classic",
+        width: '300px',
+        templateResult: formatResult // Función para formatear cómo se muestra cada opción
+    }).on('change', function (e) {
+        $scope.$apply(function () {
+            var selectedValues = $(e.target).val();
+            $scope.annosIndicadoresGenerales = selectedValues ? selectedValues : [];
+        });
+    });
+
+    $('#select-meses-indicadores-tickets').select2({
+        placeholder: "Seleccione...",
+        allowClear: true, // Permite borrar la selección
+        maximumSelectionLength: 3,
+        language: {
+            maximumSelected: function (e) {
+                return "Solo puedes seleccionar " + e.maximum + " meses";
+            }
+        },
+        closeOnSelect: false,
+        width: '300px',
+        templateResult: formatResult // Función para formatear cómo se muestra cada opción
+    }).on('change', function (e) {
+        $scope.$apply(function () {
+            var selectedValues = $(e.target).val();
+            $scope.mesesIndicadoresGenerales = selectedValues ? selectedValues : [];
+        });
+    });
+
+    function formatResult(item) {
+        if (!item.id) {
+            return item.text; // Devuelve el texto si no hay ID
+        }
+        var $result = $("<span>").text(item.text);
+        return $result;
+    }
+
+
+    $scope.buscarDatosIndicadoresGenerales = function () {
+
+        console.log($scope.annosIndicadoresGenerales);
+        console.log($scope.mesesIndicadoresGenerales);
+
+        if ($scope.annosIndicadoresGenerales.length > 0) {
+            $scope.mostrarPanelGraficosPorAnnos = true;
+        }
+
+        if ($scope.mesesIndicadoresGenerales.length > 0) {
+            $scope.mostrarPanelGraficosPorMeses = true;
+        }
+
+        $scope.mostrarPanelGraficosIndicadoresGenerales = true;
+
+        if ($scope.ticketAplicaIndicadoresGeneralesMeses) {
+            $scope.ticketPorAplicaBarrasChartMes.destroy();
+        }
+
+        if ($scope.ticketAplicaIndicadoresGeneralesAnno) {
+            $scope.ticketPorAplicaBarrasChartAnno.destroy();
+        }
+
+        $scope.TicketsAplicaIndicadoresGenerales();
+
+    };
+
+
+    $scope.TicketsAplicaIndicadoresGenerales = function () {
+        if ($scope.ticketPorAplicaBarrasChartAnno) {
+            $scope.ticketPorAplicaBarrasChartAnno.destroy();
+        }
+        if ($scope.ticketPorAplicaBarrasChartMes) {
+            $scope.ticketPorAplicaBarrasChartMes.destroy();
+        }
+
+        var infoTicketsPorAplica = $http.post("indicadores/dar-tickets-aplica-indicadores-generales/", {
+            annos: $scope.annosIndicadoresGenerales,
+            meses: $scope.mesesIndicadoresGenerales
+        });
+
+        infoTicketsPorAplica.success(function (data) {
+            $scope.loading.hide();
+            if (data.success) {
+
+                console.log(data.ticketsPorAnnoMes);
+                if (data.ticketsPorAnno.length === 0 && data.ticketsPorMes.length === 0) {
+                    $scope.mostrarGraficoTicketsAplica = false;
+                    $scope.mensajeNoDataTicketsAplica = 'No existen datos disponibles';
+                } else {
+                    $scope.infoTicketsPorAplicaAnno = data.ticketsPorAnno;
+                    $scope.infoTicketsPorAplicaMes = data.ticketsPorMes;
+                    // Formatear datos para la tabla por año
+                    var ticketsPorAplicaAnno = {};
+                    var anos = [];
+                    data.ticketsPorAnno.forEach(function (ticket) {
+                        if (!ticketsPorAplicaAnno[ticket.Aplica]) {
+                            ticketsPorAplicaAnno[ticket.Aplica] = {};
+                        }
+                        ticketsPorAplicaAnno[ticket.Aplica][ticket.Anno] = ticket.Cantidad;
+                        if (!anos.includes(ticket.Anno)) {
+                            anos.push(ticket.Anno);
+                        }
+                    });
+
+                    // Procesamiento de datos
+                    var ticketsPorAplicaAnnoMes = {};
+                    var anos = [];
+                    var meses = [];
+                    var anoActual = new Date().getFullYear();
+
+                    if (data && data.ticketsPorAnnoMes && Array.isArray(data.ticketsPorAnnoMes)) {
+
+                        data.ticketsPorAnnoMes.forEach(function (ticket) {
+                            if (!ticketsPorAplicaAnnoMes[ticket.Aplica]) {
+                                ticketsPorAplicaAnnoMes[ticket.Aplica] = {};
+                            }
+                            if (!ticketsPorAplicaAnnoMes[ticket.Aplica][ticket.Anno]) {
+                                ticketsPorAplicaAnnoMes[ticket.Aplica][ticket.Anno] = {};
+                            }
+                            ticketsPorAplicaAnnoMes[ticket.Aplica][ticket.Anno][ticket.Mes] = ticket.Cantidad;
+
+                            if (!anos.includes(ticket.Anno)) {
+                                anos.push(ticket.Anno);
+                            }
+                            if (!meses.includes(ticket.Mes)) {
+                                meses.push(ticket.Mes);
+                            }
+                        });
+                    };
+
+                };
+
+                $scope.anosTickets = [];
+                $scope.mesesTickets = [];
+                $scope.aplicasList = [];
+                $scope.ticketsPorAplicaAnnoMes = {};
+
+                if (data && data.ticketsPorAnnoMes && Array.isArray(data.ticketsPorAnnoMes)) {
+
+                    data.ticketsPorAnnoMes.forEach(function (item) {
+                        if (!$scope.anosTickets.includes(item.Anno)) {
+                            $scope.anosTickets.push(item.Anno);
+                        }
+                        if (!$scope.mesesTickets.includes(item.Mes)) {
+                            $scope.mesesTickets.push(item.Mes);
+                        }
+                        if (!$scope.aplicasList.includes(item.Aplica)) {
+                            $scope.aplicasList.push(item.Aplica);
+                        }
+
+                        if (!$scope.ticketsPorAplicaAnnoMes[item.Aplica]) {
+                            $scope.ticketsPorAplicaAnnoMes[item.Aplica] = {};
+                        }
+                        if (!$scope.ticketsPorAplicaAnnoMes[item.Aplica][item.Anno]) {
+                            $scope.ticketsPorAplicaAnnoMes[item.Aplica][item.Anno] = {};
+                        }
+                        $scope.ticketsPorAplicaAnnoMes[item.Aplica][item.Anno][item.Mes] = item.Cantidad;
+                    });
+
+                }                
+
+                $scope.anosTickets.sort((a, b) => a - b);
+                $scope.mesesTickets.sort((a, b) => a - b);
+                $scope.aplicasList.sort();
+
+                $scope.getCantidad = function (aplica, ano, mes) {
+                    return ($scope.ticketsPorAplicaAnnoMes[aplica] &&
+                        $scope.ticketsPorAplicaAnnoMes[aplica][ano] &&
+                        $scope.ticketsPorAplicaAnnoMes[aplica][ano][mes]) || 0;
+                };
+
+                function isMonthEmpty(ano, mes) {
+                    return $scope.aplicasList.every(function (aplica) {
+                        return $scope.getCantidad(aplica, ano, mes) === 0;
+                    });
+                };
+
+                function getMesByNumero(mesNumero) {
+                    var meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                    return meses[mesNumero - 1] || '';
+                };
+
+                $scope.calcularTotal = function (ano, mes) {
+                    var total = 0;
+                    $scope.aplicasList.forEach(function (aplica) {
+                        total += $scope.getCantidad(aplica, ano, mes);
+                    });
+                    return total;
+                };
+
+                 // Si no se seleccionaron años, usar el año actual
+                if (anos.length === 0) {
+                    anos.push(anoActual);
+                }
+
+                $scope.ticketsPorAplicaAnnoMes = ticketsPorAplicaAnnoMes;
+                $scope.anosTickets = anos.sort();
+                $scope.mesesTickets = meses.sort();
+
+                $scope.ticketsPorAplicaAnno = ticketsPorAplicaAnno;
+                $scope.anosTickets = anos.sort();
+
+                // Calcular totales por año
+                $scope.totalesPorAnno = {};
+                anos.forEach(function (ano) {
+                    $scope.totalesPorAnno[ano] = Object.values(ticketsPorAplicaAnno).reduce(function (total, aplica) {
+                        return total + (aplica[ano] || 0);
+                    }, 0);
+                });
+
+                // Función para crear datasets
+                function createDatasets() {
+                    var filteredLabels = [];
+                    var datasets = [];
+
+                    $scope.aplicasList.forEach(function (aplica) {
+                        var data = [];
+                        $scope.anosTickets.forEach(function (ano) {
+                            $scope.mesesTickets.forEach(function (mes) {
+                                var cantidad = $scope.getCantidad(aplica, ano, mes);
+                                if (cantidad > 0 || !isMonthEmpty(ano, mes)) {
+                                    data.push(cantidad);
+                                    if (!filteredLabels.includes(ano + '-' + mes)) {
+                                        filteredLabels.push(ano + '-' + mes);
+                                    }
+                                }
+                            });
+                        });
+
+                        if (data.length > 0) {
+                            datasets.push({
+                                label: aplica,
+                                data: data,
+                                backgroundColor: getRandomColor(),
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 1
+                            });
+                        }
+                    });
+
+                    return { datasets: datasets, labels: filteredLabels };
+                };                
+
+                // Función para generar colores aleatorios (sin cambios)
+                function getRandomColor() {
+                    var letters = '0123456789ABCDEF';
+                    var color = '#';
+                    for (var i = 0; i < 6; i++) {
+                        color += letters[Math.floor(Math.random() * 16)];
+                    }
+                    return color;
+                }
+
+                function createChart(canvasId) {
+                    var ctx = document.getElementById(canvasId).getContext('2d');
+                    var chartData = createDatasets();
+
+                    if (chartData.datasets.length === 0 || chartData.labels.length === 0) {
+                        console.log("No hay datos para mostrar en el gráfico");
+                        return;
+                    }
+
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: chartData.labels,
+                            datasets: chartData.datasets
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    display: true,
+                                    title: { display: true, text: 'Año-Mes' },
+                                    ticks: { autoSkip: true }
+                                },
+                                y: {
+                                    display: true,
+                                    title: { display: true, text: 'Cantidad de Tickets' },
+                                    ticks: { beginAtZero: true },
+                                },
+                            },
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Tickets por Año, Mes y Aplica'
+                                },
+                                datalabels: {
+                                    display: true,
+                                    align: 'center',
+                                    anchor: 'center',
+                                    color: '#000',
+                                    font: {
+                                        weight: 'bold'
+                                    },
+                                    formatter: function (value, context) {
+                                        return value > 0 ? value : '';
+                                    }
+                                },
+                                legend: {
+                                    position: 'top',
+                                }
+                            },
+                            layout: {
+                                padding: {
+                                    top: 20
+                                }
+                            },
+                            barPercentage: 0.8,
+                            categoryPercentage: 0.9
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+                }
+
+                createChart('ticketPorAplicaBarrasChartMes');
+
+                if ($scope.infoTicketsPorAplicaAnno && $scope.infoTicketsPorAplicaAnno.length > 0) {
+                    $scope.ticketPorAplicaBarrasChartAnno = createChart('ticketPorAplicaBarrasChartAnno');
+                } else {
+                    console.log('No hay datos para crear el gráfico de años');
+                }
+
+                if ($scope.infoTicketsPorAplicaMes && $scope.infoTicketsPorAplicaMes.length > 0) {
+                    $scope.ticketPorAplicaBarrasChartMes = createChart('ticketPorAplicaBarrasChartMes');
+                } else {
+                    console.log('No hay datos para crear el gráfico de meses');
+                }
+
+                $scope.mostrarGraficoTicketsAplica = true;
+            } else {
+                console.log("errorrrrrr "+ data);
+            }
+        });
+    };
+
+    
+
 
     function getRandomColor() {
         var letters = '0123456789ABCDEF';

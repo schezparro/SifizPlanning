@@ -836,9 +836,233 @@
 
     <div role="tabpanel" class="tab-pane" id="tab3">
 
+        <br />
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <form class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="fecha-inicio-etapa" class="col-sm-1 control-label">ANOS</label>
+                                    <div class="col-sm-4">
+                                        <div class="input-group date">
+                                            <select ng-class="'form-control'" id="select-annos-indicadores-tickets" multiple="multiple" ng-model="annosIndicadoresGenerales">
+                                                <option value="2020">2020</option>
+                                                <option value="2021">2021</option>
+                                                <option value="2022">2022</option>
+                                                <option value="2023">2023</option>
+                                                <option value="2024">2024</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <label for="fecha-inicio-etapa" class="col-sm-1 control-label">MESES</label>
+                                    <div class="col-sm-4">
+                                        <div class="input-group date">
+                                            <select ng-class="'form-control'" id="select-meses-indicadores-tickets" multiple="multiple" ng-model="mesesIndicadoresGenerales">
+                                                <option value="01">Enero</option>
+                                                <option value="02">Febrero</option>
+                                                <option value="03">Marzo</option>
+                                                <option value="04">Abril</option>
+                                                <option value="05">Mayo</option>
+                                                <option value="06">Junio</option>
+                                                <option value="07">Julio</option>
+                                                <option value="08">Agosto</option>
+                                                <option value="09">Septiembre</option>
+                                                <option value="10">Octubre</option>
+                                                <option value="11">Noviembre</option>
+                                                <option value="12">Diciembre</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <button id="buscar-indicadoresGenerales-btn" class="btn btn-primary" ng-click="buscarDatosIndicadoresGenerales()">Buscar datos</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="container-fluid">
+            <div style="max-height: calc(100vh - 200px); overflow-y: auto;">
+                <div class="row" ng-show="mostrarPanelGraficosIndicadoresGenerales">
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <img src="~/Web/images/s_logo.png" class="img-responsive center-block" alt="Logo" />
+                                    </div>
+                                    <div class="col-md-9 text-center">
+                                        <h3>INFORME DE TICKETS</h3>
+                                        <h5>REPORTE DE INDICADORES GENERALES</h5>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <table class="table table-bordered">
+                                            <tr>
+                                                <td><strong>Fecha de Reporte:</strong></td>
+                                                <td>{{formattedDate}}</td>
+                                                <td rowspan="2" class="small" style="vertical-align: top; background-color: #e6f2ff; width: 400px;">
+                                                    <strong>Objetivo del informe:</strong><br>
+                                                    1. Dar a conocer el estado global de los tickets, como resultado de la gestión semanal.<br>
+                                                    2. Identificar datos de desempeño relevantes.
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Realizado por:</strong></td>
+                                                <td>@User.Identity.Name</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @*TICKETS POR APLICA *@
+
+
+                    <div ng-show="mostrarPanelGraficosPorMeses">
+
+                        @*Tickets por aplica*@
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-xs-12" style="text-align:center;">
+                                    <label for="select-cliente-proyecto">TICKETS APLICADOS A:</label>
+                                </div>
+                            </div>
+                            <div ng-show="mostrarGraficoTicketsAplica">
+                                <!-- Por Año -->
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">Tickets por Aplica (Año)</div>
+                                            <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="background-color: #6eb5ff; color: black;">Aplica</th>
+                                                            <th ng-repeat="ano in anosTickets" style="background-color: #6eb5ff; color: black;">{{ano}}</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="(aplica, datos) in ticketsPorAplicaAnno">
+                                                            <td>{{aplica}}</td>
+                                                            <td ng-repeat="ano in anosTickets">{{datos[ano] || 0}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="text-align: center; background-color: #6eb5ff; color: black; font-weight: bold;">Total</td>
+                                                            <td ng-repeat="ano in anosTickets" style="text-align: center; background-color: #6eb5ff; color: black; font-size: 20px;">{{totalesPorAnno[ano] | number:0}}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">Gráfico de Tickets por Aplica (Año)</div>
+                                            <div class="panel-body" style="margin: 0 auto;">
+                                                <canvas id="ticketPorAplicaBarrasChartAnno" style="overflow-x: auto"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Por Mes -->
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">Tickets por Aplica (Mes)</div>
+                                            <div class="panel-body" style="max-height: 500px; overflow-x: auto;">
+                                                <table style="border-collapse: collapse; width: 100%;">
+                                                    <thead style="background-color: #ffcc99; color: black;">
+                                                        <tr>
+                                                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99; ">Aplica</th>
+                                                            <th ng-repeat="ano in anosTickets" style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #ffcc99; font-weight: bold; ">{{ano}}</th>
+                                                        </tr>
+                                                        <tr>
+                                                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99; "></th>
+                                                            <th ng-repeat="ano in anosTickets" style="border: 1px solid #ddd; padding: 0;">
+                                                                <table style="width: 100%; border-collapse: collapse;">
+                                                                    <tr>
+                                                                        <th ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: center; font-weight: normal;">{{mes}}</th>
+                                                                    </tr>
+                                                                </table>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="aplica in aplicasList">
+                                                            <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">{{aplica}}</td>
+                                                            <td ng-repeat="ano in anosTickets" style="border: 1px solid #ddd; padding: 0;">
+                                                                <table style="width: 100%; border-collapse: collapse;">
+                                                                    <tr>
+                                                                        <td ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: center;">
+                                                                            {{getCantidad(aplica, ano, mes)}}
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                        <!-- Nueva fila para los totales -->
+                                                        <tr style="background-color: #ffcc99; color: black;">
+                                                            <td style="border: 1px solid #ddd; padding: 8px; text-align: left; font-weight: bold;">Total</td>
+                                                            <td ng-repeat="ano in anosTickets" style="border: 1px solid #ddd; padding: 0;">
+                                                                <table style="width: 100%; border-collapse: collapse;">
+                                                                    <tr>
+                                                                        <td ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: center; font-weight: bold;">
+                                                                            {{calcularTotal(ano, mes)}}
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">Gráfico de Tickets por Aplica (Mes)</div>
+                                            <div class="panel-body" style="margin: 0 auto;">
+                                                <canvas id="ticketPorAplicaBarrasChartMes" style="overflow-x: auto"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12 text-center">
+                                    <p id="mensajeLabel">{{mensajeNoDataTicketsAplica}}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
+                            <br />
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
     </div>
 
 </div>
 
 <script type="text/javascript" src="~/Web/js/chart.js"></script>
 <script type="text/javascript" src="~/Web/js/chartjs-plugin-datalabels.js"></script>
+<script type="text/javascript" src="~/Web/js/select2.min.js"></script>
+<link href="~/Web/css/select2.min.css" rel="stylesheet" />
