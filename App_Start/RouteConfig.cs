@@ -2201,6 +2201,17 @@ namespace SifizPlanning
 
             //------------------ RUTAS DEL MODULO DE INDICADORES -------------------
             routes.MapRoute(
+                name: "DarTicketsPorGarantiaIndicadoresGenerales",
+                url: "indicadores/dar-tickets-garantia-indicadores-generales/{id}",
+                defaults: new { controller = "Indicadores", action = "DarTicketsPorGarantiaIndicadoresGenerales", id = UrlParameter.Optional }
+            );
+            routes.MapRoute(
+                name: "DarTicketsPorEstadosIndicadoresGenerales",
+                url: "indicadores/dar-tickets-estados-indicadores-generales/{id}",
+                defaults: new { controller = "Indicadores", action = "DarTicketsPorEstadosIndicadoresGenerales", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "DarTicketsPorAplicaIndicadoresGenerales",
                 url: "indicadores/dar-tickets-aplica-indicadores-generales/{id}",
                 defaults: new { controller = "Indicadores", action = "DarTicketsPorAplicaIndicadoresGenerales", id = UrlParameter.Optional }

@@ -938,7 +938,8 @@ namespace SifizPlanning.Controllers
                 // Filtrar los resultados en memoria para asegurar la correspondencia año-mes
                 ticketsList = ticketsList.Where(t =>
                     annosInt.Contains(t.AnnoFechaIngreso) &&
-                    mesesInt.Contains(t.MesFechaIngreso)
+                    mesesInt.Contains(t.MesFechaIngreso) &&
+                    t.Aplica != null
                 ).ToList();
 
                 // Agrupar por año y AplicaA
@@ -991,6 +992,212 @@ namespace SifizPlanning.Controllers
                 return Json(resp);
             }
         }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public ActionResult DarTicketsPorEstadosIndicadoresGenerales(List<string> annos, List<string> meses)
+        {
+            try
+            {
+                var annosInt = new List<int>();
+                var mesesInt = new List<int>();
+
+                if (annos == null || !annos.Any())
+                {
+                    annosInt.Add(2024);
+                }
+                else
+                {
+                    annosInt = annos.Select(int.Parse).ToList();
+                }
+
+                if (meses == null || !meses.Any())
+                {
+                    mesesInt = Enumerable.Range(1, 12).ToList();
+                }
+                else
+                {
+                    mesesInt = meses.Select(int.Parse).ToList();
+                }
+
+                // Consulta base
+                var ticketsQuery = db.InfoTickets.Where(t => t.FechaIngreso != null).Select(t => new
+                {
+                    AnnoFechaIngreso = t.FechaIngreso.Value.Year,
+                    MesFechaIngreso = t.FechaIngreso.Value.Month,
+                    Estado = t.Estado
+                });
+
+                // Filtrar por años y meses seleccionados
+                ticketsQuery = ticketsQuery.Where(t =>
+                    annosInt.Contains(t.AnnoFechaIngreso) &&
+                    mesesInt.Contains(t.MesFechaIngreso)
+                );
+
+                // Ejecutar la consulta
+                var ticketsList = ticketsQuery.ToList();
+
+                // Filtrar los resultados en memoria para asegurar la correspondencia año-mes
+                ticketsList = ticketsList.Where(t =>
+                    annosInt.Contains(t.AnnoFechaIngreso) &&
+                    mesesInt.Contains(t.MesFechaIngreso) &&
+                    t.Estado != null
+                ).ToList();
+
+                // Agrupar por año y AplicaA
+                var ticketsPorAnnoEstados = ticketsList
+                    .GroupBy(t => new { Anno = t.AnnoFechaIngreso, t.Estado })
+                    .Select(g => new
+                    {
+                        Anno = g.Key.Anno,
+                        Estado = g.Key.Estado,
+                        Cantidad = g.Count()
+                    })
+                    .OrderBy(x => x.Anno)
+                    .ThenBy(x => x.Estado)
+                    .ToList();
+
+                // Agrupar por año, mes y AplicaA
+                var ticketsPorAnnoMesEstados = ticketsList
+                    .GroupBy(t => new
+                    {
+                        Anno = t.AnnoFechaIngreso,
+                        Mes = t.MesFechaIngreso,
+                        t.Estado
+                    })
+                    .Select(g => new
+                    {
+                        Anno = g.Key.Anno,
+                        Mes = g.Key.Mes,
+                        Estado = g.Key.Estado,
+                        Cantidad = g.Count()
+                    })
+                    .OrderBy(x => x.Anno)
+                    .ThenBy(x => x.Mes)
+                    .ThenBy(x => x.Estado)
+                    .ToList();
+
+                return Json(new
+                {
+                    success = true,
+                    ticketsPorAnnoEstados = ticketsPorAnnoEstados,
+                    ticketsPorAnnoMesEstados = ticketsPorAnnoMesEstados
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public ActionResult DarTicketsPorgarantiaIndicadoresGenerales(List<string> annos, List<string> meses)
+        {
+            try
+            {
+                var annosInt = new List<int>();
+                var mesesInt = new List<int>();
+
+                if (annos == null || !annos.Any())
+                {
+                    annosInt.Add(2024);
+                }
+                else
+                {
+                    annosInt = annos.Select(int.Parse).ToList();
+                }
+
+                if (meses == null || !meses.Any())
+                {
+                    mesesInt = Enumerable.Range(1, 12).ToList();
+                }
+                else
+                {
+                    mesesInt = meses.Select(int.Parse).ToList();
+                }
+
+                // Consulta base
+                var ticketsQuery = db.InfoTickets.Where(t => t.FechaIngreso != null && t.Tipo == "GARANTÍA TÉCNICA").Select(t => new
+                {
+                    AnnoFechaIngreso = t.FechaIngreso.Value.Year,
+                    MesFechaIngreso = t.FechaIngreso.Value.Month,
+                    Cliente = t.Cliente,
+                });
+
+                // Filtrar por años y meses seleccionados
+                ticketsQuery = ticketsQuery.Where(t =>
+                    annosInt.Contains(t.AnnoFechaIngreso) &&
+                    mesesInt.Contains(t.MesFechaIngreso)
+                );
+
+                // Ejecutar la consulta
+                var ticketsList = ticketsQuery.ToList();
+
+                // Filtrar los resultados en memoria para asegurar la correspondencia año-mes
+                ticketsList = ticketsList.Where(t =>
+                    annosInt.Contains(t.AnnoFechaIngreso) &&
+                    mesesInt.Contains(t.MesFechaIngreso) &&
+                    t.Cliente != null
+                ).ToList();
+
+                // Agrupar por año y AplicaA
+                var ticketsPorAnnoGarantia = ticketsList
+                    .GroupBy(t => new { Anno = t.AnnoFechaIngreso, t.Cliente })
+                    .Select(g => new
+                    {
+                        Anno = g.Key.Anno,
+                        Cliente = g.Key.Cliente,
+                        Cantidad = g.Count()
+                    })
+                    .OrderBy(x => x.Anno)
+                    .ThenBy(x => x.Cliente)
+                    .ToList();
+
+                // Agrupar por año, mes y AplicaA
+                var ticketsPorAnnoMesGarantia = ticketsList
+                    .GroupBy(t => new
+                    {
+                        Anno = t.AnnoFechaIngreso,
+                        Mes = t.MesFechaIngreso,
+                        t.Cliente
+                    })
+                    .Select(g => new
+                    {
+                        Anno = g.Key.Anno,
+                        Mes = g.Key.Mes,
+                        Cliente = g.Key.Cliente,
+                        Cantidad = g.Count()
+                    })
+                    .OrderBy(x => x.Anno)
+                    .ThenBy(x => x.Mes)
+                    .ThenBy(x => x.Cliente)
+                    .ToList();
+
+                return Json(new
+                {
+                    success = true,
+                    ticketsPorAnnoGarantia = ticketsPorAnnoGarantia,
+                    ticketsPorAnnoMesGarantia = ticketsPorAnnoMesGarantia
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]

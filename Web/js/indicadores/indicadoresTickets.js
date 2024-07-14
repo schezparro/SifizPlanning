@@ -1280,12 +1280,29 @@
             $scope.ticketPorAplicaBarrasChartMes.destroy();
         }
 
+        if ($scope.ticketPorEstadosBarrasChartAnno) {
+            $scope.ticketPorEstadosBarrasChartAnno.destroy();
+        }
+        if ($scope.ticketPorEstadosBarrasChartMes) {
+            $scope.ticketPorEstadosBarrasChartMes.destroy();
+        }
+
+        if ($scope.ticketPorGarantiaBarrasChartAnno) {
+            $scope.ticketPorGarantiaBarrasChartAnno.destroy();
+        }
+        if ($scope.ticketPorGarantiaBarrasChartMes) {
+            $scope.ticketPorGarantiaBarrasChartMes.destroy();
+        }
+
         $scope.mostrarPanelGraficosIndicadoresGenerales = true;
 
         $scope.TicketsAplicaIndicadoresGenerales();
+        $scope.TicketsEstadosIndicadoresGenerales();
+        $scope.TicketsGarantiaIndicadoresGenerales();
 
     };
 
+    ////// Aplica
     $scope.TicketsAplicaIndicadoresGenerales = function () {
         if ($scope.ticketPorAplicaBarrasChartAnno) {
             $scope.ticketPorAplicaBarrasChartAnno.destroy();
@@ -1384,6 +1401,8 @@
                         $scope.mesesTickets.sort((a, b) => a - b);
                         $scope.aplicasList.sort();
 
+                        console.log($scope.mesesTickets);
+
                         $scope.getCantidadAnnos = function (aplica, ano) {
                             return ($scope.ticketsPorAplicaAnno[aplica] &&
                                 $scope.ticketsPorAplicaAnno[aplica][ano]) || 0;
@@ -1408,7 +1427,7 @@
                         };
 
                         function getMesByNumero(mesNumero) {
-                            var meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octtubre', 'Noviembre', 'Diciembre'];
+                            var meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
                             return meses[mesNumero - 1] || '';
                         };
 
@@ -1450,7 +1469,7 @@
                                 $scope.anosTickets.forEach(function (ano) {
 
                                     var cantidad = $scope.getCantidadAnnos(aplica, ano);
-                                    if (cantidad > 0 || !isYearEmpty(ano, mes)) {
+                                    if (cantidad > 0 || !isYearEmpty(ano)) {
                                         data.push(cantidad);
                                         if (!filteredLabels.includes(ano)) {
                                             filteredLabels.push(ano);
@@ -1528,13 +1547,12 @@
                                 scales: {
                                     x: {
                                         display: true,
-                                        title: { display: true, text: 'Año' },
-                                        ticks: { autoSkip: true }
+                                        title: { display: true, text: 'Cantidad de Tickets' },
+                                        ticks: { beginAtZero: true },
                                     },
                                     y: {
                                         display: true,
-                                        title: { display: true, text: 'Cantidad de Tickets' },
-                                        ticks: { beginAtZero: true },
+                                        title: { display: true, text: 'Año' },
                                     },
                                 },
                                 plugins: {
@@ -1546,6 +1564,8 @@
                                         display: true,
                                         align: 'center',
                                         anchor: 'center',
+                                        backgroundColor: '#D3D3D3',
+                                        borderRadius: 3,
                                         color: '#000',
                                         font: {
                                             weight: 'bold'
@@ -1578,18 +1598,18 @@
                                 datasets: chartDataMes.datasets
                             },
                             options: {
+                                //indexAxis: 'y',
                                 responsive: true,
                                 maintainAspectRatio: false,
                                 scales: {
                                     x: {
                                         display: true,
                                         title: { display: true, text: 'Año - Meses' },
-                                        ticks: { autoSkip: true }
+                                        ticks: { beginAtZero: true }
                                     },
                                     y: {
                                         display: true,
                                         title: { display: true, text: 'Cantidad de Tickets' },
-                                        ticks: { beginAtZero: true },
                                     },
                                 },
                                 plugins: {
@@ -1601,6 +1621,8 @@
                                         display: true,
                                         align: 'center',
                                         anchor: 'center',
+                                        backgroundColor: '#D3D3D3',
+                                        borderRadius: 3,
                                         color: '#000',
                                         font: {
                                             weight: 'bold'
@@ -1627,6 +1649,720 @@
                         $scope.mostrarGraficoTicketsAplica = true;
                     };
                 };
+            } else {
+                console.log("errorrrrrr " + data);
+            }
+        });
+    };
+
+    ////// Estados
+    $scope.TicketsEstadosIndicadoresGenerales = function () {
+        if ($scope.ticketPorEstadosBarrasChartAnno) {
+            $scope.ticketPorEstadosBarrasChartAnno.destroy();
+        }
+        if ($scope.ticketPorEstadosBarrasChartMes) {
+            $scope.ticketPorEstadosBarrasChartMes.destroy();
+        }
+
+        $scope.mostrarPanelGraficosPorMesesYAnnosEstados = true;
+
+        var infoTicketsPorEstados = $http.post("indicadores/dar-tickets-estados-indicadores-generales/", {
+            annos: $scope.annosIndicadoresGenerales,
+            meses: $scope.mesesIndicadoresGenerales
+        });
+
+        infoTicketsPorEstados.success(function (data) {
+            $scope.loading.hide();
+            if (data.success) {
+
+                if (data.ticketsPorAnnoEstados.length === 0 && data.ticketsPorAnnoMesEstados.length === 0) {
+                    $scope.mostrarPanelGraficosTicketsEstados = false;
+                    $scope.mensajeNoDataTicketsEstados = 'No existen datos disponibles';
+
+                } else if (data.ticketsPorAnnoEstados.length !== 0 || data.ticketsPorAnnoMesEstados.length !== 0) {
+                    $scope.mostrarPanelGraficosTicketsEstados = true;
+
+                    if (data.ticketsPorAnnoEstados.length > 0) {
+                        $scope.infoTicketsPorEstadosAnno = data.ticketsPorAnnoEstados;
+                        $scope.mostrarGraficoTicketsEstadosAnno = true;
+
+                        // Formatear datos para la tabla por año
+                        var ticketsPorAnnoEstados = {};
+                        var anos = [];
+                        data.ticketsPorAnnoEstados.forEach(function (ticket) {
+                            if (!ticketsPorAnnoEstados[ticket.Estado]) {
+                                ticketsPorAnnoEstados[ticket.Estado] = {};
+                            }
+                            ticketsPorAnnoEstados[ticket.Estado][ticket.Anno] = ticket.Cantidad;
+                            if (!anos.includes(ticket.Anno)) {
+                                anos.push(ticket.Anno);
+                            }
+                        });
+                    };
+
+                    if (data.ticketsPorAnnoMesEstados.length > 0) {
+                        $scope.infoTicketsPorEstadosMes = data.ticketsPorAnnoMesEstados;
+                        $scope.mostrarGraficoTicketsEstadosMeses = true;
+
+                        // Procesamiento de datos
+                        var ticketsPorEstadosAnnoMes = {};
+                        var anos = [];
+                        var meses = [];
+                        var anoActual = new Date().getFullYear();
+
+                        if (data && data.ticketsPorAnnoMesEstados && Array.isArray(data.ticketsPorAnnoMesEstados)) {
+                            $scope.anosTicketsEstados = [];
+                            $scope.mesesTicketsEstados = [];
+                            $scope.estadosList = [];
+                            $scope.ticketsPorEstadosAnnoMes = {};
+                            data.ticketsPorAnnoMesEstados.forEach(function (ticket) {
+                                if (!ticketsPorEstadosAnnoMes[ticket.Estado]) {
+                                    ticketsPorEstadosAnnoMes[ticket.Estado] = {};
+                                }
+                                if (!ticketsPorEstadosAnnoMes[ticket.Estado][ticket.Anno]) {
+                                    ticketsPorEstadosAnnoMes[ticket.Estado][ticket.Anno] = {};
+                                }
+                                ticketsPorEstadosAnnoMes[ticket.Estado][ticket.Anno][ticket.Mes] = ticket.Cantidad;
+
+                                if (!anos.includes(ticket.Anno)) {
+                                    anos.push(ticket.Anno);
+                                }
+                                if (!meses.includes(ticket.Mes)) {
+                                    meses.push(ticket.Mes);
+                                }
+
+                                if (!$scope.anosTicketsEstados.includes(ticket.Anno)) {
+                                    $scope.anosTicketsEstados.push(ticket.Anno);
+                                }
+                                if (!$scope.mesesTicketsEstados.includes(ticket.Mes)) {
+                                    $scope.mesesTicketsEstados.push(ticket.Mes);
+                                }
+                                if (!$scope.estadosList.includes(ticket.Estado)) {
+                                    $scope.estadosList.push(ticket.Estado);
+                                }
+
+                                if (!$scope.ticketsPorEstadosAnnoMes[ticket.Estado]) {
+                                    $scope.ticketsPorEstadosAnnoMes[ticket.Estado] = {};
+                                }
+                                if (!$scope.ticketsPorEstadosAnnoMes[ticket.Estado][ticket.Anno]) {
+                                    $scope.ticketsPorEstadosAnnoMes[ticket.Estado][ticket.Anno] = {};
+                                }
+                                $scope.ticketsPorEstadosAnnoMes[ticket.Estado][ticket.Anno][ticket.Mes] = ticket.Cantidad;
+
+                            });
+                        };
+
+                        $scope.anosTicketsEstados.sort((a, b) => a - b);
+                        $scope.mesesTicketsEstados.sort((a, b) => a - b);
+                        $scope.estadosList.sort();
+
+                        $scope.getCantidadAnnosEstados = function (estado, ano) {
+                            return ($scope.ticketsPorEstadosAnno[estado] &&
+                                $scope.ticketsPorEstadosAnno[estado][ano]) || 0;
+                        };
+
+                        $scope.getCantidadEstados = function (estado, ano, mes) {
+                            return ($scope.ticketsPorEstadosAnnoMes[estado] &&
+                                $scope.ticketsPorEstadosAnnoMes[estado][ano] &&
+                                $scope.ticketsPorEstadosAnnoMes[estado][ano][mes]) || 0;
+                        };
+
+                        function isMonthEmpty(ano, mes) {
+                            return $scope.estadosList.every(function (estado) {
+                                return $scope.getCantidadEstados(estado, ano, mes) === 0;
+                            });
+                        };
+
+                        function isYearEmpty(ano) {
+                            return $scope.estadosList.every(function (estado) {
+                                return $scope.getCantidadEstados(estado, ano) === 0;
+                            });
+                        };
+
+                        $scope.getMesByNumero = function (mesNumero) {
+                            var meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                            return meses[mesNumero - 1] || '';
+                        };
+
+                        $scope.calcularTotal = function (ano, mes) {
+                            var total = 0;
+                            $scope.estadosList.forEach(function (estado) {
+                                total += $scope.getCantidadEstados(estado, ano, mes);
+                            });
+                            return total;
+                        };
+
+                        // Si no se seleccionaron años, usar el año actual
+                        if (anos.length === 0) {
+                            anos.push(anoActual);
+                        }
+
+                        $scope.ticketsPorEstadosAnnoMes = ticketsPorEstadosAnnoMes;
+                        $scope.anosTicketsEstados = anos.sort();
+                        $scope.mesesTicketsEstados = meses.sort();
+
+                        $scope.ticketsPorEstadosAnno = ticketsPorAnnoEstados;
+                        $scope.anosTickets = anos.sort();
+
+                        // Calcular totales por año
+                        $scope.totalesPorAnno = {};
+                        anos.forEach(function (ano) {
+                            $scope.totalesPorAnno[ano] = Object.values(ticketsPorAnnoEstados).reduce(function (total, estado) {
+                                return total + (estado[ano] || 0);
+                            }, 0);
+                        });
+
+                        // Función para crear datasets
+                        function createDatasetsAnno() {
+                            var filteredLabels = [];
+                            var datasets = [];
+
+                            $scope.estadosList.forEach(function (estado) {
+                                var data = [];
+                                $scope.anosTicketsEstados.forEach(function (ano) {
+
+                                    var cantidad = $scope.getCantidadAnnosEstados(estado, ano);
+                                    if (cantidad > 0 || !isYearEmpty(ano)) {
+                                        data.push(cantidad);
+                                        if (!filteredLabels.includes(ano)) {
+                                            filteredLabels.push(ano);
+                                        }
+                                    }
+                                });
+
+                                if (data.length > 0) {
+                                    datasets.push({
+                                        label: estado,
+                                        data: data,
+                                        backgroundColor: getRandomColor(),
+                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                        borderWidth: 1
+                                    });
+                                }
+                            });
+
+                            return { datasets: datasets, labels: filteredLabels };
+                        };
+
+                        function createDatasetsMeses() {
+                            var filteredLabels = [];
+                            var datasets = [];
+
+                            $scope.estadosList.forEach(function (estado) {
+                                var data = [];
+                                $scope.anosTicketsEstados.forEach(function (ano) {
+                                    $scope.mesesTicketsEstados.forEach(function (mes) {
+                                        var cantidad = $scope.getCantidadEstados(estado, ano, mes);
+                                        if (cantidad > 0 || !isMonthEmpty(ano, mes)) {
+                                            data.push(cantidad);
+                                            if (!filteredLabels.includes(ano + '-' + $scope.getMesByNumero(mes))) {
+                                                filteredLabels.push(ano + '-' + $scope.getMesByNumero(mes));
+                                            }
+                                        }
+                                    });
+                                });
+
+                                if (data.length > 0) {
+                                    datasets.push({
+                                        label: estado,
+                                        data: data,
+                                        backgroundColor: getRandomColor(),
+                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                        borderWidth: 1
+                                    });
+                                }
+                            });
+
+                            return { datasets: datasets, labels: filteredLabels };
+                        };
+
+                        // Función para generar colores aleatorios (sin cambios)
+                        function getRandomColor() {
+                            var letters = '0123456789ABCDEF';
+                            var color = '#';
+                            for (var i = 0; i < 6; i++) {
+                                color += letters[Math.floor(Math.random() * 16)];
+                            }
+                            return color;
+                        };
+
+                        var chartDataAnnoEstados = createDatasetsAnno();
+                        var ctxAnnoEstados = document.getElementById('ticketPorEstadosBarrasChartAnno').getContext('2d');
+                        $scope.ticketPorEstadosBarrasChartAnno = new Chart(ctxAnnoEstados, {
+                            type: 'bar',
+                            data: {
+                                labels: chartDataAnnoEstados.labels,
+                                datasets: chartDataAnnoEstados.datasets
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    x: {
+                                        display: true,
+                                        title: { display: true, text: 'Cantidad de Tickets' },
+                                        ticks: { beginAtZero: true },
+                                    },
+                                    y: {
+                                        type: 'logarithmic',
+                                        display: true,
+                                        title: { display: true, text: 'Año' },
+                                    },
+                                },
+                                plugins: {
+                                    title: {
+                                        display: true,
+                                        text: 'Tickets por Año y Estados'
+                                    },
+                                    datalabels: {
+                                        display: true,
+                                        align: 'center',
+                                        anchor: 'center',
+                                        backgroundColor: '#D3D3D3',
+                                        borderRadius: 3,
+                                        color: '#000',
+                                        font: {
+                                            weight: 'bold'
+                                        },
+                                        formatter: function (value, context) {
+                                            return value > 0 ? value : '';
+                                        }
+                                    },
+                                    legend: {
+                                        position: 'top',
+                                    }
+                                },
+                                layout: {
+                                    padding: {
+                                        top: 20
+                                    }
+                                },
+                                barPercentage: 0.8,
+                                categoryPercentage: 0.9
+                            },
+                            plugins: [ChartDataLabels]
+                        });
+
+                        var chartDataMesEstados = createDatasetsMeses();
+                        var ctxMesEstados = document.getElementById('ticketPorEstadosBarrasChartMes').getContext('2d');
+                        $scope.ticketPorAplicaBarrasChartMes = new Chart(ctxMesEstados, {
+                            type: 'bar',
+                            data: {
+                                labels: chartDataMesEstados.labels,
+                                datasets: chartDataMesEstados.datasets
+                            },
+                            options: {
+                                //indexAxis: 'y',
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    x: {
+                                        display: true,
+                                        title: { display: true, text: 'Año - Meses' },
+                                        ticks: { beginAtZero: true }
+                                    },
+                                    y: {
+                                        type: 'logarithmic',
+                                        display: true,
+                                        title: { display: true, text: 'Cantidad de Tickets' },
+                                    },
+                                },
+                                plugins: {
+                                    title: {
+                                        display: true,
+                                        text: 'Tickets por Año y Estados'
+                                    },
+                                    datalabels: {
+                                        display: true,
+                                        align: 'center',
+                                        anchor: 'center',
+                                        backgroundColor: '#D3D3D3',
+                                        borderRadius: 3,
+                                        color: '#000',
+                                        font: {
+                                            weight: 'bold'
+                                        },
+                                        formatter: function (value, context) {
+                                            return value > 0 ? value : '';
+                                        }
+                                    },
+                                    legend: {
+                                        position: 'top',
+                                    }
+                                },
+                                layout: {
+                                    padding: {
+                                        top: 20
+                                    }
+                                },
+                                barPercentage: 0.8,
+                                categoryPercentage: 0.9
+                            },
+                            plugins: [ChartDataLabels]
+                        });
+
+                       
+                    };
+                };
+
+                $scope.mostrarPanelGraficosTicketsEstados = true;
+            } else {
+                console.log("errorrrrrr " + data);
+            }
+        });
+    };
+
+    /////////// garantia
+    $scope.TicketsGarantiaIndicadoresGenerales = function () {
+        if ($scope.ticketPorGarantiaBarrasChartAnno) {
+            $scope.ticketPorGarantiaBarrasChartAnno.destroy();
+        }
+        if ($scope.ticketPorGarantiaBarrasChartMes) {
+            $scope.ticketPorGarantiaBarrasChartMes.destroy();
+        }
+
+        $scope.mostrarPanelGraficosPorMesesYAnnosGarantia = true;
+
+        var infoTicketsPorGarantia = $http.post("indicadores/dar-tickets-garantia-indicadores-generales/", {
+            annos: $scope.annosIndicadoresGenerales,
+            meses: $scope.mesesIndicadoresGenerales
+        });
+
+        infoTicketsPorGarantia.success(function (data) {
+            $scope.loading.hide();
+            if (data.success) {
+
+                if (data.ticketsPorAnnoGarantia.length === 0 && data.ticketsPorAnnoMesGarantia.length === 0) {
+                    $scope.mostrarPanelGraficosTicketsGarantia = false;
+                    $scope.mensajeNoDataTicketsGarantia = 'No existen datos disponibles';
+
+                } else if (data.ticketsPorAnnoGarantia.length !== 0 || data.ticketsPorAnnoMesGarantia.length !== 0) {
+                    $scope.mostrarPanelGraficosTicketsGarantia = true;
+
+                    if (data.ticketsPorAnnoGarantia.length > 0) {
+                        $scope.infoTicketsPorGarantiaAnno = data.ticketsPorAnnoGarantia;
+                        $scope.mostrarGraficoTicketsGarantiaAnno = true;
+
+                        // Formatear datos para la tabla por año
+                        var ticketsPorAnnoGarantia = {};
+                        var anos = [];
+                        data.ticketsPorAnnoGarantia.forEach(function (ticket) {
+                            if (!ticketsPorAnnoGarantia[ticket.Cliente]) {
+                                ticketsPorAnnoGarantia[ticket.Cliente] = {};
+                            }
+                            ticketsPorAnnoGarantia[ticket.Cliente][ticket.Anno] = ticket.Cantidad;
+                            if (!anos.includes(ticket.Anno)) {
+                                anos.push(ticket.Anno);
+                            }
+                        });
+                    };
+
+                    if (data.ticketsPorAnnoMesGarantia.length > 0) {
+                        $scope.infoTicketsPorGarantiaMes = data.ticketsPorAnnoMesGarantia;
+                        $scope.mostrarGraficoTicketsGarantiaMeses = true;
+
+                        // Procesamiento de datos
+                        var ticketsPorGarantiaAnnoMes = {};
+                        var anos = [];
+                        var meses = [];
+                        var anoActual = new Date().getFullYear();
+
+                        if (data && data.ticketsPorAnnoMesGarantia && Array.isArray(data.ticketsPorAnnoMesGarantia)) {
+                            $scope.anosTicketsGarantia = [];
+                            $scope.mesesTicketsGarantia = [];
+                            $scope.clientesList = [];
+                            $scope.ticketsPorGarantiaAnnoMes = {};
+                            data.ticketsPorAnnoMesGarantia.forEach(function (ticket) {
+                                if (!ticketsPorGarantiaAnnoMes[ticket.Cliente]) {
+                                    ticketsPorGarantiaAnnoMes[ticket.Cliente] = {};
+                                }
+                                if (!ticketsPorGarantiaAnnoMes[ticket.Cliente][ticket.Anno]) {
+                                    ticketsPorGarantiaAnnoMes[ticket.Cliente][ticket.Anno] = {};
+                                }
+                                ticketsPorGarantiaAnnoMes[ticket.Cliente][ticket.Anno][ticket.Mes] = ticket.Cantidad;
+
+                                if (!anos.includes(ticket.Anno)) {
+                                    anos.push(ticket.Anno);
+                                }
+                                if (!meses.includes(ticket.Mes)) {
+                                    meses.push(ticket.Mes);
+                                }
+
+                                if (!$scope.anosTicketsGarantia.includes(ticket.Anno)) {
+                                    $scope.anosTicketsGarantia.push(ticket.Anno);
+                                }
+                                if (!$scope.mesesTicketsGarantia.includes(ticket.Mes)) {
+                                    $scope.mesesTicketsGarantia.push(ticket.Mes);
+                                }
+                                if (!$scope.clientesList.includes(ticket.Cliente)) {
+                                    $scope.clientesList.push(ticket.Cliente);
+                                }
+
+                                if (!$scope.ticketsPorGarantiaAnnoMes[ticket.Cliente]) {
+                                    $scope.ticketsPorGarantiaAnnoMes[ticket.Cliente] = {};
+                                }
+                                if (!$scope.ticketsPorGarantiaAnnoMes[ticket.Cliente][ticket.Anno]) {
+                                    $scope.ticketsPorGarantiaAnnoMes[ticket.Cliente][ticket.Anno] = {};
+                                }
+                                $scope.ticketsPorGarantiaAnnoMes[ticket.Cliente][ticket.Anno][ticket.Mes] = ticket.Cantidad;
+
+                            });
+                        };
+
+                        $scope.anosTicketsGarantia.sort((a, b) => a - b);
+                        $scope.mesesTicketsGarantia.sort((a, b) => a - b);
+                        $scope.clientesList.sort();
+
+                        $scope.getCantidadAnnosGarantia  = function (cliente, ano) {
+                            return ($scope.ticketsPorGarantiaAnno[cliente] &&
+                                $scope.ticketsPorGarantiaAnno[cliente][ano]) || 0;
+                        };
+
+                        $scope.getCantidadGarantia = function (cliente, ano, mes) {
+                            return ($scope.ticketsPorGarantiaAnnoMes[cliente] &&
+                                $scope.ticketsPorGarantiaAnnoMes[cliente][ano] &&
+                                $scope.ticketsPorGarantiaAnnoMes[cliente][ano][mes]) || 0;
+                        };
+
+                        function isMonthEmpty(ano, mes) {
+                            return $scope.clientesList.every(function (cliente) {
+                                return $scope.getCantidadGarantia(cliente, ano, mes) === 0;
+                            });
+                        };
+
+                        function isYearEmpty(ano) {
+                            return $scope.clientesList.every(function (cliente) {
+                                return $scope.getCantidadGarantia(cliente, ano) === 0;
+                            });
+                        };
+
+                        $scope.getMesByNumero = function (mesNumero) {
+                            var meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                            return meses[mesNumero - 1] || '';
+                        };
+
+                        $scope.calcularTotal = function (ano, mes) {
+                            var total = 0;
+                            $scope.clientesList.forEach(function (clientes) {
+                                total += $scope.getCantidadGarantia(clientes, ano, mes);
+                            });
+                            return total;
+                        };
+
+                        // Si no se seleccionaron años, usar el año actual
+                        if (anos.length === 0) {
+                            anos.push(anoActual);
+                        }
+
+                        $scope.ticketsPorGarantiaAnnoMes = ticketsPorGarantiaAnnoMes;
+                        $scope.anosTicketsGarantia = anos.sort();
+                        $scope.mesesTicketsGarantia = meses.sort();
+
+                        $scope.ticketsPorGarantiaAnno = ticketsPorAnnoGarantia;
+                        $scope.anosTickets = anos.sort();
+
+                        // Calcular totales por año
+                        $scope.totalesPorAnno = {};
+                        anos.forEach(function (ano) {
+                            $scope.totalesPorAnno[ano] = Object.values(ticketsPorAnnoGarantia).reduce(function (total, cliente) {
+                                return total + (cliente[ano] || 0);
+                            }, 0);
+                        });
+
+                        // Función para crear datasets
+                        function createDatasetsAnno() {
+                            var filteredLabels = [];
+                            var datasets = [];
+
+                            $scope.clientesList.forEach(function (cliente) {
+                                var data = [];
+                                $scope.anosTicketsGarantia.forEach(function (ano) {
+
+                                    var cantidad = $scope.getCantidadAnnosGarantia(cliente, ano);
+                                    if (cantidad > 0 || !isYearEmpty(ano)) {
+                                        data.push(cantidad);
+                                        if (!filteredLabels.includes(ano)) {
+                                            filteredLabels.push(ano);
+                                        }
+                                    }
+                                });
+
+                                if (data.length > 0) {
+                                    datasets.push({
+                                        label: cliente,
+                                        data: data,
+                                        backgroundColor: getRandomColor(),
+                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                        borderWidth: 1
+                                    });
+                                }
+                            });
+
+                            return { datasets: datasets, labels: filteredLabels };
+                        };
+
+                        function createDatasetsMeses() {
+                            var filteredLabels = [];
+                            var datasets = [];
+
+                            $scope.clientesList.forEach(function (cliente) {
+                                var data = [];
+                                $scope.anosTicketsGarantia.forEach(function (ano) {
+                                    $scope.mesesTicketsGarantia.forEach(function (mes) {
+                                        var cantidad = $scope.getCantidadGarantia(cliente, ano, mes);
+                                        if (cantidad > 0 || !isMonthEmpty(ano, mes)) {
+                                            data.push(cantidad);
+                                            if (!filteredLabels.includes(ano + '-' + $scope.getMesByNumero(mes))) {
+                                                filteredLabels.push(ano + '-' + $scope.getMesByNumero(mes));
+                                            }
+                                        }
+                                    });
+                                });
+
+                                if (data.length > 0) {
+                                    datasets.push({
+                                        label: cliente,
+                                        data: data,
+                                        backgroundColor: getRandomColor(),
+                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                        borderWidth: 1
+                                    });
+                                }
+                            });
+
+                            return { datasets: datasets, labels: filteredLabels };
+                        };
+
+                        // Función para generar colores aleatorios (sin cambios)
+                        function getRandomColor() {
+                            var letters = '0123456789ABCDEF';
+                            var color = '#';
+                            for (var i = 0; i < 6; i++) {
+                                color += letters[Math.floor(Math.random() * 16)];
+                            }
+                            return color;
+                        };
+
+                        var chartDataAnnoGarantia = createDatasetsAnno();
+                        var ctxAnnoGarantia = document.getElementById('ticketPorGarantiaBarrasChartAnno').getContext('2d');
+                        $scope.ticketPorGarantiaBarrasChartAnno = new Chart(ctxAnnoGarantia, {
+                            type: 'bar',
+                            data: {
+                                labels: chartDataAnnoGarantia.labels,
+                                datasets: chartDataAnnoGarantia.datasets
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    x: {
+                                        display: true,
+                                        title: { display: true, text: 'Cantidad de Tickets' },
+                                        ticks: { beginAtZero: true },
+                                    },
+                                    y: {
+                                        type: 'logarithmic',
+                                        display: true,
+                                        title: { display: true, text: 'Año' },
+                                    },
+                                },
+                                plugins: {
+                                    title: {
+                                        display: true,
+                                        text: 'Tickets por Año y Clientes'
+                                    },
+                                    datalabels: {
+                                        display: true,
+                                        align: 'center',
+                                        anchor: 'center',
+                                        backgroundColor: '#D3D3D3',
+                                        borderRadius: 3,
+                                        color: '#000',
+                                        font: {
+                                            weight: 'bold'
+                                        },
+                                        formatter: function (value, context) {
+                                            return value > 0 ? value : '';
+                                        }
+                                    },
+                                    legend: {
+                                        position: 'top',
+                                    }
+                                },
+                                layout: {
+                                    padding: {
+                                        top: 20
+                                    }
+                                },
+                                barPercentage: 0.8,
+                                categoryPercentage: 0.9
+                            },
+                            plugins: [ChartDataLabels]
+                        });
+
+                        var chartDataMesGarantia = createDatasetsMeses();
+                        var ctxMesGarantia = document.getElementById('ticketPorGarantiaBarrasChartMes').getContext('2d');
+                        $scope.ticketPorGarantiaBarrasChartMes = new Chart(ctxMesGarantia, {
+                            type: 'bar',
+                            data: {
+                                labels: chartDataMesGarantia.labels,
+                                datasets: chartDataMesGarantia.datasets
+                            },
+                            options: {
+                                //indexAxis: 'y',
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    x: {
+                                        display: true,
+                                        title: { display: true, text: 'Año - Meses' },
+                                        ticks: { beginAtZero: true }
+                                    },
+                                    y: {
+                                        type: 'logarithmic',
+                                        display: true,
+                                        title: { display: true, text: 'Cantidad de Tickets' },
+                                    },
+                                },
+                                plugins: {
+                                    title: {
+                                        display: true,
+                                        text: 'Tickets por Año y Clientes'
+                                    },
+                                    datalabels: {
+                                        display: true,
+                                        align: 'center',
+                                        anchor: 'center',
+                                        backgroundColor: '#D3D3D3',
+                                        borderRadius: 3,
+                                        color: '#000',
+                                        font: {
+                                            weight: 'bold'
+                                        },
+                                        formatter: function (value, context) {
+                                            return value > 0 ? value : '';
+                                        }
+                                    },
+                                    legend: {
+                                        position: 'top',
+                                    }
+                                },
+                                layout: {
+                                    padding: {
+                                        top: 20
+                                    }
+                                },
+                                barPercentage: 0.8,
+                                categoryPercentage: 0.9
+                            },
+                            plugins: [ChartDataLabels]
+                        });
+
+
+                    };
+                };
+
+                $scope.mostrarPanelGraficosTicketsGarantia = true;
             } else {
                 console.log("errorrrrrr " + data);
             }
