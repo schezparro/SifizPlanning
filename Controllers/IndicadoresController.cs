@@ -273,271 +273,6 @@ namespace SifizPlanning.Controllers
             }
         }
 
-        //[HttpPost]
-        //[Authorize(Roles = "ADMIN, INDICADORES")]
-        //public ActionResult DarTicketsEnGestion(string fechaInicio, string fechaFin)
-        //{
-        //    try
-        //    {
-        //        // Crear objetos DateTime para almacenar las fechas
-        //        DateTime fInicioTEG = new DateTime();
-        //        DateTime fFinTEG = new DateTime();
-
-        //        // Verificar si fechaInicio es nula o vacía
-        //        if (!string.IsNullOrEmpty(fechaInicio))
-        //        {
-        //            string[] fechas = fechaInicio.Split(new Char[] { '/' });
-        //            int dia = Int32.Parse(fechas[0]);
-        //            int mes = Int32.Parse(fechas[1]);
-        //            int anno = Int32.Parse(fechas[2]);
-        //            fInicioTEG = new DateTime(anno, mes, dia);
-        //        }
-        //        else
-        //        {
-        //            // Si fechaInicio es nula o vacía, tomar el primer día del mes en curso
-        //            fInicioTEG = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-        //        }
-
-        //        // Verificar si fechaFin es nula o vacía
-        //        if (!string.IsNullOrEmpty(fechaFin))
-        //        {
-        //            string[] fechasFin = fechaFin.Split(new Char[] { '/' });
-        //            int dia = Int32.Parse(fechasFin[0]);
-        //            int mes = Int32.Parse(fechasFin[1]);
-        //            int anno = Int32.Parse(fechasFin[2]);
-        //            fFinTEG = new DateTime(anno, mes, dia);
-        //        }
-        //        else
-        //        {
-        //            // Si fechaFin es nula o vacía, tomar el día actual
-        //            fFinTEG = DateTime.Now;
-        //        }
-
-        //        var ticketsQueryTEG = (from ticket in db.InfoTickets
-        //                              where ticket.FechaIngreso != null
-        //                                 && ticket.FechaIngreso.Value >= fInicioTEG
-        //                                 && ticket.FechaIngreso.Value <= fFinTEG
-        //                                 && ticket.Estado != "CERRADO"
-        //                                 && ticket.Estado != "ANULADO"
-        //                              select ticket).ToList();
-
-        //        // Convertir la consulta a una lista para trabajar con ella en memoria
-        //        List<InfoTickets> ticketsListTEG = ticketsQueryTEG.ToList();
-
-        //        var groupedTicketsTEG = ticketsListTEG
-        //            .GroupBy(ticket => CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(
-        //                ticket.FechaIngreso.Value,
-        //                CalendarWeekRule.FirstDay,
-        //                DayOfWeek.Monday))
-        //            .Select(g => new
-        //            {
-        //                Semana = g.Key,
-        //                Cantidad = g.Count(),
-        //                Descripcion = "AL " + g.Max(t => t.FechaIngreso.Value).ToString("dd/MM/yyyy")
-        //            })
-        //            .OrderBy(x => x.Semana)
-        //            .ToList();
-
-        //        var totalCantidades = groupedTicketsTEG.Sum(ticket => ticket.Cantidad);
-
-        //        var resp = new
-        //        {
-        //            success = true,
-        //            infoTickets = groupedTicketsTEG,
-        //            totalCantidades = totalCantidades
-        //        };
-        //        return Json(resp);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        var resp = new
-        //        {
-        //            success = false,
-        //            msg = e.Message
-        //        };
-        //        return Json(resp);
-        //    }
-        //}
-
-        //[HttpPost]
-        //[Authorize(Roles = "ADMIN, INDICADORES")]
-        //public ActionResult DarTicketsPorCategorias(string fechaInicio, string fechaFin)
-        //{
-        //    try
-        //    {
-        //        // Crear objetos DateTime para almacenar las fechas
-        //        DateTime fInicio = new DateTime();
-        //        DateTime fFin = new DateTime();
-
-        //        // Verificar si fechaInicio es nula o vacía
-        //        if (!string.IsNullOrEmpty(fechaInicio))
-        //        {
-        //            string[] fechas = fechaInicio.Split(new Char[] { '/' });
-        //            int dia = Int32.Parse(fechas[0]);
-        //            int mes = Int32.Parse(fechas[1]);
-        //            int anno = Int32.Parse(fechas[2]);
-        //            fInicio = new DateTime(anno, mes, dia);
-        //        }
-        //        else
-        //        {
-        //            // Si fechaInicio es nula o vacía, tomar el primer día del mes en curso
-        //            fInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-        //        }
-
-        //        // Verificar si fechaFin es nula o vacía
-        //        if (!string.IsNullOrEmpty(fechaFin))
-        //        {
-        //            string[] fechasFin = fechaFin.Split(new Char[] { '/' });
-        //            int dia = Int32.Parse(fechasFin[0]);
-        //            int mes = Int32.Parse(fechasFin[1]);
-        //            int anno = Int32.Parse(fechasFin[2]);
-        //            fFin = new DateTime(anno, mes, dia);
-        //        }
-        //        else
-        //        {
-        //            // Si fechaFin es nula o vacía, tomar el día actual
-        //            fFin = DateTime.Now;
-        //        }
-
-        //        var ticketsQueryPC = (from ticket in db.InfoTickets
-        //                           where ticket.FechaIngreso != null
-        //                              && ticket.FechaIngreso.Value >= fInicio
-        //                              && ticket.FechaIngreso.Value <= fFin
-        //                           select ticket).ToList();
-
-        //        // Convertir la consulta a una lista para trabajar con ella en memoria
-        //        List<InfoTickets> ticketsListPC = ticketsQueryPC.ToList();
-
-        //        // Paso 2: Aplicar el cálculo de la semana y otros procesamientos en memoria
-        //        // Agrupar los tickets por semana
-        //        var groupedTickets = ticketsListPC
-        //           .GroupBy(t => t.Tipo) // Agrupa los tickets por Tipo
-        //           .Select(g => new
-        //           {
-        //               Tipo = g.Key, // Obtiene el Tipo como clave del grupo
-        //               Cantidad = g.Count() // Cuenta la cantidad de tickets en cada grupo
-        //           })
-        //           .OrderBy(x => x.Tipo) // Ordena por Tipo (opcional, dependiendo de tus necesidades)
-        //           .ToList();
-
-        //        var totalCantidades = groupedTickets.Sum(ticket => ticket.Cantidad);
-
-        //        var categoriasPorcentajes = groupedTickets.Select(g => new
-        //        {
-        //            Categoria = g.Tipo,
-        //            Cantidad = g.Cantidad,
-        //            Porcentaje = CalcularPorcentage(g.Cantidad, totalCantidades)
-        //        }).ToList();
-
-        //        var resp = new
-        //        {
-        //            success = true,
-        //            infoTickets = categoriasPorcentajes,
-        //            totalCantidades = totalCantidades
-        //        };
-        //        return Json(resp);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        var resp = new
-        //        {
-        //            success = false,
-        //            msg = e.Message
-        //        };
-        //        return Json(resp);
-        //    }
-        //}
-
-        //[HttpPost]
-        //[Authorize(Roles = "ADMIN, INDICADORES")]
-        //public ActionResult DarTicketsPorEstados(string fechaInicio, string fechaFin)
-        //{
-        //    try
-        //    {
-        //        // Crear objetos DateTime para almacenar las fechas
-        //        DateTime fInicio = new DateTime();
-        //        DateTime fFin = new DateTime();
-
-        //        // Verificar si fechaInicio es nula o vacía
-        //        if (!string.IsNullOrEmpty(fechaInicio))
-        //        {
-        //            string[] fechas = fechaInicio.Split(new Char[] { '/' });
-        //            int dia = Int32.Parse(fechas[0]);
-        //            int mes = Int32.Parse(fechas[1]);
-        //            int anno = Int32.Parse(fechas[2]);
-        //            fInicio = new DateTime(anno, mes, dia);
-        //        }
-        //        else
-        //        {
-        //            // Si fechaInicio es nula o vacía, tomar el primer día del mes en curso
-        //            fInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-        //        }
-
-        //        // Verificar si fechaFin es nula o vacía
-        //        if (!string.IsNullOrEmpty(fechaFin))
-        //        {
-        //            string[] fechasFin = fechaFin.Split(new Char[] { '/' });
-        //            int dia = Int32.Parse(fechasFin[0]);
-        //            int mes = Int32.Parse(fechasFin[1]);
-        //            int anno = Int32.Parse(fechasFin[2]);
-        //            fFin = new DateTime(anno, mes, dia);
-        //        }
-        //        else
-        //        {
-        //            // Si fechaFin es nula o vacía, tomar el día actual
-        //            fFin = DateTime.Now;
-        //        }
-
-        //        var ticketsQueryPE = (from ticket in db.InfoTickets
-        //                           where ticket.FechaIngreso != null
-        //                              && ticket.FechaIngreso.Value >= fInicio
-        //                              && ticket.FechaIngreso.Value <= fFin
-        //                           where ticket.Estado != "CERRADO"
-        //                           select ticket).ToList();
-
-        //        // Convertir la consulta a una lista para trabajar con ella en memoria
-        //        List<InfoTickets> ticketsListPE = ticketsQueryPE.ToList();
-
-        //        // Paso 2: Aplicar el cálculo de la semana y otros procesamientos en memoria
-        //        // Agrupar los tickets por semana
-        //        var groupedTickets = ticketsListPE
-        //           .GroupBy(t => t.Estado) // Agrupa los tickets por Tipo
-        //           .Select(g => new
-        //           {
-        //               Estado = g.Key, // Obtiene el Tipo como clave del grupo
-        //               Cantidad = g.Count() // Cuenta la cantidad de tickets en cada grupo
-        //           })
-        //           .OrderBy(x => x.Estado) // Ordena por Tipo (opcional, dependiendo de tus necesidades)
-        //           .ToList();
-
-        //        var totalCantidades = groupedTickets.Sum(ticket => ticket.Cantidad);
-
-        //        var estadosPorcentajes = groupedTickets.Select(g => new
-        //        {
-        //            Estado = g.Estado,
-        //            Cantidad = g.Cantidad,
-        //            Porcentaje = CalcularPorcentage(g.Cantidad, totalCantidades)
-        //        }).ToList();
-
-        //        var resp = new
-        //        {
-        //            success = true,
-        //            infoTickets = estadosPorcentajes,
-        //            totalCantidades = totalCantidades
-        //        };
-        //        return Json(resp);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        var resp = new
-        //        {
-        //            success = false,
-        //            msg = e.Message
-        //        };
-        //        return Json(resp);
-        //    }
-        //}
-
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
         public ActionResult DarTicketsPorAplica(string fechaInicio, string fechaFin)
@@ -857,87 +592,7 @@ namespace SifizPlanning.Controllers
             }
         }
 
-        //[HttpPost]
-        //[Authorize(Roles = "ADMIN, INDICADORES")]
-        //public ActionResult DarTicketsPorClientesPorEstado(string fechaInicio, string fechaFin)
-        //{
-        //    try
-        //    {
-        //        // Crear objetos DateTime para almacenar las fechas
-        //        DateTime fInicio = new DateTime();
-        //        DateTime fFin = new DateTime();
 
-        //        // Verificar si fechaInicio es nula o vacía
-        //        if (!string.IsNullOrEmpty(fechaInicio))
-        //        {
-        //            string[] fechas = fechaInicio.Split(new Char[] { '/' });
-        //            int dia = Int32.Parse(fechas[0]);
-        //            int mes = Int32.Parse(fechas[1]);
-        //            int anno = Int32.Parse(fechas[2]);
-        //            fInicio = new DateTime(anno, mes, dia);
-        //        }
-        //        else
-        //        {
-        //            // Si fechaInicio es nula o vacía, tomar el primer día del mes en curso
-        //            fInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-        //        }
-
-        //        // Verificar si fechaFin es nula o vacía
-        //        if (!string.IsNullOrEmpty(fechaFin))
-        //        {
-        //            string[] fechasFin = fechaFin.Split(new Char[] { '/' });
-        //            int dia = Int32.Parse(fechasFin[0]);
-        //            int mes = Int32.Parse(fechasFin[1]);
-        //            int anno = Int32.Parse(fechasFin[2]);
-        //            fFin = new DateTime(anno, mes, dia);
-        //        }
-        //        else
-        //        {
-        //            // Si fechaFin es nula o vacía, tomar el día actual
-        //            fFin = DateTime.Now;
-        //        }
-
-        //        var ticketsQueryPCE = (from ticket in db.InfoTickets
-        //                           where ticket.FechaIngreso != null
-        //                              && ticket.FechaIngreso.Value >= fInicio
-        //                              && ticket.FechaIngreso.Value <= fFin
-        //                           select ticket).ToList();
-
-        //        // Convertir la consulta a una lista para trabajar con ella en memoria
-        //        List<InfoTickets> ticketsListPCE = ticketsQueryPCE.ToList();
-
-        //        // Paso 2: Aplicar el cálculo de la semana y otros procesamientos en memoria
-        //        // Agrupar los tickets por semana
-        //        var groupedTickets = ticketsListPCE
-        //            .GroupBy(ticket => new { ticket.Cliente, ticket.Estado })
-        //            .Select(group => new
-        //            {
-        //                Cliente = group.Key.Cliente,
-        //                Estado = group.Key.Estado,
-        //                Cantidad = group.Count()
-        //            }).Distinct()
-        //            .ToList();
-
-        //        var totalCantidades = groupedTickets.Sum(ticket => ticket.Cantidad);
-
-        //        var resp = new
-        //        {
-        //            success = true,
-        //            infoTickets = groupedTickets,
-        //            totalCantidades = totalCantidades
-        //        };
-        //        return Json(resp);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        var resp = new
-        //        {
-        //            success = false,
-        //            msg = e.Message
-        //        };
-        //        return Json(resp);
-        //    }
-        //}
         //*******************************************************************************TICKETS AL DIA********************************************************************************
 
         [HttpPost]
@@ -1233,6 +888,346 @@ namespace SifizPlanning.Controllers
                 return Json(resp);
             }
         }
+
+        //******************************************** Indicadores generales *********************************************
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public ActionResult DarTicketsPorAplicaIndicadoresGenerales(List<string> annos, List<string> meses)
+        {
+            try
+            {
+                var annosInt = new List<int>();
+                var mesesInt = new List<int>();
+
+                if (annos == null || !annos.Any())
+                {
+                    annosInt.Add(2024);
+                }
+                else
+                {
+                    annosInt = annos.Select(int.Parse).ToList();
+                }
+
+                if (meses == null || !meses.Any())
+                {
+                    mesesInt = Enumerable.Range(1, 12).ToList();
+                }
+                else
+                {
+                    mesesInt = meses.Select(int.Parse).ToList();
+                }
+
+                // Consulta base
+                var ticketsQuery = db.InfoTickets.Where(t => t.FechaIngreso != null).Select(t => new
+                {
+                    AnnoFechaIngreso = t.FechaIngreso.Value.Year,
+                    MesFechaIngreso = t.FechaIngreso.Value.Month,
+                    Aplica = t.AplicaA
+                });
+
+                // Filtrar por años y meses seleccionados
+                ticketsQuery = ticketsQuery.Where(t =>
+                    annosInt.Contains(t.AnnoFechaIngreso) &&
+                    mesesInt.Contains(t.MesFechaIngreso)
+                );
+
+                // Ejecutar la consulta
+                var ticketsList = ticketsQuery.ToList();
+
+                // Filtrar los resultados en memoria para asegurar la correspondencia año-mes
+                ticketsList = ticketsList.Where(t =>
+                    annosInt.Contains(t.AnnoFechaIngreso) &&
+                    mesesInt.Contains(t.MesFechaIngreso) &&
+                    t.Aplica != null
+                ).ToList();
+
+                // Agrupar por año y AplicaA
+                var ticketsPorAnno = ticketsList
+                    .GroupBy(t => new { Anno = t.AnnoFechaIngreso, t.Aplica })
+                    .Select(g => new
+                    {
+                        Anno = g.Key.Anno,
+                        Aplica = g.Key.Aplica,
+                        Cantidad = g.Count()
+                    })
+                    .OrderBy(x => x.Anno)
+                    .ThenBy(x => x.Aplica)
+                    .ToList();
+
+                // Agrupar por año, mes y AplicaA
+                var ticketsPorAnnoMes = ticketsList
+                    .GroupBy(t => new
+                    {
+                        Anno = t.AnnoFechaIngreso,
+                        Mes = t.MesFechaIngreso,
+                        t.Aplica
+                    })
+                    .Select(g => new
+                    {
+                        Anno = g.Key.Anno,
+                        Mes = g.Key.Mes,
+                        Aplica = g.Key.Aplica,
+                        Cantidad = g.Count()
+                    })
+                    .OrderBy(x => x.Anno)
+                    .ThenBy(x => x.Mes)
+                    .ThenBy(x => x.Aplica)
+                    .ToList();
+
+                return Json(new
+                {
+                    success = true,
+                    ticketsPorAnno = ticketsPorAnno,
+                    ticketsPorAnnoMes = ticketsPorAnnoMes
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public ActionResult DarTicketsPorEstadosIndicadoresGenerales(List<string> annos, List<string> meses)
+        {
+            try
+            {
+                var annosInt = new List<int>();
+                var mesesInt = new List<int>();
+
+                if (annos == null || !annos.Any())
+                {
+                    annosInt.Add(2024);
+                }
+                else
+                {
+                    annosInt = annos.Select(int.Parse).ToList();
+                }
+
+                if (meses == null || !meses.Any())
+                {
+                    mesesInt = Enumerable.Range(1, 12).ToList();
+                }
+                else
+                {
+                    mesesInt = meses.Select(int.Parse).ToList();
+                }
+
+                // Consulta base
+                var ticketsQuery = db.InfoTickets.Where(t => t.FechaIngreso != null).Select(t => new
+                {
+                    AnnoFechaIngreso = t.FechaIngreso.Value.Year,
+                    MesFechaIngreso = t.FechaIngreso.Value.Month,
+                    Estado = t.Estado
+                });
+
+                // Filtrar por años y meses seleccionados
+                ticketsQuery = ticketsQuery.Where(t =>
+                    annosInt.Contains(t.AnnoFechaIngreso) &&
+                    mesesInt.Contains(t.MesFechaIngreso)
+                );
+
+                // Ejecutar la consulta
+                var ticketsList = ticketsQuery.ToList();
+
+                // Filtrar los resultados en memoria para asegurar la correspondencia año-mes
+                ticketsList = ticketsList.Where(t =>
+                    annosInt.Contains(t.AnnoFechaIngreso) &&
+                    mesesInt.Contains(t.MesFechaIngreso) &&
+                    t.Estado != null
+                ).ToList();
+
+                // Agrupar por año y AplicaA
+                var ticketsPorAnnoEstados = ticketsList
+                    .GroupBy(t => new { Anno = t.AnnoFechaIngreso, t.Estado })
+                    .Select(g => new
+                    {
+                        Anno = g.Key.Anno,
+                        Estado = g.Key.Estado,
+                        Cantidad = g.Count()
+                    })
+                    .OrderBy(x => x.Anno)
+                    .ThenBy(x => x.Estado)
+                    .ToList();
+
+                // Agrupar por año, mes y AplicaA
+                var ticketsPorAnnoMesEstados = ticketsList
+                    .GroupBy(t => new
+                    {
+                        Anno = t.AnnoFechaIngreso,
+                        Mes = t.MesFechaIngreso,
+                        t.Estado
+                    })
+                    .Select(g => new
+                    {
+                        Anno = g.Key.Anno,
+                        Mes = g.Key.Mes,
+                        Estado = g.Key.Estado,
+                        Cantidad = g.Count()
+                    })
+                    .OrderBy(x => x.Anno)
+                    .ThenBy(x => x.Mes)
+                    .ThenBy(x => x.Estado)
+                    .ToList();
+
+                return Json(new
+                {
+                    success = true,
+                    ticketsPorAnnoEstados = ticketsPorAnnoEstados,
+                    ticketsPorAnnoMesEstados = ticketsPorAnnoMesEstados
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public ActionResult DarTicketsPorGarantiaIndicadoresGenerales(List<string> annos, List<string> meses)
+        {
+            try
+            {
+                var annosInt = new List<int>();
+                var mesesInt = new List<int>();
+
+                if (annos == null || !annos.Any())
+                {
+                    annosInt.Add(2024);
+                }
+                else
+                {
+                    annosInt = annos.Select(int.Parse).ToList();
+                }
+
+                if (meses == null || !meses.Any())
+                {
+                    mesesInt = Enumerable.Range(1, 12).ToList();
+                }
+                else
+                {
+                    mesesInt = meses.Select(int.Parse).ToList();
+                }
+
+                // Consulta base
+                var ticketsQuery = db.InfoTickets.Where(t => t.FechaIngreso != null && t.Tipo == "GARANTÍA TÉCNICA").Select(t => new
+                {
+                    AnnoFechaIngreso = t.FechaIngreso.Value.Year,
+                    MesFechaIngreso = t.FechaIngreso.Value.Month,
+                    Cliente = t.Cliente,
+                });
+
+                // Filtrar por años y meses seleccionados
+                ticketsQuery = ticketsQuery.Where(t =>
+                    annosInt.Contains(t.AnnoFechaIngreso) &&
+                    mesesInt.Contains(t.MesFechaIngreso)
+                );
+
+                // Ejecutar la consulta
+                var ticketsList = ticketsQuery.ToList();
+
+                // Filtrar los resultados en memoria para asegurar la correspondencia año-mes
+                ticketsList = ticketsList.Where(t =>
+                    annosInt.Contains(t.AnnoFechaIngreso) &&
+                    mesesInt.Contains(t.MesFechaIngreso) &&
+                    t.Cliente != null
+                ).ToList();
+
+                // Agrupar por año y AplicaA
+                var ticketsPorAnnoGarantia = ticketsList
+            .GroupBy(t => new { Anno = t.AnnoFechaIngreso, t.Cliente })
+            .Select(g => new
+            {
+                Anno = g.Key.Anno,
+                Cliente = g.Key.Cliente,
+                Cantidad = g.Count()
+            })
+            .GroupBy(x => x.Anno)
+            .Select(g => new
+            {
+                Anno = g.Key,
+                Clientes = g.OrderByDescending(x => x.Cantidad)
+                               .Take(10)
+                               .Select(x => new
+                               {
+                                   Cliente = x.Cliente,
+                                   Cantidad = x.Cantidad
+                               })
+                               .ToList(),
+                Total = g.Sum(x => x.Cantidad)
+            })
+            .OrderBy(x => x.Anno)
+            .ToList();
+
+                // Agrupar por año, mes y Cliente, y obtener los top 10 por año y mes
+                var ticketsPorAnnoMesGarantia = ticketsList
+                 .GroupBy(t => new
+                 {
+                     Anno = t.AnnoFechaIngreso,
+                     Mes = t.MesFechaIngreso,
+                     t.Cliente
+                 })
+                 .Select(g => new
+                 {
+                     Anno = g.Key.Anno,
+                     Mes = g.Key.Mes,
+                     Cliente = g.Key.Cliente,
+                     Cantidad = g.Count()
+                 })
+                 .GroupBy(x => new { x.Anno, x.Mes })
+                 .Select(g => new
+                 {
+                     Anno = g.Key.Anno,
+                     DatosMes = new
+                     {
+                         Mes = g.Key.Mes,
+                         Clientes = g.OrderByDescending(x => x.Cantidad)
+                                     .Take(10)
+                                     .Select(x => new
+                                     {
+                                         Cliente = x.Cliente,
+                                         Cantidad = x.Cantidad
+                                     })
+                                     .ToList(),
+                         Total = g.Sum(x => x.Cantidad)
+                     }
+                 })
+                 .OrderBy(x => x.Anno)
+                 .ThenBy(x => x.DatosMes.Mes)
+                 .ToList();
+
+                return Json(new
+                {
+                    success = true,
+                    ticketsPorAnnoGarantia = ticketsPorAnnoGarantia,
+                    ticketsPorAnnoMesGarantia = ticketsPorAnnoMesGarantia
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
