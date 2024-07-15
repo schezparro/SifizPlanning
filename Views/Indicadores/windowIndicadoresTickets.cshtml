@@ -845,7 +845,7 @@
                         <div class="panel-body">
                             <form class="form-horizontal">
                                 <div class="form-group">
-                                    <label for="fecha-inicio-etapa" class="col-sm-1 control-label">ANOS</label>
+                                    <label for="fecha-inicio-etapa" class="col-sm-1 control-label">ANIOS</label>
                                     <div class="col-sm-4">
                                         <div class="input-group date">
                                             <select ng-class="'form-control'" id="select-annos-indicadores-tickets" multiple="multiple" ng-model="annosIndicadoresGenerales">
@@ -1079,7 +1079,7 @@
                                                     <table class="table table-bordered">
                                                         <thead>
                                                             <tr>
-                                                                <th style="background-color: #6eb5ff; color: black;">Aplica</th>
+                                                                <th style="background-color: #6eb5ff; color: black;">Estado</th>
                                                                 <th ng-repeat="ano in anosTicketsEstados" style="background-color: #6eb5ff; color: black;">{{ano}}</th>
                                                             </tr>
                                                         </thead>
@@ -1197,36 +1197,33 @@
 
                     <div ng-show="mostrarPanelGraficosPorMesesYAnnosGarantia">
                         <div ng-show="mostrarPanelGraficosTicketsGarantia">
-                            Tickets por grantia
                             <div class="container-fluid">
                                 <div class="row">
                                     <div class="col-xs-12" style="text-align:center;">
-                                        <label for="select-cliente-proyecto">'RANKING DE CLIENTES POR GARANTÍA TÉCNICA'</label>
+                                        <label for="select-cliente-proyecto">RANKING DE CLIENTES POR GARANTÍA TÉCNICA</label>
                                     </div>
                                 </div>
-                                Por annos
                                 <div ng-show="mostrarGraficoTicketsGarantiaAnno">
-                                     Por Año 
-                                    <div class="row">
-                                        <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-6 col-md-offset-3">
+                                    <div ng-repeat="anoData in ticketsPorClientesGarantiaAnno">
+                                        <div class="col-xs-4">
                                             <div class="panel panel-default">
-                                                <div class="panel-heading">Tickets por Estados (Año)</div>
+                                                <div class="panel-heading">Tickets por Garantía (Año {{anoData.Anno}})</div>
                                                 <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
                                                     <table class="table table-bordered">
                                                         <thead>
                                                             <tr>
-                                                                <th style="background-color: #6eb5ff; color: black;">Aplica</th>
-                                                                <th ng-repeat="ano in anosTicketsGarantia" style="background-color: #6eb5ff; color: black;">{{ano}}</th>
+                                                                <th style="background-color: #6eb5ff; color: black;">Clientes</th>
+                                                                <th style="background-color: #6eb5ff; color: black;">Año</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr ng-repeat="(cliente, datos) in ticketsPorClientesGarantiaAnno">
-                                                                <td>{{cliente}}</td>
-                                                                <td ng-repeat="ano in anosTicketsGarantia">{{datos[ano] || 0}}</td>
+                                                            <tr ng-repeat="cliente in anoData.Clientes">
+                                                                <td>{{cliente.Cliente}}</td>
+                                                                <td>{{cliente.Cantidad}}</td>
                                                             </tr>
                                                             <tr>
                                                                 <td style="text-align: center; background-color: #6eb5ff; color: black; font-weight: bold;">Total</td>
-                                                                <td ng-repeat="ano in anosTicketsGarantia" style="text-align: center; background-color: #6eb5ff; color: black; font-size: 20px;">{{totalesPorAnno[ano] | number:0}}</td>
+                                                                <td style="text-align: center; background-color: #6eb5ff; color: black; font-size: 20px;">{{anoData.Total}}</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
@@ -1234,6 +1231,7 @@
                                             </div>
                                         </div>
                                     </div>
+
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="panel panel-default">
@@ -1245,55 +1243,28 @@
                                         </div>
                                     </div>
                                 </div>
-                                 Por Mes 
+
                                 <div ng-show="mostrarGraficoTicketsGarantiaMeses">
-                                    <div class="row">
-                                        <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-6 col-md-offset-3">
+                                    <div ng-repeat="annoData in ticketsPorAnnoMesClientesGarantia">
+                                        <div class="col-xs-4">
                                             <div class="panel panel-default">
-                                                <div class="panel-heading">Tickets por Estados (Mes)</div>
+                                                <div class="panel-heading">Tickets por Estados (Año {{annoData.Anno}}, Mes {{getMesByNumero(annoData.DatosMes.Mes)}})</div>
                                                 <div class="panel-body" style="max-height: 500px; overflow-x: auto;">
                                                     <table style="border-collapse: collapse; width: 100%;">
                                                         <thead style="background-color: #ffcc99; color: black;">
                                                             <tr>
-                                                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99; ">Aplica</th>
-                                                                <th ng-repeat="ano in anosTicketsGarantia" style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #ffcc99; font-weight: bold; ">{{ano}}</th>
-                                                            </tr>
-                                                            <tr>
-                                                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99; "></th>
-                                                                <th ng-repeat="ano in anosTicketsGarantia" style="border: 1px solid #ddd; padding: 0;">
-                                                                    <table style="width: 100%; border-collapse: collapse;">
-                                                                        <tr>
-                                                                            <th ng-repeat="mes in mesesTicketsGarantia" style="border: none; padding: 4px; text-align: center; font-weight: bold;">{{getMesByNumero(mes)}}</th>
-                                                                        </tr>
-                                                                    </table>
-                                                                </th>
+                                                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99;">Cliente</th>
+                                                                <th style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #ffcc99; font-weight: bold;">Cantidad</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr ng-repeat="cliente in clienteList">
-                                                                <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">{{cliente}}</td>
-                                                                <td ng-repeat="ano in anosTicketsGarantia" style="border: 1px solid #ddd; padding: 0;">
-                                                                    <table style="width: 100%; border-collapse: collapse;">
-                                                                        <tr>
-                                                                            <td ng-repeat="mes in mesesTicketsGarantia" style="border: none; padding: 4px; text-align: center;">
-                                                                                {{getCantidadGarantia(cliente, ano, mes)}}
-                                                                            </td>
-                                                                        </tr>
-                                                                    </table>
-                                                                </td>
+                                                            <tr ng-repeat="cliente in annoData.DatosMes.Clientes">
+                                                                <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">{{cliente.Cliente}}</td>
+                                                                <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">{{cliente.Cantidad}}</td>
                                                             </tr>
-                                                             Nueva fila para los totales 
-                                                            <tr style="background-color: #ffcc99; color: black;">
-                                                                <td style="border: 1px solid #ddd; padding: 8px; text-align: left; font-weight: bold;">Total</td>
-                                                                <td ng-repeat="ano in anosTicketsGarantia" style="border: 1px solid #ddd; padding: 0;">
-                                                                    <table style="width: 100%; border-collapse: collapse;">
-                                                                        <tr>
-                                                                            <td ng-repeat="mes in mesesTicketsGarantia" style="border: none; padding: 4px; text-align: center; font-weight: bold;">
-                                                                                {{calcularTotal(ano, mes)}}
-                                                                            </td>
-                                                                        </tr>
-                                                                    </table>
-                                                                </td>
+                                                            <tr>
+                                                                <td style="text-align: center; background-color: #6eb5ff; color: black; font-weight: bold;">Total</td>
+                                                                <td style="text-align: center; background-color: #6eb5ff; color: black; font-size: 20px;">{{annoData.DatosMes.Total}}</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
@@ -1301,37 +1272,39 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="container-fluid">
-                                            <div class="col-md-12">
-                                                <div class="panel panel-default">
-                                                    <div class="panel-heading">Gráfico de Ranking de Clientes por Garantía Técnica (Mes)</div>
-                                                    <div class="panel-body" style="margin: 0 auto;">
-                                                        <canvas id="ticketPorGarantiaBarrasChartMes" style="overflow-x: auto"></canvas>
-                                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="container-fluid">
+                                        <div class="col-md-12">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">Gráfico de Ranking de Clientes por Garantía Técnica (Mes)</div>
+                                                <div class="panel-body" style="margin: 0 auto;">
+                                                    <canvas id="ticketPorGarantiaBarrasChartMes" style="overflow-x: auto"></canvas>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-                        </div>
-                        <div class="row">
-                            <div class="col-xs-12 text-center">
-                                <p id="mensajeLabel">{{mensajeNoDataTicketsEstados}}</p>
-                            </div>
-                        </div>
-                        <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
-                            <br />
                         </div>
 
                     </div>
+                    <div class="row">
+                        <div class="col-xs-12 text-center">
+                            <p id="mensajeLabel">{{mensajeNoDataTicketsEstados}}</p>
+                        </div>
+                    </div>
+                    <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
+                        <br />
+                    </div>
+
                 </div>
             </div>
         </div>
-
     </div>
+
+</div>
 
 </div>
 

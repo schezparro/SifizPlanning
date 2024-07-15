@@ -1098,7 +1098,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
-        public ActionResult DarTicketsPorgarantiaIndicadoresGenerales(List<string> annos, List<string> meses)
+        public ActionResult DarTicketsPorGarantiaIndicadoresGenerales(List<string> annos, List<string> meses)
         {
             try
             {
@@ -1149,36 +1149,66 @@ namespace SifizPlanning.Controllers
 
                 // Agrupar por año y AplicaA
                 var ticketsPorAnnoGarantia = ticketsList
-                    .GroupBy(t => new { Anno = t.AnnoFechaIngreso, t.Cliente })
-                    .Select(g => new
-                    {
-                        Anno = g.Key.Anno,
-                        Cliente = g.Key.Cliente,
-                        Cantidad = g.Count()
-                    })
-                    .OrderBy(x => x.Anno)
-                    .ThenBy(x => x.Cliente)
-                    .ToList();
+            .GroupBy(t => new { Anno = t.AnnoFechaIngreso, t.Cliente })
+            .Select(g => new
+            {
+                Anno = g.Key.Anno,
+                Cliente = g.Key.Cliente,
+                Cantidad = g.Count()
+            })
+            .GroupBy(x => x.Anno)
+            .Select(g => new
+            {
+                Anno = g.Key,
+                Clientes = g.OrderByDescending(x => x.Cantidad)
+                               .Take(10)
+                               .Select(x => new
+                               {
+                                   Cliente = x.Cliente,
+                                   Cantidad = x.Cantidad
+                               })
+                               .ToList(),
+                Total = g.Sum(x => x.Cantidad)
+            })
+            .OrderBy(x => x.Anno)
+            .ToList();
 
-                // Agrupar por año, mes y AplicaA
+                // Agrupar por año, mes y Cliente, y obtener los top 10 por año y mes
                 var ticketsPorAnnoMesGarantia = ticketsList
-                    .GroupBy(t => new
-                    {
-                        Anno = t.AnnoFechaIngreso,
-                        Mes = t.MesFechaIngreso,
-                        t.Cliente
-                    })
-                    .Select(g => new
-                    {
-                        Anno = g.Key.Anno,
-                        Mes = g.Key.Mes,
-                        Cliente = g.Key.Cliente,
-                        Cantidad = g.Count()
-                    })
-                    .OrderBy(x => x.Anno)
-                    .ThenBy(x => x.Mes)
-                    .ThenBy(x => x.Cliente)
-                    .ToList();
+                 .GroupBy(t => new
+                 {
+                     Anno = t.AnnoFechaIngreso,
+                     Mes = t.MesFechaIngreso,
+                     t.Cliente
+                 })
+                 .Select(g => new
+                 {
+                     Anno = g.Key.Anno,
+                     Mes = g.Key.Mes,
+                     Cliente = g.Key.Cliente,
+                     Cantidad = g.Count()
+                 })
+                 .GroupBy(x => new { x.Anno, x.Mes })
+                 .Select(g => new
+                 {
+                     Anno = g.Key.Anno,
+                     DatosMes = new
+                     {
+                         Mes = g.Key.Mes,
+                         Clientes = g.OrderByDescending(x => x.Cantidad)
+                                     .Take(10)
+                                     .Select(x => new
+                                     {
+                                         Cliente = x.Cliente,
+                                         Cantidad = x.Cantidad
+                                     })
+                                     .ToList(),
+                         Total = g.Sum(x => x.Cantidad)
+                     }
+                 })
+                 .OrderBy(x => x.Anno)
+                 .ThenBy(x => x.DatosMes.Mes)
+                 .ToList();
 
                 return Json(new
                 {

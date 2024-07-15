@@ -55,22 +55,27 @@
 
         if ($scope.tendenciaChart) {
             $scope.tendenciaChart.destroy();
+            $scope.tendenciaChart = null;
         }
 
         if ($scope.ticketCerradosChart) {
             $scope.ticketCerradosChart.destroy();
+            $scope.ticketCerradosChart = null;
         }
 
         if ($scope.ticketPorAplicaBarrasChart) {
             $scope.ticketPorAplicaBarrasChart.destroy();
+            $scope.ticketPorAplicaBarrasChart = null;
         }
 
         if ($scope.ticketPorMttoBarrasChart) {
             $scope.ticketPorMttoBarrasChart.destroy();
+            $scope.ticketPorMttoBarrasChart = null;
         }
 
         if ($scope.ticketPorGarantiaBarrasChart) {
             $scope.ticketPorGarantiaBarrasChart.destroy();
+            $scope.ticketPorGarantiaBarrasChart = null;
         }
 
         $scope.TicketsNuevos();
@@ -1289,9 +1294,11 @@
 
         if ($scope.ticketPorGarantiaBarrasChartAnno) {
             $scope.ticketPorGarantiaBarrasChartAnno.destroy();
+            $scope.ticketPorGarantiaBarrasChartAnno = null;
         }
         if ($scope.ticketPorGarantiaBarrasChartMes) {
             $scope.ticketPorGarantiaBarrasChartMes.destroy();
+            $scope.ticketPorGarantiaBarrasChartMes = null;
         }
 
         $scope.mostrarPanelGraficosIndicadoresGenerales = true;
@@ -1945,7 +1952,7 @@
 
                         var chartDataMesEstados = createDatasetsMeses();
                         var ctxMesEstados = document.getElementById('ticketPorEstadosBarrasChartMes').getContext('2d');
-                        $scope.ticketPorAplicaBarrasChartMes = new Chart(ctxMesEstados, {
+                        $scope.ticketPorEstadosBarrasChartMes = new Chart(ctxMesEstados, {
                             type: 'bar',
                             data: {
                                 labels: chartDataMesEstados.labels,
@@ -2001,7 +2008,7 @@
                             plugins: [ChartDataLabels]
                         });
 
-                       
+
                     };
                 };
 
@@ -2012,17 +2019,21 @@
         });
     };
 
-    /////////// garantia
+    ///////// garantia
     $scope.TicketsGarantiaIndicadoresGenerales = function () {
+        // Destruir gráficos anteriores
         if ($scope.ticketPorGarantiaBarrasChartAnno) {
             $scope.ticketPorGarantiaBarrasChartAnno.destroy();
+            $scope.ticketPorGarantiaBarrasChartAnno = null;
         }
         if ($scope.ticketPorGarantiaBarrasChartMes) {
             $scope.ticketPorGarantiaBarrasChartMes.destroy();
+            $scope.ticketPorGarantiaBarrasChartMes = null;
         }
 
         $scope.mostrarPanelGraficosPorMesesYAnnosGarantia = true;
 
+        // Realizar la solicitud HTTP
         var infoTicketsPorGarantia = $http.post("indicadores/dar-tickets-garantia-indicadores-generales/", {
             annos: $scope.annosIndicadoresGenerales,
             meses: $scope.mesesIndicadoresGenerales
@@ -2031,342 +2042,219 @@
         infoTicketsPorGarantia.success(function (data) {
             $scope.loading.hide();
             if (data.success) {
-
                 if (data.ticketsPorAnnoGarantia.length === 0 && data.ticketsPorAnnoMesGarantia.length === 0) {
                     $scope.mostrarPanelGraficosTicketsGarantia = false;
                     $scope.mensajeNoDataTicketsGarantia = 'No existen datos disponibles';
-
-                } else if (data.ticketsPorAnnoGarantia.length !== 0 || data.ticketsPorAnnoMesGarantia.length !== 0) {
+                } else {
                     $scope.mostrarPanelGraficosTicketsGarantia = true;
 
                     if (data.ticketsPorAnnoGarantia.length > 0) {
-                        $scope.infoTicketsPorGarantiaAnno = data.ticketsPorAnnoGarantia;
                         $scope.mostrarGraficoTicketsGarantiaAnno = true;
-
-                        // Formatear datos para la tabla por año
-                        var ticketsPorAnnoGarantia = {};
-                        var anos = [];
-                        data.ticketsPorAnnoGarantia.forEach(function (ticket) {
-                            if (!ticketsPorAnnoGarantia[ticket.Cliente]) {
-                                ticketsPorAnnoGarantia[ticket.Cliente] = {};
-                            }
-                            ticketsPorAnnoGarantia[ticket.Cliente][ticket.Anno] = ticket.Cantidad;
-                            if (!anos.includes(ticket.Anno)) {
-                                anos.push(ticket.Anno);
-                            }
-                        });
-                    };
+                        $scope.ticketsPorClientesGarantiaAnno = data.ticketsPorAnnoGarantia;
+                    }
 
                     if (data.ticketsPorAnnoMesGarantia.length > 0) {
-                        $scope.infoTicketsPorGarantiaMes = data.ticketsPorAnnoMesGarantia;
                         $scope.mostrarGraficoTicketsGarantiaMeses = true;
+                        $scope.ticketsPorAnnoMesClientesGarantia = data.ticketsPorAnnoMesGarantia;
+                    }
 
-                        // Procesamiento de datos
-                        var ticketsPorGarantiaAnnoMes = {};
-                        var anos = [];
-                        var meses = [];
-                        var anoActual = new Date().getFullYear();
-
-                        if (data && data.ticketsPorAnnoMesGarantia && Array.isArray(data.ticketsPorAnnoMesGarantia)) {
-                            $scope.anosTicketsGarantia = [];
-                            $scope.mesesTicketsGarantia = [];
-                            $scope.clientesList = [];
-                            $scope.ticketsPorGarantiaAnnoMes = {};
-                            data.ticketsPorAnnoMesGarantia.forEach(function (ticket) {
-                                if (!ticketsPorGarantiaAnnoMes[ticket.Cliente]) {
-                                    ticketsPorGarantiaAnnoMes[ticket.Cliente] = {};
-                                }
-                                if (!ticketsPorGarantiaAnnoMes[ticket.Cliente][ticket.Anno]) {
-                                    ticketsPorGarantiaAnnoMes[ticket.Cliente][ticket.Anno] = {};
-                                }
-                                ticketsPorGarantiaAnnoMes[ticket.Cliente][ticket.Anno][ticket.Mes] = ticket.Cantidad;
-
-                                if (!anos.includes(ticket.Anno)) {
-                                    anos.push(ticket.Anno);
-                                }
-                                if (!meses.includes(ticket.Mes)) {
-                                    meses.push(ticket.Mes);
-                                }
-
-                                if (!$scope.anosTicketsGarantia.includes(ticket.Anno)) {
-                                    $scope.anosTicketsGarantia.push(ticket.Anno);
-                                }
-                                if (!$scope.mesesTicketsGarantia.includes(ticket.Mes)) {
-                                    $scope.mesesTicketsGarantia.push(ticket.Mes);
-                                }
-                                if (!$scope.clientesList.includes(ticket.Cliente)) {
-                                    $scope.clientesList.push(ticket.Cliente);
-                                }
-
-                                if (!$scope.ticketsPorGarantiaAnnoMes[ticket.Cliente]) {
-                                    $scope.ticketsPorGarantiaAnnoMes[ticket.Cliente] = {};
-                                }
-                                if (!$scope.ticketsPorGarantiaAnnoMes[ticket.Cliente][ticket.Anno]) {
-                                    $scope.ticketsPorGarantiaAnnoMes[ticket.Cliente][ticket.Anno] = {};
-                                }
-                                $scope.ticketsPorGarantiaAnnoMes[ticket.Cliente][ticket.Anno][ticket.Mes] = ticket.Cantidad;
-
-                            });
-                        };
-
-                        $scope.anosTicketsGarantia.sort((a, b) => a - b);
-                        $scope.mesesTicketsGarantia.sort((a, b) => a - b);
-                        $scope.clientesList.sort();
-
-                        $scope.getCantidadAnnosGarantia  = function (cliente, ano) {
-                            return ($scope.ticketsPorGarantiaAnno[cliente] &&
-                                $scope.ticketsPorGarantiaAnno[cliente][ano]) || 0;
-                        };
-
-                        $scope.getCantidadGarantia = function (cliente, ano, mes) {
-                            return ($scope.ticketsPorGarantiaAnnoMes[cliente] &&
-                                $scope.ticketsPorGarantiaAnnoMes[cliente][ano] &&
-                                $scope.ticketsPorGarantiaAnnoMes[cliente][ano][mes]) || 0;
-                        };
-
-                        function isMonthEmpty(ano, mes) {
-                            return $scope.clientesList.every(function (cliente) {
-                                return $scope.getCantidadGarantia(cliente, ano, mes) === 0;
-                            });
-                        };
-
-                        function isYearEmpty(ano) {
-                            return $scope.clientesList.every(function (cliente) {
-                                return $scope.getCantidadGarantia(cliente, ano) === 0;
-                            });
-                        };
-
-                        $scope.getMesByNumero = function (mesNumero) {
-                            var meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-                            return meses[mesNumero - 1] || '';
-                        };
-
-                        $scope.calcularTotal = function (ano, mes) {
-                            var total = 0;
-                            $scope.clientesList.forEach(function (clientes) {
-                                total += $scope.getCantidadGarantia(clientes, ano, mes);
-                            });
-                            return total;
-                        };
-
-                        // Si no se seleccionaron años, usar el año actual
-                        if (anos.length === 0) {
-                            anos.push(anoActual);
-                        }
-
-                        $scope.ticketsPorGarantiaAnnoMes = ticketsPorGarantiaAnnoMes;
-                        $scope.anosTicketsGarantia = anos.sort();
-                        $scope.mesesTicketsGarantia = meses.sort();
-
-                        $scope.ticketsPorGarantiaAnno = ticketsPorAnnoGarantia;
-                        $scope.anosTickets = anos.sort();
-
-                        // Calcular totales por año
-                        $scope.totalesPorAnno = {};
-                        anos.forEach(function (ano) {
-                            $scope.totalesPorAnno[ano] = Object.values(ticketsPorAnnoGarantia).reduce(function (total, cliente) {
-                                return total + (cliente[ano] || 0);
-                            }, 0);
-                        });
-
-                        // Función para crear datasets
-                        function createDatasetsAnno() {
-                            var filteredLabels = [];
-                            var datasets = [];
-
-                            $scope.clientesList.forEach(function (cliente) {
-                                var data = [];
-                                $scope.anosTicketsGarantia.forEach(function (ano) {
-
-                                    var cantidad = $scope.getCantidadAnnosGarantia(cliente, ano);
-                                    if (cantidad > 0 || !isYearEmpty(ano)) {
-                                        data.push(cantidad);
-                                        if (!filteredLabels.includes(ano)) {
-                                            filteredLabels.push(ano);
-                                        }
-                                    }
-                                });
-
-                                if (data.length > 0) {
-                                    datasets.push({
-                                        label: cliente,
-                                        data: data,
-                                        backgroundColor: getRandomColor(),
-                                        borderColor: 'rgba(255, 99, 132, 1)',
-                                        borderWidth: 1
-                                    });
-                                }
-                            });
-
-                            return { datasets: datasets, labels: filteredLabels };
-                        };
-
-                        function createDatasetsMeses() {
-                            var filteredLabels = [];
-                            var datasets = [];
-
-                            $scope.clientesList.forEach(function (cliente) {
-                                var data = [];
-                                $scope.anosTicketsGarantia.forEach(function (ano) {
-                                    $scope.mesesTicketsGarantia.forEach(function (mes) {
-                                        var cantidad = $scope.getCantidadGarantia(cliente, ano, mes);
-                                        if (cantidad > 0 || !isMonthEmpty(ano, mes)) {
-                                            data.push(cantidad);
-                                            if (!filteredLabels.includes(ano + '-' + $scope.getMesByNumero(mes))) {
-                                                filteredLabels.push(ano + '-' + $scope.getMesByNumero(mes));
-                                            }
-                                        }
-                                    });
-                                });
-
-                                if (data.length > 0) {
-                                    datasets.push({
-                                        label: cliente,
-                                        data: data,
-                                        backgroundColor: getRandomColor(),
-                                        borderColor: 'rgba(255, 99, 132, 1)',
-                                        borderWidth: 1
-                                    });
-                                }
-                            });
-
-                            return { datasets: datasets, labels: filteredLabels };
-                        };
-
-                        // Función para generar colores aleatorios (sin cambios)
-                        function getRandomColor() {
-                            var letters = '0123456789ABCDEF';
-                            var color = '#';
-                            for (var i = 0; i < 6; i++) {
-                                color += letters[Math.floor(Math.random() * 16)];
-                            }
-                            return color;
-                        };
-
-                        var chartDataAnnoGarantia = createDatasetsAnno();
-                        var ctxAnnoGarantia = document.getElementById('ticketPorGarantiaBarrasChartAnno').getContext('2d');
-                        $scope.ticketPorGarantiaBarrasChartAnno = new Chart(ctxAnnoGarantia, {
-                            type: 'bar',
-                            data: {
-                                labels: chartDataAnnoGarantia.labels,
-                                datasets: chartDataAnnoGarantia.datasets
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                scales: {
-                                    x: {
-                                        display: true,
-                                        title: { display: true, text: 'Cantidad de Tickets' },
-                                        ticks: { beginAtZero: true },
-                                    },
-                                    y: {
-                                        type: 'logarithmic',
-                                        display: true,
-                                        title: { display: true, text: 'Año' },
-                                    },
-                                },
-                                plugins: {
-                                    title: {
-                                        display: true,
-                                        text: 'Tickets por Año y Clientes'
-                                    },
-                                    datalabels: {
-                                        display: true,
-                                        align: 'center',
-                                        anchor: 'center',
-                                        backgroundColor: '#D3D3D3',
-                                        borderRadius: 3,
-                                        color: '#000',
-                                        font: {
-                                            weight: 'bold'
-                                        },
-                                        formatter: function (value, context) {
-                                            return value > 0 ? value : '';
-                                        }
-                                    },
-                                    legend: {
-                                        position: 'top',
-                                    }
-                                },
-                                layout: {
-                                    padding: {
-                                        top: 20
-                                    }
-                                },
-                                barPercentage: 0.8,
-                                categoryPercentage: 0.9
-                            },
-                            plugins: [ChartDataLabels]
-                        });
-
-                        var chartDataMesGarantia = createDatasetsMeses();
-                        var ctxMesGarantia = document.getElementById('ticketPorGarantiaBarrasChartMes').getContext('2d');
-                        $scope.ticketPorGarantiaBarrasChartMes = new Chart(ctxMesGarantia, {
-                            type: 'bar',
-                            data: {
-                                labels: chartDataMesGarantia.labels,
-                                datasets: chartDataMesGarantia.datasets
-                            },
-                            options: {
-                                //indexAxis: 'y',
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                scales: {
-                                    x: {
-                                        display: true,
-                                        title: { display: true, text: 'Año - Meses' },
-                                        ticks: { beginAtZero: true }
-                                    },
-                                    y: {
-                                        type: 'logarithmic',
-                                        display: true,
-                                        title: { display: true, text: 'Cantidad de Tickets' },
-                                    },
-                                },
-                                plugins: {
-                                    title: {
-                                        display: true,
-                                        text: 'Tickets por Año y Clientes'
-                                    },
-                                    datalabels: {
-                                        display: true,
-                                        align: 'center',
-                                        anchor: 'center',
-                                        backgroundColor: '#D3D3D3',
-                                        borderRadius: 3,
-                                        color: '#000',
-                                        font: {
-                                            weight: 'bold'
-                                        },
-                                        formatter: function (value, context) {
-                                            return value > 0 ? value : '';
-                                        }
-                                    },
-                                    legend: {
-                                        position: 'top',
-                                    }
-                                },
-                                layout: {
-                                    padding: {
-                                        top: 20
-                                    }
-                                },
-                                barPercentage: 0.8,
-                                categoryPercentage: 0.9
-                            },
-                            plugins: [ChartDataLabels]
-                        });
-
-
-                    };
-                };
-
-                $scope.mostrarPanelGraficosTicketsGarantia = true;
+                    crearGraficos();
+                }
             } else {
-                console.log("errorrrrrr " + data);
+                console.error("Error:", data);
             }
         });
+
+        // Función para crear gráficos
+        function crearGraficos() {
+            crearGraficoAnnoGarantia();
+            crearGraficoMesesGarantia();
+        }
+
+        // Función para crear el gráfico por años y clientes
+        function crearGraficoAnnoGarantia() {
+            var labels = [];
+            var datasets = [];
+
+            // Itera sobre los datos de los años y clientes
+            $scope.ticketsPorClientesGarantiaAnno.forEach(function (anno) {
+                anno.Clientes.forEach(function (cliente) {
+                    if (!labels.includes(cliente.Cliente)) {
+                        labels.push(cliente.Cliente);
+                    }
+                });
+
+                // Crea un conjunto de datos para cada año
+                datasets.push({
+                    label: anno.Anno,
+                    data: anno.Clientes.map(function (cliente) {
+                        return cliente.Cantidad;
+                    }),
+                    backgroundColor: getRandomColor()
+                });
+            });
+
+            // Configura el gráfico
+            var ctx = document.getElementById('ticketPorGarantiaBarrasChartAnno').getContext('2d');
+            $scope.ticketPorGarantiaBarrasChartAnno = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            display: true,
+                            title: { display: true, text: 'Clientes' },
+                            ticks: { beginAtZero: true },
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            title: { display: true, text: 'Cantidad de Tickets' },
+                        },
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Tickets por Año y Clientes'
+                        },
+                        datalabels: {
+                            display: true,
+                            align: 'center',
+                            anchor: 'center',
+                            backgroundColor: '#D3D3D3',
+                            borderRadius: 3,
+                            color: '#000',
+                            font: {
+                                weight: 'bold'
+                            },
+                            formatter: function (value, context) {
+                                return value > 0 ? value : '';
+                            }
+                        },
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            top: 20
+                        }
+                    },
+                    barPercentage: 0.8,
+                    categoryPercentage: 0.9
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+
+        // Función para crear el gráfico por años, meses y clientes
+        function crearGraficoMesesGarantia() {
+            if (!$scope.ticketsPorAnnoMesClientesGarantia || !Array.isArray($scope.ticketsPorAnnoMesClientesGarantia)) {
+                console.error('Los datos de ticketsPorAnnoMesGarantia no son válidos');
+                return;
+            }
+
+            var labels = [];
+            var datasets = {};
+
+            $scope.ticketsPorAnnoMesClientesGarantia.forEach(function (annoMes) {
+                var labelMes = annoMes.Anno + '-' + $scope.getMesByNumero(annoMes.DatosMes.Mes);
+                if (!labels.includes(labelMes)) {
+                    labels.push(labelMes);
+                }
+
+                annoMes.DatosMes.Clientes.forEach(function (cliente) {
+                    if (!datasets[cliente.Cliente]) {
+                        datasets[cliente.Cliente] = {
+                            label: cliente.Cliente,
+                            data: [],
+                            borderColor: getRandomColor(),
+                            backgroundColor: 'rgba(0, 0, 0, 0)', // Transparente
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            fill: false
+                        };
+                    }
+                    datasets[cliente.Cliente].data.push(cliente.Cantidad);
+                });
+            });
+
+            // Asegurar que todos los datasets tengan la misma longitud
+            Object.values(datasets).forEach(dataset => {
+                while (dataset.data.length < labels.length) {
+                    dataset.data.push(null);
+                }
+            });
+
+            var ctx = document.getElementById('ticketPorGarantiaBarrasChartMes').getContext('2d');
+            $scope.ticketPorGarantiaBarrasChartMes = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: Object.values(datasets)
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Año - Mes'
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Cantidad de Tickets'
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Tickets por Año, Mes y Clientes'
+                        },
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    hover: {
+                        mode: 'nearest',
+                        intersect: true
+                    }
+                }
+            });
+        }
+
+        // Función para obtener el nombre del mes por número
+        $scope.getMesByNumero = function (mesNumero) {
+            var meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            return meses[mesNumero - 1] || '';
+        };
+
+        // Función para generar colores aleatorios
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
     };
 
     function getRandomColor() {
