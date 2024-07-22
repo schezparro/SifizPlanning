@@ -180,6 +180,104 @@
             }
         });
     }
+    $scope.darTicketTiempoInvertido = function (data) {
+        if ($scope.ticketsInvertidoChart) $scope.ticketsInvertidoChart.destroy();
+        if (!data || data.length === 0) return alert('No hay datos para mostrar en el gráfico');
+
+        $scope.ticketsTiempoInvertido = data; // Asignar los datos a la variable para la tabla
+
+        var ctx = document.getElementById('ticketsInvertidoChart');
+        if (!ctx) return alert('No se pudo encontrar el elemento del gráfico');
+
+        var labels = [];
+        var groupedData = {};
+
+        data.forEach(item => {
+            var gestor = item.Gestor;
+            var label = `${item.Mes}/${item.Anio}`;
+
+            if (!groupedData[gestor]) {
+                groupedData[gestor] = {};
+            }
+            if (!groupedData[gestor][label]) {
+                groupedData[gestor][label] = 0;
+            }
+
+            groupedData[gestor][label] += item.TiempoTotal;
+
+            if (!labels.includes(label)) {
+                labels.push(label);
+            }
+        });
+
+        $scope.ticketsTiempoInvertidoLabels = labels;
+        $scope.ticketsTiempoInvertidoAgrupado = groupedData;
+
+        // Crear datasets para el gráfico
+        var datasets = [];
+        Object.keys(groupedData).forEach(gestor => {
+            var color = `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.6)`;
+            datasets.push({
+                label: gestor,
+                data: labels.map(label => groupedData[gestor][label] || 0),
+                backgroundColor: color,
+                borderColor: color.replace('0.6', '1'),
+                borderWidth: 1
+            });
+        });
+
+        $scope.ticketsInvertidoChart = new Chart(ctx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'Tiempo Invertido por Mes y Gestor'
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Mes y Año'
+                        },
+                        ticks: {
+                            autoSkip: true
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Tiempo Invertido (Horas)'
+                        },
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }
+                },
+                legend: {
+                    display: true
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function (tooltipItem) {
+                            return `${tooltipItem.dataset.label}: ${tooltipItem.raw} horas`;
+                        }
+                    }
+                }
+            }
+        });
+    };
+
+    // Función para sumar tiempos en la tabla
+    $scope.sumarTiempos = function (tiempos) {
+        return Object.values(tiempos).reduce((sum, tiempo) => sum + tiempo, 0).toFixed(1);
+    };
 
     $scope.generarGraficoTicketAnalizados = function (data) {
         if ($scope.ticketsAnalizadosChart) $scope.ticketsAnalizadosChart.destroy();

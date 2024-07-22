@@ -1287,7 +1287,6 @@ namespace SifizPlanning.Controllers
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
         public ActionResult DarTicketsTiempoGestores(string fechaInicio, string fechaFin)
-
         {
             try
             {
@@ -1297,29 +1296,35 @@ namespace SifizPlanning.Controllers
 
                 var tiempoQuery = from tiempo in db.InfoTickets
                                   where tiempo.FechaIngreso.HasValue &&
-                                        tiempo.FechaIngreso.Value.Year >= fInicio.Year &&
-                                        tiempo.FechaIngreso.Value.Month >= fInicio.Month &&
-                                        tiempo.FechaIngreso.Value.Day >= fInicio.Day &&
-                                        tiempo.FechaIngreso.Value.Year <= fFin.Year &&
-                                        tiempo.FechaIngreso.Value.Month <= fFin.Month &&
-                                        tiempo.FechaIngreso.Value.Day <= fFin.Day
+                                        DbFunctions.TruncateTime(tiempo.FechaIngreso.Value) >= DbFunctions.TruncateTime(fInicio) &&
+                                        DbFunctions.TruncateTime(tiempo.FechaIngreso.Value) <= DbFunctions.TruncateTime(fFin)
                                   select tiempo;
 
                 List<InfoTickets> tiempoList = tiempoQuery.ToList();
 
                 var resumenTiempo = tiempoList
                     .Where(tiempo => tiempo.Cliente != null && tiempo.FechaIngreso.HasValue)
-                    .GroupBy(tiempo => new { tiempo.Cliente, Año = tiempo.FechaIngreso.Value.Year, Mes = tiempo.FechaIngreso.Value.Month })
-                    .Select(group =>
+                    .Select(tiempo => new
                     {
-                        var gestorServicio = db.GestorServicios.FirstOrDefault(s => s.cliente != null && s.cliente.Descripcion == group.Key.Cliente);
-                        var nombreGestor = gestorServicio != null && gestorServicio.colaborador != null && gestorServicio.colaborador.persona != null ? gestorServicio.colaborador.persona.Nombre1 + " " + gestorServicio.colaborador.persona.Apellido1 : "Desconocido";
-                        return new
-                        {
-                            Gestor = nombreGestor,
-                            TiempoPorMes = group.GroupBy(item => item.FechaIngreso.Value.ToString("MMMM yyyy")).Select(g => new { Mes = g.Key, Tiempo = g.Sum(item => ((item.HorasEmpleadas ?? DateTime.MinValue) - (DateTime.MinValue)).TotalHours) }).ToList(),
-                            TiempoTotal = group.Sum(tiempo => ((tiempo.HorasEmpleadas ?? DateTime.MinValue) - (DateTime.MinValue)).TotalHours)
-                        };
+                        Cliente = tiempo.Cliente,
+                        FechaIngreso = tiempo.FechaIngreso.Value,
+                        HorasEmpleadas = tiempo.HorasEmpleadas.HasValue ? (tiempo.HorasEmpleadas.Value - DateTime.MinValue).TotalHours : 0,
+                        GestorServicio = db.GestorServicios.FirstOrDefault(s => s.cliente != null && s.cliente.Descripcion == tiempo.Cliente)
+                    })
+                    .GroupBy(tiempo => new
+                    {
+                        Gestor = tiempo.GestorServicio != null
+                            ? tiempo.GestorServicio.colaborador.persona.Nombre1 + " " + tiempo.GestorServicio.colaborador.persona.Apellido1
+                            : "Desconocido",
+                        Año = tiempo.FechaIngreso.Year,
+                        Mes = tiempo.FechaIngreso.Month
+                    })
+                    .Select(group => new
+                    {
+                        Gestor = group.Key.Gestor,
+                        Mes = group.Key.Mes,
+                        Anio = group.Key.Año,
+                        TiempoTotal = Math.Round(group.Sum(tiempo => tiempo.HorasEmpleadas), 1) // Redondear a 1 decimal
                     })
                     .ToList();
 
