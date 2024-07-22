@@ -1242,24 +1242,33 @@ namespace SifizPlanning.Controllers
 
                 var ticketsQuery = from ticket in db.InfoTickets
                                    where ticket.FechaIngreso.HasValue &&
-                                         ticket.FechaIngreso.Value.Year >= fInicio.Year &&
-                                         ticket.FechaIngreso.Value.Month >= fInicio.Month &&
-                                         ticket.FechaIngreso.Value.Day >= fInicio.Day &&
-                                         ticket.FechaIngreso.Value.Year <= fFin.Year &&
-                                         ticket.FechaIngreso.Value.Month <= fFin.Month &&
-                                         ticket.FechaIngreso.Value.Day <= fFin.Day
+                                         DbFunctions.TruncateTime(ticket.FechaIngreso.Value) >= DbFunctions.TruncateTime(fInicio) &&
+                                         DbFunctions.TruncateTime(ticket.FechaIngreso.Value) <= DbFunctions.TruncateTime(fFin)
                                    select ticket;
 
                 List<InfoTickets> ticketsList = ticketsQuery.ToList();
 
                 var resumenTickets = ticketsList
-                    .GroupBy(ticket => ticket.AsignadoA)
+                    .Where(ticket => ticket.Cliente != null && ticket.FechaIngreso.HasValue)
+                    .Select(ticket => new
+                    {
+                        Cliente = ticket.Cliente,
+                        FechaIngreso = ticket.FechaIngreso.Value,
+                        HorasEmpleadas = ticket.HorasEmpleadas.HasValue ? (ticket.HorasEmpleadas.Value - DateTime.MinValue).TotalHours : 0,
+                        GestorServicio = db.GestorServicios.FirstOrDefault(s => s.cliente != null && s.cliente.Descripcion == ticket.Cliente)
+                    })
+                    .GroupBy(ticket => new
+                    {
+                        Gestor = ticket.GestorServicio != null
+                            ? ticket.GestorServicio.colaborador.persona.Nombre1 + " " + ticket.GestorServicio.colaborador.persona.Apellido1
+                            : "Desconocido"
+                    })
                     .Select(group => new
                     {
-                        Gestor = group.Key,
+                        Gestor = group.Key.Gestor,
                         NumeroTickets = group.Count(),
-                        TiempoMinutos = Math.Round(group.Sum(ticket => ((ticket.HorasEmpleadas ?? DateTime.MinValue) - (ticket.HorasEmpleadas ?? DateTime.MinValue).Date).TotalMinutes), 2),
-                        TiempoHoras = Math.Round(group.Sum(ticket => ((ticket.HorasEmpleadas ?? DateTime.MinValue) - (ticket.HorasEmpleadas ?? DateTime.MinValue).Date).TotalHours), 2),
+                        TiempoMinutos = Math.Round(group.Sum(ticket => ticket.HorasEmpleadas * 60), 2),
+                        TiempoHoras = Math.Round(group.Sum(ticket => ticket.HorasEmpleadas), 2),
                         ClientesAtendidos = group.Select(ticket => ticket.Cliente).Distinct().Count(),
                         CarteraAsignada = group.Select(ticket => ticket.Cliente).Distinct().Count() // Ajusta según tus necesidades
                     })
@@ -1283,6 +1292,7 @@ namespace SifizPlanning.Controllers
                 return Json(resp);
             }
         }
+
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
