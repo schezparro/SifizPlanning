@@ -1,4 +1,4 @@
-﻿indicadoresApp.controller('indicadoresTickets', ['$scope', '$http', function ($scope, $http) {
+﻿indicadoresApp.controller('indicadoresTickets', ['$scope', '$timeout', '$http', function ($scope, $timeout, $http) {
     $scope.initDatepickersTickets = function () {
         angular.element('#fecha-inicio-indicadores-tickets').datepicker({
             format: 'dd/mm/yyyy',
@@ -2402,169 +2402,153 @@
                 $scope.mostrarPanelGraficosTicketsPrioridad = true;
                 $scope.mostrarPanelGraficosPorPrioridadMesesYAnnos = true;
 
-                $scope.setActiveTab = function (year) {
-                    $scope.activeTab = year;
-                };
-
-                $scope.isActiveTab = function (year) {
-                    return $scope.activeTab === year;
-                };
-
-                $scope.getDatos = function (prioridad, cliente, ano, mes) {
-                    return datos[cliente][ano][mes] || 0;
-                };
-
-                $scope.getTotal = function (prioridad, ano, mes) {
-                    return $scope.clientes.reduce(function (total, cliente) {
-                        return total + $scope.getDatos(prioridad, cliente, ano, mes);
-                    }, 0);
-                };
-
-                // Procesamiento de datos
-                var ticketsPorPrioridadaAnnoMes = {};
-                var anos = [];
-                var meses = [];
-                var anoActual = new Date().getFullYear();
-
                 if (data && data.ticketsPorClientePrioridad && Array.isArray(data.ticketsPorClientePrioridad)) {
+                    $scope.prioridadesUnicas = [];
                     $scope.anosTickets = [];
                     $scope.mesesTickets = [];
-                    $scope.clienteList = [];
-                    $scope.ticketsPorPrioridadaAnnoMes = {};
-                    var prioridadesUnicasArr = [];
+                    $scope.datosPorPrioridad = {};
 
-                    $scope.mostrarGraficoTicketsPrioridadOtrosIndicadores = true
+                    $scope.mostrarGraficoTicketsPrioridadOtrosIndicadores = true;
 
                     data.ticketsPorClientePrioridad.forEach(function (ticket) {
-                        if (!ticketsPorPrioridadaAnnoMes[ticket.Cliente]) {
-                            ticketsPorPrioridadaAnnoMes[ticket.Cliente] = {};
-                        }
-                        if (!ticketsPorPrioridadaAnnoMes[ticket.Cliente][ticket.Anno]) {
-                            ticketsPorPrioridadaAnnoMes[ticket.Cliente][ticket.Anno] = {};
-                        }
-
-                        ticketsPorPrioridadaAnnoMes[ticket.Cliente][ticket.Anno][ticket.Mes] = ticket.Cantidad;
-
-                        if (!prioridadesUnicasArr.includes(ticket.Prioridad)) {
-                            prioridadesUnicasArr.push(ticket.Prioridad);
-                        }
-
-                        if (!anos.includes(ticket.Anno)) {
-                            anos.push(ticket.Anno);
-                        }
-                        if (!meses.includes(ticket.Mes)) {
-                            meses.push(ticket.Mes);
-                        }
-
-                        if (!$scope.anosTickets.includes(ticket.Anno)) {
-                            $scope.anosTickets.push(ticket.Anno);
-                        }
-                        if (!$scope.mesesTickets.includes(ticket.Mes)) {
-                            $scope.mesesTickets.push(ticket.Mes);
-                        }
-                        if (!$scope.clienteList.includes(ticket.Cliente)) {
-                            $scope.clienteList.push(ticket.Cliente);
-                        }
-
-                        if (!$scope.ticketsPorPrioridadaAnnoMes[ticket.Cliente]) {
-                            $scope.ticketsPorPrioridadaAnnoMes[ticket.Cliente] = {};
-                        }
-                        if (!$scope.ticketsPorPrioridadaAnnoMes[ticket.Cliente][ticket.Anno]) {
-                            $scope.ticketsPorPrioridadaAnnoMes[ticket.Cliente][ticket.Anno] = {};
-                        }
-                        $scope.ticketsPorPrioridadaAnnoMes[ticket.Cliente][ticket.Anno][ticket.Mes] = ticket.Cantidad;
-
-                        var datosPorClientePrioridad = {};
-
                         var cliente = ticket.Cliente;
                         var prioridad = ticket.Prioridad;
-                        var anno = ticket.Anno;
-                        var mes = ticket.Mes;
+                        var anno = ticket.Anno.toString();
+                        var mes = ticket.Mes.toString();
                         var cantidad = ticket.Cantidad;
-                        $scope.datosPorClientePrioridad = {};
 
-                        // Verificar si el cliente ya existe en la estructura de datos
-                        if (!datosPorClientePrioridad[cliente]) {
-                            datosPorClientePrioridad[cliente] = {};
+                        if (!$scope.prioridadesUnicas.includes(prioridad)) {
+                            $scope.prioridadesUnicas.push(prioridad);
+                        }
+                        if (!$scope.anosTickets.includes(anno)) {
+                            $scope.anosTickets.push(anno);
+                        }
+                        if (!$scope.mesesTickets.includes(mes)) {
+                            $scope.mesesTickets.push(mes);
                         }
 
-                        // Verificar si la prioridad ya existe para el cliente
-                        if (!datosPorClientePrioridad[cliente][prioridad]) {
-                            datosPorClientePrioridad[cliente][prioridad] = {};
+                        if (!$scope.datosPorPrioridad[prioridad]) $scope.datosPorPrioridad[prioridad] = {};
+                        if (!$scope.datosPorPrioridad[prioridad][cliente]) $scope.datosPorPrioridad[prioridad][cliente] = {};
+                        if (!$scope.datosPorPrioridad[prioridad][cliente][anno]) $scope.datosPorPrioridad[prioridad][cliente][anno] = {};
+
+                        $scope.datosPorPrioridad[prioridad][cliente][anno][mes] = cantidad;
+                    });
+
+                    $scope.prioridadesUnicas.sort();
+                    $scope.anosTickets.sort((a, b) => parseInt(a) - parseInt(b));
+                    $scope.mesesTickets.sort((a, b) => parseInt(a) - parseInt(b));
+
+                    $scope.tabActiva = $scope.prioridadesUnicas[0] || null;
+
+                    $scope.getCantidad = function (prioridad, cliente, anno, mes) {
+                        var cantidad = $scope.datosPorPrioridad[prioridad]?.[cliente]?.[anno]?.[mes] || 0;
+                        return cantidad;
+                    };
+
+                    $scope.getClientesPorPrioridad = function (prioridad) {
+                        var clientes = Object.keys($scope.datosPorPrioridad[prioridad] || {});
+                        return clientes;
+                    };
+
+                    $scope.getMesByNumero = function (mes) {
+                        const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                        return meses[parseInt(mes) - 1];
+                    };
+
+                    $scope.generateCharts = function () {
+                        $timeout(function () {
+                            $scope.prioridadesUnicas.forEach(function (prioridad) {
+                                var canvas = document.getElementById('chart-' + prioridad);
+                                if (canvas) {
+                                    var ctx = canvas.getContext('2d');
+                                    var clientes = $scope.getClientesPorPrioridad(prioridad);
+
+                                    var datasets = clientes.map(function (cliente) {
+                                        var data = $scope.anosTickets.map(function (anno) {
+                                            return $scope.mesesTickets.map(function (mes) {
+                                                return $scope.getCantidad(prioridad, cliente, anno, mes);
+                                            });
+                                        }).flat();
+
+                                        return {
+                                            label: cliente,
+                                            data: data,
+                                            fill: true,
+                                            backgroundColor: getRandomColor(),
+                                            borderColor: getRandomColor(),
+                                            borderWidth: 1
+                                        };
+                                    });
+
+                                    var labels = $scope.anosTickets.map(function (anno) {
+                                        return $scope.mesesTickets.map(function (mes) {
+                                            return `${$scope.getMesByNumero(mes)} ${anno}`;
+                                        });
+                                    }).flat();
+
+                                    createChart(ctx, labels, datasets);
+                                }
+                            });
+                        }, 0);
+                    };
+
+                    function createChart(ctx, labels, datasets) {
+                        return new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: datasets
+                            },
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    x: {
+                                        display: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Meses'
+                                        }
+                                    },
+                                    y: {
+                                        display: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Cantidad de Tickets'
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: true,
+                                        position: 'top'
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function (context) {
+                                                return `${context.dataset.label}: ${context.raw}`;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    function getRandomColor() {
+                        var letters = '0123456789ABCDEF';
+                        var color = '#';
+                        for (var i = 0; i < 6; i++) {
+                            color += letters[Math.floor(Math.random() * 16)];
                         }
+                        return color;
+                    }
 
-                        // Verificar si el año ya existe para la prioridad y cliente
-                        if (!datosPorClientePrioridad[cliente][prioridad][anno]) {
-                            datosPorClientePrioridad[cliente][prioridad][anno] = {};
-                        }
+                    $scope.generateCharts();
 
-                        // Guardar la cantidad para el mes correspondiente
-                        datosPorClientePrioridad[cliente][prioridad][anno][mes] = cantidad;
-
-                        $scope.datosPorClientePrioridad = datosPorClientePrioridad;
-
-                    });
-                };
-                        console.log($scope.datosPorClientePrioridad);
-
-                $scope.anosTickets.sort((a, b) => a - b);
-                $scope.mesesTickets.sort((a, b) => a - b);
-                $scope.clienteList.sort();
-
-                $scope.getCantidad = function (cliente, ano, mes) {
-                    return ($scope.ticketsPorPrioridadaAnnoMes[cliente] &&
-                        $scope.ticketsPorPrioridadaAnnoMes[cliente][ano] &&
-                        $scope.ticketsPorPrioridadaAnnoMes[cliente][ano][mes]) || 0;
-                };
-
-                function isMonthEmpty(ano, mes) {
-                    return $scope.clienteList.every(function (cliente) {
-                        return $scope.getCantidad(cliente, ano, mes) === 0;
-                    });
-                };
-
-                function isYearEmpty(ano) {
-                    return $scope.clienteList.every(function (cliente) {
-                        return $scope.getCantidad(cliente, ano) === 0;
-                    });
-                };
-
-                
-
-                $scope.calcularTotal = function (ano, mes) {
-                    var total = 0;
-                    $scope.clienteList.forEach(function (cliente) {
-                        total += $scope.getCantidad(cliente, ano, mes);
-                    });
-                    return total;
-                };
-
-                // Si no se seleccionaron años, usar el año actual
-                if (anos.length === 0) {
-                    anos.push(anoActual);
                 }
 
-                $scope.ticketsPorPrioridadaAnnoMes = ticketsPorPrioridadaAnnoMes;
-                $scope.anosTickets = anos.sort();
-                $scope.mesesTickets = meses.sort();
-
-                // Calcular totales por año
-                //$scope.totalesPorAnno = {};
-                //anos.forEach(function (ano) {
-                //    $scope.totalesPorAnno[ano] = Object.values(ticketsPorAplicaAnno).reduce(function (total, aplica) {
-                //        return total + (aplica[ano] || 0);
-                //    }, 0);
-                //});
-
-                
-
-                $scope.prioridadesUnicas = prioridadesUnicasArr;
 
 
-                console.log("entro");
-
-            } else {
-                alert("Error: " + data.msg);
             }
         });
     };

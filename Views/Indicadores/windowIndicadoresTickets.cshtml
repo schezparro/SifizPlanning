@@ -429,7 +429,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
         <div class="container-fluid">
@@ -1311,17 +1310,17 @@
                     <div class="panel panel-default">
                         <div class="panel-body">
                             <form class="form-horizontal">
-                                <div class="row">
-                                    <label for="fecha-inicio-etapa" class="col-sm-1 control-label">CLIENTE</label>
-                                    <div class="col-sm-3">
+                                <div class="row form-group">
+                                    <label for="fecha-inicio-etapa" class="col-sm-2 control-label">CLIENTE</label>
+                                    <div class="col-sm-4">
                                         <select id="select-cliente-otros-indicadores" multiple="multiple" ng-model="clienteOtrosIndicadores" class="form-control">
                                             <option value="">Todos los clientes</option>
                                             <option value="{{cliente.id}}" ng-repeat="cliente in clienteOtros" ng-value="cliente.id" ng-selected="cliente.id === cliente">{{cliente.nombre}}</option>
                                         </select>
                                     </div>
 
-                                    <label for="fecha-inicio-etapa" class="col-sm-1 control-label">ANIOS</label>
-                                    <div class="col-sm-3">
+                                    <label for="fecha-inicio-etapa" class="col-sm-2 control-label">AÑOS</label>
+                                    <div class="col-sm-4">
                                         <select ng-class="'form-control'" id="select-annos-otros-indicadores" multiple="multiple" ng-model="annoOtrosIndicadores">
                                             <option value="2020">2020</option>
                                             <option value="2021">2021</option>
@@ -1330,9 +1329,10 @@
                                             <option value="2024">2024</option>
                                         </select>
                                     </div>
-
-                                    <label for="fecha-inicio-etapa" class="col-sm-1 control-label">MESES</label>
-                                    <div class="col-sm-3">
+                                </div>
+                                <div class="row form-group">
+                                    <label for="fecha-inicio-etapa" class="col-sm-2 control-label">MESES</label>
+                                    <div class="col-sm-4">
                                         <select ng-class="'form-control'" id="select-meses-otros-indicadores" multiple="multiple" ng-model="mesOtrosIndicadores">
                                             <option value="01">Enero</option>
                                             <option value="02">Febrero</option>
@@ -1348,29 +1348,30 @@
                                             <option value="12">Diciembre</option>
                                         </select>
                                     </div>
-                                </div>
-                                <br />
-                                <div class="row">
-                                    <label for="fecha-inicio-etapa" class="col-sm-1 control-label">PRIORIDAD</label>
-                                    <div class="col-sm-3">
+
+                                    <label for="fecha-inicio-etapa" class="col-sm-2 control-label">PRIORIDAD</label>
+                                    <div class="col-sm-4">
                                         <select class="form-control" id="select-prioridad-otros-indicadores" multiple="multiple" ng-model="prioridadOtrosIndicadores">
                                             <option value="">Seleccione...</option>
                                             <option ng-repeat="p in prioridades" value="{{p.id}}">{{p.name}}</option>
                                         </select>
                                     </div>
-                                    <label for="fecha-inicio-etapa" class="col-sm-1 control-label">CATEGORIA</label>
-                                    <div class="col-sm-3">
+                                </div>
+                                <div class="row form-group">
+                                    <label for="fecha-inicio-etapa" class="col-sm-2 control-label">CATEGORÍA</label>
+                                    <div class="col-sm-4">
                                         <select class="form-control" id="select-categoria-otros-indicadores" multiple="multiple" ng-model="categoriaOtrosIndicadores">
                                             <option value="">Seleccione...</option>
                                             <option ng-repeat="c in categorias" value="{{c.id}}">{{c.name}}</option>
                                         </select>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-6 text-right">
                                         <button id="buscar-indicadoresGenerales-btn" class="btn btn-primary" ng-click="buscarDatosOtrosIndicadores()">Buscar datos</button>
                                     </div>
                                 </div>
                             </form>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -1378,8 +1379,7 @@
         </div>
 
         <div class="container-fluid">
-
-            <div style="max-height: calc(100vh - 200px); overflow-y: auto;">
+            <div style="max-height: calc(100vh - 300px); overflow-y: auto;">
                 <div class="row" ng-show="mostrarPanelGraficosOtrosIndicadores">
                     <div class="col-md-12">
                         <div class="panel panel-default">
@@ -1389,7 +1389,7 @@
                                         <img src="~/Web/images/s_logo.png" class="img-responsive center-block" alt="Logo" />
                                     </div>
                                     <div class="col-md-9 text-center">
-                                        <h3>INFORME DE TICKETS 11111</h3>
+                                        <h3>INFORME DE TICKETS</h3>
                                         <h5>REPORTE DE ESTADO MENSUAL</h5>
                                     </div>
                                 </div>
@@ -1418,55 +1418,136 @@
 
                     @*TICKETS POR PRIORIDAD *@
 
-                    <div>
-                        <div>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-xs-12" style="text-align:center;">
+                                <label for="select-cliente-proyecto">TICKETS POR PRIORIDAD:</label>
+                            </div>
+                        </div>
+                        <div class="container-fluid">
+                            <ul class="nav nav-tabs centered-tabs" role="tablist">
+                                <li role="presentation" ng-repeat="prioridad in prioridadesUnicas" ng-class="{'active': isActiveTab(prioridad)}">
+                                    <a href="#{{prioridad}}" ng-click="setActiveTab(prioridad)" aria-controls="{{prioridad}}" role="tab" data-toggle="tab">{{prioridad}}</a>
+                                </li>
+                            </ul>
+                            <div role="tabpanel" class="tab-content">
+                                <div ng-repeat="prioridad in prioridadesUnicas" role="tabpanel" class="tab-pane" ng-class="{'active': isActiveTab(prioridad)}" id="{{prioridad}}">
+                                    <div ng-show="mostrarGraficoTicketsPrioridadOtrosIndicadores">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #ffcc99; font-weight: bold;">Cliente</th>
+                                                    <th ng-repeat="anno in anosTickets" style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #ffcc99; font-weight: bold;">{{anno}}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99;"></th>
+                                                    <th ng-repeat="anno in anosTickets" style="border: 1px solid #ddd; padding: 0;">
+                                                        <table style="width: 100%; border-collapse: collapse;">
+                                                            <tr>
+                                                                <th ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: center; font-weight: bold; background-color: #ffcc99;">{{getMesByNumero(mes)}}</th>
+                                                            </tr>
+                                                        </table>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="cliente in getClientesPorPrioridad(prioridad)">
+                                                    <td>{{cliente}}</td>
+                                                    <td ng-repeat="anno in anosTickets" style="border: 1px solid #ddd; padding: 0;">
+                                                        <table style="width:100%">
+                                                            <tr>
+                                                                <td ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: center;">
+                                                                    {{getCantidad(prioridad, cliente, anno, mes)}}
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
 
-                            <div class="container-fluid">
-                                <div class="row">
-                                    <div class="col-xs-12" style="text-align:center;">
-                                        <label for="select-cliente-proyecto">TICKETS por prioridad:</label>
-                                    </div>
-                                </div>
-
-                                <div class="container">
-                                    <ul class="nav nav-tabs centered-tabs" role="tablist">
-                                        <li role="presentation" ng-repeat="prioridad in prioridadesUnicas" ng-class="{'active': isActiveTab(prioridad)}">
-                                            <a href="#{{prioridad}}" ng-click="setActiveTab(prioridad)" aria-controls="{{prioridad}}" role="tab" data-toggle="tab">{{prioridad}}</a>
-                                        </li>
-                                    </ul>
-                                    <div role="tabpanel" class="tab-content">
-                                        <div ng-repeat="prioridad in prioridadesUnicas" role="tabpanel" class="tab-pane" ng-class="{'active': isActiveTab(prioridad)}" id="{{prioridad}}">
-                                            <div ng-show="mostrarGraficoTicketsPrioridadOtrosIndicadores">
-                                                <table class="table table-bordered">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Cliente</th>
-                                                            <th ng-repeat="anno in anosTickets">{{anno}}</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr ng-repeat="(cliente, clienteData) in datosPorClientePrioridad[prioridad]">
-                                                            <td>{{ cliente }}</td>
-                                                            <td ng-repeat="anno in anosTickets">
-                                                            <td>
-                                                                <table style="border-collapse: collapse;">
-                                                                    <tr>
-                                                                        <td ng-repeat="mes in mesesTickets">{{getCantidad(cliente, anno, mes)}}</td>
-                                                                    </tr>
-                                                                </table>
-                                                            </td>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
+                                        <div class=" row col-md-12">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">Gráfico de Tickets por prioridad</div>
+                                                <div class="panel-body" style="margin: 0 auto;">
+                                                    <canvas id="chart-{{prioridad}}"></canvas>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>
+
+
+                    @*TICKETS POR CATEGORIA *@
+
+                    <!--<div class="container-fluid">
+                        <div class="row">
+                            <div class="col-xs-12" style="text-align:center;">
+                                <label for="select-cliente-proyecto">TICKETS POR CATEGORIAS:</label>
+                            </div>
+                        </div>
+                        <div class="container-fluid">
+                            <ul class="nav nav-tabs centered-tabs" role="tablist">
+                                <li role="presentation" ng-repeat="prioridad in prioridadesUnicas" ng-class="{'active': isActiveTab(prioridad)}">
+                                    <a href="#{{prioridad}}" ng-click="setActiveTab(prioridad)" aria-controls="{{prioridad}}" role="tab" data-toggle="tab">{{prioridad}}</a>
+                                </li>
+                            </ul>
+                            <div role="tabpanel" class="tab-content">
+                                <div ng-repeat="prioridad in prioridadesUnicas" role="tabpanel" class="tab-pane" ng-class="{'active': isActiveTab(prioridad)}" id="{{prioridad}}">
+                                    <div ng-show="mostrarGraficoTicketsPrioridadOtrosIndicadores">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #ffcc99; font-weight: bold;">Cliente</th>
+                                                    <th ng-repeat="anno in anosTickets" style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #ffcc99; font-weight: bold;">{{anno}}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99;"></th>
+                                                    <th ng-repeat="anno in anosTickets" style="border: 1px solid #ddd; padding: 0;">
+                                                        <table style="width: 100%; border-collapse: collapse;">
+                                                            <tr>
+                                                                <th ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: center; font-weight: bold; background-color: #ffcc99;">{{getMesByNumero(mes)}}</th>
+                                                            </tr>
+                                                        </table>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="cliente in getClientesPorPrioridad(prioridad)">
+                                                    <td>{{cliente}}</td>
+                                                    <td ng-repeat="anno in anosTickets" style="border: 1px solid #ddd; padding: 0;">
+                                                        <table style="width:100%">
+                                                            <tr>
+                                                                <td ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: center;">
+                                                                    {{getCantidad(prioridad, cliente, anno, mes)}}
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <div class=" row col-md-12">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">Gráfico de Tickets por prioridad</div>
+                                                <div class="panel-body" style="margin: 0 auto;">
+                                                    <canvas id="chart-{{prioridad}}"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>-->
+
+
+
+
                 </div>
             </div>
 
@@ -1485,214 +1566,13 @@
             <div class="clear"></div>
             <div class="clear"></div>
             <div class="clear"></div>
-
-            @*Por annos*@
-            @*<div ng-show="mostrarGraficoTicketsAplicaAnno">
-
-                        <div class="row">
-                            <div>
-                                <uib-tabset>
-                                    <uib-tab ng-repeat="prioridad in prioridades" heading="{{prioridad}}">
-                                        <div class="table-responsive">
-                                            <table class="table table-bordered table-striped">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Cliente</th>
-                                                        <th ng-repeat="ano in anos" colspan="{{mesesPorAno[ano].length}}">{{ano}}</th>
-                                                    </tr>
-                                                    <tr>
-                                                        <th></th>
-                                                        <th ng-repeat-start="ano in anos" ng-repeat-end ng-repeat="mes in mesesPorAno[ano]">{{mes}}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr ng-repeat="cliente in clientes">
-                                                        <td>{{cliente}}</td>
-                                                        <td ng-repeat-start="ano in anos" ng-repeat-end ng-repeat="mes in mesesPorAno[ano]">
-                                                            {{getDatos(prioridad, cliente, ano, mes)}}
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                                <tfoot>
-                                                    <tr>
-                                                        <td>Total</td>
-                                                        <td ng-repeat-start="ano in anos" ng-repeat-end ng-repeat="mes in mesesPorAno[ano]">
-                                                            {{getTotal(prioridad, ano, mes)}}
-                                                        </td>
-                                                    </tr>
-                                                </tfoot>
-                                            </table>
-                                        </div>
-                                    </uib-tab>
-                                </uib-tabset>
-                            </div>
-                        </div>
-                    </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <ul class="nav nav-tabs" role="tablist">
-                                <li ng-repeat="prioridad in prioridadesData" role="presentation" ng-class="{'active': $first}">
-                                    <a href="#{{prioridad.prioridad}}" aria-controls="{{prioridad.prioridad}}" role="tab" data-toggle="tab">
-                                        {{prioridad.prioridad}}
-                                    </a>
-                                </li>
-                            </ul>
-
-                            <div class="tab-content">
-                                <div ng-repeat="prioridad in prioridadesData" role="tabpanel" class="tab-pane" ng-class="{'active': $first}" id="{{prioridad.prioridad}}">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Cliente</th>
-                                                <th ng-repeat="año in [2023, 2024]" colspan="3">{{año}}</th>
-                                            </tr>
-                                            <tr>
-                                                <th></th>
-                                                <th ng-repeat-start="año in [2023, 2024]">Junio</th>
-                                                <th>Julio</th>
-                                                <th ng-repeat-end>Agosto</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr ng-repeat="cliente in prioridad.datos">
-                                                <td>{{cliente.nombre}}</td>
-                                                <td ng-repeat="año in [2023, 2024]">
-                                                    {{cliente.datos[año + '-6'] || 0}}
-                                                </td>
-                                                <td ng-repeat="año in [2023, 2024]">
-                                                    {{cliente.datos[año + '-7'] || 0}}
-                                                </td>
-                                                <td ng-repeat="año in [2023, 2024]">
-                                                    {{cliente.datos[año + '-8'] || 0}}
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <!-- Por Año -->
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">Tickets por Aplica (Año)</div>
-                                        <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                            <table class="table table-bordered">
-                                                <thead>
-                                                    <tr>
-                                                        <th style="background-color: #6eb5ff; color: black;">Aplica</th>
-                                                        <th ng-repeat="ano in anosTickets" style="background-color: #6eb5ff; color: black;">{{ano}}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr ng-repeat="(aplica, datos) in ticketsPorAplicaAnno">
-                                                        <td>{{aplica}}</td>
-                                                        <td ng-repeat="ano in anosTickets">{{datos[ano] || 0}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="text-align: center; background-color: #6eb5ff; color: black; font-weight: bold;">Total</td>
-                                                        <td ng-repeat="ano in anosTickets" style="text-align: center; background-color: #6eb5ff; color: black; font-size: 20px;">{{totalesPorAnno[ano] | number:0}}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">Gráfico de Tickets por Aplica (Año)</div>
-                                        <div class="panel-body" style="margin: 0 auto;">
-                                            <canvas id="ticketPorAplicaBarrasChartAnno" style="overflow-x: auto"></canvas>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Por Mes -->
-                        <div ng-show="mostrarGraficoTicketsAplicaMeses">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">Tickets por Aplica (Mes)</div>
-                                        <div class="panel-body" style="max-height: 500px; overflow-x: auto;">
-                                            <table style="border-collapse: collapse; width: 100%;">
-                                                <thead style="background-color: #ffcc99; color: black;">
-                                                    <tr>
-                                                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99; ">Aplica</th>
-                                                        <th ng-repeat="ano in anosTickets" style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #ffcc99; font-weight: bold; ">{{ano}}</th>
-                                                    </tr>
-                                                    <tr>
-                                                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99; "></th>
-                                                        <th ng-repeat="ano in anosTickets" style="border: 1px solid #ddd; padding: 0;">
-                                                            <table style="width: 100%; border-collapse: collapse;">
-                                                                <tr>
-                                                                    <th ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: center; font-weight: bold;">{{getMesByNumero(mes)}}</th>
-                                                                </tr>
-                                                            </table>
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr ng-repeat="aplica in aplicasList">
-                                                        <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">{{aplica}}</td>
-                                                        <td ng-repeat="ano in anosTickets" style="border: 1px solid #ddd; padding: 0;">
-                                                            <table style="width: 100%; border-collapse: collapse;">
-                                                                <tr>
-                                                                    <td ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: center;">
-                                                                        {{getCantidad(aplica, ano, mes)}}
-                                                                    </td>
-                                                                </tr>
-                                                            </table>
-                                                        </td>
-                                                    </tr>
-                                                    <!-- Nueva fila para los totales -->
-                                                    <tr style="background-color: #ffcc99; color: black;">
-                                                        <td style="border: 1px solid #ddd; padding: 8px; text-align: left; font-weight: bold;">Total</td>
-                                                        <td ng-repeat="ano in anosTickets" style="border: 1px solid #ddd; padding: 0;">
-                                                            <table style="width: 100%; border-collapse: collapse;">
-                                                                <tr>
-                                                                    <td ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: center; font-weight: bold;">
-                                                                        {{calcularTotal(ano, mes)}}
-                                                                    </td>
-                                                                </tr>
-                                                            </table>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">Gráfico de Tickets por Aplica (Mes)</div>
-                                        <div class="panel-body" style="margin: 0 auto;">
-                                            <canvas id="ticketPorAplicaBarrasChartMes" style="overflow-x: auto"></canvas>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-xs-12 text-center">
-                            <p id="mensajeLabel">{{mensajeNoDataTicketsAplica}}</p>
-                        </div>
-                    </div>
-                </div>*@
-
-            <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
-                <br />
-            </div>
-
-            <div>
-                <br />
-            </div>
-
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
+            <div class="clear"></div>
         </div>
     </div>
 
