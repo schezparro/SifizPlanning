@@ -2284,6 +2284,12 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+               name: "DarTicketsAnuladosRechazados",
+               url: "indicadores/dar-tickets-anulados-rechazados/{id}",
+               defaults: new { controller = "Indicadores", action = "DarTicketsAnuladosRechazados", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                name: "DarTicketsAnalisadosGestores",
                url: "indicadores/dar-tickets-analizados-gestores/{id}",
                defaults: new { controller = "Indicadores", action = "DarTicketsAnalisadosGestores", id = UrlParameter.Optional }

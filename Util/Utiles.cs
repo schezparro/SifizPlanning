@@ -295,12 +295,16 @@ namespace SifizPlanning.Util
         public static void EnviarEmail(string emailFuente, string[] emailsDestinos, string emailBody, string asunto = "Información", string password = "", bool adjuntarimagen = false, string[] imagenes = null, string[] adjuntos = null, int idCorreo = -1)
         {
             var email = new MimeMessage();
+#pragma warning disable CS0618 // Type or member is obsolete
             email.From.Add(new MailboxAddress(emailFuente));
+#pragma warning restore CS0618 // Type or member is obsolete
             email.Subject = asunto;
 
             foreach (string emailDestino in emailsDestinos)
             {
+#pragma warning disable CS0618 // Type or member is obsolete
                 email.To.Add(new MailboxAddress(emailDestino));
+#pragma warning restore CS0618 // Type or member is obsolete
             }
             var builder = new BodyBuilder();
             if (adjuntarimagen)
@@ -813,8 +817,8 @@ namespace SifizPlanning.Util
         }
 
         //Funcion para encriptar simetricamente
-        static string claveEncriptacionSimetrica = "lkjIQWUQOWjsdlkJASDIO12%&gksklER";
-        static string vectorEncriptacionSimetrica = "ljasdls@351$%d!3";
+        static readonly string claveEncriptacionSimetrica = "lkjIQWUQOWjsdlkJASDIO12%&gksklER";
+        static readonly string vectorEncriptacionSimetrica = "ljasdls@351$%d!3";
         public static string EncriptacionSimetrica(string cadena)
         {
             byte[] key = UTF8Encoding.UTF8.GetBytes(claveEncriptacionSimetrica);
