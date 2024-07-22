@@ -1408,8 +1408,6 @@
                         $scope.mesesTickets.sort((a, b) => a - b);
                         $scope.aplicasList.sort();
 
-                        console.log($scope.mesesTickets);
-
                         $scope.getCantidadAnnos = function (aplica, ano) {
                             return ($scope.ticketsPorAplicaAnno[aplica] &&
                                 $scope.ticketsPorAplicaAnno[aplica][ano]) || 0;
@@ -1549,8 +1547,6 @@
                                 datasets: chartDataAnno.datasets
                             },
                             options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
                                 scales: {
                                     x: {
                                         display: true,
@@ -1590,8 +1586,6 @@
                                         top: 20
                                     }
                                 },
-                                barPercentage: 0.8,
-                                categoryPercentage: 0.9
                             },
                             plugins: [ChartDataLabels]
                         });
@@ -1605,9 +1599,6 @@
                                 datasets: chartDataMes.datasets
                             },
                             options: {
-                                //indexAxis: 'y',
-                                responsive: true,
-                                maintainAspectRatio: false,
                                 scales: {
                                     x: {
                                         display: true,
@@ -1902,8 +1893,6 @@
                                 datasets: chartDataAnnoEstados.datasets
                             },
                             options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
                                 scales: {
                                     x: {
                                         display: true,
@@ -1960,8 +1949,6 @@
                             },
                             options: {
                                 //indexAxis: 'y',
-                                responsive: true,
-                                maintainAspectRatio: false,
                                 scales: {
                                     x: {
                                         display: true,
@@ -2103,8 +2090,6 @@
                     datasets: datasets
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
                     scales: {
                         x: {
                             display: true,
@@ -2200,8 +2185,6 @@
                     datasets: Object.values(datasets)
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
                     scales: {
                         x: {
                             display: true,
@@ -2257,6 +2240,335 @@
         }
     };
 
+
+    //******************************************************************************************************************************** */
+    //*******************************************   OTROS INDICADORES  **************************************************************** */
+    //******************************************************************************************************************************** */
+
+    $('#select-annos-otros-indicadores').select2({
+        placeholder: "Seleccione...",
+        allowClear: true, // Permite borrar la selección
+        maximumSelectionLength: 3,
+        language: {
+            maximumSelected: function (e) {
+                return "Solo puedes seleccionar " + e.maximum + " meses";
+            }
+        },
+        closeOnSelect: false,
+        theme: "classic",
+        width: '300px',
+        templateResult: formatResult // Función para formatear cómo se muestra cada opción
+    }).on('change', function (e) {
+        $scope.$apply(function () {
+            var selectedValues = $(e.target).val();
+            $scope.annosOtrosIndicadores = selectedValues ? selectedValues : [];
+        });
+    });
+
+    $('#select-meses-otros-indicadores').select2({
+        placeholder: "Seleccione...",
+        allowClear: true, // Permite borrar la selección
+        /*maximumSelectionLength: 3,
+        language: {
+            maximumSelected: function (e) {
+                return "Solo puedes seleccionar " + e.maximum + " meses";
+            }
+        },*/
+        closeOnSelect: false,
+        width: '300px',
+        templateResult: formatResult // Función para formatear cómo se muestra cada opción
+    }).on('change', function (e) {
+        $scope.$apply(function () {
+            var selectedValues = $(e.target).val();
+            $scope.mesesOtrosIndicadores = selectedValues ? selectedValues : [];
+        });
+    });
+
+    //CLIENTES
+    var ajaxClienteProyectos = $http.post("user/cliente-incidencias", {});
+    ajaxClienteProyectos.success(function (data) {
+        if (data.success === true) {
+            $scope.clienteOtros = data.clientes;
+            $('#select-cliente-otros-indicadores').select2({
+                placeholder: 'Seleccione clientes',
+                allowClear: true,
+                multiple: true,
+                closeOnSelect: false,
+                width: '300px',
+                templateResult: formatResult
+            }).on('change', function (e) {
+                $scope.$apply(function () {
+                    var selectedValues = $(e.target).val();
+                    $scope.clienteOtrosIndicadores = selectedValues ? selectedValues : [];
+                });
+            });
+        } else {
+            messageDialog.show('Información', "No se pudo acceder a los clientes");
+        }
+    });
+
+
+    // Cargando las prioridades de los tickets
+    var ajaxPrioridades = $http.post("tickets/prioridades-ticket", {});
+    ajaxPrioridades.success(function (data) {
+        if (data.success === true) {
+            $scope.prioridades = data.prioridades;
+            $('#select-prioridad-otros-indicadores').select2({
+                placeholder: 'Seleccione prioridades',
+                allowClear: true,
+                multiple: true,
+                closeOnSelect: false,
+                width: '300px',
+                templateResult: formatResult
+            }).on('change', function (e) {
+                $scope.$apply(function () {
+                    var selectedValues = $(e.target).val();
+                    $scope.prioridadOtrosIndicadores = selectedValues ? selectedValues : [];
+                });
+            });
+        } else {
+            messageDialog.show('Información', "No se pudo acceder a las prioridades");
+        }
+    });
+
+    // Cargando las categorías de los tickets
+    var ajaxCategorias = $http.post("tickets/categorias-ticket", {});
+    ajaxCategorias.success(function (data) {
+        if (data.success === true) {
+            $scope.categorias = data.categorias;
+            $('#select-categoria-otros-indicadores').select2({
+                placeholder: 'Seleccione categorías',
+                allowClear: true,
+                multiple: true,
+                closeOnSelect: false,
+                width: '300px',
+                templateResult: formatResult
+            }).on('change', function (e) {
+                $scope.$apply(function () {
+                    var selectedValues = $(e.target).val();
+                    $scope.categoriaOtrosIndicadores = selectedValues ? selectedValues : [];
+                });
+            });
+        } else {
+            messageDialog.show('Información', "No se pudo acceder a las categorías");
+        }
+    });
+
+    function formatResult(item) {
+        if (!item.id) {
+            return item.text; // Devuelve el texto si no hay ID
+        }
+        var $result = $("<span>").text(item.text);
+        return $result;
+    };
+
+    $scope.buscarDatosOtrosIndicadores = function () {
+
+        if ($scope.ticketPorPrioridadBarrasChart) {
+            $scope.ticketPorPrioridadBarrasChart.destroy();
+        }
+        if ($scope.ticketPorCategoriasBarrasChartMes) {
+            $scope.ticketPorCategoriasBarrasChartMes.destroy();
+        }
+
+        $scope.mostrarPanelGraficosOtrosIndicadores = true;
+
+        $scope.MostrarTickectOtrosIndicadores();
+
+    };
+
+    $scope.MostrarTickectOtrosIndicadores = function () {
+        if ($scope.ticketPorPrioridadBarrasChart) {
+            $scope.ticketPorPrioridadBarrasChart.destroy();
+        }
+
+        if ($scope.ticketPorCategoriasBarrasChartMes) {
+            $scope.ticketPorCategoriasBarrasChartMes.destroy();
+        }
+
+        var infoTicketsOtrosIndicadores = $http.post("indicadores/dar-tickets-otros-indicadores/", {
+            clientes: $scope.clienteOtrosIndicadores,
+            annos: $scope.annoOtrosIndicadores,
+            meses: $scope.mesOtrosIndicadores,
+            prioridades: $scope.prioridadOtrosIndicadores,
+            categorias: $scope.categoriaOtrosIndicadores,
+        });
+
+        infoTicketsOtrosIndicadores.success(function (data) {
+            $scope.loading.hide();
+
+            if (data.success) {
+                $scope.mostrarPanelGraficosOtrosIndicadores = true;
+                $scope.mostrarPanelGraficosTicketsPrioridad = true;
+                $scope.mostrarPanelGraficosPorPrioridadMesesYAnnos = true;
+
+                $scope.setActiveTab = function (year) {
+                    $scope.activeTab = year;
+                };
+
+                $scope.isActiveTab = function (year) {
+                    return $scope.activeTab === year;
+                };
+
+                $scope.getDatos = function (prioridad, cliente, ano, mes) {
+                    return datos[cliente][ano][mes] || 0;
+                };
+
+                $scope.getTotal = function (prioridad, ano, mes) {
+                    return $scope.clientes.reduce(function (total, cliente) {
+                        return total + $scope.getDatos(prioridad, cliente, ano, mes);
+                    }, 0);
+                };
+
+                // Procesamiento de datos
+                var ticketsPorPrioridadaAnnoMes = {};
+                var anos = [];
+                var meses = [];
+                var anoActual = new Date().getFullYear();
+
+                if (data && data.ticketsPorClientePrioridad && Array.isArray(data.ticketsPorClientePrioridad)) {
+                    $scope.anosTickets = [];
+                    $scope.mesesTickets = [];
+                    $scope.clienteList = [];
+                    $scope.ticketsPorPrioridadaAnnoMes = {};
+                    var prioridadesUnicasArr = [];
+
+                    $scope.mostrarGraficoTicketsPrioridadOtrosIndicadores = true
+
+                    data.ticketsPorClientePrioridad.forEach(function (ticket) {
+                        if (!ticketsPorPrioridadaAnnoMes[ticket.Cliente]) {
+                            ticketsPorPrioridadaAnnoMes[ticket.Cliente] = {};
+                        }
+                        if (!ticketsPorPrioridadaAnnoMes[ticket.Cliente][ticket.Anno]) {
+                            ticketsPorPrioridadaAnnoMes[ticket.Cliente][ticket.Anno] = {};
+                        }
+
+                        ticketsPorPrioridadaAnnoMes[ticket.Cliente][ticket.Anno][ticket.Mes] = ticket.Cantidad;
+
+                        if (!prioridadesUnicasArr.includes(ticket.Prioridad)) {
+                            prioridadesUnicasArr.push(ticket.Prioridad);
+                        }
+
+                        if (!anos.includes(ticket.Anno)) {
+                            anos.push(ticket.Anno);
+                        }
+                        if (!meses.includes(ticket.Mes)) {
+                            meses.push(ticket.Mes);
+                        }
+
+                        if (!$scope.anosTickets.includes(ticket.Anno)) {
+                            $scope.anosTickets.push(ticket.Anno);
+                        }
+                        if (!$scope.mesesTickets.includes(ticket.Mes)) {
+                            $scope.mesesTickets.push(ticket.Mes);
+                        }
+                        if (!$scope.clienteList.includes(ticket.Cliente)) {
+                            $scope.clienteList.push(ticket.Cliente);
+                        }
+
+                        if (!$scope.ticketsPorPrioridadaAnnoMes[ticket.Cliente]) {
+                            $scope.ticketsPorPrioridadaAnnoMes[ticket.Cliente] = {};
+                        }
+                        if (!$scope.ticketsPorPrioridadaAnnoMes[ticket.Cliente][ticket.Anno]) {
+                            $scope.ticketsPorPrioridadaAnnoMes[ticket.Cliente][ticket.Anno] = {};
+                        }
+                        $scope.ticketsPorPrioridadaAnnoMes[ticket.Cliente][ticket.Anno][ticket.Mes] = ticket.Cantidad;
+
+                        var datosPorClientePrioridad = {};
+
+                        var cliente = ticket.Cliente;
+                        var prioridad = ticket.Prioridad;
+                        var anno = ticket.Anno;
+                        var mes = ticket.Mes;
+                        var cantidad = ticket.Cantidad;
+                        $scope.datosPorClientePrioridad = {};
+
+                        // Verificar si el cliente ya existe en la estructura de datos
+                        if (!datosPorClientePrioridad[cliente]) {
+                            datosPorClientePrioridad[cliente] = {};
+                        }
+
+                        // Verificar si la prioridad ya existe para el cliente
+                        if (!datosPorClientePrioridad[cliente][prioridad]) {
+                            datosPorClientePrioridad[cliente][prioridad] = {};
+                        }
+
+                        // Verificar si el año ya existe para la prioridad y cliente
+                        if (!datosPorClientePrioridad[cliente][prioridad][anno]) {
+                            datosPorClientePrioridad[cliente][prioridad][anno] = {};
+                        }
+
+                        // Guardar la cantidad para el mes correspondiente
+                        datosPorClientePrioridad[cliente][prioridad][anno][mes] = cantidad;
+
+                        $scope.datosPorClientePrioridad = datosPorClientePrioridad;
+
+                    });
+                };
+                        console.log($scope.datosPorClientePrioridad);
+
+                $scope.anosTickets.sort((a, b) => a - b);
+                $scope.mesesTickets.sort((a, b) => a - b);
+                $scope.clienteList.sort();
+
+                $scope.getCantidad = function (cliente, ano, mes) {
+                    return ($scope.ticketsPorPrioridadaAnnoMes[cliente] &&
+                        $scope.ticketsPorPrioridadaAnnoMes[cliente][ano] &&
+                        $scope.ticketsPorPrioridadaAnnoMes[cliente][ano][mes]) || 0;
+                };
+
+                function isMonthEmpty(ano, mes) {
+                    return $scope.clienteList.every(function (cliente) {
+                        return $scope.getCantidad(cliente, ano, mes) === 0;
+                    });
+                };
+
+                function isYearEmpty(ano) {
+                    return $scope.clienteList.every(function (cliente) {
+                        return $scope.getCantidad(cliente, ano) === 0;
+                    });
+                };
+
+                
+
+                $scope.calcularTotal = function (ano, mes) {
+                    var total = 0;
+                    $scope.clienteList.forEach(function (cliente) {
+                        total += $scope.getCantidad(cliente, ano, mes);
+                    });
+                    return total;
+                };
+
+                // Si no se seleccionaron años, usar el año actual
+                if (anos.length === 0) {
+                    anos.push(anoActual);
+                }
+
+                $scope.ticketsPorPrioridadaAnnoMes = ticketsPorPrioridadaAnnoMes;
+                $scope.anosTickets = anos.sort();
+                $scope.mesesTickets = meses.sort();
+
+                // Calcular totales por año
+                //$scope.totalesPorAnno = {};
+                //anos.forEach(function (ano) {
+                //    $scope.totalesPorAnno[ano] = Object.values(ticketsPorAplicaAnno).reduce(function (total, aplica) {
+                //        return total + (aplica[ano] || 0);
+                //    }, 0);
+                //});
+
+                
+
+                $scope.prioridadesUnicas = prioridadesUnicasArr;
+
+
+                console.log("entro");
+
+            } else {
+                alert("Error: " + data.msg);
+            }
+        });
+    };
+
     function getRandomColor() {
         var letters = '0123456789ABCDEF';
         var color = '#';
@@ -2265,6 +2577,11 @@
         }
         return color;
     }
+
+    function getMesByNumero(mesNumero) {
+        var meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        return meses[mesNumero - 1] || '';
+    };
 
     function dateToStr(dateObj, format, separator) {
         /**

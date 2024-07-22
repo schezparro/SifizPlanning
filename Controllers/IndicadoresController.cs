@@ -521,6 +521,8 @@ namespace SifizPlanning.Controllers
             }
         }
 
+
+
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
         public ActionResult DarTicketsPorGestor(string fechaInicio, string fechaFin, string gestor)
@@ -1215,6 +1217,143 @@ namespace SifizPlanning.Controllers
                     success = true,
                     ticketsPorAnnoGarantia = ticketsPorAnnoGarantia,
                     ticketsPorAnnoMesGarantia = ticketsPorAnnoMesGarantia
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        //********************** OTROS TICKETS *******************
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public ActionResult DarTicketsOtrosIndicadores(List<string> clientes, List<string> annos, List<string> meses, List<string> prioridades, List<string> categorias)
+        {
+            try
+            {
+                var fechaActual = DateTime.Now;
+                var annoActual = fechaActual.Year;
+                var mesActual = fechaActual.Month;
+
+                // Manejo de años
+                var annosInt = new List<int>();
+                if (annos == null || !annos.Any())
+                {
+                    annosInt.Add(annoActual);
+                }
+                else
+                {
+                    annosInt = annos.Select(int.Parse).ToList();
+                }
+
+                // Manejo de meses
+                var mesesInt = new List<int>();
+                if (meses == null || !meses.Any())
+                {
+                    if (annosInt.Contains(annoActual))
+                    {
+                        mesesInt = Enumerable.Range(1, mesActual).ToList();
+                    }
+                    else
+                    {
+                        mesesInt = Enumerable.Range(1, 12).ToList();
+                    }
+                }
+                else
+                {
+                    mesesInt = meses.Select(int.Parse).ToList();
+                }
+
+                // Consulta base con joins
+                var ticketsQuery = from t in db.Ticket
+                                   join tpc in db.Persona_Cliente on t.SecuencialPersona_Cliente equals tpc.SecuencialPersona
+                                   join tc in db.Cliente on tpc.SecuencialCliente equals tc.Secuencial
+                                   join tp in db.PrioridadTicket on t.SecuencialPrioridadTicket equals tp.Secuencial
+                                   join ct in db.CategoriaTicket on t.SecuencialCategoriaTicket equals ct.Secuencial
+                                   where t.FechaCreado != null
+                                   select new
+                                   {
+                                       FechaIngreso = t.FechaCreado,
+                                       Cliente = tc.Descripcion,
+                                       ClienteSecuencial = tc.Secuencial,
+                                       Prioridad = tp.Codigo,
+                                       PrioridadSecuencial = tp.Secuencial,
+                                       Categoria = ct.Codigo,
+                                       CategoriaSecuencial = ct.Secuencial
+                                   };
+
+                // Aplicar filtros solo si tienen valores
+                if (clientes != null && clientes.Any())
+                    ticketsQuery = ticketsQuery.Where(t => clientes.Contains(t.Cliente));
+
+                if (prioridades != null && prioridades.Any())
+                    ticketsQuery = ticketsQuery.Where(t => prioridades.Contains(t.PrioridadSecuencial.ToString()));
+
+                if (categorias != null && categorias.Any())
+                    ticketsQuery = ticketsQuery.Where(t => categorias.Contains(t.CategoriaSecuencial.ToString()));
+
+                // Filtrar por años y meses seleccionados
+                ticketsQuery = ticketsQuery.Where(t =>
+                    annosInt.Contains(t.FechaIngreso.Year) &&
+                    mesesInt.Contains(t.FechaIngreso.Month)
+                );
+
+                // Seleccionar los campos necesarios
+                var ticketsList = ticketsQuery.Select(t => new
+                {
+                    AnnoFechaIngreso = t.FechaIngreso.Year,
+                    MesFechaIngreso = t.FechaIngreso.Month,
+                    t.Cliente,
+                    t.Prioridad,
+                    t.Categoria
+                }).ToList();
+
+                // Agrupar por año, mes, cliente y prioridad
+                var ticketsPorClientePrioridad = ticketsList
+                    .GroupBy(t => new { t.AnnoFechaIngreso, t.MesFechaIngreso, t.Cliente, t.Prioridad })
+                    .Select(g => new
+                    {
+                        Anno = g.Key.AnnoFechaIngreso,
+                        Mes = g.Key.MesFechaIngreso,
+                        Cliente = g.Key.Cliente,
+                        Prioridad = g.Key.Prioridad,
+                        Cantidad = g.Count()
+                    })
+                    .OrderBy(x => x.Prioridad)
+                    .ThenBy(x => x.Anno)
+                    .ThenBy(x => x.Mes)
+                    .ThenBy(x => x.Cliente)
+                    .ToList();
+
+                // Agrupar por año, mes, cliente y categoría
+                var ticketsPorClienteCategoria = ticketsList
+                    .GroupBy(t => new { t.AnnoFechaIngreso, t.MesFechaIngreso, t.Cliente, t.Categoria })
+                    .Select(g => new
+                    {
+                        Anno = g.Key.AnnoFechaIngreso,
+                        Mes = g.Key.MesFechaIngreso,
+                        Cliente = g.Key.Cliente,
+                        Categoria = g.Key.Categoria,
+                        Cantidad = g.Count()
+                    })
+                    .OrderBy(x => x.Anno)
+                    .ThenBy(x => x.Mes)
+                    .ThenBy(x => x.Cliente)
+                    .ThenBy(x => x.Categoria)
+                    .ToList();
+
+                return Json(new
+                {
+                    success = true,
+                    ticketsPorClientePrioridad = ticketsPorClientePrioridad,
+                    ticketsPorClienteCategoria = ticketsPorClienteCategoria
                 }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception e)
