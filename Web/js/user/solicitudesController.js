@@ -66,16 +66,11 @@
 
     //Para la solicitud de vacaciones
     $scope.windowSolicitarVacaciones = function () {
+        $scope.solVacaciones.id = "undefined";
         $scope.solVacaciones.apellidosNombres = $scope.datosUsuario.nombre;
         $scope.solVacaciones.cargo = $scope.datosUsuario.cargo;
         $scope.isEmpresaVacacionesSelectEditable = false;
         $scope.btnEditar = false;
-        console.log($scope.solVacaciones.id);
-
-        if ($scope.solVacaciones.id != undefined) {
-            $scope.btnEditar = true;
-        }
-        
        
         if ($scope.datosUsuario.empresa === "SIFIZSOFT") {
             $scope.solVacaciones.empresa = "SIFIZSOFT";
@@ -110,7 +105,7 @@
         });
     };
 
-    $scope.editarSolVacaciones = function () {
+    $scope.editarSolVacaciones = function (event) {
         event.preventDefault();
         waitingDialog.show('Solicitando vacaciones...', { dialogSize: 'sm', progressType: 'success' });
 
@@ -203,6 +198,7 @@
 
     //Para la solicitud de permisos
     $scope.windowSolicitarPermiso = function () {
+        $scope.solicitudPer.id = "undefined";
         $scope.solicitudPer.apellidosNombres = $scope.datosUsuario.nombre;
         $scope.solicitudPer.cargo = $scope.datosUsuario.cargo;
         $scope.solicitudPer.area = $scope.datosUsuario.departamento;
@@ -240,7 +236,8 @@
         });
     };
 
-    $scope.editarSolPermisos = function () {
+    $scope.editarSolPermisos = function (event) {
+        event.preventDefault();
         waitingDialog.show('Solicitando permisos...', { dialogSize: 'sm', progressType: 'success' });
         var solicitudPermisos = $http.post("user/editar-solicitar-permisos",
             {
@@ -346,9 +343,9 @@
             $scope.solVacaciones.fechaPresentarseTrabajar = convertDate(solVac.FechaPresentarseTrabajar);
             $scope.solVacaciones.observaciones = solVac.Observaciones;
             $scope.solVacaciones.jefe = solVac.Jefe;
-            $scope.solVacaciones.id = solVac.ID;
             $scope.solVacaciones.estado = solVac.Estado;
             $scope.windowSolicitarVacaciones();          
+            $scope.solVacaciones.id = solVac.ID;
         }
     };
 
@@ -368,9 +365,9 @@
             $scope.solicitudPer.horaRetorno = solPer.HoraRetorno;
             $scope.solicitudPer.motivo = solPer.Motivo;
             $scope.solicitudPer.jefe = solPer.Jefe;
-            $scope.solicitudPer.id = solPer.ID;
             $scope.solicitudPer.estado = solPer.Estado;           
             $scope.windowSolicitarPermiso();
+            $scope.solicitudPer.id = solPer.ID;
         }
     };
 

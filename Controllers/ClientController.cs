@@ -1733,13 +1733,13 @@ namespace SifizPlanning.Controllers
 
                     var client = new HttpClient();
                     string key = ConfigurationManager.AppSettings.Get("Devops");
+                    client.DefaultRequestHeaders.Add("X-API-KEY", key);
 
-                    var requestUrl = "https://d788-186-101-80-114.ngrok-free.app/api/WorkItemStateNotification/ModificarCambioDeEstadoAsignacionTareaDePublicacionRechazada";
+                    var requestUrl = "https://api-sifizops.sifizsoft.com/api/WorkItemStateNotification/ModificarCambioDeEstadoAsignacionTareaDePublicacionRechazada";
                     var data = new
                     {
                         Identifier = idTicket.ToString(),
-                        CambiarEstadoRechazado = "SI",
-                        Key = key
+                        CambiarEstadoRechazado = "SI"
                     };
 
                     var json = JsonConvert.SerializeObject(data);

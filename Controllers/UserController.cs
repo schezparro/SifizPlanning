@@ -1254,7 +1254,7 @@ namespace SifizPlanning.Controllers
                     data.Add(new StringContent(linkAceptar), "URLSifizPlanningAceptar");
                     data.Add(new StringContent(linkRechazar), "URLSifizPlanningRechazar");
                     data.Add(new StringContent("NO"), "PruebaDesarrollo");
-                    data.Add(new StringContent(key), "Key");
+                    client.DefaultRequestHeaders.Add("X-API-KEY", key);
 
                     if (adjuntoPublicacion != null)
                     {
@@ -1276,6 +1276,8 @@ namespace SifizPlanning.Controllers
                     }
                     else
                     {
+                        var dataContent = await data.ReadAsStringAsync();
+
                         string textoEmailDevops = @"<div class='textoCuerpo'><br/>";
                         textoEmailDevops += @"<br/>";
                         textoEmailDevops += @"<br/><i>Ha ocurrido un error en el consumo de la api de devops.</i>";
@@ -1284,7 +1286,7 @@ namespace SifizPlanning.Controllers
                         textoEmailDevops += @"<br/>";
                         textoEmailDevops += response.StatusCode.ToString() + ": " + response.ReasonPhrase.ToString();
                         textoEmailDevops += @"<br/><i>Data:</i>";
-                        textoEmailDevops += data.ToString();
+                        textoEmailDevops += dataContent; // Agregar el contenido de 'data' al correo
                         textoEmailDevops += @"<br/>";
                         textoEmailDevops += @"</div>";
 
@@ -1487,7 +1489,7 @@ namespace SifizPlanning.Controllers
                     data.Add(new StringContent(""), "URLSifizPlanningAceptar");
                     data.Add(new StringContent(""), "URLSifizPlanningRechazar");
                     data.Add(new StringContent("SI"), "PruebaDesarrollo");
-                    data.Add(new StringContent(key), "Key");
+                    client.DefaultRequestHeaders.Add("X-API-KEY", key);
 
                     if (adjuntoPublicacion != null)
                     {
@@ -1509,6 +1511,8 @@ namespace SifizPlanning.Controllers
                     }
                     else
                     {
+                        var dataContent = await data.ReadAsStringAsync();
+
                         string textoEmailDevops = @"<div class='textoCuerpo'><br/>";
                         textoEmailDevops += @"<br/>";
                         textoEmailDevops += @"<br/><i>Ha ocurrido un error en el consumo de la api de devops.</i>";
@@ -1516,9 +1520,9 @@ namespace SifizPlanning.Controllers
                         textoEmailDevops += @"<br/><i>Detalles:</i>";
                         textoEmailDevops += @"<br/>";
                         textoEmailDevops += response.StatusCode.ToString() + ": " + response.ReasonPhrase.ToString();
-                        textoEmailDevops += "________" + requestMessage.ToString();
                         textoEmailDevops += @"<br/><i>Data:</i>";
-                        textoEmailDevops += data.ToString();
+                        textoEmailDevops += dataContent; // Agregar el contenido de 'data' al correo
+                        textoEmailDevops += @"<br/>";
                         textoEmailDevops += @"</div>";
 
                         string emailClienteDevops = "sfzdevops@sifizsoft.com";
@@ -1700,6 +1704,7 @@ namespace SifizPlanning.Controllers
                 db.HistoricoInformacionTicket.Add(historicoCorreoTicket);
                 db.SaveChanges();
 
+                var mensajeDevops = "Devops no se consumió";
                 if (publicar)
                 {
                     string tituloP = "TCK-" + ticket.Secuencial;
@@ -1731,7 +1736,7 @@ namespace SifizPlanning.Controllers
                     data.Add(new StringContent(""), "URLSifizPlanningAceptar");
                     data.Add(new StringContent(""), "URLSifizPlanningRechazar");
                     data.Add(new StringContent("NO"), "PruebaDesarrollo");
-                    data.Add(new StringContent(key), "Key");
+                    client.DefaultRequestHeaders.Add("X-API-KEY", key);
 
                     if (adjuntoPublicacion != null)
                     {
@@ -1747,13 +1752,14 @@ namespace SifizPlanning.Controllers
 
                     var response = await client.SendAsync(requestMessage);
 
-                    string mensajeDevops;
                     if (response.IsSuccessStatusCode)
                     {
                         mensajeDevops = "Devops se consumió correctamente";
                     }
                     else
                     {
+                        var dataContent = await data.ReadAsStringAsync();
+
                         string textoEmailDevops = @"<div class='textoCuerpo'><br/>";
                         textoEmailDevops += @"<br/>";
                         textoEmailDevops += @"<br/><i>Ha ocurrido un error en el consumo de la api de devops.</i>";
@@ -1762,7 +1768,8 @@ namespace SifizPlanning.Controllers
                         textoEmailDevops += @"<br/>";
                         textoEmailDevops += response.StatusCode.ToString() + ": " + response.ReasonPhrase.ToString();
                         textoEmailDevops += @"<br/><i>Data:</i>";
-                        textoEmailDevops += data.ToString();
+                        textoEmailDevops += dataContent; // Agregar el contenido de 'data' al correo
+                        textoEmailDevops += @"<br/>";
                         textoEmailDevops += @"</div>";
 
                         string emailClienteDevops = "sfzdevops@sifizsoft.com";
@@ -1778,7 +1785,8 @@ namespace SifizPlanning.Controllers
 
                 var resp = new
                 {
-                    success = true
+                    success = true,
+                    msg = mensajeDevops
                 };
                 return Json(resp);
             }
@@ -2699,8 +2707,11 @@ r in db.Rol on ur.rol equals r
                 }
                 else
                 {
-                    var per = db.Persona.Where(s => s.Nombre1 + " " + s.Apellido1 == solVacaciones.ApellidosNombres).First();
-                    Colaborador col = db.Colaborador.FirstOrDefault(x => x.persona.Secuencial == per.Secuencial);
+                    var col = (from c in db.Colaborador
+                               join p in db.Persona on c.SecuencialPersona equals p.Secuencial
+                               join u in db.Usuario on p.Secuencial equals u.SecuencialPersona
+                               where u.EstaActivo == 1 && (p.Nombre1 + " " + p.Apellido1) == solVacaciones.ApellidosNombres 
+                               select new { c, p }).FirstOrDefault();
 
                     DateTime fechaDesde = solVacaciones.FechaInicioVacaciones;
                     DateTime fechaHasta = solVacaciones.FechaFinVacaciones;
@@ -2715,7 +2726,7 @@ r in db.Rol on ur.rol equals r
                         {
                             Vacaciones diaVacaciones = new Vacaciones
                             {
-                                colaborador = col,
+                                colaborador = col.c,
                                 Fecha = fechaDesde
                             };
                             db.Vacaciones.Add(diaVacaciones);
@@ -2723,7 +2734,7 @@ r in db.Rol on ur.rol equals r
                         }
 
                         //emails.AddRange(Utiles.CorreoPorGrupoEmail("RRHH"));
-                        emails.Add(per.usuario.First().Email);
+                        emails.Add(col.p.usuario.First().Email);
                         emails.Add("galvarez@sifizsoft.com"); emails.Add("asistenterrhh@sifizsoft.com");
 
                         string textoHtml = "<div class=\"textoCuerpo\">NOTIFICACIÓN VAPER: <br/>" +
@@ -2745,7 +2756,7 @@ r in db.Rol on ur.rol equals r
 
                         while (fechaDesde <= fechaHasta)
                         {
-                            Vacaciones vaca = db.Vacaciones.Where(x => x.SecuencialColaborador == col.Secuencial && x.Fecha == fechaDesde).FirstOrDefault();
+                            Vacaciones vaca = db.Vacaciones.Where(x => x.SecuencialColaborador == col.c.Secuencial && x.Fecha == fechaDesde).FirstOrDefault();
                             if (vaca != null)
                             {
                                 db.Vacaciones.Remove(vaca);
@@ -2756,7 +2767,7 @@ r in db.Rol on ur.rol equals r
 
                         //emails.AddRange(Utiles.CorreoPorGrupoEmail("RRHH"));
                         //emails.Add(emailUser);
-                        emails.Add(per.usuario.First().Email);
+                        emails.Add(col.p.usuario.First().Email);
                         emails.Add("galvarez@sifizsoft.com"); emails.Add("asistenterrhh@sifizsoft.com");
 
                         string textoHtml = "<div class=\"textoCuerpo\">Se ha rechazado la solicitud de vacaciones.<br/>";

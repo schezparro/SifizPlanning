@@ -6,6 +6,7 @@ using System.Data.Entity;
 using System.Data.Entity.SqlServer;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -1380,24 +1381,33 @@ namespace SifizPlanning.Controllers
 
                 var ticketsQuery = from ticket in db.InfoTickets
                                    where ticket.FechaIngreso.HasValue &&
-                                         ticket.FechaIngreso.Value.Year >= fInicio.Year &&
-                                         ticket.FechaIngreso.Value.Month >= fInicio.Month &&
-                                         ticket.FechaIngreso.Value.Day >= fInicio.Day &&
-                                         ticket.FechaIngreso.Value.Year <= fFin.Year &&
-                                         ticket.FechaIngreso.Value.Month <= fFin.Month &&
-                                         ticket.FechaIngreso.Value.Day <= fFin.Day
+                                         DbFunctions.TruncateTime(ticket.FechaIngreso.Value) >= DbFunctions.TruncateTime(fInicio) &&
+                                         DbFunctions.TruncateTime(ticket.FechaIngreso.Value) <= DbFunctions.TruncateTime(fFin)
                                    select ticket;
 
                 List<InfoTickets> ticketsList = ticketsQuery.ToList();
 
                 var resumenTickets = ticketsList
-                    .GroupBy(ticket => ticket.AsignadoA)
+                    .Where(ticket => ticket.Cliente != null && ticket.FechaIngreso.HasValue)
+                    .Select(ticket => new
+                    {
+                        Cliente = ticket.Cliente,
+                        FechaIngreso = ticket.FechaIngreso.Value,
+                        HorasEmpleadas = ticket.HorasEmpleadas.HasValue ? (ticket.HorasEmpleadas.Value - DateTime.MinValue).TotalHours : 0,
+                        GestorServicio = db.GestorServicios.FirstOrDefault(s => s.cliente != null && s.cliente.Descripcion == ticket.Cliente)
+                    })
+                    .GroupBy(ticket => new
+                    {
+                        Gestor = ticket.GestorServicio != null
+                            ? ticket.GestorServicio.colaborador.persona.Nombre1 + " " + ticket.GestorServicio.colaborador.persona.Apellido1
+                            : "Desconocido"
+                    })
                     .Select(group => new
                     {
-                        Gestor = group.Key,
+                        Gestor = group.Key.Gestor,
                         NumeroTickets = group.Count(),
-                        TiempoMinutos = Math.Round(group.Sum(ticket => ((ticket.HorasEmpleadas ?? DateTime.MinValue) - (ticket.HorasEmpleadas ?? DateTime.MinValue).Date).TotalMinutes), 2),
-                        TiempoHoras = Math.Round(group.Sum(ticket => ((ticket.HorasEmpleadas ?? DateTime.MinValue) - (ticket.HorasEmpleadas ?? DateTime.MinValue).Date).TotalHours), 2),
+                        TiempoMinutos = Math.Round(group.Sum(ticket => ticket.HorasEmpleadas * 60), 2),
+                        TiempoHoras = Math.Round(group.Sum(ticket => ticket.HorasEmpleadas), 2),
                         ClientesAtendidos = group.Select(ticket => ticket.Cliente).Distinct().Count(),
                         CarteraAsignada = group.Select(ticket => ticket.Cliente).Distinct().Count() // Ajusta según tus necesidades
                     })
@@ -1421,6 +1431,122 @@ namespace SifizPlanning.Controllers
                 return Json(resp);
             }
         }
+
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public ActionResult DarTicketsTiempoGestores(string fechaInicio, string fechaFin)
+        {
+            try
+            {
+                // Crear objetos DateTime para almacenar las fechas
+                DateTime fInicio = DateTime.ParseExact(fechaInicio, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                DateTime fFin = DateTime.ParseExact(fechaFin, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+                var tiempoQuery = from tiempo in db.InfoTickets
+                                  where tiempo.FechaIngreso.HasValue &&
+                                        DbFunctions.TruncateTime(tiempo.FechaIngreso.Value) >= DbFunctions.TruncateTime(fInicio) &&
+                                        DbFunctions.TruncateTime(tiempo.FechaIngreso.Value) <= DbFunctions.TruncateTime(fFin)
+                                  select tiempo;
+
+                List<InfoTickets> tiempoList = tiempoQuery.ToList();
+
+                var resumenTiempo = tiempoList
+                    .Where(tiempo => tiempo.Cliente != null && tiempo.FechaIngreso.HasValue)
+                    .Select(tiempo => new
+                    {
+                        Cliente = tiempo.Cliente,
+                        FechaIngreso = tiempo.FechaIngreso.Value,
+                        HorasEmpleadas = tiempo.HorasEmpleadas.HasValue ? (tiempo.HorasEmpleadas.Value - DateTime.MinValue).TotalHours : 0,
+                        GestorServicio = db.GestorServicios.FirstOrDefault(s => s.cliente != null && s.cliente.Descripcion == tiempo.Cliente)
+                    })
+                    .GroupBy(tiempo => new
+                    {
+                        Gestor = tiempo.GestorServicio != null
+                            ? tiempo.GestorServicio.colaborador.persona.Nombre1 + " " + tiempo.GestorServicio.colaborador.persona.Apellido1
+                            : "Desconocido",
+                        Año = tiempo.FechaIngreso.Year,
+                        Mes = tiempo.FechaIngreso.Month
+                    })
+                    .Select(group => new
+                    {
+                        Gestor = group.Key.Gestor,
+                        Mes = group.Key.Mes,
+                        Anio = group.Key.Año,
+                        TiempoTotal = Math.Round(group.Sum(tiempo => tiempo.HorasEmpleadas), 1) // Redondear a 1 decimal
+                    })
+                    .ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    tiempoIntervaloGestores = resumenTiempo
+                };
+
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public async Task<ActionResult> DarTicketsAnuladosRechazados(string fechaInicio, string fechaFin)
+        {
+            try
+            {
+                DateTime fInicio = DateTime.ParseExact(fechaInicio, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                DateTime fFin = DateTime.ParseExact(fechaFin, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+                var ticketsPorMes = from ticket in db.InfoTickets
+                                    where ticket.FechaIngreso.HasValue &&
+                                          ticket.FechaIngreso.Value.Year >= fInicio.Year &&
+                                          ticket.FechaIngreso.Value.Month >= fInicio.Month &&
+                                          ticket.FechaIngreso.Value.Day >= fInicio.Day &&
+                                          ticket.FechaIngreso.Value.Year <= fFin.Year &&
+                                          ticket.FechaIngreso.Value.Month <= fFin.Month &&
+                                          ticket.FechaIngreso.Value.Day <= fFin.Day
+                                    let gestorServicio = db.GestorServicios.FirstOrDefault(s => s.cliente != null && s.cliente.Descripcion == ticket.Cliente)
+                                    let nombreGestor = gestorServicio != null && gestorServicio.colaborador != null && gestorServicio.colaborador.persona != null ? gestorServicio.colaborador.persona.Nombre1 + " " + gestorServicio.colaborador.persona.Apellido1 : "Desconocido"
+                                    group ticket by new { Gestor = nombreGestor, Anio = ticket.FechaIngreso.Value.Year, Mes = ticket.FechaIngreso.Value.Month } into g
+                                    select new
+                                    {
+                                        g.Key.Gestor,
+                                        g.Key.Anio,
+                                        g.Key.Mes,
+                                        Ingresado = g.Count(),
+                                        AnuladoRechazado = g.Count(t => t.Estado == "Anulado" || t.Estado == "Rechazado")
+                                    };
+
+                var listaTicketsPorMes = ticketsPorMes.ToList();
+                var resp = new
+                {
+                    success = true,
+                    anuladosRechazados = listaTicketsPorMes
+                };
+
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+
+
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
         public ActionResult DarTicketsAnalisadosGestores(string fechaInicio, string fechaFin)
@@ -1504,11 +1630,15 @@ namespace SifizPlanning.Controllers
                     throw new ArgumentException("El gestor no puede estar vacío.");
 
                 var gestorUpperCase = gestor.ToUpper();
+                var clientes = (from c in db.Cliente
+                                join g in db.GestorServicios on c.Secuencial equals g.SecuencialCliente
+                                where g.colaborador.persona.Nombre1.ToUpper() + " " + g.colaborador.persona.Apellido1.ToUpper() == gestorUpperCase
+                                select c.Descripcion.ToUpper()).ToList();
 
                 var ticketsQuery = from ticket in db.InfoTickets
                                    where ticket.FechaIngreso.HasValue &&
                                          ticket.FechaIngreso.Value.Year == anio &&
-                                         ticket.AsignadoA.ToUpper() == gestorUpperCase
+                                         clientes.Contains(ticket.Cliente.ToUpper())
                                    select ticket;
 
                 List<InfoTickets> ticketsList = ticketsQuery.ToList();

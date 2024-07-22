@@ -214,8 +214,8 @@
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" id="enviar-solicitud-vacaciones-btn" class="btn btn-primary">Enviar</button>
-                    <button class="btn btn-success" ng-click="editarSolVacaciones()" ng-show="btnEditar" >Editar</button>
+                    <button type="submit" ng-show="solVacaciones.id == 'undefined'" id="enviar-solicitud-vacaciones-btn" class="btn btn-primary">Enviar</button>
+                    <button class="btn btn-success" ng-show="solVacaciones.id != 'undefined'" ng-click="editarSolVacaciones()">Editar</button>
                     <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </form>
@@ -342,8 +342,8 @@
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" id="enviar-solicitud-permiso-btn" class="btn btn-primary">Enviar</button>
-                    <button class="btn btn-success" ng-click="editarSolPermisos()">Editar</button>
+                    <button type="submit" ng-show="solicitudPer.id == 'undefined'" id="enviar-solicitud-permiso-btn" class="btn btn-primary">Enviar</button>
+                    <button class="btn btn-success" ng-show="solicitudPer.id != 'undefined'" ng-click="editarSolPermisos()">Editar</button>
                     <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </form>

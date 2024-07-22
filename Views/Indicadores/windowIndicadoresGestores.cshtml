@@ -7,6 +7,8 @@
         <li class="active"><a href="#anio-gestor" role="tab" data-toggle="tab">Tickets por Cliente</a></li>
         <li><a href="#mes-gestor" role="tab" data-toggle="tab">Por Fecha y Gestores</a></li>
         <li><a href="#mes-gestor-analizados" role="tab" data-toggle="tab">Analizados</a></li>
+        <li><a href="#mes-gestor-invertido" role="tab" data-toggle="tab">Tiempo Invertido</a></li>
+        <li><a href="#mes-anulado-rechazado" role="tab" data-toggle="tab">Anulado / Rechazado</a></li>
     </ul>
 
     <div class="tab-content">
@@ -21,15 +23,14 @@
 
                 <div class="form-group" style="margin-left: 20px;">
                     <label for="gestor">Gestor:</label>
-                    <select id="gestor" class="form-control" ng-init="gestorSeleccionado = 'MARITZA REINO'" ng-model="gestorSeleccionado" ng-change="darTicketsPorAnioGestor()" style="width: auto; margin-left: 10px;">
-                        <option ng-repeat="gestor in gestores" value="{{gestor.nombre}}">{{gestor.nombre}}</option>
+                    <select id="gestor" class="form-control" ng-model="gestorSeleccionado" ng-change="darTicketsPorAnioGestor()" style="width: auto; margin-left: 10px;">
+                        <option ng-repeat="gestor in gestores" value={{gestor.nombre}}> {{gestor.nombre}}</option>
                     </select>
                 </div>
             </div>
             <br>
-            <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="3000">
+            <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="3000" style="width: 100%">
                 <div class="carousel-inner" role="listbox">
-                    <!-- Slide for Table -->
                     <div class="item active">
                         <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
                             <table class="table table-bordered table-striped table-condensed" ng-if="datos.length > 0">
@@ -51,15 +52,15 @@
                         </div>
                     </div>
 
-                    <!-- Slide for Chart -->
-                    <div class="item" style="overflow-y: auto; height: 60vh; width: 90vw">
-                        <canvas id="ticketsChart" style="width: 100%; height: 100%;"></canvas>
+                    <div class="item" style="height: 500px; width: 100%;">
+                        <div style="position: relative; height: 100%; width: 100%;">
+                            <canvas id="ticketsAnioGestorChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Tickets por Mes y Gestor -->
         <div class="tab-pane" id="mes-gestor">
             <div class="form-inline" style="display: flex; align-items: center; justify-content: flex-start;">
                 <div>
@@ -108,14 +109,15 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="item" style="overflow-y: auto; height: 60vh; width: 90vw">
-                        <canvas id="ticketsIntervaloChart" style="width: 100%; height: 100%;"></canvas>
+                    <div class="item" style="height: 500px; width: 100%;">
+                        <div style="position: relative; height: 100%; width: 100%;">
+                            <canvas id="ticketsIntervaloChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Tickets Analizados por Mes y Gestor -->
         <div class="tab-pane" id="mes-gestor-analizados">
             <div class="form-inline" style="display: flex; align-items: center; justify-content: flex-start;">
                 <div>
@@ -158,20 +160,126 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="item" style="overflow-y: auto; height: 60vh; width: 90vw">
-                        <canvas id="ticketsAnalizadosChart" style="width: 100%; height: 100%;"></canvas>
+                    <div class="item" style="height: 500px; width: 100%;">
+                        <div style="position: relative; height: 100%; width: 100%;">
+                            <canvas id="ticketsAnalizadosChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <div class="tab-pane" id="mes-gestor-invertido">
+            <div class="form-inline" style="display: flex; align-items: center; justify-content: flex-start;">
+                <div>
+                    <label>FECHA INICIO</label>
+                    <div class='input-group date'>
+                        <input id="fecha-inicio-invertido" ng-model="fechaInicioInvertido" format-date class="form-control" ng-required="true" autocomplete="off" />
+                    </div>
+                    <label>  </label>
+                </div>
+
+                <div>
+                    <label>FECHA FIN</label>
+                    <div class='input-group date'>
+                        <input id="fecha-fin-invertido" ng-model="fechaFinInvertido" format-date class="form-control" ng-required="true" autocomplete="off" />
+                    </div>
+                </div>
+                <div>
+                    <label>  </label>
+                    <button id="buscar-invertido-btn" class="btn btn-primary" ng-click="darTicketTiempoGestores()">Actualizar</button>
+                </div>
+            </div>
+            <br>
+            <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="3000">
+                <div class="carousel-inner" role="listbox">
+                    <div class="item active" style="height: 500px; overflow-y: auto">
+                        <table class="table table-bordered table-striped table-condensed" width="100%" ng-if="ticketsTiempoInvertido.length > 0">
+                            <thead>
+                                <tr>
+                                    <th>Gestor</th>
+                                    <th ng-repeat="label in ticketsTiempoInvertidoLabels">{{label}}</th>
+                                    <th>Tiempo Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="(gestor, tiempos) in ticketsTiempoInvertidoAgrupado">
+                                    <td>{{gestor}}</td>
+                                    <td ng-repeat="label in ticketsTiempoInvertidoLabels">
+                                        {{tiempos[label] || 0}} horas
+                                    </td>
+                                    <td>{{sumarTiempos(tiempos)}} horas</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="item" style="height: 500px; width: 100%;">
+                        <div style="position: relative; height: 100%; width: 100%;">
+                            <canvas id="ticketsInvertidoChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane" id="mes-anulado-rechazado">
+            <div class="form-inline" style="display: flex; align-items: center; justify-content: flex-start;">
+                <div>
+                    <label>FECHA INICIO</label>
+                    <div class='input-group date'>
+                        <input id="fecha-inicio-anulado" ng-model="fechaInicioAnulado" format-date class="form-control" ng-required="true" autocomplete="off" />
+                    </div>
+                    <label>  </label>
+                </div>
+
+                <div>
+                    <label>FECHA FIN</label>
+                    <div class='input-group date'>
+                        <input id="fecha-fin-anulado" ng-model="fechaFinAnulado" format-date class="form-control" ng-required="true" autocomplete="off" />
+                    </div>
+                </div>
+                <div>
+                    <label>  </label>
+                    <button id="buscar-anulados-btn" class="btn btn-primary" ng-click="darTicketAnuladosRechazados()">Actualizar</button>
+                </div>
+            </div>
+            <br>
+            <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="3000">
+                <div class="carousel-inner" role="listbox">
+                    <div class="item active" style="height: 500px; overflow-y: auto">
+                        <table class="table table-bordered table-striped table-condensed" width="100%" ng-if="anuladosRechazados.length > 0">
+                            <thead>
+                                <tr>
+                                    <th>Gestor</th>
+                                    <th>Anio/Mes</th>
+                                    <th>Tickets Ingresados</th>
+                                    <th>Tickets Anulados/Rechazados</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="ticket in anuladosRechazados">
+                                    <td>{{ticket.Gestor}}</td>
+                                    <td>{{ticket.Anio}}/{{ticket.Mes}}</td>
+                                    <td>{{ticket.Ingresado}}</td>
+                                    <td>{{ticket.AnuladoRechazado}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="item" style="height: 500px; width: 100%;">
+                        <div style="position: relative; height: 100%; width: 100%;">
+                            <canvas id="anuladoRechazadoChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <script type="text/javascript" src="~/Web/js/chart.js"></script>
 <script type="text/javascript" src="~/Web/js/chartjs-plugin-datalabels.js"></script>
 <script>
-    // Asegúrate de tener jQuery y Bootstrap JavaScript cargados para que los tabs funcionen correctamente.
     $(document).ready(function () {
         $('[data-toggle="tab"]').on('click', function (e) {
             e.preventDefault();
