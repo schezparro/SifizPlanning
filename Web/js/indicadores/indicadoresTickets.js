@@ -1,4 +1,4 @@
-﻿indicadoresApp.controller('indicadoresTickets', ['$scope', '$http', function ($scope, $http) {
+﻿indicadoresApp.controller('indicadoresTickets', ['$scope', '$timeout', '$http', function ($scope, $timeout, $http) {
     $scope.initDatepickersTickets = function () {
         angular.element('#fecha-inicio-indicadores-tickets').datepicker({
             format: 'dd/mm/yyyy',
@@ -1408,8 +1408,6 @@
                         $scope.mesesTickets.sort((a, b) => a - b);
                         $scope.aplicasList.sort();
 
-                        console.log($scope.mesesTickets);
-
                         $scope.getCantidadAnnos = function (aplica, ano) {
                             return ($scope.ticketsPorAplicaAnno[aplica] &&
                                 $scope.ticketsPorAplicaAnno[aplica][ano]) || 0;
@@ -1549,8 +1547,6 @@
                                 datasets: chartDataAnno.datasets
                             },
                             options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
                                 scales: {
                                     x: {
                                         display: true,
@@ -1590,8 +1586,6 @@
                                         top: 20
                                     }
                                 },
-                                barPercentage: 0.8,
-                                categoryPercentage: 0.9
                             },
                             plugins: [ChartDataLabels]
                         });
@@ -1605,9 +1599,6 @@
                                 datasets: chartDataMes.datasets
                             },
                             options: {
-                                //indexAxis: 'y',
-                                responsive: true,
-                                maintainAspectRatio: false,
                                 scales: {
                                     x: {
                                         display: true,
@@ -1902,8 +1893,6 @@
                                 datasets: chartDataAnnoEstados.datasets
                             },
                             options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
                                 scales: {
                                     x: {
                                         display: true,
@@ -1960,8 +1949,6 @@
                             },
                             options: {
                                 //indexAxis: 'y',
-                                responsive: true,
-                                maintainAspectRatio: false,
                                 scales: {
                                     x: {
                                         display: true,
@@ -2103,8 +2090,6 @@
                     datasets: datasets
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
                     scales: {
                         x: {
                             display: true,
@@ -2200,8 +2185,6 @@
                     datasets: Object.values(datasets)
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
                     scales: {
                         x: {
                             display: true,
@@ -2257,6 +2240,319 @@
         }
     };
 
+
+    //******************************************************************************************************************************** */
+    //*******************************************   OTROS INDICADORES  **************************************************************** */
+    //******************************************************************************************************************************** */
+
+    $('#select-annos-otros-indicadores').select2({
+        placeholder: "Seleccione...",
+        allowClear: true, // Permite borrar la selección
+        maximumSelectionLength: 3,
+        language: {
+            maximumSelected: function (e) {
+                return "Solo puedes seleccionar " + e.maximum + " meses";
+            }
+        },
+        closeOnSelect: false,
+        theme: "classic",
+        width: '300px',
+        templateResult: formatResult // Función para formatear cómo se muestra cada opción
+    }).on('change', function (e) {
+        $scope.$apply(function () {
+            var selectedValues = $(e.target).val();
+            $scope.annosOtrosIndicadores = selectedValues ? selectedValues : [];
+        });
+    });
+
+    $('#select-meses-otros-indicadores').select2({
+        placeholder: "Seleccione...",
+        allowClear: true, // Permite borrar la selección
+        /*maximumSelectionLength: 3,
+        language: {
+            maximumSelected: function (e) {
+                return "Solo puedes seleccionar " + e.maximum + " meses";
+            }
+        },*/
+        closeOnSelect: false,
+        width: '300px',
+        templateResult: formatResult // Función para formatear cómo se muestra cada opción
+    }).on('change', function (e) {
+        $scope.$apply(function () {
+            var selectedValues = $(e.target).val();
+            $scope.mesesOtrosIndicadores = selectedValues ? selectedValues : [];
+        });
+    });
+
+    //CLIENTES
+    var ajaxClienteProyectos = $http.post("user/cliente-incidencias", {});
+    ajaxClienteProyectos.success(function (data) {
+        if (data.success === true) {
+            $scope.clienteOtros = data.clientes;
+            $('#select-cliente-otros-indicadores').select2({
+                placeholder: 'Seleccione clientes',
+                allowClear: true,
+                multiple: true,
+                closeOnSelect: false,
+                width: '300px',
+                templateResult: formatResult
+            }).on('change', function (e) {
+                $scope.$apply(function () {
+                    var selectedValues = $(e.target).val();
+                    $scope.clienteOtrosIndicadores = selectedValues ? selectedValues : [];
+                });
+            });
+        } else {
+            messageDialog.show('Información', "No se pudo acceder a los clientes");
+        }
+    });
+
+
+    // Cargando las prioridades de los tickets
+    var ajaxPrioridades = $http.post("tickets/prioridades-ticket", {});
+    ajaxPrioridades.success(function (data) {
+        if (data.success === true) {
+            $scope.prioridades = data.prioridades;
+            $('#select-prioridad-otros-indicadores').select2({
+                placeholder: 'Seleccione prioridades',
+                allowClear: true,
+                multiple: true,
+                closeOnSelect: false,
+                width: '300px',
+                templateResult: formatResult
+            }).on('change', function (e) {
+                $scope.$apply(function () {
+                    var selectedValues = $(e.target).val();
+                    $scope.prioridadOtrosIndicadores = selectedValues ? selectedValues : [];
+                });
+            });
+        } else {
+            messageDialog.show('Información', "No se pudo acceder a las prioridades");
+        }
+    });
+
+    // Cargando las categorías de los tickets
+    var ajaxCategorias = $http.post("tickets/categorias-ticket", {});
+    ajaxCategorias.success(function (data) {
+        if (data.success === true) {
+            $scope.categorias = data.categorias;
+            $('#select-categoria-otros-indicadores').select2({
+                placeholder: 'Seleccione categorías',
+                allowClear: true,
+                multiple: true,
+                closeOnSelect: false,
+                width: '300px',
+                templateResult: formatResult
+            }).on('change', function (e) {
+                $scope.$apply(function () {
+                    var selectedValues = $(e.target).val();
+                    $scope.categoriaOtrosIndicadores = selectedValues ? selectedValues : [];
+                });
+            });
+        } else {
+            messageDialog.show('Información', "No se pudo acceder a las categorías");
+        }
+    });
+
+    function formatResult(item) {
+        if (!item.id) {
+            return item.text; // Devuelve el texto si no hay ID
+        }
+        var $result = $("<span>").text(item.text);
+        return $result;
+    };
+
+    $scope.buscarDatosOtrosIndicadores = function () {
+
+        if ($scope.ticketPorPrioridadBarrasChart) {
+            $scope.ticketPorPrioridadBarrasChart.destroy();
+        }
+        if ($scope.ticketPorCategoriasBarrasChartMes) {
+            $scope.ticketPorCategoriasBarrasChartMes.destroy();
+        }
+
+        $scope.mostrarPanelGraficosOtrosIndicadores = true;
+
+        $scope.MostrarTickectOtrosIndicadores();
+
+    };
+
+    $scope.MostrarTickectOtrosIndicadores = function () {
+        if ($scope.ticketPorPrioridadBarrasChart) {
+            $scope.ticketPorPrioridadBarrasChart.destroy();
+        }
+
+        if ($scope.ticketPorCategoriasBarrasChartMes) {
+            $scope.ticketPorCategoriasBarrasChartMes.destroy();
+        }
+
+        var infoTicketsOtrosIndicadores = $http.post("indicadores/dar-tickets-otros-indicadores/", {
+            clientes: $scope.clienteOtrosIndicadores,
+            annos: $scope.annoOtrosIndicadores,
+            meses: $scope.mesOtrosIndicadores,
+            prioridades: $scope.prioridadOtrosIndicadores,
+            categorias: $scope.categoriaOtrosIndicadores,
+        });
+
+        infoTicketsOtrosIndicadores.success(function (data) {
+            $scope.loading.hide();
+
+            if (data.success) {
+                $scope.mostrarPanelGraficosOtrosIndicadores = true;
+                $scope.mostrarPanelGraficosTicketsPrioridad = true;
+                $scope.mostrarPanelGraficosPorPrioridadMesesYAnnos = true;
+
+                if (data && data.ticketsPorClientePrioridad && Array.isArray(data.ticketsPorClientePrioridad)) {
+                    $scope.prioridadesUnicas = [];
+                    $scope.anosTickets = [];
+                    $scope.mesesTickets = [];
+                    $scope.datosPorPrioridad = {};
+
+                    $scope.mostrarGraficoTicketsPrioridadOtrosIndicadores = true;
+
+                    data.ticketsPorClientePrioridad.forEach(function (ticket) {
+                        var cliente = ticket.Cliente;
+                        var prioridad = ticket.Prioridad;
+                        var anno = ticket.Anno.toString();
+                        var mes = ticket.Mes.toString();
+                        var cantidad = ticket.Cantidad;
+
+                        if (!$scope.prioridadesUnicas.includes(prioridad)) {
+                            $scope.prioridadesUnicas.push(prioridad);
+                        }
+                        if (!$scope.anosTickets.includes(anno)) {
+                            $scope.anosTickets.push(anno);
+                        }
+                        if (!$scope.mesesTickets.includes(mes)) {
+                            $scope.mesesTickets.push(mes);
+                        }
+
+                        if (!$scope.datosPorPrioridad[prioridad]) $scope.datosPorPrioridad[prioridad] = {};
+                        if (!$scope.datosPorPrioridad[prioridad][cliente]) $scope.datosPorPrioridad[prioridad][cliente] = {};
+                        if (!$scope.datosPorPrioridad[prioridad][cliente][anno]) $scope.datosPorPrioridad[prioridad][cliente][anno] = {};
+
+                        $scope.datosPorPrioridad[prioridad][cliente][anno][mes] = cantidad;
+                    });
+
+                    $scope.prioridadesUnicas.sort();
+                    $scope.anosTickets.sort((a, b) => parseInt(a) - parseInt(b));
+                    $scope.mesesTickets.sort((a, b) => parseInt(a) - parseInt(b));
+
+                    $scope.tabActiva = $scope.prioridadesUnicas[0] || null;
+
+                    $scope.getCantidad = function (prioridad, cliente, anno, mes) {
+                        var cantidad = $scope.datosPorPrioridad[prioridad]?.[cliente]?.[anno]?.[mes] || 0;
+                        return cantidad;
+                    };
+
+                    $scope.getClientesPorPrioridad = function (prioridad) {
+                        var clientes = Object.keys($scope.datosPorPrioridad[prioridad] || {});
+                        return clientes;
+                    };
+
+                    $scope.getMesByNumero = function (mes) {
+                        const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                        return meses[parseInt(mes) - 1];
+                    };
+
+                    $scope.generateCharts = function () {
+                        $timeout(function () {
+                            $scope.prioridadesUnicas.forEach(function (prioridad) {
+                                var canvas = document.getElementById('chart-' + prioridad);
+                                if (canvas) {
+                                    var ctx = canvas.getContext('2d');
+                                    var clientes = $scope.getClientesPorPrioridad(prioridad);
+
+                                    var datasets = clientes.map(function (cliente) {
+                                        var data = $scope.anosTickets.map(function (anno) {
+                                            return $scope.mesesTickets.map(function (mes) {
+                                                return $scope.getCantidad(prioridad, cliente, anno, mes);
+                                            });
+                                        }).flat();
+
+                                        return {
+                                            label: cliente,
+                                            data: data,
+                                            fill: true,
+                                            backgroundColor: getRandomColor(),
+                                            borderColor: getRandomColor(),
+                                            borderWidth: 1
+                                        };
+                                    });
+
+                                    var labels = $scope.anosTickets.map(function (anno) {
+                                        return $scope.mesesTickets.map(function (mes) {
+                                            return `${$scope.getMesByNumero(mes)} ${anno}`;
+                                        });
+                                    }).flat();
+
+                                    createChart(ctx, labels, datasets);
+                                }
+                            });
+                        }, 0);
+                    };
+
+                    function createChart(ctx, labels, datasets) {
+                        return new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: datasets
+                            },
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    x: {
+                                        display: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Meses'
+                                        }
+                                    },
+                                    y: {
+                                        display: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Cantidad de Tickets'
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: true,
+                                        position: 'top'
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function (context) {
+                                                return `${context.dataset.label}: ${context.raw}`;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    function getRandomColor() {
+                        var letters = '0123456789ABCDEF';
+                        var color = '#';
+                        for (var i = 0; i < 6; i++) {
+                            color += letters[Math.floor(Math.random() * 16)];
+                        }
+                        return color;
+                    }
+
+                    $scope.generateCharts();
+
+                }
+
+
+
+            }
+        });
+    };
+
     function getRandomColor() {
         var letters = '0123456789ABCDEF';
         var color = '#';
@@ -2265,6 +2561,11 @@
         }
         return color;
     }
+
+    function getMesByNumero(mesNumero) {
+        var meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        return meses[mesNumero - 1] || '';
+    };
 
     function dateToStr(dateObj, format, separator) {
         /**
