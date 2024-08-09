@@ -1914,97 +1914,97 @@ namespace SifizPlanning.Controllers
 
         public void SetDataInfoTickets()
         {
-            //try
-            //{
-            //    db.InfoTickets.RemoveRange(db.InfoTickets);
-            //    db.SaveChanges();
+            try
+            {
+                db.InfoTickets.RemoveRange(db.InfoTickets);
+                db.SaveChanges();
 
-            //    var infoTickets = new List<InfoTickets>();
+                var infoTickets = new List<InfoTickets>();
 
-            //    foreach (var item in db.Ticket.AsNoTracking())
-            //    {
-            //        InfoTickets InfoTicket = new InfoTickets();
-            //        InfoTicket.Id = item.Secuencial;
-            //        InfoTicket.Cliente = item.persona_cliente.cliente.Descripcion;
-            //        InfoTicket.Prioridad = item.prioridadTicket.Codigo;
-            //        InfoTicket.Tipo = item.categoriaTicket.Codigo;
-            //        InfoTicket.Usuario = item.persona_cliente.persona.Nombre1 + " " + item.persona_cliente.persona.Apellido1;
-            //        InfoTicket.ProbadoPor = "";
-            //        InfoTicket.FechaIngreso = item.FechaCreado;
-            //        InfoTicket.FechaRespuesta = item.FechaCreado;
-            //        InfoTicket.FechaAsignacion = item.ticketHistorico?
-            //                                         .Where(s => s.estadoTicket?.Codigo == "ASIGNADO")
-            //                                         .OrderBy(s => s.Version)
-            //                                         .FirstOrDefault()?.FechaOperacion;
-            //        InfoTicket.FechaEntrega = item.ticketHistorico?
-            //                                 .OrderByDescending(h => h.Version)
-            //                                 .Zip(item.ticketHistorico?
-            //                                     .OrderByDescending(h => h.Version)
-            //                                     .Skip(1), (h1, h2) => new { h1, h2 })
-            //                                 .Where(pair => pair.h1.estadoTicket?.Codigo == "RESUELTO" && pair.h2.estadoTicket?.Codigo != "RESUELTO")
-            //                                 .Select(pair => pair.h1?.FechaOperacion)?
-            //                                 .FirstOrDefault();
-            //        InfoTicket.FechaCierre = item.ticketHistorico?
-            //                                         .Where(s => s.estadoTicket?.Codigo == "CERRADO")
-            //                                         .OrderBy(s => s.Version)
-            //                                         .FirstOrDefault()?.FechaOperacion;
-            //        InfoTicket.NumeroReprocesos = int.Parse(item.ticketHistorico?.OrderByDescending(s => s.Version).First().Reprocesos.ToString());
-            //        InfoTicket.EstimadoPor = "";
-            //        InfoTicket.AsignadoA = (
-            //                       db.TicketTarea.Where(x => x.SecuencialTicket == item.Secuencial && x.EstaActiva == 1).Any()
-            //                      ) ?
-            //                          (from p in db.Persona
-            //                           join c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
-            //                           join tar in db.Tarea on c.Secuencial equals tar.SecuencialColaborador
-            //                           join ttar in db.TicketTarea on tar.Secuencial equals ttar.SecuencialTarea
-            //                           where ttar.SecuencialTicket == item.Secuencial
-            //                           select p.Nombre1 + " " + p.Apellido1).FirstOrDefault()
-            //                        : "NO ASIGNADO";
-            //        InfoTicket.EntregadoPor = "";
+                foreach (var item in db.Ticket.AsNoTracking())
+                {
+                    InfoTickets InfoTicket = new InfoTickets();
+                    InfoTicket.Id = item.Secuencial;
+                    InfoTicket.Cliente = item.persona_cliente.cliente.Descripcion;
+                    InfoTicket.Prioridad = item.prioridadTicket.Codigo;
+                    InfoTicket.Tipo = item.categoriaTicket.Codigo;
+                    InfoTicket.Usuario = item.persona_cliente.persona.Nombre1 + " " + item.persona_cliente.persona.Apellido1;
+                    InfoTicket.ProbadoPor = "";
+                    InfoTicket.FechaIngreso = item.FechaCreado;
+                    InfoTicket.FechaRespuesta = item.FechaCreado;
+                    InfoTicket.FechaAsignacion = item.ticketHistorico?
+                                                     .Where(s => s.estadoTicket?.Codigo == "ASIGNADO")
+                                                     .OrderBy(s => s.Version)
+                                                     .FirstOrDefault()?.FechaOperacion;
+                    InfoTicket.FechaEntrega = item.ticketHistorico?
+                                             .OrderByDescending(h => h.Version)
+                                             .Zip(item.ticketHistorico?
+                                                 .OrderByDescending(h => h.Version)
+                                                 .Skip(1), (h1, h2) => new { h1, h2 })
+                                             .Where(pair => pair.h1.estadoTicket?.Codigo == "RESUELTO" && pair.h2.estadoTicket?.Codigo != "RESUELTO")
+                                             .Select(pair => pair.h1?.FechaOperacion)?
+                                             .FirstOrDefault();
+                    InfoTicket.FechaCierre = item.ticketHistorico?
+                                                     .Where(s => s.estadoTicket?.Codigo == "CERRADO")
+                                                     .OrderBy(s => s.Version)
+                                                     .FirstOrDefault()?.FechaOperacion;
+                    InfoTicket.NumeroReprocesos = int.Parse(item.ticketHistorico?.OrderByDescending(s => s.Version).First().Reprocesos.ToString());
+                    InfoTicket.EstimadoPor = "";
+                    InfoTicket.AsignadoA = (
+                                   db.TicketTarea.Where(x => x.SecuencialTicket == item.Secuencial && x.EstaActiva == 1).Any()
+                                  ) ?
+                                      (from p in db.Persona
+                                       join c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
+                                       join tar in db.Tarea on c.Secuencial equals tar.SecuencialColaborador
+                                       join ttar in db.TicketTarea on tar.Secuencial equals ttar.SecuencialTarea
+                                       where ttar.SecuencialTicket == item.Secuencial
+                                       select p.Nombre1 + " " + p.Apellido1).FirstOrDefault()
+                                    : "NO ASIGNADO";
+                    InfoTicket.EntregadoPor = "";
 
-            //        TimeSpan TotalAsignado = TimeSpan.Zero;
-            //        TimeSpan TotalUtilizado = TimeSpan.Zero;
+                    TimeSpan TotalAsignado = TimeSpan.Zero;
+                    TimeSpan TotalUtilizado = TimeSpan.Zero;
 
-            //        var ticketsTareas = db.TicketTarea
-            //                                 .Where(s => s.SecuencialTicket == item.Secuencial && s.EstaActiva == 1)
-            //                                 .ToList();
+                    var ticketsTareas = db.TicketTarea
+                                             .Where(s => s.SecuencialTicket == item.Secuencial && s.EstaActiva == 1)
+                                             .ToList();
 
-            //        foreach (var ta in ticketsTareas)
-            //        {
-            //            TimeSpan tiempoAsignado = ta.tarea.FechaFin - ta.tarea.FechaInicio;
-            //            TimeSpan tiempoUtilizado = TimeSpan.FromMinutes(
-            //                Math.Round(60 * (double)(ta.tarea.HorasUtilizadas)));
+                    foreach (var ta in ticketsTareas)
+                    {
+                        TimeSpan tiempoAsignado = ta.tarea.FechaFin - ta.tarea.FechaInicio;
+                        TimeSpan tiempoUtilizado = TimeSpan.FromMinutes(
+                            Math.Round(60 * (double)(ta.tarea.HorasUtilizadas)));
 
-            //            if (ta.tarea.FechaInicio.Hour < 13 && ta.tarea.FechaFin.Hour > 13)
-            //            {
-            //                tiempoAsignado -= TimeSpan.FromHours(1);
-            //            }
+                        if (ta.tarea.FechaInicio.Hour < 13 && ta.tarea.FechaFin.Hour > 13)
+                        {
+                            tiempoAsignado -= TimeSpan.FromHours(1);
+                        }
 
-            //            TotalAsignado += tiempoAsignado;
-            //            TotalUtilizado += tiempoUtilizado;
-            //        }
+                        TotalAsignado += tiempoAsignado;
+                        TotalUtilizado += tiempoUtilizado;
+                    }
 
-            //        InfoTicket.HorasAsignadas = DateTime.MinValue + TotalAsignado;
-            //        InfoTicket.HorasEmpleadas = DateTime.MinValue + TotalUtilizado;
+                    InfoTicket.HorasAsignadas = DateTime.MinValue + TotalAsignado;
+                    InfoTicket.HorasEmpleadas = DateTime.MinValue + TotalUtilizado;
 
-            //        TimeSpan TotalEstimado = new TimeSpan(item.Estimacion, 0, 0);
-            //        InfoTicket.HorasEstimadas = DateTime.MinValue + TotalEstimado;
+                    TimeSpan TotalEstimado = new TimeSpan(item.Estimacion, 0, 0);
+                    InfoTicket.HorasEstimadas = DateTime.MinValue + TotalEstimado;
 
-            //        InfoTicket.HorasEntrega = DateTime.MinValue + TimeSpan.Zero;
-            //        InfoTicket.HorasPrueba = DateTime.MinValue + TimeSpan.Zero;
-            //        InfoTicket.Estado = item.estadoTicket?.Codigo;
-            //        InfoTicket.AplicaA = item.ticketVersionClliente?.Descripcion;
+                    InfoTicket.HorasEntrega = DateTime.MinValue + TimeSpan.Zero;
+                    InfoTicket.HorasPrueba = DateTime.MinValue + TimeSpan.Zero;
+                    InfoTicket.Estado = item.estadoTicket?.Codigo;
+                    InfoTicket.AplicaA = item.ticketVersionClliente?.Descripcion;
 
-            //        infoTickets.Add(InfoTicket);
-            //    }
+                    infoTickets.Add(InfoTicket);
+                }
 
-            //    db.InfoTickets.AddRange(infoTickets);
-            //    db.SaveChanges();
-            //}
-            //catch (Exception e)
-            //{
-            //    Console.WriteLine(e.Message);
-            //}
+                db.InfoTickets.AddRange(infoTickets);
+                db.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
         public void CalcularSemaforoTciket()
