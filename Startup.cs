@@ -43,8 +43,8 @@ namespace SifizPlanning
 
             if (System.Configuration.ConfigurationManager.AppSettings["hangfire"] == "true")
                 app.UseHangfireDashboard();
-            Hangfire hangfire = new Hangfire();
-            hangfire.Start();
+            //Hangfire hangfire = new Hangfire();
+            //hangfire.Start();
         }
     }
 }
