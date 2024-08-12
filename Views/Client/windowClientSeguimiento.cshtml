@@ -124,7 +124,10 @@
             <td ng-click="mostrarOfertaCotizacion(ticket.id)">{{ticket.id | rellenarIzq : 0 : 6 }}</td>
             <td ng-click="mostrarOfertaCotizacion(ticket.id)">{{ticket.persona}}</td>
             <td ng-click="mostrarOfertaCotizacion(ticket.id)">{{ticket.fecha | strDateToStr}}</td>
-            <td ng-click="mostrarOfertaCotizacion(ticket.id)">{{ticket.fechaVencimiento | strDateToStr | dateNoNull}}</td>
+            <td ng-click="mostrarOfertaCotizacion(ticket.id)">
+                <span ng-if="ticket.categoria === 'REQUERIMIENTO NUEVO'">{{ticket.fechaVencimiento | strDateToStr | dateNoNull}}</span>
+                <span ng-if="ticket.categoria !== 'REQUERIMIENTO NUEVO'">NO APLICA</span>
+            </td>
             <td ng-click="mostrarOfertaCotizacion(ticket.id)">{{ticket.prioridad}}</td>
             <td ng-click="mostrarOfertaCotizacion(ticket.id)">{{ticket.categoria}}</td>
             <td ng-click="mostrarOfertaCotizacion(ticket.id)">{{ticket.asunto}}</td>
