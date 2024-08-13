@@ -729,6 +729,7 @@
             {
                 idEntregableTrabajo: $scope.entregablesContrato[index].Id,
                 porcentaje: $scope.entregablesContrato[index].Avance,
+                diasGarantia: $scope.entregablesContrato[index].DiasGarantia,
                 colaboradorID: angular.element('#select-colaborador-entregable' + index).val(),
                 codigoContrato: $scope.codigoContrato
             });

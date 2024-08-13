@@ -392,6 +392,12 @@
                                             </select>
                                         </td>
                                         <td>
+                                            <div style="text-align: center">
+                                                <span ng-hide="mostrarInput">{{entregable.DiasGarantia}} dias</span>
+                                            </div>
+                                            <input ng-show="mostrarInput" type="number" ng-style="{'width': '65px'}" min="0" ng-model="entregable.DiasGarantia" class="form-control" />
+                                        </td>
+                                        <td>
                                             <button aria-hidden="true" ng-show="mostrarInput" ng-click="mostrarInput=false; editarAvance($index)" type="button" class="btn btn-primary btn-xs" aria-label="Left Align">
                                                 <span aria-hidden="true" class="glyphicon glyphicon-ok"></span>
                                             </button>

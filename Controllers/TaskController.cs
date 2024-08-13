@@ -8795,6 +8795,7 @@ p in db.Persona on c.persona equals p
 															   Id = e.Secuencial,
 															   e.Nombre,
 															   e.Avance,
+                                                               DiasGarantia = e.DiasGarantia ?? 0,
 															   Colaborador = e.colaborador != null ? e.colaborador.persona.Nombre1.Substring(0, 1) + "." + e.colaborador.persona.Apellido1 : "No_Asignado",
 															   ColaboradorId = e.colaborador != null ? e.colaborador.Secuencial : 0
 														   }).ToList(),
@@ -9053,7 +9054,7 @@ p in db.Persona on c.persona equals p
 
 		[HttpPost]
 		[Authorize(Roles = "ADMIN, GESTOR")]
-		public ActionResult EditarPorcentajeEntregable(int idEntregableTrabajo, int porcentaje, int colaboradorID = 0, string codigoContrato = "")
+		public ActionResult EditarPorcentajeEntregable(int idEntregableTrabajo, int porcentaje, int colaboradorID = 0, int? diasGarantia = 0, string codigoContrato = "")
 		{
 			try
 			{
@@ -9074,7 +9075,8 @@ p in db.Persona on c.persona equals p
 				}
 
 				entregable.Avance = porcentaje;
-				if(colaboradorID != 0)
+				entregable.DiasGarantia = diasGarantia ?? 0;
+                if (colaboradorID != 0)
 				{
 					entregable.SecuencialColaborador = colaboradorID;
 				}
@@ -9136,7 +9138,8 @@ p in db.Persona on c.persona equals p
 									   Id = e.Secuencial,
 									   e.Nombre,
 									   e.Avance,
-									   Colaborador = e.colaborador != null ? e.colaborador.persona.Nombre1.Substring(0, 1) + "." + e.colaborador.persona.Apellido1 : "No_Asignado",
+                                       DiasGarantia = e.DiasGarantia ?? 0,
+                                       Colaborador = e.colaborador != null ? e.colaborador.persona.Nombre1.Substring(0, 1) + "." + e.colaborador.persona.Apellido1 : "No_Asignado",
 									   ColaboradorId = e.colaborador != null ? e.colaborador.Secuencial : 0
 								   }).ToList();
 

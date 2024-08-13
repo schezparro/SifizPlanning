@@ -32,6 +32,7 @@ namespace SifizPlanning.Models
         public int NumeroVerificador { get; set; }
         public Nullable<int> SecuencialColaborador { get; set; }
         public Nullable<System.DateTime> FechaProduccion { get; set; }
+        public Nullable<int> DiasGarantia { get; set; }
     
         public virtual MotivoTrabajo motivoTrabajo { get; set; }
         public virtual ICollection<Tarea> tarea { get; set; }

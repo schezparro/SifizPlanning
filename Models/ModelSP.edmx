@@ -478,6 +478,7 @@
           <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
           <Property Name="SECUENCIALCOLABORADOR" Type="int" />
           <Property Name="FECHAPRODUCCION" Type="date" />
+          <Property Name="DIASGARANTIA" Type="int" />
         </EntityType>
         <EntityType Name="ESPECIALIDAD">
           <Key>
@@ -9109,6 +9110,7 @@
           <NavigationProperty Name="colaborador" Relationship="SifizPlanningModel.FK_ENTREGABLEMOTIVOTRABAJO_COLABORADOR" FromRole="EntregableMotivoTrabajo" ToRole="Colaborador" />
           <Property Name="FechaProduccion" Type="DateTime" Precision="0" />
           <NavigationProperty Name="ENTREGABLETICKET" Relationship="SifizPlanningModel.FK_ENTREGABLETICKET_ENTREGABLEMOTIVOTRABAJO" FromRole="EntregableMotivoTrabajo" ToRole="ENTREGABLETICKET" />
+          <Property Name="DiasGarantia" Type="Int32" />
         </EntityType>
         <EntityType Name="MotivoTrabajo">
           <Key>
@@ -13563,6 +13565,7 @@
           <EntitySetMapping Name="EntregableMotivoTrabajo">
             <EntityTypeMapping TypeName="SifizPlanningModel.EntregableMotivoTrabajo">
               <MappingFragment StoreEntitySet="ENTREGABLEMOTIVOTRABAJO">
+                <ScalarProperty Name="DiasGarantia" ColumnName="DIASGARANTIA" />
                 <ScalarProperty Name="FechaProduccion" ColumnName="FECHAPRODUCCION" />
                 <ScalarProperty Name="SecuencialColaborador" ColumnName="SECUENCIALCOLABORADOR" />
                 <ScalarProperty Name="NumeroVerificador" ColumnName="NUMEROVERIFICADOR" />
