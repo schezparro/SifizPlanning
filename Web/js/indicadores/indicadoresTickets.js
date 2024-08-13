@@ -78,11 +78,17 @@
             $scope.ticketPorGarantiaBarrasChart = null;
         }
 
+        if ($scope.ticketPorReqNuevoBarrasChart) {
+            $scope.ticketPorReqNuevoBarrasChart.destroy();
+            $scope.ticketPorReqNuevoBarrasChart = null;
+        }
+
         $scope.TicketsNuevos();
         $scope.TicketsCerrados();
         $scope.TicketsAplica();
         $scope.TicketsPorMantenimiento();
         $scope.TicketsPorGarantia();
+        $scope.TicketsPorReqNuevo();
 
     };
 
@@ -485,6 +491,88 @@
         });
     };
 
+    //TTICKET POR REQUERIMIENTO NUEVO
+    $scope.TicketsPorReqNuevo = function () {
+
+        if ($scope.ticketPorReqNuevoBarrasChart) {
+            $scope.ticketPorReqNuevoBarrasChart.destroy();
+        }
+
+        var infoTicketsPorReqNuevo = $http.post("indicadores/dar-tickets-por-req-nuevo/", {
+            fechaInicio: $scope.fechaInicio,
+            fechaFin: $scope.fechaFin
+        });
+
+        infoTicketsPorReqNuevo.success(function (data) {
+            $scope.loading.hide();
+
+            if (data.success) {
+
+                if (data.infoTickets.length === 0) {
+                    $scope.mostrarGraficoTicketsReqNuevo = false;
+                    $scope.mensajeNoDataTicketsReqNuevo = 'No existen datos disponibles';
+
+                } else {
+                    $scope.infoTicketsPorReqNuevo = data.infoTickets;
+                    $scope.totalCantidadesTicketsPorReqNuevo = data.totalCantidades;
+                    $scope.mostrarGraficos = true;
+                    $scope.mensajeNoDataTicketsReqNuevo = '';
+                    var clientes = [];
+                    var cantidades = [];
+
+                    $scope.infoTicketsPorReqNuevo.forEach(function (ticket) {
+                        clientes.push(ticket.Cliente);
+                        cantidades.push(ticket.Cantidad);
+                    });
+
+                    function getRandomColor() {
+                        var letters = '0123456789ABCDEF';
+                        var color = '#';
+                        for (var i = 0; i < 6; i++) {
+                            color += letters[Math.floor(Math.random() * 16)];
+                        }
+                        return color;
+                    }
+
+                    var coloresAleatorios = cantidades.map(getRandomColor);
+
+                    var tendenciaChartCtx = document.getElementById('ticketPorReqNuevoBarrasChart').getContext('2d');
+                    $scope.ticketPorReqNuevoBarrasChart = new Chart(tendenciaChartCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: clientes,
+                            datasets: [{
+                                label: 'Cantidad de tickets por clientes en requerimiento nuevo',
+                                data: cantidades,
+                                backgroundColor: coloresAleatorios,
+                                hoverBackgroundColor: coloresAleatorios,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                datalabels: {
+                                    display: true,
+                                    align: 'top',
+                                    backgroundColor: '#D3D3D3',
+                                    borderRadius: 3,
+                                    font: {
+                                        weight: 'bold'
+                                    }
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+
+                    $scope.mostrarGraficoTicketsReqNuevo = true;
+                }
+            } else {
+                alert("Error: " + data.msg);
+            }
+        });
+    };
+
     // *****************************************************************************************************************************************************************************
 
     let clienteSeleccionado;
@@ -526,8 +614,8 @@
             $scope.ticketPorClienteEstadoBarrasChart2AlDia.destroy();
         }
 
-        if ($scope.ticketPendientesChartAlDia) {
-            $scope.ticketPendientesChartAlDia.destroy();
+        if ($scope.ticketAplicadosChartAlDia) {
+            $scope.ticketAplicadosChartAlDia.destroy();
         }
 
         if ($scope.cliente == "")
@@ -539,7 +627,28 @@
         $scope.TicketsPorCategoriaAlDia();
         $scope.TicketsPorEstadosAlDia();
         $scope.TicketsPorClientesEstadosAlDia();
-        $scope.TicketsPendientesAlDia();
+        $scope.TicketsPorAplicaAlDia();
+
+        if ($scope.cliente == "") {
+            if ($scope.ticketRankingReqNuevoChartAlDia) {
+                $scope.ticketRankingReqNuevoChartAlDia.destroy();
+                $scope.ticketRankingReqNuevoChartAlDia = null;
+            }
+
+            if ($scope.ticketRankingGarantiaChartAlDia) {
+                $scope.ticketRankingGarantiaChartAlDia.destroy();
+                $scope.ticketRankingGarantiaChartAlDia = null;
+            }
+
+            if ($scope.ticketRankingMantenimientoChartAlDia) {
+                $scope.ticketRankingMantenimientoChartAlDia.destroy();
+                $scope.ticketRankingMantenimientoChartAlDia = null;
+            }
+
+            $scope.TicketsPorRankingCategoriasAlDia();
+        } else {
+            $scope.todosLosClientes = false;
+        }
 
     };
 
@@ -1016,7 +1125,6 @@
                                 datasets: datasets
                             },
                             options: {
-                                responsive: true,
                                 maintainAspectRatio: true,
                                 scales: {
                                     x: { display: true, title: { display: true, text: 'Clientes' }, ticks: { autoSkip: true } },
@@ -1091,7 +1199,6 @@
                                 datasets: datasets
                             },
                             options: {
-                                responsive: true,
                                 maintainAspectRatio: true,
                                 scales: {
                                     x: { display: true, title: { display: true, text: 'Clientes' }, ticks: { autoSkip: true } },
@@ -1128,36 +1235,37 @@
         });
     };
 
-    $scope.TicketsPendientesAlDia = function () {
-        if ($scope.ticketPendientesChartAlDia) {
-            $scope.ticketPendientesChartAlDia.destroy();
+    $scope.TicketsPorAplicaAlDia = function () {
+        if ($scope.ticketAplicadosChartAlDia) {
+            $scope.ticketAplicadosChartAlDia.destroy();
         }
 
-        var infoTicketsPendientesAlDia = $http.post("indicadores/dar-tickets-pendientes-aldia/", {
+        var infoTicketsAplicadosAlDia = $http.post("indicadores/dar-tickets-por-aplica-aldia/", {
             cliente: clienteSeleccionado
         });
 
-        infoTicketsPendientesAlDia.success(function (data) {
+        infoTicketsAplicadosAlDia.success(function (data) {
             $scope.loading.hide();
 
             if (data.success) {
 
                 if (data.infoTickets.length === 0) {
 
-                    $scope.mensajeNoDataTicketPendientesAlDia = 'No existen datos disponibles'
-                    $scope.mostrarGraficosTicketsPendientesAlDia = false
+                    $scope.mensajeNoDataTicketAplicadosAlDia = 'No existen datos disponibles'
+                    $scope.mostrarGraficosTicketsAplicadosAlDia = false
 
                 } else {
-                    $scope.infoTicketsPendientesAlDia = data.infoTickets;
-                    $scope.totalCantidadesTicketsPendientesAlDia = data.totalCantidades;
-                    $scope.mensajeNoDataTicketPendientesAlDia = '';
+                    $scope.infoTicketsAplicadosAlDia = data.infoTickets;
+                    $scope.totalCantidadesTicketsAplicadosAlDia = data.totalCantidades;
+                    $scope.mensajeNoDataTicketAplicadosAlDia = '';
 
-                    var semanas = [];
+                    var aplicas = [];
                     var cantidades = [];
-
-                    $scope.infoTicketsPendientesAlDia.forEach(function (ticket) {
-                        semanas.push(ticket.Descripcion);
+                    var porcentaje = [];
+                    $scope.infoTicketsAplicadosAlDia.forEach(function (ticket) {
+                        aplicas.push(ticket.Aplica);
                         cantidades.push(ticket.Cantidad);
+                        porcentaje.push(ticket.Porcentaje);
                     });
 
                     function getRandomColor() {
@@ -1171,13 +1279,13 @@
 
                     var coloresAleatorios = cantidades.map(getRandomColor);
 
-                    var tendenciaChartCtx = document.getElementById('ticketPendientesChartAlDia').getContext('2d');
-                    $scope.ticketPendientesChartAlDia = new Chart(tendenciaChartCtx, {
+                    var tendenciaChartCtx = document.getElementById('ticketAplicadosChartAlDia').getContext('2d');
+                    $scope.ticketAplicadosChartAlDia = new Chart(tendenciaChartCtx, {
                         type: 'bar',
                         data: {
-                            labels: semanas,
+                            labels: aplicas,
                             datasets: [{
-                                label: 'Tickets pendientes',
+                                label: 'Tickets Aplicados a:',
                                 data: cantidades,
                                 backgroundColor: coloresAleatorios,
                                 hoverBackgroundColor: coloresAleatorios,
@@ -1205,7 +1313,7 @@
                         plugins: [ChartDataLabels]
                     });
 
-                    $scope.mostrarGraficosTicketsPendientesAlDia = true;
+                    $scope.mostrarGraficosTicketsAplicadosAlDia = true;
                 }
 
             } else {
@@ -1213,6 +1321,104 @@
             }
         });
     };
+
+    //Ranking de clientes
+    $scope.TicketsPorRankingCategoriasAlDia = function () {
+        if ($scope.ticketRankingReqNuevoChartAlDia) {
+            $scope.ticketRankingReqNuevoChartAlDia.destroy();
+        }
+
+        if ($scope.ticketRankingGarantiaChartAlDia) {
+            $scope.ticketRankingGarantiaChartAlDia.destroy();
+        }
+
+        if ($scope.ticketRankingMantenimientoChartAlDia) {
+            $scope.ticketRankingMantenimientoChartAlDia.destroy();
+        }
+
+        var infoTicketsRankingCategoriasAlDia = $http.post("indicadores/dar-tickets-ranking-categorias-aldia/", {});
+
+        infoTicketsRankingCategoriasAlDia.success(function (data) {
+            $scope.loading.hide();
+
+            if (data.success) {
+
+                if (data.ticketsPorCategorias.length === 0) {
+
+                    $scope.mensajeNoDataTicketAplicadosAlDia = 'No existen datos disponibles'
+                    $scope.todosLosClientes = false
+
+                } else {
+                    $scope.todosLosClientes = true;
+                    // Procesar los datos para cada categoría
+                    data.ticketsPorCategorias.forEach(function (categoria) {
+                        switch (categoria.Tipo) {
+                            case "REQUERIMIENTO NUEVO":
+                                procesarDatosCategoria(categoria, 'ReqNuevo');
+                                break;
+                            case "GARANTÍA TÉCNICA":
+                                procesarDatosCategoria(categoria, 'Garantia');
+                                break;
+                            case "MANTENIMIENTO":
+                                procesarDatosCategoria(categoria, 'Mantenimiento');
+                                break;
+                        }
+                    });
+                }
+
+            } else {
+                alert("Error: " + data.msg);
+            }
+        });
+    };
+
+    function procesarDatosCategoria(categoria, tipo) {
+        // Actualizar datos de la tabla
+        $scope['infoTicketsRanking' + tipo + 'AlDia'] = categoria.Clientes;
+        $scope['totalCantidadesTicketsRanking' + tipo + 'AlDia'] = categoria.Total;
+        $scope['mostrarGraficosTicketsRanking' + tipo + 'AlDia'] = true;
+
+        // Generar colores aleatorios
+        var coloresAleatorios = categoria.Clientes.map(() =>
+            `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.6)`
+        );
+
+        // Crear el gráfico
+        var ctx = document.getElementById('ticketRanking' + tipo + 'ChartAlDia').getContext('2d');
+        $scope['ticketRanking' + tipo + 'ChartAlDia'] = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: categoria.Clientes.map(item => item.Cliente),
+                datasets: [{
+                    label: 'Cantidad',
+                    data: categoria.Clientes.map(item => item.Cantidad),
+                    backgroundColor: coloresAleatorios,
+                    hoverBackgroundColor: coloresAleatorios,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {
+                    datalabels: {
+                        display: true,
+                        align: 'top',
+                        backgroundColor: '#D3D3D3',
+                        borderRadius: 3,
+                        font: {
+                            weight: 'bold'
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                maintainAspectRatio: false
+            },
+            plugins: [ChartDataLabels]
+        });
+    }
 
 
     //******************************************************************************************************************************** */
@@ -2362,6 +2568,7 @@
         return $result;
     };
 
+    $scope.charts = {};
     $scope.buscarDatosOtrosIndicadores = function () {
 
         if ($scope.ticketPorPrioridadBarrasChart) {
@@ -2378,6 +2585,12 @@
     };
 
     $scope.MostrarTickectOtrosIndicadores = function () {
+
+        if (!$scope.charts) {
+            $scope.charts = {};
+        }
+        $scope.clearAllCharts();
+
         if ($scope.ticketPorPrioridadBarrasChart) {
             $scope.ticketPorPrioridadBarrasChart.destroy();
         }
@@ -2410,6 +2623,7 @@
 
                     $scope.mostrarGraficoTicketsPrioridadOtrosIndicadores = true;
 
+                    $scope.datosPorPrioridad = {};
                     data.ticketsPorClientePrioridad.forEach(function (ticket) {
                         var cliente = ticket.Cliente;
                         var prioridad = ticket.Prioridad;
@@ -2430,7 +2644,6 @@
                         if (!$scope.datosPorPrioridad[prioridad]) $scope.datosPorPrioridad[prioridad] = {};
                         if (!$scope.datosPorPrioridad[prioridad][cliente]) $scope.datosPorPrioridad[prioridad][cliente] = {};
                         if (!$scope.datosPorPrioridad[prioridad][cliente][anno]) $scope.datosPorPrioridad[prioridad][cliente][anno] = {};
-
                         $scope.datosPorPrioridad[prioridad][cliente][anno][mes] = cantidad;
                     });
 
@@ -2438,11 +2651,12 @@
                     $scope.anosTickets.sort((a, b) => parseInt(a) - parseInt(b));
                     $scope.mesesTickets.sort((a, b) => parseInt(a) - parseInt(b));
 
-                    $scope.tabActiva = $scope.prioridadesUnicas[0] || null;
+                    $scope.getCantidadPrioridad = function (prioridad, cliente, anno, mes) {
+                        return $scope.datosPorPrioridad[prioridad]?.[cliente]?.[anno]?.[mes] || 0;
+                    };
 
-                    $scope.getCantidad = function (prioridad, cliente, anno, mes) {
-                        var cantidad = $scope.datosPorPrioridad[prioridad]?.[cliente]?.[anno]?.[mes] || 0;
-                        return cantidad;
+                    $scope.getCantidadPrioridad = function (prioridad, cliente, anno, mes) {
+                        return $scope.datosPorPrioridad[prioridad]?.[cliente]?.[anno]?.[mes] || 0;
                     };
 
                     $scope.getClientesPorPrioridad = function (prioridad) {
@@ -2458,15 +2672,22 @@
                     $scope.generateCharts = function () {
                         $timeout(function () {
                             $scope.prioridadesUnicas.forEach(function (prioridad) {
+                                var canvasId = 'chart-' + prioridad;
                                 var canvas = document.getElementById('chart-' + prioridad);
                                 if (canvas) {
+
+                                    // Destruir el gráfico existente si existe
+                                    if ($scope.charts[canvasId]) {
+                                        $scope.charts[canvasId].destroy();
+                                    }
+
                                     var ctx = canvas.getContext('2d');
                                     var clientes = $scope.getClientesPorPrioridad(prioridad);
-
-                                    var datasets = clientes.map(function (cliente) {
+                                    var mostrarTodosLosClientes = clientes.length === 1;
+                                    var datasets = clientes.map(function (cliente, index) {
                                         var data = $scope.anosTickets.map(function (anno) {
                                             return $scope.mesesTickets.map(function (mes) {
-                                                return $scope.getCantidad(prioridad, cliente, anno, mes);
+                                                return $scope.getCantidadPrioridad(prioridad, cliente, anno, mes);
                                             });
                                         }).flat();
 
@@ -2476,7 +2697,8 @@
                                             fill: true,
                                             backgroundColor: getRandomColor(),
                                             borderColor: getRandomColor(),
-                                            borderWidth: 1
+                                            borderWidth: 1,
+                                            hidden: !mostrarTodosLosClientes && index >= 1
                                         };
                                     });
 
@@ -2486,7 +2708,7 @@
                                         });
                                     }).flat();
 
-                                    createChart(ctx, labels, datasets);
+                                    $scope.charts[canvasId] = createChart(ctx, labels, datasets);
                                 }
                             });
                         }, 0);
@@ -2500,37 +2722,50 @@
                                 datasets: datasets
                             },
                             options: {
-                                responsive: true,
                                 scales: {
                                     x: {
                                         display: true,
-                                        title: {
-                                            display: true,
-                                            text: 'Meses'
-                                        }
+                                        title: { display: true, text: 'Cantidad de Tickets' },
+                                        ticks: { beginAtZero: true },
                                     },
                                     y: {
+                                        type: 'logarithmic',
                                         display: true,
-                                        title: {
-                                            display: true,
-                                            text: 'Cantidad de Tickets'
-                                        }
-                                    }
+                                        title: { display: true, text: 'Año' },
+                                    },
                                 },
                                 plugins: {
-                                    legend: {
+                                    title: {
                                         display: true,
-                                        position: 'top'
+                                        text: 'Tickets por Prioridad y Clientes'
                                     },
-                                    tooltip: {
-                                        callbacks: {
-                                            label: function (context) {
-                                                return `${context.dataset.label}: ${context.raw}`;
-                                            }
+                                    datalabels: {
+                                        display: true,
+                                        align: 'center',
+                                        anchor: 'center',
+                                        backgroundColor: '#D3D3D3',
+                                        borderRadius: 3,
+                                        color: '#000',
+                                        font: {
+                                            weight: 'bold'
+                                        },
+                                        formatter: function (value, context) {
+                                            return value > 0 ? value : '';
                                         }
+                                    },
+                                    legend: {
+                                        position: 'top',
                                     }
-                                }
-                            }
+                                },
+                                layout: {
+                                    padding: {
+                                        top: 20
+                                    }
+                                },
+                                barPercentage: 0.8,
+                                categoryPercentage: 0.9
+                            },
+                            plugins: [ChartDataLabels]
                         });
                     }
 
@@ -2547,10 +2782,211 @@
 
                 }
 
+                if (data && data.ticketsPorClienteCategoria && Array.isArray(data.ticketsPorClienteCategoria)) {
+                    $scope.categoriasUnicas = [];
+                    $scope.anosTickets = [];
+                    $scope.mesesTickets = [];
+                    $scope.datosPorCategoria = {};
 
+                    $scope.mostrarGraficoTicketsCategoriaOtrosIndicadores = true;
+
+                    data.ticketsPorClienteCategoria.forEach(function (ticket) {
+                        var cliente = ticket.Cliente;
+                        var categoria = ticket.Categoria;
+                        var anno = ticket.Anno.toString();
+                        var mes = ticket.Mes.toString();
+                        var cantidad = ticket.Cantidad;
+
+                        if (!$scope.categoriasUnicas.includes(categoria)) {
+                            $scope.categoriasUnicas.push(categoria);
+                        }
+                        if (!$scope.anosTickets.includes(anno)) {
+                            $scope.anosTickets.push(anno);
+                        }
+                        if (!$scope.mesesTickets.includes(mes)) {
+                            $scope.mesesTickets.push(mes);
+                        }
+
+                        if (!$scope.datosPorCategoria[categoria]) $scope.datosPorCategoria[categoria] = {};
+                        if (!$scope.datosPorCategoria[categoria][cliente]) $scope.datosPorCategoria[categoria][cliente] = {};
+                        if (!$scope.datosPorCategoria[categoria][cliente][anno]) $scope.datosPorCategoria[categoria][cliente][anno] = {};
+                        $scope.datosPorCategoria[categoria][cliente][anno][mes] = cantidad;
+                    });
+
+                    $scope.categoriasUnicas.sort();
+                    $scope.anosTickets.sort((a, b) => parseInt(a) - parseInt(b));
+                    $scope.mesesTickets.sort((a, b) => parseInt(a) - parseInt(b));
+
+                    $scope.getCantidadCategoria = function (categoria, cliente, anno, mes) {
+                        return $scope.datosPorCategoria[categoria]?.[cliente]?.[anno]?.[mes] || 0;
+                    };
+
+                    $scope.getClientesPorCategoria = function (categoria) {
+                        var clientes = Object.keys($scope.datosPorCategoria[categoria] || {});
+                        return clientes;
+                    };
+
+                    $scope.getMesByNumero = function (mes) {
+                        const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                        return meses[parseInt(mes) - 1];
+                    };
+
+                    $scope.generateCharts = function () {
+                        $timeout(function () {
+                            $scope.categoriasUnicas.forEach(function (categoria) {
+                                var canvasId = 'chart-' + categoria;
+                                var canvas = document.getElementById('chart-' + categoria);
+                                if (canvas) {
+
+                                    if ($scope.charts[canvasId]) {
+                                        $scope.charts[canvasId].destroy();
+                                    }
+
+                                    var ctx = canvas.getContext('2d');
+                                    var clientes = $scope.getClientesPorCategoria(categoria);
+                                    var mostrarTodosLosClientes = clientes.length === 1;
+                                    var datasets = clientes.map(function (cliente, index) {
+                                        var data = $scope.anosTickets.map(function (anno) {
+                                            return $scope.mesesTickets.map(function (mes) {
+                                                return $scope.getCantidadCategoria(categoria, cliente, anno, mes);
+                                            });
+                                        }).flat();
+
+                                        return {
+                                            label: cliente,
+                                            data: data,
+                                            fill: true,
+                                            backgroundColor: getRandomColor(),
+                                            borderColor: getRandomColor(),
+                                            borderWidth: 1,
+                                            hidden: !mostrarTodosLosClientes && index >= 1
+                                        };
+                                    });
+
+                                    var labels = $scope.anosTickets.map(function (anno) {
+                                        return $scope.mesesTickets.map(function (mes) {
+                                            return `${$scope.getMesByNumero(mes)} ${anno}`;
+                                        });
+                                    }).flat();
+
+                                    $scope.charts[canvasId] = createChart(ctx, labels, datasets);
+                                }
+                            });
+                        }, 0);
+                    };
+
+                    function createChart(ctx, labels, datasets) {
+                        return new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: datasets
+                            },
+                            options: {
+                                scales: {
+                                    x: {
+                                        display: true,
+                                        title: { display: true, text: 'Cantidad de Tickets' },
+                                        ticks: { beginAtZero: true },
+                                    },
+                                    y: {
+                                        type: 'logarithmic',
+                                        display: true,
+                                        title: { display: true, text: 'Año' },
+                                    },
+                                },
+                                plugins: {
+                                    title: {
+                                        display: true,
+                                        text: 'Tickets por Categorias y Clientes'
+                                    },
+                                    datalabels: {
+                                        display: true,
+                                        align: 'center',
+                                        anchor: 'center',
+                                        backgroundColor: '#D3D3D3',
+                                        borderRadius: 3,
+                                        color: '#000',
+                                        font: {
+                                            weight: 'bold'
+                                        },
+                                        formatter: function (value, context) {
+                                            return value > 0 ? value : '';
+                                        }
+                                    },
+                                    legend: {
+                                        position: 'top',
+                                    }
+                                },
+                                layout: {
+                                    padding: {
+                                        top: 20
+                                    }
+                                },
+                                barPercentage: 0.8,
+                                categoryPercentage: 0.9
+                            },
+                            plugins: [ChartDataLabels]
+                        });
+                    }
+                    function getRandomColor() {
+                        var letters = '0123456789ABCDEF';
+                        var color = '#';
+                        for (var i = 0; i < 6; i++) {
+                            color += letters[Math.floor(Math.random() * 16)];
+                        }
+                        return color;
+                    }
+
+                }
+
+                $scope.tabActivaPrioridad = null;
+                $scope.tabActivaCategoria = null;
+
+                $scope.setActiveTabPrioridad = function (prioridad) {
+                    $scope.tabActivaPrioridad = prioridad;
+                };
+
+                $scope.setActiveTabCategoria = function (categoria) {
+                    $scope.tabActivaCategoria = categoria;
+                };
+
+                $scope.isActiveTabPrioridad = function (prioridad) {
+                    return $scope.tabActivaPrioridad === prioridad;
+                };
+
+                $scope.isActiveTabCategoria = function (categoria) {
+                    return $scope.tabActivaCategoria === categoria;
+                };
+
+                $scope.initializeTabs = function () {
+                    if ($scope.prioridadesUnicas && $scope.prioridadesUnicas.length > 0) {
+                        $scope.setActiveTabPrioridad($scope.prioridadesUnicas[0]);
+                    }
+                    if ($scope.categoriasUnicas && $scope.categoriasUnicas.length > 0) {
+                        $scope.setActiveTabCategoria($scope.categoriasUnicas[0]);
+                    }
+                };
+
+                $scope.generateCharts();
+                // Llamar a esta función después de procesar los datos
+                $scope.initializeTabs();
 
             }
         });
+    };
+
+    $scope.clearAllCharts = function () {
+        if ($scope.charts) {
+            Object.values($scope.charts).forEach(chart => {
+                if (chart && typeof chart.destroy === 'function') {
+                    chart.destroy();
+                }
+            });
+            $scope.charts = {};
+        } else {
+            $scope.charts = {};
+        }
     };
 
     function getRandomColor() {
