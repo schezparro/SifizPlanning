@@ -2,15 +2,14 @@
     $http.post("catalogos/dar-gestores/", {}).success(function (data) {
         if (data.success) {
             $scope.gestores = data.gestores;
-            console.log($scope.gestores);
             $scope.anioSeleccionado = new Date().getFullYear();
-            $scope.gestorSeleccionado = 'BOLIVAR VALLEJO';
+            $scope.gestorSeleccionado = 'TODOS';
             $scope.darTicketsPorAnioGestor();
         } else {
-            alert("No se pudieron cargar los datos");
+            console.log("No se pudieron cargar los datos");
         }
     });
-    $scope.gestorSeleccionado = 'BOLIVAR VALLEJO';
+    $scope.gestorSeleccionado = 'TODOS';
 
     $scope.anios = [2020, 2021, 2022, 2023, 2024]; // Ajusta según tus necesidades
     $scope.meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -71,14 +70,14 @@
     $scope.darTicketsPorAnioGestor = function () {
         $http.post('indicadores/dar-tickets-por-anio-gestor/', {
             anio: $scope.anioSeleccionado,
-            gestor: $scope.gestorSeleccionado != undefined ? $scope.gestorSeleccionado : 'BOLIVAR VALLEJO'
+            gestor: $scope.gestorSeleccionado != undefined ? $scope.gestorSeleccionado : 'TODOS'
         }).success(function (data) {
             if (data.success) {
                 $scope.datos = data.resumenTickets;
                 $scope.totalTickets = data.totalTickets;
                 generarGraficoTicketAnioGestor(data.resumenTickets);
             } else {
-                alert('Error: ' + data.msg);
+                console.log('Error: ' + data.msg);
             }
         });
     };
@@ -95,7 +94,7 @@
                 $scope.ticketIntervaloGestores = response.ticketIntervaloGestores;
                 $scope.generarGraficoTicketPorIntervalo($scope.ticketIntervaloGestores);
             } else {
-                alert('Error: ' + response.msg);
+                console.log('Error: ' + response.msg);
             }
         });
     };
@@ -113,7 +112,7 @@
                 $scope.ticketsTiempoInvertido = response.tiempoIntervaloGestores;
                 $scope.darTicketTiempoInvertido($scope.ticketsTiempoInvertido);
             } else {
-                alert('Error: ' + response.msg);
+                console.log('Error: ' + response.msg);
             }
         });
     };
@@ -131,7 +130,7 @@
                 $scope.ticketsAnalizados = response.ticketsAnalizados;
                 $scope.generarGraficoTicketAnalizados($scope.ticketsAnalizados);
             } else {
-                alert('Error: ' + response.msg);
+                console.log('Error: ' + response.msg);
             }
         });
     };
@@ -149,7 +148,7 @@
                 $scope.anuladosRechazados = response.anuladosRechazados;
                 $scope.generarGraficoTicketAnulados($scope.anuladosRechazados);
             } else {
-                alert('Error: ' + response.msg);
+                console.log('Error: ' + response.msg);
             }
         });
     };
@@ -182,12 +181,12 @@
     }
     $scope.darTicketTiempoInvertido = function (data) {
         if ($scope.ticketsInvertidoChart) $scope.ticketsInvertidoChart.destroy();
-        if (!data || data.length === 0) return alert('No hay datos para mostrar en el gráfico');
+        if (!data || data.length === 0) return console.log('No hay datos para mostrar en el gráfico');
 
         $scope.ticketsTiempoInvertido = data; // Asignar los datos a la variable para la tabla
 
         var ctx = document.getElementById('ticketsInvertidoChart');
-        if (!ctx) return alert('No se pudo encontrar el elemento del gráfico');
+        if (!ctx) return console.log('No se pudo encontrar el elemento del gráfico');
 
         var labels = [];
         var groupedData = {};
@@ -281,9 +280,9 @@
 
     $scope.generarGraficoTicketAnalizados = function (data) {
         if ($scope.ticketsAnalizadosChart) $scope.ticketsAnalizadosChart.destroy();
-        if (!data || data.length === 0) return alert('No hay datos para mostrar en el gráfico');
+        if (!data || data.length === 0) return console.log('No hay datos para mostrar en el gráfico');
         var ctx = document.getElementById('ticketsAnalizadosChart');
-        if (!ctx) return alert('No se pudo encontrar el elemento del gráfico');
+        if (!ctx) return console.log('No se pudo encontrar el elemento del gráfico');
         $scope.ticketsAnalizadosChart = new Chart(ctx.getContext('2d'), {
             type: 'line',
             data: {
@@ -311,9 +310,9 @@
 
     $scope.generarGraficoTicketAnulados = function (data) {
         if ($scope.anuladoRechazadoChart) $scope.anuladoRechazadoChart.destroy();
-        if (!data || data.length === 0) return alert('No hay datos para mostrar en el gráfico');
+        if (!data || data.length === 0) return console.log('No hay datos para mostrar en el gráfico');
         var ctx = document.getElementById('anuladoRechazadoChart');
-        if (!ctx) return alert('No se pudo encontrar el elemento del gráfico');
+        if (!ctx) return console.log('No se pudo encontrar el elemento del gráfico');
         $scope.anuladoRechazadoChart = new Chart(ctx.getContext('2d'), {
             type: 'bar',
             data: {
@@ -348,6 +347,7 @@
 
     $scope.generarGraficoTicketPorIntervalo = function (data) {
         if ($scope.ticketsIntervaloChart) $scope.ticketsIntervaloChart.destroy();
+        if (!data || data.length === 0) return console.log('No hay datos para mostrar en el gráfico');
         var labels = data.map(item => item.Gestor);
         var clientesData = data.map(item => item.ClientesAtendidos);
         var carteraData = data.map(item => item.CarteraAsignada);
@@ -380,10 +380,10 @@
         });
     };
 
-    $scope.darTicketIntervaloGestores();
-    $scope.darTicketTiempoGestores();
-    $scope.darTicketAnalizadosGestores();
-    $scope.darTicketAnuladosRechazados();
+    //$scope.darTicketIntervaloGestores();
+    //$scope.darTicketTiempoGestores();
+    //$scope.darTicketAnalizadosGestores();
+    //$scope.darTicketAnuladosRechazados();
 
 }]);
 

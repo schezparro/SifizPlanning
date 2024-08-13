@@ -24,6 +24,7 @@
                 <div class="form-group" style="margin-left: 20px;">
                     <label for="gestor">Gestor:</label>
                     <select id="gestor" class="form-control" ng-model="gestorSeleccionado" ng-change="darTicketsPorAnioGestor()" style="width: auto; margin-left: 10px;">
+                        <option value="TODOS">*</option>
                         <option ng-repeat="gestor in gestores" value={{gestor.nombre}}> {{gestor.nombre}}</option>
                     </select>
                 </div>

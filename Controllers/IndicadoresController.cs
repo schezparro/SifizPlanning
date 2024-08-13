@@ -1632,7 +1632,7 @@ namespace SifizPlanning.Controllers
                 var gestorUpperCase = gestor.ToUpper();
                 var clientes = (from c in db.Cliente
                                 join g in db.GestorServicios on c.Secuencial equals g.SecuencialCliente
-                                where g.colaborador.persona.Nombre1.ToUpper() + " " + g.colaborador.persona.Apellido1.ToUpper() == gestorUpperCase
+                                where gestorUpperCase == "TODOS" || g.colaborador.persona.Nombre1.ToUpper() + " " + g.colaborador.persona.Apellido1.ToUpper() == gestorUpperCase
                                 select c.Descripcion.ToUpper()).ToList();
 
                 var ticketsQuery = from ticket in db.InfoTickets
