@@ -75,6 +75,7 @@
             if (data.success) {
                 $scope.datos = data.resumenTickets;
                 $scope.totalTickets = data.totalTickets;
+                $scope.totalesPorMes = data.totalesPorMes; // Añadir los totales por mes al 
                 generarGraficoTicketAnioGestor(data.resumenTickets);
             } else {
                 console.log('Error: ' + data.msg);

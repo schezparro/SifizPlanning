@@ -48,6 +48,11 @@
                                         <td ng-repeat="mes in meses">{{cliente.TicketsPorMes[($index + 1)] || 0}}</td>
                                         <td>{{cliente.Total}}</td>
                                     </tr>
+                                    <tr>
+                                        <td>Total</td>
+                                        <td ng-repeat="mes in meses">{{totalesPorMes[$index]}}</td>
+                                        <td>{{totalTickets}}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>

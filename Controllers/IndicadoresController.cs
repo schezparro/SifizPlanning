@@ -1670,11 +1670,22 @@ namespace SifizPlanning.Controllers
 
                 var totalTickets = resumenFinal.Sum(r => r.Total);
 
+                // Calcular los totales por mes
+                var totalesPorMes = new int[12];
+                foreach (var cliente in resumenFinal)
+                {
+                    for (int i = 0; i < cliente.TicketsPorMes.Count; i++)
+                    {
+                        totalesPorMes[i] += cliente.TicketsPorMes[i];
+                    }
+                }
+
                 var resp = new
                 {
                     success = true,
                     resumenTickets = resumenFinal,
-                    totalTickets = totalTickets
+                    totalTickets = totalTickets,
+                    totalesPorMes = totalesPorMes
                 };
 
                 return Json(resp);
