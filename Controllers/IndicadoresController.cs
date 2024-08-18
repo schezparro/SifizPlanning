@@ -522,7 +522,88 @@ namespace SifizPlanning.Controllers
             }
         }
 
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public ActionResult DarTicketsPorReqNuevo(string fechaInicio, string fechaFin)
+        {
+            try
+            {
+                // Crear objetos DateTime para almacenar las fechas
+                DateTime fInicio = new DateTime();
+                DateTime fFin = new DateTime();
 
+                // Verificar si fechaInicio es nula o vacía
+                if (!string.IsNullOrEmpty(fechaInicio))
+                {
+                    string[] fechas = fechaInicio.Split(new Char[] { '/' });
+                    int dia = Int32.Parse(fechas[0]);
+                    int mes = Int32.Parse(fechas[1]);
+                    int anno = Int32.Parse(fechas[2]);
+                    fInicio = new DateTime(anno, mes, dia);
+                }
+                else
+                {
+                    // Si fechaInicio es nula o vacía, tomar el primer día del mes en curso
+                    fInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                }
+
+                // Verificar si fechaFin es nula o vacía
+                if (!string.IsNullOrEmpty(fechaFin))
+                {
+                    string[] fechasFin = fechaFin.Split(new Char[] { '/' });
+                    int dia = Int32.Parse(fechasFin[0]);
+                    int mes = Int32.Parse(fechasFin[1]);
+                    int anno = Int32.Parse(fechasFin[2]);
+                    fFin = new DateTime(anno, mes, dia);
+                }
+                else
+                {
+                    // Si fechaFin es nula o vacía, tomar el día actual
+                    fFin = DateTime.Now;
+                }
+
+                var ticketsQueryPRN = (from ticket in db.InfoTickets
+                                      where ticket.FechaIngreso != null
+                                         && ticket.FechaIngreso.Value >= fInicio
+                                         && ticket.FechaIngreso.Value <= fFin
+                                         && ticket.Tipo == "REQUERIMIENTO NUEVO"
+                                      select ticket).ToList();
+
+                // Convertir la consulta a una lista para trabajar con ella en memoria
+                List<InfoTickets> ticketsListPRN = ticketsQueryPRN.ToList();
+
+                // Paso 2: Aplicar el cálculo de la semana y otros procesamientos en memoria
+                // Agrupar los tickets por semana
+                var groupedTickets = ticketsListPRN
+                   .GroupBy(t => t.Cliente) // Agrupa los tickets por Tipo
+                   .Select(g => new
+                   {
+                       Cliente = g.Key, // Obtiene el Tipo como clave del grupo
+                       Cantidad = g.Count() // Cuenta la cantidad de tickets en cada grupo
+                   })
+                   .OrderByDescending(x => x.Cantidad) // Ordena por Tipo (opcional, dependiendo de tus necesidades)
+                   .ToList();
+
+                var totalCantidades = groupedTickets.Sum(ticket => ticket.Cantidad);
+
+                var resp = new
+                {
+                    success = true,
+                    infoTickets = groupedTickets,
+                    totalCantidades = totalCantidades
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
@@ -618,6 +699,7 @@ namespace SifizPlanning.Controllers
                                             && ticket.FechaIngreso.Value <= fActual
                                             && ticket.Estado != "CERRADO"
                                             && ticket.Estado != "ANULADO"
+                                            && ticket.Estado != "RECHAZADO"
                                             && (ticket.Cliente == nombreCliente || nombreCliente == "")
                                          select ticket).ToList();
 
@@ -675,6 +757,9 @@ namespace SifizPlanning.Controllers
                 var ticketsQueryPCAD = (from ticket in db.InfoTickets
                                         where ticket.FechaIngreso != null
                                            && ticket.FechaIngreso.Value <= fActual
+                                           && ticket.Estado != "CERRADO"
+                                            && ticket.Estado != "ANULADO"
+                                            && ticket.Estado != "RECHAZADO"
                                             && (ticket.Cliente == nombreCliente || nombreCliente == "")
                                         select ticket).ToList();
 
@@ -737,6 +822,8 @@ namespace SifizPlanning.Controllers
                                         where ticket.FechaIngreso != null
                                            && ticket.FechaIngreso.Value <= fActual
                                             && ticket.Estado != "CERRADO"
+                                            && ticket.Estado != "ANULADO"
+                                            && ticket.Estado != "RECHAZADO"
                                             && (ticket.Cliente == nombreCliente || nombreCliente == "")
                                         select ticket).ToList();
 
@@ -798,6 +885,9 @@ namespace SifizPlanning.Controllers
                 var ticketsQueryPCEAD = (from ticket in db.InfoTickets
                                          where ticket.FechaIngreso != null
                                             && ticket.FechaIngreso.Value <= fActual
+                                            && ticket.Estado != "CERRADO"
+                                            && ticket.Estado != "ANULADO"
+                                            && ticket.Estado != "RECHAZADO"
                                             && (ticket.Cliente == nombreCliente || nombreCliente == "")
                                          select ticket).ToList();
 
@@ -836,7 +926,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
-        public ActionResult DarTicketsPendientesAlDia(int cliente)
+        public ActionResult DarTicketsAplicadosAlDia(int cliente)
         {
             try
             {
@@ -851,32 +941,37 @@ namespace SifizPlanning.Controllers
                 var ticketsQueryTPAD = (from ticket in db.InfoTickets
                                         where ticket.FechaIngreso != null
                                            && ticket.FechaIngreso.Value <= fActual
-                                           && ticket.Estado == "PENDIENTE"
+                                           && ticket.Estado != "CERRADO"
+                                           && ticket.Estado != "ANULADO"
+                                           && ticket.Estado != "RECHAZADO"
                                            && (ticket.Cliente == nombreCliente || nombreCliente == "")
                                         select ticket).ToList();
 
                 List<InfoTickets> ticketsListTPAD = ticketsQueryTPAD.ToList();
 
                 var groupedTicketsTPAD = ticketsListTPAD
-                    .GroupBy(ticket => CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(
-                        ticket.FechaIngreso.Value,
-                        CalendarWeekRule.FirstDay,
-                        DayOfWeek.Monday))
-                    .Select(g => new
-                    {
-                        Semana = g.Key,
-                        Cantidad = g.Count(),
-                        Descripcion = "AL " + g.Max(t => t.FechaIngreso.Value).ToString("dd/MM/yyyy")
-                    })
-                    .OrderBy(x => x.Semana)
-                    .ToList();
+                   .GroupBy(t => t.AplicaA) // Agrupa los tickets por Tipo
+                   .Select(g => new
+                   {
+                       Aplica = g.Key, // Obtiene el Tipo como clave del grupo
+                       Cantidad = g.Count() // Cuenta la cantidad de tickets en cada grupo
+                   })
+                   .OrderBy(x => x.Aplica) // Ordena por Tipo (opcional, dependiendo de tus necesidades)
+                   .ToList();
 
                 var totalCantidadesTPAD = groupedTicketsTPAD.Sum(ticket => ticket.Cantidad);
+
+                var aplicasPorcentajes = groupedTicketsTPAD.Select(g => new
+                {
+                    Aplica = g.Aplica,
+                    Cantidad = g.Cantidad,
+                    Porcentaje = CalcularPorcentage(g.Cantidad, totalCantidadesTPAD)
+                }).ToList();
 
                 var resp = new
                 {
                     success = true,
-                    infoTickets = groupedTicketsTPAD,
+                    infoTickets = aplicasPorcentajes,
                     totalCantidades = totalCantidadesTPAD
                 };
                 return Json(resp);
@@ -891,6 +986,69 @@ namespace SifizPlanning.Controllers
                 return Json(resp);
             }
         }
+
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public ActionResult DarTicketsRankingPorCategoriasAlDia()
+        {
+            try
+            {
+                DateTime fActual = DateTime.Today;
+
+                // Consulta base
+                var ticketsQuery = db.InfoTickets.Where(t => t.FechaIngreso <= fActual
+                && t.Estado != "CERRADO" && t.Estado != "ANULADO" && t.Estado != "RECHAZADO").Select(t => new
+                {
+                    Tipo = t.Tipo,
+                    Cliente = t.Cliente
+                });
+
+                // Ejecutar la consulta
+                var ticketsList = ticketsQuery.ToList();
+
+                var ticketsPorCategorias = ticketsList
+            .GroupBy(t => new { Tipo = t.Tipo, t.Cliente })
+            .Select(g => new
+            {
+                Tipo = g.Key.Tipo,
+                Cliente = g.Key.Cliente,
+                Cantidad = g.Count()
+            })
+            .GroupBy(x => x.Tipo)
+            .Select(g => new
+            {
+                Tipo = g.Key,
+                Clientes = g.OrderByDescending(x => x.Cantidad)
+                               .Take(10)
+                               .Select(x => new
+                               {
+                                   Cliente = x.Cliente,
+                                   Cantidad = x.Cantidad
+                               })
+                               .ToList(),
+                Total = g.Sum(x => x.Cantidad)
+            })
+            .OrderBy(x => x.Tipo)
+            .ToList();
+
+                return Json(new
+                {
+                    success = true,
+                    ticketsPorCategorias = ticketsPorCategorias,
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
 
         //******************************************** Indicadores generales *********************************************
 
@@ -1292,7 +1450,7 @@ namespace SifizPlanning.Controllers
 
                 // Aplicar filtros solo si tienen valores
                 if (clientes != null && clientes.Any())
-                    ticketsQuery = ticketsQuery.Where(t => clientes.Contains(t.Cliente));
+                    ticketsQuery = ticketsQuery.Where(t => clientes.Contains(t.ClienteSecuencial.ToString()));
 
                 if (prioridades != null && prioridades.Any())
                     ticketsQuery = ticketsQuery.Where(t => prioridades.Contains(t.PrioridadSecuencial.ToString()));

@@ -2223,9 +2223,15 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
-                name: "DarTicketsPendientesAlDia",
-                url: "indicadores/dar-tickets-pendientes-aldia/{id}",
-                defaults: new { controller = "Indicadores", action = "DarTicketsPendientesAlDia", id = UrlParameter.Optional }
+                name: "DarTicketsRankingPorCategoriasAlDia",
+                url: "indicadores/dar-tickets-ranking-categorias-aldia/{id}",
+                defaults: new { controller = "Indicadores", action = "DarTicketsRankingPorCategoriasAlDia", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarTicketsAplicadosAlDia",
+                url: "indicadores/dar-tickets-por-aplica-aldia/{id}",
+                defaults: new { controller = "Indicadores", action = "DarTicketsAplicadosAlDia", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(
@@ -2304,6 +2310,12 @@ namespace SifizPlanning
                 name: "DarTicketsPorGestor",
                 url: "indicadores/dar-tickets-por-gestor/{id}",
                 defaults: new { controller = "Indicadores", action = "DarTicketsPorGestor", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarTicketsPorReqNuevo",
+                url: "indicadores/dar-tickets-por-req-nuevo/{id}",
+                defaults: new { controller = "Indicadores", action = "DarTicketsPorReqNuevo", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(

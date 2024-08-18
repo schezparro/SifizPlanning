@@ -70,7 +70,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td><strong>Realizado por:</strong></td>
+                                                <td><strong>Generado por:</strong></td>
                                                 <td>@User.Identity.Name</td>
                                             </tr>
                                             <tr>
@@ -367,6 +367,61 @@
                         <br />
                     </div>
 
+                    @*Tickets por requerimiento nuevo*@
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-xs-12" style="text-align:center;">
+                                <label for="select-cliente-proyecto">TICKETS POR REQUERIMIENTO NUEVO</label>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="mostrarGraficoTicketsReqNuevo">
+                            <!-- Tabla (1/3 del ancho) -->
+                            <div class="col-md-4">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">Tickets por requerimiento nuevo</div>
+                                    <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th style="background-color: #e8f577; color: black;">Cliente</th>
+                                                    <th style="background-color: #e8f577; color: black;">Cantidad</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="ticket in infoTicketsPorReqNuevo">
+                                                    <td>{{ticket.Cliente}}</td>
+                                                    <td>{{ticket.Cantidad}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align: center; background-color: #e8f577; color: black; font-weight: bold;">Total</td>
+                                                    <td style="text-align: center; background-color: #e8f577; color: black; font-size: 20px;">{{totalCantidadesTicketsPorReqNuevo | number:0}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Gráfico (2/3 del ancho) -->
+                            <div class="col-md-8">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">Gráfico de Tickets por requerimiento nuevo</div>
+                                    <div class="panel-body" style="margin: 0 auto;">
+                                        <canvas id="ticketPorReqNuevoBarrasChart" style="overflow-x:auto"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 text-center">
+                                <p id="mensajeLabel">{{mensajeNoDataTicketsReqNuevo}}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
+                        <br />
+                    </div>
+
                     <div>
                         <br />
                     </div>
@@ -460,7 +515,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td><strong>Realizado por:</strong></td>
+                                                <td><strong>Generado por:</strong></td>
                                                 <td>@User.Identity.Name</td>
                                             </tr>
                                         </table>
@@ -539,7 +594,7 @@
                             <!-- Tabla (1/3 del ancho) -->
                             <div class="col-md-4">
                                 <div class="panel panel-default">
-                                    <div class="panel-heading">Tickets Cerrados</div>
+                                    <div class="panel-heading">Tickets por categorías</div>
                                     <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
                                         <table class="table table-bordered">
                                             <thead>
@@ -748,36 +803,36 @@
                         <br />
                     </div>
 
-                    @*TICKETS PENDIENTES*@
+                    @*TICKETS APLICADOS A*@
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col-xs-12" style="text-align:center;">
-                                <label for="select-cliente-proyecto">TICKETS PENDIENTES</label>
+                                <label for="select-cliente-proyecto">TICKETS APLICADOS A</label>
                             </div>
                         </div>
-                        <div class="row" ng-show="mostrarGraficosTicketsPendientesAlDia">
+                        <div class="row" ng-show="mostrarGraficosTicketsAplicadosAlDia">
                             <!-- Tabla (1/3 del ancho) -->
                             <div class="col-md-4">
                                 <div class="panel panel-default">
-                                    <div class="panel-heading">Tickets Pendientes</div>
+                                    <div class="panel-heading">Tickets aplicados a</div>
                                     <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
                                         <table class="table table-bordered">
                                             <thead>
                                                 <tr>
-                                                    <th style="background-color: #add8e6; color: black;">Semana</th>
-                                                    <th style="background-color: #add8e6; color: black;">Descripción</th>
+                                                    <th style="background-color: #add8e6; color: black;">Aplica a</th>
+                                                    <th style="background-color: #add8e6; color: black;">Porciento</th>
                                                     <th style="background-color: #add8e6; color: black;">Cantidad</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr ng-repeat="ticket in infoTicketsPendientesAlDia">
-                                                    <td>{{ticket.Semana}}</td>
-                                                    <td>{{ticket.Descripcion}}</td>
+                                                <tr ng-repeat="ticket in infoTicketsAplicadosAlDia">
+                                                    <td>{{ticket.Aplica}}</td>
+                                                    <td>{{ticket.Porcentaje}}%</td>
                                                     <td>{{ticket.Cantidad}}</td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="2" style="text-align: center; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
-                                                    <td style="text-align: center; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsPendientesAlDia | number:0}}</td>
+                                                    <td style="text-align: center; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsAplicadosAlDia | number:0}}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -787,16 +842,16 @@
                             <!-- Gráfico (2/3 del ancho) -->
                             <div class="col-md-8">
                                 <div class="panel panel-default">
-                                    <div class="panel-heading">Gráfico de Tickets Pendientes</div>
+                                    <div class="panel-heading">Gráfico de Tickets por aplica</div>
                                     <div class="panel-body" style="margin: 0 auto;">
-                                        <canvas id="ticketPendientesChartAlDia" style="overflow-x: auto;"></canvas>
+                                        <canvas id="ticketAplicadosChartAlDia" style="overflow-x: auto;"></canvas>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-xs-12 text-center">
-                                <p id="mensajeLabel">{{mensajeNoDataTicketPendientesAlDia}}</p>
+                                <p id="mensajeLabel">{{mensajeNoDataTicketAplicadosAlDia}}</p>
                             </div>
                         </div>
                     </div>
@@ -804,6 +859,183 @@
                     <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
                         <br />
                     </div>
+
+                    @*RANKING DE CLIENTES*@
+                    @*POR CATERGORIAS*@
+
+                <div ng-show="todosLosClientes">
+                    @*POR REQUERIMIENTO NUEVO*@
+
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-xs-12" style="text-align:center;">
+                                <label for="select-cliente-proyecto">RANKING DE CLIENTES POR REQUEMIENTOS NUEVOS</label>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="mostrarGraficosTicketsRankingReqNuevoAlDia">
+                            <!-- Tabla (1/3 del ancho) -->
+                            <div class="col-md-4">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">Ranking Requerimientos Nuevos</div>
+                                    <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th style="background-color: #add8e6; color: black;">Cliente</th>
+                                                    <th style="background-color: #add8e6; color: black;">Cantidad</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="ticket in infoTicketsRankingReqNuevoAlDia">
+                                                    <td>{{ticket.Cliente}}</td>
+                                                    <td>{{ticket.Cantidad}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align: center; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
+                                                    <td style="text-align: center; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsRankingReqNuevoAlDia | number:0}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Gráfico (2/3 del ancho) -->
+                            <div class="col-md-8">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">Gráfico de Ranking de Clientes por Requerimientos Nuevos</div>
+                                    <div class="panel-body" style="margin: 0 auto;">
+                                        <canvas id="ticketRankingReqNuevoChartAlDia" style="overflow-x: auto;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 text-center">
+                                <p id="mensajeLabel">{{mensajeNoDataTicketRankingReqNuevoAlDia}}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
+                        <br />
+                    </div>
+
+
+                    @*POR GARANTIA TECNICA*@
+
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-xs-12" style="text-align:center;">
+                                <label for="select-cliente-proyecto">RANKING DE CLIENTES POR GARANTIA TECNICA</label>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="mostrarGraficosTicketsRankingGarantiaAlDia">
+                            <!-- Tabla (1/3 del ancho) -->
+                            <div class="col-md-4">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">Ranking Garantía Técnica</div>
+                                    <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th style="background-color: #add8e6; color: black;">Cliente</th>
+                                                    <th style="background-color: #add8e6; color: black;">Cantidad</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="ticket in infoTicketsRankingGarantiaAlDia">
+                                                    <td>{{ticket.Cliente}}</td>
+                                                    <td>{{ticket.Cantidad}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align: center; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
+                                                    <td style="text-align: center; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsRankingGarantiaAlDia | number:0}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Gráfico (2/3 del ancho) -->
+                            <div class="col-md-8">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">Gráfico de Ranking de Clientes por Garantía Técnica</div>
+                                    <div class="panel-body" style="margin: 0 auto;">
+                                        <canvas id="ticketRankingGarantiaChartAlDia" style="overflow-x: auto;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 text-center">
+                                <p id="mensajeLabel">{{mensajeNoDataTicketRankingGarantiaAlDia}}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
+                        <br />
+                    </div>
+
+
+                    @*POR MANTENIMIENTO*@
+
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-xs-12" style="text-align:center;">
+                                <label for="select-cliente-proyecto">RANKING DE CLIENTES POR MANTENIMIENTO</label>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="mostrarGraficosTicketsRankingMantenimientoAlDia">
+                            <!-- Tabla (1/3 del ancho) -->
+                            <div class="col-md-4">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">Ranking Mantenimiento</div>
+                                    <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th style="background-color: #add8e6; color: black;">Cliente</th>
+                                                    <th style="background-color: #add8e6; color: black;">Cantidad</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="ticket in infoTicketsRankingMantenimientoAlDia">
+                                                    <td>{{ticket.Cliente}}</td>
+                                                    <td>{{ticket.Cantidad}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align: center; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
+                                                    <td style="text-align: center; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsRankingMantenimientoAlDia | number:0}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Gráfico (2/3 del ancho) -->
+                            <div class="col-md-8">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">Gráfico de Ranking de Clientes por Mantenimiento</div>
+                                    <div class="panel-body" style="margin: 0 auto;">
+                                        <canvas id="ticketRankingMantenimientoChartAlDia" style="overflow-x: auto;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 text-center">
+                                <p id="mensajeLabel">{{mensajeNoDataTicketRankingMantenimientoAlDia}}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
+                        <br />
+                    </div>
+                </div>
+                    
+
 
                 </div>
             </div>
@@ -912,7 +1144,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td><strong>Realizado por:</strong></td>
+                                                <td><strong>Generado por:</strong></td>
                                                 <td>@User.Identity.Name</td>
                                             </tr>
                                         </table>
@@ -1406,7 +1638,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td><strong>Realizado por:</strong></td>
+                                                <td><strong>Generado por:</strong></td>
                                                 <td>@User.Identity.Name</td>
                                             </tr>
                                         </table>
@@ -1426,12 +1658,14 @@
                         </div>
                         <div class="container-fluid">
                             <ul class="nav nav-tabs centered-tabs" role="tablist">
-                                <li role="presentation" ng-repeat="prioridad in prioridadesUnicas" ng-class="{'active': isActiveTab(prioridad)}">
-                                    <a href="#{{prioridad}}" ng-click="setActiveTab(prioridad)" aria-controls="{{prioridad}}" role="tab" data-toggle="tab">{{prioridad}}</a>
+                                <li role="presentation" ng-repeat="prioridad in prioridadesUnicas" ng-class="{'active': isActiveTabPrioridad(prioridad)}">
+                                    <a href="#{{prioridad}}" ng-click="setActiveTabPrioridad(prioridad)" aria-controls="{{prioridad}}" role="tab" data-toggle="tab">{{prioridad}}</a>
                                 </li>
+
                             </ul>
                             <div role="tabpanel" class="tab-content">
-                                <div ng-repeat="prioridad in prioridadesUnicas" role="tabpanel" class="tab-pane" ng-class="{'active': isActiveTab(prioridad)}" id="{{prioridad}}">
+                                <div ng-repeat="prioridad in prioridadesUnicas" role="tabpanel" class="tab-pane" ng-class="{'active': isActiveTabPrioridad(prioridad)}" id="{{prioridad}}">
+
                                     <div ng-show="mostrarGraficoTicketsPrioridadOtrosIndicadores">
                                         <table class="table table-bordered">
                                             <thead>
@@ -1457,7 +1691,7 @@
                                                         <table style="width:100%">
                                                             <tr>
                                                                 <td ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: center;">
-                                                                    {{getCantidad(prioridad, cliente, anno, mes)}}
+                                                                    {{getCantidadPrioridad(prioridad, cliente, anno, mes)}}
                                                                 </td>
                                                             </tr>
                                                         </table>
@@ -1480,10 +1714,9 @@
                         </div>
                     </div>
 
-
                     @*TICKETS POR CATEGORIA *@
 
-                    <!--<div class="container-fluid">
+                    <div class="container-fluid">
                         <div class="row">
                             <div class="col-xs-12" style="text-align:center;">
                                 <label for="select-cliente-proyecto">TICKETS POR CATEGORIAS:</label>
@@ -1491,13 +1724,14 @@
                         </div>
                         <div class="container-fluid">
                             <ul class="nav nav-tabs centered-tabs" role="tablist">
-                                <li role="presentation" ng-repeat="prioridad in prioridadesUnicas" ng-class="{'active': isActiveTab(prioridad)}">
-                                    <a href="#{{prioridad}}" ng-click="setActiveTab(prioridad)" aria-controls="{{prioridad}}" role="tab" data-toggle="tab">{{prioridad}}</a>
+                                <li role="presentation" ng-repeat="categoria in categoriasUnicas" ng-class="{'active': isActiveTabCategoria(categoria)}">
+                                    <a href="#{{categoria}}" ng-click="setActiveTabCategoria(categoria)" aria-controls="{{categoria}}" role="tab" data-toggle="tab">{{categoria}}</a>
                                 </li>
+
                             </ul>
                             <div role="tabpanel" class="tab-content">
-                                <div ng-repeat="prioridad in prioridadesUnicas" role="tabpanel" class="tab-pane" ng-class="{'active': isActiveTab(prioridad)}" id="{{prioridad}}">
-                                    <div ng-show="mostrarGraficoTicketsPrioridadOtrosIndicadores">
+                                <div ng-repeat="categoria in categoriasUnicas" role="tabpanel" class="tab-pane" ng-class="{'active': isActiveTabCategoria(categoria)}" id="{{categoria}}">
+                                    <div ng-show="mostrarGraficoTicketsCategoriaOtrosIndicadores">
                                         <table class="table table-bordered">
                                             <thead>
                                                 <tr>
@@ -1516,13 +1750,13 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr ng-repeat="cliente in getClientesPorPrioridad(prioridad)">
+                                                <tr ng-repeat="cliente in getClientesPorCategoria(categoria)">
                                                     <td>{{cliente}}</td>
                                                     <td ng-repeat="anno in anosTickets" style="border: 1px solid #ddd; padding: 0;">
                                                         <table style="width:100%">
                                                             <tr>
                                                                 <td ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: center;">
-                                                                    {{getCantidad(prioridad, cliente, anno, mes)}}
+                                                                    {{getCantidadCategoria(categoria, cliente, anno, mes)}}
                                                                 </td>
                                                             </tr>
                                                         </table>
@@ -1533,9 +1767,9 @@
 
                                         <div class=" row col-md-12">
                                             <div class="panel panel-default">
-                                                <div class="panel-heading">Gráfico de Tickets por prioridad</div>
+                                                <div class="panel-heading">Gráfico de Tickets por categorías</div>
                                                 <div class="panel-body" style="margin: 0 auto;">
-                                                    <canvas id="chart-{{prioridad}}"></canvas>
+                                                    <canvas id="chart-{{categoria}}"></canvas>
                                                 </div>
                                             </div>
                                         </div>
@@ -1543,7 +1777,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div>-->
+                    </div>
+
 
 
 
