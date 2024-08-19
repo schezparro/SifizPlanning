@@ -2232,6 +2232,34 @@ namespace SifizPlanning.Controllers
             }
         }
 
+        public ActionResult ActualizarCapacitaciones()
+        {
+            try
+            {
+                DateTime hoy = DateTime.Today;
+                DateTime manana = hoy.AddDays(1);
+
+                var capacitaciones = db.Recursos
+                    .Where(s => s.EsPlan == 1 && s.Fecha >= hoy && s.Fecha < DbFunctions.TruncateTime(manana))
+                    .ToList();
+
+                int filasActualizadas = 0;
+                foreach (var item in capacitaciones)
+                {
+                    item.EsPlan = 0;
+                    filasActualizadas++;
+                }
+
+                db.SaveChanges();
+
+                return Json(new { success = true, filasActualizadas = filasActualizadas }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
         public class ClienteHoras
         {
             public string mes { get; set; }
