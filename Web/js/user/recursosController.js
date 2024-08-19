@@ -115,8 +115,19 @@
         $scope.newDetalle = '';
         $scope.url = '';
         $scope.moduloSeleccionado = '';
-        
+
         angular.element("#modal-agregar-recursos").modal("show");
+    };
+
+    $scope.windowAgregarPlan = function () {
+        $scope.newTituloPlan = '';
+        $scope.newDetallePlan = '';
+        $scope.horasPlan = 0;
+        $scope.minutosPlan = 0;
+        $scope.moduloSeleccionadoPlan = '';
+        $scope.capacitadorSeleccionadoPlan = '';
+
+        angular.element("#modal-agregar-plan").modal("show");
     };
 
     $scope.abrirRegistroAsistencia = function () {
@@ -152,11 +163,17 @@
                 angular.element("#guardar-registro").show();
                 angular.element("#modal-asistencia-recurso").modal("show");
             }
-        });      
+        });
     };
 
-    var ajaxTipoModulo = $http.post("user/tipo-modulo", {});
+    var ajaxCapacitadores = $http.post("catalogos/dar-colaboradores", {});
+    ajaxCapacitadores.success(function (data) {
+        if (data.success === true) {
+            $scope.capacitadores = data.colaboradores;
+        }
+    });
 
+    var ajaxTipoModulo = $http.post("user/tipo-modulo", {});
     ajaxTipoModulo.success(function (data) {
         if (data.success === true) {
             $scope.tipoModulo = data.tipoModulo;
@@ -218,17 +235,61 @@
         });
     };
 
+    $scope.GuardarNuevoPlan = function () {
+        var moduloPlan = angular.element("#select-modulo-plan")[0].value;
+        var colaborador = angular.element("#select-capacitador-plan")[0].value;
+        var fechaSistemaPlan = new Date().toISOString();
+
+        waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
+
+        var formData = new FormData();
+        formData.append('titulo', $scope.newTituloPlan);
+        formData.append('detalle', $scope.newDetallePlan);
+        formData.append('fecha', fechaSistemaPlan);
+        formData.append('modulo', moduloPlan);
+        formData.append('colaborador', colaborador);
+
+        var tiempo = toTotalMinutes($scope.horasPlan, $scope.minutosPlan);
+        formData.append('tiempo', tiempo);
+
+        var ajaxEnvioDatos = $http({
+            method: 'POST',
+            url: "user/guardar-plan-recurso",
+            data: formData,
+            headers: { 'Content-Type': undefined },
+            transformRequest: angular.identity
+        });
+
+        ajaxEnvioDatos.success(function (data) {
+            waitingDialog.hide();
+            if (data.success === true) {
+                angular.element("#modal-agregar-plan").modal("hide");
+                $scope.cargarRecursos();
+
+                $scope.horasPlan = 0;
+                $scope.minutosPlan = 0;
+            } else {
+                messageDialog.show("Información", data.msg);
+            }
+        });
+
+        ajaxEnvioDatos.error(function (data) {
+            waitingDialog.hide();
+            console.log('Error: ' + data);
+        });
+    };
+
     $scope.registrarAsistencia = function () {
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
 
         var datosGuardar = [];
 
-            $scope.datosAsistencia.forEach(function (itemAsistencia) {
-                if (itemAsistencia.asignado === true) {
-                    if (itemAsistencia.asistencia === true || itemAsistencia.puntuacion != 0.0)
-                        datosGuardar.push(itemAsistencia);
-                };
-            });
+        $scope.datosAsistencia.forEach(function (itemAsistencia) {
+            if (itemAsistencia.asignado === true) {
+                if (itemAsistencia.asistencia === true || itemAsistencia.puntuacion != 0.0)
+                    datosGuardar.push(itemAsistencia);
+            };
+        });
 
         var formData = new FormData();
         formData.append('idRecurso', $scope.secuencialRecurso);

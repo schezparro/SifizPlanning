@@ -1734,6 +1734,8 @@
           <Property Name="ADJUNTO" Type="varchar" MaxLength="255" Nullable="false" />
           <Property Name="ADJUNTOASISTENCIA" Type="varchar" MaxLength="255" />
           <Property Name="TIEMPOCAPACITACION" Type="int" />
+          <Property Name="ESPLAN" Type="numeric" Precision="1" Scale="0" />
+          <Property Name="SECUENCIALCOLABORADOR" Type="int" />
         </EntityType>
         <EntityType Name="RECURSOSASISTENCIA">
           <Key>
@@ -2719,6 +2721,18 @@
             </Principal>
             <Dependent Role="PROYECTOMODULOCLIENTE">
               <PropertyRef Name="SecuencialSubmodulo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RECURSOS_COLABORADOR">
+          <End Role="COLABORADOR" Type="Self.COLABORADOR" Multiplicity="0..1" />
+          <End Role="RECURSOS" Type="Self.RECURSOS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="COLABORADOR">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="RECURSOS">
+              <PropertyRef Name="SECUENCIALCOLABORADOR" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -5422,6 +5436,10 @@
             <End Role="SubModulo" EntitySet="SubModulo" />
             <End Role="PROYECTOMODULOCLIENTE" EntitySet="PROYECTOMODULOCLIENTE" />
           </AssociationSet>
+          <AssociationSet Name="FK_RECURSOS_COLABORADOR" Association="Self.FK_RECURSOS_COLABORADOR">
+            <End Role="COLABORADOR" EntitySet="COLABORADOR" />
+            <End Role="RECURSOS" EntitySet="RECURSOS" />
+          </AssociationSet>
           <AssociationSet Name="FK_RECURSOS_MODULO" Association="Self.FK_RECURSOS_MODULO">
             <End Role="MODULO" EntitySet="MODULO" />
             <End Role="RECURSOS" EntitySet="RECURSOS" />
@@ -7355,6 +7373,10 @@
             <End Role="ClienteAuxiliar" EntitySet="ClienteAuxiliar" />
             <End Role="TiemposProyecto" EntitySet="TiemposProyecto" />
           </AssociationSet>
+          <AssociationSet Name="FK_RECURSOS_COLABORADOR" Association="SifizPlanningModel.FK_RECURSOS_COLABORADOR">
+            <End Role="Colaborador" EntitySet="Colaborador" />
+            <End Role="Recursos" EntitySet="Recursos" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="Rol">
           <Key>
@@ -7504,6 +7526,7 @@
           <NavigationProperty Name="RECURSOSASISTENCIA" Relationship="SifizPlanningModel.FK_RECURSOSASISTENCIA_COLABORADOR" FromRole="Colaborador" ToRole="RECURSOSASISTENCIA" />
           <NavigationProperty Name="INCIDENCIASRECURSOS" Relationship="SifizPlanningModel.FK_INCIDENCIASRECURSOS_COLABORADOR" FromRole="Colaborador" ToRole="INCIDENCIASRECURSOS" />
           <NavigationProperty Name="TIEMPOSPROYECTO" Relationship="SifizPlanningModel.FK_TIEMPOSPROYECTO_COLABORADOR" FromRole="Colaborador" ToRole="TIEMPOSPROYECTO" />
+          <NavigationProperty Name="recursos" Relationship="SifizPlanningModel.FK_RECURSOS_COLABORADOR" FromRole="Colaborador" ToRole="Recursos" />
           </EntityType>
         <EntityType Name="Colaborador_JefeInmediato">
           <Key>
@@ -12455,6 +12478,9 @@
           <Property Name="AdjuntoAsistencia" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="TiempoCapacitacion" Type="Int32" />
           <NavigationProperty Name="RECURSOSASISTENCIA" Relationship="SifizPlanningModel.FK_RECURSOSASISTENCIA_RECURSOS" FromRole="Recursos" ToRole="RECURSOSASISTENCIA" />
+          <Property Name="EsPlan" Type="Decimal" Precision="1" Scale="0" />
+          <Property Name="SecuencialColaborador" Type="Int32" />
+          <NavigationProperty Name="colaborador" Relationship="SifizPlanningModel.FK_RECURSOS_COLABORADOR" FromRole="Recursos" ToRole="Colaborador" />
         </EntityType>
         <Association Name="FK_RECURSOS_MODULO">
           <End Type="SifizPlanningModel.Modulo" Role="Modulo" Multiplicity="1" />
@@ -12814,6 +12840,18 @@
             </Principal>
             <Dependent Role="TiemposProyecto">
               <PropertyRef Name="SecuencialClienteAuxiliar" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RECURSOS_COLABORADOR">
+          <End Type="SifizPlanningModel.Colaborador" Role="Colaborador" Multiplicity="0..1" />
+          <End Type="SifizPlanningModel.Recursos" Role="Recursos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Colaborador">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="Recursos">
+              <PropertyRef Name="SecuencialColaborador" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -14889,6 +14927,8 @@
           <EntitySetMapping Name="Recursos">
             <EntityTypeMapping TypeName="SifizPlanningModel.Recursos">
               <MappingFragment StoreEntitySet="RECURSOS">
+                <ScalarProperty Name="SecuencialColaborador" ColumnName="SECUENCIALCOLABORADOR" />
+                <ScalarProperty Name="EsPlan" ColumnName="ESPLAN" />
                 <ScalarProperty Name="TiempoCapacitacion" ColumnName="TIEMPOCAPACITACION" />
                 <ScalarProperty Name="AdjuntoAsistencia" ColumnName="ADJUNTOASISTENCIA" />
                 <ScalarProperty Name="Adjunto" ColumnName="ADJUNTO" />

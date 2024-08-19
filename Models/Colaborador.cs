@@ -49,6 +49,7 @@ namespace SifizPlanning.Models
             this.RECURSOSASISTENCIA = new HashSet<RecursosAsistencia>();
             this.INCIDENCIASRECURSOS = new HashSet<IncidenciasRecursos>();
             this.TIEMPOSPROYECTO = new HashSet<TiemposProyecto>();
+            this.recursos = new HashSet<Recursos>();
         }
     
         public int Secuencial { get; set; }
@@ -98,5 +99,6 @@ namespace SifizPlanning.Models
         public virtual ICollection<RecursosAsistencia> RECURSOSASISTENCIA { get; set; }
         public virtual ICollection<IncidenciasRecursos> INCIDENCIASRECURSOS { get; set; }
         public virtual ICollection<TiemposProyecto> TIEMPOSPROYECTO { get; set; }
+        public virtual ICollection<Recursos> recursos { get; set; }
     }
 }
