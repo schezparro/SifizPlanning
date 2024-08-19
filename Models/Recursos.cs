@@ -27,8 +27,11 @@ namespace SifizPlanning.Models
         public string Adjunto { get; set; }
         public string AdjuntoAsistencia { get; set; }
         public Nullable<int> TiempoCapacitacion { get; set; }
+        public Nullable<decimal> EsPlan { get; set; }
+        public Nullable<int> SecuencialColaborador { get; set; }
     
         public virtual Modulo modulo { get; set; }
         public virtual ICollection<RecursosAsistencia> RECURSOSASISTENCIA { get; set; }
+        public virtual Colaborador colaborador { get; set; }
     }
 }

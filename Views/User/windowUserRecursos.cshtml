@@ -7,6 +7,7 @@
 @if (Roles.IsUserInRole("ADMIN") || Roles.IsUserInRole("OPERACIONES"))
 {
     <button class="btn btn-primary" ng-click="windowAgregarRecursos()">Nueva Capacitación</button>
+    <button class="btn btn-primary" ng-click="windowAgregarPlan()">Nuevo Plan</button>
 }
 <input type="text" ng-keyup="cargarRecursos()" ng-model="filtroRecursos" class="form-control right filtro" placeholder="Filtrar..." />
 <div class="clear"></div>
@@ -123,6 +124,56 @@
 
                 <div class="modal-footer">
                     <button type="submit" id="enviar-modal-recursos-btn" class="btn btn-primary">Guardar</button>
+                    <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="modal-agregar-plan" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form ng-submit="GuardarNuevoPlan()" name="nuevoPlan">
+                <div class="modal-header">
+                    <h5 class="modal-title">NUEVO PLAN DE CAPACITACION</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="inputTitulo">TÍTULO:</label>
+                        <input type="text" class="form-control" ng-model="newTituloPlan" ng-required="true" placeholder="Título">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputDetalle">DETALLE:</label>
+                        <textarea type="text" class="form-control" ng-model="newDetallePlan" ng-required="true" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputModulo">MÓDULO:</label>
+                        <select id="select-modulo-plan" ng-model="moduloSeleccionadoPlan" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{tipo.id}}" ng-repeat="tipo in tipoModulo">{{tipo.nombre}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputModulo">CAPACITADOR:</label>
+                        <select id="select-capacitador-plan" ng-model="capacitadorSeleccionadoPlan" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{capacitador.id}}" ng-repeat="capacitador in capacitadores">{{capacitador.nombre}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                        TIEMPO DE CAPACITACIÓN:
+                        <input type="number" class="form-control" ng-model="horasPlan" ng-required="true" style="width:10%; text-align:center;" min="0">
+                        horas
+                        :
+                        <input type="number" class="form-control" ng-model="minutosPlan" ng-required="true" style="width: 10%; text-align: center;" min="0" max="60">
+                        minutos
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
                     <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
             </form>

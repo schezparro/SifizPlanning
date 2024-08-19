@@ -4761,6 +4761,7 @@ r in db.Rol on ur.rol equals r
             {
                 var recursosUsuario = (from rec in db.Recursos
                                        join modulo in db.Modulo on rec.SecuencialModulo equals modulo.Secuencial
+                                       where (rec.EsPlan == null || rec.EsPlan == 0)
                                        select new
                                        {
                                            secuencial = rec.Secuencial,
@@ -4874,6 +4875,7 @@ r in db.Rol on ur.rol equals r
                     Fecha = fecha,
                     SecuencialModulo = modulo,
                     Adjunto = url,
+                    EsPlan = 0,
                     TiempoCapacitacion = tiempo
                 };
                 db.Recursos.Add(nuevoRecurso);
@@ -4905,6 +4907,43 @@ r in db.Rol on ur.rol equals r
                         db.SaveChanges();
                     }
                 };
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult GuardarPlanRecurso(string titulo, string detalle, DateTime fecha, int modulo, int colaborador, int tiempo)
+        {
+            try
+            {
+                var s = new JavaScriptSerializer();
+                Recursos nuevoRecurso = new Recursos
+                {
+                    Titulo = titulo,
+                    Detalle = detalle,
+                    Fecha = fecha,
+                    SecuencialModulo = modulo,
+                    Adjunto = "",
+                    EsPlan = 1,
+                    SecuencialColaborador = colaborador,
+                    TiempoCapacitacion = tiempo
+                };
+                db.Recursos.Add(nuevoRecurso);
+                db.SaveChanges();
 
                 return Json(new
                 {

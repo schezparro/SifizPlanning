@@ -1123,6 +1123,10 @@
     <Content Include="SCRIPTSDATABASE\01\3-TIEMPOCERRADOTICKET.sql" />
     <Content Include="SCRIPTSDATABASE\02\01-SOLICITUDVACACIONES.sql" />
     <Content Include="SCRIPTSDATABASE\02\02-Convertir tiempo.sql" />
+    <Content Include="SCRIPTSDATABASE\08\ENTREGABLEMOTIVOTRABAJO.sql" />
+    <Content Include="SCRIPTSDATABASE\08\RECURSOS.sql" />
+    <Content Include="SCRIPTSDATABASE\08\RECURSOS2.sql" />
+    <Content Include="SCRIPTSDATABASE\08\RECURSOS3.sql" />
     <Content Include="SCRIPTSDATABASE\12\06-FERIADOS.sql" />
     <Content Include="SCRIPTSDATABASE\12\01-TICKET.sql" />
     <Content Include="SCRIPTSDATABASE\12\02-TICKET.sql" />

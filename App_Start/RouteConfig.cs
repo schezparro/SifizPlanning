@@ -1163,6 +1163,12 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "GuardarPlanRecurso",
+                url: "user/guardar-plan-recurso/{id}",
+                defaults: new { controller = "User", action = "GuardarPlanRecurso", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "GuardarAsistenciaRecurso",
                 url: "user/guardar-asistencia-recurso/{id}",
                 defaults: new { controller = "User", action = "GuardarAsistenciaRecurso", id = UrlParameter.Optional }
