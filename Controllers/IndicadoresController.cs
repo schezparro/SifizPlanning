@@ -228,12 +228,12 @@ namespace SifizPlanning.Controllers
                     // Si fechaFin es nula o vacía, tomar el día actual
                     fFin = DateTime.Now;
                 }
+                fFin = fFin.AddDays(1);
 
                 var ticketsQueryC = from ticket in db.InfoTickets
                                     where ticket.FechaIngreso.Value >= fInicio
                                        && ticket.FechaIngreso.Value <= fFin
                                        && ticket.Estado == "CERRADO"
-                                       && ticket.FechaCierre != null
                                     select ticket;
 
                 // Convertir la consulta a una lista para trabajar con ella en memoria

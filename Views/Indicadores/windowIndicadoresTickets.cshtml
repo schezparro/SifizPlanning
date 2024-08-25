@@ -59,7 +59,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <table class="table table-bordered">
+                                        <table class="table table-striped table-condensed">
                                             <tr>
                                                 <td><strong>Fecha de Reporte:</strong></td>
                                                 <td>{{formattedDate}}</td>
@@ -101,7 +101,7 @@
                                 <div class="panel panel-default">
                                     <div class="panel-heading">Tickets Ingresados</div>
                                     <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                        <table class="table table-bordered">
+                                        <table class="table table-striped table-condensed">
                                             <thead>
                                                 <tr>
                                                     <th style="background-color: #add8e6; color: black;">Semana</th>
@@ -116,8 +116,8 @@
                                                     <td>{{ticket.Cantidad}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="2" style="text-align: center; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
-                                                    <td style="text-align: center; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidades | number:0}}</td>
+                                                    <td colspan="2" style="text-align: left; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
+                                                    <td style="text-align: left; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidades | number:0}}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -158,7 +158,7 @@
                                 <div class="panel panel-default">
                                     <div class="panel-heading">Tickets Cerrados</div>
                                     <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                        <table class="table table-bordered">
+                                        <table class="table table-striped table-condensed">
                                             <thead>
                                                 <tr>
                                                     <th style="background-color: #ffc0cb; color: black;">Semana</th>
@@ -173,8 +173,8 @@
                                                     <td>{{ticket.Cantidad}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="2" style="text-align: center; background-color: #ffc0cb; color: black; font-weight: bold;">Total</td>
-                                                    <td style="text-align: center; background-color: #ffc0cb; color: black; font-size: 20px;">{{totalCantidadesCerrados | number:0}}</td>
+                                                    <td colspan="2" style="text-align: left; background-color: #ffc0cb; color: black; font-weight: bold;">Total</td>
+                                                    <td style="text-align: left; background-color: #ffc0cb; color: black; font-size: 20px;">{{totalCantidadesCerrados | number:0}}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -215,7 +215,7 @@
                                 <div class="panel panel-default">
                                     <div class="panel-heading">Tickets por Aplica</div>
                                     <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                        <table class="table table-bordered">
+                                        <table class="table table-striped table-condensed">
                                             <thead>
                                                 <tr>
                                                     <th style="background-color: #008aff; color: black;">Aplica</th>
@@ -228,8 +228,8 @@
                                                     <td>{{ticket.Cantidad}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="text-align: center; background-color: #008aff; color: black; font-weight: bold;">Total</td>
-                                                    <td style="text-align: center; background-color: #008aff; color: black; font-size: 20px;">{{totalCantidadesTicketsPorAplica | number:0}}</td>
+                                                    <td style="text-align: left; background-color: #008aff; color: black; font-weight: bold;">Total</td>
+                                                    <td style="text-align: left; background-color: #008aff; color: black; font-size: 20px;">{{totalCantidadesTicketsPorAplica | number:0}}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -270,7 +270,7 @@
                                 <div class="panel panel-default">
                                     <div class="panel-heading">Tickets por mantenimiento</div>
                                     <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                        <table class="table table-bordered">
+                                        <table class="table table-striped table-condensed">
                                             <thead>
                                                 <tr>
                                                     <th style="background-color: #f58e8e; color: black;">Cliente</th>
@@ -283,8 +283,8 @@
                                                     <td>{{ticket.Cantidad}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="text-align: center; background-color: #f58e8e; color: black; font-weight: bold;">Total</td>
-                                                    <td style="text-align: center; background-color: #f58e8e; color: black; font-size: 20px;">{{totalCantidadesTicketsPorMantenimiento | number:0}}</td>
+                                                    <td style="text-align: left; background-color: #f58e8e; color: black; font-weight: bold;">Total</td>
+                                                    <td style="text-align: left; background-color: #f58e8e; color: black; font-size: 20px;">{{totalCantidadesTicketsPorMantenimiento | number:0}}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -325,7 +325,7 @@
                                 <div class="panel panel-default">
                                     <div class="panel-heading">Tickets por garantía</div>
                                     <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                        <table class="table table-bordered">
+                                        <table class="table table-striped table-condensed">
                                             <thead>
                                                 <tr>
                                                     <th style="background-color: #ee59da; color: black;">Cliente</th>
@@ -338,8 +338,8 @@
                                                     <td>{{ticket.Cantidad}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="text-align: center; background-color: #ee59da; color: black; font-weight: bold;">Total</td>
-                                                    <td style="text-align: center; background-color: #ee59da; color: black; font-size: 20px;">{{totalCantidadesTicketsPorGarantia | number:0}}</td>
+                                                    <td style="text-align: left; background-color: #ee59da; color: black; font-weight: bold;">Total</td>
+                                                    <td style="text-align: left; background-color: #ee59da; color: black; font-size: 20px;">{{totalCantidadesTicketsPorGarantia | number:0}}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -380,7 +380,7 @@
                                 <div class="panel panel-default">
                                     <div class="panel-heading">Tickets por requerimiento nuevo</div>
                                     <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                        <table class="table table-bordered">
+                                        <table class="table table-striped table-condensed">
                                             <thead>
                                                 <tr>
                                                     <th style="background-color: #e8f577; color: black;">Cliente</th>
@@ -393,8 +393,8 @@
                                                     <td>{{ticket.Cantidad}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="text-align: center; background-color: #e8f577; color: black; font-weight: bold;">Total</td>
-                                                    <td style="text-align: center; background-color: #e8f577; color: black; font-size: 20px;">{{totalCantidadesTicketsPorReqNuevo | number:0}}</td>
+                                                    <td style="text-align: left; background-color: #e8f577; color: black; font-weight: bold;">Total</td>
+                                                    <td style="text-align: left; background-color: #e8f577; color: black; font-size: 20px;">{{totalCantidadesTicketsPorReqNuevo | number:0}}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -471,7 +471,6 @@
                                     <label for="fecha-inicio-etapa" class="col-sm-2 control-label">CLIENTE</label>
                                     <div class="col-sm-8">
                                         <select id="select-cliente-indicadores-tickets-aldia" ng-model="cliente" class="form-control">
-                                            <option value="">Todos los clientes</option>
                                             <option value="{{cliente.id}}" ng-repeat="cliente in clientes" ng-value="cliente.id" ng-selected="cliente.id === cliente">{{cliente.nombre}}</option>
                                         </select>
                                     </div>
@@ -504,7 +503,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <table class="table table-bordered">
+                                        <table class="table table-striped table-condensed">
                                             <tr>
                                                 <td><strong>Fecha de Reporte:</strong></td>
                                                 <td>{{formattedDate}}</td>
@@ -538,7 +537,7 @@
                                 <div class="panel panel-default">
                                     <div class="panel-heading">Tickets en Gestión</div>
                                     <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                        <table class="table table-bordered">
+                                        <table class="table table-striped table-condensed">
                                             <thead>
                                                 <tr>
                                                     <th style="background-color: #add8e6; color: black;">Semana</th>
@@ -553,8 +552,8 @@
                                                     <td>{{ticket.Cantidad}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="2" style="text-align: center; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
-                                                    <td style="text-align: center; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsEnGestionAlDia | number:0}}</td>
+                                                    <td colspan="2" style="text-align: left; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
+                                                    <td style="text-align: left; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsEnGestionAlDia | number:0}}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -596,7 +595,7 @@
                                 <div class="panel panel-default">
                                     <div class="panel-heading">Tickets por categorías</div>
                                     <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                        <table class="table table-bordered">
+                                        <table class="table table-striped table-condensed">
                                             <thead>
                                                 <tr>
                                                     <th style="background-color: #ffc0cb; color: black;">Categoría</th>
@@ -611,8 +610,8 @@
                                                     <td>{{ticket.Cantidad}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="2" style="text-align: center; background-color: #ffc0cb; color: black; font-weight: bold;">Total</td>
-                                                    <td style="text-align: center; background-color: #ffc0cb; color: black; font-size: 20px;">{{totalCantidadesTicketsPorCategoriaAlDia | number:0}}</td>
+                                                    <td colspan="2" style="text-align: left; background-color: #ffc0cb; color: black; font-weight: bold;">Total</td>
+                                                    <td style="text-align: left; background-color: #ffc0cb; color: black; font-size: 20px;">{{totalCantidadesTicketsPorCategoriaAlDia | number:0}}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -665,7 +664,7 @@
                                 <div class="panel panel-default">
                                     <div class="panel-heading">Tickets por Estados</div>
                                     <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                        <table class="table table-bordered">
+                                        <table class="table table-striped table-condensed">
                                             <thead>
                                                 <tr>
                                                     <th style="background-color: #008aff; color: black;">Estado</th>
@@ -680,8 +679,8 @@
                                                     <td>{{ticket.Cantidad}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="2" style="text-align: center; background-color: #008aff; color: black; font-weight: bold;">Total</td>
-                                                    <td style="text-align: center; background-color: #008aff; color: black; font-size: 20px;">{{totalCantidadesTicketsPorEstadosAlDia | number:0}}</td>
+                                                    <td colspan="2" style="text-align: left; background-color: #008aff; color: black; font-weight: bold;">Total</td>
+                                                    <td style="text-align: left; background-color: #008aff; color: black; font-size: 20px;">{{totalCantidadesTicketsPorEstadosAlDia | number:0}}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -735,26 +734,26 @@
                                             <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd; font-size: 12px;">
                                                 <thead>
                                                     <tr>
-                                                        <th style="background-color: #e8f577; text-align: center; padding: 6px; border: 1px solid #ddd;">Cliente</th>
-                                                        <th ng-repeat="estado in estadosUnicos" style="background-color: #e8f577; text-align: center; padding: 6px; border: 1px solid #ddd; ">{{estado}}</th>
-                                                        <th style="background-color: #e8f577; text-align: center; padding: 6px; border: 1px solid #ddd; ">Total</th>
+                                                        <th style="background-color: #e8f577; text-align: left; padding: 6px; border: 1px solid #ddd;">Cliente</th>
+                                                        <th ng-repeat="estado in estadosUnicos" style="background-color: #e8f577; text-align: left; padding: 6px; border: 1px solid #ddd; ">{{estado}}</th>
+                                                        <th style="background-color: #e8f577; text-align: left; padding: 6px; border: 1px solid #ddd; ">Total</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <tr ng-repeat="(cliente, estados) in clientesEstructurados" ng-style="{'background-color': $even ? '#f2f2f2' : 'white'}">
                                                         <td style="text-align: left; padding: 4px; border: 1px solid #ddd;">{{cliente}}</td>
-                                                        <td ng-repeat="estado in estados" ng-if="estado.Estado !== 'Total'" style="text-align: center; padding: 4px; border: 1px solid #ddd;">
+                                                        <td ng-repeat="estado in estados" ng-if="estado.Estado !== 'Total'" style="text-align: left; padding: 4px; border: 1px solid #ddd;">
                                                             {{estado.Cantidad}}
                                                         </td>
-                                                        <td style="text-align: center; padding: 4px; border: 1px solid #ddd;"><strong>{{estados[estados.length - 1].Cantidad}}</strong></td>
+                                                        <td style="text-align: left; padding: 4px; border: 1px solid #ddd;"><strong>{{estados[estados.length - 1].Cantidad}}</strong></td>
                                                     </tr>
                                                     <!-- Nueva fila de totales -->
                                                     <tr style="background-color: #e8f577; font-weight: bold;">
                                                         <td style="text-align: left; padding: 4px; border: 1px solid #ddd;">TOTAL</td>
-                                                        <td ng-repeat="estado in estadosUnicos" style="text-align: center; padding: 4px; border: 1px solid #ddd;">
+                                                        <td ng-repeat="estado in estadosUnicos" style="text-align: left; padding: 4px; border: 1px solid #ddd;">
                                                             {{totalesPorEstado[estado]}}
                                                         </td>
-                                                        <td style="text-align: center; padding: 4px; border: 1px solid #ddd;">{{granTotal}}</td>
+                                                        <td style="text-align: left; padding: 4px; border: 1px solid #ddd;">{{granTotal}}</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -816,7 +815,7 @@
                                 <div class="panel panel-default">
                                     <div class="panel-heading">Tickets aplicados a</div>
                                     <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                        <table class="table table-bordered">
+                                        <table class="table table-striped table-condensed">
                                             <thead>
                                                 <tr>
                                                     <th style="background-color: #add8e6; color: black;">Aplica a</th>
@@ -831,8 +830,8 @@
                                                     <td>{{ticket.Cantidad}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="2" style="text-align: center; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
-                                                    <td style="text-align: center; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsAplicadosAlDia | number:0}}</td>
+                                                    <td colspan="2" style="text-align: left; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
+                                                    <td style="text-align: left; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsAplicadosAlDia | number:0}}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -878,7 +877,7 @@
                                 <div class="panel panel-default">
                                     <div class="panel-heading">Ranking Requerimientos Nuevos</div>
                                     <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                        <table class="table table-bordered">
+                                        <table class="table table-striped table-condensed">
                                             <thead>
                                                 <tr>
                                                     <th style="background-color: #add8e6; color: black;">Cliente</th>
@@ -891,8 +890,8 @@
                                                     <td>{{ticket.Cantidad}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="text-align: center; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
-                                                    <td style="text-align: center; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsRankingReqNuevoAlDia | number:0}}</td>
+                                                    <td style="text-align: left; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
+                                                    <td style="text-align: left; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsRankingReqNuevoAlDia | number:0}}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -935,7 +934,7 @@
                                 <div class="panel panel-default">
                                     <div class="panel-heading">Ranking Garantía Técnica</div>
                                     <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                        <table class="table table-bordered">
+                                        <table class="table table-striped table-condensed">
                                             <thead>
                                                 <tr>
                                                     <th style="background-color: #add8e6; color: black;">Cliente</th>
@@ -948,8 +947,8 @@
                                                     <td>{{ticket.Cantidad}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="text-align: center; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
-                                                    <td style="text-align: center; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsRankingGarantiaAlDia | number:0}}</td>
+                                                    <td style="text-align: left; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
+                                                    <td style="text-align: left; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsRankingGarantiaAlDia | number:0}}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -992,7 +991,7 @@
                                 <div class="panel panel-default">
                                     <div class="panel-heading">Ranking Mantenimiento</div>
                                     <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                        <table class="table table-bordered">
+                                        <table class="table table-striped table-condensed">
                                             <thead>
                                                 <tr>
                                                     <th style="background-color: #add8e6; color: black;">Cliente</th>
@@ -1005,8 +1004,8 @@
                                                     <td>{{ticket.Cantidad}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="text-align: center; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
-                                                    <td style="text-align: center; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsRankingMantenimientoAlDia | number:0}}</td>
+                                                    <td style="text-align: left; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
+                                                    <td style="text-align: left; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsRankingMantenimientoAlDia | number:0}}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -1133,7 +1132,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <table class="table table-bordered">
+                                        <table class="table table-striped table-condensed">
                                             <tr>
                                                 <td><strong>Fecha de Reporte:</strong></td>
                                                 <td>{{formattedDate}}</td>
@@ -1173,7 +1172,7 @@
                                             <div class="panel panel-default">
                                                 <div class="panel-heading">Tickets por Aplica (Año)</div>
                                                 <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                                    <table class="table table-bordered">
+                                                    <table class="table table-striped table-condensed">
                                                         <thead>
                                                             <tr>
                                                                 <th style="background-color: #6eb5ff; color: black;">Aplica</th>
@@ -1186,8 +1185,8 @@
                                                                 <td ng-repeat="ano in anosTickets">{{datos[ano] || 0}}</td>
                                                             </tr>
                                                             <tr>
-                                                                <td style="text-align: center; background-color: #6eb5ff; color: black; font-weight: bold;">Total</td>
-                                                                <td ng-repeat="ano in anosTickets" style="text-align: center; background-color: #6eb5ff; color: black; font-size: 20px;">{{totalesPorAnno[ano] | number:0}}</td>
+                                                                <td style="background-color: #6eb5ff; color: black; font-weight: bold;">Total</td>
+                                                                <td ng-repeat="ano in anosTickets" style="background-color: #6eb5ff; color: black; font-size: 20px;">{{totalesPorAnno[ano] | number:0}}</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
@@ -1214,17 +1213,17 @@
                                                     <table style="border-collapse: collapse; width: 100%;">
                                                         <thead style="background-color: #ffcc99; color: black;">
                                                             <tr>
-                                                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99; ">Aplica</th>
-                                                                <th ng-repeat="ano in anosTickets" style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #ffcc99; font-weight: bold; ">{{ano}}</th>
+                                                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99;">Aplica</th>
+                                                                <th ng-repeat="ano in anosTickets" style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99; font-weight: bold;">{{ano}}</th>
                                                             </tr>
                                                             <tr>
-                                                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99; "></th>
+                                                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99;"></th>
                                                                 <th ng-repeat="ano in anosTickets" style="border: 1px solid #ddd; padding: 0;">
-                                                                    <table style="width: 100%; border-collapse: collapse;">
-                                                                        <tr>
-                                                                            <th ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: center; font-weight: bold;">{{getMesByNumero(mes)}}</th>
-                                                                        </tr>
-                                                                    </table>
+                                                                    <div style="width: 100%; display: flex; flex-wrap: wrap; border-collapse: collapse;">
+                                                                        <div ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: left; font-weight: bold; flex: 1;">
+                                                                            {{getMesByNumero(mes)}}
+                                                                        </div>
+                                                                    </div>
                                                                 </th>
                                                             </tr>
                                                         </thead>
@@ -1232,26 +1231,22 @@
                                                             <tr ng-repeat="aplica in aplicasList">
                                                                 <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">{{aplica}}</td>
                                                                 <td ng-repeat="ano in anosTickets" style="border: 1px solid #ddd; padding: 0;">
-                                                                    <table style="width: 100%; border-collapse: collapse;">
-                                                                        <tr>
-                                                                            <td ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: center;">
-                                                                                {{getCantidad(aplica, ano, mes)}}
-                                                                            </td>
-                                                                        </tr>
-                                                                    </table>
+                                                                    <div style="width: 100%; display: flex; flex-wrap: wrap;">
+                                                                        <div ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: left; flex: 1;">
+                                                                            {{getCantidad(aplica, ano, mes)}}
+                                                                        </div>
+                                                                    </div>
                                                                 </td>
                                                             </tr>
                                                             <!-- Nueva fila para los totales -->
                                                             <tr style="background-color: #ffcc99; color: black;">
                                                                 <td style="border: 1px solid #ddd; padding: 8px; text-align: left; font-weight: bold;">Total</td>
                                                                 <td ng-repeat="ano in anosTickets" style="border: 1px solid #ddd; padding: 0;">
-                                                                    <table style="width: 100%; border-collapse: collapse;">
-                                                                        <tr>
-                                                                            <td ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: center; font-weight: bold;">
-                                                                                {{calcularTotal(ano, mes)}}
-                                                                            </td>
-                                                                        </tr>
-                                                                    </table>
+                                                                    <div style="width: 100%; display: flex; flex-wrap: wrap;">
+                                                                        <div ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: left; font-weight: bold; flex: 1;">
+                                                                            {{calcularTotal(ano, mes)}}
+                                                                        </div>
+                                                                    </div>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -1303,7 +1298,7 @@
                                             <div class="panel panel-default">
                                                 <div class="panel-heading">Tickets por Estados (Año)</div>
                                                 <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                                    <table class="table table-bordered">
+                                                    <table class="table table-striped table-condensed">
                                                         <thead>
                                                             <tr>
                                                                 <th style="background-color: #6eb5ff; color: black;">Estado</th>
@@ -1316,8 +1311,8 @@
                                                                 <td ng-repeat="ano in anosTicketsEstados">{{datos[ano] || 0}}</td>
                                                             </tr>
                                                             <tr>
-                                                                <td style="text-align: center; background-color: #6eb5ff; color: black; font-weight: bold;">Total</td>
-                                                                <td ng-repeat="ano in anosTicketsEstados" style="text-align: center; background-color: #6eb5ff; color: black; font-size: 20px;">{{totalesPorAnno[ano] | number:0}}</td>
+                                                                <td style="text-align: left; background-color: #6eb5ff; color: black; font-weight: bold;">Total</td>
+                                                                <td ng-repeat="ano in anosTicketsEstados" style="text-align: left; background-color: #6eb5ff; color: black; font-size: 20px;">{{totalesPorAnno[ano] | number:0}}</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
@@ -1346,17 +1341,17 @@
                                                     <table style="border-collapse: collapse; width: 100%;">
                                                         <thead style="background-color: #ffcc99; color: black;">
                                                             <tr>
-                                                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99; ">Aplica</th>
-                                                                <th ng-repeat="ano in anosTicketsEstados" style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #ffcc99; font-weight: bold; ">{{ano}}</th>
+                                                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99;">Aplica</th>
+                                                                <th ng-repeat="ano in anosTicketsEstados" style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99; font-weight: bold;">{{ano}}</th>
                                                             </tr>
                                                             <tr>
-                                                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99; "></th>
+                                                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99;"></th>
                                                                 <th ng-repeat="ano in anosTicketsEstados" style="border: 1px solid #ddd; padding: 0;">
-                                                                    <table style="width: 100%; border-collapse: collapse;">
-                                                                        <tr>
-                                                                            <th ng-repeat="mes in mesesTicketsEstados" style="border: none; padding: 4px; text-align: center; font-weight: bold;">{{getMesByNumero(mes)}}</th>
-                                                                        </tr>
-                                                                    </table>
+                                                                    <div style="width: 100%; display: flex; flex-wrap: wrap; border-collapse: collapse;">
+                                                                        <div ng-repeat="mes in mesesTicketsEstados" style="border: none; padding: 4px; text-align: left; font-weight: bold; flex: 1;">
+                                                                            {{getMesByNumero(mes)}}
+                                                                        </div>
+                                                                    </div>
                                                                 </th>
                                                             </tr>
                                                         </thead>
@@ -1364,26 +1359,22 @@
                                                             <tr ng-repeat="estado in estadosList">
                                                                 <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">{{estado}}</td>
                                                                 <td ng-repeat="ano in anosTicketsEstados" style="border: 1px solid #ddd; padding: 0;">
-                                                                    <table style="width: 100%; border-collapse: collapse;">
-                                                                        <tr>
-                                                                            <td ng-repeat="mes in mesesTicketsEstados" style="border: none; padding: 4px; text-align: center;">
-                                                                                {{getCantidadEstados(estado, ano, mes)}}
-                                                                            </td>
-                                                                        </tr>
-                                                                    </table>
+                                                                    <div style="width: 100%; display: flex; flex-wrap: wrap;">
+                                                                        <div ng-repeat="mes in mesesTicketsEstados" style="border: none; padding: 4px; text-align: left; flex: 1;">
+                                                                            {{getCantidadEstados(estado, ano, mes)}}
+                                                                        </div>
+                                                                    </div>
                                                                 </td>
                                                             </tr>
                                                             <!-- Nueva fila para los totales -->
                                                             <tr style="background-color: #ffcc99; color: black;">
                                                                 <td style="border: 1px solid #ddd; padding: 8px; text-align: left; font-weight: bold;">Total</td>
                                                                 <td ng-repeat="ano in anosTicketsEstados" style="border: 1px solid #ddd; padding: 0;">
-                                                                    <table style="width: 100%; border-collapse: collapse;">
-                                                                        <tr>
-                                                                            <td ng-repeat="mes in mesesTicketsEstados" style="border: none; padding: 4px; text-align: center; font-weight: bold;">
-                                                                                {{calcularTotal(ano, mes)}}
-                                                                            </td>
-                                                                        </tr>
-                                                                    </table>
+                                                                    <div style="width: 100%; display: flex; flex-wrap: wrap;">
+                                                                        <div ng-repeat="mes in mesesTicketsEstados" style="border: none; padding: 4px; text-align: left; font-weight: bold; flex: 1;">
+                                                                            {{calcularTotal(ano, mes)}}
+                                                                        </div>
+                                                                    </div>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -1436,7 +1427,7 @@
                                             <div class="panel panel-default">
                                                 <div class="panel-heading">Tickets por Garantía (Año {{anoData.Anno}})</div>
                                                 <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                                    <table class="table table-bordered">
+                                                    <table class="table table-striped table-condensed">
                                                         <thead>
                                                             <tr>
                                                                 <th style="background-color: #6eb5ff; color: black;">Clientes</th>
@@ -1449,8 +1440,8 @@
                                                                 <td>{{cliente.Cantidad}}</td>
                                                             </tr>
                                                             <tr>
-                                                                <td style="text-align: center; background-color: #6eb5ff; color: black; font-weight: bold;">Total</td>
-                                                                <td style="text-align: center; background-color: #6eb5ff; color: black; font-size: 20px;">{{anoData.Total}}</td>
+                                                                <td style="text-align: left; background-color: #6eb5ff; color: black; font-weight: bold;">Total</td>
+                                                                <td style="text-align: left; background-color: #6eb5ff; color: black; font-size: 20px;">{{anoData.Total}}</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
@@ -1481,17 +1472,17 @@
                                                         <thead style="background-color: #ffcc99; color: black;">
                                                             <tr>
                                                                 <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99;">Cliente</th>
-                                                                <th style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #ffcc99; font-weight: bold;">Cantidad</th>
+                                                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99; font-weight: bold;">Cantidad</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             <tr ng-repeat="cliente in annoData.DatosMes.Clientes">
                                                                 <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">{{cliente.Cliente}}</td>
-                                                                <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">{{cliente.Cantidad}}</td>
+                                                                <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">{{cliente.Cantidad}}</td>
                                                             </tr>
                                                             <tr>
-                                                                <td style="text-align: center; background-color: #ffcc99; color: black; font-weight: bold;">Total</td>
-                                                                <td style="text-align: center; background-color: #ffcc99; color: black; font-size: 20px;">{{annoData.DatosMes.Total}}</td>
+                                                                <td style="text-align: left; background-color: #ffcc99; color: black; font-weight: bold;">Total</td>
+                                                                <td style="text-align: left; background-color: #ffcc99; color: black; font-size: 20px;">{{annoData.DatosMes.Total}}</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
@@ -1584,7 +1575,6 @@
                                     <label for="fecha-inicio-etapa" class="col-sm-2 control-label">PRIORIDAD</label>
                                     <div class="col-sm-4">
                                         <select class="form-control" id="select-prioridad-otros-indicadores" multiple="multiple" ng-model="prioridadOtrosIndicadores">
-                                            <option value="">Seleccione...</option>
                                             <option ng-repeat="p in prioridades" value="{{p.id}}">{{p.name}}</option>
                                         </select>
                                     </div>
@@ -1593,7 +1583,6 @@
                                     <label for="fecha-inicio-etapa" class="col-sm-2 control-label">CATEGORÍA</label>
                                     <div class="col-sm-4">
                                         <select class="form-control" id="select-categoria-otros-indicadores" multiple="multiple" ng-model="categoriaOtrosIndicadores">
-                                            <option value="">Seleccione...</option>
                                             <option ng-repeat="c in categorias" value="{{c.id}}">{{c.name}}</option>
                                         </select>
                                     </div>
@@ -1627,7 +1616,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <table class="table table-bordered">
+                                        <table class="table table-striped table-condensed">
                                             <tr>
                                                 <td><strong>Fecha de Reporte:</strong></td>
                                                 <td>{{formattedDate}}</td>
@@ -1667,20 +1656,20 @@
                                 <div ng-repeat="prioridad in prioridadesUnicas" role="tabpanel" class="tab-pane" ng-class="{'active': isActiveTabPrioridad(prioridad)}" id="{{prioridad}}">
 
                                     <div ng-show="mostrarGraficoTicketsPrioridadOtrosIndicadores">
-                                        <table class="table table-bordered">
+                                        <table class="table table-striped table-condensed">
                                             <thead>
                                                 <tr>
-                                                    <th style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #ffcc99; font-weight: bold;">Cliente</th>
-                                                    <th ng-repeat="anno in anosTickets" style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #ffcc99; font-weight: bold;">{{anno}}</th>
+                                                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99; font-weight: bold;">Cliente</th>
+                                                    <th ng-repeat="anno in anosTickets" style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99; font-weight: bold;">{{anno}}</th>
                                                 </tr>
                                                 <tr>
                                                     <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99;"></th>
                                                     <th ng-repeat="anno in anosTickets" style="border: 1px solid #ddd; padding: 0;">
-                                                        <table style="width: 100%; border-collapse: collapse;">
-                                                            <tr>
-                                                                <th ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: center; font-weight: bold; background-color: #ffcc99;">{{getMesByNumero(mes)}}</th>
-                                                            </tr>
-                                                        </table>
+                                                        <div style="width: 100%; display: flex; flex-wrap: wrap; border-collapse: collapse;">
+                                                            <div ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: left; font-weight: bold; background-color: #ffcc99; flex: 1;">
+                                                                {{getMesByNumero(mes)}}
+                                                            </div>
+                                                        </div>
                                                     </th>
                                                 </tr>
                                             </thead>
@@ -1688,13 +1677,11 @@
                                                 <tr ng-repeat="cliente in getClientesPorPrioridad(prioridad)">
                                                     <td>{{cliente}}</td>
                                                     <td ng-repeat="anno in anosTickets" style="border: 1px solid #ddd; padding: 0;">
-                                                        <table style="width:100%">
-                                                            <tr>
-                                                                <td ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: center;">
-                                                                    {{getCantidadPrioridad(prioridad, cliente, anno, mes)}}
-                                                                </td>
-                                                            </tr>
-                                                        </table>
+                                                        <div style="width: 100%; display: flex; flex-wrap: wrap;">
+                                                            <div ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: left; flex: 1;">
+                                                                {{getCantidadPrioridad(prioridad, cliente, anno, mes)}}
+                                                            </div>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -1732,20 +1719,20 @@
                             <div role="tabpanel" class="tab-content">
                                 <div ng-repeat="categoria in categoriasUnicas" role="tabpanel" class="tab-pane" ng-class="{'active': isActiveTabCategoria(categoria)}" id="{{categoria}}">
                                     <div ng-show="mostrarGraficoTicketsCategoriaOtrosIndicadores">
-                                        <table class="table table-bordered">
+                                        <table class="table table-striped table-condensed">
                                             <thead>
                                                 <tr>
-                                                    <th style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #ffcc99; font-weight: bold;">Cliente</th>
-                                                    <th ng-repeat="anno in anosTickets" style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #ffcc99; font-weight: bold;">{{anno}}</th>
+                                                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99; font-weight: bold;">Cliente</th>
+                                                    <th ng-repeat="anno in anosTickets" style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99; font-weight: bold;">{{anno}}</th>
                                                 </tr>
                                                 <tr>
                                                     <th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #ffcc99;"></th>
                                                     <th ng-repeat="anno in anosTickets" style="border: 1px solid #ddd; padding: 0;">
-                                                        <table style="width: 100%; border-collapse: collapse;">
-                                                            <tr>
-                                                                <th ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: center; font-weight: bold; background-color: #ffcc99;">{{getMesByNumero(mes)}}</th>
-                                                            </tr>
-                                                        </table>
+                                                        <div style="width: 100%; display: flex; flex-wrap: wrap; border-collapse: collapse;">
+                                                            <div ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: left; font-weight: bold; background-color: #ffcc99; flex: 1;">
+                                                                {{getMesByNumero(mes)}}
+                                                            </div>
+                                                        </div>
                                                     </th>
                                                 </tr>
                                             </thead>
@@ -1753,13 +1740,11 @@
                                                 <tr ng-repeat="cliente in getClientesPorCategoria(categoria)">
                                                     <td>{{cliente}}</td>
                                                     <td ng-repeat="anno in anosTickets" style="border: 1px solid #ddd; padding: 0;">
-                                                        <table style="width:100%">
-                                                            <tr>
-                                                                <td ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: center;">
-                                                                    {{getCantidadCategoria(categoria, cliente, anno, mes)}}
-                                                                </td>
-                                                            </tr>
-                                                        </table>
+                                                        <div style="width: 100%; display: flex; flex-wrap: wrap;">
+                                                            <div ng-repeat="mes in mesesTickets" style="border: none; padding: 4px; text-align: left; flex: 1;">
+                                                                {{getCantidadCategoria(categoria, cliente, anno, mes)}}
+                                                            </div>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             </tbody>
