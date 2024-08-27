@@ -1684,6 +1684,17 @@
                                                         </div>
                                                     </td>
                                                 </tr>
+                                                <!-- Nueva fila de totales -->
+                                                <tr style="background-color: #ffcc99; font-weight: bold;">
+                                                    <td style="text-align: center; padding: 4px; border: 1px solid #ddd;">TOTAL</td>
+                                                    <td ng-repeat="anno in anosTickets">
+                                                        <table style="width:100%">
+                                                            <tr>
+                                                                <td ng-repeat="mes in mesesTickets">{{getCantidadTotalPrioridad(prioridad, anno, mes)}}</td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                </tr>
                                             </tbody>
                                         </table>
 
@@ -1745,6 +1756,17 @@
                                                                 {{getCantidadCategoria(categoria, cliente, anno, mes)}}
                                                             </div>
                                                         </div>
+                                                    </td>
+                                                </tr>
+                                                <!-- Nueva fila de totales -->
+                                                <tr style="background-color: #ffcc99; font-weight: bold;">
+                                                    <td style="text-align: center; padding: 4px; border: 1px solid #ddd;">TOTAL</td>
+                                                    <td ng-repeat="anno in anosTickets">
+                                                        <table style="width:100%">
+                                                            <tr>
+                                                                <td ng-repeat="mes in mesesTickets">{{getCantidadTotalCategoria(categoria, anno, mes)}}</td>
+                                                            </tr>
+                                                        </table>
                                                     </td>
                                                 </tr>
                                             </tbody>

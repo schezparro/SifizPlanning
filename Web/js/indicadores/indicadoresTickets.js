@@ -2673,6 +2673,16 @@
                         return clientes;
                     };
 
+                    $scope.getCantidadTotalPrioridad = function (prioridad, anno, mes) {
+                        let total = 0;
+                        const clientes = $scope.getClientesPorPrioridad(prioridad);
+
+                        for (let cliente of clientes) {
+                            total += $scope.getCantidadPrioridad(prioridad, cliente, anno, mes);
+                        }
+                        return total;
+                    };
+
                     $scope.getMesByNumero = function (mes) {
                         const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
                         return meses[parseInt(mes) - 1];
@@ -2838,6 +2848,16 @@
                     $scope.getMesByNumero = function (mes) {
                         const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
                         return meses[parseInt(mes) - 1];
+                    };
+
+                    $scope.getCantidadTotalCategoria = function (categoria, anno, mes) {
+                        let total = 0;
+                        const clientes = $scope.getClientesPorCategoria(categoria);
+
+                        for (let cliente of clientes) {
+                            total += $scope.getCantidadCategoria(categoria, cliente, anno, mes);
+                        }
+                        return total;
                     };
 
                     $scope.generateCharts = function () {
