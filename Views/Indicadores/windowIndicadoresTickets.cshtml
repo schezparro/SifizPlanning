@@ -471,6 +471,7 @@
                                     <label for="fecha-inicio-etapa" class="col-sm-2 control-label">CLIENTE</label>
                                     <div class="col-sm-8">
                                         <select id="select-cliente-indicadores-tickets-aldia" ng-model="cliente" class="form-control">
+                                            <option value="">*</option> 
                                             <option value="{{cliente.id}}" ng-repeat="cliente in clientes" ng-value="cliente.id" ng-selected="cliente.id === cliente">{{cliente.nombre}}</option>
                                         </select>
                                     </div>
@@ -1686,13 +1687,13 @@
                                                 </tr>
                                                 <!-- Nueva fila de totales -->
                                                 <tr style="background-color: #ffcc99; font-weight: bold;">
-                                                    <td style="text-align: center; padding: 4px; border: 1px solid #ddd;">TOTAL</td>
-                                                    <td ng-repeat="anno in anosTickets">
-                                                        <table style="width:100%">
-                                                            <tr>
-                                                                <td ng-repeat="mes in mesesTickets">{{getCantidadTotalPrioridad(prioridad, anno, mes)}}</td>
-                                                            </tr>
-                                                        </table>
+                                                    <td style="text-align: left; border: 1px solid #ddd;">TOTAL</td>
+                                                    <td ng-repeat="anno in anosTickets" style="border: 1px solid #ddd; padding: 0;">
+                                                        <div style="display: flex; flex-wrap: wrap; width: 100%;">
+                                                            <div ng-repeat="mes in mesesTickets" style="flex: 1; border: none; padding: 4px; text-align: left;">
+                                                                {{getCantidadTotalPrioridad(prioridad, anno, mes)}}
+                                                            </div>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -1760,13 +1761,13 @@
                                                 </tr>
                                                 <!-- Nueva fila de totales -->
                                                 <tr style="background-color: #ffcc99; font-weight: bold;">
-                                                    <td style="text-align: center; padding: 4px; border: 1px solid #ddd;">TOTAL</td>
-                                                    <td ng-repeat="anno in anosTickets">
-                                                        <table style="width:100%">
-                                                            <tr>
-                                                                <td ng-repeat="mes in mesesTickets">{{getCantidadTotalCategoria(categoria, anno, mes)}}</td>
-                                                            </tr>
-                                                        </table>
+                                                    <td style="text-align: left; padding: 4px; border: 1px solid #ddd;">TOTAL</td>
+                                                    <td ng-repeat="anno in anosTickets" style="border: 1px solid #ddd; padding: 0;">
+                                                        <div style="display: flex; flex-wrap: wrap; width: 100%;">
+                                                            <div ng-repeat="mes in mesesTickets" style="flex: 1; padding: 4px; border: none; text-align: left;">
+                                                                {{getCantidadTotalCategoria(categoria, anno, mes)}}
+                                                            </div>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             </tbody>

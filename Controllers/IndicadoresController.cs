@@ -146,9 +146,10 @@ namespace SifizPlanning.Controllers
                     // Si fechaFin es nula o vacía, tomar el día actual
                     fFin = DateTime.Now;
                 }
+                fFin = fFin.AddDays(1);
 
                 var ticketsQueryN = db.InfoTickets.AsNoTracking()
-                                             .Where(it => it.FechaIngreso.Value >= fInicio && it.FechaIngreso.Value <= fFin)
+                                             .Where(it => it.FechaIngreso.Value >= fInicio && it.FechaIngreso.Value <= fFin && it.Estado != "ANULADO" && it.Estado != "RECHAZADO" )
                                              .ToList();
 
                 // Convertir la consulta a una lista para trabajar con ella en memoria
