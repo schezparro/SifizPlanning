@@ -7,21 +7,26 @@
 @if (Roles.IsUserInRole("ADMIN") || Roles.IsUserInRole("OPERACIONES"))
 {
     <button class="btn btn-primary" ng-click="windowAgregarRecursos()">Nueva Capacitación</button>
-    <button class="btn btn-primary" ng-click="windowAgregarPlan()">Nuevo Plan</button>
+    <button class="btn btn-primary" ng-click="windowAgregarPlan()">Tema a Capacitar</button>
 }
 <input type="text" ng-keyup="cargarRecursos()" ng-model="filtroRecursos" class="form-control right filtro" placeholder="Filtrar..." />
 <div class="clear"></div>
+<label style="display: inline-block">
+    Temas a capacitar:
+    <input style="vertical-align: -2px;" type="checkbox" ng-click="cargarRecursos()" ng-model="esPlan" ng-init="esPlan=false" />
+</label>
 <div id="tabla-user-recursos">
     <table id="tabla-recursos-usuario" class="table table-striped">
         <thead>
             <tr>
-                <th width="10">Título</th>
-                <th width="20">Detalle</th>
-                <th width="8">Fecha</th>
-                <th width="20">Modulo</th>
-                <th width="15">Url</th>
-                <th width="15">Registro Asistencia</th>
-                <th width="8">Tiempo Capacitacion</th>
+                <th>Título</th>
+                <th>Detalle</th>
+                <th>Fecha</th>
+                <th>Modulo</th>
+                <th ng-show="!esPlan">Url</th>
+                <th ng-show="!esPlan">Registro Asistencia</th>
+                <th ng-show="esPlan">Asistencia</th>
+                <th>Tiempo Capacitacion</th>
             </tr>
         </thead>
 
@@ -31,15 +36,32 @@
                 <td>{{recurso.detalle | limitTo:100}}</td>
                 <td>{{recurso.fecha | strDateToStr}}</td>
                 <td>{{recurso.modulo}}</td>
-                <td>
-                    <a class="btn btn-success btn-xs" target="_blank" href="{{recurso.adjunto}}" ng-show="recurso.adjunto != ''">
-                        <span class="glyphicon glyphicon-link"></span> Url 
-                    </a>
+                <td ng-show="!esPlan">
+                    <div ng-if="!recurso.editandoUrl" style="display: inline-flex; align-items: center;">
+                        <a class="btn btn-success btn-xs" target="_blank" href="{{recurso.adjunto}}" ng-show="recurso.adjunto != ''">
+                            <span class="glyphicon glyphicon-link"></span> Url
+                        </a>
+                        <button class="btn btn-warning btn-xs" ng-click="editarUrl(recurso)" style="margin-left: 5px;">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </button>
+                    </div>
+                    <div ng-if="recurso.editandoUrl" style="display: inline-flex; align-items: center;">
+                        <input type="text" class="form-control" ng-model="recurso.adjunto" style="flex-grow: 1; margin-right: 5px;" />
+                        <button class="btn btn-success btn-xs" ng-click="guardarUrl(recurso)" style="margin-right: 5px;">
+                            <span class="glyphicon glyphicon-ok"></span>
+                        </button>
+                        <button class="btn btn-danger btn-xs" ng-click="cancelarEdicionUrl(recurso)">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </button>
+                    </div>
                 </td>
 
                 <td>
-                    <a class="btn btn-primary btn-xs" ng-click="mostrarRegistroAsistencia(recurso.secuencial)">
-                        <span class="glyphicon glyphicon-calendar"></span> Registro asistencia
+                    <a ng-show="!esPlan" class="btn btn-primary btn-xs" ng-click="mostrarRegistroAsistencia(recurso.secuencial)">
+                        <span class="glyphicon glyphicon-calendar"></span> Registro Asistencia
+                    </a>
+                    <a ng-show="esPlan" class="btn btn-primary btn-xs" ng-click="mostrarRegistroAsistencia(recurso.secuencial)">
+                        <span class="glyphicon glyphicon-calendar"></span> Asistencia
                     </a>
                 </td>
 
@@ -136,7 +158,7 @@
         <div class="modal-content">
             <form ng-submit="GuardarNuevoPlan()" name="nuevoPlan">
                 <div class="modal-header">
-                    <h5 class="modal-title">NUEVO PLAN DE CAPACITACION</h5>
+                    <h5 class="modal-title">TEMA A CAPACITAR</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
@@ -156,6 +178,12 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <label for="fecha-capacitacion">FECHA</label>
+                        <div class='input-group date'>
+                            <input id="fecha-capacitacion" ng-model="fechaCapacitacion" class="form-control" ng-required="true" autocomplete="off" />
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label for="inputModulo">CAPACITADOR:</label>
                         <select id="select-capacitador-plan" ng-model="capacitadorSeleccionadoPlan" class="form-control" required="required">
                             <option value="">Seleccione...</option>
@@ -169,6 +197,9 @@
                         :
                         <input type="number" class="form-control" ng-model="minutosPlan" ng-required="true" style="width: 10%; text-align: center;" min="0" max="60">
                         minutos
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-primary" ng-click="abrirModalSeleccionarAsistentes()">Asistentes</button>
                     </div>
                 </div>
 
@@ -209,7 +240,7 @@
                     <div class="col-sm-4"><strong>Url:</strong></div>
                     <div class="col-sm-8">
                         <a class="btn btn-success btn-xs" target="_blank" href="{{adjuntoV}}">
-                            <span class="glyphicon glyphicon-link"></span> Url 
+                            <span class="glyphicon glyphicon-link"></span> Url
                         </a>
                     </div>
                 </div>
@@ -231,7 +262,8 @@
         <div class="modal-content">
             <div class="modal-header" style="padding: 10px, 10px">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Registro de asistencia </h4>
+                <h4 ng-show="!esPlan" class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Registro de asistencia </h4>
+                <h4 ng-show="esPlan" class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Asistentes </h4>
             </div>
 
             <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
@@ -243,9 +275,9 @@
                                 <th>No.</th>
                                 <th>PERSONAL SIFIZSOFT E INTESOFT</th>
                                 <th>ASIGNADO</th>
-                                <th>ASISTENCIA</th>
-                                <th>PUNTUACIÓN</th>
-                                <th></th>
+                                <th ng-show="!esPlan">ASISTENCIA</th>
+                                <th ng-show="!esPlan">PUNTUACIÓN</th>
+                                <th ng-show="!esPlan"></th>
                             </tr>
                         </thead>
 
@@ -256,20 +288,20 @@
                                     <td>{{$index + 1}}</td> <!-- Autoincremental -->
                                     <td>{{item.nombre}}</td> <!-- Nombre del colaborador -->
                                     <td><input type="checkbox" ng-model="item.asignado"></td> <!-- Checkbox para asignado -->
-                                    <td><input type="checkbox" ng-model="item.asistencia"></td> <!-- Checkbox para asistencia -->
-                                    <td><input type="number" ng-model="item.puntuacion" min="0" max="5"></td> <!-- Input para puntuación -->
-                                    <td><input type="hidden" value="{{item.id}}"></td> <!-- Campo oculto con el ID -->
+                                    <td ng-show="!esPlan"><input type="checkbox" ng-model="item.asistencia"></td> <!-- Checkbox para asistencia -->
+                                    <td ng-show="!esPlan"><input type="number" ng-model="item.puntuacion" min="0" max="5"></td> <!-- Input para puntuación -->
+                                    <td ng-show="!esPlan"><input type="hidden" value="{{item.id}}"></td> <!-- Campo oculto con el ID -->
                                 </tr>
                             }
-                            else 
+                            else
                             {
                                 <tr ng-repeat="item in datosAsistencia track by $index">
                                     <td>{{$index + 1}}</td> <!-- Autoincremental -->
                                     <td>{{item.nombre}}</td> <!-- Nombre del colaborador -->
                                     <td><input type="checkbox" ng-disabled="true" ng-model="item.asignado"></td> <!-- Checkbox para asignado -->
-                                    <td><input type="checkbox" ng-disabled="true" ng-model="item.asistencia"></td> <!-- Checkbox para asistencia -->
-                                    <td><input type="number" ng-disabled="true" ng-model="item.puntuacion" min="0" max="5"></td> <!-- Input para puntuación -->
-                                    <td><input type="hidden" value="{{item.id}}"></td> <!-- Campo oculto con el ID -->
+                                    <td ng-show="!esPlan"><input type="checkbox" ng-disabled="true" ng-model="item.asistencia"></td> <!-- Checkbox para asistencia -->
+                                    <td ng-show="!esPlan"><input type="number" ng-disabled="true" ng-model="item.puntuacion" min="0" max="5"></td> <!-- Input para puntuación -->
+                                    <td ng-show="!esPlan"><input type="hidden" value="{{item.id}}"></td> <!-- Campo oculto con el ID -->
                                 </tr>
                             }
                         </tbody>
@@ -290,3 +322,40 @@
         </div>
     </div>
 </div>
+
+<div id="modal-seleccionar-asistentes" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">ASISTENTES</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="seleccionarTodos" ng-model="todosSeleccionados" ng-change="seleccionarTodosAsistentes()">
+                    <label class="form-check-label" for="seleccionarTodos">Todos</label>
+                </div>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>PERSONAL SIFIZSOFT E INTESOFT</th>
+                            <th>ASIGNADO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="asistente in asistentesCapacitacion">
+                            <td>{{$index + 1}}</td>
+                            <td>{{asistente.nombre}}</td>
+                            <td><input type="checkbox" ng-model="asistente.seleccionado"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+

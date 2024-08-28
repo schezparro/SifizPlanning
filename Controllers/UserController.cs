@@ -2710,7 +2710,7 @@ r in db.Rol on ur.rol equals r
                     var col = (from c in db.Colaborador
                                join p in db.Persona on c.SecuencialPersona equals p.Secuencial
                                join u in db.Usuario on p.Secuencial equals u.SecuencialPersona
-                               where u.EstaActivo == 1 && (p.Nombre1 + " " + p.Apellido1) == solVacaciones.ApellidosNombres 
+                               where u.EstaActivo == 1 && (p.Nombre1 + " " + p.Apellido1) == solVacaciones.ApellidosNombres
                                select new { c, p }).FirstOrDefault();
 
                     DateTime fechaDesde = solVacaciones.FechaInicioVacaciones;
@@ -4754,14 +4754,13 @@ r in db.Rol on ur.rol equals r
         //RECURSOS DE LOS USUARIOS
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult RecursosUsuario(int start, int lenght, string filtro = "", bool todos = false)
+        public ActionResult RecursosUsuario(int start, int lenght, string filtro = "", bool todos = false, bool esPlan = false)
         {
-
             try
             {
                 var recursosUsuario = (from rec in db.Recursos
                                        join modulo in db.Modulo on rec.SecuencialModulo equals modulo.Secuencial
-                                       where (rec.EsPlan == null || rec.EsPlan == 0)
+                                       where (rec.EsPlan != null && rec.EsPlan != 0) == esPlan
                                        select new
                                        {
                                            secuencial = rec.Secuencial,
@@ -4926,23 +4925,49 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult GuardarPlanRecurso(string titulo, string detalle, DateTime fecha, int modulo, int colaborador, int tiempo)
+        public ActionResult GuardarPlanRecurso(string titulo, string detalle, string fecha, int modulo, int colaborador, int tiempo, string asistentesJson)
         {
             try
             {
-                var s = new JavaScriptSerializer();
+                // Convertir la fecha
+                string[] fechas = fecha.Split(new Char[] { '/' });
+                int dia = Int32.Parse(fechas[0]);
+                int mes = Int32.Parse(fechas[1]);
+                int anno = Int32.Parse(fechas[2]);
+                DateTime fechaCapacitacion = new DateTime(anno, mes, dia);
+
+                // Decodificar la cadena JSON de asistentes
+                var serializer = new JavaScriptSerializer();
+                int[] asistentesIds = serializer.Deserialize<int[]>(asistentesJson);
+
+                // Crear el nuevo recurso (plan)
                 Recursos nuevoRecurso = new Recursos
                 {
                     Titulo = titulo,
                     Detalle = detalle,
-                    Fecha = fecha,
+                    Fecha = fechaCapacitacion,
                     SecuencialModulo = modulo,
                     Adjunto = "",
-                    EsPlan = 1,
+                    EsPlan = fechaCapacitacion.Date > DateTime.Now.Date ? 1 : 0,
                     SecuencialColaborador = colaborador,
                     TiempoCapacitacion = tiempo
                 };
                 db.Recursos.Add(nuevoRecurso);
+                db.SaveChanges();
+
+                foreach (int asistenteId in asistentesIds)
+                {
+                    RecursosAsistencia ra = new RecursosAsistencia
+                    {
+                        SecuencialColaborador = asistenteId,
+                        SecuencialRecurso = nuevoRecurso.Secuencial,
+                        Asistencia = 0,
+                        Puntuacion = 0,
+                        EstaActivo = 1
+                    };
+
+                    db.RecursosAsistencia.Add(ra);
+                }
                 db.SaveChanges();
 
                 return Json(new
@@ -4960,6 +4985,42 @@ r in db.Rol on ur.rol equals r
                 });
             }
         }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult EditarPlanRecurso(int secuencial, string url)
+        {
+            try
+            {
+                var recurso = db.Recursos.Find(secuencial);
+                if (recurso == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        msg = "Recurso no encontrado."
+                    });
+                }
+
+                recurso.Adjunto = url;
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
 
         //Guardar modal nuevos recursos
         [HttpPost]

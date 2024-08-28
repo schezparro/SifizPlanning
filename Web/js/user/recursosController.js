@@ -1,10 +1,16 @@
 ﻿devApp.controller('recursosController', ['$scope', '$http', 'filtroService', function ($scope, $http, filtroService) {
+    $scope.esPlan = false;
     var numerosPorPagina = 10;
     var pagina = 1;
     $scope.idRecursos = 0;
     $scope.mostrarTodosRecursos = false;
     $scope.horas = 0;
     $scope.minutos = 0;
+
+    angular.element('#fecha-capacitacion').datepicker({
+        format: 'dd/mm/yyyy',
+        forceParse: false
+    });
 
     $scope.filtroRecursos = filtroService.filtroRecursos;
 
@@ -15,12 +21,14 @@
             lenght = numerosPorPagina;
 
         $scope.loading.show();
+
         var recursos = $http.post("user/recursos-usuario",
             {
                 start: start,
                 lenght: lenght,
                 filtro: $scope.filtroRecursos,
-                todos: $scope.mostrarTodosRecursos
+                todos: $scope.mostrarTodosRecursos,
+                esPlan: $scope.esPlan
             });
         recursos.success(function (data) {
             $scope.loading.hide();
@@ -72,7 +80,7 @@
     var ajaxColaboradores = $http.post("catalogos/dar-colaboradores", {});
     ajaxColaboradores.success(function (data) {
         if (data.success === true) {
-
+            $scope.colaboradores = data.colaboradores;
             var datos = [];
             data.colaboradores.forEach(function (item) {
                 // Agrega la etapa al arreglo aplanado
@@ -85,6 +93,16 @@
                 });
             });
             $scope.datosAsistencia = datos;
+
+            var datosAsistente = [];
+            data.colaboradores.forEach(function (item) {
+                datosAsistente.push({
+                    id: item.id,
+                    nombre: item.nombre,
+                    asignado: false
+                });
+            });
+            $scope.asistentesCapacitacion = datosAsistente;
         }
     });
 
@@ -137,13 +155,14 @@
     };
 
     $scope.mostrarRegistroAsistencia = function (secuencial) {
+        var ajaxObtenerRecurso = $http.post("user/dar-datos-asistencia-recursos", {
+            secuencialRecurso: secuencial
+        });
 
-        var ajaxObtenerRecurso = $http.post("user/dar-datos-asistencia-recursos",
-            {
-                secuencialRecurso: secuencial
-            });
         ajaxObtenerRecurso.success(function (data) {
             if (data.success === true) {
+                $scope.limpiarDatosAsistencia();
+
                 var datosPorId = {};
                 data.datos.forEach(function (item) {
                     datosPorId[item.id] = item;
@@ -155,7 +174,7 @@
                             itemAsistencia.asistencia = itemData.asistencia;
                             itemAsistencia.puntuacion = itemData.puntuacion;
                             itemAsistencia.asignado = true;
-                        };
+                        }
                     });
                 });
 
@@ -180,19 +199,10 @@
         }
     });
 
-    $scope.urlNoValida = false;
     $scope.GuardarNuevoRecurso = function () {
         var modulo = angular.element("#select-modulo-recursos")[0].value;
         var fechaSistema = new Date().toISOString();
 
-        if ($scope.url != null) {
-            if (validarURL($scope.url) == false) {
-                $scope.urlNoValida = true;
-                return;
-            } else {
-                $scope.urlNoValida = false;
-            };
-        };
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
 
         var formData = new FormData();
@@ -238,16 +248,22 @@
     $scope.GuardarNuevoPlan = function () {
         var moduloPlan = angular.element("#select-modulo-plan")[0].value;
         var colaborador = angular.element("#select-capacitador-plan")[0].value;
-        var fechaSistemaPlan = new Date().toISOString();
+        var fecha = angular.element("#fecha-capacitacion")[0].value;
+
+        var asistentesSeleccionadosIds = $scope.asistentesCapacitacion
+            .filter(asistente => asistente.seleccionado)
+            .map(asistente => asistente.id);
+        var asistentesSeleccionadosJson = JSON.stringify(asistentesSeleccionadosIds);
 
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
 
         var formData = new FormData();
         formData.append('titulo', $scope.newTituloPlan);
         formData.append('detalle', $scope.newDetallePlan);
-        formData.append('fecha', fechaSistemaPlan);
+        formData.append('fecha', fecha);
         formData.append('modulo', moduloPlan);
         formData.append('colaborador', colaborador);
+        formData.append('asistentesJson', asistentesSeleccionadosJson);
 
         var tiempo = toTotalMinutes($scope.horasPlan, $scope.minutosPlan);
         formData.append('tiempo', tiempo);
@@ -266,6 +282,16 @@
                 angular.element("#modal-agregar-plan").modal("hide");
                 $scope.cargarRecursos();
 
+                var datosAsistente = [];
+                data.colaboradores.forEach(function (item) {
+                    datosAsistente.push({
+                        id: item.id,
+                        nombre: item.nombre,
+                        asignado: false
+                    });
+                });
+                $scope.asistentesCapacitacion = datosAsistente;
+
                 $scope.horasPlan = 0;
                 $scope.minutosPlan = 0;
             } else {
@@ -278,6 +304,36 @@
             console.log('Error: ' + data);
         });
     };
+
+    // Dentro del controlador AngularJS:
+    $scope.editarUrl = function (recurso) {
+        recurso.editandoUrl = true;
+    };
+
+    $scope.guardarUrl = function (recurso) {
+        var ajax = $http.post("user/editar-plan-recurso",
+            {
+                secuencial: recurso.secuencial,
+                url: recurso.adjunto,
+            });
+        ajax.success(function (data) {
+            if (data.success === true) {
+                recurso.editandoUrl = false;
+            }
+            else {
+                messageDialog.show('Información', data.msg);
+            }
+        });
+    };
+
+    $scope.cancelarEdicionUrl = function (recurso) {
+        recurso.editandoUrl = false;
+    };
+
+    $scope.validarUrl = function (url) {
+        return /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/.test(url);
+    };
+
 
     $scope.registrarAsistencia = function () {
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
@@ -347,6 +403,25 @@
             }
         });
     };
+
+    $scope.abrirModalSeleccionarAsistentes = function () {
+        angular.element("#modal-seleccionar-asistentes").modal("show");
+    };
+
+    $scope.seleccionarTodosAsistentes = function () {
+        for (var i = 0; i < $scope.asistentesCapacitacion.length; i++) {
+            $scope.asistentesCapacitacion[i].seleccionado = $scope.todosSeleccionados;
+        }
+    };
+
+    $('#modal-agregar-plan').on('hidden.bs.modal', function () {
+        $scope.$apply(function () {
+            for (var i = 0; i < $scope.asistentesCapacitacion.length; i++) {
+                $scope.asistentesCapacitacion[i].seleccionado = false;
+            }
+            $scope.todosSeleccionados = false;
+        });
+    });
 
 }]);
 
