@@ -49,9 +49,9 @@
                                         <td>{{cliente.Total}}</td>
                                     </tr>
                                     <tr>
-                                        <td>Total</td>
-                                        <td ng-repeat="mes in meses">{{totalesPorMes[$index]}}</td>
-                                        <td>{{totalTickets}}</td>
+                                        <td><strong>Total</strong></td>
+                                        <td ng-repeat="mes in meses"><strong>{{totalesPorMes[$index]}}</strong></td>
+                                        <td><strong>{{totalTickets}}</strong></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -112,6 +112,15 @@
                                     <td>{{ticket.ClientesAtendidos}}</td>
                                     <td>{{ticket.CarteraAsignada}}</td>
                                 </tr>
+
+                                <tr>
+                                    <td><strong>Total</strong></td>
+                                    <td><strong>{{getTotal('NumeroTickets')}}</strong></td>
+                                    <td><strong>{{getTotal('TiempoMinutos')}}</strong></td>
+                                    <td><strong>{{getTotal('TiempoHoras')}}</strong></td>
+                                    <td><strong>{{getTotal('ClientesAtendidos')}}</strong></td>
+                                    <td><strong>{{getTotal('CarteraAsignada')}}</strong></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -162,6 +171,12 @@
                                     <td>{{ticket.Gestor}}</td>
                                     <td>{{ticket.Mes}} - {{ticket.Anio}}</td>
                                     <td>{{ticket.NumeroTickets}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td><strong>Total</strong></td>
+                                    <td></td>
+                                    <td><strong>{{getTotalTicketsAnalizados()}}</strong></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -216,6 +231,14 @@
                                     </td>
                                     <td>{{sumarTiempos(tiempos)}} horas</td>
                                 </tr>
+
+                                <tr>
+                                    <td><strong>Total</strong></td>
+                                    <td ng-repeat="label in ticketsTiempoInvertidoLabels">
+                                        <strong>{{getTotalPorColumna(label)}} horas</strong>
+                                    </td>
+                                    <td><strong>{{getTotalGeneral()}} horas</strong></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -268,6 +291,12 @@
                                     <td>{{ticket.Anio}}/{{ticket.Mes}}</td>
                                     <td>{{ticket.Ingresado}}</td>
                                     <td>{{ticket.AnuladoRechazado}}</td>
+                                </tr>
+
+                                <tr>
+                                    <td colspan="2"><strong>Totales</strong></td>
+                                    <td><strong>{{getTotalIngresados()}}</strong></td>
+                                    <td><strong>{{getTotalAnuladosRechazados()}}</strong></td>
                                 </tr>
                             </tbody>
                         </table>

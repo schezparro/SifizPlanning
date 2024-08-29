@@ -100,6 +100,13 @@
         });
     };
 
+    $scope.getTotal = function (column) {
+        return $scope.ticketIntervaloGestores.reduce(function (total, ticket) {
+            return total + ticket[column];
+        }, 0);
+    };
+
+
     $scope.darTicketTiempoGestores = function () {
         $scope.loading.show();
         var data = {
@@ -117,6 +124,21 @@
             }
         });
     };
+
+    // Función para obtener el total por columna
+    $scope.getTotalPorColumna = function (label) {
+        return Object.values($scope.ticketsTiempoInvertidoAgrupado).reduce(function (total, tiempos) {
+            return total + (tiempos[label] || 0);
+        }, 0);
+    };
+
+    // Función para obtener el total general
+    $scope.getTotalGeneral = function () {
+        return $scope.ticketsTiempoInvertidoLabels.reduce(function (total, label) {
+            return total + parseFloat($scope.getTotalPorColumna(label));
+        }, 0).toFixed(2);
+    };
+
 
     $scope.darTicketAnalizadosGestores = function () {
         $scope.loading.show();
@@ -136,6 +158,13 @@
         });
     };
 
+    $scope.getTotalTicketsAnalizados = function () {
+        return $scope.ticketsAnalizados.reduce(function (total, ticket) {
+            return total + ticket.NumeroTickets;
+        }, 0);
+    };
+
+
     $scope.darTicketAnuladosRechazados = function () {
         $scope.loading.show();
         var data = {
@@ -153,6 +182,19 @@
             }
         });
     };
+
+    $scope.getTotalIngresados = function () {
+        return $scope.anuladosRechazados.reduce(function (total, ticket) {
+            return total + ticket.Ingresado;
+        }, 0);
+    };
+
+    $scope.getTotalAnuladosRechazados = function () {
+        return $scope.anuladosRechazados.reduce(function (total, ticket) {
+            return total + ticket.AnuladoRechazado;
+        }, 0);
+    };
+
 
     function generarGraficoTicketAnioGestor(data) {
         if ($scope.ticketsAnioGestorChart) $scope.ticketsAnioGestorChart.destroy();
