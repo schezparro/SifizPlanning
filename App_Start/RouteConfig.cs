@@ -1031,6 +1031,12 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+               name: "GenerarCertificado",
+               url: "user/generar-certificado/{id}",
+               defaults: new { controller = "User", action = "GenerarCertificado", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "DarTipoModulo",
                 url: "user/tipo-modulo/{id}",
                 defaults: new { controller = "User", action = "DarTipoModulo", id = UrlParameter.Optional }
@@ -2516,6 +2522,12 @@ namespace SifizPlanning
                 name: "DarColaboradores",
                 url: "catalogos/dar-colaboradores/{id}",
                 defaults: new { controller = "Admin", action = "DarColaboradores", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarFullColaboradores",
+                url: "catalogos/dar-full-colaboradores/{id}",
+                defaults: new { controller = "Admin", action = "DarFullColaboradores", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(

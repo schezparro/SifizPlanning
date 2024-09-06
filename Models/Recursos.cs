@@ -29,6 +29,7 @@ namespace SifizPlanning.Models
         public Nullable<int> TiempoCapacitacion { get; set; }
         public Nullable<decimal> EsPlan { get; set; }
         public Nullable<int> SecuencialColaborador { get; set; }
+        public string Url { get; set; }
     
         public virtual Modulo modulo { get; set; }
         public virtual ICollection<RecursosAsistencia> RECURSOSASISTENCIA { get; set; }

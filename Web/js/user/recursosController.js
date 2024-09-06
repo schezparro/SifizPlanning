@@ -6,10 +6,12 @@
     $scope.mostrarTodosRecursos = false;
     $scope.horas = 0;
     $scope.minutos = 0;
+    $scope.currentDate = new Date();
 
     angular.element('#fecha-capacitacion').datepicker({
         format: 'dd/mm/yyyy',
-        forceParse: false
+        forceParse: false,
+        startDate: new Date(new Date().setDate(new Date().getDate() - 1)) // Resta un día a la fecha actual
     });
 
     $scope.filtroRecursos = filtroService.filtroRecursos;
@@ -77,7 +79,7 @@
     $scope.cargarRecursos();
 
     //COLABORADORES ASISTENCIA
-    var ajaxColaboradores = $http.post("catalogos/dar-colaboradores", {});
+    var ajaxColaboradores = $http.post("catalogos/dar-full-colaboradores", {});
     ajaxColaboradores.success(function (data) {
         if (data.success === true) {
             $scope.colaboradores = data.colaboradores;
@@ -133,6 +135,7 @@
         $scope.newDetalle = '';
         $scope.url = '';
         $scope.moduloSeleccionado = '';
+        $scope.link = '';
 
         angular.element("#modal-agregar-recursos").modal("show");
     };
@@ -144,6 +147,7 @@
         $scope.minutosPlan = 0;
         $scope.moduloSeleccionadoPlan = '';
         $scope.capacitadorSeleccionadoPlan = '';
+        $scope.linkPlan = '';
 
         angular.element("#modal-agregar-plan").modal("show");
     };
@@ -154,10 +158,12 @@
         angular.element("#modal-asistencia-recurso").modal("show");
     };
 
-    $scope.mostrarRegistroAsistencia = function (secuencial) {
+    $scope.mostrarRegistroAsistencia = function (recurso) {
         var ajaxObtenerRecurso = $http.post("user/dar-datos-asistencia-recursos", {
-            secuencialRecurso: secuencial
+            secuencialRecurso: recurso.secuencial
         });
+
+        $scope.recursoActual = recurso;
 
         ajaxObtenerRecurso.success(function (data) {
             if (data.success === true) {
@@ -178,14 +184,14 @@
                     });
                 });
 
-                $scope.secuencialRecurso = secuencial;
+                $scope.secuencialRecurso = recurso.secuencial;
                 angular.element("#guardar-registro").show();
                 angular.element("#modal-asistencia-recurso").modal("show");
             }
         });
     };
 
-    var ajaxCapacitadores = $http.post("catalogos/dar-colaboradores", {});
+    var ajaxCapacitadores = $http.post("catalogos/dar-full-colaboradores", {});
     ajaxCapacitadores.success(function (data) {
         if (data.success === true) {
             $scope.capacitadores = data.colaboradores;
@@ -211,6 +217,7 @@
         formData.append('fecha', fechaSistema);
         formData.append('modulo', modulo);
         formData.append('url', $scope.url);
+        formData.append('link', $scope.link);
         formData.append('adjuntoAsistencia', JSON.stringify($scope.datosAsistencia));
 
         var tiempo = toTotalMinutes($scope.horas, $scope.minutos)
@@ -264,6 +271,7 @@
         formData.append('modulo', moduloPlan);
         formData.append('colaborador', colaborador);
         formData.append('asistentesJson', asistentesSeleccionadosJson);
+        formData.append('link', $scope.linkPlan);
 
         var tiempo = toTotalMinutes($scope.horasPlan, $scope.minutosPlan);
         formData.append('tiempo', tiempo);
@@ -394,6 +402,7 @@
                 $scope.fechaV = data.recursoResult.fecha;
                 $scope.adjuntoV = data.recursoResult.adjunto;
                 $scope.tiempoV = data.recursoResult.tiempo;
+                $scope.linkV = data.recursoResult.url;
                 $scope.adjuntoAsistenciaV = data.recursoResult.adjuntoAsistencia;
 
                 angular.element("#modal-datos-recurso").modal("show");
@@ -422,6 +431,35 @@
             $scope.todosSeleccionados = false;
         });
     });
+
+    $scope.getDatosAsistenciaFiltrados = function () {
+        if ($scope.esPlan) {
+            return $scope.datosAsistencia.filter(item => item.asignado);
+        }
+        return $scope.datosAsistencia;
+    };
+
+    $scope.generarCertificado = function (colaborador) {
+        console.log($scope.recursoActual);
+
+        var ajaxCertificado = $http.post('user/generar-certificado',
+            {
+                colaborador: colaborador,
+                titulo: $scope.recursoActual.titulo,
+                minutos: $scope.recursoActual.tiempo,
+                fecha: new Date($scope.recursoActual.fecha).toISOString()
+            });
+        ajaxCertificado.success(function (data) {
+            if (data.success === true) {
+                var certificadoUrl = data.url;
+                window.open(certificadoUrl, '_blank');
+            } else {
+                console.error('Error al generar el certificado:', data.message);
+            }
+        }).error(function (error) {
+            console.error('Error al generar el certificado:', error);
+        });
+    };
 
 }]);
 

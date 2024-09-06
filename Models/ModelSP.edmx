@@ -1736,6 +1736,7 @@
           <Property Name="TIEMPOCAPACITACION" Type="int" />
           <Property Name="ESPLAN" Type="numeric" Precision="1" Scale="0" />
           <Property Name="SECUENCIALCOLABORADOR" Type="int" />
+          <Property Name="URL" Type="varchar" MaxLength="255" />
         </EntityType>
         <EntityType Name="RECURSOSASISTENCIA">
           <Key>
@@ -12481,6 +12482,7 @@
           <Property Name="EsPlan" Type="Decimal" Precision="1" Scale="0" />
           <Property Name="SecuencialColaborador" Type="Int32" />
           <NavigationProperty Name="colaborador" Relationship="SifizPlanningModel.FK_RECURSOS_COLABORADOR" FromRole="Recursos" ToRole="Colaborador" />
+          <Property Name="Url" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
         </EntityType>
         <Association Name="FK_RECURSOS_MODULO">
           <End Type="SifizPlanningModel.Modulo" Role="Modulo" Multiplicity="1" />
@@ -14927,6 +14929,7 @@
           <EntitySetMapping Name="Recursos">
             <EntityTypeMapping TypeName="SifizPlanningModel.Recursos">
               <MappingFragment StoreEntitySet="RECURSOS">
+                <ScalarProperty Name="Url" ColumnName="URL" />
                 <ScalarProperty Name="SecuencialColaborador" ColumnName="SECUENCIALCOLABORADOR" />
                 <ScalarProperty Name="EsPlan" ColumnName="ESPLAN" />
                 <ScalarProperty Name="TiempoCapacitacion" ColumnName="TIEMPOCAPACITACION" />

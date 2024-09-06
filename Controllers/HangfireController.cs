@@ -13,6 +13,7 @@ using System.Web.Mvc;
 using System.Web.Hosting;
 using SpreadsheetLight.Charts;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace SifizPlanning.Controllers
 {
@@ -1946,7 +1947,7 @@ namespace SifizPlanning.Controllers
                         .AsNoTracking()
                         .ToDictionary(c => c.SecuencialPersona);
 
-                    var infoTickets = new List<InfoTickets>();
+                    var infoTickets = new ConcurrentDictionary<int, InfoTickets>();
 
                     Parallel.ForEach(tickets, item =>
                     {
@@ -1992,13 +1993,13 @@ namespace SifizPlanning.Controllers
                         infoTicket.HorasEntrega = DateTime.MinValue;
                         infoTicket.HorasPrueba = DateTime.MinValue;
 
-                        lock (infoTickets)
+                        if (!infoTickets.TryAdd(infoTicket.Id, infoTicket))
                         {
-                            infoTickets.Add(infoTicket);
+                            Console.WriteLine($"Duplicate ticket ID found: {infoTicket.Id}");
                         }
                     });
 
-                    db.InfoTickets.AddRange(infoTickets);
+                    db.InfoTickets.AddRange(infoTickets.Values);
                     db.SaveChanges();
                     transaction.Commit();
                 }

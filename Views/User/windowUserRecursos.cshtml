@@ -4,9 +4,9 @@
     <input style="vertical-align: -2px;" type="checkbox" ng-click="cargarRecursos()" ng-model="mostrarTodosRecursos" ng-init="mostrarTodosRecursos=false" />
 </label>
  -->
-@if (Roles.IsUserInRole("ADMIN") || Roles.IsUserInRole("OPERACIONES"))
+@if (Roles.IsUserInRole("ADMIN") || Roles.IsUserInRole("OPERACIONES") || Roles.IsUserInRole("RRHH"))
 {
-    <button class="btn btn-primary" ng-click="windowAgregarRecursos()">Nueva Capacitación</button>
+    <button class="btn btn-primary" ng-click="windowAgregarRecursos()">Agregar</button>
     <button class="btn btn-primary" ng-click="windowAgregarPlan()">Tema a Capacitar</button>
 }
 <input type="text" ng-keyup="cargarRecursos()" ng-model="filtroRecursos" class="form-control right filtro" placeholder="Filtrar..." />
@@ -24,9 +24,10 @@
                 <th>Fecha</th>
                 <th>Modulo</th>
                 <th ng-show="!esPlan">Url</th>
+                <th>Link Meet</th>
                 <th ng-show="!esPlan">Registro Asistencia</th>
                 <th ng-show="esPlan">Asistencia</th>
-                <th>Tiempo Capacitacion</th>
+                <th>Tiempo</th>
             </tr>
         </thead>
 
@@ -55,12 +56,14 @@
                         </button>
                     </div>
                 </td>
-
                 <td>
-                    <a ng-show="!esPlan" class="btn btn-primary btn-xs" ng-click="mostrarRegistroAsistencia(recurso.secuencial)">
+                    <a href="{{recurso.url}}" target="_blank">{{recurso.url}}</a>
+                </td>
+                <td>
+                    <a ng-show="!esPlan" class="btn btn-primary btn-xs" ng-click="mostrarRegistroAsistencia(recurso)">
                         <span class="glyphicon glyphicon-calendar"></span> Registro Asistencia
                     </a>
-                    <a ng-show="esPlan" class="btn btn-primary btn-xs" ng-click="mostrarRegistroAsistencia(recurso.secuencial)">
+                    <a ng-show="esPlan" class="btn btn-primary btn-xs" ng-click="mostrarRegistroAsistencia(recurso)">
                         <span class="glyphicon glyphicon-calendar"></span> Asistencia
                     </a>
                 </td>
@@ -100,7 +103,7 @@
         <div class="modal-content">
             <form ng-submit="GuardarNuevoRecurso()" name="nuevoRecurso">
                 <div class="modal-header">
-                    <h5 class="modal-title">NUEVA CAPACITACION</h5>
+                    <h5 class="modal-title">REUNION/CAPACITACION</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
@@ -114,6 +117,7 @@
                         <label for="inputDetalle">DETALLE:</label>
                         <textarea type="text" class="form-control" ng-model="newDetalle" ng-required="true" rows="3"></textarea>
                     </div>
+
 
                     <div class="form-group">
                         <label for="inputModulo">MÓDULO:</label>
@@ -130,11 +134,16 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="inputDetalle">LINK MEET:</label>
+                        <input type="text" class="form-control" ng-model="link" ng-required="true"></>
+                    </div>
+
+                    <div class="form-group">
                         <button type="button" id="abrir-modal-registro-asistencia" ng-click="abrirRegistroAsistencia()" class="btn btn-primary">REGISTRO DE ASISTENCIA</button>
                     </div>
 
                     <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                        TIEMPO DE CAPACITACIÓN:
+                        TIEMPO:
                         <input type="number" class="form-control" ng-model="horas" ng-required="true" style="width:10%; text-align:center;" min="0">
                         horas
                         :
@@ -180,8 +189,12 @@
                     <div class="form-group">
                         <label for="fecha-capacitacion">FECHA</label>
                         <div class='input-group date'>
-                            <input id="fecha-capacitacion" ng-model="fechaCapacitacion" class="form-control" ng-required="true" autocomplete="off" />
+                            <input id="fecha-capacitacion" ng-model="fechaCapacitacion" class="form-control" ng-required="true" autocomplete="off"  min="{{currentDate | date:'yyyy-MM-dd'}}" />
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputLink">LINK MEET:</label>
+                        <input type="text" class="form-control" ng-model="linkPlan" ng-required="true"></>
                     </div>
                     <div class="form-group">
                         <label for="inputModulo">CAPACITADOR:</label>
@@ -191,7 +204,7 @@
                         </select>
                     </div>
                     <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                        TIEMPO DE CAPACITACIÓN:
+                        TIEMPO:
                         <input type="number" class="form-control" ng-model="horasPlan" ng-required="true" style="width:10%; text-align:center;" min="0">
                         horas
                         :
@@ -216,7 +229,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header" style="padding: 10px, 10px">
-                <label>CAPACITACIÓN</label>
+                <label>Reunión/Capacitación</label>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
@@ -245,7 +258,11 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-4"><strong>Tiempo de Capacitación:</strong></div>
+                    <div class="col-sm-4"><strong>Link Meet:</strong></div>
+                    <a target="_blank" href="{{linkV}}">{{linkV}}</a>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4"><strong>Tiempo:</strong></div>
                     <div class="col-sm-8">{{tiempoV | toHoursAndMinutes}}</div>
                 </div>
             </div>
@@ -267,41 +284,49 @@
             </div>
 
             <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
-
                 <div id="div-user-informe-proyecto">
                     <table id="tabla-registro-asistencia" class="table table-striped">
                         <thead>
                             <tr>
                                 <th>No.</th>
                                 <th>PERSONAL SIFIZSOFT E INTESOFT</th>
-                                <th>ASIGNADO</th>
+                                <th ng-show="!esPlan">ASIGNADO</th>
                                 <th ng-show="!esPlan">ASISTENCIA</th>
                                 <th ng-show="!esPlan">PUNTUACIÓN</th>
                                 <th ng-show="!esPlan"></th>
                             </tr>
                         </thead>
-
                         <tbody>
-                            @if (Roles.IsUserInRole("ADMIN") || Roles.IsUserInRole("OPERACIONES"))
+                            @if (Roles.IsUserInRole("ADMIN") || Roles.IsUserInRole("RRHH"))
                             {
-                                <tr ng-repeat="item in datosAsistencia track by $index">
+                                <tr ng-repeat="item in getDatosAsistenciaFiltrados() track by $index">
                                     <td>{{$index + 1}}</td> <!-- Autoincremental -->
                                     <td>{{item.nombre}}</td> <!-- Nombre del colaborador -->
-                                    <td><input type="checkbox" ng-model="item.asignado"></td> <!-- Checkbox para asignado -->
+                                    <td ng-show="!esPlan"><input type="checkbox" ng-model="item.asignado"></td> <!-- Checkbox para asignado -->
                                     <td ng-show="!esPlan"><input type="checkbox" ng-model="item.asistencia"></td> <!-- Checkbox para asistencia -->
                                     <td ng-show="!esPlan"><input type="number" ng-model="item.puntuacion" min="0" max="5"></td> <!-- Input para puntuación -->
                                     <td ng-show="!esPlan"><input type="hidden" value="{{item.id}}"></td> <!-- Campo oculto con el ID -->
+                                    <td ng-if="item.puntuacion == 1">
+                                        <button class="btn btn-primary btn-xs" ng-click="generarCertificado(item.id)">
+                                            <span class="glyphicon glyphicon-download"></span> Descargar Certificado
+                                        </button>
+                                    </td>
                                 </tr>
                             }
                             else
                             {
-                                <tr ng-repeat="item in datosAsistencia track by $index">
+                                <tr ng-repeat="item in getDatosAsistenciaFiltrados() track by $index">
                                     <td>{{$index + 1}}</td> <!-- Autoincremental -->
                                     <td>{{item.nombre}}</td> <!-- Nombre del colaborador -->
-                                    <td><input type="checkbox" ng-disabled="true" ng-model="item.asignado"></td> <!-- Checkbox para asignado -->
+                                    <td ng-show="!esPlan"><input type="checkbox" ng-disabled="true" ng-model="item.asignado"></td> <!-- Checkbox para asignado -->
                                     <td ng-show="!esPlan"><input type="checkbox" ng-disabled="true" ng-model="item.asistencia"></td> <!-- Checkbox para asistencia -->
                                     <td ng-show="!esPlan"><input type="number" ng-disabled="true" ng-model="item.puntuacion" min="0" max="5"></td> <!-- Input para puntuación -->
                                     <td ng-show="!esPlan"><input type="hidden" value="{{item.id}}"></td> <!-- Campo oculto con el ID -->
+                                    <td ng-if="item.puntuacion == 1">
+                                        <button class="btn btn-primary btn-xs" ng-click="generarCertificado(item)">
+                                            <span class="glyphicon glyphicon-download"></span> Descargar Certificado
+                                        </button>
+                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -309,9 +334,9 @@
                 </div>
             </div>
             <div class="modal-footer">
-                @if (Roles.IsUserInRole("ADMIN") || Roles.IsUserInRole("OPERACIONES"))
+                @if (Roles.IsUserInRole("ADMIN") || Roles.IsUserInRole("RRHH"))
                 {
-                    <button type="button" id="guardar-registro" ng-click="registrarAsistencia()" class="btn btn-primary">Guardar</button>
+                    <button ng-show="!esPlan" type="button" id="guardar-registro" ng-click="registrarAsistencia()" class="btn btn-primary">Guardar</button>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 }
                 else

@@ -37,6 +37,8 @@ using System.Data.Entity;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using DocumentFormat.OpenXml.Wordprocessing;
 using System.Diagnostics.Contracts;
+using System.Drawing.Imaging;
+using System.Drawing;
 
 namespace SifizPlanning.Controllers
 {
@@ -3565,7 +3567,8 @@ r in db.Rol on ur.rol equals r
                                detalle = r.Detalle,
                                adjunto = r.Adjunto,
                                fecha = r.Fecha,
-                               tiempo = r.TiempoCapacitacion
+                               tiempo = r.TiempoCapacitacion,
+                               Url = r.Url ?? ""
                            }).FirstOrDefault();
 
                 var result = new
@@ -4756,6 +4759,11 @@ r in db.Rol on ur.rol equals r
         [Authorize(Roles = "USER, ADMIN")]
         public ActionResult RecursosUsuario(int start, int lenght, string filtro = "", bool todos = false, bool esPlan = false)
         {
+            string emailUser = User.Identity.Name;
+            Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+            Persona persona = user.persona;
+            int colab = persona.colaborador.FirstOrDefault().Secuencial;
+
             try
             {
                 var recursosUsuario = (from rec in db.Recursos
@@ -4769,8 +4777,10 @@ r in db.Rol on ur.rol equals r
                                            fecha = rec.Fecha,
                                            modulo = rec.modulo.Descripcion,
                                            adjunto = rec.Adjunto,
+                                           esCapacitador = rec.SecuencialColaborador == colab ? true : false,
                                            tiempo = rec.TiempoCapacitacion.ToString().Substring(0, 5),
-                                           adjuntoAsistencia = rec.AdjuntoAsistencia
+                                           adjuntoAsistencia = rec.AdjuntoAsistencia,
+                                           url = rec.Url ?? ""
                                        }).ToList();
 
                 int total = recursosUsuario.Count();
@@ -4861,7 +4871,7 @@ r in db.Rol on ur.rol equals r
         //Guardar modal nuevos recursos
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult GuardarRecurso(string titulo, string detalle, DateTime fecha, int modulo, int tiempo, string url, string adjuntoAsistencia = null)
+        public ActionResult GuardarRecurso(string titulo, string detalle, DateTime fecha, int modulo, int tiempo, string url, string adjuntoAsistencia = null, string link = "")
         {
             try
             {
@@ -4875,7 +4885,8 @@ r in db.Rol on ur.rol equals r
                     SecuencialModulo = modulo,
                     Adjunto = url,
                     EsPlan = 0,
-                    TiempoCapacitacion = tiempo
+                    TiempoCapacitacion = tiempo,
+                    Url = link
                 };
                 db.Recursos.Add(nuevoRecurso);
                 db.SaveChanges();
@@ -4925,7 +4936,7 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult GuardarPlanRecurso(string titulo, string detalle, string fecha, int modulo, int colaborador, int tiempo, string asistentesJson)
+        public ActionResult GuardarPlanRecurso(string titulo, string detalle, string fecha, int modulo, int colaborador, int tiempo, string asistentesJson, string link = "")
         {
             try
             {
@@ -4950,11 +4961,13 @@ r in db.Rol on ur.rol equals r
                     Adjunto = "",
                     EsPlan = fechaCapacitacion.Date > DateTime.Now.Date ? 1 : 0,
                     SecuencialColaborador = colaborador,
-                    TiempoCapacitacion = tiempo
+                    TiempoCapacitacion = tiempo,
+                    Url = link
                 };
                 db.Recursos.Add(nuevoRecurso);
                 db.SaveChanges();
 
+                List<string> usuariosDestinos = new List<string>();
                 foreach (int asistenteId in asistentesIds)
                 {
                     RecursosAsistencia ra = new RecursosAsistencia
@@ -4967,7 +4980,30 @@ r in db.Rol on ur.rol equals r
                     };
 
                     db.RecursosAsistencia.Add(ra);
+
+                    string email = db.Colaborador.FirstOrDefault(s => s.Secuencial == asistenteId).persona.usuario.FirstOrDefault().Email;
+                    usuariosDestinos.Add(email);
                 }
+
+
+                string textoEmail = @"<div class='textoCuerpo'>Estimado(a): ";
+                textoEmail += "<br>";
+                textoEmail += "Por medio del siguiente correo se establece la reunión programada con el siguiente detalle: ";
+                textoEmail += "<br/>";
+                textoEmail += "<strong>Tema: <strong/>" + titulo;
+                textoEmail += "<br/>";
+                textoEmail += "<strong>Fecha: <strong/>" + fecha;
+                textoEmail += "<br/>";
+                textoEmail += $"<strong>Duración: </strong>{tiempo / 60} horas y {tiempo % 60} minutos";
+                textoEmail += "<br/>";
+                textoEmail += "<strong>Modulador: <strong/>" + modulo;
+                textoEmail += "<br/>";
+                textoEmail += "<strong>Enlace de la reunión: <strong/>" + link;
+                textoEmail += "</div>";
+
+                string asuntoEmail = "Nueva Reunión/Capacitación";
+                Utiles.EnviarEmailSistema(usuariosDestinos.ToArray(), textoEmail, asuntoEmail);
+
                 db.SaveChanges();
 
                 return Json(new
@@ -4984,6 +5020,61 @@ r in db.Rol on ur.rol equals r
                     msg = e.Message
                 });
             }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult GenerarCertificado(int colaborador, string titulo = "", int minutos = 0, string fecha = "")
+        {
+            try
+            {
+                // Generar el certificado con los datos del colaborador
+                var certificadoPath = GenerarCert(colaborador, titulo, minutos, fecha);
+
+                // Devolver la URL del certificado
+                return Json(new { success = true, url = Url.Content($"~/Certificados/{Path.GetFileName(certificadoPath)}") });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        private string GenerarCert(int colaborador, string titulo = "", int minutos = 0, string fecha = "")
+        {
+            if (fecha == null) return null;
+
+            DateTime ffecha = DateTime.Parse(fecha);
+
+            string fmostrar = ffecha.ToString("dd/mm/yyyy");
+
+            int horasFormateadas = (int)Math.Round(minutos / 60.0);
+
+            var col = db.Colaborador.FirstOrDefault(s => s.Secuencial == colaborador);
+            // Ruta de la plantilla del certificado
+            var plantillaPath = Server.MapPath("~/Content/Certificado.png");
+
+            var fechaActual = DateTime.Now.ToString("yyyyMMddHHmmss");
+            var certificadoPath = Path.Combine(Server.MapPath("~/Certificados"), $"{col.persona.Nombre1 + " " + col.persona.Apellido1 + " " + col.persona.Apellido2}_{fechaActual}.png");
+
+            using (var imagen = System.Drawing.Image.FromFile(plantillaPath))
+            using (var grafico = Graphics.FromImage(imagen))
+            {
+                var fuente = new System.Drawing.Font("Verdana", 20, FontStyle.Bold);
+                var pincel = new SolidBrush(System.Drawing.Color.Black);
+                var punto = new PointF(800, 550); // Ajusta la posición según sea necesario
+                var punto2 = new PointF(800, 750); // Ajusta la posición según sea necesario
+                var punto3 = new PointF(800, 950); // Ajusta la posición según sea necesario
+                var punto4 = new PointF(800, 1050); // Ajusta la posición según sea necesario
+
+                grafico.DrawString($"{col.persona.Nombre1 + " " + col.persona.Apellido1}", fuente, pincel, punto);
+                grafico.DrawString($"{titulo}", fuente, pincel, punto2);
+                grafico.DrawString($"{horasFormateadas}", fuente, pincel, punto3);
+                grafico.DrawString($"{fmostrar}", fuente, pincel, punto4);
+                imagen.Save(certificadoPath, ImageFormat.Png);
+            }
+
+            return certificadoPath;
         }
 
         [HttpPost]
