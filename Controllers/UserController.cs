@@ -4780,7 +4780,11 @@ r in db.Rol on ur.rol equals r
                                            esCapacitador = rec.SecuencialColaborador == colab ? true : false,
                                            tiempo = rec.TiempoCapacitacion.ToString().Substring(0, 5),
                                            adjuntoAsistencia = rec.AdjuntoAsistencia,
-                                           url = rec.Url ?? ""
+                                           url = rec.Url ?? "",
+                                           darCertificado = db.RecursosAsistencia
+                                               .Any(ra => ra.SecuencialRecurso == rec.Secuencial
+                                                          && ra.SecuencialColaborador == colab
+                                                          && ra.Puntuacion == 1)
                                        }).ToList();
 
                 int total = recursosUsuario.Count();
@@ -5024,12 +5028,24 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult GenerarCertificado(int colaborador, string titulo = "", int minutos = 0, string fecha = "")
+        public ActionResult GenerarCertificado(int secuencialRecurso)
         {
             try
             {
+                var r = (from rec in db.Recursos
+                                 join ra in db.RecursosAsistencia on rec.Secuencial equals ra.SecuencialRecurso
+                                 join c in db.Colaborador on ra.SecuencialColaborador equals c.Secuencial
+                                 where rec.Secuencial == secuencialRecurso && ra.Puntuacion == 1
+                                 select new
+                                 {
+                                     nombreColaborador = c.persona.Nombre1 + " " + c.persona.Apellido1,
+                                     titulo = rec.Titulo,
+                                     fecha = rec.Fecha,
+                                     minutos = rec.TiempoCapacitacion ?? 0
+                                 }).FirstOrDefault();
+
                 // Generar el certificado con los datos del colaborador
-                var certificadoPath = GenerarCert(colaborador, titulo, minutos, fecha);
+                var certificadoPath = GenerarCert(r.nombreColaborador, r.titulo, r.minutos, r.fecha);
 
                 // Devolver la URL del certificado
                 return Json(new { success = true, url = Url.Content($"~/Certificados/{Path.GetFileName(certificadoPath)}") });
@@ -5040,37 +5056,35 @@ r in db.Rol on ur.rol equals r
             }
         }
 
-        private string GenerarCert(int colaborador, string titulo = "", int minutos = 0, string fecha = "")
+        private string GenerarCert(string colaborador, string titulo = "", int minutos = 0, DateTime? fecha = null)
         {
             if (fecha == null) return null;
 
-            DateTime ffecha = DateTime.Parse(fecha);
+            string fmostrar = fecha.Value.ToString("dd/MM/yyyy");
 
-            string fmostrar = ffecha.ToString("dd/mm/yyyy");
+            double horasFormateadas = Math.Round(minutos / 60.0, 1);
+            string horasFormateadasString = horasFormateadas.ToString("0.0");
 
-            int horasFormateadas = (int)Math.Round(minutos / 60.0);
-
-            var col = db.Colaborador.FirstOrDefault(s => s.Secuencial == colaborador);
-            // Ruta de la plantilla del certificado
             var plantillaPath = Server.MapPath("~/Content/Certificado.png");
 
             var fechaActual = DateTime.Now.ToString("yyyyMMddHHmmss");
-            var certificadoPath = Path.Combine(Server.MapPath("~/Certificados"), $"{col.persona.Nombre1 + " " + col.persona.Apellido1 + " " + col.persona.Apellido2}_{fechaActual}.png");
+            var certificadoPath = Path.Combine(Server.MapPath("~/Certificados"), $"{colaborador}_{fechaActual}.png");
 
             using (var imagen = System.Drawing.Image.FromFile(plantillaPath))
             using (var grafico = Graphics.FromImage(imagen))
             {
-                var fuente = new System.Drawing.Font("Verdana", 20, FontStyle.Bold);
+                var fuente = new System.Drawing.Font("Arial", 20, FontStyle.Bold);
+                var fuente2 = new System.Drawing.Font("Arial", 14, FontStyle.Bold);
                 var pincel = new SolidBrush(System.Drawing.Color.Black);
                 var punto = new PointF(800, 550); // Ajusta la posición según sea necesario
                 var punto2 = new PointF(800, 750); // Ajusta la posición según sea necesario
-                var punto3 = new PointF(800, 950); // Ajusta la posición según sea necesario
-                var punto4 = new PointF(800, 1050); // Ajusta la posición según sea necesario
+                var punto3 = new PointF(1650, 870); // Ajusta la posición según sea necesario
+                var punto4 = new PointF(1050, 964); // Ajusta la posición según sea necesario
 
-                grafico.DrawString($"{col.persona.Nombre1 + " " + col.persona.Apellido1}", fuente, pincel, punto);
+                grafico.DrawString($"{colaborador}", fuente, pincel, punto);
                 grafico.DrawString($"{titulo}", fuente, pincel, punto2);
-                grafico.DrawString($"{horasFormateadas}", fuente, pincel, punto3);
-                grafico.DrawString($"{fmostrar}", fuente, pincel, punto4);
+                grafico.DrawString($"{horasFormateadasString}", fuente2, pincel, punto3);
+                grafico.DrawString($"{fmostrar}", fuente2, pincel, punto4);
                 imagen.Save(certificadoPath, ImageFormat.Png);
             }
 

@@ -7,6 +7,7 @@
     $scope.horas = 0;
     $scope.minutos = 0;
     $scope.currentDate = new Date();
+    $scope.esUserAllow = esUserAllow;
 
     angular.element('#fecha-capacitacion').datepicker({
         format: 'dd/mm/yyyy',
@@ -439,15 +440,14 @@
         return $scope.datosAsistencia;
     };
 
-    $scope.generarCertificado = function (colaborador) {
-        console.log($scope.recursoActual);
+    $scope.generarCertificado = function (recurso) {
+        var fecha = recurso.fecha;
+        var timestamp = parseInt(fecha.replace(/\/Date\((\d+)\)\//, '$1'));
+        var date = new Date(timestamp);
 
         var ajaxCertificado = $http.post('user/generar-certificado',
             {
-                colaborador: colaborador,
-                titulo: $scope.recursoActual.titulo,
-                minutos: $scope.recursoActual.tiempo,
-                fecha: new Date($scope.recursoActual.fecha).toISOString()
+                secuencialRecurso: recurso.secuencial
             });
         ajaxCertificado.success(function (data) {
             if (data.success === true) {
