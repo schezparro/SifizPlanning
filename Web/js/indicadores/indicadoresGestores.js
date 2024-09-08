@@ -4,6 +4,8 @@
             $scope.gestores = data.gestores;
             $scope.anioSeleccionado = new Date().getFullYear();
             $scope.gestorSeleccionado = 'TODOS';
+            $scope.secuencialGestorIndicadores = "0";
+            
             $scope.darTicketsPorAnioGestor();
         } else {
             console.log("No se pudieron cargar los datos");
@@ -54,6 +56,16 @@
             format: 'dd/mm/yyyy',
             locale: 'es'
         }).datepicker('setDate', $scope.fechaFinAnulado);
+
+        angular.element('#fecha-inicio-anulado-indicadores').datepicker({
+            format: 'dd/mm/yyyy',
+            locale: 'es'
+        }).datepicker('setDate', $scope.fechaInicioAnuladoIndicadores);
+
+        angular.element('#fecha-fin-anulado-indicadores').datepicker({
+            format: 'dd/mm/yyyy',
+            locale: 'es'
+        }).datepicker('setDate', $scope.fechaFinAnuladoIndicadores);
     };
 
     var fechaActual = new Date();
@@ -65,6 +77,8 @@
     $scope.fechaFinInvertido = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0);
     $scope.fechaInicioAnulado = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1);
     $scope.fechaFinAnulado = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0);
+    $scope.fechaInicioAnuladoIndicadores = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1);
+    $scope.fechaFinAnuladoIndicadores = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0);
 
     $scope.initDatepickers();
     $scope.darTicketsPorAnioGestor = function () {
@@ -182,6 +196,98 @@
             }
         });
     };
+
+    $scope.darTicketAnuladosRechazadosIndicadores = function () {
+        $scope.loading.show();
+        var data = {
+            fechaInicio: $filter('date')($scope.fechaInicioAnuladoIndicadores, 'dd/MM/yyyy'),
+            fechaFin: $filter('date')($scope.fechaFinAnuladoIndicadores, 'dd/MM/yyyy'),
+            secuencialGestor: $scope.secuencialGestorIndicadores
+        };
+
+        var request = $http.post("indicadores/dar-tickets-anulados-rechazados-indicadores/", data);
+        request.success(function (response) {
+            $scope.loading.hide();
+            if (response.success) {
+                $scope.anuladosRechazadosIndicadores = response.anuladosRechazados;
+
+                $scope.generateTableARI();
+            } else {
+                console.log('Error: ' + response.msg);
+            }
+        });
+    };
+
+    $scope.generateTableARI = function () {
+        $scope.mesesFormateados = [];
+        $scope.gestoresTicket = [];
+
+        function getNombreMes(numeroMes) {
+            var meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            return meses[numeroMes - 1];
+        }
+
+        $scope.anuladosRechazadosIndicadores.sort(function (a, b) {
+            if (a.Anio !== b.Anio) return a.Anio - b.Anio;
+            return a.Mes - b.Mes;
+        });
+
+        $scope.anuladosRechazadosIndicadores.forEach(function (ticket) {
+            var mesFormateado = getNombreMes(ticket.Mes) + '/' + ticket.Anio;
+            if ($scope.mesesFormateados.indexOf(mesFormateado) === -1) {
+                $scope.mesesFormateados.push(mesFormateado);
+            }
+        });
+
+        $scope.tableData = {};
+        $scope.gestores.forEach(function (gestor) {
+            $scope.tableData[gestor.nombre] = {
+                totalIngresados: 0,
+                totalAnuladosRechazados: 0
+            };
+            $scope.mesesFormateados.forEach(function (mesFormateado) {
+                $scope.tableData[gestor.nombre][mesFormateado] = { ingresado: 0, anuladoRechazado: 0, porcentage: 0 };
+            });
+        });
+
+        $scope.tableData["Desconocido"] = {
+            totalIngresados: 0,
+            totalAnuladosRechazados: 0
+        };
+        $scope.mesesFormateados.forEach(function (mesFormateado) {
+            $scope.tableData["Desconocido"][mesFormateado] = { ingresado: 0, anuladoRechazado: 0, porcentage: 0 };
+        });
+
+        $scope.anuladosRechazadosIndicadores.forEach(function (ticket) {
+            var mesFormateado = getNombreMes(ticket.Mes) + '/' + ticket.Anio;
+            $scope.tableData[ticket.Gestor][mesFormateado].ingresado = ticket.Ingresado;
+            $scope.tableData[ticket.Gestor][mesFormateado].anuladoRechazado = ticket.AnuladoRechazado;
+            $scope.tableData[ticket.Gestor][mesFormateado].porcentage = ticket.PorcentajeAnuladoRechazado;
+            $scope.tableData[ticket.Gestor].totalIngresados += ticket.Ingresado;
+            $scope.tableData[ticket.Gestor].totalAnuladosRechazados += ticket.AnuladoRechazado;
+        });
+
+        $scope.totalPorcentagePorMes = {};
+        $scope.mesesFormateados.forEach(function (mesFormateado) {
+            var totalIngresadosMes = 0;
+            var totalAnuladosRechazadosMes = 0;
+            $scope.gestores.forEach(function (gestor) {
+                totalIngresadosMes += $scope.tableData[gestor.nombre][mesFormateado].ingresado;
+                totalAnuladosRechazadosMes += $scope.tableData[gestor.nombre][mesFormateado].anuladoRechazado;
+            });
+            $scope.totalPorcentagePorMes[mesFormateado] = totalIngresadosMes > 0 ? ((totalAnuladosRechazadosMes / totalIngresadosMes) * 100).toFixed(2) : 0;
+        });
+
+        var totalIngresadosGeneral = 0;
+        var totalAnuladosRechazadosGeneral = 0;
+        $scope.gestores.forEach(function (gestor) {
+            totalIngresadosGeneral += $scope.tableData[gestor.nombre].totalIngresados;
+            totalAnuladosRechazadosGeneral += $scope.tableData[gestor.nombre].totalAnuladosRechazados;
+        });
+        $scope.totalPorcentageGeneral = totalIngresadosGeneral > 0 ? ((totalAnuladosRechazadosGeneral / totalIngresadosGeneral) * 100).toFixed(2) : 0;
+        $scope.totalPorcentageValidado = (100 - $scope.totalPorcentageGeneral).toFixed(2);
+    };
+
 
     $scope.getTotalIngresados = function () {
         return $scope.anuladosRechazados.reduce(function (total, ticket) {

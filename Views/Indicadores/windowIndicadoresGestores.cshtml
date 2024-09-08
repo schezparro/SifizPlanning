@@ -9,6 +9,7 @@
         <li><a href="#mes-gestor-analizados" role="tab" data-toggle="tab">Analizados</a></li>
         <li><a href="#mes-gestor-invertido" role="tab" data-toggle="tab">Tiempo Invertido</a></li>
         <li><a href="#mes-anulado-rechazado" role="tab" data-toggle="tab">Anulado / Rechazado</a></li>
+        <li><a href="#indicadores-gestor" role="tab" data-toggle="tab">Indicadores</a></li>
     </ul>
 
     <div class="tab-content">
@@ -309,9 +310,89 @@
                 </div>
             </div>
         </div>
+        <div class="tab-pane" id="indicadores-gestor">
+            <div class="form-inline" style="display: flex; align-items: center; justify-content: flex-start;">
+                <div>
+                    <label>FECHA INICIO</label>
+                    <div class='input-group date'>
+                        <input id="fecha-inicio-anulado-indicadores" ng-model="fechaInicioAnuladoIndicadores" format-date class="form-control" ng-required="true" autocomplete="off" />
+                    </div>
+                    <label>  </label>
+                </div>
+
+                <div>
+                    <label>FECHA FIN</label>
+                    <div class='input-group date'>
+                        <input id="fecha-fin-anulado-indicadores" ng-model="fechaFinAnuladoIndicadores" format-date class="form-control" ng-required="true" autocomplete="off" />
+                    </div>
+                </div>
+                @*<div class="form-group" style="margin-left: 20px;">
+                        <label>Gestor:</label>
+                        <select id="gestor-indicadores" class="form-control" ng-model="secuencialGestorIndicadores" ng-change="darTicketAnuladosRechazadosIndicadores()" style="width: auto; margin-left: 10px;">
+                            <option value="0">*</option>
+                            <option ng-repeat="gestor in gestores" value={{gestor.idColaborador}}> {{gestor.nombre}}</option>
+                        </select>
+                    </div>*@
+                <div>
+                    <label>  </label>
+                    <button id="buscar-anulados-btn" class="btn btn-primary" ng-click="darTicketAnuladosRechazadosIndicadores()">Actualizar</button>
+                </div>
+            </div>
+            <br>
+            <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="3000">
+                <div class="carousel-inner" role="listbox">
+                    <div class="item active" style="height: 500px; overflow-y: auto">
+                        <table class="table table-striped table-condensed table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Gestor</th>
+                                    <th ng-repeat="mesFormateado in mesesFormateados">{{mesFormateado}}</th>
+                                    <th>Porcentaje Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="gestor in gestores">
+                                    <td>{{gestor.nombre}}</td>
+                                    <td ng-repeat="mesFormateado in mesesFormateados">
+                                        {{tableData[gestor.nombre][mesFormateado].porcentage}} %
+                                    </td>
+                                    <td> <strong> {{tableData[gestor.nombre].totalIngresados > 0 ? ((tableData[gestor.nombre].totalAnuladosRechazados / tableData[gestor.nombre].totalIngresados) * 100).toFixed(2) : 0}} %</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Indicador % de tickets rechazados/anulados</strong></td>
+                                    <td ng-repeat="mesFormateado in mesesFormateados">
+                                        <strong>{{totalPorcentagePorMes[mesFormateado]}} %</strong>
+                                    </td>
+                                    <td><strong>{{totalPorcentageGeneral}} %</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Indicador % de tickets validados para atención</strong></td>
+                                    <td ng-repeat="mesFormateado in mesesFormateados">
+                                        <strong>{{(100 - totalPorcentagePorMes[mesFormateado]).toFixed(2)}} %</strong>
+                                    </td>
+                                    <td><strong>{{totalPorcentageValidado}} %</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="item" style="height: 500px; overflow-y: auto; padding: 20px;">
+                        <h3>Fórmulas para calcular los indicadores</h3>
+                        <p><strong>Indicador % de tickets rechazados/anulados:</strong></p>
+                        <p style="font-size: 1.2em;">$$\text{Porcentaje} = \left( \frac{\text{Total de tickets anulados/rechazados}}{\text{Total de tickets ingresados}} \right) \times 100$$</p>
+                        <p><strong>Indicador % de tickets validados para atención:</strong></p>
+                        <p style="font-size: 1.2em;">$$\text{Porcentaje} = 100 - \text{Indicador % de tickets rechazados/anulados}$$</p>
+                        <p style="font-size: 1.2em; color: #2c3e50; background-color: #ecf0f1; padding: 10px; border-radius: 5px; text-align: center;">
+                            <strong>Estos indicadores nos permiten evaluar la eficiencia y calidad del proceso de gestión de tickets, proporcionando una visión clara del rendimiento de cada gestor y del equipo en general.</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <script type="text/javascript" src="~/Web/js/chart.js"></script>
 <script type="text/javascript" src="~/Web/js/chartjs-plugin-datalabels.js"></script>
 <script>

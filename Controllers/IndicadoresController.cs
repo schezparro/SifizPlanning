@@ -1614,10 +1614,10 @@ namespace SifizPlanning.Controllers
                     {
                         Gestor = group.Key.Gestor,
                         NumeroTickets = group.Count(),
-                        TiempoMinutos = Math.Round(group.Sum(ticket => ticket.HorasEmpleadas * 60), 2),
-                        TiempoHoras = Math.Round(group.Sum(ticket => ticket.HorasEmpleadas), 2),
+                        TiempoMinutos = group.Count() * 5,
+                        TiempoHoras = Math.Round((double)(group.Count() * 5) / 60, 2),
                         ClientesAtendidos = group.Select(ticket => ticket.Cliente).Distinct().Count(),
-                        CarteraAsignada = group.Select(ticket => ticket.Cliente).Distinct().Count() // Ajusta según tus necesidades
+                        CarteraAsignada = db.GestorServicios.Where(s=> (s.colaborador.persona.Nombre1 + " " + s.colaborador.persona.Apellido1) == group.Key.Gestor).Count(),
                     })
                     .ToList();
 
@@ -1753,6 +1753,52 @@ namespace SifizPlanning.Controllers
             }
         }
 
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public async Task<ActionResult> DarTicketsAnuladosRechazadosIndicadores(string fechaInicio, string fechaFin, int secuencialGestor)
+        {
+            try
+            {
+                DateTime fInicio = DateTime.ParseExact(fechaInicio, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                DateTime fFin = DateTime.ParseExact(fechaFin, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+                var ticketsPorMes = from ticket in db.InfoTickets
+                                    where ticket.FechaIngreso.HasValue &&
+                                          ticket.FechaIngreso.Value >= fInicio &&
+                                          ticket.FechaIngreso.Value <= fFin
+                                    let gestorServicio = db.GestorServicios.FirstOrDefault(s => s.cliente != null && s.cliente.Descripcion == ticket.Cliente)
+                                    let nombreGestor = gestorServicio != null && gestorServicio.colaborador != null && gestorServicio.colaborador.persona != null ? gestorServicio.colaborador.persona.Nombre1 + " " + gestorServicio.colaborador.persona.Apellido1 : "Desconocido"
+                                    where secuencialGestor == 0 || (gestorServicio != null && gestorServicio.Secuencial == secuencialGestor)
+                                    group ticket by new { Gestor = nombreGestor, Anio = ticket.FechaIngreso.Value.Year, Mes = ticket.FechaIngreso.Value.Month } into g
+                                    select new
+                                    {
+                                        g.Key.Gestor,
+                                        g.Key.Anio,
+                                        g.Key.Mes,
+                                        Ingresado = g.Count(),
+                                        AnuladoRechazado = g.Count(t => t.Estado == "Anulado" || t.Estado == "Rechazado"),
+                                        PorcentajeAnuladoRechazado = Math.Round((double)g.Count(t => t.Estado == "Anulado" || t.Estado == "Rechazado") / g.Count() * 100)
+                                    };
+
+                var listaTicketsPorMes = ticketsPorMes.ToList();
+                var resp = new
+                {
+                    success = true,
+                    anuladosRechazados = listaTicketsPorMes
+                };
+
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
 
 
         [HttpPost]
