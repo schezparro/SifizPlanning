@@ -149,7 +149,7 @@ namespace SifizPlanning.Controllers
                 fFin = fFin.AddDays(1);
 
                 var ticketsQueryN = db.InfoTickets.AsNoTracking()
-                                             .Where(it => it.FechaIngreso.Value >= fInicio && it.FechaIngreso.Value <= fFin && it.Estado != "ANULADO" && it.Estado != "RECHAZADO" )
+                                             .Where(it => it.FechaIngreso.Value >= fInicio && it.FechaIngreso.Value <= fFin && it.Estado != "ANULADO" && it.Estado != "RECHAZADO")
                                              .ToList();
 
                 // Convertir la consulta a una lista para trabajar con ella en memoria
@@ -564,11 +564,11 @@ namespace SifizPlanning.Controllers
                 }
 
                 var ticketsQueryPRN = (from ticket in db.InfoTickets
-                                      where ticket.FechaIngreso != null
-                                         && ticket.FechaIngreso.Value >= fInicio
-                                         && ticket.FechaIngreso.Value <= fFin
-                                         && ticket.Tipo == "REQUERIMIENTO NUEVO"
-                                      select ticket).ToList();
+                                       where ticket.FechaIngreso != null
+                                          && ticket.FechaIngreso.Value >= fInicio
+                                          && ticket.FechaIngreso.Value <= fFin
+                                          && ticket.Tipo == "REQUERIMIENTO NUEVO"
+                                       select ticket).ToList();
 
                 // Convertir la consulta a una lista para trabajar con ella en memoria
                 List<InfoTickets> ticketsListPRN = ticketsQueryPRN.ToList();
@@ -706,18 +706,67 @@ namespace SifizPlanning.Controllers
 
                 List<InfoTickets> ticketsListTEGAD = ticketsQueryTEGAD.ToList();
 
-                var groupedTicketsTEGAD = ticketsListTEGAD
-                    .GroupBy(ticket => CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(
-                        ticket.FechaIngreso.Value,
-                        CalendarWeekRule.FirstDay,
-                        DayOfWeek.Monday))
+                // Encontrar la fecha más antigua y la más reciente en los tickets
+                var fechaInicial = ticketsQueryTEGAD.Min(t => t.FechaIngreso.Value);
+
+                // Función para obtener el número de semana
+                Func<DateTime, int> GetWeekNumber = (date) =>
+                {
+                    return CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
+                        date,
+                        CalendarWeekRule.FirstFourDayWeek,
+                        DayOfWeek.Monday);
+                };
+
+                // Agrupar los tickets por año y semana
+                var groupedTickets = ticketsQueryTEGAD
+                    .GroupBy(ticket => new
+                    {
+                        Year = ticket.FechaIngreso.Value.Year,
+                        Week = GetWeekNumber(ticket.FechaIngreso.Value)
+                    })
                     .Select(g => new
                     {
-                        Semana = g.Key,
+                        g.Key.Year,
+                        g.Key.Week,
                         Cantidad = g.Count(),
-                        Descripcion = "AL " + g.Max(t => t.FechaIngreso.Value).ToString("dd/MM/yyyy")
+                        UltimaFecha = g.Max(t => t.FechaIngreso.Value)
                     })
-                    .OrderBy(x => x.Semana)
+                    .ToList();
+
+                // Crear una lista de todas las semanas desde la fecha inicial hasta la actual
+                var allWeeks = Enumerable.Range(0, (int)(fActual - fechaInicial).TotalDays / 7 + 1)
+                    .Select(i => fechaInicial.AddDays(i * 7))
+                    .Select(date => new
+                    {
+                        Year = date.Year,
+                        Week = GetWeekNumber(date),
+                        Date = date
+                    })
+                    .Distinct()
+                    .ToList();
+
+                // Combinar todas las semanas con los tickets agrupados
+                var groupedTicketsTEGAD = allWeeks
+                    .GroupJoin(groupedTickets,
+                        aw => new { aw.Year, aw.Week },
+                        gt => new { gt.Year, gt.Week },
+                        (aw, gt) => new
+                        {
+                            aw.Year,
+                            aw.Week,
+                            Cantidad = gt.Sum(x => x.Cantidad),
+                            UltimaFecha = gt.Any() ? gt.Max(x => x.UltimaFecha) : aw.Date.AddDays(6)
+                        })
+                    .Where(x => x.Cantidad > 0) // Excluir semanas con cantidad 0
+                    .OrderByDescending(x => x.Year)
+                    .ThenByDescending(x => x.Week)
+                    .Select(x => new
+                    {
+                        Semana = x.Week,
+                        Cantidad = x.Cantidad,
+                        Descripcion = $"AL {x.UltimaFecha:dd/MM/yyyy}"
+                    })
                     .ToList();
 
                 var totalCantidadesTEGAD = groupedTicketsTEGAD.Sum(ticket => ticket.Cantidad);

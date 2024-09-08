@@ -78,7 +78,7 @@
                 <td>{{recurso.tiempo | toHoursAndMinutes}}</td>
                 <td ng-show="!esPlan">
                     <button class="btn btn-sm btn-link" ng-show="recurso.darCertificado" ng-click="generarCertificado(recurso)">Descargar</button>
-                    <div ng-show="!recurso.darCertificado">NO APLICA</div>
+                    <div ng-show="!recurso.darCertificado">NO TIENE</div>
                 </td>
             </tr>
         </tbody>
@@ -308,7 +308,6 @@
                                 <th ng-show="!esPlan">ASIGNADO</th>
                                 <th ng-show="!esPlan">ASISTENCIA</th>
                                 <th ng-show="!esPlan">PUNTUACIÓN</th>
-                                <th ng-show="!esPlan"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -321,11 +320,6 @@
                                     <td ng-show="!esPlan"><input type="checkbox" ng-model="item.asistencia"></td> <!-- Checkbox para asistencia -->
                                     <td ng-show="!esPlan"><input type="number" ng-model="item.puntuacion" min="0" max="5"></td> <!-- Input para puntuación -->
                                     <td ng-show="!esPlan"><input type="hidden" value="{{item.id}}"></td> <!-- Campo oculto con el ID -->
-                                    <td ng-if="item.puntuacion == 1">
-                                        <button class="btn btn-primary btn-xs" ng-click="generarCertificado(item.id)">
-                                            <span class="glyphicon glyphicon-download"></span> Descargar Certificado
-                                        </button>
-                                    </td>
                                 </tr>
                             }
                             else
@@ -337,11 +331,6 @@
                                     <td ng-show="!esPlan"><input type="checkbox" ng-disabled="true" ng-model="item.asistencia"></td> <!-- Checkbox para asistencia -->
                                     <td ng-show="!esPlan"><input type="number" ng-disabled="true" ng-model="item.puntuacion" min="0" max="5"></td> <!-- Input para puntuación -->
                                     <td ng-show="!esPlan"><input type="hidden" value="{{item.id}}"></td> <!-- Campo oculto con el ID -->
-                                    <td ng-if="item.puntuacion == 1">
-                                        <button class="btn btn-primary btn-xs" ng-click="generarCertificado(item)">
-                                            <span class="glyphicon glyphicon-download"></span> Descargar Certificado
-                                        </button>
-                                    </td>
                                 </tr>
                             }
                         </tbody>
