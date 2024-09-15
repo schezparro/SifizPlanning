@@ -20,8 +20,8 @@ namespace SifizPlanning
             //RecurringJob.AddOrUpdate("ActualizarCapacitaciones", () => hangfireController.ActualizarCapacitaciones(), "30 2 * * *", TimeZoneInfo.Local);
             //RecurringJob.AddOrUpdate("CerrarTicketsResueltos", () => hangfireController.CerrarTicketsResueltos(), "0 3 * * *", TimeZoneInfo.Local);
             //RecurringJob.AddOrUpdate("SetDataInfoTickets", () => hangfireController.SetDataInfoTickets(), "30 3 * * *", TimeZoneInfo.Local);
-            
-            
+
+
             //RecurringJob.AddOrUpdate("TareaReporteHorasMantenimiento", () => hangfireController.TareaReporteHorasMantenimiento(), Cron.Monthly(), TimeZoneInfo.Local);
             //RecurringJob.AddOrUpdate("TareaReporteIncidencias", () => hangfireController.TareaReporteIncidencias(), Cron.Monthly(), TimeZoneInfo.Local);
             //RecurringJob.AddOrUpdate("TareaReporteEstadoTicketsColaborador", () => hangfireController.TareaReporteEstadoTicketsColaborador(), Cron.Daily(), TimeZoneInfo.Local);

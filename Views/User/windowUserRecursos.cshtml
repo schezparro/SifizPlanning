@@ -27,7 +27,7 @@
                 <th>Detalle</th>
                 <th>Fecha</th>
                 <th>Modulo</th>
-                <th ng-show="!esPlan && esUserAllow">Url</th>
+                <th ng-show="!esPlan">Url</th>
                 <th>Link Meet</th>
                 <th ng-show="!esPlan && esUserAllow">Registro Asistencia</th>
                 <th ng-show="esPlan && esUserAllow">Asistencia</th>
@@ -42,16 +42,16 @@
                 <td>{{recurso.detalle | limitTo:100}}</td>
                 <td>{{recurso.fecha | strDateToStr}}</td>
                 <td>{{ recurso.modulo === 'N//A' ? 'Otros' : recurso.modulo }}</td>
-                <td ng-show="!esPlan && esUserAllow">
+                <td ng-show="!esPlan">
                     <div ng-if="!recurso.editandoUrl" style="display: inline-flex; align-items: center;">
                         <a class="btn btn-success btn-xs" target="_blank" href="{{recurso.adjunto}}" ng-show="recurso.adjunto != ''">
                             <span class="glyphicon glyphicon-link"></span> Url
                         </a>
-                        <button class="btn btn-warning btn-xs" ng-click="editarUrl(recurso)" style="margin-left: 5px;">
+                        <button class="btn btn-warning btn-xs" ng-click="editarUrl(recurso)" style="margin-left: 5px;" ng-if="esUserAllow">
                             <span class="glyphicon glyphicon-pencil"></span>
                         </button>
                     </div>
-                    <div ng-if="recurso.editandoUrl" style="display: inline-flex; align-items: center;">
+                    <div ng-if="recurso.editandoUrl && esUserAllow" style="display: inline-flex; align-items: center;">
                         <input type="text" class="form-control" ng-model="recurso.adjunto" style="flex-grow: 1; margin-right: 5px;" />
                         <button class="btn btn-success btn-xs" ng-click="guardarUrl(recurso)" style="margin-right: 5px;">
                             <span class="glyphicon glyphicon-ok"></span>
@@ -64,7 +64,7 @@
                 <td>
                     <a href="{{recurso.url}}" target="_blank">{{recurso.url}}</a>
                 </td>
-                <td ng-show="!esPlan && esUserAllow" >
+                <td ng-show="!esPlan && esUserAllow">
                     <a class="btn btn-primary btn-xs" ng-click="mostrarRegistroAsistencia(recurso)">
                         <span class="glyphicon glyphicon-calendar"></span> Registro Asistencia
                     </a>
