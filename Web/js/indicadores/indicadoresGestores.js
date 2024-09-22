@@ -115,9 +115,9 @@
     };
 
     $scope.getTotal = function (column) {
-        return $scope.ticketIntervaloGestores.reduce(function (total, ticket) {
+        return parseFloat($scope.ticketIntervaloGestores.reduce(function (total, ticket) {
             return total + ticket[column];
-        }, 0);
+        }, 0).toFixed(2)).toString();
     };
 
 
@@ -138,20 +138,20 @@
             }
         });
     };
-
     // Función para obtener el total por columna
     $scope.getTotalPorColumna = function (label) {
-        return Object.values($scope.ticketsTiempoInvertidoAgrupado).reduce(function (total, tiempos) {
+        return parseFloat(Object.values($scope.ticketsTiempoInvertidoAgrupado).reduce(function (total, tiempos) {
             return total + (tiempos[label] || 0);
-        }, 0);
+        }, 0).toFixed(2)).toString();
     };
 
     // Función para obtener el total general
     $scope.getTotalGeneral = function () {
-        return $scope.ticketsTiempoInvertidoLabels.reduce(function (total, label) {
+        return parseFloat($scope.ticketsTiempoInvertidoLabels.reduce(function (total, label) {
             return total + parseFloat($scope.getTotalPorColumna(label));
-        }, 0).toFixed(2);
+        }, 0).toFixed(2)).toString();
     };
+
 
 
     $scope.darTicketAnalizadosGestores = function () {

@@ -308,6 +308,7 @@ namespace SifizPlanning.Controllers
                     int mes = Int32.Parse(fechasFin[1]);
                     int anno = Int32.Parse(fechasFin[2]);
                     fFin = new DateTime(anno, mes, dia);
+                    fFin = fFin.AddDays(1);
                 }
                 else
                 {
@@ -1601,7 +1602,6 @@ namespace SifizPlanning.Controllers
                     {
                         Cliente = ticket.Cliente,
                         FechaIngreso = ticket.FechaIngreso.Value,
-                        HorasEmpleadas = ticket.HorasEmpleadas.HasValue ? (ticket.HorasEmpleadas.Value - DateTime.MinValue).TotalHours : 0,
                         GestorServicio = db.GestorServicios.FirstOrDefault(s => s.cliente != null && s.cliente.Descripcion == ticket.Cliente)
                     })
                     .GroupBy(ticket => new
@@ -1617,7 +1617,7 @@ namespace SifizPlanning.Controllers
                         TiempoMinutos = group.Count() * 5,
                         TiempoHoras = Math.Round((double)(group.Count() * 5) / 60, 2),
                         ClientesAtendidos = group.Select(ticket => ticket.Cliente).Distinct().Count(),
-                        CarteraAsignada = db.GestorServicios.Where(s=> (s.colaborador.persona.Nombre1 + " " + s.colaborador.persona.Apellido1) == group.Key.Gestor).Count(),
+                        CarteraAsignada = db.GestorServicios.Count(s => (s.colaborador.persona.Nombre1 + " " + s.colaborador.persona.Apellido1) == group.Key.Gestor),
                     })
                     .ToList();
 
@@ -1665,7 +1665,6 @@ namespace SifizPlanning.Controllers
                     {
                         Cliente = tiempo.Cliente,
                         FechaIngreso = tiempo.FechaIngreso.Value,
-                        HorasEmpleadas = tiempo.HorasEmpleadas.HasValue ? (tiempo.HorasEmpleadas.Value - DateTime.MinValue).TotalHours : 0,
                         GestorServicio = db.GestorServicios.FirstOrDefault(s => s.cliente != null && s.cliente.Descripcion == tiempo.Cliente)
                     })
                     .GroupBy(tiempo => new
@@ -1681,7 +1680,7 @@ namespace SifizPlanning.Controllers
                         Gestor = group.Key.Gestor,
                         Mes = group.Key.Mes,
                         Anio = group.Key.Año,
-                        TiempoTotal = Math.Round(group.Sum(tiempo => tiempo.HorasEmpleadas), 1) // Redondear a 1 decimal
+                        TiempoTotal = Math.Round((double)(group.Count() * 5) / 60, 2)
                     })
                     .ToList();
 
