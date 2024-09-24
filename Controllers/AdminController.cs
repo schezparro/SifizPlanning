@@ -3607,6 +3607,38 @@ f in db.FotoColaborador on t equals f.colaborador
 
         [HttpPost]
         [Authorize]
+        public ActionResult DarFullColaboradores()
+        {
+            try
+            {
+                var colaboradores = (from colab in db.Colaborador
+                                     where colab.persona.usuario.FirstOrDefault().EstaActivo == 1
+                                     && colab.persona.Nombre1 != "ADMIN"
+                                     orderby colab.persona.Nombre1, colab.persona.Apellido1
+                                     select new
+                                     {
+                                         id = colab.Secuencial,
+                                         nombre = colab.persona.Nombre1 + " " + colab.persona.Apellido1
+                                     }).ToList();
+
+                return Json(new
+                {
+                    success = true,
+                    colaboradores = colaboradores
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        [Authorize]
         public ActionResult DarFuncionalidades(string filtro = "")
         {
             List<object> tiposContrato = new List<object>();

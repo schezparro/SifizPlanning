@@ -823,46 +823,55 @@
                         plugins: [ChartDataLabels]
                     });
 
-                    //Grafico de pastel
                     var tendenciaChartCtx1 = document.getElementById('ticketPorCategoriaPastelChartAlDia').getContext('2d');
                     $scope.ticketPorCategoriaPastelChartAlDia = new Chart(tendenciaChartCtx1, {
                         type: 'doughnut',
                         data: {
-                            labels: cantidades,
+                            labels: categorias.map((categoria, index) => {
+                                let sum = cantidades.reduce((a, b) => a + b, 0);
+                                let percentage = ((cantidades[index] / sum) * 100).toFixed(2) + "%";
+                                return `${categoria}: ${percentage}`;
+                            }),
                             datasets: [{
                                 backgroundColor: coloresAleatorios,
                                 hoverBorderColor: 'white',
-                                data: cantidades,
-                                datalabels: {
-                                    labels: {
-                                        name: {
-                                            align: 'center',
-                                            anchor: 'center',
-                                            color: function (ctx) {
-                                                return ctx.dataset.backgroundColor;
-                                            },
-                                            font: { size: 16 },
-                                            formatter: function (value, ctx) {
-                                                return categorias[ctx.dataIndex];
-                                            }
-                                        }
-                                    }
-                                }
+                                data: cantidades
                             }]
                         },
                         options: {
                             plugins: {
-                                datalabels: {
-                                    color: 'white',
-                                    display: function (ctx) {
-                                        return ctx.dataset.data[ctx.dataIndex] > 10;
-                                    },
-                                    font: {
-                                        weight: 'bold',
-                                    },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            let sum = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            let percentage = ((context.raw / sum) * 100).toFixed(2) + "%";
+                                            return context.label + ": " + percentage;
+                                        }
+                                    }
                                 }
                             },
-                            plugins: [ChartDataLabels]
+                            animation: false,
+                            events: [],
+                            onClick: null,
+                            onHover: null,
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            legend: {
+                                display: true,
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Distribución de Tickets por Categoría'
+                            },
+                            layout: {
+                                padding: {
+                                    left: 10,
+                                    right: 10,
+                                    top: 10,
+                                    bottom: 10
+                                }
+                            }
                         }
                     });
 
@@ -2496,7 +2505,7 @@
         if (data.success === true) {
             $scope.clienteOtros = data.clientes;
             $('#select-cliente-otros-indicadores').select2({
-                placeholder: 'Seleccione clientes',
+                placeholder: 'Seleccione...',
                 allowClear: true,
                 multiple: true,
                 closeOnSelect: false,
@@ -2520,7 +2529,7 @@
         if (data.success === true) {
             $scope.prioridades = data.prioridades;
             $('#select-prioridad-otros-indicadores').select2({
-                placeholder: 'Seleccione prioridades',
+                placeholder: 'Seleccione...',
                 allowClear: true,
                 multiple: true,
                 closeOnSelect: false,
@@ -2543,7 +2552,7 @@
         if (data.success === true) {
             $scope.categorias = data.categorias;
             $('#select-categoria-otros-indicadores').select2({
-                placeholder: 'Seleccione categorías',
+                placeholder: 'Seleccione...',
                 allowClear: true,
                 multiple: true,
                 closeOnSelect: false,

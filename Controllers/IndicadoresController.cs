@@ -146,9 +146,10 @@ namespace SifizPlanning.Controllers
                     // Si fechaFin es nula o vacía, tomar el día actual
                     fFin = DateTime.Now;
                 }
+                fFin = fFin.AddDays(1);
 
                 var ticketsQueryN = db.InfoTickets.AsNoTracking()
-                                             .Where(it => it.FechaIngreso.Value >= fInicio && it.FechaIngreso.Value <= fFin)
+                                             .Where(it => it.FechaIngreso.Value >= fInicio && it.FechaIngreso.Value <= fFin && it.Estado != "ANULADO" && it.Estado != "RECHAZADO")
                                              .ToList();
 
                 // Convertir la consulta a una lista para trabajar con ella en memoria
@@ -228,12 +229,12 @@ namespace SifizPlanning.Controllers
                     // Si fechaFin es nula o vacía, tomar el día actual
                     fFin = DateTime.Now;
                 }
+                fFin = fFin.AddDays(1);
 
                 var ticketsQueryC = from ticket in db.InfoTickets
                                     where ticket.FechaIngreso.Value >= fInicio
                                        && ticket.FechaIngreso.Value <= fFin
                                        && ticket.Estado == "CERRADO"
-                                       && ticket.FechaCierre != null
                                     select ticket;
 
                 // Convertir la consulta a una lista para trabajar con ella en memoria
@@ -307,6 +308,7 @@ namespace SifizPlanning.Controllers
                     int mes = Int32.Parse(fechasFin[1]);
                     int anno = Int32.Parse(fechasFin[2]);
                     fFin = new DateTime(anno, mes, dia);
+                    fFin = fFin.AddDays(1);
                 }
                 else
                 {
@@ -563,11 +565,11 @@ namespace SifizPlanning.Controllers
                 }
 
                 var ticketsQueryPRN = (from ticket in db.InfoTickets
-                                      where ticket.FechaIngreso != null
-                                         && ticket.FechaIngreso.Value >= fInicio
-                                         && ticket.FechaIngreso.Value <= fFin
-                                         && ticket.Tipo == "REQUERIMIENTO NUEVO"
-                                      select ticket).ToList();
+                                       where ticket.FechaIngreso != null
+                                          && ticket.FechaIngreso.Value >= fInicio
+                                          && ticket.FechaIngreso.Value <= fFin
+                                          && ticket.Tipo == "REQUERIMIENTO NUEVO"
+                                       select ticket).ToList();
 
                 // Convertir la consulta a una lista para trabajar con ella en memoria
                 List<InfoTickets> ticketsListPRN = ticketsQueryPRN.ToList();
@@ -705,18 +707,67 @@ namespace SifizPlanning.Controllers
 
                 List<InfoTickets> ticketsListTEGAD = ticketsQueryTEGAD.ToList();
 
-                var groupedTicketsTEGAD = ticketsListTEGAD
-                    .GroupBy(ticket => CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(
-                        ticket.FechaIngreso.Value,
-                        CalendarWeekRule.FirstDay,
-                        DayOfWeek.Monday))
+                // Encontrar la fecha más antigua y la más reciente en los tickets
+                var fechaInicial = ticketsQueryTEGAD.Min(t => t.FechaIngreso.Value);
+
+                // Función para obtener el número de semana
+                Func<DateTime, int> GetWeekNumber = (date) =>
+                {
+                    return CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
+                        date,
+                        CalendarWeekRule.FirstFourDayWeek,
+                        DayOfWeek.Monday);
+                };
+
+                // Agrupar los tickets por año y semana
+                var groupedTickets = ticketsQueryTEGAD
+                    .GroupBy(ticket => new
+                    {
+                        Year = ticket.FechaIngreso.Value.Year,
+                        Week = GetWeekNumber(ticket.FechaIngreso.Value)
+                    })
                     .Select(g => new
                     {
-                        Semana = g.Key,
+                        g.Key.Year,
+                        g.Key.Week,
                         Cantidad = g.Count(),
-                        Descripcion = "AL " + g.Max(t => t.FechaIngreso.Value).ToString("dd/MM/yyyy")
+                        UltimaFecha = g.Max(t => t.FechaIngreso.Value)
                     })
-                    .OrderBy(x => x.Semana)
+                    .ToList();
+
+                // Crear una lista de todas las semanas desde la fecha inicial hasta la actual
+                var allWeeks = Enumerable.Range(0, (int)(fActual - fechaInicial).TotalDays / 7 + 1)
+                    .Select(i => fechaInicial.AddDays(i * 7))
+                    .Select(date => new
+                    {
+                        Year = date.Year,
+                        Week = GetWeekNumber(date),
+                        Date = date
+                    })
+                    .Distinct()
+                    .ToList();
+
+                // Combinar todas las semanas con los tickets agrupados
+                var groupedTicketsTEGAD = allWeeks
+                    .GroupJoin(groupedTickets,
+                        aw => new { aw.Year, aw.Week },
+                        gt => new { gt.Year, gt.Week },
+                        (aw, gt) => new
+                        {
+                            aw.Year,
+                            aw.Week,
+                            Cantidad = gt.Sum(x => x.Cantidad),
+                            UltimaFecha = gt.Any() ? gt.Max(x => x.UltimaFecha) : aw.Date.AddDays(6)
+                        })
+                    .Where(x => x.Cantidad > 0) // Excluir semanas con cantidad 0
+                    .OrderByDescending(x => x.Year)
+                    .ThenByDescending(x => x.Week)
+                    .Select(x => new
+                    {
+                        Semana = x.Week,
+                        Cantidad = x.Cantidad,
+                        Descripcion = $"AL {x.UltimaFecha:dd/MM/yyyy}"
+                    })
                     .ToList();
 
                 var totalCantidadesTEGAD = groupedTicketsTEGAD.Sum(ticket => ticket.Cantidad);
@@ -1551,7 +1602,6 @@ namespace SifizPlanning.Controllers
                     {
                         Cliente = ticket.Cliente,
                         FechaIngreso = ticket.FechaIngreso.Value,
-                        HorasEmpleadas = ticket.HorasEmpleadas.HasValue ? (ticket.HorasEmpleadas.Value - DateTime.MinValue).TotalHours : 0,
                         GestorServicio = db.GestorServicios.FirstOrDefault(s => s.cliente != null && s.cliente.Descripcion == ticket.Cliente)
                     })
                     .GroupBy(ticket => new
@@ -1564,10 +1614,10 @@ namespace SifizPlanning.Controllers
                     {
                         Gestor = group.Key.Gestor,
                         NumeroTickets = group.Count(),
-                        TiempoMinutos = Math.Round(group.Sum(ticket => ticket.HorasEmpleadas * 60), 2),
-                        TiempoHoras = Math.Round(group.Sum(ticket => ticket.HorasEmpleadas), 2),
+                        TiempoMinutos = group.Count() * 5,
+                        TiempoHoras = Math.Round((double)(group.Count() * 5) / 60, 2),
                         ClientesAtendidos = group.Select(ticket => ticket.Cliente).Distinct().Count(),
-                        CarteraAsignada = group.Select(ticket => ticket.Cliente).Distinct().Count() // Ajusta según tus necesidades
+                        CarteraAsignada = db.GestorServicios.Count(s => (s.colaborador.persona.Nombre1 + " " + s.colaborador.persona.Apellido1) == group.Key.Gestor),
                     })
                     .ToList();
 
@@ -1615,7 +1665,6 @@ namespace SifizPlanning.Controllers
                     {
                         Cliente = tiempo.Cliente,
                         FechaIngreso = tiempo.FechaIngreso.Value,
-                        HorasEmpleadas = tiempo.HorasEmpleadas.HasValue ? (tiempo.HorasEmpleadas.Value - DateTime.MinValue).TotalHours : 0,
                         GestorServicio = db.GestorServicios.FirstOrDefault(s => s.cliente != null && s.cliente.Descripcion == tiempo.Cliente)
                     })
                     .GroupBy(tiempo => new
@@ -1631,7 +1680,7 @@ namespace SifizPlanning.Controllers
                         Gestor = group.Key.Gestor,
                         Mes = group.Key.Mes,
                         Anio = group.Key.Año,
-                        TiempoTotal = Math.Round(group.Sum(tiempo => tiempo.HorasEmpleadas), 1) // Redondear a 1 decimal
+                        TiempoTotal = Math.Round((double)(group.Count() * 5) / 60, 2)
                     })
                     .ToList();
 
@@ -1703,6 +1752,52 @@ namespace SifizPlanning.Controllers
             }
         }
 
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public async Task<ActionResult> DarTicketsAnuladosRechazadosIndicadores(string fechaInicio, string fechaFin, int secuencialGestor)
+        {
+            try
+            {
+                DateTime fInicio = DateTime.ParseExact(fechaInicio, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                DateTime fFin = DateTime.ParseExact(fechaFin, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+                var ticketsPorMes = from ticket in db.InfoTickets
+                                    where ticket.FechaIngreso.HasValue &&
+                                          ticket.FechaIngreso.Value >= fInicio &&
+                                          ticket.FechaIngreso.Value <= fFin
+                                    let gestorServicio = db.GestorServicios.FirstOrDefault(s => s.cliente != null && s.cliente.Descripcion == ticket.Cliente)
+                                    let nombreGestor = gestorServicio != null && gestorServicio.colaborador != null && gestorServicio.colaborador.persona != null ? gestorServicio.colaborador.persona.Nombre1 + " " + gestorServicio.colaborador.persona.Apellido1 : "Desconocido"
+                                    where secuencialGestor == 0 || (gestorServicio != null && gestorServicio.Secuencial == secuencialGestor)
+                                    group ticket by new { Gestor = nombreGestor, Anio = ticket.FechaIngreso.Value.Year, Mes = ticket.FechaIngreso.Value.Month } into g
+                                    select new
+                                    {
+                                        g.Key.Gestor,
+                                        g.Key.Anio,
+                                        g.Key.Mes,
+                                        Ingresado = g.Count(),
+                                        AnuladoRechazado = g.Count(t => t.Estado == "Anulado" || t.Estado == "Rechazado"),
+                                        PorcentajeAnuladoRechazado = Math.Round((double)g.Count(t => t.Estado == "Anulado" || t.Estado == "Rechazado") / g.Count() * 100)
+                                    };
+
+                var listaTicketsPorMes = ticketsPorMes.ToList();
+                var resp = new
+                {
+                    success = true,
+                    anuladosRechazados = listaTicketsPorMes
+                };
+
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
 
 
         [HttpPost]

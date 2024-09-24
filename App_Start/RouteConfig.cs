@@ -1031,6 +1031,12 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+               name: "GenerarCertificado",
+               url: "user/generar-certificado/{id}",
+               defaults: new { controller = "User", action = "GenerarCertificado", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "DarTipoModulo",
                 url: "user/tipo-modulo/{id}",
                 defaults: new { controller = "User", action = "DarTipoModulo", id = UrlParameter.Optional }
@@ -1160,6 +1166,18 @@ namespace SifizPlanning
                 name: "GuardarRecurso",
                 url: "user/guardar-recurso/{id}",
                 defaults: new { controller = "User", action = "GuardarRecurso", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "GuardarPlanRecurso",
+                url: "user/guardar-plan-recurso/{id}",
+                defaults: new { controller = "User", action = "GuardarPlanRecurso", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "EditarPlanRecurso",
+                url: "user/editar-plan-recurso/{id}",
+                defaults: new { controller = "User", action = "EditarPlanRecurso", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(
@@ -2301,6 +2319,12 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+               name: "DarTicketsAnuladosRechazadosIndicadores",
+               url: "indicadores/dar-tickets-anulados-rechazados-indicadores/{id}",
+               defaults: new { controller = "Indicadores", action = "DarTicketsAnuladosRechazadosIndicadores", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                name: "DarTicketsAnalisadosGestores",
                url: "indicadores/dar-tickets-analizados-gestores/{id}",
                defaults: new { controller = "Indicadores", action = "DarTicketsAnalisadosGestores", id = UrlParameter.Optional }
@@ -2504,6 +2528,12 @@ namespace SifizPlanning
                 name: "DarColaboradores",
                 url: "catalogos/dar-colaboradores/{id}",
                 defaults: new { controller = "Admin", action = "DarColaboradores", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarFullColaboradores",
+                url: "catalogos/dar-full-colaboradores/{id}",
+                defaults: new { controller = "Admin", action = "DarFullColaboradores", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(

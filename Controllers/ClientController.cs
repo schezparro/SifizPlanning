@@ -49,55 +49,57 @@ namespace SifizPlanning.Controllers
 
 			if(persona.persona_cliente != null)
 			{
-				var garantias = (from mt in db.MotivoTrabajo
-								 join tt in db.TipoMotivoTrabajo on mt.SecuencialTipoMotivoTrabajo equals tt.Secuencial
-								 join cl in db.Cliente on mt.SecuencialCliente equals cl.Secuencial
-								 where mt.EstaActivo == 1 && cl.Descripcion == persona.persona_cliente.cliente.Descripcion /*&& tt.Codigo.ToString().ToUpper().Equals("PENDIENTES")*/
-								 orderby mt.Codigo
-								 select new
-								 {
-									 id = mt.Secuencial,
-									 codigo = mt.Codigo,
-									 fechaVencimiento = mt.motivoTrabajoInformacionAdicional != null ? DbFunctions.AddDays(mt.motivoTrabajoInformacionAdicional.FechaProduccion, mt.motivoTrabajoInformacionAdicional.DiasGarantia) : (DateTime?)null,
-									 diasRestantes = mt.motivoTrabajoInformacionAdicional != null ? DbFunctions.DiffDays(DateTime.Now, mt.motivoTrabajoInformacionAdicional.FechaProduccion) + mt.motivoTrabajoInformacionAdicional.DiasGarantia : 0,
-									 entregables = (from e in mt.entregableMotivoTrabajo
-													where e.EstaActivo == 1
-													select new
-													{
-														id = e.Secuencial,
-														descripcion = e.Nombre,
-														e.FechaProduccion,
-														FechaVencimiento = DbFunctions.AddDays(e.FechaProduccion, mt.motivoTrabajoInformacionAdicional != null ? mt.motivoTrabajoInformacionAdicional.DiasGarantia : 0),
-														DiasRestantes = DbFunctions.DiffDays(DateTime.Now, DbFunctions.AddDays(e.FechaProduccion, mt.motivoTrabajoInformacionAdicional != null ? mt.motivoTrabajoInformacionAdicional.DiasGarantia : 0))
-													}).OrderByDescending(x => x.DiasRestantes).ToList(),
-									 descripcion = mt.Codigo + " __ " + "Fecha Vencimiento GT: " + (mt.motivoTrabajoInformacionAdicional != null ? DbFunctions.AddDays(mt.motivoTrabajoInformacionAdicional.FechaProduccion, mt.motivoTrabajoInformacionAdicional.DiasGarantia) : (DateTime?)null).ToString() + " __ " + mt.Descripcion
-								 }).ToList();
+                var garantias = (from mt in db.MotivoTrabajo
+                                 join tt in db.TipoMotivoTrabajo on mt.SecuencialTipoMotivoTrabajo equals tt.Secuencial
+                                 join cl in db.Cliente on mt.SecuencialCliente equals cl.Secuencial
+                                 where mt.EstaActivo == 1 && cl.Descripcion == persona.persona_cliente.cliente.Descripcion
+                                 orderby mt.Codigo
+                                 select new
+                                 {
+                                     id = mt.Secuencial,
+                                     codigo = mt.Codigo,
+                                     fechaVencimiento = mt.motivoTrabajoInformacionAdicional != null ? DbFunctions.AddDays(mt.motivoTrabajoInformacionAdicional.FechaProduccion, mt.motivoTrabajoInformacionAdicional.DiasGarantia) : (DateTime?)null,
+                                     diasRestantes = mt.motivoTrabajoInformacionAdicional != null ? DbFunctions.DiffDays(DateTime.Now, mt.motivoTrabajoInformacionAdicional.FechaProduccion) + mt.motivoTrabajoInformacionAdicional.DiasGarantia : 0,
+                                     entregables = (from e in mt.entregableMotivoTrabajo
+                                                    where e.EstaActivo == 1
+                                                    select new
+                                                    {
+                                                        id = e.Secuencial,
+                                                        descripcion = e.Nombre,
+                                                        e.FechaProduccion,
+                                                        //FechaVencimiento = DbFunctions.AddDays(e.FechaProduccion, mt.motivoTrabajoInformacionAdicional != null ? mt.motivoTrabajoInformacionAdicional.DiasGarantia : 0),
+                                                        //DiasRestantes = DbFunctions.DiffDays(DateTime.Now, DbFunctions.AddDays(e.FechaProduccion, mt.motivoTrabajoInformacionAdicional != null ? mt.motivoTrabajoInformacionAdicional.DiasGarantia : 0))
+                                                        FechaVencimiento = DbFunctions.AddDays(e.FechaProduccion, e.DiasGarantia != null ? e.DiasGarantia : (mt.motivoTrabajoInformacionAdicional != null ? mt.motivoTrabajoInformacionAdicional.DiasGarantia : 0)),
+                                                        DiasRestantes = DbFunctions.DiffDays(DateTime.Now, DbFunctions.AddDays(e.FechaProduccion, e.DiasGarantia != null ? e.DiasGarantia : (mt.motivoTrabajoInformacionAdicional != null ? mt.motivoTrabajoInformacionAdicional.DiasGarantia : 0)))
+                                                    }).OrderByDescending(x => x.DiasRestantes).ToList(),
+                                     descripcion = mt.Codigo + " __ " + "Fecha Vencimiento GT: " + (mt.motivoTrabajoInformacionAdicional != null ? DbFunctions.AddDays(mt.motivoTrabajoInformacionAdicional.FechaProduccion, mt.motivoTrabajoInformacionAdicional.DiasGarantia) : (DateTime?)null).ToString() + " __ " + mt.Descripcion
+                                 }).ToList();
 
+                garantias = (from g in garantias
+                             select new
+                             {
+                                 id = g.id,
+                                 codigo = g.codigo,
+                                 fechaVencimiento = g.fechaVencimiento,
+                                 diasRestantes = g.diasRestantes,
+                                 entregables = (from e in g.entregables
+                                                select new
+                                                {
+                                                    id = e.id,
+                                                    descripcion = e.descripcion,
+                                                    e.FechaProduccion,
+                                                    FechaVencimiento = e.FechaVencimiento != null ? e.FechaVencimiento : g.fechaVencimiento,
+                                                    DiasRestantes = e.DiasRestantes != null ? e.DiasRestantes : g.diasRestantes
+                                                }).OrderByDescending(x => x.DiasRestantes).ToList(),
+                                 descripcion = g.descripcion
+                             }).ToList();
 
-				garantias = (from g in garantias
-							 select new
-							 {
-								 id = g.id,
-								 codigo = g.codigo,
-								 fechaVencimiento = g.fechaVencimiento,
-								 diasRestantes = g.diasRestantes,
-								 entregables = (from e in g.entregables
-												select new
-												{
-													id = e.id,
-													descripcion = e.descripcion,
-													e.FechaProduccion,
-													FechaVencimiento = e.FechaVencimiento != null ? e.FechaVencimiento : g.fechaVencimiento,
-													DiasRestantes = e.DiasRestantes != null ? e.DiasRestantes : g.diasRestantes
-												}).OrderByDescending(x => x.DiasRestantes).ToList(),
-								 descripcion = g.descripcion
-							 }).ToList();
+                garantias = (from c in garantias
+                             //where c.diasRestantes > 0 || c.entregables.Where(s => s.DiasRestantes > 0).Count() > 0
+                             where c.entregables.Where(s => s.DiasRestantes > 0).Count() > 0
+                             select c).ToList();
 
-				garantias = (from c in garantias
-							 where c.diasRestantes > 0 || c.entregables.Where(s => s.DiasRestantes > 0).Count() > 0
-							 select c).ToList();
-
-				garantias = (from g in garantias
+                garantias = (from g in garantias
 							 select new
 							 {
 								 id = g.id,

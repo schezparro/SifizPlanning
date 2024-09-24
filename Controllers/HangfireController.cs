@@ -13,6 +13,7 @@ using System.Web.Mvc;
 using System.Web.Hosting;
 using SpreadsheetLight.Charts;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace SifizPlanning.Controllers
 {
@@ -1946,7 +1947,7 @@ namespace SifizPlanning.Controllers
                         .AsNoTracking()
                         .ToDictionary(c => c.SecuencialPersona);
 
-                    var infoTickets = new List<InfoTickets>();
+                    var infoTickets = new ConcurrentDictionary<int, InfoTickets>();
 
                     Parallel.ForEach(tickets, item =>
                     {
@@ -1992,13 +1993,13 @@ namespace SifizPlanning.Controllers
                         infoTicket.HorasEntrega = DateTime.MinValue;
                         infoTicket.HorasPrueba = DateTime.MinValue;
 
-                        lock (infoTickets)
+                        if (!infoTickets.TryAdd(infoTicket.Id, infoTicket))
                         {
-                            infoTickets.Add(infoTicket);
+                            Console.WriteLine($"Duplicate ticket ID found: {infoTicket.Id}");
                         }
                     });
 
-                    db.InfoTickets.AddRange(infoTickets);
+                    db.InfoTickets.AddRange(infoTickets.Values);
                     db.SaveChanges();
                     transaction.Commit();
                 }
@@ -2229,6 +2230,34 @@ namespace SifizPlanning.Controllers
                     msg = e.Message
                 };
                 throw;
+            }
+        }
+
+        public ActionResult ActualizarCapacitaciones()
+        {
+            try
+            {
+                DateTime hoy = DateTime.Today;
+                DateTime manana = hoy.AddDays(1);
+
+                var capacitaciones = db.Recursos
+                    .Where(s => s.EsPlan == 1 && s.Fecha >= hoy && s.Fecha < DbFunctions.TruncateTime(manana))
+                    .ToList();
+
+                int filasActualizadas = 0;
+                foreach (var item in capacitaciones)
+                {
+                    item.EsPlan = 0;
+                    filasActualizadas++;
+                }
+
+                db.SaveChanges();
+
+                return Json(new { success = true, filasActualizadas = filasActualizadas }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message }, JsonRequestBehavior.AllowGet);
             }
         }
 
