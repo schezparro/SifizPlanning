@@ -15,11 +15,11 @@ namespace SifizPlanning
         HangfireController hangfireController = new HangfireController();
         public void Start()
         {
-            //RecurringJob.AddOrUpdate("CalcularSemaforoTciket", () => hangfireController.CalcularSemaforoTciket(), "0 * * * *", TimeZoneInfo.Local);
-            //RecurringJob.AddOrUpdate("CalcularResolucionSemaforoTciket", () => hangfireController.CalcularResolucionSemaforoTciket(), "5 * * * *", TimeZoneInfo.Local);
-            //RecurringJob.AddOrUpdate("ActualizarCapacitaciones", () => hangfireController.ActualizarCapacitaciones(), "30 2 * * *", TimeZoneInfo.Local);
-            //RecurringJob.AddOrUpdate("CerrarTicketsResueltos", () => hangfireController.CerrarTicketsResueltos(), "0 3 * * *", TimeZoneInfo.Local);
-            //RecurringJob.AddOrUpdate("SetDataInfoTickets", () => hangfireController.SetDataInfoTickets(), "30 3 * * *", TimeZoneInfo.Local);
+            RecurringJob.AddOrUpdate("CalcularSemaforoTciket", () => hangfireController.CalcularSemaforoTciket(), "0 * * * *", TimeZoneInfo.Local);
+            RecurringJob.AddOrUpdate("CalcularResolucionSemaforoTciket", () => hangfireController.CalcularResolucionSemaforoTciket(), "5 * * * *", TimeZoneInfo.Local);
+            RecurringJob.AddOrUpdate("ActualizarCapacitaciones", () => hangfireController.ActualizarCapacitaciones(), "30 2 * * *", TimeZoneInfo.Local);
+            RecurringJob.AddOrUpdate("CerrarTicketsResueltos", () => hangfireController.CerrarTicketsResueltos(), "0 3 * * *", TimeZoneInfo.Local);
+            RecurringJob.AddOrUpdate("SetDataInfoTickets", () => hangfireController.SetDataInfoTickets(), "30 3 * * *", TimeZoneInfo.Local);
 
 
             //RecurringJob.AddOrUpdate("TareaReporteHorasMantenimiento", () => hangfireController.TareaReporteHorasMantenimiento(), Cron.Monthly(), TimeZoneInfo.Local);
