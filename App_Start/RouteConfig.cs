@@ -1121,6 +1121,12 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "ConvocadosRecurso",
+                url: "user/dar-datos-convocados-recursos/{id}",
+                defaults: new { controller = "User", action = "ConvocadosRecurso", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "DarCategoriaRecurso",
                 url: "user/categoria-recursos/{id}",
                 defaults: new { controller = "User", action = "DarCategoriaRecurso", id = UrlParameter.Optional }
@@ -1184,6 +1190,12 @@ namespace SifizPlanning
                 name: "GuardarAsistenciaRecurso",
                 url: "user/guardar-asistencia-recurso/{id}",
                 defaults: new { controller = "User", action = "GuardarAsistenciaRecurso", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "GuardarConvocadosRecurso",
+                url: "user/guardar-asignados-recurso/{id}",
+                defaults: new { controller = "User", action = "GuardarConvocadosRecurso", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(

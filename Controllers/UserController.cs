@@ -4821,7 +4821,7 @@ r in db.Rol on ur.rol equals r
                 var asistenciaRecurso = (from ra in db.RecursosAsistencia
                                          join r in db.Recursos on ra.SecuencialRecurso equals r.Secuencial
                                          join c in db.Colaborador on ra.SecuencialColaborador equals c.Secuencial
-                                         where ra.SecuencialRecurso == secuencialRecurso
+                                         where ra.SecuencialRecurso == secuencialRecurso && ra.Convocado == 1
                                          orderby c.persona.Nombre1, c.persona.Apellido1
                                          select new
                                          {
@@ -4832,6 +4832,47 @@ r in db.Rol on ur.rol equals r
                                              asistencia = ra.Asistencia == 1 ? true : false,
                                              puntuacion = ra.Puntuacion
                                          }).ToList();
+                var result = new
+                {
+                    success = true,
+                    datos = asistenciaRecurso
+                };
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+                var result = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(result);
+            }
+        }
+
+        //RECURSOS DE LOS USUARIOS
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult ConvocadosRecurso(int secuencialRecurso)
+        {
+
+            try
+            {
+                var asistenciaRecurso = (from ra in db.RecursosAsistencia
+                                         join r in db.Recursos on ra.SecuencialRecurso equals r.Secuencial
+                                         join c in db.Colaborador on ra.SecuencialColaborador equals c.Secuencial
+                                         where ra.SecuencialRecurso == secuencialRecurso
+                                         orderby c.persona.Nombre1, c.persona.Apellido1
+                                         select new
+                                         {
+                                             id = ra.Secuencial,
+                                             idColaborador = ra.SecuencialColaborador,
+                                             nombre = c.persona.Nombre1 + " " + c.persona.Apellido1,
+                                             asignado = true,
+                                             asistencia = ra.Asistencia == 1 ? true : false,
+                                             puntuacion = ra.Puntuacion,
+                                             convocado = ra.Convocado == 1 ? true : false
+                                         }).Distinct().ToList();
                 var result = new
                 {
                     success = true,
@@ -4914,6 +4955,7 @@ r in db.Rol on ur.rol equals r
                             SecuencialRecurso = nuevoRecurso.Secuencial,
                             Asistencia = asistencia == true ? 1 : 0,
                             Puntuacion = puntuacion,
+                            Convocado = 1,
                             EstaActivo = 1
                         };
 
@@ -4963,7 +5005,8 @@ r in db.Rol on ur.rol equals r
                     Fecha = fechaCapacitacion,
                     SecuencialModulo = modulo,
                     Adjunto = "",
-                    EsPlan = fechaCapacitacion.Date > DateTime.Now.Date ? 1 : 0,
+                    //EsPlan = fechaCapacitacion.Date > DateTime.Now.Date ? 1 : 0,
+                    EsPlan = 1,
                     SecuencialColaborador = colaborador,
                     TiempoCapacitacion = tiempo,
                     Url = link
@@ -4971,7 +5014,6 @@ r in db.Rol on ur.rol equals r
                 db.Recursos.Add(nuevoRecurso);
                 db.SaveChanges();
 
-                List<string> usuariosDestinos = new List<string>();
                 foreach (int asistenteId in asistentesIds)
                 {
                     RecursosAsistencia ra = new RecursosAsistencia
@@ -4980,33 +5022,12 @@ r in db.Rol on ur.rol equals r
                         SecuencialRecurso = nuevoRecurso.Secuencial,
                         Asistencia = 0,
                         Puntuacion = 0,
-                        EstaActivo = 1
+                        EstaActivo = 1,
+                        Convocado = 0
                     };
 
                     db.RecursosAsistencia.Add(ra);
-
-                    string email = db.Colaborador.FirstOrDefault(s => s.Secuencial == asistenteId).persona.usuario.FirstOrDefault().Email;
-                    usuariosDestinos.Add(email);
                 }
-
-
-                string textoEmail = @"<div class='textoCuerpo'>Estimado(a): ";
-                textoEmail += "<br>";
-                textoEmail += "Por medio del siguiente correo se establece la reunión programada con el siguiente detalle: ";
-                textoEmail += "<br/>";
-                textoEmail += "<strong>Tema: <strong/>" + titulo;
-                textoEmail += "<br/>";
-                textoEmail += "<strong>Fecha: <strong/>" + fecha;
-                textoEmail += "<br/>";
-                textoEmail += $"<strong>Duración: </strong>{tiempo / 60} horas y {tiempo % 60} minutos";
-                textoEmail += "<br/>";
-                textoEmail += "<strong>Modulador: <strong/>" + modulo;
-                textoEmail += "<br/>";
-                textoEmail += "<strong>Enlace de la reunión: <strong/>" + link;
-                textoEmail += "</div>";
-
-                string asuntoEmail = "Nueva Reunión/Capacitación";
-                Utiles.EnviarEmailSistema(usuariosDestinos.ToArray(), textoEmail, asuntoEmail);
 
                 db.SaveChanges();
 
@@ -5032,20 +5053,26 @@ r in db.Rol on ur.rol equals r
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+
+                Persona persona = user.persona;
+                Colaborador colab = persona.colaborador.FirstOrDefault();
+                string nombreColaborador = persona.Nombre1 + " " + persona.Apellido1 + " " + persona.Nombre2;
+
                 var r = (from rec in db.Recursos
-                                 join ra in db.RecursosAsistencia on rec.Secuencial equals ra.SecuencialRecurso
-                                 join c in db.Colaborador on ra.SecuencialColaborador equals c.Secuencial
-                                 where rec.Secuencial == secuencialRecurso && ra.Puntuacion == 1
-                                 select new
-                                 {
-                                     nombreColaborador = c.persona.Nombre1 + " " + c.persona.Apellido1,
-                                     titulo = rec.Titulo,
-                                     fecha = rec.Fecha,
-                                     minutos = rec.TiempoCapacitacion ?? 0
-                                 }).FirstOrDefault();
+                         join ra in db.RecursosAsistencia on rec.Secuencial equals ra.SecuencialRecurso
+                         join c in db.Colaborador on ra.SecuencialColaborador equals colab.Secuencial
+                         where rec.Secuencial == secuencialRecurso && ra.Puntuacion == 1
+                         select new
+                         {
+                             titulo = rec.Titulo,
+                             fecha = rec.Fecha,
+                             minutos = rec.TiempoCapacitacion ?? 0
+                         }).FirstOrDefault();
 
                 // Generar el certificado con los datos del colaborador
-                var certificadoPath = GenerarCert(r.nombreColaborador, r.titulo, r.minutos, r.fecha);
+                var certificadoPath = GenerarCert(nombreColaborador, r.titulo, r.minutos, r.fecha);
 
                 // Devolver la URL del certificado
                 return Json(new { success = true, url = Url.Content($"~/Certificados/{Path.GetFileName(certificadoPath)}") });
@@ -5143,24 +5170,88 @@ r in db.Rol on ur.rol equals r
                     {
                         int id = Convert.ToInt32(item["id"]);
                         bool asistencia = Convert.ToBoolean(item["asistencia"]);
-                        bool asignado = Convert.ToBoolean(item["asignado"]);
                         double puntuacion = Convert.ToDouble(item["puntuacion"]);
 
-                        if (asignado == true)
+                        RecursosAsistencia r = db.RecursosAsistencia.FirstOrDefault(ra => ra.Secuencial == id);
+
+                        r.Asistencia = (asistencia == true ? 1 : 0);
+                        r.Puntuacion = puntuacion;
+
+                        //db.SubmitChanges();
+                        db.SaveChanges();
+
+                    }
+                };
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+
+        //Guardar modal nuevos recursos
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult GuardarConvocadosRecurso(int idRecurso, string adjuntoAsistencia = null)
+        {
+            try
+            {
+                if (idRecurso != 0)
+                {
+                    var s1 = new JavaScriptSerializer();
+                    var datosAsistencia = s1.Deserialize<List<dynamic>>(adjuntoAsistencia);
+                    List<string> usuariosDestinos = new List<string>();
+
+                    foreach (var item in datosAsistencia)
+                    {
+                        int id = Convert.ToInt32(item["id"]);
+                        bool convocado = Convert.ToBoolean(item["convocado"]);
+
+                        RecursosAsistencia r = db.RecursosAsistencia.FirstOrDefault(ra => ra.Secuencial == id);
+                        bool con = r.Convocado == 1 ? true : false;
+
+                        if (con != convocado)
                         {
-                            RecursosAsistencia ra = new RecursosAsistencia
-                            {
-                                SecuencialColaborador = id,
-                                SecuencialRecurso = idRecurso,
-                                Asistencia = asistencia == true ? 1 : 0,
-                                Puntuacion = puntuacion,
-                                EstaActivo = 1
-                            };
-
-                            db.RecursosAsistencia.Add(ra);
+                            r.Convocado = convocado == true ? 1 : 0;
                             db.SaveChanges();
-                        };
 
+                            if (convocado == true)
+                            {
+                                Recursos re = db.Recursos.FirstOrDefault(rr => rr.Secuencial == idRecurso);
+
+                                string email = db.Colaborador.FirstOrDefault(s => s.Secuencial == r.SecuencialColaborador).persona.usuario.FirstOrDefault().Email;
+                                usuariosDestinos.Add(email);
+
+                                string textoEmail = @"<div class='textoCuerpo'>Estimado(a): ";
+                                textoEmail += "<br>";
+                                textoEmail += "Por medio del siguiente correo se establece la reunión programada con el siguiente detalle: ";
+                                textoEmail += "<br/>";
+                                textoEmail += "<strong>Tema: <strong/>" + re.Titulo;
+                                textoEmail += "<br/>";
+                                textoEmail += "<strong>Fecha: <strong/>" + re.Fecha;
+                                textoEmail += "<br/>";
+                                textoEmail += $"<strong>Duración: </strong>{re.TiempoCapacitacion / 60} horas y {re.TiempoCapacitacion % 60} minutos";
+                                textoEmail += "<br/>";
+                                textoEmail += "<strong>Modulador: <strong/>" + re.SecuencialModulo;
+                                textoEmail += "<br/>";
+                                textoEmail += "<strong>Enlace de la reunión: <strong/>" + re.Url;
+                                textoEmail += "</div>";
+
+                                string asuntoEmail = "Nueva Reunión/Capacitación";
+                                Utiles.EnviarEmailSistema(usuariosDestinos.ToArray(), textoEmail, asuntoEmail);
+                            }
+                        }
                     }
                 };
 

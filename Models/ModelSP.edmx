@@ -1748,6 +1748,7 @@
           <Property Name="ASISTENCIA" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="PUNTUACION" Type="float" Nullable="false" />
           <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="CONVOCADO" Type="numeric" Precision="1" Scale="0" />
         </EntityType>
         <EntityType Name="RECURSOSSUBETAPASPROYECTO">
           <Key>
@@ -12732,6 +12733,7 @@
           <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
           <NavigationProperty Name="colaborador" Relationship="SifizPlanningModel.FK_RECURSOSASISTENCIA_COLABORADOR" FromRole="RECURSOSASISTENCIA" ToRole="Colaborador" />
           <NavigationProperty Name="recursos" Relationship="SifizPlanningModel.FK_RECURSOSASISTENCIA_RECURSOS" FromRole="RECURSOSASISTENCIA" ToRole="Recursos" />
+          <Property Name="Convocado" Type="Decimal" Precision="1" Scale="0" />
         </EntityType>
         <Association Name="FK_RECURSOSASISTENCIA_COLABORADOR">
           <End Type="SifizPlanningModel.Colaborador" Role="Colaborador" Multiplicity="1" />
@@ -15046,6 +15048,7 @@
           <EntitySetMapping Name="RecursosAsistencia">
             <EntityTypeMapping TypeName="SifizPlanningModel.RecursosAsistencia">
               <MappingFragment StoreEntitySet="RECURSOSASISTENCIA">
+                <ScalarProperty Name="Convocado" ColumnName="CONVOCADO" />
                 <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
                 <ScalarProperty Name="Puntuacion" ColumnName="PUNTUACION" />
                 <ScalarProperty Name="Asistencia" ColumnName="ASISTENCIA" />
