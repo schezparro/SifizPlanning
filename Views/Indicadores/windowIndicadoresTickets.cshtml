@@ -3,6 +3,7 @@
     <li role="presentation"><a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab">INFORME DE TICKETS AL DÍA</a></li>
     <li role="presentation"><a href="#tab3" aria-controls="tab3" role="tab" data-toggle="tab">INFORME DE TICKETS HISTORICO</a></li>
     <li role="presentation"><a href="#tab4" aria-controls="tab4" role="tab" data-toggle="tab">INFORME DE TICKETS POR CLIENTE</a></li>
+    <li role="presentation"><a href="#tab5" aria-controls="tab5" role="tab" data-toggle="tab">INDICADORES</a></li>
 </ul>
 
 <div class="tab-content">
@@ -453,8 +454,7 @@
     </div>
 
 
-
-    @*Tab hasta la fecha*@
+    @*Tab hasta la fecha AL DIA*@
 
     <div role="tabpanel" class="tab-pane" id="tab2">
 
@@ -470,7 +470,7 @@
                                     <label for="fecha-inicio-etapa" class="col-sm-2 control-label">CLIENTE</label>
                                     <div class="col-sm-8">
                                         <select id="select-cliente-indicadores-tickets-aldia" ng-model="cliente" class="form-control">
-                                            <option value="">*</option> 
+                                            <option value="">*</option>
                                             <option value="{{cliente.id}}" ng-repeat="cliente in clientes" ng-value="cliente.id" ng-selected="cliente.id === cliente">{{cliente.nombre}}</option>
                                         </select>
                                     </div>
@@ -545,8 +545,8 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr ng-repeat="ticket in infoTicketsEnGestionAlDia">
-                                                    <td>{{ticket.Semana}}</td>
+                                                <tr ng-repeat="ticket in infoTicketsEnGestionAlDia" ng-click="mostrarDetallesTicketsGestion(ticket.WeekIdentifier)">
+                                                    <td>{{ticket.WeekIdentifier}}</td>
                                                     <td>{{ticket.Descripcion}}</td>
                                                     <td>{{ticket.Cantidad}}</td>
                                                 </tr>
@@ -580,6 +580,39 @@
                         <br />
                     </div>
 
+                    <div id="detallesModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Detalles del Ticket</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body" id="modalContent" style="max-height: 800px; overflow-y: auto;">
+                                    <table class="table table-striped table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th style="background-color: #add8e6; color: black;">Fecha</th>
+                                                <th style="background-color: #add8e6; color: black;">No. Ticket</th>
+                                                <th style="background-color: #add8e6; color: black;">Detalle</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="ticket in detallesTickets">
+                                                <td>{{ticket.FechaCreado}}</td>
+                                                <td>{{ticket.Secuencial}}</td>
+                                                <td>{{ticket.Detalle}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     @*TICKETS POR CATEGORIAS*@
                     <div class="container-fluid">
@@ -603,7 +636,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr ng-repeat="ticket in infoTicketsPorCategoriasAlDia">
+                                                <tr ng-repeat="ticket in infoTicketsPorCategoriasAlDia" ng-click="mostrarDetallesTicketsCategorias(ticket.Categoria)">
                                                     <td>{{ticket.Categoria}}</td>
                                                     <td>{{ticket.Porcentaje}}%</td>
                                                     <td>{{ticket.Cantidad}}</td>
@@ -649,6 +682,39 @@
                         <br />
                     </div>
 
+                    <div id="detallesCategoriasModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Detalles del Ticket</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body" id="modalContent" style="max-height: 800px; overflow-y: auto;">
+                                    <table class="table table-striped table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th style="background-color: #add8e6; color: black;">Fecha</th>
+                                                <th style="background-color: #add8e6; color: black;">No. Ticket</th>
+                                                <th style="background-color: #add8e6; color: black;">Detalle</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="ticket in detallesCategoriasTickets">
+                                                <td>{{ticket.FechaCreado}}</td>
+                                                <td>{{ticket.Secuencial}}</td>
+                                                <td>{{ticket.Detalle}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     @*TICKETS POR ESTADOS*@
                     <div class="container-fluid">
@@ -672,7 +738,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr ng-repeat="ticket in infoTicketsPorEstadosAlDia">
+                                                <tr ng-repeat="ticket in infoTicketsPorEstadosAlDia" ng-click="mostrarDetallesTicketsEstados(ticket.Estado)">
                                                     <td>{{ticket.Estado}}</td>
                                                     <td>{{ticket.Porcentaje}}%</td>
                                                     <td>{{ticket.Cantidad}}</td>
@@ -717,6 +783,40 @@
                         <br />
                     </div>
 
+                    <div id="detallesEstadosModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Detalles del Ticket</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body" id="modalContent" style="max-height: 800px; overflow-y: auto;">
+                                    <table class="table table-striped table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th style="background-color: #add8e6; color: black;">Fecha</th>
+                                                <th style="background-color: #add8e6; color: black;">No. Ticket</th>
+                                                <th style="background-color: #add8e6; color: black;">Detalle</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="ticket in detallesEstadosTickets">
+                                                <td>{{ticket.FechaCreado}}</td>
+                                                <td>{{ticket.Secuencial}}</td>
+                                                <td>{{ticket.Detalle}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     @*TICKETS POR CLIENTES Y ESTADOS: *@
                     <div class="container-fluid">
                         <div class="row">
@@ -741,7 +841,7 @@
                                                 <tbody>
                                                     <tr ng-repeat="(cliente, estados) in clientesEstructurados" ng-style="{'background-color': $even ? '#f2f2f2' : 'white'}">
                                                         <td style="text-align: left; padding: 4px; border: 1px solid #ddd;">{{cliente}}</td>
-                                                        <td ng-repeat="estado in estados" ng-if="estado.Estado !== 'Total'" style="text-align: left; padding: 4px; border: 1px solid #ddd;">
+                                                        <td ng-repeat="estado in estados" ng-if="estado.Estado !== 'Total'" style="text-align: left; padding: 4px; border: 1px solid #ddd;" ng-click="mostrarDetallesTicketsClientesEstados(estado.Estado, cliente)">
                                                             {{estado.Cantidad}}
                                                         </td>
                                                         <td style="text-align: left; padding: 4px; border: 1px solid #ddd;"><strong>{{estados[estados.length - 1].Cantidad}}</strong></td>
@@ -801,6 +901,40 @@
                         <br />
                     </div>
 
+                    <div id="detallesClientesEstadosModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Detalles del Ticket</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body" id="modalContent" style="max-height: 800px; overflow-y: auto;">
+                                    <table class="table table-striped table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th style="background-color: #add8e6; color: black;">Fecha</th>
+                                                <th style="background-color: #add8e6; color: black;">No. Ticket</th>
+                                                <th style="background-color: #add8e6; color: black;">Detalle</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="ticket in detallesClientesEstadosTickets">
+                                                <td>{{ticket.FechaCreado}}</td>
+                                                <td>{{ticket.Secuencial}}</td>
+                                                <td>{{ticket.Detalle}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     @*TICKETS APLICADOS A*@
                     <div class="container-fluid">
                         <div class="row">
@@ -823,7 +957,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr ng-repeat="ticket in infoTicketsAplicadosAlDia">
+                                                <tr ng-repeat="ticket in infoTicketsAplicadosAlDia" ng-click="mostrarDetallesTicketsAplicados(ticket.Aplica)">
                                                     <td>{{ticket.Aplica}}</td>
                                                     <td>{{ticket.Porcentaje}}%</td>
                                                     <td>{{ticket.Cantidad}}</td>
@@ -858,182 +992,247 @@
                         <br />
                     </div>
 
+                    <div id="detallesAplicadosModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Detalles del Ticket</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body" id="modalContent" style="max-height: 800px; overflow-y: auto;">
+                                    <table class="table table-striped table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th style="background-color: #add8e6; color: black;">Fecha</th>
+                                                <th style="background-color: #add8e6; color: black;">No. Ticket</th>
+                                                <th style="background-color: #add8e6; color: black;">Detalle</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="ticket in detallesAplicadosTickets">
+                                                <td>{{ticket.FechaCreado}}</td>
+                                                <td>{{ticket.Secuencial}}</td>
+                                                <td>{{ticket.Detalle}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     @*RANKING DE CLIENTES*@
                     @*POR CATERGORIAS*@
 
-                <div ng-show="todosLosClientes">
-                    @*POR REQUERIMIENTO NUEVO*@
+                    <div ng-show="todosLosClientes">
+                        @*POR REQUERIMIENTO NUEVO*@
 
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-xs-12" style="text-align:center;">
-                                <label for="select-cliente-proyecto">RANKING DE CLIENTES POR REQUEMIENTOS NUEVOS</label>
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-xs-12" style="text-align:center;">
+                                    <label for="select-cliente-proyecto">RANKING DE CLIENTES POR REQUEMIENTOS NUEVOS</label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row" ng-show="mostrarGraficosTicketsRankingReqNuevoAlDia">
-                            <!-- Tabla (1/3 del ancho) -->
-                            <div class="col-md-4">
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">Ranking Requerimientos Nuevos</div>
-                                    <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                        <table class="table table-striped table-condensed">
-                                            <thead>
-                                                <tr>
-                                                    <th style="background-color: #add8e6; color: black;">Cliente</th>
-                                                    <th style="background-color: #add8e6; color: black;">Cantidad</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr ng-repeat="ticket in infoTicketsRankingReqNuevoAlDia">
-                                                    <td>{{ticket.Cliente}}</td>
-                                                    <td>{{ticket.Cantidad}}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="text-align: left; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
-                                                    <td style="text-align: left; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsRankingReqNuevoAlDia | number:0}}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                            <div class="row" ng-show="mostrarGraficosTicketsRankingReqNuevoAlDia">
+                                <!-- Tabla (1/3 del ancho) -->
+                                <div class="col-md-4">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">Ranking Requerimientos Nuevos</div>
+                                        <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
+                                            <table class="table table-striped table-condensed">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="background-color: #add8e6; color: black;">Cliente</th>
+                                                        <th style="background-color: #add8e6; color: black;">Cantidad</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="ticket in infoTicketsRankingReqNuevoAlDia" ng-click="mostrarDetallesTicketsRanking(ticket.Cliente, 'REQUERIMIENTO NUEVO')">
+                                                        <td>{{ticket.Cliente}}</td>
+                                                        <td>{{ticket.Cantidad}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: left; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
+                                                        <td style="text-align: left; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsRankingReqNuevoAlDia | number:0}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Gráfico (2/3 del ancho) -->
+                                <div class="col-md-8">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">Gráfico de Ranking de Clientes por Requerimientos Nuevos</div>
+                                        <div class="panel-body" style="margin: 0 auto;">
+                                            <canvas id="ticketRankingReqNuevoChartAlDia" style="overflow-x: auto;"></canvas>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Gráfico (2/3 del ancho) -->
-                            <div class="col-md-8">
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">Gráfico de Ranking de Clientes por Requerimientos Nuevos</div>
-                                    <div class="panel-body" style="margin: 0 auto;">
-                                        <canvas id="ticketRankingReqNuevoChartAlDia" style="overflow-x: auto;"></canvas>
-                                    </div>
+                            <div class="row">
+                                <div class="col-xs-12 text-center">
+                                    <p id="mensajeLabel">{{mensajeNoDataTicketRankingReqNuevoAlDia}}</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-xs-12 text-center">
-                                <p id="mensajeLabel">{{mensajeNoDataTicketRankingReqNuevoAlDia}}</p>
-                            </div>
+
+                        <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
+                            <br />
                         </div>
-                    </div>
 
-                    <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
-                        <br />
-                    </div>
+                        @*POR GARANTIA TECNICA*@
 
-
-                    @*POR GARANTIA TECNICA*@
-
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-xs-12" style="text-align:center;">
-                                <label for="select-cliente-proyecto">RANKING DE CLIENTES POR GARANTIA TECNICA</label>
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-xs-12" style="text-align:center;">
+                                    <label for="select-cliente-proyecto">RANKING DE CLIENTES POR GARANTIA TECNICA</label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row" ng-show="mostrarGraficosTicketsRankingGarantiaAlDia">
-                            <!-- Tabla (1/3 del ancho) -->
-                            <div class="col-md-4">
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">Ranking Garantía Técnica</div>
-                                    <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                        <table class="table table-striped table-condensed">
-                                            <thead>
-                                                <tr>
-                                                    <th style="background-color: #add8e6; color: black;">Cliente</th>
-                                                    <th style="background-color: #add8e6; color: black;">Cantidad</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr ng-repeat="ticket in infoTicketsRankingGarantiaAlDia">
-                                                    <td>{{ticket.Cliente}}</td>
-                                                    <td>{{ticket.Cantidad}}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="text-align: left; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
-                                                    <td style="text-align: left; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsRankingGarantiaAlDia | number:0}}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                            <div class="row" ng-show="mostrarGraficosTicketsRankingGarantiaAlDia">
+                                <!-- Tabla (1/3 del ancho) -->
+                                <div class="col-md-4">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">Ranking Garantía Técnica</div>
+                                        <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
+                                            <table class="table table-striped table-condensed">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="background-color: #add8e6; color: black;">Cliente</th>
+                                                        <th style="background-color: #add8e6; color: black;">Cantidad</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="ticket in infoTicketsRankingGarantiaAlDia" ng-click="mostrarDetallesTicketsRanking(ticket.Cliente, 'GARANTÍA TÉCNICA')">
+                                                        <td>{{ticket.Cliente}}</td>
+                                                        <td>{{ticket.Cantidad}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: left; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
+                                                        <td style="text-align: left; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsRankingGarantiaAlDia | number:0}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Gráfico (2/3 del ancho) -->
+                                <div class="col-md-8">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">Gráfico de Ranking de Clientes por Garantía Técnica</div>
+                                        <div class="panel-body" style="margin: 0 auto;">
+                                            <canvas id="ticketRankingGarantiaChartAlDia" style="overflow-x: auto;"></canvas>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Gráfico (2/3 del ancho) -->
-                            <div class="col-md-8">
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">Gráfico de Ranking de Clientes por Garantía Técnica</div>
-                                    <div class="panel-body" style="margin: 0 auto;">
-                                        <canvas id="ticketRankingGarantiaChartAlDia" style="overflow-x: auto;"></canvas>
-                                    </div>
+                            <div class="row">
+                                <div class="col-xs-12 text-center">
+                                    <p id="mensajeLabel">{{mensajeNoDataTicketRankingGarantiaAlDia}}</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-xs-12 text-center">
-                                <p id="mensajeLabel">{{mensajeNoDataTicketRankingGarantiaAlDia}}</p>
-                            </div>
+
+                        <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
+                            <br />
                         </div>
-                    </div>
-
-                    <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
-                        <br />
-                    </div>
 
 
-                    @*POR MANTENIMIENTO*@
+                        @*POR MANTENIMIENTO*@
 
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-xs-12" style="text-align:center;">
-                                <label for="select-cliente-proyecto">RANKING DE CLIENTES POR MANTENIMIENTO</label>
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-xs-12" style="text-align:center;">
+                                    <label for="select-cliente-proyecto">RANKING DE CLIENTES POR MANTENIMIENTO</label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row" ng-show="mostrarGraficosTicketsRankingMantenimientoAlDia">
-                            <!-- Tabla (1/3 del ancho) -->
-                            <div class="col-md-4">
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">Ranking Mantenimiento</div>
-                                    <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
-                                        <table class="table table-striped table-condensed">
-                                            <thead>
-                                                <tr>
-                                                    <th style="background-color: #add8e6; color: black;">Cliente</th>
-                                                    <th style="background-color: #add8e6; color: black;">Cantidad</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr ng-repeat="ticket in infoTicketsRankingMantenimientoAlDia">
-                                                    <td>{{ticket.Cliente}}</td>
-                                                    <td>{{ticket.Cantidad}}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="text-align: left; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
-                                                    <td style="text-align: left; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsRankingMantenimientoAlDia | number:0}}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                            <div class="row" ng-show="mostrarGraficosTicketsRankingMantenimientoAlDia">
+                                <!-- Tabla (1/3 del ancho) -->
+                                <div class="col-md-4">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">Ranking Mantenimiento</div>
+                                        <div class="panel-body" style="max-height: 500px; overflow-y: auto;">
+                                            <table class="table table-striped table-condensed">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="background-color: #add8e6; color: black;">Cliente</th>
+                                                        <th style="background-color: #add8e6; color: black;">Cantidad</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="ticket in infoTicketsRankingMantenimientoAlDia" ng-click="mostrarDetallesTicketsRanking(ticket.Cliente, 'MANTENIMIENTO')">
+                                                        <td>{{ticket.Cliente}}</td>
+                                                        <td>{{ticket.Cantidad}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: left; background-color: #add8e6; color: black; font-weight: bold;">Total</td>
+                                                        <td style="text-align: left; background-color: #add8e6; color: black; font-size: 20px;">{{totalCantidadesTicketsRankingMantenimientoAlDia | number:0}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Gráfico (2/3 del ancho) -->
+                                <div class="col-md-8">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">Gráfico de Ranking de Clientes por Mantenimiento</div>
+                                        <div class="panel-body" style="margin: 0 auto;">
+                                            <canvas id="ticketRankingMantenimientoChartAlDia" style="overflow-x: auto;"></canvas>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Gráfico (2/3 del ancho) -->
-                            <div class="col-md-8">
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">Gráfico de Ranking de Clientes por Mantenimiento</div>
-                                    <div class="panel-body" style="margin: 0 auto;">
-                                        <canvas id="ticketRankingMantenimientoChartAlDia" style="overflow-x: auto;"></canvas>
-                                    </div>
+                            <div class="row">
+                                <div class="col-xs-12 text-center">
+                                    <p id="mensajeLabel">{{mensajeNoDataTicketRankingMantenimientoAlDia}}</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-xs-12 text-center">
-                                <p id="mensajeLabel">{{mensajeNoDataTicketRankingMantenimientoAlDia}}</p>
-                            </div>
+
+                        <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
+                            <br />
                         </div>
                     </div>
 
-                    <div style="width: 100%; border-top: 2px solid #E0E0E0; ">
-                        <br />
+                    <div id="detallesRankingModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Detalles del Ticket</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body" id="modalContent" style="max-height: 800px; overflow-y: auto;">
+                                    <table class="table table-striped table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th style="background-color: #add8e6; color: black;">Fecha</th>
+                                                <th style="background-color: #add8e6; color: black;">No. Ticket</th>
+                                                <th style="background-color: #add8e6; color: black;">Detalle</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="ticket in detallesRankingTickets">
+                                                <td>{{ticket.FechaCreado}}</td>
+                                                <td>{{ticket.Secuencial}}</td>
+                                                <td>{{ticket.Detalle}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                    
-
 
                 </div>
             </div>
@@ -1062,6 +1261,7 @@
         </div>
     </div>
 
+    @*Tab hasta la fecha*@
     <div role="tabpanel" class="tab-pane" id="tab3">
 
         <br />
@@ -1407,7 +1607,6 @@
                         </div>
 
                     </div>
-
 
                     @*TICKETS POR GARANTIA TECNICA *@
 
