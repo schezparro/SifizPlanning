@@ -39,6 +39,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using System.Diagnostics.Contracts;
 using System.Drawing.Imaging;
 using System.Drawing;
+using DocumentFormat.OpenXml.ExtendedProperties;
 
 namespace SifizPlanning.Controllers
 {
@@ -4982,17 +4983,10 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult GuardarPlanRecurso(string titulo, string detalle, string fecha, int modulo, int colaborador, int tiempo, string asistentesJson, string link = "")
+        public ActionResult GuardarPlanRecurso(string titulo, string detalle, DateTime fecha, int modulo, int colaborador, int tiempo, string asistentesJson, string link = "")
         {
             try
             {
-                // Convertir la fecha
-                string[] fechas = fecha.Split(new Char[] { '/' });
-                int dia = Int32.Parse(fechas[0]);
-                int mes = Int32.Parse(fechas[1]);
-                int anno = Int32.Parse(fechas[2]);
-                DateTime fechaCapacitacion = new DateTime(anno, mes, dia);
-
                 // Decodificar la cadena JSON de asistentes
                 var serializer = new JavaScriptSerializer();
                 int[] asistentesIds = serializer.Deserialize<int[]>(asistentesJson);
@@ -5002,7 +4996,7 @@ r in db.Rol on ur.rol equals r
                 {
                     Titulo = titulo,
                     Detalle = detalle,
-                    Fecha = fechaCapacitacion,
+                    Fecha = fecha,
                     SecuencialModulo = modulo,
                     Adjunto = "",
                     //EsPlan = fechaCapacitacion.Date > DateTime.Now.Date ? 1 : 0,
@@ -5219,6 +5213,8 @@ r in db.Rol on ur.rol equals r
                         bool convocado = Convert.ToBoolean(item["convocado"]);
 
                         RecursosAsistencia r = db.RecursosAsistencia.FirstOrDefault(ra => ra.Secuencial == id);
+                        Recursos cap = db.Recursos.FirstOrDefault(ca => ca.Secuencial == r.SecuencialRecurso);
+
                         bool con = r.Convocado == 1 ? true : false;
 
                         if (con != convocado)
@@ -5228,6 +5224,23 @@ r in db.Rol on ur.rol equals r
 
                             if (convocado == true)
                             {
+                                Tarea tar = new Tarea
+                                {
+                                    SecuencialColaborador = r.SecuencialColaborador,
+                                    SecuencialActividad = 6,
+                                    SecuencialModulo = cap.SecuencialModulo,
+                                    SecuencialCliente = 78,
+                                    SecuencialEstadoTarea = 1,
+                                    SecuencialLugarTarea = 5,
+                                    Detalle = $"{cap.Titulo}\n\nurl: <a href=\"{cap.Url}\" target=\"_blank\">{cap.Url}</a>",
+                                    FechaInicio = cap.Fecha,
+                                    FechaFin = cap.Fecha.AddMinutes((double)cap.TiempoCapacitacion),
+                                    HorasUtilizadas = 0,
+                                    NumeroVerificador = 1,
+                                };
+                                Utiles.AgregarTareaConReubicacion(tar, db);
+
+
                                 Recursos re = db.Recursos.FirstOrDefault(rr => rr.Secuencial == idRecurso);
 
                                 string email = db.Colaborador.FirstOrDefault(s => s.Secuencial == r.SecuencialColaborador).persona.usuario.FirstOrDefault().Email;
@@ -8535,5 +8548,224 @@ r in db.Rol on ur.rol equals r
                 return Json(resp);
             }
         }
+
+        private JsonResult CrearNuevaTareaCapacitacion(NuevaTareaDTO tareaDTO)
+        {
+            try
+            {
+                Usuario user = ObtenerUsuarioActual();
+                DateTime horaCapacitacion = tareaDTO.Fecha;
+                DateTime finCapacitacion = horaCapacitacion.AddHours(tareaDTO.Horas).AddMinutes(tareaDTO.Minutos);
+
+                var tareasExistentes = db.Tarea
+                    .Where(t => t.SecuencialColaborador == tareaDTO.IdTrabajador &&
+                                ((t.FechaInicio < finCapacitacion && t.FechaInicio >= horaCapacitacion) ||
+                                 (t.FechaFin > horaCapacitacion && t.FechaFin <= finCapacitacion) ||
+                                 (t.FechaInicio < horaCapacitacion && t.FechaFin > finCapacitacion)))
+                    .ToList();
+
+                foreach (var tarea in tareasExistentes)
+                {
+                    if (tarea.FechaInicio < horaCapacitacion)
+                    {
+                        var tareaAntes = CrearNuevaTareaDesdeExistente(tarea, tarea.FechaInicio, horaCapacitacion);
+                        db.Tarea.Add(tareaAntes);
+                    }
+
+                    if (tarea.FechaFin > finCapacitacion)
+                    {
+                        var tareaDespues = CrearNuevaTareaDesdeExistente(tarea, finCapacitacion, tarea.FechaFin);
+
+                        DateTime nuevaFechaInicio = BuscarHuecoDespuesDeLasCinco(tareaDTO.IdTrabajador, finCapacitacion.Date.AddHours(17.5), tareaDespues.FechaFin);
+                        tareaDespues.FechaInicio = nuevaFechaInicio;
+                        tareaDespues.FechaFin = nuevaFechaInicio.AddMinutes((tarea.FechaFin - finCapacitacion).TotalMinutes);
+
+                        db.Tarea.Add(tareaDespues);
+                    }
+
+                    db.Tarea.Remove(tarea);
+                }
+
+                Tarea nuevaCapacitacion = CrearTareaBase(tareaDTO, horaCapacitacion);
+
+                AgregarCoordinadorSiExiste(nuevaCapacitacion, tareaDTO.Coordinador);
+                AgregarHistoricoEstado(nuevaCapacitacion, user);
+
+                db.Tarea.Add(nuevaCapacitacion);
+                db.SaveChanges();
+
+                return Json(new { success = true, msg = "Capacitación creada correctamente" });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message });
+            }
+        }
+
+        private Tarea CrearNuevaTareaDesdeExistente(Tarea tareaOriginal, DateTime nuevaFechaInicio, DateTime nuevaFechaFin)
+        {
+            return new Tarea
+            {
+                SecuencialColaborador = tareaOriginal.SecuencialColaborador,
+                SecuencialActividad = tareaOriginal.SecuencialActividad,
+                SecuencialModulo = tareaOriginal.SecuencialModulo,
+                SecuencialCliente = tareaOriginal.SecuencialCliente,
+                SecuencialEstadoTarea = tareaOriginal.SecuencialEstadoTarea,
+                SecuencialLugarTarea = tareaOriginal.SecuencialLugarTarea,
+                Detalle = tareaOriginal.Detalle,
+                FechaInicio = nuevaFechaInicio,
+                FechaFin = nuevaFechaFin,
+                HorasUtilizadas = tareaOriginal.HorasUtilizadas,
+                NumeroVerificador = tareaOriginal.NumeroVerificador,
+                TiempoEstimacion = tareaOriginal.TiempoEstimacion,
+                EsReproceso = tareaOriginal.EsReproceso
+            };
+        }
+
+        private DateTime BuscarHuecoDespuesDeLasCinco(int idTrabajador, DateTime fechaInicio, DateTime fechaFin)
+        {
+            var tareasDespuesDeCinco = db.Tarea
+                .Where(t => t.SecuencialColaborador == idTrabajador &&
+                            t.FechaInicio >= fechaInicio)
+                .OrderBy(t => t.FechaInicio)
+                .ToList();
+
+            foreach (var tarea in tareasDespuesDeCinco)
+            {
+                if (fechaInicio < tarea.FechaInicio)
+                {
+                    var hueco = tarea.FechaInicio - fechaInicio;
+                    if (hueco >= (fechaFin - fechaInicio))
+                    {
+                        return fechaInicio;
+                    }
+                }
+                fechaInicio = tarea.FechaFin;
+            }
+
+            return fechaInicio;
+        }
+
+        private Usuario ObtenerUsuarioActual()
+        {
+            string emailUser = User.Identity.Name;
+            return db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+        }
+
+        private DateTime ParsearFecha(string fecha)
+        {
+            return DateTime.ParseExact(fecha, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+        }
+
+        private Tarea CrearTareaBase(NuevaTareaDTO tareaDTO, DateTime diaTarea)
+        {
+            DateTime fechaInicio, fechaFin;
+            CalcularHorasTarea(diaTarea, tareaDTO, out fechaInicio, out fechaFin);
+
+            return new Tarea
+            {
+                SecuencialColaborador = tareaDTO.IdTrabajador,
+                SecuencialActividad = tareaDTO.Actividad,
+                SecuencialModulo = tareaDTO.Modulo,
+                SecuencialCliente = tareaDTO.Cliente,
+                SecuencialEstadoTarea = 1,
+                SecuencialLugarTarea = tareaDTO.Ubicacion,
+                Detalle = tareaDTO.Detalle.ToUpper(),
+                FechaInicio = fechaInicio,
+                FechaFin = fechaFin,
+                HorasUtilizadas = 0,
+                NumeroVerificador = 1,
+                TiempoEstimacion = new TimeSpan(tareaDTO.HorasEstimadas, tareaDTO.MinutosEstimados, 0),
+                EsReproceso = tareaDTO.EsReproceso ? 1 : 0
+            };
+        }
+
+        private void CalcularHorasTarea(DateTime diaTarea, NuevaTareaDTO tareaDTO, out DateTime fechaInicio, out DateTime fechaFin)
+        {
+            DateTime fechaInicioTareas = CalcularFechaInicioTareas(diaTarea, tareaDTO.Extraordinaria);
+            var tareasDia = ObtenerTareasDia(tareaDTO.IdTrabajador, fechaInicioTareas, diaTarea.AddDays(1));
+
+            int tiempoUsado = CalcularTiempoUsado(tareasDia);
+            fechaInicio = fechaInicioTareas.AddMinutes(tiempoUsado);
+            fechaFin = fechaInicio.AddHours(tareaDTO.Horas).AddMinutes(tareaDTO.Minutos);
+
+            AjustarPorAlmuerzo(ref fechaInicio, ref fechaFin);
+        }
+
+        private DateTime CalcularFechaInicioTareas(DateTime diaTarea, bool esExtraordinaria)
+        {
+            return esExtraordinaria ? diaTarea.AddMinutes(90) : diaTarea.AddMinutes(510);
+        }
+
+        private List<dynamic> ObtenerTareasDia(int idTrabajador, DateTime fechaInicio, DateTime fechaFin)
+        {
+            return db.Tarea
+                .Where(t => t.SecuencialColaborador == idTrabajador &&
+                            t.FechaInicio >= fechaInicio &&
+                            t.FechaInicio < fechaFin &&
+                            t.SecuencialEstadoTarea != 4)
+                .Select(t => new { t.FechaInicio, t.FechaFin })
+                .ToList<dynamic>();
+        }
+
+        private int CalcularTiempoUsado(List<dynamic> tareasDia)
+        {
+            return (int)tareasDia.Sum(t => ((DateTime)t.FechaFin - (DateTime)t.FechaInicio).TotalMinutes);
+        }
+
+        private void AjustarPorAlmuerzo(ref DateTime fechaInicio, ref DateTime fechaFin)
+        {
+            if (fechaInicio.Hour < 13 && fechaFin.Hour > 13)
+            {
+                fechaFin = fechaFin.AddHours(1);
+            }
+            else if (fechaInicio.Hour == 13)
+            {
+                fechaInicio = fechaInicio.AddHours(1);
+                fechaFin = fechaFin.AddHours(1);
+            }
+        }
+
+        private void AgregarCoordinadorSiExiste(Tarea tarea, int coordinadorId)
+        {
+            if (coordinadorId != 0)
+            {
+                db.Tarea_Coordinador.Add(new Tarea_Coordinador
+                {
+                    tarea = tarea,
+                    SecuencialColaborador = coordinadorId,
+                    EstaActivo = 1,
+                    NumeroVerificador = 1
+                });
+            }
+        }
+
+        private void AgregarHistoricoEstado(Tarea tarea, Usuario user)
+        {
+            db.HistoricoTareaEstado.Add(new HistoricoTareaEstado
+            {
+                tarea = tarea,
+                SecuencialEstadoTarea = 1,
+                FechaOperacion = DateTime.Now,
+                usuario = user
+            });
+        }
+    }
+    public class NuevaTareaDTO
+    {
+        public int IdTrabajador { get; set; }
+        public int Actividad { get; set; }
+        public int Modulo { get; set; }
+        public int Cliente { get; set; }
+        public int Ubicacion { get; set; }
+        public string Detalle { get; set; }
+        public int HorasEstimadas { get; set; }
+        public int MinutosEstimados { get; set; }
+        public bool EsReproceso { get; set; }
+        public bool Extraordinaria { get; set; }
+        public int Horas { get; set; }
+        public int Minutos { get; set; }
+        public DateTime Fecha { get; set; }
+        public int Coordinador { get; set; }
     }
 }

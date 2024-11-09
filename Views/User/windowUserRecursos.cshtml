@@ -25,13 +25,13 @@
             <tr>
                 <th>Título</th>
                 <th>Detalle</th>
-                <th>Fecha</th>
+                <th>Fecha y Hora</th>
                 <th>Modulo</th>
                 <th ng-show="!esPlan">Url</th>
                 <th>Link Meet</th>
                 <th ng-show="!esPlan && esUserAllow">Registro Asistencia</th>
                 <th ng-show="esPlan && esUserAllow">Asistencia</th>
-                <th>Tiempo</th>
+                <th>Duración</th>
                 <th ng-show="!esPlan">Certificado</th>
             </tr>
         </thead>
@@ -40,7 +40,7 @@
             <tr ng-repeat="recurso in recursos | filter: filtroRecursos" ng-dblclick="mostrarDetalleRecurso(recurso.secuencial)">
                 <td>{{recurso.titulo | limitTo:100}}</td>
                 <td>{{recurso.detalle | limitTo:100}}</td>
-                <td>{{recurso.fecha | strDateToStr}}</td>
+                <td>{{recurso.fecha | strDateToStrTime}}</td>
                 <td>{{ recurso.modulo === 'N//A' ? 'Otros' : recurso.modulo }}</td>
                 <td ng-show="!esPlan">
                     <div ng-if="!recurso.editandoUrl" style="display: inline-flex; align-items: center;">
@@ -155,8 +155,13 @@
                         <button type="button" id="abrir-modal-registro-asistencia" ng-click="abrirRegistroAsistencia()" class="btn btn-primary">REGISTRO DE ASISTENCIA</button>
                     </div>
 
+                    <div class="form-group">
+                        <label for="inputFechaHora">FECHA Y HORA DE INICIO:</label>
+                        <input type="datetime-local" class="form-control" id="inputFechaHora" ng-model="fechaHora" ng-required="true">
+                    </div>
+
                     <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                        TIEMPO:
+                        <label>DURACION:</label>
                         <input type="number" class="form-control" ng-model="horas" ng-required="true" style="width:10%; text-align:center;" min="0">
                         horas
                         :
@@ -202,9 +207,15 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="fecha-capacitacion">FECHA</label>
+                        <label for="fecha-hora-capacitacion">FECHA Y HORA</label>
                         <div class='input-group date'>
-                            <input id="fecha-capacitacion" ng-model="fechaCapacitacion" class="form-control" ng-required="true" autocomplete="off" min="{{currentDate | date:'yyyy-MM-dd'}}" />
+                            <input id="fecha-hora-capacitacion"
+                                   type="datetime-local"
+                                   ng-model="fechaHoraCapacitacion"
+                                   class="form-control"
+                                   ng-required="true"
+                                   min="{{currentDate | date:'yyyy-MM-ddTHH:mm'}}"
+                                   step="60" />
                         </div>
                     </div>
                     <div class="form-group">
@@ -262,7 +273,7 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-4"><strong>Fecha:</strong></div>
-                    <div class="col-sm-8">{{fechaV | strDateToStr}}</div>
+                    <div class="col-sm-8">{{fechaV | strDateToStrTime}}</div>
                 </div>
                 <div class="row" ng-show="adjuntoV != ''">
                     <div class="col-sm-4"><strong>Url:</strong></div>
@@ -277,7 +288,7 @@
                     <a target="_blank" href="{{linkV}}">{{linkV}}</a>
                 </div>
                 <div class="row">
-                    <div class="col-sm-4"><strong>Tiempo:</strong></div>
+                    <div class="col-sm-4"><strong>Duración:</strong></div>
                     <div class="col-sm-8">{{tiempoV | toHoursAndMinutes}}</div>
                 </div>
             </div>

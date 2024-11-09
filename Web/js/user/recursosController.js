@@ -245,14 +245,15 @@
 
     $scope.GuardarNuevoRecurso = function () {
         var modulo = angular.element("#select-modulo-recursos")[0].value;
-        var fechaSistema = new Date().toISOString();
 
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
+
+        var fecha = $scope.fechaHora ? new Date($scope.fechaHora).toISOString() : new Date().toISOString();
 
         var formData = new FormData();
         formData.append('titulo', $scope.newTitulo);
         formData.append('detalle', $scope.newDetalle);
-        formData.append('fecha', fechaSistema);
+        formData.append('fecha', fecha);
         formData.append('modulo', modulo);
         formData.append('url', $scope.url);
         formData.append('link', $scope.link);
@@ -293,7 +294,8 @@
     $scope.GuardarNuevoPlan = function () {
         var moduloPlan = angular.element("#select-modulo-plan")[0].value;
         var colaborador = angular.element("#select-capacitador-plan")[0].value;
-        var fecha = angular.element("#fecha-capacitacion")[0].value;
+
+        var fecha = $scope.fechaHoraCapacitacion ? new Date($scope.fechaHoraCapacitacion).toISOString() : new Date().toISOString();
 
         var asistentesSeleccionadosIds = $scope.asistentesCapacitacion
             .filter(asistente => asistente.seleccionado)
