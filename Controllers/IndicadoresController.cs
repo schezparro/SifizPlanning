@@ -1009,11 +1009,11 @@ namespace SifizPlanning.Controllers
                         Estado = group.Key.Estado,
                         Cantidad = group.Count(),
                         Tickets = group.Select(t => new
-                         {
-                             FechaCreado = t.Ticket.FechaCreado.ToString("dd/MM/yyyy"), // Format the date here
-                             t.Ticket.Secuencial,
-                             t.Ticket.Detalle
-                         })
+                        {
+                            FechaCreado = t.Ticket.FechaCreado.ToString("dd/MM/yyyy"), // Format the date here
+                            t.Ticket.Secuencial,
+                            t.Ticket.Detalle
+                        })
                     }).Distinct()
                     .ToList();
 
@@ -1882,6 +1882,306 @@ namespace SifizPlanning.Controllers
                 };
 
                 return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+
+        //********************************* INDICADORES FINALES *****************************************************
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        //public ActionResult DarTicketsIndicadoresResultado(List<string> annos, List<string> meses)
+        //{
+        //    try
+        //    {
+        //        DateTime fActual = DateTime.Today;
+        //        var annosInt = new List<int>();
+        //        var mesesInt = new List<int>();
+
+        //        if (annos == null || !annos.Any())
+        //        {
+        //            annosInt.Add(2024);
+        //        }
+        //        else
+        //        {
+        //            annosInt = annos.Select(int.Parse).OrderBy(a => a).ToList();
+        //        }
+
+        //        if (meses == null || !meses.Any())
+        //        {
+        //            mesesInt = Enumerable.Range(1, 12).ToList();
+        //        }
+        //        else
+        //        {
+        //            mesesInt = meses.Select(int.Parse).OrderBy(m => m).ToList();
+
+        //        }
+
+        //        var resultado = new List<dynamic>();
+
+        //        foreach (var anno in annosInt)
+        //        {
+        //            foreach (var mes in mesesInt)
+        //            {
+        //                int mesAnterior = mes - 1;
+        //                int annoAnterior = anno;
+        //                if (mesAnterior == 0)
+        //                {
+        //                    mesAnterior = 12;
+        //                    annoAnterior -= 1;
+        //                }
+
+        //                // Aumenta el tiempo de espera
+        //                db.Database.CommandTimeout = 180;
+
+        //                // Saldo de tickets del mes anterior
+        //                var saldoMesAnterior = db.Ticket
+        //                    .Where(t => t.FechaCreado.Year == annoAnterior &&
+        //                                t.FechaCreado.Month == mesAnterior &&
+        //                                t.estadoTicket.Codigo != "CERRADO" &&
+        //                                t.estadoTicket.Codigo != "ANULADO" &&
+        //                                t.estadoTicket.Codigo != "RECHAZADO")
+        //                    .Count();
+
+        //                // Tickets ingresados en el mismo mes
+        //                var ticketsIngresadosMes = db.Ticket
+        //                    .Where(t => t.FechaCreado.Year == anno &&
+        //                                t.FechaCreado.Month == mes &&
+        //                                t.FechaCreado <= fActual)
+        //                    .Count();
+
+        //                // Total de tickets para atender en el mes
+        //                var ticketsParaAtender = saldoMesAnterior + ticketsIngresadosMes;
+
+        //                // Tickets cerrados atendidos en el mes actual
+        //                var ticketsCerradosAtendidos = db.Ticket
+        //                    .Where(t => t.FechaCreado.Year == anno &&
+        //                                t.FechaCreado.Month == mes &&
+        //                                t.FechaCreado <= fActual &&
+        //                                t.estadoTicket.Codigo == "CERRADO")
+        //                    .Count();
+
+        //                // Tickets anulados o rechazados en el mes actual
+        //                var ticketsAnuladosRechazados = db.Ticket
+        //                    .Where(t => t.FechaCreado.Year == anno &&
+        //                                t.FechaCreado.Month == mes &&
+        //                                t.FechaCreado <= fActual &&
+        //                                (t.estadoTicket.Codigo == "ANULADO" || t.estadoTicket.Codigo == "RECHAZADO"))
+        //                    .Count();
+
+        //                // Filtra primero por el mes de cierre
+        //                var ticketsCerradosEnMesActual = db.Ticket
+        //                    .Where(t => t.Fecha.HasValue &&
+        //                                t.Fecha.Value.Year == anno &&
+        //                                t.Fecha.Value.Month == mes &&
+        //                                t.estadoTicket.Codigo == "CERRADO");
+
+        //                // Filtra los tickets cerrados en el mismo mes (creados y cerrados en el mismo mes)
+        //                var ticketsCerradosMismoMes = ticketsCerradosEnMesActual
+        //                    .Where(t => t.FechaCreado.Year == anno &&
+        //                                t.FechaCreado.Month == mes)
+        //                    .Count();
+
+        //                // Filtra los tickets cerrados de meses anteriores
+        //                var ticketsCerradosMesesAnteriores = ticketsCerradosEnMesActual
+        //                    .Where(t => t.FechaCreado.Year < anno ||
+        //                                (t.FechaCreado.Year == anno && t.FechaCreado.Month < mes))
+        //                    .Count();
+
+
+        //                // Tickets pendientes para el siguiente mes
+        //                var ticketsPendientesSiguienteMes = ticketsParaAtender - (ticketsCerradosAtendidos + ticketsAnuladosRechazados);
+
+        //                // Indicador de resolución de tickets total
+        //                var indicadorResolucion = ticketsParaAtender > 0 ?
+        //                    (ticketsCerradosAtendidos * 100 / ticketsParaAtender) : 0;
+
+        //                resultado.Add(new
+        //                {
+        //                    Mes = $"{CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(mes)}-{anno}",
+        //                    SaldoMesAnterior = saldoMesAnterior,
+        //                    TicketsIngresadosMes = ticketsIngresadosMes,
+        //                    TicketsParaAtender = ticketsParaAtender,
+        //                    TicketsCerradosAtendidos = ticketsCerradosAtendidos,
+        //                    AnuladosORechazados = ticketsAnuladosRechazados,
+        //                    CerradosEnMismoMes = ticketsCerradosMismoMes,
+        //                    TicketsCerradosMesesAnteriores = ticketsCerradosMesesAnteriores,
+        //                    TicketsPendientesMesSiguiente = ticketsPendientesSiguienteMes,
+        //                    IndicadorResolucion = indicadorResolucion
+        //                });
+        //            }
+        //        }
+
+        //        return Json(resultado, JsonRequestBehavior.AllowGet);
+
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        var resp = new
+        //        {
+        //            success = false,
+        //            msg = e.Message
+        //        };
+        //        return Json(resp);
+        //    }
+        //}
+        public ActionResult DarTicketsIndicadoresResultado(List<string> annos, List<string> meses)
+        {
+            try
+            {
+                var annosInt = new List<int>();
+                var mesesInt = new List<int>();
+
+                if (annos == null || !annos.Any())
+                {
+                    annosInt.Add(2024);
+                }
+                else
+                {
+                    annosInt = annos.Select(int.Parse).OrderBy(a => a).ToList();
+                }
+
+                if (meses == null || !meses.Any())
+                {
+                    mesesInt = Enumerable.Range(1, 12).ToList();
+                }
+                else
+                {
+                    mesesInt = meses.Select(int.Parse).OrderBy(m => m).ToList();
+
+                }
+
+                var resultado = new List<dynamic>();
+
+                foreach (var anno in annosInt)
+                {
+                    foreach (var mes in mesesInt)
+                    {
+                        int mesAnterior = mes - 1;
+                        int annoAnterior = anno;
+                        if (mesAnterior == 0)
+                        {
+                            mesAnterior = 12;
+                            annoAnterior -= 1;
+                        }
+
+                        // Aumenta el tiempo de espera
+                        db.Database.CommandTimeout = 180;
+
+                        // Creamos la fecha final del mes anterior con la hora al final del día
+                        DateTime fechaFinMesAnterior = new DateTime(annoAnterior, mesAnterior, DateTime.DaysInMonth(annoAnterior, mesAnterior), 23, 59, 59, 999);
+                        DateTime fActual = new DateTime(anno, mes, DateTime.DaysInMonth(anno, mes), 23, 59, 59, 999);
+
+                        // Consulta utilizando la fecha `DateTime` directamente
+                        var saldoMesAnterior = db.Ticket
+                                                .Where(t => t.FechaCreado != null
+                                                     && t.FechaCreado <= fechaFinMesAnterior
+                                                     && t.estadoTicket.Codigo != "CERRADO"
+                                                     && t.estadoTicket.Codigo != "ANULADO"
+                                                     && t.estadoTicket.Codigo != "RECHAZADO")
+                                                .Count();
+
+                        // Tickets ingresados en el mismo mes
+                        var ticketsIngresadosMes = db.Ticket
+                            .Where(t => t.FechaCreado.Year == anno &&
+                                        t.FechaCreado.Month == mes)
+                            .Count();
+
+                        // Total de tickets para atender en el mes
+                        var ticketsParaAtender = saldoMesAnterior + ticketsIngresadosMes;
+
+                        // Tickets cerrados atendidos en el mes actual
+                        var ticketsCerradosAtendidos = db.Ticket
+                            .Where(t => t.FechaCreado.Year == anno &&
+                                        t.FechaCreado.Month == mes &&
+                                        t.FechaCreado <= fActual &&
+                                        t.estadoTicket.Codigo == "CERRADO")
+                            .Count();
+
+                        // Tickets anulados o rechazados en el mes actual
+
+                        var ticketsAnuladosRechazados = db.Ticket
+                            .Join(db.TicketHistorico,
+                                ticket => ticket.Secuencial,
+                                historico => historico.SecuencialTicket,
+                                (ticket, historico) => new { ticket, historico })
+                            .Where(t => t.historico.FechaOperacion <= fActual &&
+                                        t.historico.FechaOperacion.Year == anno &&
+                                        t.historico.FechaOperacion.Month == mes &&
+                                        (t.ticket.estadoTicket.Codigo == "ANULADO" || t.ticket.estadoTicket.Codigo == "RECHAZADO"))
+                            .Select(t => t.ticket.Secuencial) // Selecciona solo los secuenciales de los tickets
+                            .Distinct().Count();
+
+                        // Filtra primero por el mes de cierre
+                        var ticketsCerradosEnMesActual = db.Ticket
+                            .Join(db.TicketHistorico,
+                                ticket => ticket.Secuencial,
+                                historico => historico.SecuencialTicket,
+                                (ticket, historico) => new { ticket, historico })
+                            .Where(t => t.historico.FechaOperacion <= fActual &&
+                                        t.historico.FechaOperacion.Year == anno &&
+                                        t.historico.FechaOperacion.Month == mes &&
+                                        (t.ticket.estadoTicket.Codigo == "CERRADO"))
+                            .Select(t => t.ticket) // Selecciona solo los secuenciales de los tickets
+                            .Distinct();
+
+                        // Filtra los tickets cerrados en el mismo mes (creados y cerrados en el mismo mes)
+                        var ticketsCerradosMismoMes = ticketsCerradosEnMesActual
+                            .Where(t => t.FechaCreado.Year == anno &&
+                                        t.FechaCreado.Month == mes)
+                            .Count();
+
+                        // Filtra los tickets cerrados de meses anteriores
+                        var ticketsCerradosMesesAnteriores = ticketsCerradosEnMesActual
+                            .Where(t => t.FechaCreado.Month != mes)
+                            .Count();
+
+
+                        // Tickets pendientes para el siguiente mes
+                        var ticketsPendientesSiguienteMes = ticketsParaAtender - (ticketsCerradosAtendidos + ticketsAnuladosRechazados);
+
+                        // Indicador de resolución de tickets total
+                        var indicadorResolucion = ticketsParaAtender > 0 ?
+                            (ticketsCerradosAtendidos * 100 / ticketsParaAtender) : 0;
+
+                        // Indicador de resolución de tickets total
+                        var indicadorResolucionCerrados = ticketsIngresadosMes > 0 ?
+                            (ticketsCerradosMismoMes * 100 / ticketsIngresadosMes) : 0;
+
+                        // Indicador de resolución de tickets total
+                        var indicadorResolucionPendientes = ticketsCerradosMismoMes > 0 ?
+                            (ticketsPendientesSiguienteMes * 100 / ticketsParaAtender) : 0;
+
+                        resultado.Add(new
+                        {
+                            Mes = $"{CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(mes)}-{anno}",
+                            SaldoMesAnterior = saldoMesAnterior,
+                            TicketsIngresadosMes = ticketsIngresadosMes,
+                            TicketsParaAtender = ticketsParaAtender,
+                            TicketsCerradosAtendidos = ticketsCerradosAtendidos,
+                            AnuladosORechazados = ticketsAnuladosRechazados,
+                            CerradosEnMismoMes = ticketsCerradosMismoMes,
+                            TicketsCerradosMesesAnteriores = ticketsCerradosMesesAnteriores,
+                            TicketsPendientesMesSiguiente = ticketsPendientesSiguienteMes,
+                            IndicadorResolucion = indicadorResolucion,
+                            IndicadorResolucionCerrados = indicadorResolucionCerrados,
+                            IndicadorResolucionPendientes = indicadorResolucionPendientes
+                        });
+
+                    }
+                }
+
+                return Json(resultado, JsonRequestBehavior.AllowGet);
+
             }
             catch (Exception e)
             {

@@ -2231,6 +2231,11 @@ namespace SifizPlanning
 
             //------------------ RUTAS DEL MODULO DE INDICADORES -------------------
             routes.MapRoute(
+                name: "DarTicketsIndicadoresResultado",
+                url: "indicadores/dar-resultados-indicadores/{id}",
+                defaults: new { controller = "Indicadores", action = "DarTicketsIndicadoresResultado", id = UrlParameter.Optional }
+            );
+            routes.MapRoute(
                 name: "DarTicketsOtrosIndicadores",
                 url: "indicadores/dar-tickets-otros-indicadores/{id}",
                 defaults: new { controller = "Indicadores", action = "DarTicketsOtrosIndicadores", id = UrlParameter.Optional }
