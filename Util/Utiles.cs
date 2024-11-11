@@ -737,6 +737,244 @@ namespace SifizPlanning.Util
             db1.SaveChanges();
         }
 
+        public static void AgregarTareaConReubicacion(Tarea nuevaTarea, SifizPlanningEntidades db1 = null)
+        {
+            try
+            {
+                if (db1 == null)
+                {
+                    db1 = db;
+                }
+                // Obtener el inicio y fin del día para la fecha de la nueva tarea
+                DateTime inicioDelDia = nuevaTarea.FechaInicio.Date;
+                DateTime finDelDia = inicioDelDia.AddDays(1).AddSeconds(-1);
+
+                // Modificar la consulta
+                DateTime finUltimaTarea = db1.Tarea
+                    .Where(t => t.SecuencialColaborador == nuevaTarea.SecuencialColaborador &&
+                                t.FechaInicio >= inicioDelDia &&
+                                t.FechaInicio < finDelDia)
+                    .OrderByDescending(t => t.FechaFin)
+                    .FirstOrDefault()?.FechaFin ?? inicioDelDia.AddHours(17.5);
+
+                // Buscar tareas existentes del colaborador que se solapen con la nueva tarea
+                var tareasSolapadas = (from t in db1.Tarea
+                                       where t.SecuencialColaborador == nuevaTarea.SecuencialColaborador &&
+                                             t.SecuencialEstadoTarea != 4 && // Excluir tareas anuladas
+                                             t.FechaInicio < nuevaTarea.FechaFin && t.FechaFin > nuevaTarea.FechaInicio
+                                       select t).ToList();
+
+                foreach (var tarea in tareasSolapadas)
+                {
+                    // Caso 1: Solapamiento Total
+                    if (tarea.FechaInicio >= nuevaTarea.FechaInicio && tarea.FechaFin <= nuevaTarea.FechaFin)
+                    {
+                        Tarea tareaReubicada = ClonarSinSecuencial(tarea);
+                        tareaReubicada.FechaInicio = finUltimaTarea;
+                        tareaReubicada.FechaFin = finUltimaTarea.Add(tarea.FechaFin - tarea.FechaInicio);
+
+                        db1.Tarea.Add(tareaReubicada);
+                        finUltimaTarea = tareaReubicada.FechaFin;
+                    }
+                    // Caso 2: Solapamiento Parcial al Inicio
+                    else if (tarea.FechaInicio < nuevaTarea.FechaInicio && tarea.FechaFin > nuevaTarea.FechaInicio && tarea.FechaFin <= nuevaTarea.FechaFin)
+                    {
+                        // Parte antes del solapamiento
+                        Tarea tareaAntes = ClonarSinSecuencial(tarea);
+                        tareaAntes.FechaInicio = tarea.FechaInicio;
+                        tareaAntes.FechaFin = nuevaTarea.FechaInicio;
+                        db1.Tarea.Add(tareaAntes);
+
+                        // Parte dentro del solapamiento reubicada
+                        Tarea tareaReubicada = ClonarSinSecuencial(tarea);
+                        tareaReubicada.FechaInicio = finUltimaTarea;
+                        tareaReubicada.FechaFin = finUltimaTarea.Add(tarea.FechaFin - nuevaTarea.FechaInicio);
+                        db1.Tarea.Add(tareaReubicada);
+                        finUltimaTarea = tareaReubicada.FechaFin;
+                    }
+                    // Caso 3: Solapamiento Parcial al Final
+                    else if (tarea.FechaInicio >= nuevaTarea.FechaInicio && tarea.FechaInicio < nuevaTarea.FechaFin && tarea.FechaFin > nuevaTarea.FechaFin)
+                    {
+                        // Parte solapada al inicio
+                        Tarea tareaReubicada = ClonarSinSecuencial(tarea);
+                        tareaReubicada.FechaInicio = finUltimaTarea;
+                        tareaReubicada.FechaFin = finUltimaTarea.Add(nuevaTarea.FechaFin - tarea.FechaInicio);
+                        db1.Tarea.Add(tareaReubicada);
+                        finUltimaTarea = tareaReubicada.FechaFin;
+
+                        // Parte posterior al solapamiento
+                        Tarea tareaDespues = ClonarSinSecuencial(tarea);
+                        tareaDespues.FechaInicio = nuevaTarea.FechaFin;
+                        tareaDespues.FechaFin = tarea.FechaFin;
+                        db1.Tarea.Add(tareaDespues);
+                    }
+                    // Caso 4: Solapamiento Completamente Cubierto
+                    else if (tarea.FechaInicio < nuevaTarea.FechaInicio && tarea.FechaFin > nuevaTarea.FechaFin)
+                    {
+                        // Parte antes del solapamiento
+                        Tarea tareaAntes = ClonarSinSecuencial(tarea);
+                        tareaAntes.FechaInicio = tarea.FechaInicio;
+                        tareaAntes.FechaFin = nuevaTarea.FechaInicio;
+                        db1.Tarea.Add(tareaAntes);
+
+                        // Parte coincidente reubicada
+                        Tarea tareaReubicada = ClonarSinSecuencial(tarea);
+                        tareaReubicada.FechaInicio = finUltimaTarea;
+                        tareaReubicada.FechaFin = finUltimaTarea.Add(nuevaTarea.FechaFin - nuevaTarea.FechaInicio);
+                        db1.Tarea.Add(tareaReubicada);
+                        finUltimaTarea = tareaReubicada.FechaFin;
+
+                        // Parte después del solapamiento
+                        Tarea tareaDespues = ClonarSinSecuencial(tarea);
+                        tareaDespues.FechaInicio = nuevaTarea.FechaFin;
+                        tareaDespues.FechaFin = tarea.FechaFin;
+                        db1.Tarea.Add(tareaDespues);
+                    }
+
+                    // Marcar la tarea original como anulada
+                    tarea.SecuencialEstadoTarea = 4;
+                }
+
+                // Agregar la nueva tarea
+                db1.Tarea.Add(nuevaTarea);
+
+                // Guardar todos los cambios en la base de datos
+                db1.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+
+        //public static void AgregarTareaConReubicacion(Tarea nuevaTarea, SifizPlanningEntidades db1 = null)
+        //{
+        //    try
+        //    {
+        //        if (db1 == null)
+        //        {
+        //            db1 = db;
+        //        }
+        //        // Obtener el inicio y fin del día para la fecha de la nueva tarea
+        //        DateTime inicioDelDia = nuevaTarea.FechaInicio.Date;
+        //        DateTime finDelDia = inicioDelDia.AddDays(1).AddSeconds(-1);
+
+        //        // Modificar la consulta
+        //        DateTime finUltimaTarea = db1.Tarea
+        //            .Where(t => t.SecuencialColaborador == nuevaTarea.SecuencialColaborador &&
+        //                        t.FechaInicio >= inicioDelDia &&
+        //                        t.FechaInicio < finDelDia)
+        //            .OrderByDescending(t => t.FechaFin)
+        //            .FirstOrDefault()?.FechaFin ?? inicioDelDia.AddHours(17.5);
+
+        //        // Buscar tareas existentes del colaborador que se solapen con la nueva tarea
+        //        var tareasSolapadas = (from t in db1.Tarea
+        //                               where t.SecuencialColaborador == nuevaTarea.SecuencialColaborador &&
+        //                                     t.SecuencialEstadoTarea != 4 && // Excluir tareas anuladas
+        //                                     t.FechaInicio < nuevaTarea.FechaFin && t.FechaFin > nuevaTarea.FechaInicio
+        //                               select t).ToList();
+
+        //        foreach (var tarea in tareasSolapadas)
+        //        {
+        //            // Caso 1: Solapamiento Total
+        //            if (tarea.FechaInicio >= nuevaTarea.FechaInicio && tarea.FechaFin <= nuevaTarea.FechaFin)
+        //            {
+        //                Tarea tareaReubicada = new Tarea();
+        //                tareaReubicada = tarea;
+        //                tareaReubicada.Secuencial = 0;
+        //                tareaReubicada.FechaInicio = finUltimaTarea;
+        //                tareaReubicada.FechaFin = finUltimaTarea.Add(tarea.FechaFin - tarea.FechaInicio);
+
+        //                db1.Tarea.Add(tareaReubicada);
+        //                finUltimaTarea = tareaReubicada.FechaFin;
+        //            }
+        //            // Caso 2: Solapamiento Parcial al Inicio
+        //            else if (tarea.FechaInicio < nuevaTarea.FechaInicio && tarea.FechaFin > nuevaTarea.FechaInicio && tarea.FechaFin <= nuevaTarea.FechaFin)
+        //            {
+        //                // Parte antes del solapamiento
+        //                Tarea tareaAntes = new Tarea();
+        //                tareaAntes = tarea;
+        //                tareaAntes.Secuencial = 0;
+        //                tareaAntes.FechaInicio = tarea.FechaInicio;
+        //                tareaAntes.FechaFin = nuevaTarea.FechaInicio;
+        //                db1.Tarea.Add(tareaAntes);
+
+        //                // Parte dentro del solapamiento reubicada
+        //                Tarea tareaReubicada = new Tarea();
+        //                tareaReubicada = tarea;
+        //                tareaReubicada.Secuencial = 0;
+        //                tareaReubicada.FechaInicio = finUltimaTarea;
+        //                tareaReubicada.FechaFin = finUltimaTarea.Add(tarea.FechaFin - nuevaTarea.FechaInicio);
+        //                db1.Tarea.Add(tareaReubicada);
+        //                finUltimaTarea = tareaReubicada.FechaFin;
+        //            }
+        //            // Caso 3: Solapamiento Parcial al Final
+        //            else if (tarea.FechaInicio >= nuevaTarea.FechaInicio && tarea.FechaInicio < nuevaTarea.FechaFin && tarea.FechaFin > nuevaTarea.FechaFin)
+        //            {
+        //                // Parte solapada al inicio
+        //                Tarea tareaReubicada = new Tarea();
+        //                tareaReubicada = tarea;
+        //                tareaReubicada.Secuencial = 0;
+        //                tareaReubicada.FechaInicio = finUltimaTarea;
+        //                tareaReubicada.FechaFin = finUltimaTarea.Add(nuevaTarea.FechaFin - tarea.FechaInicio);
+        //                db1.Tarea.Add(tareaReubicada);
+        //                finUltimaTarea = tareaReubicada.FechaFin;
+
+        //                // Parte posterior al solapamiento
+        //                Tarea tareaDespues = new Tarea();
+        //                tareaDespues = tarea;
+        //                tareaDespues.Secuencial = 0;
+        //                tareaDespues.FechaInicio = nuevaTarea.FechaFin;
+        //                tareaDespues.FechaFin = tarea.FechaFin;
+        //                db1.Tarea.Add(tareaDespues);
+        //            }
+        //            // Caso 4: Solapamiento Completamente Cubierto
+        //            else if (tarea.FechaInicio < nuevaTarea.FechaInicio && tarea.FechaFin > nuevaTarea.FechaFin)
+        //            {
+        //                // Parte antes del solapamiento
+        //                Tarea tareaAntes = new Tarea();
+        //                tareaAntes = tarea;
+        //                tareaAntes.Secuencial = 0;
+        //                tareaAntes.FechaInicio = tarea.FechaInicio;
+        //                tareaAntes.FechaFin = nuevaTarea.FechaInicio;
+        //                db1.Tarea.Add(tareaAntes);
+
+        //                // Parte coincidente reubicada
+        //                Tarea tareaReubicada = new Tarea();
+        //                tareaReubicada = tarea;
+        //                tareaReubicada.Secuencial = 0;
+        //                tareaReubicada.FechaInicio = finUltimaTarea;
+        //                tareaReubicada.FechaFin = finUltimaTarea.Add(nuevaTarea.FechaFin - nuevaTarea.FechaInicio);
+        //                db1.Tarea.Add(tareaReubicada);
+        //                finUltimaTarea = tareaReubicada.FechaFin;
+
+        //                // Parte después del solapamiento
+        //                Tarea tareaDespues = new Tarea();
+        //                tareaDespues = tarea;
+        //                tareaDespues.Secuencial = 0;
+        //                tareaDespues.FechaInicio = nuevaTarea.FechaFin;
+        //                tareaDespues.FechaFin = tarea.FechaFin;
+        //                db1.Tarea.Add(tareaDespues);
+        //            }
+
+        //            // Marcar la tarea original como anulada
+        //            tarea.SecuencialEstadoTarea = 4;
+        //        }
+
+        //        // Agregar la nueva tarea
+        //        db1.Tarea.Add(nuevaTarea);
+
+        //        // Guardar todos los cambios en la base de datos
+        //        db1.SaveChanges();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(ex.Message);
+        //    }
+        //}
+
+
         public static List<string> CorreoPorGrupoEmail(string codigoGrupoEmail)
         {
             var correos = (from p in db.Persona
@@ -884,6 +1122,29 @@ namespace SifizPlanning.Util
 
             // Retornar la representación de texto de los datos descifrados
             return Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount);
+        }
+
+        private static Tarea ClonarSinSecuencial(Tarea t)
+        {
+            // Clona la instancia actual sin el Secuencial y sin relaciones
+            Tarea clon = new Tarea
+            {
+                SecuencialColaborador = t.SecuencialColaborador,
+                SecuencialActividad = t.SecuencialActividad,
+                SecuencialLugarTarea = t.SecuencialLugarTarea,
+                SecuencialEstadoTarea = t.SecuencialEstadoTarea,
+                SecuencialModulo = t.SecuencialModulo,
+                SecuencialCliente = t.SecuencialCliente,
+                Detalle = t.Detalle,
+                FechaInicio = t.FechaInicio,
+                FechaFin = t.FechaFin,
+                HorasUtilizadas = t.HorasUtilizadas,
+                NumeroVerificador = t.NumeroVerificador,
+                TiempoEstimacion = t.TiempoEstimacion,
+                EsReproceso = t.EsReproceso
+            };
+
+            return clon;
         }
     }
 }

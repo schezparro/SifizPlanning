@@ -479,6 +479,12 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "CrearNuevaTareaCapacitacion",
+                url: "task/nueva-tarea-capacitacion/{id}",
+                defaults: new { controller = "Task", action = "CrearNuevaTareaCapacitacion", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "EmailNuevaTarea",
                 url: "task/email-nueva-tarea/{id}",
                 defaults: new { controller = "Task", action = "EmailNuevaTarea", id = UrlParameter.Optional }
