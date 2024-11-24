@@ -433,6 +433,7 @@
     <Compile Include="Controllers\HangfireController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\IndicadoresController.cs" />
+    <Compile Include="Controllers\ComercialController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\RrhhController.cs" />
     <Compile Include="Controllers\ServiciosController.cs" />
@@ -755,6 +756,9 @@
     <Compile Include="Models\OfertaCotizacionTicket.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\OfertaRequerimiento.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Ofertas.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
@@ -801,6 +805,9 @@
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repositorio.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Requerimiento.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ResolucionSemaforoPrioridad.cs">
@@ -1235,6 +1242,7 @@
     <Content Include="Views\Indicadores\Index.cshtml" />
     <Content Include="Views\Indicadores\windowIndicadoresTickets.cshtml" />
     <Content Include="Views\Indicadores\windowIndicadoresGestores.cshtml" />
+    <Content Include="Views\Comercial\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1242,7 +1250,9 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
     <Content Include="Web\css\font-awesome.css" />
+    <Content Include="Web\images\menu\icon-indicadores.png" />
     <Content Include="Web\images\menu\icon-reportes.png" />
+    <Content Include="Web\images\menu\icon-comercial.png" />
     <Content Include="Web\images\Reports-icon.png" />
     <Content Include="Web\js\admin\correosNoEnviadosController.js" />
     <Content Include="Web\js\angular-bootstrap-multiselect.js" />
@@ -1267,6 +1277,9 @@
     <Content Include="Web\js\indicadores\indicadoresGestores.js" />
     <Content Include="Web\js\indicadores\indicadores.js" />
     <Content Include="Web\js\indicadores\indicadoresTickets.js" />
+    <Content Include="Web\js\comercial\feriadosController.js" />
+    <Content Include="Web\js\comercial\comercial.js" />
+    <Content Include="Web\js\comercial\solicitudesController.js" />
     <Content Include="Web\js\rrhh\feriadosController.js" />
     <Content Include="Web\js\rrhh\solicitudesController.js" />
     <Content Include="Web\js\solid-gauge.js" />

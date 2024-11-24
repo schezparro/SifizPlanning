@@ -2679,6 +2679,28 @@ namespace SifizPlanning
                 url: "report/{id}",
                 defaults: new { controller = "Report", action = "Index", id = UrlParameter.Optional }
             );
+
+
+            //RUTAS DE COMERCIAL
+
+            //routes.MapRoute(
+            //    name: "VerReport",
+            //    url: "report/VerReporte/{id}",
+            //    defaults: new { controller = "Report", action = "VerReporte", id = UrlParameter.Optional }
+            //);
+
+            //routes.MapRoute(
+            //    name: "VerReporteCliente",
+            //    url: "report/VerReporteCliente/{id}",
+            //    defaults: new { controller = "Report", action = "VerReporteCliente", id = UrlParameter.Optional }
+            //);
+
+            routes.MapRoute(
+                name: "Comercial",
+                url: "comercial/{id}",
+                defaults: new { controller = "Comerial", action = "Index", id = UrlParameter.Optional }
+            );
+
         }
     }
 }
