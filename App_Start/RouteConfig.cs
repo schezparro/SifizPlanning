@@ -2675,6 +2675,18 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+               name: "GetReportAccess",
+               url: "report/GetReportAccess/{id}",
+               defaults: new { controller = "Report", action = "GetReportAccess", id = UrlParameter.Optional }
+           );
+
+            routes.MapRoute(
+                name: "VerReporteMantenimientoCliente",
+                url: "report/VerReporteMantenimientoCliente/{id}",
+                defaults: new { controller = "Report", action = "VerReporteMantenimientoCliente", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "Report",
                 url: "report/{id}",
                 defaults: new { controller = "Report", action = "Index", id = UrlParameter.Optional }

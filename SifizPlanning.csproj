@@ -1246,6 +1246,7 @@
     <Content Include="Views\Indicadores\windowIndicadoresTickets.cshtml" />
     <Content Include="Views\Indicadores\windowIndicadoresGestores.cshtml" />
     <Content Include="Views\Comercial\Index.cshtml" />
+    <Content Include="Views\Report\VerReporteMantenimientoCliente.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

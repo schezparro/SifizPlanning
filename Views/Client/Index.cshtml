@@ -30,6 +30,11 @@
 
                     <a hidden id="ver-reporte" href="" target="_blank"></a>
                     <li role="presentation"><a href="#" ng-click="VerReporteTicket()">Reporte de Tickets</a></li>
+                    
+                    <li ng-show="@ViewBag.isAlowReportMtto.ToString().ToLower()" role="presentation">
+                        <a href="#" ng-click="VerReporteMtto()">Reporte de Mtto</a>
+                    </li>
+
 
                     <a href="cerrar/sesion/" class="right btn btn-danger"><span class="glyphicon glyphicon-off"></span> Cerrar Sesión</a>
                     <a href="main-menu" style="margin-right: 4px;" class="right btn btn-warning"><span class="glyphicon glyphicon-menu-hamburger"></span> Menú Principal</a>

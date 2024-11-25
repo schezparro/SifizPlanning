@@ -66,6 +66,16 @@ clientApp.controller('clientController', ['$scope', '$http', function ($scope, $
         angular.element("#ver-reporte")[0].click();
     };
 
+    $scope.VerReporteMtto = function () {
+        $http.get('/Report/GetReportAccess?cliente=' + $scope.idCliente)
+            .then(function (response) {
+                var code = response.data.code;
+                var reportUrl = "/Report/VerReporteMantenimientoCliente?code=" + code;
+                angular.element("#ver-reporte").attr({ "href": reportUrl });
+                angular.element("#ver-reporte")[0].click();
+            });
+    };
+
     //Cambiar la contraseña del usuario
     $scope.cambiarPassUsuario = function () {
         waitingDialog.show('Cambiando la contraseña del usuario...', { dialogSize: 'sm', progressType: 'success' });
