@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="41eaed6327af4b2585e910c8381c19a4" Name="Diagram1" ZoomLevel="80">
+      <Diagram DiagramId="41eaed6327af4b2585e910c8381c19a4" Name="Diagram1" ZoomLevel="129">
         <EntityTypeShape EntityType="SifizPlanningModel.Rol" Width="1.5" PointX="26.625" PointY="16.625" />
         <EntityTypeShape EntityType="SifizPlanningModel.Usuario" Width="1.5" PointX="25.625" PointY="9.25" />
         <EntityTypeShape EntityType="SifizPlanningModel.UsuarioRol" Width="1.5" PointX="26.625" PointY="13.25" />
@@ -432,6 +432,8 @@
         <AssociationConnector Association="SifizPlanningModel.FK_RECURSOS_COLABORADOR" />
         <EntityTypeShape EntityType="SifizPlanningModel.OfertaRequerimiento" Width="1.5" PointX="0.75" PointY="39.75" />
         <EntityTypeShape EntityType="SifizPlanningModel.Requerimiento" Width="1.5" PointX="2.75" PointY="39.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.ClienteReporteMantenimiento" Width="1.5" PointX="8.375" PointY="49.75" />
+        <AssociationConnector Association="SifizPlanningModel.FK_CLIENTEREPORTEMANTENIMIENTO_CLIENTE" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

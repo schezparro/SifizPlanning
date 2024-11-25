@@ -3557,25 +3557,55 @@ r in db.Rol on ur.rol equals r
                     throw new Exception("El recurso no se encuentra en el sistema");
                 }
 
-                var rec = (from r in db.Recursos
-                           join md in db.Modulo on r.SecuencialModulo equals md.Secuencial
-                           where r.Secuencial == secuencialRecurso
-                           select new
-                           {
-                               secuencial = r.Secuencial,
-                               titulo = r.Titulo,
-                               modulo = md.Descripcion,
-                               detalle = r.Detalle,
-                               adjunto = r.Adjunto,
-                               fecha = r.Fecha,
-                               tiempo = r.TiempoCapacitacion,
-                               Url = r.Url ?? ""
-                           }).FirstOrDefault();
+                var recu = (from r in db.Recursos
+                            join md in db.Modulo on r.SecuencialModulo equals md.Secuencial
+                            where r.Secuencial == secuencialRecurso
+                            select new
+                            {
+                                secuencial = r.Secuencial,
+                                titulo = r.Titulo,
+                                detalle = r.Detalle,
+                                modulo = md.Secuencial,
+                                fecha = r.Fecha,
+                                adjunto = r.Adjunto,
+                                horas = r.TiempoCapacitacion / 60,
+                                minutos = r.TiempoCapacitacion % 60,
+                                capacitor = r.SecuencialColaborador,
+                                url = r.Url ?? ""
+                            }).FirstOrDefault();
+
+                var rec = recu != null ? new
+                {
+                    secuencial = recu.secuencial,
+                    titulo = recu.titulo,
+                    detalle = recu.detalle,
+                    modulo = recu.modulo,
+                    fecha = recu.fecha.ToString("yyyy-MM-ddTHH:mm"),
+                    adjunto = recu.adjunto,
+                    horas = recu.horas,
+                    minutos = recu.minutos,
+                    capacitor = recu.capacitor,
+                    url = recu.url
+                } : null;
+
+                var asistenciaRecurso = (from ra in db.RecursosAsistencia
+                                         join r in db.Recursos on ra.SecuencialRecurso equals r.Secuencial
+                                         join c in db.Colaborador on ra.SecuencialColaborador equals c.Secuencial
+                                         where ra.SecuencialRecurso == secuencialRecurso
+                                         orderby c.persona.Nombre1, c.persona.Apellido1
+                                         select new
+                                         {
+                                             id = ra.Secuencial,
+                                             idColaborador = ra.SecuencialColaborador,
+                                             nombre = c.persona.Nombre1 + " " + c.persona.Apellido1,
+                                             asignado = ra.Convocado
+                                         }).ToList();
 
                 var result = new
                 {
                     success = true,
-                    recursoResult = rec
+                    recurso = rec,
+                    asistencia = asistenciaRecurso
                 };
                 return Json(result);
             }
