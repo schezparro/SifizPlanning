@@ -3259,12 +3259,8 @@
         });
 
         infoTicketsResultados.success(function (resultado) {
-            console.log("entreeee");
-            console.log(infoTicketsResultados);
-
             $scope.loading.hide();
             var data = resultado;
-            console.log(resultado);
 
             if (resultado) {
                 $scope.resultadosIndicadores = data; // Asegúrate de que data contiene 'resultado'

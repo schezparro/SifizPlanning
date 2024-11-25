@@ -1894,150 +1894,40 @@ namespace SifizPlanning.Controllers
             }
         }
 
+        private IQueryable<EstadoTicketInfo> ObtenerUltimoEstadoTicketsAntesDeFecha(DateTime fechaLimite)
+{
+            var latestStatusQuery =
+                from th in db.TicketHistorico
+                join maxDate in
+                    (from thSub in db.TicketHistorico
+                     where thSub.FechaOperacion <= fechaLimite
+                     group thSub by thSub.SecuencialTicket into grouped
+                     select new
+                     {
+                         SecuencialTicket = grouped.Key,
+                         MaxFechaOperacion = grouped.Max(g => g.FechaOperacion)
+                     })
+                on new { th.SecuencialTicket, th.FechaOperacion } equals new { maxDate.SecuencialTicket, FechaOperacion = maxDate.MaxFechaOperacion }
+                join et in db.EstadoTicket
+                    on th.SecuencialEstadoTicket equals et.Secuencial
+                select new EstadoTicketInfo
+                {
+                    SecuencialTicket = th.SecuencialTicket,
+                    CodigoEstado = et.Codigo, // Incluye el Código desde la tabla EstadoTicket
+                    FechaOperacion = th.FechaOperacion, // Incluye la fecha de operación
+                    FechaCreado = th.FechaCreado
+                };
 
-        //********************************* INDICADORES FINALES *****************************************************
+            return latestStatusQuery;
+        }
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
-        //public ActionResult DarTicketsIndicadoresResultado(List<string> annos, List<string> meses)
-        //{
-        //    try
-        //    {
-        //        DateTime fActual = DateTime.Today;
-        //        var annosInt = new List<int>();
-        //        var mesesInt = new List<int>();
-
-        //        if (annos == null || !annos.Any())
-        //        {
-        //            annosInt.Add(2024);
-        //        }
-        //        else
-        //        {
-        //            annosInt = annos.Select(int.Parse).OrderBy(a => a).ToList();
-        //        }
-
-        //        if (meses == null || !meses.Any())
-        //        {
-        //            mesesInt = Enumerable.Range(1, 12).ToList();
-        //        }
-        //        else
-        //        {
-        //            mesesInt = meses.Select(int.Parse).OrderBy(m => m).ToList();
-
-        //        }
-
-        //        var resultado = new List<dynamic>();
-
-        //        foreach (var anno in annosInt)
-        //        {
-        //            foreach (var mes in mesesInt)
-        //            {
-        //                int mesAnterior = mes - 1;
-        //                int annoAnterior = anno;
-        //                if (mesAnterior == 0)
-        //                {
-        //                    mesAnterior = 12;
-        //                    annoAnterior -= 1;
-        //                }
-
-        //                // Aumenta el tiempo de espera
-        //                db.Database.CommandTimeout = 180;
-
-        //                // Saldo de tickets del mes anterior
-        //                var saldoMesAnterior = db.Ticket
-        //                    .Where(t => t.FechaCreado.Year == annoAnterior &&
-        //                                t.FechaCreado.Month == mesAnterior &&
-        //                                t.estadoTicket.Codigo != "CERRADO" &&
-        //                                t.estadoTicket.Codigo != "ANULADO" &&
-        //                                t.estadoTicket.Codigo != "RECHAZADO")
-        //                    .Count();
-
-        //                // Tickets ingresados en el mismo mes
-        //                var ticketsIngresadosMes = db.Ticket
-        //                    .Where(t => t.FechaCreado.Year == anno &&
-        //                                t.FechaCreado.Month == mes &&
-        //                                t.FechaCreado <= fActual)
-        //                    .Count();
-
-        //                // Total de tickets para atender en el mes
-        //                var ticketsParaAtender = saldoMesAnterior + ticketsIngresadosMes;
-
-        //                // Tickets cerrados atendidos en el mes actual
-        //                var ticketsCerradosAtendidos = db.Ticket
-        //                    .Where(t => t.FechaCreado.Year == anno &&
-        //                                t.FechaCreado.Month == mes &&
-        //                                t.FechaCreado <= fActual &&
-        //                                t.estadoTicket.Codigo == "CERRADO")
-        //                    .Count();
-
-        //                // Tickets anulados o rechazados en el mes actual
-        //                var ticketsAnuladosRechazados = db.Ticket
-        //                    .Where(t => t.FechaCreado.Year == anno &&
-        //                                t.FechaCreado.Month == mes &&
-        //                                t.FechaCreado <= fActual &&
-        //                                (t.estadoTicket.Codigo == "ANULADO" || t.estadoTicket.Codigo == "RECHAZADO"))
-        //                    .Count();
-
-        //                // Filtra primero por el mes de cierre
-        //                var ticketsCerradosEnMesActual = db.Ticket
-        //                    .Where(t => t.Fecha.HasValue &&
-        //                                t.Fecha.Value.Year == anno &&
-        //                                t.Fecha.Value.Month == mes &&
-        //                                t.estadoTicket.Codigo == "CERRADO");
-
-        //                // Filtra los tickets cerrados en el mismo mes (creados y cerrados en el mismo mes)
-        //                var ticketsCerradosMismoMes = ticketsCerradosEnMesActual
-        //                    .Where(t => t.FechaCreado.Year == anno &&
-        //                                t.FechaCreado.Month == mes)
-        //                    .Count();
-
-        //                // Filtra los tickets cerrados de meses anteriores
-        //                var ticketsCerradosMesesAnteriores = ticketsCerradosEnMesActual
-        //                    .Where(t => t.FechaCreado.Year < anno ||
-        //                                (t.FechaCreado.Year == anno && t.FechaCreado.Month < mes))
-        //                    .Count();
-
-
-        //                // Tickets pendientes para el siguiente mes
-        //                var ticketsPendientesSiguienteMes = ticketsParaAtender - (ticketsCerradosAtendidos + ticketsAnuladosRechazados);
-
-        //                // Indicador de resolución de tickets total
-        //                var indicadorResolucion = ticketsParaAtender > 0 ?
-        //                    (ticketsCerradosAtendidos * 100 / ticketsParaAtender) : 0;
-
-        //                resultado.Add(new
-        //                {
-        //                    Mes = $"{CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(mes)}-{anno}",
-        //                    SaldoMesAnterior = saldoMesAnterior,
-        //                    TicketsIngresadosMes = ticketsIngresadosMes,
-        //                    TicketsParaAtender = ticketsParaAtender,
-        //                    TicketsCerradosAtendidos = ticketsCerradosAtendidos,
-        //                    AnuladosORechazados = ticketsAnuladosRechazados,
-        //                    CerradosEnMismoMes = ticketsCerradosMismoMes,
-        //                    TicketsCerradosMesesAnteriores = ticketsCerradosMesesAnteriores,
-        //                    TicketsPendientesMesSiguiente = ticketsPendientesSiguienteMes,
-        //                    IndicadorResolucion = indicadorResolucion
-        //                });
-        //            }
-        //        }
-
-        //        return Json(resultado, JsonRequestBehavior.AllowGet);
-
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        var resp = new
-        //        {
-        //            success = false,
-        //            msg = e.Message
-        //        };
-        //        return Json(resp);
-        //    }
-        //}
         public ActionResult DarTicketsIndicadoresResultado(List<string> annos, List<string> meses)
         {
             try
             {
+                db.Database.CommandTimeout = 180;
                 var annosInt = new List<int>();
                 var mesesInt = new List<int>();
 
@@ -2061,6 +1951,7 @@ namespace SifizPlanning.Controllers
                 }
 
                 var resultado = new List<dynamic>();
+                var mesesProcesados = new List<string>();
 
                 foreach (var anno in annosInt)
                 {
@@ -2074,21 +1965,38 @@ namespace SifizPlanning.Controllers
                             annoAnterior -= 1;
                         }
 
-                        // Aumenta el tiempo de espera
-                        db.Database.CommandTimeout = 180;
-
-                        // Creamos la fecha final del mes anterior con la hora al final del día
-                        DateTime fechaFinMesAnterior = new DateTime(annoAnterior, mesAnterior, DateTime.DaysInMonth(annoAnterior, mesAnterior), 23, 59, 59, 999);
                         DateTime fActual = new DateTime(anno, mes, DateTime.DaysInMonth(anno, mes), 23, 59, 59, 999);
 
-                        // Consulta utilizando la fecha `DateTime` directamente
-                        var saldoMesAnterior = db.Ticket
-                                                .Where(t => t.FechaCreado != null
-                                                     && t.FechaCreado <= fechaFinMesAnterior
-                                                     && t.estadoTicket.Codigo != "CERRADO"
-                                                     && t.estadoTicket.Codigo != "ANULADO"
-                                                     && t.estadoTicket.Codigo != "RECHAZADO")
-                                                .Count();
+                        // Generar fechas de fin de mes para el cálculo
+                        DateTime fechaFinMesAnterior = new DateTime(annoAnterior, mesAnterior, DateTime.DaysInMonth(annoAnterior, mesAnterior), 23, 59, 59, 999);
+                        var idMesAnterior = CrearIdentificadorMes(mesAnterior, annoAnterior);
+                        var saldoMesAnterior = 0;
+
+                        if (!mesesProcesados.Contains(idMesAnterior))
+                        {
+                            var latestStatusQuery = ObtenerUltimoEstadoTicketsAntesDeFecha(fechaFinMesAnterior);
+
+                            saldoMesAnterior = (from ls in latestStatusQuery
+                                                    where !new[] { "CERRADO", "ANULADO", "RECHAZADO" }.Contains(ls.CodigoEstado)
+                                                    select ls.SecuencialTicket)
+                                                   .Distinct()
+                                                   .Count();
+                            mesesProcesados.Add(idMesAnterior);
+                        }
+                        else
+                        {
+                            if (resultado != null && resultado.Any())
+                            {
+                                 saldoMesAnterior = resultado
+                                .Where(t => t.Mes == idMesAnterior)
+                                .Select(t => t.TicketsPendientesMesSiguiente)
+                                .FirstOrDefault() ?? 0;
+                            }
+                            else
+                            {
+                                saldoMesAnterior = 0;
+                            }
+                        };
 
                         // Tickets ingresados en el mismo mes
                         var ticketsIngresadosMes = db.Ticket
@@ -2099,84 +2007,101 @@ namespace SifizPlanning.Controllers
                         // Total de tickets para atender en el mes
                         var ticketsParaAtender = saldoMesAnterior + ticketsIngresadosMes;
 
-                        // Tickets cerrados atendidos en el mes actual
-                        var ticketsCerradosAtendidos = db.Ticket
-                            .Where(t => t.FechaCreado.Year == anno &&
-                                        t.FechaCreado.Month == mes &&
-                                        t.FechaCreado <= fActual &&
-                                        t.estadoTicket.Codigo == "CERRADO")
+                        // Generar fecha de fin del mes actual
+                        DateTime fechaFinMesActual = new DateTime(anno, mes, DateTime.DaysInMonth(anno, mes), 23, 59, 59, 999);
+                        var idMesActual = CrearIdentificadorMes(mes, anno);
+                        mesesProcesados.Add(idMesActual);
+
+                        // Subconsulta: Obtener el último estado de cada ticket antes de la fecha límite (fin del mes actual)
+                        var latestStatusQuery2 = ObtenerUltimoEstadoTicketsAntesDeFecha(fechaFinMesActual);
+                           
+                        // Consulta principal: Filtrar los tickets cerrados en el mes y año actuales
+                        var ticketsCerradosMismoMes = (from ls in latestStatusQuery2
+                             join t in db.Ticket
+                                 on ls.SecuencialTicket equals t.Secuencial
+                             where ls.CodigoEstado == "CERRADO" &&
+                                   t.FechaCreado.Year == anno &&
+                                   t.FechaCreado.Month == mes
+                             select ls.SecuencialTicket)
+                            .Distinct()
                             .Count();
 
-                        // Tickets anulados o rechazados en el mes actual
-
-                        var ticketsAnuladosRechazados = db.Ticket
-                            .Join(db.TicketHistorico,
-                                ticket => ticket.Secuencial,
-                                historico => historico.SecuencialTicket,
-                                (ticket, historico) => new { ticket, historico })
-                            .Where(t => t.historico.FechaOperacion <= fActual &&
-                                        t.historico.FechaOperacion.Year == anno &&
-                                        t.historico.FechaOperacion.Month == mes &&
-                                        (t.ticket.estadoTicket.Codigo == "ANULADO" || t.ticket.estadoTicket.Codigo == "RECHAZADO"))
-                            .Select(t => t.ticket.Secuencial) // Selecciona solo los secuenciales de los tickets
-                            .Distinct().Count();
-
-                        // Filtra primero por el mes de cierre
-                        var ticketsCerradosEnMesActual = db.Ticket
-                            .Join(db.TicketHistorico,
-                                ticket => ticket.Secuencial,
-                                historico => historico.SecuencialTicket,
-                                (ticket, historico) => new { ticket, historico })
-                            .Where(t => t.historico.FechaOperacion <= fActual &&
-                                        t.historico.FechaOperacion.Year == anno &&
-                                        t.historico.FechaOperacion.Month == mes &&
-                                        (t.ticket.estadoTicket.Codigo == "CERRADO"))
-                            .Select(t => t.ticket) // Selecciona solo los secuenciales de los tickets
-                            .Distinct();
-
-                        // Filtra los tickets cerrados en el mismo mes (creados y cerrados en el mismo mes)
-                        var ticketsCerradosMismoMes = ticketsCerradosEnMesActual
-                            .Where(t => t.FechaCreado.Year == anno &&
-                                        t.FechaCreado.Month == mes)
+                        // Filtrar tickets anulados o rechazados en el mes actual
+                        var ticketsAnuladosRechazados = (from ls in latestStatusQuery2
+                             join t in db.Ticket
+                                 on ls.SecuencialTicket equals t.Secuencial
+                             where (ls.CodigoEstado == "ANULADO" || ls.CodigoEstado == "RECHAZADO") &&
+                                   t.FechaCreado.Year == anno &&
+                                   t.FechaCreado.Month == mes
+                             select ls.SecuencialTicket)
+                            .Distinct()
                             .Count();
 
-                        // Filtra los tickets cerrados de meses anteriores
-                        var ticketsCerradosMesesAnteriores = ticketsCerradosEnMesActual
-                            .Where(t => t.FechaCreado.Month != mes)
+                        // Filtrar tickets cerrados en el mes actual pero creados en meses anteriores
+                        var ticketsCerradosDeMesesAnteriores = (from ls in latestStatusQuery2
+                             join t in db.Ticket
+                                 on ls.SecuencialTicket equals t.Secuencial
+                             where ls.CodigoEstado == "CERRADO" &&
+                                   t.FechaCreado < new DateTime(anno, mes, 1) && 
+                                   ls.FechaOperacion.Month == mes && ls.FechaOperacion.Year == anno
+                                   select ls.SecuencialTicket)
+                            .Distinct()
                             .Count();
+
+                        // Obtener los días de resolución de los tickets cerrados en el mes
+                        var diasResolucionTickets = (from ls in latestStatusQuery2
+                                                     join t in db.Ticket
+                                                         on ls.SecuencialTicket equals t.Secuencial
+                                                     where ls.CodigoEstado == "CERRADO" &&
+                                                           ls.FechaOperacion.Year == anno &&
+                                                           ls.FechaOperacion.Month == mes
+                                                     select DbFunctions.DiffDays(t.FechaCreado, ls.FechaOperacion))
+                                                     .ToList();
+
+                        // Sumar los días de resolución
+                        int totalDiasResolucion = diasResolucionTickets.Sum() ?? 0;
+
+                        // Cantidad de tickets cerrados
+                        int cantidadTicketsCerrados = diasResolucionTickets.Count();
+
+                        // Calcular el promedio de días de resolución
+                        int promedioResolucionDias = cantidadTicketsCerrados > 0
+     ? (int)Math.Round((double)totalDiasResolucion / cantidadTicketsCerrados) // Redondear al entero más cercano
+     : 0;
 
 
                         // Tickets pendientes para el siguiente mes
-                        var ticketsPendientesSiguienteMes = ticketsParaAtender - (ticketsCerradosAtendidos + ticketsAnuladosRechazados);
-
+                        var ticketsPendientesSiguienteMes = ticketsParaAtender - (ticketsCerradosMismoMes + ticketsAnuladosRechazados + ticketsCerradosDeMesesAnteriores);
+                        var ticketsCerradosAtendidos = (ticketsCerradosMismoMes + ticketsAnuladosRechazados + ticketsCerradosDeMesesAnteriores);
                         // Indicador de resolución de tickets total
                         var indicadorResolucion = ticketsParaAtender > 0 ?
                             (ticketsCerradosAtendidos * 100 / ticketsParaAtender) : 0;
 
                         // Indicador de resolución de tickets total
                         var indicadorResolucionCerrados = ticketsIngresadosMes > 0 ?
-                            (ticketsCerradosMismoMes * 100 / ticketsIngresadosMes) : 0;
+                            (ticketsCerradosAtendidos * 100 / ticketsIngresadosMes) : 0;
 
                         // Indicador de resolución de tickets total
-                        var indicadorResolucionPendientes = ticketsCerradosMismoMes > 0 ?
+                        var indicadorResolucionPendientes = ticketsCerradosAtendidos > 0 ?
                             (ticketsPendientesSiguienteMes * 100 / ticketsParaAtender) : 0;
 
                         resultado.Add(new
                         {
-                            Mes = $"{CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(mes)}-{anno}",
+                            Mes = $"{(mes)}/{anno}",
                             SaldoMesAnterior = saldoMesAnterior,
                             TicketsIngresadosMes = ticketsIngresadosMes,
                             TicketsParaAtender = ticketsParaAtender,
                             TicketsCerradosAtendidos = ticketsCerradosAtendidos,
                             AnuladosORechazados = ticketsAnuladosRechazados,
                             CerradosEnMismoMes = ticketsCerradosMismoMes,
-                            TicketsCerradosMesesAnteriores = ticketsCerradosMesesAnteriores,
+                            TicketsCerradosMesesAnteriores = ticketsCerradosDeMesesAnteriores,
                             TicketsPendientesMesSiguiente = ticketsPendientesSiguienteMes,
                             IndicadorResolucion = indicadorResolucion,
                             IndicadorResolucionCerrados = indicadorResolucionCerrados,
-                            IndicadorResolucionPendientes = indicadorResolucionPendientes
+                            IndicadorResolucionPendientes = indicadorResolucionPendientes,
+                            PromedioResolucionDias = promedioResolucionDias
                         });
-
+                        
                     }
                 }
 
@@ -2194,6 +2119,10 @@ namespace SifizPlanning.Controllers
             }
         }
 
+        string CrearIdentificadorMes(int mes, int anno)
+        {
+            return $"{mes}/{anno}"; // Formato "MM/AAAA" (ejemplo: "01/2024")
+        }
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
@@ -2362,4 +2291,14 @@ namespace SifizPlanning.Controllers
         public Dictionary<int, int> TicketsPorMes { get; set; }
         public int Total { get; set; }
     }
+
+    public class EstadoTicketInfo
+    {
+        public int SecuencialTicket { get; set; }
+        public string CodigoEstado { get; set; }
+        public DateTime FechaOperacion { get; set; }
+        public DateTime FechaCreado { get; set; }
+    }
+
+
 }
