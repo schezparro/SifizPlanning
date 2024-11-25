@@ -204,5 +204,7 @@ namespace SifizPlanning.Models
         public virtual DbSet<RecursosAsistencia> RecursosAsistencia { get; set; }
         public virtual DbSet<ServicioImplantacionCore> ServicioImplantacionCore { get; set; }
         public virtual DbSet<TiemposProyecto> TiemposProyecto { get; set; }
+        public virtual DbSet<OfertaRequerimiento> OFERTAREQUERIMIENTO { get; set; }
+        public virtual DbSet<Requerimiento> REQUERIMIENTO { get; set; }
     }
 }
