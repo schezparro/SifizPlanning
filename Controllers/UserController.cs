@@ -5309,13 +5309,24 @@ r in db.Rol on ur.rol equals r
                     var datosAsistencia = s1.Deserialize<List<dynamic>>(adjuntoAsistencia);
                     List<string> usuariosDestinos = new List<string>();
 
+                    Recursos cap = db.Recursos.FirstOrDefault(ca => ca.Secuencial == idRecurso);
+                    var tareasAsignadas = db.TareaCapacitacion.Where(s => s.SecuencialCapacitacion == cap.Secuencial).ToList();
+                    foreach (var tar in tareasAsignadas)
+                    {
+                        var tarea = db.Tarea.Where(s => s.Secuencial == tar.SecuencialTarea).FirstOrDefault();
+
+                        tarea.SecuencialEstadoTarea = 4;
+                        db.TareaCapacitacion.Remove(tar);
+
+                        db.SaveChanges();
+                    }
+
                     foreach (var item in datosAsistencia)
                     {
                         int id = Convert.ToInt32(item["id"]);
                         bool convocado = Convert.ToBoolean(item["convocado"]);
 
                         RecursosAsistencia r = db.RecursosAsistencia.FirstOrDefault(ra => ra.Secuencial == id);
-                        Recursos cap = db.Recursos.FirstOrDefault(ca => ca.Secuencial == r.SecuencialRecurso);
 
                         bool con = r.Convocado == 1 ? true : false;
 
@@ -5342,8 +5353,13 @@ r in db.Rol on ur.rol equals r
                                 };
                                 Utiles.AgregarTareaConReubicacion(tar, db);
 
-
-                                Recursos re = db.Recursos.FirstOrDefault(rr => rr.Secuencial == idRecurso);
+                                TareaCapacitacion tarc = new TareaCapacitacion()
+                                {
+                                    SecuencialCapacitacion = cap.Secuencial,
+                                    SecuencialTarea = tar.Secuencial
+                                };
+                                db.TareaCapacitacion.Add(tarc);
+                                db.SaveChanges();
 
                                 string email = db.Colaborador.FirstOrDefault(s => s.Secuencial == r.SecuencialColaborador).persona.usuario.FirstOrDefault().Email;
                                 usuariosDestinos.Add(email);
@@ -5352,15 +5368,15 @@ r in db.Rol on ur.rol equals r
                                 textoEmail += "<br>";
                                 textoEmail += "Por medio del siguiente correo se establece la reunión programada con el siguiente detalle: ";
                                 textoEmail += "<br/>";
-                                textoEmail += "<strong>Tema: <strong/>" + re.Titulo;
+                                textoEmail += "<strong>Tema: <strong/>" + cap.Titulo;
                                 textoEmail += "<br/>";
-                                textoEmail += "<strong>Fecha: <strong/>" + re.Fecha;
+                                textoEmail += "<strong>Fecha: <strong/>" + cap.Fecha;
                                 textoEmail += "<br/>";
-                                textoEmail += $"<strong>Duración: </strong>{re.TiempoCapacitacion / 60} horas y {re.TiempoCapacitacion % 60} minutos";
+                                textoEmail += $"<strong>Duración: </strong>{cap.TiempoCapacitacion / 60} horas y {cap.TiempoCapacitacion % 60} minutos";
                                 textoEmail += "<br/>";
-                                textoEmail += "<strong>Modulador: <strong/>" + re.SecuencialModulo;
+                                textoEmail += "<strong>Modulador: <strong/>" + cap.SecuencialModulo;
                                 textoEmail += "<br/>";
-                                textoEmail += "<strong>Enlace de la reunión: <strong/>" + re.Url;
+                                textoEmail += "<strong>Enlace de la reunión: <strong/>" + cap.Url;
                                 textoEmail += "</div>";
 
                                 string asuntoEmail = "Nueva Reunión/Capacitación";

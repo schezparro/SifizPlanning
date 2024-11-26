@@ -870,6 +870,9 @@
     <Compile Include="Models\TareaActividadRealizada.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\TareaCapacitacion.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\TareaCompensatoria.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>

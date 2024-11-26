@@ -17,6 +17,7 @@ namespace SifizPlanning.Models
         public Recursos()
         {
             this.RECURSOSASISTENCIA = new HashSet<RecursosAsistencia>();
+            this.TAREACAPACITACION = new HashSet<TareaCapacitacion>();
         }
     
         public int Secuencial { get; set; }
@@ -34,5 +35,6 @@ namespace SifizPlanning.Models
         public virtual Modulo modulo { get; set; }
         public virtual ICollection<RecursosAsistencia> RECURSOSASISTENCIA { get; set; }
         public virtual Colaborador colaborador { get; set; }
+        public virtual ICollection<TareaCapacitacion> TAREACAPACITACION { get; set; }
     }
 }

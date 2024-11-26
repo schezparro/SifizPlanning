@@ -1001,6 +1001,14 @@ warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have 
           <Property Name="HORAFIN" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="HORAOPERACION" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
+        <EntityType Name="TAREACAPACITACION">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SECUENCIALTAREA" Type="int" Nullable="false" />
+          <Property Name="SECUENCIALCAPACITACION" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="TAREACOMPENSATORIA">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
@@ -2905,6 +2913,30 @@ warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have 
             </Principal>
             <Dependent Role="SubModulo">
               <PropertyRef Name="SecuencialModulo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TAREACAPACITACION_RECURSOS">
+          <End Role="RECURSOS" Type="Self.RECURSOS" Multiplicity="1" />
+          <End Role="TAREACAPACITACION" Type="Self.TAREACAPACITACION" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="RECURSOS">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="TAREACAPACITACION">
+              <PropertyRef Name="SECUENCIALCAPACITACION" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TAREACAPACITACION_TAREA">
+          <End Role="TAREA" Type="Self.TAREA" Multiplicity="1" />
+          <End Role="TAREACAPACITACION" Type="Self.TAREACAPACITACION" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TAREA">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="TAREACAPACITACION">
+              <PropertyRef Name="SECUENCIALTAREA" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -5167,6 +5199,7 @@ warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have 
           <EntitySet Name="TAREA_GESTION_SOLICITUDTAREA" EntityType="Self.TAREA_GESTION_SOLICITUDTAREA" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="TAREA_TAREARELACIONADA" EntityType="Self.TAREA_TAREARELACIONADA" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="TAREAACTIVIDADREALIZADA" EntityType="Self.TAREAACTIVIDADREALIZADA" Schema="TAREAS" store:Type="Tables" />
+          <EntitySet Name="TAREACAPACITACION" EntityType="Self.TAREACAPACITACION" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="TAREACOMPENSATORIA" EntityType="Self.TAREACOMPENSATORIA" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="TAREACOMPENSATORIAPERMISO" EntityType="Self.TAREACOMPENSATORIAPERMISO" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="TAREACOMPENSATORIAVACACION" EntityType="Self.TAREACOMPENSATORIAVACACION" Schema="TAREAS" store:Type="Tables" />
@@ -5546,6 +5579,14 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
           <AssociationSet Name="FK_SUBMODULO_MODULO" Association="Self.FK_SUBMODULO_MODULO">
             <End Role="MODULO" EntitySet="MODULO" />
             <End Role="SubModulo" EntitySet="SubModulo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TAREACAPACITACION_RECURSOS" Association="Self.FK_TAREACAPACITACION_RECURSOS">
+            <End Role="RECURSOS" EntitySet="RECURSOS" />
+            <End Role="TAREACAPACITACION" EntitySet="TAREACAPACITACION" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TAREACAPACITACION_TAREA" Association="Self.FK_TAREACAPACITACION_TAREA">
+            <End Role="TAREA" EntitySet="TAREA" />
+            <End Role="TAREACAPACITACION" EntitySet="TAREACAPACITACION" />
           </AssociationSet>
           <AssociationSet Name="FK_TAREAMANTENIMIENTO_TAREA" Association="Self.FK_TAREAMANTENIMIENTO_TAREA">
             <End Role="TAREA" EntitySet="TAREA" />
@@ -7451,6 +7492,15 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
             <End Role="Cliente" EntitySet="Cliente" />
             <End Role="CLIENTEREPORTEMANTENIMIENTO" EntitySet="ClienteReporteMantenimiento" />
           </AssociationSet>
+          <EntitySet Name="TareaCapacitacion" EntityType="SifizPlanningModel.TareaCapacitacion" />
+          <AssociationSet Name="FK_TAREACAPACITACION_TAREA" Association="SifizPlanningModel.FK_TAREACAPACITACION_TAREA">
+            <End Role="Tarea" EntitySet="Tarea" />
+            <End Role="TAREACAPACITACION" EntitySet="TareaCapacitacion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TAREACAPACITACION_RECURSOS" Association="SifizPlanningModel.FK_TAREACAPACITACION_RECURSOS">
+            <End Role="Recursos" EntitySet="Recursos" />
+            <End Role="TAREACAPACITACION" EntitySet="TareaCapacitacion" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="Rol">
           <Key>
@@ -9326,6 +9376,7 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
           <NavigationProperty Name="TAREAMANTENIMIENTOBORRAR" Relationship="SifizPlanningModel.FK_TAREAMANTENIMIENTOBORRAR_TAREA" FromRole="Tarea" ToRole="TAREAMANTENIMIENTOBORRAR" />
           <Property Name="TiempoEstimacion" Type="Time" Precision="0" />
           <Property Name="EsReproceso" Type="Decimal" Precision="1" Scale="0" />
+          <NavigationProperty Name="tareaCapacitacion" Relationship="SifizPlanningModel.FK_TAREACAPACITACION_TAREA" FromRole="Tarea" ToRole="TAREACAPACITACION" />
         </EntityType>
         <Association Name="RefACTIVIDAD22">
           <End Type="SifizPlanningModel.Actividad" Role="Actividad" Multiplicity="1" />
@@ -12557,6 +12608,7 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
           <Property Name="SecuencialColaborador" Type="Int32" />
           <NavigationProperty Name="colaborador" Relationship="SifizPlanningModel.FK_RECURSOS_COLABORADOR" FromRole="Recursos" ToRole="Colaborador" />
           <Property Name="Url" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="TAREACAPACITACION" Relationship="SifizPlanningModel.FK_TAREACAPACITACION_RECURSOS" FromRole="Recursos" ToRole="TAREACAPACITACION" />
         </EntityType>
         <Association Name="FK_RECURSOS_MODULO">
           <End Type="SifizPlanningModel.Modulo" Role="Modulo" Multiplicity="1" />
@@ -12978,6 +13030,40 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
             </Principal>
             <Dependent Role="CLIENTEREPORTEMANTENIMIENTO">
               <PropertyRef Name="SecuencialCliente" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="TareaCapacitacion">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SecuencialTarea" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialCapacitacion" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="tarea" Relationship="SifizPlanningModel.FK_TAREACAPACITACION_TAREA" FromRole="TAREACAPACITACION" ToRole="Tarea" />
+          <NavigationProperty Name="recursos" Relationship="SifizPlanningModel.FK_TAREACAPACITACION_RECURSOS" FromRole="TAREACAPACITACION" ToRole="Recursos" />
+        </EntityType>
+        <Association Name="FK_TAREACAPACITACION_TAREA">
+          <End Type="SifizPlanningModel.Tarea" Role="Tarea" Multiplicity="1" />
+          <End Type="SifizPlanningModel.TareaCapacitacion" Role="TAREACAPACITACION" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Tarea">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="TAREACAPACITACION">
+              <PropertyRef Name="SecuencialTarea" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TAREACAPACITACION_RECURSOS">
+          <End Type="SifizPlanningModel.Recursos" Role="Recursos" Multiplicity="1" />
+          <End Type="SifizPlanningModel.TareaCapacitacion" Role="TAREACAPACITACION" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Recursos">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="TAREACAPACITACION">
+              <PropertyRef Name="SecuencialCapacitacion" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -15249,6 +15335,15 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
                 <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
                 <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
                 <ScalarProperty Name="Codigo" ColumnName="CODIGO" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TareaCapacitacion">
+            <EntityTypeMapping TypeName="SifizPlanningModel.TareaCapacitacion">
+              <MappingFragment StoreEntitySet="TAREACAPACITACION">
+                <ScalarProperty Name="SecuencialCapacitacion" ColumnName="SECUENCIALCAPACITACION" />
+                <ScalarProperty Name="SecuencialTarea" ColumnName="SECUENCIALTAREA" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
               </MappingFragment>
             </EntityTypeMapping>

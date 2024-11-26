@@ -24,6 +24,7 @@ namespace SifizPlanning.Models
             this.NOTERMINACIONTAREA = new HashSet<NoTerminacionTarea>();
             this.tareaMantenimiento = new HashSet<TareaMantenimiento>();
             this.TAREAMANTENIMIENTOBORRAR = new HashSet<TareaMantenimientoBorrar>();
+            this.tareaCapacitacion = new HashSet<TareaCapacitacion>();
         }
     
         public int Secuencial { get; set; }
@@ -59,5 +60,6 @@ namespace SifizPlanning.Models
         public virtual Modulo modulo { get; set; }
         public virtual ICollection<TareaMantenimiento> tareaMantenimiento { get; set; }
         public virtual ICollection<TareaMantenimientoBorrar> TAREAMANTENIMIENTOBORRAR { get; set; }
+        public virtual ICollection<TareaCapacitacion> tareaCapacitacion { get; set; }
     }
 }
