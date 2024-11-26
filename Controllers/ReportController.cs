@@ -11,6 +11,7 @@ using System.Web.UI.WebControls;
 using System.Configuration;
 using System.Web.Caching;
 using System.Net;
+using System.Net.Mail;
 
 namespace SifizPlanning.Controllers
 {
@@ -129,12 +130,14 @@ namespace SifizPlanning.Controllers
                            where r.Modulo.Equals(modulo) && r.Nombre.Equals(reporte)
                            select r.Url).FirstOrDefault();
 
+                string reportServerUser = ConfigurationManager.AppSettings.Get("ReportServerUser");
+                string reportServerPass = ConfigurationManager.AppSettings.Get("ReportServerPass");
+                string reportServerUrl = ConfigurationManager.AppSettings.Get("ReportServerUrl");
+
                 if (string.IsNullOrEmpty(url))
                 {
                     return new HttpStatusCodeResult(HttpStatusCode.NotFound, "Reporte no encontrado.");
                 }
-
-                string reportServerUrl = ConfigurationManager.AppSettings.Get("ReportServerUrl");
 
                 // Calcular las fechas de inicio y fin del mes anterior
                 DateTime currentDate = DateTime.Now;
@@ -144,9 +147,13 @@ namespace SifizPlanning.Controllers
 
                 ReportViewer reportViewer = new ReportViewer();
                 reportViewer.ProcessingMode = ProcessingMode.Remote;
+                reportViewer.ServerReport.ReportServerCredentials = new ReportServerCredentials(reportServerUser, reportServerPass, "");
+
+
                 reportViewer.SizeToReportContent = true;
                 reportViewer.Width = Unit.Percentage(100);
                 reportViewer.Height = Unit.Percentage(100);
+
                 reportViewer.ServerReport.ReportServerUrl = new Uri(reportServerUrl);
                 reportViewer.ServerReport.ReportPath = url;
 
@@ -168,6 +175,34 @@ namespace SifizPlanning.Controllers
             }
         }
 
+        [HttpPost]
+        public JsonResult AcceptReport()
+        {
+            EnviarEmail("aceptado");
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public JsonResult RejectReport()
+        {
+            EnviarEmail("rechazado");
+            return Json(new { success = true });
+        }
+
+        private void EnviarEmail(string status)
+        {
+            string emailUser = User.Identity.Name;
+            Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+            Persona persona = user.persona;
+
+            var cliente = persona.persona_cliente.cliente;
+
+            string email = "rlandave@sifizsoft.com";
+            string[] emails = new string[] { email };
+            string textoHtml = $"<div class=\"textoCuerpo\">Estimado, el cliente {cliente.Descripcion} ha {status} el reporte de horas de mantenimiento. Por favor, su gentil gestión.</div>";
+
+            Utiles.EnviarEmailSistema(emails, textoHtml, $"Reporte mantenimiento {status}");
+        }
 
     }
 }
