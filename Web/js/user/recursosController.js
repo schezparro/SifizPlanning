@@ -488,6 +488,69 @@
         }
     };
 
+    $scope.EditarPlan = function () {
+        var moduloPlan = angular.element("#edit-select-modulo-plan")[0].value;
+        var colaborador = angular.element("#edit-select-capacitador-plan")[0].value;
+
+        var fecha = $scope.editFechaHoraCapacitacion ? new Date($scope.editFechaHoraCapacitacion).toISOString() : new Date().toISOString();
+
+        var asistentesSeleccionadosIds = $scope.datosAsistenciaEdicion
+            .filter(asistente => asistente.asignado)
+            .map(asistente => asistente.id);
+        var asistentesSeleccionadosJson = JSON.stringify(asistentesSeleccionadosIds);
+
+        waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
+
+        var formData = new FormData();
+        formData.append('id', $scope.secuencialRecurso);
+        formData.append('titulo', $scope.editTituloPlan);
+        formData.append('detalle', $scope.editDetallePlan);
+        formData.append('fecha', fecha);
+        formData.append('modulo', moduloPlan);
+        formData.append('colaborador', colaborador);
+        formData.append('asistentesJson', asistentesSeleccionadosJson);
+        formData.append('link', $scope.editLinkPlan);
+
+        var tiempo = toTotalMinutes($scope.editHorasPlan, $scope.editMinutosPlan);
+        formData.append('tiempo', tiempo);
+
+        var ajaxEnvioDatos = $http({
+            method: 'POST',
+            url: "user/editar-plan-recurso-capacitacion",
+            data: formData,
+            headers: { 'Content-Type': undefined },
+            transformRequest: angular.identity
+        });
+
+        ajaxEnvioDatos.success(function (data) {
+            waitingDialog.hide();
+            if (data.success === true) {
+                angular.element("#modal-datos-recurso").modal("hide");
+                $scope.cargarRecursos();
+
+                var datosAsistente = [];
+                data.colaboradores.forEach(function (item) {
+                    datosAsistente.push({
+                        id: item.id,
+                        nombre: item.nombre,
+                        asignado: false
+                    });
+                });
+                $scope.asistentesCapacitacion = datosAsistente;
+
+                $scope.horasPlan = 0;
+                $scope.minutosPlan = 0;
+            } else {
+                messageDialog.show("Información", data.msg);
+            }
+        });
+
+        ajaxEnvioDatos.error(function (data) {
+            waitingDialog.hide();
+            console.log('Error: ' + data);
+        });
+    };
+
     $scope.abrirModalSeleccionarAsistentesEdicion = function () {
         $scope.todosSeleccionadosEdicion = false;
 

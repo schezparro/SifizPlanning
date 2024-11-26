@@ -5073,6 +5073,78 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult EditarPlanRecursoCapacitacion(int id, string titulo, string detalle, DateTime fecha, int modulo, int colaborador, int tiempo, string asistentesJson, string link = "")
+        {
+            try
+            {
+                // Decodificar la cadena JSON de asistentes
+                var serializer = new JavaScriptSerializer();
+                int[] asistentesIds = serializer.Deserialize<int[]>(asistentesJson);
+
+                // Buscar el recurso existente por ID
+                var recurso = db.Recursos.FirstOrDefault(s => s.Secuencial == id);
+                if (recurso == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        msg = "El recurso especificado no existe."
+                    });
+                }
+
+                // Actualizar los datos del recurso
+                recurso.Titulo = titulo;
+                recurso.Detalle = detalle;
+                recurso.Fecha = fecha;
+                recurso.SecuencialModulo = modulo;
+                recurso.SecuencialColaborador = colaborador;
+                recurso.TiempoCapacitacion = tiempo;
+                recurso.Url = link;
+                recurso.EsPlan = 1; // Mantener como plan por defecto
+                db.SaveChanges();
+
+                // Eliminar las asociaciones previas de asistentes
+                var asistentesExistentes = db.RecursosAsistencia.Where(ra => ra.SecuencialRecurso == id).ToList();
+                db.RecursosAsistencia.RemoveRange(asistentesExistentes);
+                db.SaveChanges();
+
+                // Crear las nuevas asociaciones de asistentes
+                foreach (int asistenteId in asistentesIds)
+                {
+                    RecursosAsistencia ra = new RecursosAsistencia
+                    {
+                        SecuencialColaborador = asistenteId,
+                        SecuencialRecurso = id,
+                        Asistencia = 0,
+                        Puntuacion = 0,
+                        EstaActivo = 1,
+                        Convocado = 0
+                    };
+
+                    db.RecursosAsistencia.Add(ra);
+                }
+
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "El recurso ha sido actualizado correctamente."
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
         public ActionResult GenerarCertificado(int secuencialRecurso)
         {
             try

@@ -1187,6 +1187,12 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "EditarPlanRecursoCapacitacion",
+                url: "user/editar-plan-recurso-capacitacion/{id}",
+                defaults: new { controller = "User", action = "EditarPlanRecursoCapacitacion", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "EditarPlanRecurso",
                 url: "user/editar-plan-recurso/{id}",
                 defaults: new { controller = "User", action = "EditarPlanRecurso", id = UrlParameter.Optional }
