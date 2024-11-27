@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SifizPlanning.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -2235,6 +2236,37 @@ namespace SifizPlanning
 
             //------------------ FIN DE RUTAS DEL MODULO DE RRHH -------------------
 
+            //-------------------COMERCIAL---------------------
+            routes.MapRoute(
+                name: "DarDatosRequerimientos",
+                url: "comercial/dar-datos-requerimientos/{id}",
+                defaults: new { controller = "Comercial", action = "DarDatosRequerimientos", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "GuardarRequerimiento",
+                url: "comercial/guardar-requerimiento/{id}",
+                defaults: new { controller = "Comercial", action = "GuardarRequerimiento", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "RequerimientosComercial",
+                url: "comercial/requerimientos-comercial/{id}",
+                defaults: new { controller = "Comercial", action = "RequerimientosComercial", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarCatalogoRequerimientos",
+                url: "comercial/catalogo-requerimientos/{id}",
+                defaults: new { controller = "Comercial", action = "DarCatalogoRequerimientos", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "Comercial",
+                url: "comercial/{id}",
+                defaults: new { controller = "Comercial", action = "Index", id = UrlParameter.Optional }
+            );
+
             //------------------ RUTAS DEL MODULO DE INDICADORES -------------------
             routes.MapRoute(
                 name: "DarTicketsIndicadoresResultado",
@@ -2695,12 +2727,8 @@ namespace SifizPlanning
             //    defaults: new { controller = "Report", action = "VerReporteCliente", id = UrlParameter.Optional }
             //);
 
-            routes.MapRoute(
-                name: "Comercial",
-                url: "comercial/{id}",
-                defaults: new { controller = "Comerial", action = "Index", id = UrlParameter.Optional }
-            );
 
+            
         }
     }
 }

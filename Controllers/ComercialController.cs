@@ -8,6 +8,7 @@ using System.Web.Mvc;
 using SifizPlanning.Util;
 using System.Web.UI.WebControls;
 using System.Configuration;
+using System.Web.Script.Serialization;
 
 namespace SifizPlanning.Controllers
 {
@@ -17,10 +18,193 @@ namespace SifizPlanning.Controllers
 
 		// GET: Comercial
 		//PANTALLA INICIAL
-		[Authorize(Roles = "COMECIAL, ADMIN")]
+		[Authorize(Roles = "COMERCIAL, ADMIN")]
 		public ActionResult Index()
 		{
 			return View();
 		}
+
+        //INCIDENCIAS DE LOS USUARIOS
+        [HttpPost]
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
+        public ActionResult RequerimientosComercial(int start, int lenght, string filtro = "")
+        {
+
+            try
+            {
+                var requerimientosComercial = (from or in db.OFERTAREQUERIMIENTO
+                           join r in db.REQUERIMIENTO on or.SecuencialRequerimiento equals r.Secuencial
+                           join cli in db.Cliente on or.SecuencialCLiente equals cli.Secuencial
+                           join t in db.Ticket on or.SecuencialTicketTarea equals t.Secuencial
+                           select new
+                           {
+                               secuencial = or.Secuencial,
+                               cliente = cli.Descripcion,
+                               clienteId = cli.Secuencial,
+                               ticket = t.Secuencial,
+                               detalle = or.Detalle,
+                               requerimientoId = or.SecuencialRequerimiento,
+                               requerimiento = r.Descripcion,
+                               fecha = or.FechaPedidoCLiente.HasValue ? or.FechaPedidoCLiente.Value.ToString() : "",
+                           }).ToList();
+
+
+                if (filtro != "")
+                {
+                    requerimientosComercial = requerimientosComercial.Where(x =>
+                                            x.cliente.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.ticket.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.detalle.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.requerimiento.ToString().ToLower().Contains(filtro.ToLower())
+                                          ).ToList();
+                }
+
+                int total = requerimientosComercial.Count();
+                requerimientosComercial = requerimientosComercial.Skip(start).Take(lenght).ToList();
+
+                var result = new
+                {
+                    success = true,
+                    total = total,
+                    requerimientos = requerimientosComercial
+                };
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+                var result = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(result);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
+        public ActionResult DarDatosRequerimientos(int secuencialRequerimiento)
+        {
+            try
+            {
+                OfertaRequerimiento o = db.OFERTAREQUERIMIENTO.Find(secuencialRequerimiento);
+                if (o == null)
+                {
+                    throw new Exception("No se encuentra el requerimiento en el sistema");
+                }
+
+                var ofr = (from or in db.OFERTAREQUERIMIENTO
+                           join r in db.REQUERIMIENTO on or.SecuencialRequerimiento equals r.Secuencial
+                           join cli in db.Cliente on or.SecuencialCLiente equals cli.Secuencial
+                           join t in db.Ticket on or.SecuencialTicketTarea equals t.Secuencial
+                           where or.Secuencial == secuencialRequerimiento
+                           select new
+                           {
+                               secuencial = or.Secuencial,
+                               cliente = cli.Descripcion,
+                               clienteId = cli.Secuencial,
+                               ticket = t.Secuencial,
+                               detalle = or.Detalle,
+                               requerimientoId = or.SecuencialRequerimiento,
+                               requerimiento = r.Descripcion,
+                               fecha = or.FechaPedidoCLiente.HasValue ? or.FechaPedidoCLiente.Value.ToString() : "",
+                           }).FirstOrDefault();
+
+                var result = new
+                {
+                    success = true,
+                    requerimientoResult = ofr
+                };
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+                var result = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(result);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
+        public ActionResult GuardarRequerimiento(int cliente, int requerimiento, string ticket, string detalle, string fechaPedidoCliente)
+        {
+            try
+            {
+
+                int ticketNumerico;
+                if (!int.TryParse(ticket, out ticketNumerico))
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        msg = "El ticket debe ser un valor numérico válido."
+                    });
+                }
+
+                Ticket t = db.Ticket.Find(ticketNumerico);
+
+                OfertaRequerimiento nuevaOfertaRequerimiento = new OfertaRequerimiento
+                {
+                    SecuencialCLiente = cliente,
+                    SecuencialRequerimiento = requerimiento,
+                    SecuencialTicketTarea = ticketNumerico, // Si lo necesitas como número en la base
+                    Detalle = t.Detalle,
+                    FechaPedidoCLiente = t.FechaCreado
+                };
+
+                db.OFERTAREQUERIMIENTO.Add(nuevaOfertaRequerimiento);
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
+        public ActionResult DarCatalogoRequerimientos()
+        {
+            try
+            {
+                var ofr = (from or in db.REQUERIMIENTO
+                           select new
+                           {
+                               descripcion = or.Descripcion,
+                               id = or.Secuencial
+                           }).ToList();
+
+                var result = new
+                {
+                    success = true,
+                    requerimientos = ofr
+                };
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+                var result = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(result);
+            }
+        }
+
     }
 }

@@ -1243,6 +1243,7 @@
     <Content Include="Views\Indicadores\windowIndicadoresTickets.cshtml" />
     <Content Include="Views\Indicadores\windowIndicadoresGestores.cshtml" />
     <Content Include="Views\Comercial\Index.cshtml" />
+    <Content Include="Views\Comercial\windowRequerimientoComercial.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1277,9 +1278,7 @@
     <Content Include="Web\js\indicadores\indicadoresGestores.js" />
     <Content Include="Web\js\indicadores\indicadores.js" />
     <Content Include="Web\js\indicadores\indicadoresTickets.js" />
-    <Content Include="Web\js\comercial\feriadosController.js" />
     <Content Include="Web\js\comercial\comercial.js" />
-    <Content Include="Web\js\comercial\solicitudesController.js" />
     <Content Include="Web\js\rrhh\feriadosController.js" />
     <Content Include="Web\js\rrhh\solicitudesController.js" />
     <Content Include="Web\js\solid-gauge.js" />
