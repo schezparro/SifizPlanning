@@ -56,7 +56,7 @@
     </table>
 </div>
 
-<<div id="modal-agregar-requerimientos" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div id="modal-agregar-requerimientos" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-l">
         <div class="modal-content">
             <form ng-submit="GuardarNuevoRequerimiento()">
@@ -68,17 +68,15 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="col-md-6">
-                                <!-- Checkbox para habilitar el ingreso del ticket -->
                                 <label>
                                     <input type="checkbox" ng-model="habilitarTicket"> TICKET
                                 </label>
-
-                                <!-- Textarea visible solo cuando el checkbox está seleccionado -->
                                 <div ng-show="habilitarTicket" class="mt-2">
                                     <input type="text"
                                            class="form-control"
                                            id="ticketSeleccionado"
                                            ng-model="ticketSeleccionado"
+                                           ng-model-options='{ debounce: 3000 }'
                                            ng-change="debounceValidarTicket(ticketSeleccionado)"
                                            ng-class="{'is-invalid': !ticketValido}"
                                            placeholder="Ingrese el número del ticket"
@@ -88,11 +86,9 @@
                                     </small>
                                 </div>
                             </div>
-
-
                         </div>
                     </div>
-                    <br />
+                    <br>
                     <div>
                         <label>PEDIDO/REQUERIMIENTO:</label>
                         <select id="select-requerimiento" ng-model="pedReqSeleccionado" class="form-control" required="required">
@@ -100,7 +96,7 @@
                             <option value="{{req.id}}" ng-repeat="req in requerimientos">{{req.descripcion}}</option>
                         </select>
                     </div>
-                    <br />
+                    <br>
                     <div>
                         <label>CLIENTE:</label>
                         <select id="select-cliente-requerimiento" ng-model="clienteSeleccionado" class="form-control" required="required">
@@ -108,13 +104,13 @@
                             <option value="{{cliente.id}}" ng-repeat="cliente in clientes">{{cliente.nombre}}</option>
                         </select>
                     </div>
-                    <br />
+                    <br>
 
                     <div>
                         <label>DETALLE:</label>
                         <textarea type="text" class="form-control" ng-model="detalleSeleccionado"></textarea>
                     </div>
-                    <br />
+                    <br>
 
                     <div class="div-info-ticket">
                         <label>FECHA PEDIDO CLIENTE:</label>
@@ -167,6 +163,5 @@
             <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
         </div>
     </div>
-</div>
 </div>
 
