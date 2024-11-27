@@ -3557,25 +3557,55 @@ r in db.Rol on ur.rol equals r
                     throw new Exception("El recurso no se encuentra en el sistema");
                 }
 
-                var rec = (from r in db.Recursos
-                           join md in db.Modulo on r.SecuencialModulo equals md.Secuencial
-                           where r.Secuencial == secuencialRecurso
-                           select new
-                           {
-                               secuencial = r.Secuencial,
-                               titulo = r.Titulo,
-                               modulo = md.Descripcion,
-                               detalle = r.Detalle,
-                               adjunto = r.Adjunto,
-                               fecha = r.Fecha,
-                               tiempo = r.TiempoCapacitacion,
-                               Url = r.Url ?? ""
-                           }).FirstOrDefault();
+                var recu = (from r in db.Recursos
+                            join md in db.Modulo on r.SecuencialModulo equals md.Secuencial
+                            where r.Secuencial == secuencialRecurso
+                            select new
+                            {
+                                secuencial = r.Secuencial,
+                                titulo = r.Titulo,
+                                detalle = r.Detalle,
+                                modulo = md.Secuencial,
+                                fecha = r.Fecha,
+                                adjunto = r.Adjunto,
+                                horas = r.TiempoCapacitacion / 60,
+                                minutos = r.TiempoCapacitacion % 60,
+                                capacitor = r.SecuencialColaborador,
+                                url = r.Url ?? ""
+                            }).FirstOrDefault();
+
+                var rec = recu != null ? new
+                {
+                    secuencial = recu.secuencial,
+                    titulo = recu.titulo,
+                    detalle = recu.detalle,
+                    modulo = recu.modulo,
+                    fecha = recu.fecha.ToString("yyyy-MM-ddTHH:mm"),
+                    adjunto = recu.adjunto,
+                    horas = recu.horas,
+                    minutos = recu.minutos,
+                    capacitor = recu.capacitor,
+                    url = recu.url
+                } : null;
+
+                var asistenciaRecurso = (from ra in db.RecursosAsistencia
+                                         join r in db.Recursos on ra.SecuencialRecurso equals r.Secuencial
+                                         join c in db.Colaborador on ra.SecuencialColaborador equals c.Secuencial
+                                         where ra.SecuencialRecurso == secuencialRecurso
+                                         orderby c.persona.Nombre1, c.persona.Apellido1
+                                         select new
+                                         {
+                                             id = ra.Secuencial,
+                                             idColaborador = ra.SecuencialColaborador,
+                                             nombre = c.persona.Nombre1 + " " + c.persona.Apellido1,
+                                             asignado = ra.Convocado
+                                         }).ToList();
 
                 var result = new
                 {
                     success = true,
-                    recursoResult = rec
+                    recurso = rec,
+                    asistencia = asistenciaRecurso
                 };
                 return Json(result);
             }
@@ -5043,6 +5073,78 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult EditarPlanRecursoCapacitacion(int id, string titulo, string detalle, DateTime fecha, int modulo, int colaborador, int tiempo, string asistentesJson, string link = "")
+        {
+            try
+            {
+                // Decodificar la cadena JSON de asistentes
+                var serializer = new JavaScriptSerializer();
+                int[] asistentesIds = serializer.Deserialize<int[]>(asistentesJson);
+
+                // Buscar el recurso existente por ID
+                var recurso = db.Recursos.FirstOrDefault(s => s.Secuencial == id);
+                if (recurso == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        msg = "El recurso especificado no existe."
+                    });
+                }
+
+                // Actualizar los datos del recurso
+                recurso.Titulo = titulo;
+                recurso.Detalle = detalle;
+                recurso.Fecha = fecha;
+                recurso.SecuencialModulo = modulo;
+                recurso.SecuencialColaborador = colaborador;
+                recurso.TiempoCapacitacion = tiempo;
+                recurso.Url = link;
+                recurso.EsPlan = 1; // Mantener como plan por defecto
+                db.SaveChanges();
+
+                // Eliminar las asociaciones previas de asistentes
+                var asistentesExistentes = db.RecursosAsistencia.Where(ra => ra.SecuencialRecurso == id).ToList();
+                db.RecursosAsistencia.RemoveRange(asistentesExistentes);
+                db.SaveChanges();
+
+                // Crear las nuevas asociaciones de asistentes
+                foreach (int asistenteId in asistentesIds)
+                {
+                    RecursosAsistencia ra = new RecursosAsistencia
+                    {
+                        SecuencialColaborador = asistenteId,
+                        SecuencialRecurso = id,
+                        Asistencia = 0,
+                        Puntuacion = 0,
+                        EstaActivo = 1,
+                        Convocado = 0
+                    };
+
+                    db.RecursosAsistencia.Add(ra);
+                }
+
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "El recurso ha sido actualizado correctamente."
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
         public ActionResult GenerarCertificado(int secuencialRecurso)
         {
             try
@@ -5207,13 +5309,24 @@ r in db.Rol on ur.rol equals r
                     var datosAsistencia = s1.Deserialize<List<dynamic>>(adjuntoAsistencia);
                     List<string> usuariosDestinos = new List<string>();
 
+                    Recursos cap = db.Recursos.FirstOrDefault(ca => ca.Secuencial == idRecurso);
+                    var tareasAsignadas = db.TareaCapacitacion.Where(s => s.SecuencialCapacitacion == cap.Secuencial).ToList();
+                    foreach (var tar in tareasAsignadas)
+                    {
+                        var tarea = db.Tarea.Where(s => s.Secuencial == tar.SecuencialTarea).FirstOrDefault();
+
+                        tarea.SecuencialEstadoTarea = 4;
+                        db.TareaCapacitacion.Remove(tar);
+
+                        db.SaveChanges();
+                    }
+
                     foreach (var item in datosAsistencia)
                     {
                         int id = Convert.ToInt32(item["id"]);
                         bool convocado = Convert.ToBoolean(item["convocado"]);
 
                         RecursosAsistencia r = db.RecursosAsistencia.FirstOrDefault(ra => ra.Secuencial == id);
-                        Recursos cap = db.Recursos.FirstOrDefault(ca => ca.Secuencial == r.SecuencialRecurso);
 
                         bool con = r.Convocado == 1 ? true : false;
 
@@ -5240,8 +5353,13 @@ r in db.Rol on ur.rol equals r
                                 };
                                 Utiles.AgregarTareaConReubicacion(tar, db);
 
-
-                                Recursos re = db.Recursos.FirstOrDefault(rr => rr.Secuencial == idRecurso);
+                                TareaCapacitacion tarc = new TareaCapacitacion()
+                                {
+                                    SecuencialCapacitacion = cap.Secuencial,
+                                    SecuencialTarea = tar.Secuencial
+                                };
+                                db.TareaCapacitacion.Add(tarc);
+                                db.SaveChanges();
 
                                 string email = db.Colaborador.FirstOrDefault(s => s.Secuencial == r.SecuencialColaborador).persona.usuario.FirstOrDefault().Email;
                                 usuariosDestinos.Add(email);
@@ -5250,15 +5368,15 @@ r in db.Rol on ur.rol equals r
                                 textoEmail += "<br>";
                                 textoEmail += "Por medio del siguiente correo se establece la reunión programada con el siguiente detalle: ";
                                 textoEmail += "<br/>";
-                                textoEmail += "<strong>Tema: <strong/>" + re.Titulo;
+                                textoEmail += "<strong>Tema: <strong/>" + cap.Titulo;
                                 textoEmail += "<br/>";
-                                textoEmail += "<strong>Fecha: <strong/>" + re.Fecha;
+                                textoEmail += "<strong>Fecha: <strong/>" + cap.Fecha;
                                 textoEmail += "<br/>";
-                                textoEmail += $"<strong>Duración: </strong>{re.TiempoCapacitacion / 60} horas y {re.TiempoCapacitacion % 60} minutos";
+                                textoEmail += $"<strong>Duración: </strong>{cap.TiempoCapacitacion / 60} horas y {cap.TiempoCapacitacion % 60} minutos";
                                 textoEmail += "<br/>";
-                                textoEmail += "<strong>Modulador: <strong/>" + re.SecuencialModulo;
+                                textoEmail += "<strong>Modulador: <strong/>" + cap.SecuencialModulo;
                                 textoEmail += "<br/>";
-                                textoEmail += "<strong>Enlace de la reunión: <strong/>" + re.Url;
+                                textoEmail += "<strong>Enlace de la reunión: <strong/>" + cap.Url;
                                 textoEmail += "</div>";
 
                                 string asuntoEmail = "Nueva Reunión/Capacitación";

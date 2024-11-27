@@ -32,6 +32,7 @@ namespace SifizPlanning.Models
             this.ofertas = new HashSet<Ofertas>();
             this.INCIDENCIAS = new HashSet<Incidencias>();
             this.TIEMPOCERRADOTICKET = new HashSet<TiempoCerradoTicket>();
+            this.clienteReporteMantenimiento = new HashSet<ClienteReporteMantenimiento>();
         }
     
         public int Secuencial { get; set; }
@@ -56,5 +57,6 @@ namespace SifizPlanning.Models
         public virtual ICollection<Ofertas> ofertas { get; set; }
         public virtual ICollection<Incidencias> INCIDENCIAS { get; set; }
         public virtual ICollection<TiempoCerradoTicket> TIEMPOCERRADOTICKET { get; set; }
+        public virtual ICollection<ClienteReporteMantenimiento> clienteReporteMantenimiento { get; set; }
     }
 }

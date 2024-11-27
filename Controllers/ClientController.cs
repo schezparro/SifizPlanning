@@ -37,6 +37,7 @@ namespace SifizPlanning.Controllers
 			ViewBag.emailUser = user.Email;
 			ViewBag.cliente = persona.persona_cliente.cliente.Descripcion;
 			ViewBag.telefono = persona.persona_cliente.Telefono;
+            ViewBag.isAlowReportMtto = db.ClienteReporteMantenimiento.Where(s => s.SecuencialCliente == persona.persona_cliente.cliente.Secuencial && s.Codigo == "REPORTE MANTENIMIENTO").FirstOrDefault() != null; 
 
 			var categorias = (from c in db.CategoriaTicket
 							  where c.EstaActiva == 1

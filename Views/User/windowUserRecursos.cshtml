@@ -254,47 +254,69 @@
 <div id="modal-datos-recurso" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header" style="padding: 10px, 10px">
-                <label>Reunión/Capacitación</label>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            </div>
-            <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
-                <div class="row">
-                    <div class="col-sm-4"><strong>Título:</strong></div>
-                    <div class="col-sm-8">{{tituloV}}</div>
+            <form ng-submit="EditarPlan()" name="editarPlan">
+                <div class="modal-header">
+                    <h5 class="modal-title">TEMA A CAPACITAR</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
-                <div class="row">
-                    <div class="col-sm-4"><strong>Detalle:</strong></div>
-                    <div class="col-sm-8">{{detalleV}}</div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4"><strong>Módulo:</strong></div>
-                    <div class="col-sm-8">{{moduloV}}</div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4"><strong>Fecha:</strong></div>
-                    <div class="col-sm-8">{{fechaV | strDateToStrTime}}</div>
-                </div>
-                <div class="row" ng-show="adjuntoV != ''">
-                    <div class="col-sm-4"><strong>Url:</strong></div>
-                    <div class="col-sm-8">
-                        <a class="btn btn-success btn-xs" target="_blank" href="{{adjuntoV}}">
-                            <span class="glyphicon glyphicon-link"></span> Url
-                        </a>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="inputTitulo">TÍTULO:</label>
+                        <input type="text" class="form-control" ng-model="editTituloPlan" ng-required="true" placeholder="Título">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputDetalle">DETALLE:</label>
+                        <textarea type="text" class="form-control" ng-model="editDetallePlan" ng-required="true" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputModulo">MÓDULO:</label>
+                        <select id="edit-select-modulo-plan" ng-model="editModuloSeleccionadoPlan" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{tipo.id}}" ng-repeat="tipo in tipoModulo">
+                                {{ tipo.nombre === 'N//A' ? 'Otros' : tipo.nombre }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-fecha-hora-capacitacion">FECHA Y HORA</label>
+                        <div class='input-group date'>
+                            <input id="edit-fecha-hora-capacitacion"
+                                   type="datetime-local"
+                                   ng-model="editFechaHoraCapacitacion"
+                                   class="form-control"
+                                   ng-required="true"
+                                   step="60" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputLink">LINK MEET:</label>
+                        <input type="text" class="form-control" ng-model="editLinkPlan" ng-required="true"></>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputModulo">CAPACITADOR:</label>
+                        <select id="edit-select-capacitador-plan" ng-model="editCapacitadorSeleccionadoPlan" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{capacitador.id}}" ng-repeat="capacitador in capacitadores">{{capacitador.nombre}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                        TIEMPO:
+                        <input type="number" class="form-control" ng-model="editHorasPlan" ng-required="true" style="width:10%; text-align:center;" min="0">
+                        horas
+                        :
+                        <input type="number" class="form-control" ng-model="editMinutosPlan" ng-required="true" style="width: 10%; text-align: center;" min="0" max="60">
+                        minutos
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-primary" ng-click="abrirModalSeleccionarAsistentesEdicion()">Asistentes</button>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-sm-4"><strong>Link Meet:</strong></div>
-                    <a target="_blank" href="{{linkV}}">{{linkV}}</a>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
-                <div class="row">
-                    <div class="col-sm-4"><strong>Duración:</strong></div>
-                    <div class="col-sm-8">{{tiempoV | toHoursAndMinutes}}</div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-            </div>
+            </form>
         </div>
     </div>
 </div>
@@ -457,9 +479,6 @@
     </div>
 </div>
 
-
-
-
 <div id="modal-seleccionar-asistentes" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -495,6 +514,43 @@
         </div>
     </div>
 </div>
+
+<div id="modal-seleccionar-asistentes-edicion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">ASISTENTES</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="seleccionarTodos" ng-model="todosSeleccionadosEdicion" ng-change="seleccionarTodosAsistentesEdicion()">
+                    <label class="form-check-label" for="seleccionarTodos">Todos</label>
+                </div>
+                <table class="table table-striped table-condensed">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>PERSONAL SIFIZSOFT E INTESOFT</th>
+                            <th>CONVOCADO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="asistente in datosAsistenciaEdicion">
+                            <td>{{$index + 1}}</td>
+                            <td>{{asistente.nombre}}</td>
+                            <td><input type="checkbox" ng-model="asistente.asignado"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
     var esUserAllow = @esUserAllow.ToString().ToLower();
 </script>

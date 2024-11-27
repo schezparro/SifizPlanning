@@ -2541,6 +2541,7 @@ f in db.FotoColaborador on t equals f.colaborador
                 //Adicionando los parámetros
                 foreach (var d in data)
                 {
+                    
                     string keyAdd = d.Key;
                     if (keyAdd == "idTuplaCatalogo")
                         keyAdd = "Secuencial";
