@@ -507,6 +507,9 @@
     <Compile Include="Models\ClienteAuxiliar.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ClienteReporteMantenimiento.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Colaborador.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
@@ -865,6 +868,9 @@
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\TareaActividadRealizada.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TareaCapacitacion.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\TareaCompensatoria.cs">
@@ -1244,6 +1250,7 @@
     <Content Include="Views\Indicadores\windowIndicadoresGestores.cshtml" />
     <Content Include="Views\Comercial\Index.cshtml" />
     <Content Include="Views\Comercial\windowRequerimientoComercial.cshtml" />
+    <Content Include="Views\Report\VerReporteMantenimientoCliente.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
