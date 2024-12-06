@@ -5,7 +5,6 @@
     <table id="tabla-requerimientos-comercial" class="table table-striped table-condensed nowrap">
         <thead>
             <tr>
-                <th>Id</th>
                 <th>Cliente</th>
                 <th>Pedido/Requeriimiento</th>
                 <th>No. Ticket</th>
@@ -16,17 +15,16 @@
 
         <tbody>
             <tr ng-repeat="requerimiento in requerimientosLista  | filter: filtroRequerimientos" ng-dblclick="mostrarDetalleRequerimiento(requerimiento.secuencial)">
-                <td>{{requerimiento.id}}</td>
                 <td>{{requerimiento.cliente | limitTo:50}}</td>
-                <td>{{requerimiento.pedReq}}</td>
-                <td>{{requerimiento.ticket | strDateToStr}}</td>
-                <td>{{requerimiento.detalle | limitTo:50}}</td>
+                <td>{{requerimiento.requerimiento}}</td>
+                <td>{{requerimiento.ticket }}</td>
+                <td>{{requerimiento.detalle }}</td>
                 <td>{{requerimiento.fecha }}</td>
                 <td>
-                    <button type="button" class="btn btn-xs btn-success" ng-click="seleccionarParaPublicar(requerimiento.id)"><span class="glyphicon glyphicon-ok"></span> publicado</button>
+                    <button type="button" class="btn btn-xs btn-success" ng-click="editarRequerimiento(requerimiento.secuencial)"><span class="glyphicon glyphicon-edit"></span></button>
                 </td>
                 <td>
-                    <button type="button" class="btn btn-xs btn-danger" ng-click="seleccionarParaPublicar(requerimiento.id)"><span class="glyphicon glyphicon-ok"></span> publicado</button>
+                    <button type="button" class="btn btn-xs btn-danger" ng-click="borrarRequerimiento(requerimiento.secuencial)"><span class="glyphicon glyphicon-trash"></span></button>
                 </td>
             </tr>
         </tbody>
@@ -69,7 +67,7 @@
                         <div class="col-md-12">
                             <div class="col-md-6">
                                 <label>
-                                    <input type="checkbox" ng-model="habilitarTicket"> TICKET
+                                    <input type="checkbox" ng-model="habilitarTicket" ng-checked="habilitarTicketCkc()"> TICKET
                                 </label>
                                 <div ng-show="habilitarTicket" class="mt-2">
                                     <input type="text"
@@ -108,7 +106,7 @@
 
                     <div>
                         <label>DETALLE:</label>
-                        <textarea type="text" class="form-control" ng-model="detalleSeleccionado"></textarea>
+                        <textarea id="detalle-requerimiento" type="text" class="form-control" ng-model="detalleSeleccionado"></textarea>
                     </div>
                     <br>
 
@@ -129,38 +127,75 @@
     </div>
 </div>
 
-<div id="modal-datos-requerimiento" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div id="modal-editar-requerimientos" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-l">
         <div class="modal-content">
-            <div class="modal-header" style="padding: 10px, 10px">
-                <label>REQUERIMIENTO</label>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            </div>
-            <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
-                <div class="row">
-                    <div class="col-sm-4"><strong>Cliente:</strong></div>
-                    <div class="col-sm-8">{{clienteV}}</div>
+            <form ng-submit="editarRequerimiento()">
+                <div class="modal-header" style="padding: 10px, 10px">
+                    <label>EDITAR REQUERIMIENTO</label>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
-                <div class="row">
-                    <div class="col-sm-4"><strong>Pedido/Requerimiento:</strong></div>
-                    <div class="col-sm-8">{{pedReqV}}</div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+                                <label>
+                                    <input type="checkbox" ng-model="habilitarTicket" ng-checked="habilitarTicketCkc()"> TICKET
+                                </label>
+                                <div ng-show="habilitarTicket" class="mt-2">
+                                    <input type="text"
+                                           class="form-control"
+                                           id="ticketSeleccionado"
+                                           ng-model="ticketSeleccionadoE"
+                                           ng-model-options='{ debounce: 3000 }'
+                                           ng-change="debounceValidarTicket(ticketSeleccionadoE)"
+                                           ng-class="{'is-invalid': !ticketValido}"
+                                           placeholder="Ingrese el número del ticket"
+                                           ng-keypress="validarSoloNumeros($event)">
+                                    <small class="text-danger" ng-if="!ticketValido && ticketSeleccionadoE">
+                                        El número de ticket no es válido o no se encuentra en la base de datos.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div>
+                        <label>PEDIDO/REQUERIMIENTO:</label>
+                        <select id="select-requerimiento" ng-model="pedReqSeleccionadoE" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{req.id}}" ng-repeat="req in requerimientos">{{req.descripcion}}</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div>
+                        <label>CLIENTE:</label>
+                        <select id="select-cliente-requerimiento" ng-model="clienteSeleccionadoE" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{cliente.id}}" ng-repeat="cliente in clientes">{{cliente.nombre}}</option>
+                        </select>
+                    </div>
+                    <br>
+
+                    <div>
+                        <label>DETALLE:</label>
+                        <textarea id="detalle-requerimiento" type="text" class="form-control" ng-model="detalleSeleccionadoE"></textarea>
+                    </div>
+                    <br>
+
+                    <div class="div-info-ticket">
+                        <label>FECHA PEDIDO CLIENTE:</label>
+                        <div class='input-group date'>
+                            <input id="fecha-requerimiento" ng-model="fechaSeleccionadaE" class="form-control" ng-required="true" autocomplete="off" />
+                        </div>
+                    </div>
                 </div>
-                <div class="row">
-                    <div class="col-sm-4"><strong>Ticket:</strong></div>
-                    <div class="col-sm-8">{{ticketV}}</div>
+                <br>
+                <div class="modal-footer">
+                    <button type="submit" id="enviar-modal-requerimientos-btn" class="btn btn-primary">Guardar</button>
+                    <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                 </div>
-                <div class="row">
-                    <div class="col-sm-4"><strong>Detalle:</strong></div>
-                    <div class="col-sm-8">{{detalleV}}</div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4"><strong>Fecha requerimiento:</strong></div>
-                    <div class="col-sm-8">{{fechaV}}</div>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+            </form>
         </div>
     </div>
 </div>

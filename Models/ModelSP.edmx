@@ -736,7 +736,7 @@
           <Property Name="SECUENCIALCLIENTE" Type="int" Nullable="false" />
           <Property Name="SECUENCIALREQUERIMIENTO" Type="int" Nullable="false" />
           <Property Name="SECUENCIALTICKETTAREA" Type="int" />
-          <Property Name="DETALLE" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="DETALLE" Type="varchar" MaxLength="8000" Nullable="false" />
           <Property Name="FECHAPEDIDOCLIENTE" Type="date" />
         </EntityType>
         <EntityType Name="PAIS">
@@ -1775,7 +1775,7 @@ warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have 
           <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="TITULO" Type="varchar" MaxLength="255" Nullable="false" />
           <Property Name="DETALLE" Type="varchar(max)" Nullable="false" />
-          <Property Name="FECHA" Type="datetime" Nullable="false" />
+          <Property Name="FECHA" Type="date" Nullable="false" />
           <Property Name="SECUENCIALMODULO" Type="int" Nullable="false" />
           <Property Name="ADJUNTO" Type="varchar" MaxLength="255" Nullable="false" />
           <Property Name="ADJUNTOASISTENCIA" Type="varchar" MaxLength="255" />
@@ -12597,7 +12597,7 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
           <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Titulo" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="Detalle" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="SecuencialModulo" Type="Int32" Nullable="false" />
           <Property Name="Adjunto" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="modulo" Relationship="SifizPlanningModel.FK_RECURSOS_MODULO" FromRole="RECURSOS" ToRole="Modulo" />
@@ -12992,7 +12992,7 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
           <Property Name="SecuencialCLiente" Type="Int32" Nullable="false" />
           <Property Name="SecuencialRequerimiento" Type="Int32" Nullable="false" />
           <Property Name="SecuencialTicketTarea" Type="Int32" />
-          <Property Name="Detalle" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Detalle" Type="String" Nullable="false" MaxLength="8000" FixedLength="false" Unicode="false" />
           <Property Name="FechaPedidoCLiente" Type="DateTime" Precision="0" />
         </EntityType>
         <EntityType Name="Requerimiento">

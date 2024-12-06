@@ -181,6 +181,18 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
         }
     };
 
+    $scope.habilitarTicketCkc = function () {
+        if ($scope.habilitarTicket == false) {
+            $scope.ticketSeleccionado = "";
+            $scope.clienteSeleccionado = "";
+            $scope.detalleSeleccionado = "";
+            $scope.fechaSeleccionada = "";
+            document.getElementById("select-cliente-requerimiento").removeAttribute("disabled");
+            document.getElementById("detalle-requerimiento").removeAttribute("disabled");
+            document.getElementById("fecha-requerimiento").removeAttribute("disabled");
+        }
+    };
+     
     // Función de debounce para retrasar la validación
     $scope.debounceValidarTicket = function (ticket) {
         if (debounceTimeout) {
@@ -211,6 +223,9 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
                 $scope.clienteSeleccionado = data.datosTicket.idCliente;
                 $scope.detalleSeleccionado = data.datosTicket.detalle;
                 $scope.fechaSeleccionada = $scope.convertirFecha(data.datosTicket.fecha);
+                document.getElementById("select-cliente-requerimiento").setAttribute("disabled", "disabled");
+                document.getElementById("detalle-requerimiento").setAttribute("disabled", "disabled");
+                document.getElementById("fecha-requerimiento").setAttribute("disabled", "disabled");
             }
             else {
                 messageDialog.show('Información', data.msg);
@@ -223,12 +238,6 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
 
         var cliente = angular.element("#select-cliente-requerimiento")[0].value;
-        console.log(cliente);
-        console.log($scope.pedReqSeleccionado);
-        console.log($scope.ticketSeleccionado);
-        console.log($scope.detalleSeleccionado);
-        console.log($scope.fechaSeleccionada);
-
         var datos = {
             cliente: $scope.clienteSeleccionado, // Usar el modelo Angular
             requerimiento: $scope.pedReqSeleccionado,
@@ -255,22 +264,26 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
         });
     };
 
-    $scope.mostrarDetalleRequerimiento = function (secuencial) {
+    $scope.editarRequerimiento = function (secuencial) {
         $scope.secuencialRequerimiento = secuencial;
-
         var ajaxObtenerRequerimiento = $http.post("comercial/dar-datos-requerimientos",
             {
                 secuencialRequerimiento: secuencial
             });
         ajaxObtenerRequerimiento.success(function (data) {
             if (data.success === true) {
-                $scope.clienteV = data.incidenciaResult.cliente;
-                $scope.pedReqV = data.incidenciaResult.modulo;
-                $scope.ticketV = data.incidenciaResult.incidente;
-                $scope.detalleV = data.incidenciaResult.acciones;
-                $scope.fechaV = data.incidenciaResult.fecha;
+                if (data.requerimientoResult.ticket != null) {
+                    habilitarTicket = true;
+                    $scope.ticketSeleccionado = data.requerimientoResult.ticket;
+                } else {
+                    habilitarTicket = false;
+                };
+                $scope.clienteSeleccionado = data.requerimientoResult.clienteId;
+                $scope.pedReqSeleccionado = data.requerimientoResult.requerimientoId;
+                $scope.detalleSeleccionado = data.requerimientoResult.detalle;
+                $scope.fechaSeleccionada = $scope.convertirFecha(data.requerimientoResult.fecha);
 
-                angular.element("#modal-datos-requerimiento").modal("show");
+                angular.element("#modal-agregar-requerimientos").modal("show");
             }
             else {
                 messageDialog.show('Información', data.msg);
@@ -279,11 +292,9 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
     };
 
     $scope.convertirFecha = function (fechaJson) {
-        // Extrae el número de milisegundos del formato /Date(1431356799000)/
         const timestamp = parseInt(fechaJson.match(/\d+/)[0], 10);
         const fecha = new Date(timestamp); // Crea un objeto Date
 
-        // Opcional: Formatea la fecha para mostrarla en formato DD/MM/YYYY
         const dia = String(fecha.getDate()).padStart(2, '0');
         const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Meses empiezan en 0
         const anio = fecha.getFullYear();

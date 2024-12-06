@@ -9,20 +9,22 @@ using SifizPlanning.Util;
 using System.Web.UI.WebControls;
 using System.Configuration;
 using System.Web.Script.Serialization;
+using System.Data.Entity.Validation;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
 namespace SifizPlanning.Controllers
 {
-	public class ComercialController : Controller
-	{
-		SifizPlanningEntidades db = DbCnx.getCnx();
+    public class ComercialController : Controller
+    {
+        SifizPlanningEntidades db = DbCnx.getCnx();
 
-		// GET: Comercial
-		//PANTALLA INICIAL
-		[Authorize(Roles = "COMERCIAL, ADMIN")]
-		public ActionResult Index()
-		{
-			return View();
-		}
+        // GET: Comercial
+        //PANTALLA INICIAL
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
+        public ActionResult Index()
+        {
+            return View();
+        }
 
         //INCIDENCIAS DE LOS USUARIOS
         [HttpPost]
@@ -33,20 +35,19 @@ namespace SifizPlanning.Controllers
             try
             {
                 var requerimientosComercial = (from or in db.OFERTAREQUERIMIENTO
-                           join r in db.REQUERIMIENTO on or.SecuencialRequerimiento equals r.Secuencial
-                           join cli in db.Cliente on or.SecuencialCLiente equals cli.Secuencial
-                           join t in db.Ticket on or.SecuencialTicketTarea equals t.Secuencial
-                           select new
-                           {
-                               secuencial = or.Secuencial,
-                               cliente = cli.Descripcion,
-                               clienteId = cli.Secuencial,
-                               ticket = t.Secuencial,
-                               detalle = or.Detalle,
-                               requerimientoId = or.SecuencialRequerimiento,
-                               requerimiento = r.Descripcion,
-                               fecha = or.FechaPedidoCLiente.HasValue ? or.FechaPedidoCLiente.Value.ToString() : "",
-                           }).ToList();
+                                               join r in db.REQUERIMIENTO on or.SecuencialRequerimiento equals r.Secuencial
+                                               join cli in db.Cliente on or.SecuencialCLiente equals cli.Secuencial
+                                               select new
+                                               {
+                                                   secuencial = or.Secuencial,
+                                                   cliente = cli.Descripcion,
+                                                   clienteId = cli.Secuencial,
+                                                   ticket = or.SecuencialTicketTarea,
+                                                   detalle = or.Detalle,
+                                                   requerimientoId = or.SecuencialRequerimiento,
+                                                   requerimiento = r.Descripcion,
+                                                   fecha = or.FechaPedidoCLiente.HasValue ? or.FechaPedidoCLiente.Value.ToString() : "",
+                                               }).ToList();
 
 
                 if (filtro != "")
@@ -96,14 +97,13 @@ namespace SifizPlanning.Controllers
                 var ofr = (from or in db.OFERTAREQUERIMIENTO
                            join r in db.REQUERIMIENTO on or.SecuencialRequerimiento equals r.Secuencial
                            join cli in db.Cliente on or.SecuencialCLiente equals cli.Secuencial
-                           join t in db.Ticket on or.SecuencialTicketTarea equals t.Secuencial
                            where or.Secuencial == secuencialRequerimiento
                            select new
                            {
                                secuencial = or.Secuencial,
                                cliente = cli.Descripcion,
                                clienteId = cli.Secuencial,
-                               ticket = t.Secuencial,
+                               ticket = or.SecuencialTicketTarea,
                                detalle = or.Detalle,
                                requerimientoId = or.SecuencialRequerimiento,
                                requerimiento = r.Descripcion,
@@ -134,27 +134,47 @@ namespace SifizPlanning.Controllers
         {
             try
             {
+                OfertaRequerimiento nuevaOfertaRequerimiento = new OfertaRequerimiento();
 
-                int ticketNumerico;
-                if (!int.TryParse(ticket, out ticketNumerico))
+                if (ticket != "")
                 {
-                    return Json(new
+                    int ticketNumerico;
+                    if (!int.TryParse(ticket, out ticketNumerico))
                     {
-                        success = false,
-                        msg = "El ticket debe ser un valor numérico válido."
-                    });
+                        return Json(new
+                        {
+                            success = false,
+                            msg = "El ticket debe ser un valor numérico válido."
+                        });
+                    }
+
+                    Ticket t = db.Ticket.Find(ticketNumerico);
+
+                    if (t != null)
+                    {
+                        nuevaOfertaRequerimiento.SecuencialCLiente = cliente;
+                        nuevaOfertaRequerimiento.SecuencialRequerimiento = requerimiento;
+                        nuevaOfertaRequerimiento.SecuencialTicketTarea = ticketNumerico;
+                        nuevaOfertaRequerimiento.Detalle = t.Detalle;
+                        nuevaOfertaRequerimiento.FechaPedidoCLiente = t.FechaCreado;
+                    }
+                    else
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            msg = "No se encuentra el ticket en la base de datos. Rectifique."
+                        });
+                    }
+                }
+                else
+                {
+                    nuevaOfertaRequerimiento.SecuencialCLiente = cliente;
+                    nuevaOfertaRequerimiento.SecuencialRequerimiento = requerimiento;
+                    nuevaOfertaRequerimiento.Detalle = detalle;
+                    nuevaOfertaRequerimiento.FechaPedidoCLiente = DateTime.Parse(fechaPedidoCliente);
                 }
 
-                Ticket t = db.Ticket.Find(ticketNumerico);
-
-                OfertaRequerimiento nuevaOfertaRequerimiento = new OfertaRequerimiento
-                {
-                    SecuencialCLiente = cliente,
-                    SecuencialRequerimiento = requerimiento,
-                    SecuencialTicketTarea = ticketNumerico, // Si lo necesitas como número en la base
-                    Detalle = t.Detalle,
-                    FechaPedidoCLiente = t.FechaCreado
-                };
 
                 db.OFERTAREQUERIMIENTO.Add(nuevaOfertaRequerimiento);
                 db.SaveChanges();
@@ -165,6 +185,21 @@ namespace SifizPlanning.Controllers
                     msg = "Se ha realizado la operación correctamente."
                 });
             }
+            catch (DbEntityValidationException ex)
+            {
+                var errorMessages = ex.EntityValidationErrors
+                    .SelectMany(e => e.ValidationErrors)
+                    .Select(e => $"{e.PropertyName}: {e.ErrorMessage}");
+
+                var fullErrorMessage = string.Join("; ", errorMessages);
+                var exceptionMessage = $"Error de validación: {fullErrorMessage}";
+
+                return Json(new
+                {
+                    success = false,
+                    msg = exceptionMessage
+                });
+            }
             catch (Exception e)
             {
                 return Json(new
@@ -173,6 +208,7 @@ namespace SifizPlanning.Controllers
                     msg = e.Message
                 });
             }
+
         }
 
         [HttpPost]
