@@ -71,7 +71,7 @@
                 </td>
                 <td ng-show="esPlan && esUserAllow">
                     <a class="btn btn-primary btn-xs" ng-click="mostrarRegistroConvocados(recurso)">
-                        <span class="glyphicon glyphicon-calendar"></span> Asistencia
+                        <span class="glyphicon glyphicon-calendar"></span> Convocados/Asignados
                     </a>
                 </td>
 
@@ -152,7 +152,7 @@
                     </div>
 
                     <div class="form-group">
-                        <button type="button" id="abrir-modal-registro-asistencia" ng-click="abrirRegistroAsistencia()" class="btn btn-primary">REGISTRO DE ASISTENCIA</button>
+                        <button type="button" id="abrir-modal-registro-asistencia" ng-click="abrirRegistroAsistencia()" class="btn btn-primary">Convocados/Asignados</button>
                     </div>
 
                     <div class="form-group">
@@ -238,7 +238,7 @@
                         minutos
                     </div>
                     <div class="form-group">
-                        <button type="button" class="btn btn-primary" ng-click="abrirModalSeleccionarAsistentes()">Asistentes</button>
+                        <button type="button" class="btn btn-primary" ng-click="abrirModalSeleccionarAsistentes()">Convocados</button>
                     </div>
                 </div>
 
@@ -308,7 +308,7 @@
                         minutos
                     </div>
                     <div class="form-group">
-                        <button type="button" class="btn btn-primary" ng-click="abrirModalSeleccionarAsistentesEdicion()">Asistentes</button>
+                        <button type="button" class="btn btn-primary" ng-click="abrirModalSeleccionarAsistentesEdicion()">Convocados</button>
                     </div>
                 </div>
 
@@ -328,7 +328,7 @@
             <div class="modal-header" style="padding: 10px, 10px">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 ng-show="!esPlan" class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Registro de asistencia </h4>
-                <h4 ng-show="esPlan" class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Asistentes </h4>
+                <h4 ng-show="esPlan" class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Convocados/asignados </h4>
             </div>
 
             <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
@@ -389,7 +389,7 @@
         <div class="modal-content">
             <div class="modal-header" style="padding: 10px, 10px">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Asistentes </h4>
+                <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Asignados </h4>
             </div>
 
             <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
@@ -483,7 +483,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">ASISTENTES</h4>
+                <h4 class="modal-title">CONVOCADO</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
@@ -519,7 +519,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">ASISTENTES</h4>
+                <h4 class="modal-title">CONVOCADOS</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
