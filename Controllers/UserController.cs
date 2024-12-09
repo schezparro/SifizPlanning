@@ -5073,26 +5073,31 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult EditarPlanRecursoCapacitacion(int id, string titulo, string detalle, DateTime fecha, int modulo, int colaborador, int tiempo, string asistentesJson, string link = "")
+        public ActionResult EditarPlanRecursoCapacitacion(
+            int id, string titulo, string detalle, DateTime fecha, int modulo, int colaborador,
+            int tiempo, string asistentesJson, string link = "")
         {
             try
             {
-                // Decodificar la cadena JSON de asistentes
                 var serializer = new JavaScriptSerializer();
                 int[] asistentesIds = serializer.Deserialize<int[]>(asistentesJson);
 
-                // Buscar el recurso existente por ID
+                // Buscar el recurso existente
                 var recurso = db.Recursos.FirstOrDefault(s => s.Secuencial == id);
                 if (recurso == null)
                 {
-                    return Json(new
-                    {
-                        success = false,
-                        msg = "El recurso especificado no existe."
-                    });
+                    return Json(new { success = false, msg = "El recurso especificado no existe." });
                 }
 
-                // Actualizar los datos del recurso
+                // Verificar si el recurso cambió
+                bool recursoCambio = recurso.Titulo != titulo ||
+                                     recurso.Detalle != detalle ||
+                                     recurso.Fecha != fecha ||
+                                     recurso.SecuencialModulo != modulo ||
+                                     recurso.TiempoCapacitacion != tiempo ||
+                                     recurso.Url != link;
+
+                // Actualizar el recurso
                 recurso.Titulo = titulo;
                 recurso.Detalle = detalle;
                 recurso.Fecha = fecha;
@@ -5100,45 +5105,110 @@ r in db.Rol on ur.rol equals r
                 recurso.SecuencialColaborador = colaborador;
                 recurso.TiempoCapacitacion = tiempo;
                 recurso.Url = link;
-                recurso.EsPlan = 1; // Mantener como plan por defecto
-                db.SaveChanges();
+                recurso.EsPlan = 1;
 
-                // Eliminar las asociaciones previas de asistentes
-                var asistentesExistentes = db.RecursosAsistencia.Where(ra => ra.SecuencialRecurso == id).ToList();
-                db.RecursosAsistencia.RemoveRange(asistentesExistentes);
-                db.SaveChanges();
+                // Obtener asistentes existentes
+                var asistentesExistentes = db.RecursosAsistencia
+                    .Where(ra => ra.SecuencialRecurso == id)
+                    .ToList();
 
-                // Crear las nuevas asociaciones de asistentes
+                // Notificación y reconfiguración de tareas si el recurso cambió
+                if (recursoCambio)
+                {
+                    var convocadosActuales = asistentesExistentes.Where(a => a.Convocado == 1).ToList();
+                    List<string> emailsNotificar = new List<string>();
+
+                    foreach (var asistente in convocadosActuales)
+                    {
+                        // Anular tareas actuales
+                        var tareaCap = db.TareaCapacitacion.FirstOrDefault(tc => tc.SecuencialCapacitacion == id && tc.tarea.SecuencialColaborador == asistente.SecuencialColaborador);
+                        if (tareaCap != null)
+                        {
+                            var tarea = db.Tarea.FirstOrDefault(t => t.Secuencial == tareaCap.SecuencialTarea);
+                            if (tarea != null)
+                            {
+                                tarea.SecuencialEstadoTarea = 4; // Anulada
+                            }
+                            db.TareaCapacitacion.Remove(tareaCap);
+                        }
+
+                        // Crear nueva tarea
+                        var nuevaTarea = new Tarea
+                        {
+                            SecuencialColaborador = asistente.SecuencialColaborador,
+                            SecuencialActividad = 6,
+                            SecuencialModulo = modulo,
+                            SecuencialCliente = 78,
+                            SecuencialEstadoTarea = 1,
+                            SecuencialLugarTarea = 5,
+                            Detalle = $"{titulo}\n\nurl: <a href=\"{link}\" target=\"_blank\">{link}</a>",
+                            FechaInicio = fecha,
+                            FechaFin = fecha.AddMinutes((double)tiempo),
+                            HorasUtilizadas = 0,
+                            NumeroVerificador = 1,
+                        };
+                        Utiles.AgregarTareaConReubicacion(nuevaTarea, db);
+
+                        var nuevaTareaCap = new TareaCapacitacion
+                        {
+                            SecuencialCapacitacion = id,
+                            SecuencialTarea = nuevaTarea.Secuencial
+                        };
+                        db.TareaCapacitacion.Add(nuevaTareaCap);
+
+                        // Agregar email a la lista de notificación
+                        var email = db.Colaborador
+                            .FirstOrDefault(c => c.Secuencial == asistente.SecuencialColaborador)?
+                            .persona.usuario.FirstOrDefault()?.Email;
+
+                        if (!string.IsNullOrEmpty(email))
+                        {
+                            emailsNotificar.Add(email);
+                        }
+                    }
+
+                    // Enviar correos a convocados actuales
+                    if (emailsNotificar.Any())
+                    {
+                        string textoEmail = ConstruirTextoEmail(recurso);
+                        string asuntoEmail = "Actualización en la reunión/capacitación";
+                        Utiles.EnviarEmailSistema(emailsNotificar.ToArray(), textoEmail, asuntoEmail);
+                    }
+                }
+
+                // Procesar nuevos asistentes
+                var asistentesAEliminar = asistentesExistentes
+                    .Where(a => !asistentesIds.Contains(a.SecuencialColaborador))
+                    .ToList();
+
+                db.RecursosAsistencia.RemoveRange(asistentesAEliminar);
+
                 foreach (int asistenteId in asistentesIds)
                 {
-                    RecursosAsistencia ra = new RecursosAsistencia
-                    {
-                        SecuencialColaborador = asistenteId,
-                        SecuencialRecurso = id,
-                        Asistencia = 0,
-                        Puntuacion = 0,
-                        EstaActivo = 1,
-                        Convocado = 0
-                    };
+                    var asistenteExistente = asistentesExistentes.FirstOrDefault(a => a.SecuencialColaborador == asistenteId);
 
-                    db.RecursosAsistencia.Add(ra);
+                    if (asistenteExistente == null)
+                    {
+                        var nuevoAsistente = new RecursosAsistencia
+                        {
+                            SecuencialColaborador = asistenteId,
+                            SecuencialRecurso = id,
+                            Asistencia = 0,
+                            Puntuacion = 0,
+                            EstaActivo = 1,
+                            Convocado = 0 // Por defecto, no convocado
+                        };
+                        db.RecursosAsistencia.Add(nuevoAsistente);
+                    }
                 }
 
                 db.SaveChanges();
 
-                return Json(new
-                {
-                    success = true,
-                    msg = "El recurso ha sido actualizado correctamente."
-                });
+                return Json(new { success = true, msg = "El recurso ha sido actualizado correctamente." });
             }
             catch (Exception e)
             {
-                return Json(new
-                {
-                    success = false,
-                    msg = e.Message
-                });
+                return Json(new { success = false, msg = e.Message });
             }
         }
 
@@ -5296,112 +5366,111 @@ r in db.Rol on ur.rol equals r
         }
 
 
-        //Guardar modal nuevos recursos
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
         public ActionResult GuardarConvocadosRecurso(int idRecurso, string adjuntoAsistencia = null)
         {
+            if (idRecurso == 0 || string.IsNullOrEmpty(adjuntoAsistencia))
+            {
+                return Json(new { success = false, msg = "Datos inválidos" });
+            }
+
             try
             {
-                if (idRecurso != 0)
+                // Deserializar datos
+                var asistentes = JsonConvert.DeserializeObject<List<dynamic>>(adjuntoAsistencia);
+
+                // Obtener recurso
+                var recurso = db.Recursos.FirstOrDefault(c => c.Secuencial == idRecurso);
+                if (recurso == null)
                 {
-                    var s1 = new JavaScriptSerializer();
-                    var datosAsistencia = s1.Deserialize<List<dynamic>>(adjuntoAsistencia);
-                    List<string> usuariosDestinos = new List<string>();
+                    return Json(new { success = false, msg = "Recurso no encontrado" });
+                }
 
-                    Recursos cap = db.Recursos.FirstOrDefault(ca => ca.Secuencial == idRecurso);
-                    var tareasAsignadas = db.TareaCapacitacion.Where(s => s.SecuencialCapacitacion == cap.Secuencial).ToList();
-                    foreach (var tar in tareasAsignadas)
+                // Obtener lista de tareas ya asignadas
+                var tareasAsignadas = db.TareaCapacitacion
+                    .Where(tc => tc.SecuencialCapacitacion == recurso.Secuencial)
+                    .Select(tc => tc.tarea.SecuencialColaborador)
+                    .ToList();
+
+                List<string> nuevosConvocadosEmails = new List<string>();
+
+                foreach (var asistente in asistentes)
+                {
+                    int colaboradorId = (int)asistente["idColaborador"];
+                    bool convocado = (bool)asistente["convocado"];
+
+                    // Si el colaborador está convocado y no tiene tarea asignada, se crea una nueva
+                    if (convocado && !tareasAsignadas.Contains(colaboradorId))
                     {
-                        var tarea = db.Tarea.Where(s => s.Secuencial == tar.SecuencialTarea).FirstOrDefault();
-
-                        tarea.SecuencialEstadoTarea = 4;
-                        db.TareaCapacitacion.Remove(tar);
-
-                        db.SaveChanges();
-                    }
-
-                    foreach (var item in datosAsistencia)
-                    {
-                        int id = Convert.ToInt32(item["id"]);
-                        bool convocado = Convert.ToBoolean(item["convocado"]);
-
-                        RecursosAsistencia r = db.RecursosAsistencia.FirstOrDefault(ra => ra.Secuencial == id);
-
-                        bool con = r.Convocado == 1 ? true : false;
-
-                        if (con != convocado)
+                        var tarea = new Tarea
                         {
-                            r.Convocado = convocado == true ? 1 : 0;
-                            db.SaveChanges();
+                            SecuencialColaborador = colaboradorId,
+                            SecuencialActividad = 6,
+                            SecuencialModulo = recurso.SecuencialModulo,
+                            SecuencialCliente = 78,
+                            SecuencialEstadoTarea = 1,
+                            SecuencialLugarTarea = 5,
+                            Detalle = $"{recurso.Titulo}\n\nurl: <a href=\"{recurso.Url}\" target=\"_blank\">{recurso.Url}</a>",
+                            FechaInicio = recurso.Fecha,
+                            FechaFin = recurso.Fecha.AddMinutes((double)recurso.TiempoCapacitacion),
+                            HorasUtilizadas = 0,
+                            NumeroVerificador = 1,
+                        };
 
-                            if (convocado == true)
-                            {
-                                Tarea tar = new Tarea
-                                {
-                                    SecuencialColaborador = r.SecuencialColaborador,
-                                    SecuencialActividad = 6,
-                                    SecuencialModulo = cap.SecuencialModulo,
-                                    SecuencialCliente = 78,
-                                    SecuencialEstadoTarea = 1,
-                                    SecuencialLugarTarea = 5,
-                                    Detalle = $"{cap.Titulo}\n\nurl: <a href=\"{cap.Url}\" target=\"_blank\">{cap.Url}</a>",
-                                    FechaInicio = cap.Fecha,
-                                    FechaFin = cap.Fecha.AddMinutes((double)cap.TiempoCapacitacion),
-                                    HorasUtilizadas = 0,
-                                    NumeroVerificador = 1,
-                                };
-                                Utiles.AgregarTareaConReubicacion(tar, db);
+                        db.Tarea.Add(tarea);
+                        db.SaveChanges();
 
-                                TareaCapacitacion tarc = new TareaCapacitacion()
-                                {
-                                    SecuencialCapacitacion = cap.Secuencial,
-                                    SecuencialTarea = tar.Secuencial
-                                };
-                                db.TareaCapacitacion.Add(tarc);
-                                db.SaveChanges();
+                        // Relación entre tarea y capacitación
+                        var tareaCapacitacion = new TareaCapacitacion
+                        {
+                            SecuencialCapacitacion = recurso.Secuencial,
+                            SecuencialTarea = tarea.Secuencial
+                        };
+                        db.TareaCapacitacion.Add(tareaCapacitacion);
+                        db.SaveChanges();
 
-                                string email = db.Colaborador.FirstOrDefault(s => s.Secuencial == r.SecuencialColaborador).persona.usuario.FirstOrDefault().Email;
-                                usuariosDestinos.Add(email);
+                        // Obtener correo del colaborador
+                        string email = db.Colaborador
+                            .FirstOrDefault(c => c.Secuencial == colaboradorId)?
+                            .persona.usuario.FirstOrDefault()?.Email;
 
-                                string textoEmail = @"<div class='textoCuerpo'>Estimado(a): ";
-                                textoEmail += "<br>";
-                                textoEmail += "Por medio del siguiente correo se establece la reunión programada con el siguiente detalle: ";
-                                textoEmail += "<br/>";
-                                textoEmail += "<strong>Tema: <strong/>" + cap.Titulo;
-                                textoEmail += "<br/>";
-                                textoEmail += "<strong>Fecha: <strong/>" + cap.Fecha;
-                                textoEmail += "<br/>";
-                                textoEmail += $"<strong>Duración: </strong>{cap.TiempoCapacitacion / 60} horas y {cap.TiempoCapacitacion % 60} minutos";
-                                textoEmail += "<br/>";
-                                textoEmail += "<strong>Modulador: <strong/>" + cap.SecuencialModulo;
-                                textoEmail += "<br/>";
-                                textoEmail += "<strong>Enlace de la reunión: <strong/>" + cap.Url;
-                                textoEmail += "</div>";
-
-                                string asuntoEmail = "Nueva Reunión/Capacitación";
-                                Utiles.EnviarEmailSistema(usuariosDestinos.ToArray(), textoEmail, asuntoEmail);
-                            }
+                        if (!string.IsNullOrEmpty(email))
+                        {
+                            nuevosConvocadosEmails.Add(email);
                         }
                     }
-                };
+                }
 
-                return Json(new
+                // Enviar correos solo a los nuevos convocados
+                if (nuevosConvocadosEmails.Any())
                 {
-                    success = true,
-                    msg = "Se ha realizado la operación correctamente."
-                });
+                    string textoEmail = ConstruirTextoEmail(recurso);
+                    string asuntoEmail = "Nueva Reunión/Capacitación";
+                    Utiles.EnviarEmailSistema(nuevosConvocadosEmails.ToArray(), textoEmail, asuntoEmail);
+                }
+
+                return Json(new { success = true, msg = "Operación realizada correctamente." });
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return Json(new
-                {
-                    success = false,
-                    msg = e.Message
-                });
+                return Json(new { success = false, msg = "Ocurrió un error: " + ex.Message });
             }
         }
 
+        private string ConstruirTextoEmail(Recursos recurso)
+        {
+            return $@"
+        <div class='textoCuerpo'>
+            <p>Estimado(a):</p>
+            <p>Por medio del presente correo se establece la reunión programada con el siguiente detalle:</p>
+            <strong>Tema:</strong> {recurso.Titulo}<br/>
+            <strong>Fecha:</strong> {recurso.Fecha:dd/MM/yyyy HH:mm}<br/>
+            <strong>Duración:</strong> {Math.Floor((double)recurso.TiempoCapacitacion / 60)} horas y {recurso.TiempoCapacitacion % 60} minutos<br/>
+            <strong>Modulador:</strong> {recurso.SecuencialModulo}<br/>
+            <strong>Enlace de la reunión:</strong> <a href='{recurso.Url}' target='_blank'>{recurso.Url}</a><br/>
+        </div>";
+        }
 
         //ESTIMACIONES DE LOS USUARIOS
         [HttpPost]
