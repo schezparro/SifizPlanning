@@ -11,6 +11,7 @@ using System.Configuration;
 using System.Web.Script.Serialization;
 using System.Data.Entity.Validation;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
+using Microsoft.Ajax.Utilities;
 
 namespace SifizPlanning.Controllers
 {
@@ -209,6 +210,130 @@ namespace SifizPlanning.Controllers
                 });
             }
 
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
+        public ActionResult EditarRequerimiento(int id, int cliente, int requerimiento, string ticket, string detalle, string fechaPedidoCliente)
+        {
+            try
+            {
+                var nuevaOfertaRequerimiento = db.OFERTAREQUERIMIENTO.FirstOrDefault(s => s.Secuencial == id);
+
+                if (nuevaOfertaRequerimiento == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        msg = "El recurso especificado no existe."
+                    });
+                }
+
+                int ticketNumerico;
+                if (ticket != "")
+                {
+                    if (!int.TryParse(ticket, out ticketNumerico))
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            msg = "El ticket debe ser un valor numérico válido."
+                        });
+                    }
+                    else
+                    {
+                        nuevaOfertaRequerimiento.SecuencialTicketTarea = ticketNumerico;
+                    }
+                }
+
+                nuevaOfertaRequerimiento.SecuencialCLiente = cliente;
+                nuevaOfertaRequerimiento.SecuencialRequerimiento = requerimiento;
+                nuevaOfertaRequerimiento.Detalle = detalle;
+                nuevaOfertaRequerimiento.FechaPedidoCLiente = DateTime.Parse(fechaPedidoCliente);
+
+                db.OFERTAREQUERIMIENTO.Add(nuevaOfertaRequerimiento);
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
+            }
+            catch (DbEntityValidationException ex)
+            {
+                var errorMessages = ex.EntityValidationErrors
+                    .SelectMany(e => e.ValidationErrors)
+                    .Select(e => $"{e.PropertyName}: {e.ErrorMessage}");
+
+                var fullErrorMessage = string.Join("; ", errorMessages);
+                var exceptionMessage = $"Error de validación: {fullErrorMessage}";
+
+                return Json(new
+                {
+                    success = false,
+                    msg = exceptionMessage
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
+        public ActionResult EliminarRequerimiento(int id)
+        {
+            try
+            {
+                var ofertaRequerimiento = db.OFERTAREQUERIMIENTO.Find(id);
+
+                if (ofertaRequerimiento == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        msg = "El recurso especificado no existe."
+                    });
+                }
+
+                db.OFERTAREQUERIMIENTO.Remove(ofertaRequerimiento);
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
+            }
+            catch (DbEntityValidationException ex)
+            {
+                var errorMessages = ex.EntityValidationErrors
+                    .SelectMany(e => e.ValidationErrors)
+                    .Select(e => $"{e.PropertyName}: {e.ErrorMessage}");
+
+                var fullErrorMessage = string.Join("; ", errorMessages);
+                var exceptionMessage = $"Error de validación: {fullErrorMessage}";
+
+                return Json(new
+                {
+                    success = false,
+                    msg = exceptionMessage
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
         }
 
         [HttpPost]
