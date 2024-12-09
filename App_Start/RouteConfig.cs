@@ -2256,6 +2256,18 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "EliminarRequerimiento",
+                url: "comercial/eliminar-requerimiento/{id}",
+                defaults: new { controller = "Comercial", action = "EliminarRequerimiento", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "EditarRequerimiento",
+                url: "comercial/editar-requerimiento/{id}",
+                defaults: new { controller = "Comercial", action = "EditarRequerimiento", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "RequerimientosComercial",
                 url: "comercial/requerimientos-comercial/{id}",
                 defaults: new { controller = "Comercial", action = "RequerimientosComercial", id = UrlParameter.Optional }

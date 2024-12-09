@@ -184,12 +184,26 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
     $scope.habilitarTicketCkc = function () {
         if ($scope.habilitarTicket == false) {
             $scope.ticketSeleccionado = "";
+            $scope.pedReqSeleccionado = "";
             $scope.clienteSeleccionado = "";
             $scope.detalleSeleccionado = "";
             $scope.fechaSeleccionada = "";
             document.getElementById("select-cliente-requerimiento").removeAttribute("disabled");
             document.getElementById("detalle-requerimiento").removeAttribute("disabled");
             document.getElementById("fecha-requerimiento").removeAttribute("disabled");
+        }
+    };
+
+    $scope.habilitarTicketCkcE = function () {
+        if ($scope.habilitarTicketE == false) {
+            $scope.ticketSeleccionadoE = "";
+            $scope.pedReqSeleccionadoE = "";
+            $scope.clienteSeleccionadoE = "";
+            $scope.detalleSeleccionadoE = "";
+            $scope.fechaSeleccionadaE = "";
+            document.getElementById("select-editar-cliente-requerimiento").removeAttribute("disabled");
+            document.getElementById("detalle-editar-requerimiento").removeAttribute("disabled");
+            document.getElementById("fecha-editar-requerimiento").removeAttribute("disabled");
         }
     };
      
@@ -272,22 +286,74 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
             });
         ajaxObtenerRequerimiento.success(function (data) {
             if (data.success === true) {
+                console.log(data.requerimientoResult);
                 if (data.requerimientoResult.ticket != null) {
                     habilitarTicket = true;
-                    $scope.ticketSeleccionado = data.requerimientoResult.ticket;
+                    $scope.ticketSeleccionadoE = data.requerimientoResult.ticket;
                 } else {
                     habilitarTicket = false;
                 };
-                $scope.clienteSeleccionado = data.requerimientoResult.clienteId;
-                $scope.pedReqSeleccionado = data.requerimientoResult.requerimientoId;
-                $scope.detalleSeleccionado = data.requerimientoResult.detalle;
-                $scope.fechaSeleccionada = $scope.convertirFecha(data.requerimientoResult.fecha);
+                $scope.clienteSeleccionadoE = data.requerimientoResult.clienteId;
+                $scope.pedReqSeleccionadoE = data.requerimientoResult.requerimientoId;
+                $scope.detalleSeleccionadoE = data.requerimientoResult.detalle;
+                $scope.fechaSeleccionadaE = $scope.convertirFecha(data.requerimientoResult.fecha);
 
-                angular.element("#modal-agregar-requerimientos").modal("show");
+                angular.element("#modal-editar-requerimientos").modal("show");
             }
             else {
                 messageDialog.show('Información', data.msg);
             }
+        });
+    };
+
+    $scope.modificarRequerimiento = function () {
+
+        waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
+
+        var datos = {
+            id: $scope.secuencialRequerimiento,
+            cliente: $scope.clienteSeleccionadoE, // Usar el modelo Angular
+            requerimiento: $scope.pedReqSeleccionadoE,
+            ticket: $scope.ticketSeleccionadoE,
+            detalle: $scope.detalleSeleccionadoE,
+            fechaPedidoCliente: $scope.fechaSeleccionadaE
+        };
+
+        var insertReq = $http.post("comercial/editar-requerimiento",
+            datos);
+
+        insertReq.success(function (data) {
+            waitingDialog.hide();
+            if (data.success === true) {
+                angular.element("#modal-agregar-requerimientos").modal("hide");
+                $scope.cargarRequerimientos();
+            } else {
+                messageDialog.show("Información", data.msg);
+            }
+        });
+        insertReq.error(function (data) {
+            waitingDialog.hide();
+            messageDialog.show('Error', 'Error en la petición por favor verifique que los datos sean correctos.');
+        });
+    };
+
+    $scope.eliminarRequerimiento = function (secuencial) {
+        console.log("en eliminar  " + secuencial);
+        var ajaxObtenerRequerimiento = $http.post("comercial/eliminar-requerimiento",
+            {
+                id: secuencial
+            });
+        ajaxObtenerRequerimiento.success(function (data) {
+            waitingDialog.hide();
+            if (data.success === true) {
+                $scope.cargarRequerimientos();
+            } else {
+                messageDialog.show("Información", data.msg);
+            }
+        });
+        ajaxObtenerRequerimiento.error(function (data) {
+            waitingDialog.hide();
+            messageDialog.show('Error', 'Error en la petición por favor verifique que los datos sean correctos.');
         });
     };
 
