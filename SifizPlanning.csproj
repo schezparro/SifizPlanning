@@ -1022,6 +1022,7 @@
     <Compile Include="Security\MyRoleProvider.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Util\Utiles.cs" />
+    <Content Include="Web\js\comercial\ofertasController.js" />
     <Content Include="Areas\HelpPage\HelpPage.css" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
@@ -1251,6 +1252,7 @@
     <Content Include="Views\Comercial\Index.cshtml" />
     <Content Include="Views\Comercial\windowRequerimientoComercial.cshtml" />
     <Content Include="Views\Report\VerReporteMantenimientoCliente.cshtml" />
+    <Content Include="Views\Comercial\windowOfertasComercial.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

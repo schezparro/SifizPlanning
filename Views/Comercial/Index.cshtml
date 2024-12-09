@@ -35,6 +35,7 @@
         <div id="menu-principal">
             <ul class="nav nav-pills">
                 <li role="presentation" class="active"><a href="#" ng-click="IrRequerimientosComercial()">Requerimientos</a></li>
+                <li role="presentation"><a href="#" ng-click="IrOfertasComercial()">Ofertas</a></li>
 
                 <a href="cerrar/sesion/" class="right btn btn-danger"><span class="glyphicon glyphicon-off"></span>Cerrar Sesión</a>
                 <a href="main-menu" style="margin-right: 4px;" class="right btn btn-warning"><span class="glyphicon glyphicon-menu-hamburger"></span> Menú Principal</a>
@@ -49,6 +50,9 @@
 
                 <div id="panel-requerimientos" ng-controller="comercialController">
                     @{Html.RenderPartial("windowRequerimientoComercial");}
+                </div>
+                <div id="panel-ofertas" ng-controller="ofertasController">
+                    @{Html.RenderPartial("windowOfertasComercial");}
                 </div>
             </div>
 
@@ -114,6 +118,7 @@
     <script type="text/javascript" src="~/Web/js/chat.js"></script>
     <script type="text/javascript" src="~/Web/js/waiting.js"></script>
     <script type="text/javascript" src="~/Web/js/comercial/comercial.js"></script>
+    <script type="text/javascript" src="~/Web/js/comercial/ofertasController.js"></script>
 
 
 </body>
