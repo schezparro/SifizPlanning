@@ -50,13 +50,25 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
 
     function ocultar() {
         angular.element("#panel-requerimientos").addClass('invisible');
+        angular.element("#panel-ofertas").addClass('invisible');
     };
 
+    $scope.funcionalidad = 'REQUERIMIENTOS';
+
     $scope.IrRequerimientosComercial = function () {
-        //ocultar();
-        angular.element("#panel-requerimientos").removeClass('invisible');
+        ocultar(); // Oculta ambos paneles
         $scope.funcionalidad = 'GESTION DE REQUERIMIENTOS';
+        angular.element("#panel-requerimientos").removeClass('invisible');
     };
+
+    $scope.IrOfertasComercial = function () {
+        ocultar(); // Oculta ambos paneles
+        $scope.funcionalidad = 'GESTION DE OFERTAS';
+        angular.element("#panel-ofertas").removeClass('invisible');
+    };
+
+    $scope.IrRequerimientosComercial();
+
     var numerosPorPagina = 10;
     var pagina = 1;
     $scope.cargarRequerimientos = function (start, lenght) {
