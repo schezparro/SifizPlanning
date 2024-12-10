@@ -85,7 +85,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "COMERCIAL, ADMIN")]
-        public ActionResult DarDatosRequerimientos(int secuencialRequerimiento)
+        public ActionResult DarDatosRequerimiento(int secuencialRequerimiento)
         {
             try
             {
@@ -108,7 +108,7 @@ namespace SifizPlanning.Controllers
                                detalle = or.Detalle,
                                requerimientoId = or.SecuencialRequerimiento,
                                requerimiento = r.Descripcion,
-                               fecha = or.FechaPedidoCLiente.HasValue ? or.FechaPedidoCLiente.Value.ToString() : "",
+                               fecha = or.FechaPedidoCLiente.HasValue ? or.FechaPedidoCLiente : null,
                            }).FirstOrDefault();
 
                 var result = new
@@ -170,10 +170,16 @@ namespace SifizPlanning.Controllers
                 }
                 else
                 {
+                    string[] fechaI = fechaPedidoCliente.Split(new Char[] { '/' });
+                    int dia = Int32.Parse(fechaI[0]);
+                    int mes = Int32.Parse(fechaI[1]);
+                    int anno = Int32.Parse(fechaI[2]);
+                    DateTime fechaPC = new DateTime(anno, mes, dia);
+
                     nuevaOfertaRequerimiento.SecuencialCLiente = cliente;
                     nuevaOfertaRequerimiento.SecuencialRequerimiento = requerimiento;
                     nuevaOfertaRequerimiento.Detalle = detalle;
-                    nuevaOfertaRequerimiento.FechaPedidoCLiente = DateTime.Parse(fechaPedidoCliente);
+                    nuevaOfertaRequerimiento.FechaPedidoCLiente = fechaPC;
                 }
 
 
@@ -244,14 +250,22 @@ namespace SifizPlanning.Controllers
                     {
                         nuevaOfertaRequerimiento.SecuencialTicketTarea = ticketNumerico;
                     }
+                } else
+                {
+                    nuevaOfertaRequerimiento.SecuencialTicketTarea = null;
                 }
+
+                string[] fechaI = fechaPedidoCliente.Split(new Char[] { '/' });
+                int dia = Int32.Parse(fechaI[0]);
+                int mes = Int32.Parse(fechaI[1]);
+                int anno = Int32.Parse(fechaI[2]);
+                DateTime fechaPC = new DateTime(anno, mes, dia);
 
                 nuevaOfertaRequerimiento.SecuencialCLiente = cliente;
                 nuevaOfertaRequerimiento.SecuencialRequerimiento = requerimiento;
                 nuevaOfertaRequerimiento.Detalle = detalle;
-                nuevaOfertaRequerimiento.FechaPedidoCLiente = DateTime.Parse(fechaPedidoCliente);
+                nuevaOfertaRequerimiento.FechaPedidoCLiente = fechaPC;
 
-                db.OFERTAREQUERIMIENTO.Add(nuevaOfertaRequerimiento);
                 db.SaveChanges();
 
                 return Json(new

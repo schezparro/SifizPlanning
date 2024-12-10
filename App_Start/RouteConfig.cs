@@ -2244,9 +2244,9 @@ namespace SifizPlanning
 
             //-------------------COMERCIAL---------------------
             routes.MapRoute(
-                name: "DarDatosRequerimientos",
-                url: "comercial/dar-datos-requerimientos/{id}",
-                defaults: new { controller = "Comercial", action = "DarDatosRequerimientos", id = UrlParameter.Optional }
+                name: "DarDatosRequerimiento",
+                url: "comercial/dar-datos-requerimiento/{id}",
+                defaults: new { controller = "Comercial", action = "DarDatosRequerimiento", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(

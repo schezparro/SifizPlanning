@@ -142,9 +142,12 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
 
     angular.element('#fecha-requerimiento').datepicker({
         format: 'dd/mm/yyyy',
-        locale: 'es'
-    }).datepicker({
-        format: 'dd/mm/yyyy'
+        forceParse: false
+    });
+
+    angular.element('#fecha-editar-requerimiento').datepicker({
+        format: 'dd/mm/yyyy',
+        forceParse: false
     });
 
     var ajaxClientes = $http.post("catalogos/clientes", {});
@@ -161,12 +164,16 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
         }
     });
     $scope.windowAgregarRequerimiento = function () {
+        $scope.habilitarTicket = false;
         $scope.clienteSeleccionado = '';
         $scope.pedReqSeleccionado = '';
         $scope.ticketSeleccionado = '';
         $scope.detalleSeleccionado = '';
         $scope.fechaSeleccionada = '';
         angular.element("#modal-agregar-requerimientos").modal("show");
+        //document.getElementById("select-cliente-requerimiento").removeAttribute("disabled");
+        //document.getElementById("detalle-requerimiento").removeAttribute("disabled");
+        //document.getElementById("fecha-requerimiento").removeAttribute("disabled");
     };
 
     $scope.habilitarTicket = false; 
@@ -183,27 +190,27 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
 
     $scope.habilitarTicketCkc = function () {
         if ($scope.habilitarTicket == false) {
-            $scope.ticketSeleccionado = "";
-            $scope.pedReqSeleccionado = "";
-            $scope.clienteSeleccionado = "";
-            $scope.detalleSeleccionado = "";
-            $scope.fechaSeleccionada = "";
+            $scope.ticketSeleccionado=""
             document.getElementById("select-cliente-requerimiento").removeAttribute("disabled");
             document.getElementById("detalle-requerimiento").removeAttribute("disabled");
             document.getElementById("fecha-requerimiento").removeAttribute("disabled");
+        } else {
+            document.getElementById("select-cliente-requerimiento").setAttribute("disabled", "disabled");
+            document.getElementById("detalle-requerimiento").setAttribute("disabled", "disabled");
+            document.getElementById("fecha-requerimiento").setAttribute("disabled", "disabled");
         }
     };
 
     $scope.habilitarTicketCkcE = function () {
         if ($scope.habilitarTicketE == false) {
-            $scope.ticketSeleccionadoE = "";
-            $scope.pedReqSeleccionadoE = "";
-            $scope.clienteSeleccionadoE = "";
-            $scope.detalleSeleccionadoE = "";
-            $scope.fechaSeleccionadaE = "";
+            $scope.ticketSeleccionadoE=""
             document.getElementById("select-editar-cliente-requerimiento").removeAttribute("disabled");
             document.getElementById("detalle-editar-requerimiento").removeAttribute("disabled");
             document.getElementById("fecha-editar-requerimiento").removeAttribute("disabled");
+        } else {
+            document.getElementById("select-editar-cliente-requerimiento").setAttribute("disabled", "disabled");
+            document.getElementById("detalle-editar-requerimiento").setAttribute("disabled", "disabled");
+            document.getElementById("fecha-editar-requerimiento").setAttribute("disabled", "disabled");
         }
     };
      
@@ -221,6 +228,7 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
     };
 
     $scope.validarTicket = function (ticket) {
+        waitingDialog.show('Validando el número de ticket ingresado...', { dialogSize: 'sm', progressType: 'success' });
         // Verificar que sea un número
         if (!ticket || isNaN(ticket)) {
             $scope.ticketValido = false;
@@ -234,6 +242,7 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
 
         ajaxObtenerTicket.success(function (data) {
             if (data.success === true) {
+                waitingDialog.hide();
                 $scope.clienteSeleccionado = data.datosTicket.idCliente;
                 $scope.detalleSeleccionado = data.datosTicket.detalle;
                 $scope.fechaSeleccionada = $scope.convertirFecha(data.datosTicket.fecha);
@@ -242,22 +251,64 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
                 document.getElementById("fecha-requerimiento").setAttribute("disabled", "disabled");
             }
             else {
+                waitingDialog.hide();
                 messageDialog.show('Información', data.msg);
             }
         });
-        
+    };
+
+    $scope.debounceValidarTicketE = function (ticket) {
+        if (debounceTimeout) {
+            clearTimeout(debounceTimeout); // Cancela el timeout anterior
+        }
+
+        debounceTimeout = setTimeout(function () {
+            $scope.$apply(function () {
+                $scope.validarTicketE(ticket); // Llama a la validación real
+            });
+        }, 500); // Retraso de 500 ms
+    };
+
+
+    $scope.validarTicketE = function (ticket) {
+        waitingDialog.show('Validando el número de ticket ingresado...', { dialogSize: 'sm', progressType: 'success' });
+        // Verificar que sea un número
+        if (!ticket || isNaN(ticket)) {
+            $scope.ticketValidoE = false;
+            return;
+        }
+
+        var ajaxObtenerTicket = $http.post("tickets/dar-datos-ticket",
+            {
+                idTicket: ticket
+            });
+
+        ajaxObtenerTicket.success(function (data) {
+            if (data.success === true) {
+                waitingDialog.hide();
+                $scope.clienteSeleccionadoE = data.datosTicket.idCliente;
+                $scope.detalleSeleccionadoE = data.datosTicket.detalle;
+                $scope.fechaSeleccionadaE = $scope.convertirFecha(data.datosTicket.fecha);
+                document.getElementById("select-cliente-requerimiento").setAttribute("disabled", "disabled");
+                document.getElementById("detalle-requerimiento").setAttribute("disabled", "disabled");
+                document.getElementById("fecha-requerimiento").setAttribute("disabled", "disabled");
+            }
+            else {
+                waitingDialog.hide();
+                messageDialog.show('Información', data.msg);
+            }
+        });
     };
 
     $scope.GuardarNuevoRequerimiento = function () {
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
-
-        var cliente = angular.element("#select-cliente-requerimiento")[0].value;
+        var fechaSe = angular.element("#fecha-requerimiento")[0].value;
         var datos = {
-            cliente: $scope.clienteSeleccionado, // Usar el modelo Angular
+            cliente: $scope.clienteSeleccionado, 
             requerimiento: $scope.pedReqSeleccionado,
             ticket: $scope.ticketSeleccionado,
             detalle: $scope.detalleSeleccionado,
-            fechaPedidoCliente: $scope.fechaSeleccionada
+            fechaPedidoCliente: fechaSe
         };
 
         var insertReq = $http.post("comercial/guardar-requerimiento",
@@ -280,24 +331,31 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
 
     $scope.editarRequerimiento = function (secuencial) {
         $scope.secuencialRequerimiento = secuencial;
-        var ajaxObtenerRequerimiento = $http.post("comercial/dar-datos-requerimientos",
+        var ajaxObtenerRequerimiento = $http.post("comercial/dar-datos-requerimiento",
             {
                 secuencialRequerimiento: secuencial
             });
         ajaxObtenerRequerimiento.success(function (data) {
             if (data.success === true) {
-                console.log(data.requerimientoResult);
                 if (data.requerimientoResult.ticket != null) {
-                    habilitarTicket = true;
+                    $scope.habilitarTicketE = true;
                     $scope.ticketSeleccionadoE = data.requerimientoResult.ticket;
+                    document.getElementById("select-editar-cliente-requerimiento").setAttribute("disabled", "disabled");
+                    document.getElementById("detalle-editar-requerimiento").setAttribute("disabled", "disabled");
+                    document.getElementById("fecha-editar-requerimiento").setAttribute("disabled", "disabled");
                 } else {
-                    habilitarTicket = false;
+                    $scope.habilitarTicketE = false;
+                    $scope.ticketSeleccionadoE = "";
+                    document.getElementById("select-editar-cliente-requerimiento").removeAttribute("disabled");
+                    document.getElementById("detalle-editar-requerimiento").removeAttribute("disabled");
+                    document.getElementById("fecha-editar-requerimiento").removeAttribute("disabled");
                 };
                 $scope.clienteSeleccionadoE = data.requerimientoResult.clienteId;
                 $scope.pedReqSeleccionadoE = data.requerimientoResult.requerimientoId;
                 $scope.detalleSeleccionadoE = data.requerimientoResult.detalle;
-                $scope.fechaSeleccionadaE = $scope.convertirFecha(data.requerimientoResult.fecha);
 
+                $scope.fechaSeleccionadaE = $scope.convertirFecha(data.requerimientoResult.fecha);
+                angular.element('#fecha-editar-requerimiento').datepicker('setValue', new Date(data.requerimientoResult.fecha));
                 angular.element("#modal-editar-requerimientos").modal("show");
             }
             else {
@@ -309,14 +367,14 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
     $scope.modificarRequerimiento = function () {
 
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
-
+        var fechaSe = angular.element("#fecha-editar-requerimiento")[0].value;
         var datos = {
             id: $scope.secuencialRequerimiento,
             cliente: $scope.clienteSeleccionadoE, // Usar el modelo Angular
             requerimiento: $scope.pedReqSeleccionadoE,
             ticket: $scope.ticketSeleccionadoE,
             detalle: $scope.detalleSeleccionadoE,
-            fechaPedidoCliente: $scope.fechaSeleccionadaE
+            fechaPedidoCliente: fechaSe
         };
 
         var insertReq = $http.post("comercial/editar-requerimiento",
@@ -325,7 +383,7 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
         insertReq.success(function (data) {
             waitingDialog.hide();
             if (data.success === true) {
-                angular.element("#modal-agregar-requerimientos").modal("hide");
+                angular.element("#modal-editar-requerimientos").modal("hide");
                 $scope.cargarRequerimientos();
             } else {
                 messageDialog.show("Información", data.msg);

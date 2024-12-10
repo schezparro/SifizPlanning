@@ -143,7 +143,7 @@
                         <div class="col-md-12">
                             <div class="col-md-6">
                                 <label>
-                                    <input type="checkbox" ng-model="habilitarTicketE" ng-checked="habilitarTicketCkc()"> TICKET
+                                    <input type="checkbox" ng-model="habilitarTicketE" ng-checked="habilitarTicketCkcE()"> TICKET
                                 </label>
                                 <div ng-show="habilitarTicketE" class="mt-2">
                                     <input type="text"
@@ -151,7 +151,7 @@
                                            id="ticketSeleccionadoE"
                                            ng-model="ticketSeleccionadoE"
                                            ng-model-options='{ debounce: 3000 }'
-                                           ng-change="debounceValidarTicket(ticketSeleccionadoE)"
+                                           ng-change="debounceValidarTicketE(ticketSeleccionadoE)"
                                            ng-class="{'is-invalid': !ticketValido}"
                                            placeholder="Ingrese el número del ticket"
                                            ng-keypress="validarSoloNumeros($event)">

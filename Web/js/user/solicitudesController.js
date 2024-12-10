@@ -371,6 +371,29 @@
         }
     };
 
+    //*********************** REGISTRO DE VACACIONES**************/
+    $scope.registroVacaciones = function () {
+        if (solPer.Estado === "RECHAZADA") {
+            $scope.solicitudPer.cedula = solPer.Cedula;
+            $scope.solicitudPer.fechaIngresoSolicitud = convertDate(solPer.FechaIngresoSolicitud);
+            $scope.solicitudPer.empresa = solPer.Empresa;
+            $scope.solicitudPer.personal = solPer.Personal;
+            $scope.solicitudPer.matrimonio = solPer.Matrimonio;
+            $scope.solicitudPer.comida = solPer.Comida;
+            $scope.solicitudPer.paternidad = solPer.Paternidad;
+            $scope.solicitudPer.otros = solPer.Otros;
+            $scope.solicitudPer.fechaDesde = convertDate(solPer.FechaDesde);
+            $scope.solicitudPer.horaSalida = solPer.HoraSalida;
+            $scope.solicitudPer.fechaHasta = convertDate(solPer.FechaHasta);
+            $scope.solicitudPer.horaRetorno = solPer.HoraRetorno;
+            $scope.solicitudPer.motivo = solPer.Motivo;
+            $scope.solicitudPer.jefe = solPer.Jefe;
+            $scope.solicitudPer.estado = solPer.Estado;
+            $scope.windowSolicitarPermiso();
+            $scope.solicitudPer.id = solPer.ID;
+        }
+    };
+
 }]);
 
 devApp.filter("strDateToStr", function () {
