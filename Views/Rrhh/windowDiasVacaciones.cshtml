@@ -1,0 +1,26 @@
+﻿<div class="col-md-12">
+    <input type="text" id="filtro-dias-vacaciones" placeholder="Filtrar..." ng-model="filtroColaboradoresDiasVacaciones" class="form-control right filtro" ng-keyup="filtrarColaboradoresDiasVacaciones()" />
+</div>
+
+<div class="panel-body" style="height: 400px; overflow-y: auto;">
+    <table class="table table-striped">
+        <thead id="thead-incidencias">
+            <tr>
+                <th>Colaborador</th>
+                <th>Cantidad de días</th>
+            </tr>
+        </thead>
+
+        <tbody id="tbody-incidencias">
+            <tr class="table-tr" ng-repeat="col in diasVacacionesColaboradores">
+                <td>{{ col.nombre }}</td>
+                <td class="col-md-1">
+                    <input id="cantidad-dias" type="number" ng-model="col.cantidad"/>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-xs btn-success" ng-click="guardarDiasColaboradores(col.secuencialColaborador, col.cantidad)"><span class="glyphicon glyphicon-save-file"></span></button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

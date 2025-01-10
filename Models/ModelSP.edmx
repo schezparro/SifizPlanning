@@ -52,6 +52,18 @@
           <Property Name="DETALLE" Type="varchar" MaxLength="2000" Nullable="false" />
           <Property Name="SECUENCIALGESTIONPERMISO" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="DIASDISPONIBLESVACACIONES">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CODIGO" Type="nvarchar" MaxLength="50" />
+          <Property Name="DESCRIPCION" Type="nvarchar" MaxLength="250" />
+          <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" />
+          <Property Name="NUMEROVERIFICADOR" Type="int" />
+          <Property Name="SECUENCIALCOLABORADOR" Type="int" Nullable="false" />
+          <Property Name="DIASDISPONIBLES" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="ESTADOPERMISO">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
@@ -111,6 +123,14 @@
           <Property Name="FECHAINICIO" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="FECHAFIN" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="MOTIVO" Type="varchar" MaxLength="2000" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PROPUESTAVACACIONES">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SECUENCIALCOLABORADOR" Type="int" Nullable="false" />
+          <Property Name="FECHA" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="TIPOPERMISO">
           <Key>
@@ -2400,6 +2420,18 @@ warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have 
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_DIASDISPONIBLESVACACIONES_COLABORADOR">
+          <End Role="COLABORADOR" Type="Self.COLABORADOR" Multiplicity="1" />
+          <End Role="DIASDISPONIBLESVACACIONES" Type="Self.DIASDISPONIBLESVACACIONES" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="COLABORADOR">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="DIASDISPONIBLESVACACIONES">
+              <PropertyRef Name="SECUENCIALCOLABORADOR" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ENTREGABLEMOTIVOTRABAJO_COLABORADOR">
           <End Role="COLABORADOR" Type="Self.COLABORADOR" Multiplicity="0..1" />
           <End Role="ENTREGABLEMOTIVOTRABAJO" Type="Self.ENTREGABLEMOTIVOTRABAJO" Multiplicity="*" />
@@ -2768,6 +2800,18 @@ warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have 
               <PropertyRef Name="SECUENCIAL" />
             </Principal>
             <Dependent Role="OFERTAS">
+              <PropertyRef Name="SECUENCIALCOLABORADOR" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PROPUESTAVACACIONES_COLABORADOR">
+          <End Role="COLABORADOR" Type="Self.COLABORADOR" Multiplicity="1" />
+          <End Role="PROPUESTAVACACIONES" Type="Self.PROPUESTAVACACIONES" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="COLABORADOR">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="PROPUESTAVACACIONES">
               <PropertyRef Name="SECUENCIALCOLABORADOR" />
             </Dependent>
           </ReferentialConstraint>
@@ -5118,12 +5162,14 @@ warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have 
           <EntitySet Name="FBSLOGEQUIPO" EntityType="Self.FBSLOGEQUIPO" Schema="FBSLOG" store:Type="Tables" />
           <EntitySet Name="FBSLOGERROR" EntityType="Self.FBSLOGERROR" Schema="FBSLOG" store:Type="Tables" />
           <EntitySet Name="DETALLEGESTIONPERMISO" EntityType="Self.DETALLEGESTIONPERMISO" Schema="RRHH" store:Type="Tables" />
+          <EntitySet Name="DIASDISPONIBLESVACACIONES" EntityType="Self.DIASDISPONIBLESVACACIONES" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="ESTADOPERMISO" EntityType="Self.ESTADOPERMISO" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="FERIADOS" EntityType="Self.FERIADOS" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="GESTIONPERMISO" EntityType="Self.GESTIONPERMISO" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="INCIDENCIASRECURSOS" EntityType="Self.INCIDENCIASRECURSOS" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="MARCAELECTRONICA" EntityType="Self.MARCAELECTRONICA" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="PERMISO" EntityType="Self.PERMISO" Schema="RRHH" store:Type="Tables" />
+          <EntitySet Name="PROPUESTAVACACIONES" EntityType="Self.PROPUESTAVACACIONES" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="TIPOPERMISO" EntityType="Self.TIPOPERMISO" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="VACACIONES" EntityType="Self.VACACIONES" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="MENSAJE" EntityType="Self.MENSAJE" Schema="SEGURIDADES" store:Type="Tables" />
@@ -5408,6 +5454,10 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
             <End Role="ENTREGABLEDETALLEESTIMACION" EntitySet="ENTREGABLEDETALLEESTIMACION" />
             <End Role="DETALLEESTIMACIONTICKET" EntitySet="DETALLEESTIMACIONTICKET" />
           </AssociationSet>
+          <AssociationSet Name="FK_DIASDISPONIBLESVACACIONES_COLABORADOR" Association="Self.FK_DIASDISPONIBLESVACACIONES_COLABORADOR">
+            <End Role="COLABORADOR" EntitySet="COLABORADOR" />
+            <End Role="DIASDISPONIBLESVACACIONES" EntitySet="DIASDISPONIBLESVACACIONES" />
+          </AssociationSet>
           <AssociationSet Name="FK_ENTREGABLEMOTIVOTRABAJO_COLABORADOR" Association="Self.FK_ENTREGABLEMOTIVOTRABAJO_COLABORADOR">
             <End Role="COLABORADOR" EntitySet="COLABORADOR" />
             <End Role="ENTREGABLEMOTIVOTRABAJO" EntitySet="ENTREGABLEMOTIVOTRABAJO" />
@@ -5531,6 +5581,10 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
           <AssociationSet Name="FK_OFERTAS_COLABORADOR" Association="Self.FK_OFERTAS_COLABORADOR">
             <End Role="COLABORADOR" EntitySet="COLABORADOR" />
             <End Role="OFERTAS" EntitySet="OFERTAS" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PROPUESTAVACACIONES_COLABORADOR" Association="Self.FK_PROPUESTAVACACIONES_COLABORADOR">
+            <End Role="COLABORADOR" EntitySet="COLABORADOR" />
+            <End Role="PROPUESTAVACACIONES" EntitySet="PROPUESTAVACACIONES" />
           </AssociationSet>
           <AssociationSet Name="FK_PROYECTOMODULO_SUBMODULO" Association="Self.FK_PROYECTOMODULO_SUBMODULO">
             <End Role="SubModulo" EntitySet="SubModulo" />
@@ -7501,6 +7555,16 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
             <End Role="Recursos" EntitySet="Recursos" />
             <End Role="TAREACAPACITACION" EntitySet="TareaCapacitacion" />
           </AssociationSet>
+          <EntitySet Name="DiasDisponiblesVacaciones" EntityType="SifizPlanningModel.DiasDisponiblesVacaciones" />
+          <EntitySet Name="PropuestaVacaciones" EntityType="SifizPlanningModel.PropuestaVacaciones" />
+          <AssociationSet Name="FK_DIASDISPONIBLESVACACIONES_COLABORADOR" Association="SifizPlanningModel.FK_DIASDISPONIBLESVACACIONES_COLABORADOR">
+            <End Role="Colaborador" EntitySet="Colaborador" />
+            <End Role="DIASDISPONIBLESVACACIONES" EntitySet="DiasDisponiblesVacaciones" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PROPUESTAVACACIONES_COLABORADOR" Association="SifizPlanningModel.FK_PROPUESTAVACACIONES_COLABORADOR">
+            <End Role="Colaborador" EntitySet="Colaborador" />
+            <End Role="PROPUESTAVACACIONES" EntitySet="PropuestaVacaciones" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="Rol">
           <Key>
@@ -7652,6 +7716,8 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
           <NavigationProperty Name="INCIDENCIASRECURSOS" Relationship="SifizPlanningModel.FK_INCIDENCIASRECURSOS_COLABORADOR" FromRole="Colaborador" ToRole="INCIDENCIASRECURSOS" />
           <NavigationProperty Name="TIEMPOSPROYECTO" Relationship="SifizPlanningModel.FK_TIEMPOSPROYECTO_COLABORADOR" FromRole="Colaborador" ToRole="TIEMPOSPROYECTO" />
           <NavigationProperty Name="recursos" Relationship="SifizPlanningModel.FK_RECURSOS_COLABORADOR" FromRole="Colaborador" ToRole="Recursos" />
+          <NavigationProperty Name="DIASDISPONIBLESVACACIONES" Relationship="SifizPlanningModel.FK_DIASDISPONIBLESVACACIONES_COLABORADOR" FromRole="Colaborador" ToRole="DIASDISPONIBLESVACACIONES" />
+          <NavigationProperty Name="PROPUESTAVACACIONES" Relationship="SifizPlanningModel.FK_PROPUESTAVACACIONES_COLABORADOR" FromRole="Colaborador" ToRole="PROPUESTAVACACIONES" />
           </EntityType>
         <EntityType Name="Colaborador_JefeInmediato">
           <Key>
@@ -13067,6 +13133,52 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="DiasDisponiblesVacaciones">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Codigo" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Descripcion" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="EstaActivo" Type="Decimal" Precision="1" Scale="0" />
+          <Property Name="NumeroVerificador" Type="Int32" />
+          <Property Name="SecuencialColaborador" Type="Int32" Nullable="false" />
+          <Property Name="DiasDisponibles" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="colaborador" Relationship="SifizPlanningModel.FK_DIASDISPONIBLESVACACIONES_COLABORADOR" FromRole="DIASDISPONIBLESVACACIONES" ToRole="Colaborador" />
+        </EntityType>
+        <EntityType Name="PropuestaVacaciones">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SecuencialColaborador" Type="Int32" Nullable="false" />
+          <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="colaborador" Relationship="SifizPlanningModel.FK_PROPUESTAVACACIONES_COLABORADOR" FromRole="PROPUESTAVACACIONES" ToRole="Colaborador" />
+        </EntityType>
+        <Association Name="FK_DIASDISPONIBLESVACACIONES_COLABORADOR">
+          <End Type="SifizPlanningModel.Colaborador" Role="Colaborador" Multiplicity="1" />
+          <End Type="SifizPlanningModel.DiasDisponiblesVacaciones" Role="DIASDISPONIBLESVACACIONES" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Colaborador">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="DIASDISPONIBLESVACACIONES">
+              <PropertyRef Name="SecuencialColaborador" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PROPUESTAVACACIONES_COLABORADOR">
+          <End Type="SifizPlanningModel.Colaborador" Role="Colaborador" Multiplicity="1" />
+          <End Type="SifizPlanningModel.PropuestaVacaciones" Role="PROPUESTAVACACIONES" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Colaborador">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="PROPUESTAVACACIONES">
+              <PropertyRef Name="SecuencialColaborador" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -15344,6 +15456,28 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
               <MappingFragment StoreEntitySet="TAREACAPACITACION">
                 <ScalarProperty Name="SecuencialCapacitacion" ColumnName="SECUENCIALCAPACITACION" />
                 <ScalarProperty Name="SecuencialTarea" ColumnName="SECUENCIALTAREA" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DiasDisponiblesVacaciones">
+            <EntityTypeMapping TypeName="SifizPlanningModel.DiasDisponiblesVacaciones">
+              <MappingFragment StoreEntitySet="DIASDISPONIBLESVACACIONES">
+                <ScalarProperty Name="DiasDisponibles" ColumnName="DIASDISPONIBLES" />
+                <ScalarProperty Name="SecuencialColaborador" ColumnName="SECUENCIALCOLABORADOR" />
+                <ScalarProperty Name="NumeroVerificador" ColumnName="NUMEROVERIFICADOR" />
+                <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
+                <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
+                <ScalarProperty Name="Codigo" ColumnName="CODIGO" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PropuestaVacaciones">
+            <EntityTypeMapping TypeName="SifizPlanningModel.PropuestaVacaciones">
+              <MappingFragment StoreEntitySet="PROPUESTAVACACIONES">
+                <ScalarProperty Name="Fecha" ColumnName="FECHA" />
+                <ScalarProperty Name="SecuencialColaborador" ColumnName="SECUENCIALCOLABORADOR" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
               </MappingFragment>
             </EntityTypeMapping>

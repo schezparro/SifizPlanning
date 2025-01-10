@@ -6,7 +6,6 @@
         solicitudes.success(function (data) {
             waitingDialog.hide();
             if (data.success === true) {
-                console.log(data);
                 $scope.vacaciones = data.solicitudes;
             }
             else {
@@ -22,7 +21,6 @@
             waitingDialog.hide();
             if (data.success === true) {
                 $scope.permisos = data.solicitudes;
-                console.log($scope.permisos)
             }
             else {
                 messageDialog.show('Información', data.msg);
@@ -69,7 +67,6 @@
             waitingDialog.show('Rechazando solicitud...', { dialogSize: 'sm', progressType: 'success' });
 
             $scope.solVacTemp.Estado = "RECHAZADA"
-            console.log($scope.solVacTemp);
             var solicitudVacaciones = $http.post("user/solicitar-vacaciones",
                 {
                     solicitud: $scope.solVacTemp,
@@ -81,7 +78,6 @@
                     waitingDialog.hide();
                 }
                 else {
-                    console.log(data);
                     messageDialog.show('Información', data.msg);
                 }
             });
@@ -125,7 +121,6 @@
                     waitingDialog.hide();
                 }
                 else {
-                    console.log(data.msg);
                     messageDialog.show('Información', data.msg);
                 }
             });

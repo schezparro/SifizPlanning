@@ -969,7 +969,50 @@ namespace SifizPlanning
             );
 
             //---------------------- RUTAS DEL USUARIO -------------------------------
-            //RUTAS DE LA EDICION DE LAS TAREAS POR EL USUARIO            
+            //RUTAS DE LA EDICION DE LAS TAREAS POR EL USUARIO
+            //
+
+            routes.MapRoute(
+                name: "DarAnnosMesPropuestaVacaciones",
+                url: "user/dar-annos-meses/{id}",
+                defaults: new { controller = "User", action = "DarAnnosMesPropuestaVacaciones", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "EliminarPropuestaVacaciones",
+                url: "user/eliminar-propuesta-vacaciones/{id}",
+                defaults: new { controller = "User", action = "EliminarPropuestaVacaciones", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "ActualizarDatosPropuestaVacaciones",
+                url: "user/actualizar-propuesta-vacaciones/{id}",
+                defaults: new { controller = "User", action = "ActualizarDatosPropuestaVacaciones", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarFeriadosPorAnno",
+                url: "user/dar-feriados-ano/{id}",
+                defaults: new { controller = "User", action = "DarFeriadosPorAnno", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarFeriadosPorMes",
+                url: "user/dar-feriados-mes/{id}",
+                defaults: new { controller = "User", action = "DarFeriadosPorMes", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "ObtenerPropuestasPorAnno",
+                url: "user/dar-datos-vacaciones-anno/{id}",
+                defaults: new { controller = "User", action = "ObtenerPropuestasPorAnno", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarDatosColaboradorDiasVacaciones",
+                url: "user/dar-datos-dias-vacaciones/{id}",
+                defaults: new { controller = "User", action = "DarDatosColaboradorDiasVacaciones", id = UrlParameter.Optional }
+            );
 
             routes.MapRoute(
                 name: "UltimoLunesUsuario",
@@ -2143,6 +2186,19 @@ namespace SifizPlanning
             //------------------ FIN DE RUTAS DE LOS TICKETS ----------------
 
             //------------------ RUTAS DEL MODULO DE RRHH -------------------
+
+            routes.MapRoute(
+                name: "GuardarDiasDisponiblesVacacionesColaboradores",
+                url: "rrhh/guardar-dias-vacaciones-colaborador/{id}",
+                defaults: new { controller = "Rrhh", action = "GuardarDiasDisponiblesVacacionesColaboradores", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DiasVacacionesColaboradores",
+                url: "rrhh/dias-vacaciones-colaborador/{id}",
+                defaults: new { controller = "Rrhh", action = "DiasVacacionesColaboradores", id = UrlParameter.Optional }
+            );
+
             routes.MapRoute(
                 name: "GuardarFeriado",
                 url: "rrhh/guardar-feriado/{id}",

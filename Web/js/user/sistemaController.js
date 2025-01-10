@@ -56,6 +56,7 @@ devApp.controller('desarrolladoresController', ['$scope', '$http', 'filtroServic
         angular.element("#panel_ftp").addClass('invisible');
         angular.element("#panel_incidencias").addClass('invisible');
         angular.element("#panel_recursos").addClass('invisible');
+        angular.element("#panel_propuesta_vacaciones").addClass('invisible');
     };
 
     $scope.IrMisTareas = function () {
@@ -120,6 +121,13 @@ devApp.controller('desarrolladoresController', ['$scope', '$http', 'filtroServic
         angular.element("#panel_recursos").removeClass('invisible');
         $scope.funcionalidad = "Reunión/Capacitación";
         filtroService.filtroRecursos = '';
+    };
+
+    $scope.IrPanelPropuestaVacaciones = function () {
+        ocultar();
+        angular.element("#panel_propuesta_vacaciones").removeClass('invisible');
+        $scope.funcionalidad = "Propuesta de vacaciones";
+        //filtroService.filtroRecursos = '';
     };
 
     $scope.buscarTicketPorPublicar = function () {

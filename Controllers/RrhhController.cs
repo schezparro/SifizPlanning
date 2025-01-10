@@ -1222,5 +1222,114 @@ namespace SifizPlanning.Controllers
                 return Json(result);
             }
         }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, RRHH")]
+        public ActionResult DiasVacacionesColaboradores(int start, string filtro = "")
+        {
+
+            try
+            {
+                var diasVacacionesColaboradores = (from c in db.Colaborador
+                                                join pe in db.Persona on c.SecuencialPersona equals pe.Secuencial
+                                                join dv in db.DiasDisponiblesVacaciones
+                                                    on c.Secuencial equals dv.SecuencialColaborador into dvGroup
+                                                from dv in dvGroup.DefaultIfEmpty()
+                                                select new
+                                                {
+                                                    secuencialColaborador = c.Secuencial,
+                                                    nombre = pe.Nombre1 + " " + pe.Nombre2 + " " + pe.Apellido1 + " " + pe.Apellido2,
+                                                    cantidad = dv == null ? 0 : dv.DiasDisponibles
+                                                }).ToList();
+
+
+
+
+
+                if (filtro != "")
+                {
+                    diasVacacionesColaboradores = diasVacacionesColaboradores.Where(x =>
+                                            x.nombre.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.cantidad.ToString().ToLower().Contains(filtro.ToLower())
+                                          ).ToList();
+                }
+
+                var result = new
+                {
+                    success = true,
+                    diasVacacionesColaboradores = diasVacacionesColaboradores
+                };
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+                var result = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(result);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, RRHH")]
+        public ActionResult GuardarDiasDisponiblesVacacionesColaboradores(string idColaborador, string cantidad)
+        {
+            try
+            {
+                if (!int.TryParse(idColaborador, out int colaborador))
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        msg = "El ID del colaborador no es válido."
+                    });
+                }
+
+                if (!int.TryParse(cantidad, out int cant))
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        msg = "La cantidad de días no es válida."
+                    });
+                }
+
+                var ddv = db.DiasDisponiblesVacaciones.FirstOrDefault(d => d.SecuencialColaborador == colaborador);
+
+                if (ddv != null)
+                {
+                    ddv.DiasDisponibles = cant;
+                    db.SaveChanges();
+                }
+                else
+                {
+                    DiasDisponiblesVacaciones nuevaIncidencia = new DiasDisponiblesVacaciones
+                    {
+                        SecuencialColaborador = colaborador,
+                        DiasDisponibles = cant
+                    };
+
+                    db.DiasDisponiblesVacaciones.Add(nuevaIncidencia);
+                    db.SaveChanges();
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
     }
 }

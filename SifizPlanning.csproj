@@ -582,6 +582,9 @@
     <Compile Include="Models\DiaInactivo.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\DiasDisponiblesVacaciones.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\EntregableDetalleEstimacion.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
@@ -781,6 +784,9 @@
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\PrioridadTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\PropuestaVacaciones.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ProximaActividad.cs">
@@ -1253,6 +1259,9 @@
     <Content Include="Views\Comercial\windowRequerimientoComercial.cshtml" />
     <Content Include="Views\Report\VerReporteMantenimientoCliente.cshtml" />
     <Content Include="Views\Comercial\windowOfertasComercial.cshtml" />
+    <Content Include="Views\Rrhh\windowDiasVacaciones.cshtml" />
+    <Content Include="Views\User\windowUserPropuestaVacaciones.cshtml" />
+    <Content Include="Views\Rrhh\windowPropuestaVacaciones.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1289,6 +1298,7 @@
     <Content Include="Web\js\indicadores\indicadoresTickets.js" />
     <Content Include="Web\js\comercial\comercial.js" />
     <Content Include="Web\js\rrhh\feriadosController.js" />
+    <Content Include="Web\js\rrhh\propuestaVacacionesController.js" />
     <Content Include="Web\js\rrhh\solicitudesController.js" />
     <Content Include="Web\js\solid-gauge.js" />
     <Content Include="Web\js\consultas\actasContratos.js" />
@@ -1296,6 +1306,7 @@
     <Content Include="Web\js\tfs\consultaCambios.js" />
     <Content Include="Web\js\tfs\consultaProyectos.js" />
     <Content Include="Web\js\user\ftpController.js" />
+    <Content Include="Web\js\user\propuestaVacacionesController.js" />
     <Content Include="Web\js\user\recursosController.js" />
     <Content Include="Web\js\user\incidenciasController.js" />
     <Content Include="Web\js\user\proyectosController.js" />

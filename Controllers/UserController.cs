@@ -40,6 +40,7 @@ using System.Diagnostics.Contracts;
 using System.Drawing.Imaging;
 using System.Drawing;
 using DocumentFormat.OpenXml.ExtendedProperties;
+using System.Data.Entity.SqlServer;
 
 namespace SifizPlanning.Controllers
 {
@@ -8937,6 +8938,326 @@ r in db.Rol on ur.rol equals r
                 usuario = user
             });
         }
+
+        [HttpPost]
+        [Authorize]
+        public ActionResult ObtenerPropuestasPorAnno(string anno)
+        {
+            try
+            {
+                string emailUser = User.Identity.Name;
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+
+                if (user == null)
+                {
+                    return Json(new { success = false, msg = "Usuario no encontrado." });
+                }
+
+                if (!int.TryParse(anno, out int annoInt))
+                {
+                    return Json(new { success = false, msg = "Año inválido." });
+                }
+
+                // Obtener propuestas de vacaciones con los días feriados integrados
+                var propuestasPorMes = (from u in db.Usuario
+                                        join p in db.Persona on u.SecuencialPersona equals p.Secuencial
+                                        join c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
+                                        join pv in db.PropuestaVacaciones on c.Secuencial equals pv.SecuencialColaborador
+                                        where u.Secuencial == user.Secuencial && pv.Fecha.Year == annoInt
+                                        group pv by new
+                                        {
+                                            Mes = pv.Fecha.Month,
+                                            Anno = pv.Fecha.Year
+                                        } into g
+                                        select new
+                                        {
+                                            Mes = g.Key.Mes,
+                                            Anno = g.Key.Anno,
+                                            DiasDeVacaciones = g.Select(v => v.Fecha.Day).Distinct().ToList(),
+                                            DiasFeriados = db.Feriados
+                                                .Where(f => f.Fecha.Year == g.Key.Anno && f.Fecha.Month == g.Key.Mes)
+                                                .Select(f => f.Fecha.Day)
+                                                .Distinct()
+                                                .ToList()
+                                        }).ToList();
+
+                return Json(new { success = true, propuestas = propuestasPorMes });
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error en ObtenerPropuestasPorAnno: {e.Message}");
+                return Json(new { success = false, msg = e.Message });
+            }
+        }
+
+
+
+        [HttpPost]
+        [Authorize]
+        public ActionResult DarDatosColaboradorDiasVacaciones(bool usuario, string anno, string mes)
+        {
+            try
+            {
+                string emailUser = User.Identity.Name;
+                var datosColaborador = new Object();
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+                int annoInt = int.Parse(anno);
+                int mesInt = int.Parse(mes);
+
+                if (usuario == true)
+                {
+                    datosColaborador = (from u in db.Usuario
+                                        join p in db.Persona on u.SecuencialPersona equals p.Secuencial
+                                        join c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
+                                        join ddv in db.DiasDisponiblesVacaciones on c.Secuencial equals ddv.SecuencialColaborador into ddvGroup
+                                        from ddv in ddvGroup.DefaultIfEmpty() // LEFT JOIN para DiasDisponiblesVacaciones
+                                        join pv in db.PropuestaVacaciones on c.Secuencial equals pv.SecuencialColaborador into pvGroup
+                                        from pv in pvGroup.DefaultIfEmpty() // LEFT JOIN para PropuestaVacaciones
+                                        where u.Secuencial == user.Secuencial
+                                        group pv by new
+                                        {
+                                            c.Secuencial,
+                                            NombreCompleto = p.Nombre1 + " " + p.Apellido1 + " " + p.Apellido2,
+                                            DiasDisponibles = ddv != null ? ddv.DiasDisponibles : 0 // Usar 0 si no hay días disponibles
+                                        } into g
+                                        select new
+                                        {
+                                            id = g.Key.Secuencial,
+                                            nombre = g.Key.NombreCompleto,
+                                            diasDisponibles = g.Key.DiasDisponibles,
+                                            diasDeVacaciones = g
+                                                .Where(v => v != null && v.Fecha.Year == annoInt && v.Fecha.Month == mesInt) // Filtrar por mes y año
+                                                .Select(v => v.Fecha.Day)
+                                                .Distinct()
+                                                .ToList(),
+                                            diasMarcadosCount = g
+                                                .Count(v => v != null && v.Fecha.Year == annoInt && v.Fecha.Month == mesInt) // Contar solo registros del mes/año
+                                        }).ToList();
+
+                }
+                else
+                {
+                    datosColaborador = (from p in db.Persona
+                                        join c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
+                                        join ddv in db.DiasDisponiblesVacaciones on c.Secuencial equals ddv.SecuencialColaborador into ddvGroup
+                                        from ddv in ddvGroup.DefaultIfEmpty() // LEFT JOIN para DiasDisponiblesVacaciones
+                                        join pv in db.PropuestaVacaciones on c.Secuencial equals pv.SecuencialColaborador into pvGroup
+                                        from pv in pvGroup.DefaultIfEmpty() // LEFT JOIN para PropuestaVacaciones
+                                        where
+                                            ( // Mostrar si cumple al menos una de estas condiciones:
+                                                (ddv != null && ddv.DiasDisponibles > 0) || // Tiene días disponibles
+                                                (pv != null && pv.Fecha.Year == annoInt && pv.Fecha.Month == mesInt) // Tiene días seleccionados en el mes y año
+                                            )
+                                        group pv by new
+                                        {
+                                            c.Secuencial,
+                                            NombreCompleto = p.Nombre1 + " " + p.Apellido1 + " " + p.Apellido2,
+                                            DiasDisponibles = ddv != null ? ddv.DiasDisponibles : 0
+                                        } into g
+                                        select new
+                                        {
+                                            id = g.Key.Secuencial,
+                                            nombre = g.Key.NombreCompleto,
+                                            diasDisponibles = g.Key.DiasDisponibles,
+                                            diasDeVacaciones = g
+                                                .Where(v => v != null && v.Fecha.Year == annoInt && v.Fecha.Month == mesInt) // Filtrar por mes y año
+                                                .Select(v => v.Fecha.Day)
+                                                .Distinct() // Eliminar duplicados
+                                                .ToList(),
+                                            diasMarcadosCount = g
+                                                .Count(v => v != null && v.Fecha.Year == annoInt && v.Fecha.Month == mesInt) // Contar solo los días del mes y año seleccionados
+                                        }).ToList();
+
+                }
+
+                var resp = new
+                {
+                    success = true,
+                    datosColaborador = datosColaborador
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, RRHH, USER")]
+        public ActionResult DarFeriadosPorMes(int anno, int mes)
+        {
+            try
+            {
+                var feriados = db.Feriados
+                    .Where(f => f.Fecha.Year == anno && f.Fecha.Month == mes) // Filtrar por año y mes
+                    .AsEnumerable() // Ejecutar la consulta y traer los datos a memoria
+                    .Select(f => f.Fecha.Day) // Convertir a string con formato
+                    .ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    diasFeriados = feriados
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, RRHH, USER")]
+        public ActionResult DarFeriadosPorAnno(int anno)
+        {
+            try
+            {
+                // Consultar los feriados para el año especificado
+                var feriados = db.Feriados
+                    .Where(f => f.Fecha.Year == anno) // Filtrar por el año
+                    .Select(f => new
+                    {
+                        Dia = f.Fecha.Day,
+                        Mes = f.Fecha.Month,
+                        FechaCompleta = f.Fecha
+                    })
+                    .ToList();
+
+                // Preparar la respuesta
+                var resp = new
+                {
+                    success = true,
+                    diasFeriados = feriados
+                };
+
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                // Manejo de errores
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, RRHH, USER")]
+        public ActionResult DarAnnosMesPropuestaVacaciones()
+        {
+            try
+            {
+                string emailUser = User.Identity.Name;
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+
+                var propuestaVacacionesData = (from u in db.Usuario
+                                               join p in db.Persona on u.SecuencialPersona equals p.Secuencial
+                                               join c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
+                                               join pv in db.PropuestaVacaciones on c.Secuencial equals pv.SecuencialColaborador
+                                               where u.Secuencial == user.Secuencial
+                                               select new
+                                               {
+                                                   Mes = pv.Fecha.Month,
+                                                   Anno = pv.Fecha.Year
+                                               })
+                               .Distinct()
+                               .GroupBy(x => x.Anno)
+                               .Select(g => new
+                               {
+                                   anno = g.Key,
+                                   meses = g.Select(x => x.Mes).OrderBy(m => m).ToList()
+                               })
+                               .OrderBy(x => x.anno)
+                               .ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    propuestaVacacionesData = propuestaVacacionesData
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, RRHH, USER")]
+        public ActionResult ActualizarDatosPropuestaVacaciones(int idColaborador, List<int> days, int mes, int anno)
+        {
+            try
+            {
+                foreach (var day in days)
+                {
+                    DateTime fecha = new DateTime(anno, mes, day);
+                    db.PropuestaVacaciones.Add(new PropuestaVacaciones
+                    {
+                        SecuencialColaborador = idColaborador,
+                        Fecha = fecha
+                    });
+
+                    var ddv = db.DiasDisponiblesVacaciones.FirstOrDefault(d => d.SecuencialColaborador == idColaborador);
+                    if (ddv != null) ddv.DiasDisponibles--;
+                }
+                db.SaveChanges();
+
+                return Json(new { success = true });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message });
+            }
+        }
+
+        [HttpPost]
+        [Authorize]
+        public ActionResult EliminarPropuestaVacaciones(int idColaborador, List<int> days, int mes, int anno)
+        {
+            try
+            {
+                foreach (var day in days)
+                {
+                    DateTime fecha = new DateTime(anno, mes, day);
+                    var propuesta = db.PropuestaVacaciones.FirstOrDefault(p => p.SecuencialColaborador == idColaborador && p.Fecha == fecha);
+                    if (propuesta != null) db.PropuestaVacaciones.Remove(propuesta);
+
+                    var ddv = db.DiasDisponiblesVacaciones.FirstOrDefault(d => d.SecuencialColaborador == idColaborador);
+                    if (ddv != null) ddv.DiasDisponibles++;
+                }
+                db.SaveChanges();
+
+                return Json(new { success = true });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message });
+            }
+        }
+
     }
     public class NuevaTareaDTO
     {

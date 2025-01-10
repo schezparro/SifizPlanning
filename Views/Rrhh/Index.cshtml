@@ -45,6 +45,8 @@
 
                 <li role="presentation"><a href="#" ng-click="IrFeriados()">Gestión de Feriados</a></li>
                 <li role="presentation"><a href="#" ng-click="IrIncidencias()">Gestión de Incidencias</a></li>
+                <li role="presentation"><a href="#" ng-click="IrDiasDisponiblesVacaciones()">Días de Vacaciones</a></li>
+                <li role="presentation"><a href="#" ng-click="IrPlanificacionVacaciones()">Planificación Vacaciones</a></li>
 
                 <a href="cerrar/sesion/" class="right btn btn-danger"><span class="glyphicon glyphicon-off"></span>Cerrar Sesión</a>
                 <a href="main-menu" style="margin-right: 4px;" class="right btn btn-warning"><span class="glyphicon glyphicon-menu-hamburger"></span> Menú Principal</a>
@@ -82,6 +84,13 @@
                     @{Html.RenderPartial("windowIncidencias");}
                 </div>
 
+                <div id="panel-dias-vacaciones" class="invisible" ng-controller="diasVacacionesController">
+                    @{Html.RenderPartial("windowDiasVacaciones");}
+                </div>
+
+                <div id="panel-planificacion-vacaciones" class="invisible" ng-controller="planificacionVacacionesController">
+                    @{Html.RenderPartial("windowPropuestaVacaciones");}
+                </div>
                 <div id="loadingDiv">
                     <img src="~/Web/images/ajax-loader.gif" />
                 </div>

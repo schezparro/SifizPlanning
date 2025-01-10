@@ -1,4 +1,18 @@
 ﻿devApp.controller('solicitudesController', ['$scope', '$http', function ($scope, $http) {
+    $scope.activeTab = 'vacaciones'; // Pestaña activa por defecto
+
+    $scope.changeTab = function (tabName) {
+        $scope.activeTab = tabName;
+        if (tabName = 'planificacion') {
+            $scope.annos = [];
+            $scope.propuestaVacacionesData = {};
+            $scope.anno = null;
+            $scope.mes = null;
+            $scope.verAnno = false; // Para mostrar el select de años
+            $scope.verTabla = false; 
+            $scope.ObtenerMesesAnnos();
+        }
+    };
     $scope.recargarVacaciones = function () {
         var solicitudes = $http.post("user/vacaciones-usuario", {});
         solicitudes.success(function (data) {
@@ -71,7 +85,7 @@
         $scope.solVacaciones.cargo = $scope.datosUsuario.cargo;
         $scope.isEmpresaVacacionesSelectEditable = false;
         $scope.btnEditar = false;
-       
+
         if ($scope.datosUsuario.empresa === "SIFIZSOFT") {
             $scope.solVacaciones.empresa = "SIFIZSOFT";
             $scope.isEmpresaVacacionesSelectEditable = true;
@@ -344,7 +358,7 @@
             $scope.solVacaciones.observaciones = solVac.Observaciones;
             $scope.solVacaciones.jefe = solVac.Jefe;
             $scope.solVacaciones.estado = solVac.Estado;
-            $scope.windowSolicitarVacaciones();          
+            $scope.windowSolicitarVacaciones();
             $scope.solVacaciones.id = solVac.ID;
         }
     };
@@ -365,33 +379,118 @@
             $scope.solicitudPer.horaRetorno = solPer.HoraRetorno;
             $scope.solicitudPer.motivo = solPer.Motivo;
             $scope.solicitudPer.jefe = solPer.Jefe;
-            $scope.solicitudPer.estado = solPer.Estado;           
-            $scope.windowSolicitarPermiso();
-            $scope.solicitudPer.id = solPer.ID;
-        }
-    };
-
-    //*********************** REGISTRO DE VACACIONES**************/
-    $scope.registroVacaciones = function () {
-        if (solPer.Estado === "RECHAZADA") {
-            $scope.solicitudPer.cedula = solPer.Cedula;
-            $scope.solicitudPer.fechaIngresoSolicitud = convertDate(solPer.FechaIngresoSolicitud);
-            $scope.solicitudPer.empresa = solPer.Empresa;
-            $scope.solicitudPer.personal = solPer.Personal;
-            $scope.solicitudPer.matrimonio = solPer.Matrimonio;
-            $scope.solicitudPer.comida = solPer.Comida;
-            $scope.solicitudPer.paternidad = solPer.Paternidad;
-            $scope.solicitudPer.otros = solPer.Otros;
-            $scope.solicitudPer.fechaDesde = convertDate(solPer.FechaDesde);
-            $scope.solicitudPer.horaSalida = solPer.HoraSalida;
-            $scope.solicitudPer.fechaHasta = convertDate(solPer.FechaHasta);
-            $scope.solicitudPer.horaRetorno = solPer.HoraRetorno;
-            $scope.solicitudPer.motivo = solPer.Motivo;
-            $scope.solicitudPer.jefe = solPer.Jefe;
             $scope.solicitudPer.estado = solPer.Estado;
             $scope.windowSolicitarPermiso();
             $scope.solicitudPer.id = solPer.ID;
         }
+    };
+    $scope.esPropuestaVacaciones = false;
+    $scope.esVacacionesPermiso = true;
+    $scope.verCkeck = true;
+
+    //*********************** REGISTRO DE VACACIONES**************/
+
+    $scope.annos = []; // Opciones para el primer select (años)
+    $scope.meses = []; // Opciones para el segundo select (meses)
+
+    // Función para llenar meses cuando se selecciona un año
+    $scope.cargarMeses = function (annoSeleccionado) {
+        console.log(annoSeleccionado);
+        let anno = $scope.annos;
+        //$scope.ObtenerFeriados(anno, mes);
+        //$scope.ObtenerPropuesta(anno, mes);
+        let dataAnno = $scope.propuestaVacacionesData.find(item => item.anno === annoSeleccionado);
+        console.log(dataAnno);
+        $scope.meses = dataAnno ? dataAnno.meses : [];
+        $scope.mes = null; // Reiniciar el mes seleccionado
+    };
+
+    $scope.getNombreMes = function (mes) {
+        var meses = [
+            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+        ];
+        return meses[mes - 1] || 'Mes inválido'; 
+    };
+    $scope.ObtenerMesesAnnos = function () {
+        var ajaxObtenerFeriados = $http.post("user/dar-annos-meses",
+            {});
+
+        ajaxObtenerFeriados.success(function (data) {
+            if (data.success === true) {
+                $scope.propuestaVacacionesData = data.propuestaVacacionesData;
+                $scope.annos = $scope.propuestaVacacionesData.map(item => item.anno);
+                if ($scope.annos != undefined) {
+                    $scope.verAnno = true;
+                };
+            }
+        });
+    };
+
+    $scope.ObtenerFeriados = function (anno, mes) {
+        var ajaxObtenerFeriados = $http.post("user/dar-feriados-mes",
+            {
+                anno: anno,
+                mes: mes
+            });
+
+        ajaxObtenerFeriados.success(function (data) {
+            if (data.success === true) {
+                $scope.diasFeriados = data.diasFeriados;
+                $scope.getDaysOfMonth(anno, mes);
+            }
+        });
+    };
+
+    // Variable para manejar la selección
+    $scope.isSelecting = false;
+
+    // Función para obtener los días del mes
+    $scope.getDaysOfMonth = function (anno, mes) {
+        let days = [];
+        let firstDay = new Date(anno, mes - 1, 1);
+        let lastDay = new Date(anno, mes, 0);
+
+        // Generar los días del mes
+        for (let i = 1; i <= lastDay.getDate(); i++) {
+            days.push({
+                dayNumber: i,
+                day: ['D', 'L', 'M', 'M', 'J', 'V', 'S'][new Date(anno, mes - 1, i).getDay()],
+                isHoliday: $scope.diasFeriados.includes(i),
+            });
+        }
+
+        $scope.daysOfMonth = days; // Guardar en el scope para la tabla
+    };
+
+
+    $scope.verTabla = false;
+
+    $scope.ObtenerPropuesta = function (anno, mes) {
+        var ajaxObtenerPropuestaVac = $http.post("user/dar-datos-dias-vacaciones",
+            {
+                anno: anno,
+                mes: mes
+            });
+
+        ajaxObtenerPropuestaVac.success(function (data) {
+            if (data.success === true) {
+                $scope.verTabla = true;
+                $scope.colaboradores = data.datosColaborador;
+            }
+            else {
+                waitingDialog.hide();
+                messageDialog.show('Información', data.msg);
+            }
+        });
+    };
+
+    // Función que se ejecuta al cambiar el mes
+    $scope.onChangeMes = function (mes) {
+        let anno = $scope.annos;
+        $scope.ObtenerFeriados(anno, mes);
+        $scope.ObtenerPropuesta(anno, mes);
+
     };
 
 }]);
