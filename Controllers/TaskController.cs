@@ -1451,7 +1451,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
-        public JsonResult NuevaTarea(int idTrabajador, string fecha, int cliente, int ubicacion, int modulo, int actividad, int horas, int minutos, int horasEstimadas, int minutosEstimados, string detalle, int referencia = 0, int coordinador = 0, string repetir = "", int finSemana = 0, int repetirTipoFin = 0, int numVeces = 0, string fechaHasta = "", bool extraordinaria = false, int ticketTarea = 0, int idTarea = 0, int verificador = 0, bool esReproceso = false)
+        public JsonResult NuevaTarea(int idTrabajador, string fecha, int cliente, int ubicacion, int modulo, int actividad, int horas, int minutos, int horasEstimadas, int minutosEstimados, string detalle, int referencia = 0, int coordinador = 0, string repetir = "", int finSemana = 0, int repetirTipoFin = 0, int numVeces = 0, string fechaHasta = "", bool extraordinaria = false, int ticketTarea = 0, int idTarea = 0, int verificador = 0, bool esReproceso = false, string tipoTarea = "")
         {
             try
             {
@@ -2333,6 +2333,49 @@ namespace SifizPlanning.Controllers
                         }
                     }
                 }
+
+                DevopsAccesoProyectos dap = new DevopsAccesoProyectos();
+                var nombreCliente = (from c in db.Cliente
+                                     where c.Secuencial == cliente
+                                     select new {
+                                         nombreCliente = c.Codigo
+                                     }).FirstOrDefault();
+                dap.Organizacion = nombreCliente.nombreCliente;
+                var nombreUsuario = (from u in db.Usuario
+                                     join p in db.Persona on u.SecuencialPersona equals p.Secuencial
+                                     where u.Secuencial == idTrabajador
+                                     select new
+                                     {
+                                         nombreUsuario = p.Nombre1 + " " + p.Apellido1 + " " + p.Apellido2,
+                                         usuario = u.Email
+                                     }).FirstOrDefault();
+                dap.NombreUsuario = nombreUsuario.nombreUsuario;
+                dap.Usuario = nombreUsuario.usuario;
+                var nombreModulo = (from m in db.Modulo
+                                     where m.Secuencial == modulo
+                                     select new
+                                     {
+                                         nombreModulo = m.Descripcion
+                                     }).FirstOrDefault();
+                dap.Modulo = nombreModulo.nombreModulo;
+
+                if (tipoTarea == "proyecto")
+                    dap.EsDev = true;
+                else
+                    dap.EsDev = false;
+
+                if (tipoTarea == "ticket")
+                    dap.EsTck = true;
+                else
+                    dap.EsTck = false;
+
+                if (tipoTarea == "contrato")
+                    dap.EsReq = true;
+                else
+                    dap.EsReq = false;
+
+                db.DevopsAccesoProyectos.Add(dap);
+                db.SaveChanges();
 
                 string msg = "Se ha creado correctamente la tarea";
                 if (repetir != "")

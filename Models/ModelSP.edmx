@@ -150,6 +150,22 @@
           <Property Name="SECUENCIALCOLABORADOR" Type="int" Nullable="false" />
           <Property Name="FECHA" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
+        <EntityType Name="DEVOPSACCESOPROYECTOS">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ORGANIZACION" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="NOMBREUSUARIO" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="USUARIO" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="MODULO" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="ESTCK" Type="bit" Nullable="false" />
+          <Property Name="ESREQ" Type="bit" Nullable="false" />
+          <Property Name="ESDEV" Type="bit" Nullable="false" />
+          <Property Name="SERIETICKET" Type="int" />
+          <Property Name="SERIEDESARROLLO" Type="int" />
+          <Property Name="SERIEREQUERIMIENTO" Type="int" />
+        </EntityType>
         <EntityType Name="MENSAJE">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
@@ -756,7 +772,7 @@
           <Property Name="SECUENCIALCLIENTE" Type="int" Nullable="false" />
           <Property Name="SECUENCIALREQUERIMIENTO" Type="int" Nullable="false" />
           <Property Name="SECUENCIALTICKETTAREA" Type="int" />
-          <Property Name="DETALLE" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="DETALLE" Type="varchar" MaxLength="8000" Nullable="false" />
           <Property Name="FECHAPEDIDOCLIENTE" Type="date" />
         </EntityType>
         <EntityType Name="PAIS">
@@ -818,9 +834,15 @@
           <Property Name="EstaActivo" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="NumeroVerificador" Type="int" Nullable="false" />
         </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="REQUERIMIENTO">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
+            
+            
+            
+            
           </Key>
           <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="CODIGO" Type="varchar" MaxLength="50" Nullable="false" />
@@ -1789,7 +1811,7 @@
           <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="TITULO" Type="varchar" MaxLength="255" Nullable="false" />
           <Property Name="DETALLE" Type="varchar(max)" Nullable="false" />
-          <Property Name="FECHA" Type="datetime" Nullable="false" />
+          <Property Name="FECHA" Type="date" Nullable="false" />
           <Property Name="SECUENCIALMODULO" Type="int" Nullable="false" />
           <Property Name="ADJUNTO" Type="varchar" MaxLength="255" Nullable="false" />
           <Property Name="ADJUNTOASISTENCIA" Type="varchar" MaxLength="255" />
@@ -5166,6 +5188,7 @@
           <EntitySet Name="PROPUESTAVACACIONES" EntityType="Self.PROPUESTAVACACIONES" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="TIPOPERMISO" EntityType="Self.TIPOPERMISO" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="VACACIONES" EntityType="Self.VACACIONES" Schema="RRHH" store:Type="Tables" />
+          <EntitySet Name="DEVOPSACCESOPROYECTOS" EntityType="Self.DEVOPSACCESOPROYECTOS" Schema="SEGURIDADES" store:Type="Tables" />
           <EntitySet Name="MENSAJE" EntityType="Self.MENSAJE" Schema="SEGURIDADES" store:Type="Tables" />
           <EntitySet Name="ROL" EntityType="Self.ROL" Schema="SEGURIDADES" store:Type="Tables" />
           <EntitySet Name="ROLSYSMENU" EntityType="Self.ROLSYSMENU" Schema="SEGURIDADES" store:Type="Tables" />
@@ -5224,7 +5247,6 @@
           <EntitySet Name="PERSONAGRUPOEMAIL" EntityType="Self.PERSONAGRUPOEMAIL" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="PROYECTOMODULOCLIENTE" EntityType="Self.PROYECTOMODULOCLIENTE" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="Reporte" EntityType="Self.Reporte" Schema="TAREAS" store:Type="Tables" />
-          <EntitySet Name="REQUERIMIENTO" EntityType="Self.REQUERIMIENTO" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="RESPONSABLEPROYECTOS" EntityType="Self.RESPONSABLEPROYECTOS" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="SEDE" EntityType="Self.SEDE" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="SERVICIOIMPLANTACIONCORE" EntityType="Self.SERVICIOIMPLANTACIONCORE" Schema="TAREAS" store:Type="Tables" />
@@ -5340,6 +5362,15 @@
           <EntitySet Name="TIPOCONTRATOCLIENTE" EntityType="Self.TIPOCONTRATOCLIENTE" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="TIPONOTIFICACIONTICKET" EntityType="Self.TIPONOTIFICACIONTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="TIPORECURSO" EntityType="Self.TIPORECURSO" Schema="TICKET" store:Type="Tables" />
+          <EntitySet Name="REQUERIMIENTO" EntityType="Self.REQUERIMIENTO" store:Type="Tables" store:Schema="TAREAS">
+            <DefiningQuery>SELECT 
+[REQUERIMIENTO].[SECUENCIAL] AS [SECUENCIAL], 
+[REQUERIMIENTO].[CODIGO] AS [CODIGO], 
+[REQUERIMIENTO].[DESCRIPCION] AS [DESCRIPCION], 
+[REQUERIMIENTO].[ESTAACTIVO] AS [ESTAACTIVO], 
+[REQUERIMIENTO].[NUMEROVERIFICADOR] AS [NUMEROVERIFICADOR]
+FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
+          </EntitySet>
           <AssociationSet Name="FK_ACTA_CLIENTE" Association="Self.FK_ACTA_CLIENTE">
             <End Role="CLIENTE" EntitySet="CLIENTE" />
             <End Role="Acta" EntitySet="Acta" />
@@ -7551,6 +7582,7 @@
             <End Role="Colaborador" EntitySet="Colaborador" />
             <End Role="PROPUESTAVACACIONES" EntitySet="PropuestaVacaciones" />
           </AssociationSet>
+          <EntitySet Name="DevopsAccesoProyectos" EntityType="SifizPlanningModel.DevopsAccesoProyectos" />
           </EntityContainer>
         <EntityType Name="Rol">
           <Key>
@@ -12649,7 +12681,7 @@
           <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Titulo" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="Detalle" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="SecuencialModulo" Type="Int32" Nullable="false" />
           <Property Name="Adjunto" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="modulo" Relationship="SifizPlanningModel.FK_RECURSOS_MODULO" FromRole="RECURSOS" ToRole="Modulo" />
@@ -13044,7 +13076,7 @@
           <Property Name="SecuencialCLiente" Type="Int32" Nullable="false" />
           <Property Name="SecuencialRequerimiento" Type="Int32" Nullable="false" />
           <Property Name="SecuencialTicketTarea" Type="Int32" />
-          <Property Name="Detalle" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Detalle" Type="String" Nullable="false" MaxLength="8000" FixedLength="false" Unicode="false" />
           <Property Name="FechaPedidoCLiente" Type="DateTime" Precision="0" />
         </EntityType>
         <EntityType Name="ClienteReporteMantenimiento">
@@ -13161,6 +13193,22 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="DevopsAccesoProyectos">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Organizacion" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="NombreUsuario" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Usuario" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Modulo" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="EsTck" Type="Boolean" Nullable="false" />
+          <Property Name="EsReq" Type="Boolean" Nullable="false" />
+          <Property Name="EsDev" Type="Boolean" Nullable="false" />
+          <Property Name="SerieTicket" Type="Int32" />
+          <Property Name="SerieDesarrollo" Type="Int32" />
+          <Property Name="SerieRequerimiento" Type="Int32" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -15461,6 +15509,23 @@
                 <ScalarProperty Name="Fecha" ColumnName="FECHA" />
                 <ScalarProperty Name="SecuencialColaborador" ColumnName="SECUENCIALCOLABORADOR" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DevopsAccesoProyectos">
+            <EntityTypeMapping TypeName="SifizPlanningModel.DevopsAccesoProyectos">
+              <MappingFragment StoreEntitySet="DEVOPSACCESOPROYECTOS">
+                <ScalarProperty Name="SerieRequerimiento" ColumnName="SERIEREQUERIMIENTO" />
+                <ScalarProperty Name="SerieDesarrollo" ColumnName="SERIEDESARROLLO" />
+                <ScalarProperty Name="SerieTicket" ColumnName="SERIETICKET" />
+                <ScalarProperty Name="EsDev" ColumnName="ESDEV" />
+                <ScalarProperty Name="EsReq" ColumnName="ESREQ" />
+                <ScalarProperty Name="EsTck" ColumnName="ESTCK" />
+                <ScalarProperty Name="Modulo" ColumnName="MODULO" />
+                <ScalarProperty Name="Usuario" ColumnName="USUARIO" />
+                <ScalarProperty Name="NombreUsuario" ColumnName="NOMBREUSUARIO" />
+                <ScalarProperty Name="Organizacion" ColumnName="ORGANIZACION" />
+                <ScalarProperty Name="Id" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

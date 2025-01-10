@@ -210,5 +210,6 @@ namespace SifizPlanning.Models
         public virtual DbSet<Requerimiento> Requerimiento { get; set; }
         public virtual DbSet<DiasDisponiblesVacaciones> DiasDisponiblesVacaciones { get; set; }
         public virtual DbSet<PropuestaVacaciones> PropuestaVacaciones { get; set; }
+        public virtual DbSet<DevopsAccesoProyectos> DevopsAccesoProyectos { get; set; }
     }
 }

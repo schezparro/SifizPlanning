@@ -840,6 +840,9 @@
         formData.append('idTarea', $scope.idTarea);
         formData.append('verificador', $scope.verificadorTarea);
         formData.append('esReproceso', $scope.reproceso);
+        formData.append('tipoTarea', $scope.tipoTarea);
+
+        console.log($scope.tipoTarea);
 
         var newTask = $http.post("task/nueva-tarea",
             formData,
