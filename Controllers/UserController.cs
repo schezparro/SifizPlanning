@@ -40,6 +40,7 @@ using System.Diagnostics.Contracts;
 using System.Drawing.Imaging;
 using System.Drawing;
 using DocumentFormat.OpenXml.ExtendedProperties;
+using System.Data.Entity.Migrations;
 using System.Data.Entity.SqlServer;
 
 namespace SifizPlanning.Controllers
@@ -5116,9 +5117,24 @@ r in db.Rol on ur.rol equals r
                 // Notificación y reconfiguración de tareas si el recurso cambió
                 if (recursoCambio)
                 {
-                    var convocadosActuales = asistentesExistentes.Where(a => a.Convocado == 1).ToList();
-                    List<string> emailsNotificar = new List<string>();
+                    var convocadosActuales = asistentesExistentes.Where(a => a.Convocado == 1 && asistentesIds.Contains(a.SecuencialColaborador)).ToList();
+                    var convocadosEliminados = asistentesExistentes.Where(a => a.Convocado == 1 && !asistentesIds.Contains(a.SecuencialColaborador)).ToList();
 
+                    foreach (var asistente in convocadosEliminados)
+                    {
+                        var tareaCap = db.TareaCapacitacion.FirstOrDefault(tc => tc.SecuencialCapacitacion == id && tc.tarea.SecuencialColaborador == asistente.SecuencialColaborador);
+                        if (tareaCap != null)
+                        {
+                            var tarea = db.Tarea.FirstOrDefault(t => t.Secuencial == tareaCap.SecuencialTarea);
+                            if (tarea != null)
+                            {
+                                tarea.SecuencialEstadoTarea = 4; // Anulada
+                            }
+                            db.TareaCapacitacion.Remove(tareaCap);
+                        }
+                    }
+
+                    List<string> emailsNotificar = new List<string>();
                     foreach (var asistente in convocadosActuales)
                     {
                         // Anular tareas actuales
@@ -5177,10 +5193,24 @@ r in db.Rol on ur.rol equals r
                     }
                 }
 
-                // Procesar nuevos asistentes
                 var asistentesAEliminar = asistentesExistentes
                     .Where(a => !asistentesIds.Contains(a.SecuencialColaborador))
                     .ToList();
+
+                foreach(var a in asistentesAEliminar)
+                {
+                    var tareaCap = db.TareaCapacitacion.FirstOrDefault(tc => tc.SecuencialCapacitacion == id && tc.tarea.SecuencialColaborador == a.SecuencialColaborador);
+                    if (tareaCap != null)
+                    {
+                        var tarea = db.Tarea.FirstOrDefault(t => t.Secuencial == tareaCap.SecuencialTarea);
+                        if (tarea != null)
+                        {
+                            tarea.SecuencialEstadoTarea = 4; // Anulada
+                        }
+                        db.TareaCapacitacion.Remove(tareaCap);
+                        db.SaveChanges();
+                    }
+                }
 
                 db.RecursosAsistencia.RemoveRange(asistentesAEliminar);
 
@@ -5388,12 +5418,6 @@ r in db.Rol on ur.rol equals r
                     return Json(new { success = false, msg = "Recurso no encontrado" });
                 }
 
-                // Obtener lista de tareas ya asignadas
-                var tareasAsignadas = db.TareaCapacitacion
-                    .Where(tc => tc.SecuencialCapacitacion == recurso.Secuencial)
-                    .Select(tc => tc.tarea.SecuencialColaborador)
-                    .ToList();
-
                 List<string> nuevosConvocadosEmails = new List<string>();
 
                 foreach (var asistente in asistentes)
@@ -5401,9 +5425,16 @@ r in db.Rol on ur.rol equals r
                     int colaboradorId = (int)asistente["idColaborador"];
                     bool convocado = (bool)asistente["convocado"];
 
-                    // Si el colaborador está convocado y no tiene tarea asignada, se crea una nueva
-                    if (convocado && !tareasAsignadas.Contains(colaboradorId))
+                    RecursosAsistencia ra = db.RecursosAsistencia
+                         .Where(r => r.SecuencialRecurso == recurso.Secuencial && r.SecuencialColaborador == colaboradorId)
+                         .FirstOrDefault();
+
+                    if (convocado && ra.Convocado == 0)
                     {
+                        ra.Convocado = 1;
+                        db.RecursosAsistencia.AddOrUpdate(ra);
+                        db.SaveChanges();
+
                         var tarea = new Tarea
                         {
                             SecuencialColaborador = colaboradorId,
@@ -5419,7 +5450,7 @@ r in db.Rol on ur.rol equals r
                             NumeroVerificador = 1,
                         };
 
-                        db.Tarea.Add(tarea);
+                        Utiles.AgregarTareaConReubicacion(tarea, db);
                         db.SaveChanges();
 
                         // Relación entre tarea y capacitación
@@ -5439,6 +5470,24 @@ r in db.Rol on ur.rol equals r
                         if (!string.IsNullOrEmpty(email))
                         {
                             nuevosConvocadosEmails.Add(email);
+                        }
+                    }
+                    else if (!convocado && ra.Convocado == 1)
+                    {
+                        ra.Convocado = 0;
+                        db.RecursosAsistencia.AddOrUpdate(ra);
+                        db.SaveChanges();
+
+                        var tareaCap = db.TareaCapacitacion.FirstOrDefault(tc => tc.SecuencialCapacitacion == idRecurso && tc.tarea.SecuencialColaborador == colaboradorId);
+                        if (tareaCap != null)
+                        {
+                            var tarea = db.Tarea.FirstOrDefault(t => t.Secuencial == tareaCap.SecuencialTarea);
+                            if (tarea != null)
+                            {
+                                tarea.SecuencialEstadoTarea = 4; // Anulada
+                            }
+                            db.TareaCapacitacion.Remove(tareaCap);
+                            db.SaveChanges();
                         }
                     }
                 }

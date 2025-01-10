@@ -431,12 +431,12 @@
         <AssociationConnector Association="SifizPlanningModel.FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR" />
         <AssociationConnector Association="SifizPlanningModel.FK_RECURSOS_COLABORADOR" />
         <EntityTypeShape EntityType="SifizPlanningModel.OfertaRequerimiento" Width="1.5" PointX="0.75" PointY="39.75" />
-        <EntityTypeShape EntityType="SifizPlanningModel.Requerimiento" Width="1.5" PointX="2.75" PointY="39.75" />
         <EntityTypeShape EntityType="SifizPlanningModel.ClienteReporteMantenimiento" Width="1.5" PointX="8.375" PointY="49.75" />
         <AssociationConnector Association="SifizPlanningModel.FK_CLIENTEREPORTEMANTENIMIENTO_CLIENTE" />
         <EntityTypeShape EntityType="SifizPlanningModel.TareaCapacitacion" Width="1.5" PointX="42.25" PointY="28" />
         <AssociationConnector Association="SifizPlanningModel.FK_TAREACAPACITACION_TAREA" />
         <AssociationConnector Association="SifizPlanningModel.FK_TAREACAPACITACION_RECURSOS" />
+        <EntityTypeShape EntityType="SifizPlanningModel.Requerimiento" Width="1.5" PointX="3.375" PointY="39.75" />
         <EntityTypeShape EntityType="SifizPlanningModel.DiasDisponiblesVacaciones" Width="1.5" PointX="17.5" PointY="64.25" />
         <EntityTypeShape EntityType="SifizPlanningModel.PropuestaVacaciones" Width="1.5" PointX="17.5" PointY="13.625" />
         <AssociationConnector Association="SifizPlanningModel.FK_DIASDISPONIBLESVACACIONES_COLABORADOR" />

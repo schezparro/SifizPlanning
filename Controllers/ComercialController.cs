@@ -36,7 +36,7 @@ namespace SifizPlanning.Controllers
             try
             {
                 var requerimientosComercial = (from or in db.OFERTAREQUERIMIENTO
-                                               join r in db.REQUERIMIENTO on or.SecuencialRequerimiento equals r.Secuencial
+                                               join r in db.Requerimiento on or.SecuencialRequerimiento equals r.Secuencial
                                                join cli in db.Cliente on or.SecuencialCLiente equals cli.Secuencial
                                                select new
                                                {
@@ -96,7 +96,7 @@ namespace SifizPlanning.Controllers
                 }
 
                 var ofr = (from or in db.OFERTAREQUERIMIENTO
-                           join r in db.REQUERIMIENTO on or.SecuencialRequerimiento equals r.Secuencial
+                           join r in db.Requerimiento on or.SecuencialRequerimiento equals r.Secuencial
                            join cli in db.Cliente on or.SecuencialCLiente equals cli.Secuencial
                            where or.Secuencial == secuencialRequerimiento
                            select new
@@ -156,7 +156,7 @@ namespace SifizPlanning.Controllers
                         nuevaOfertaRequerimiento.SecuencialCLiente = cliente;
                         nuevaOfertaRequerimiento.SecuencialRequerimiento = requerimiento;
                         nuevaOfertaRequerimiento.SecuencialTicketTarea = ticketNumerico;
-                        nuevaOfertaRequerimiento.Detalle = t.Detalle;
+                        nuevaOfertaRequerimiento.Detalle = t.Detalle.Substring(0, 250);
                         nuevaOfertaRequerimiento.FechaPedidoCLiente = t.FechaCreado;
                     }
                     else
@@ -356,7 +356,7 @@ namespace SifizPlanning.Controllers
         {
             try
             {
-                var ofr = (from or in db.REQUERIMIENTO
+                var ofr = (from or in db.Requerimiento
                            select new
                            {
                                descripcion = or.Descripcion,
