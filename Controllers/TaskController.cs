@@ -2335,10 +2335,13 @@ namespace SifizPlanning.Controllers
                 }
 
                 DevopsAccesoProyectos dap = new DevopsAccesoProyectos();
+                dap.SecuencialTarea = tareaPrincipal.Secuencial;
+                dap.Detalle = detalle;
                 var nombreCliente = (from c in db.Cliente
                                      where c.Secuencial == cliente
-                                     select new {
-                                         nombreCliente = c.Codigo
+                                     select new
+                                     {
+                                         nombreCliente = c.Descripcion
                                      }).FirstOrDefault();
                 dap.Organizacion = nombreCliente.nombreCliente;
                 var nombreUsuario = (from u in db.Usuario
@@ -2352,25 +2355,43 @@ namespace SifizPlanning.Controllers
                 dap.NombreUsuario = nombreUsuario.nombreUsuario;
                 dap.Usuario = nombreUsuario.usuario;
                 var nombreModulo = (from m in db.Modulo
-                                     where m.Secuencial == modulo
-                                     select new
-                                     {
-                                         nombreModulo = m.Descripcion
-                                     }).FirstOrDefault();
+                                    where m.Secuencial == modulo
+                                    select new
+                                    {
+                                        nombreModulo = m.Descripcion
+                                    }).FirstOrDefault();
                 dap.Modulo = nombreModulo.nombreModulo;
 
                 if (tipoTarea == "proyecto")
+                {
+                    if (tareaPrincipal.entregableMotivoTrabajo != null)
+                        dap.SerieDesarrollo = tareaPrincipal.entregableMotivoTrabajo.Secuencial;
                     dap.EsDev = true;
+                }
                 else
                     dap.EsDev = false;
 
                 if (tipoTarea == "ticket")
+                {
+                    if (ticketTarea != 0)
+                    {
+                        Ticket t = db.Ticket.Where(s => s.Secuencial == ticketTarea).FirstOrDefault();
+                        if (t != null)
+                        {
+                            dap.SerieTicket = t.Secuencial;
+                        }
+                    }
                     dap.EsTck = true;
+                }
                 else
                     dap.EsTck = false;
 
                 if (tipoTarea == "contrato")
+                {
+                    if (tareaPrincipal.entregableMotivoTrabajo != null)
+                        dap.SerieDesarrollo = tareaPrincipal.entregableMotivoTrabajo.Secuencial;
                     dap.EsReq = true;
+                }
                 else
                     dap.EsReq = false;
 
@@ -2403,35 +2424,7 @@ namespace SifizPlanning.Controllers
                 {
                     Utiles.OrdenarTareasPermisos(diaColab.Fecha, diaColab.IdColaborador, user, db);
                 }
-                //Actualizando las fechas de los dias que existieron los cambios y en las fechas
-
-                //Actualizando cambios en la interfaz de usuario
                 ActualizarTDTarea(listaCambiosTareas);
-
-                //try
-                //{
-                //    List<string> correosDestinos = new List<string>();
-                //    correosDestinos.AddRange(Utiles.CorreoPorGrupoEmail("TFS"));
-                //    correosDestinos.Add(emailUser);
-                //    correosDestinos.Add(colaboradorTarea.persona.usuario.FirstOrDefault().Email);
-
-                //    string textoEmail = @"<div class='textoCuerpo'><br/>";
-                //    textoEmail += "Buen día,";
-                //    textoEmail += @"<br/>";
-
-                //    textoEmail += "Con el presente correo se solicita acceso a las fuentes del cliente: " + clienteTarea.Descripcion + ", al colaborador: " + colaboradorTarea.persona.Nombre1 + " " + colaboradorTarea.persona.Apellido1;
-                //    textoEmail += "</div>";
-
-
-                //    string asuntoEmail = "Solicitud Acceso";
-                //    Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmail, asuntoEmail);
-
-                //}
-                //catch (Exception e)
-                //{
-                //    throw new Exception(e.Message);
-                //}
-
 
                 var respOk = new
                 {
@@ -2446,7 +2439,6 @@ namespace SifizPlanning.Controllers
                 {
                     success = false,
                     msg = e.Message
-                    //msg = "Hay errores en los datos por favor verifíquelos"
                 };
                 return Json(resp);
             }

@@ -584,7 +584,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult ActualizarTareaUsuario(int idTarea, int estado, bool publicar = false)
+        public async Task<ActionResult> ActualizarTareaUsuarioAsync(int idTarea, int estado, bool publicar = false)
         {
             try
             {
@@ -696,44 +696,10 @@ namespace SifizPlanning.Controllers
                                 db.TicketHistorico.Add(ticketHistorico);
 
                                 db.SaveChanges();//Salvando los cambios
-
-                                /*
-                                //Enviando el correo a los usuarios
-                                List<string> correosDestinos = Utiles.CorreoPorGrupoEmail("COORD");
-                                Persona personaCliente = ticket.persona_cliente.persona;
-                                string nombreCliente = personaCliente.Nombre1 + " " + personaCliente.Apellido1;
-                                string correoCliente = personaCliente.usuario.FirstOrDefault().Email;
-                                correosDestinos.Insert(0, emailUser);
-                                
-                                string textoEmail = "<div class=\"textoCuerpo\">Por medio del presente correo le informamos que la terminación de esta tarea dio por <b>'RESUELTO'</b> el ticket <b>" + string.Format("{0:000000}", ticket.Secuencial) + @"</b>.<br/>                                       
-                                      <b>Asunto del ticket: </b>" + ticket.Asunto + @"<br/>
-                                      Por favor comuníquese lo antes posible con el cliente.<br/>
-                                      Nombre del cliente: " + nombreCliente + @"<br/>
-                                      Correo del cliente: " + correoCliente + @"<br/></div>";
-
-                                //Borrar aqui
-                                string codigoCliente = ticket.persona_cliente.cliente.Codigo;
-                                Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmail, codigoCliente + " HESO " + string.Format("{0:000000}", ticket.Secuencial) + " - Ticket Resuelto (" + ticket.Asunto + ")", null, string.Format("{0:000000}", ticket.Secuencial));
-
-                                //adicionando el email a los historicos
-                                string destinos = String.Join(", ", correosDestinos.ToArray());
-                                string textoHistoricoCorreo = "<b>Correo de información, Ticket Resuelto</b><br/>";
-                                textoHistoricoCorreo += "<b>Destinos:</b> " + destinos + "<br/>";
-                                textoHistoricoCorreo += "<b>Asunto:</b> " + "Ticket Resuelto" + "<br/>";
-                                textoHistoricoCorreo += "<b>Texto del correo:</b> <br/>" + textoEmail;
-                                HistoricoInformacionTicket historicoCorreoTicket = new HistoricoInformacionTicket
-                                {
-                                    SecuencialTicketHistorico = ticketHistorico.SecuencialTicket,
-                                    VersionTicketHistorico = ticketHistorico.Version,
-                                    Fecha = DateTime.Now,
-                                    Texto = textoHistoricoCorreo
-                                };
-                                db.HistoricoInformacionTicket.Add(historicoCorreoTicket);
-                                db.SaveChanges();
-                                */
                             }
                         }
                     }
+                    bool quitar = await QuitarAccesoDevops(tarea.Secuencial);
                 }
                 else if (estado == 2)//Desarrollo
                 {
@@ -858,6 +824,8 @@ namespace SifizPlanning.Controllers
                             db.SaveChanges();
                         }
                     }
+
+                    bool envio = await DarAccesoDevops(tarea.Secuencial);
                 }
                 else if (estado == 5)//EN PAUSA
                 {
@@ -980,6 +948,65 @@ namespace SifizPlanning.Controllers
                 };
                 return Json(result);
             }
+        }
+
+        private async Task<bool> DarAccesoDevops(int tarea)
+        {
+            string key = ConfigurationManager.AppSettings.Get("Devops");
+            var client = new HttpClient();
+            var requestUrl = "https://api-sifizops.sifizsoft.com/api/AsignacionPublicacion/AsignarTareaDePublicacion";
+            var data = new MultipartFormDataContent();
+
+            var dap = db.DevopsAccesoProyectos.Where(s => s.SecuencialTarea == tarea).FirstOrDefault();
+
+            data.Add(new StringContent(dap.Organizacion), "Organizacion");
+            data.Add(new StringContent(dap.NombreUsuario), "NombreUsuario");
+            data.Add(new StringContent(dap.Usuario), "Usuario");
+            data.Add(new StringContent(dap.Modulo), "Modulo");
+            data.Add(new StringContent(dap.EsTck ? "SI" : "NO"), "EsTCK");
+            data.Add(new StringContent(dap.EsReq ? "SI" : "NO"), "EsREQ");
+            data.Add(new StringContent(dap.EsDev ? "SI" : "NO"), "EsDEV");
+            data.Add(new StringContent(dap.SerieTicket.ToString()), "SerieTicket");
+            data.Add(new StringContent(dap.SerieRequerimiento.ToString()), "SerieRequerimiento");
+            data.Add(new StringContent(dap.SerieDesarrollo.ToString()), "SerieDesarrollo");
+            data.Add(new StringContent(dap.SecuencialTarea.ToString()), "Identificador");
+            client.DefaultRequestHeaders.Add("X-API-KEY", key);
+
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+            requestMessage.Content = data;
+
+            var response = await client.SendAsync(requestMessage);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private async Task<bool> QuitarAccesoDevops(int tarea)
+        {
+            string key = ConfigurationManager.AppSettings.Get("Devops");
+            var client = new HttpClient();
+            var requestUrl = "https://api-sifizops.sifizsoft.com/api/AsignacionPublicacion/AsignarTareaDePublicacion";
+            var data = new MultipartFormDataContent();
+
+            data.Add(new StringContent(tarea.ToString()), "Identificador");
+            client.DefaultRequestHeaders.Add("X-API-KEY", key);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+            requestMessage.Content = data;
+
+            var response = await client.SendAsync(requestMessage);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         [HttpPost]
@@ -5197,7 +5224,7 @@ r in db.Rol on ur.rol equals r
                     .Where(a => !asistentesIds.Contains(a.SecuencialColaborador))
                     .ToList();
 
-                foreach(var a in asistentesAEliminar)
+                foreach (var a in asistentesAEliminar)
                 {
                     var tareaCap = db.TareaCapacitacion.FirstOrDefault(tc => tc.SecuencialCapacitacion == id && tc.tarea.SecuencialColaborador == a.SecuencialColaborador);
                     if (tareaCap != null)

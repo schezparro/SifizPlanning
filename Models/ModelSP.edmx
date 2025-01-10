@@ -52,18 +52,6 @@
           <Property Name="DETALLE" Type="varchar" MaxLength="2000" Nullable="false" />
           <Property Name="SECUENCIALGESTIONPERMISO" Type="int" Nullable="false" />
         </EntityType>
-        <EntityType Name="DIASDISPONIBLESVACACIONES">
-          <Key>
-            <PropertyRef Name="SECUENCIAL" />
-          </Key>
-          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="CODIGO" Type="nvarchar" MaxLength="50" />
-          <Property Name="DESCRIPCION" Type="nvarchar" MaxLength="250" />
-          <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" />
-          <Property Name="NUMEROVERIFICADOR" Type="int" />
-          <Property Name="SECUENCIALCOLABORADOR" Type="int" Nullable="false" />
-          <Property Name="DIASDISPONIBLES" Type="int" Nullable="false" />
-        </EntityType>
         <EntityType Name="ESTADOPERMISO">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
@@ -124,14 +112,6 @@
           <Property Name="FECHAFIN" Type="datetime2" Precision="7" Nullable="false" />
           <Property Name="MOTIVO" Type="varchar" MaxLength="2000" Nullable="false" />
         </EntityType>
-        <EntityType Name="PROPUESTAVACACIONES">
-          <Key>
-            <PropertyRef Name="SECUENCIAL" />
-          </Key>
-          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="SECUENCIALCOLABORADOR" Type="int" Nullable="false" />
-          <Property Name="FECHA" Type="datetime2" Precision="7" Nullable="false" />
-        </EntityType>
         <EntityType Name="TIPOPERMISO">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
@@ -165,6 +145,8 @@
           <Property Name="SERIETICKET" Type="int" />
           <Property Name="SERIEDESARROLLO" Type="int" />
           <Property Name="SERIEREQUERIMIENTO" Type="int" />
+          <Property Name="SECUENCIALTAREA" Type="int" />
+          <Property Name="DETALLE" Type="nvarchar(max)" />
         </EntityType>
         <EntityType Name="MENSAJE">
           <Key>
@@ -772,7 +754,7 @@
           <Property Name="SECUENCIALCLIENTE" Type="int" Nullable="false" />
           <Property Name="SECUENCIALREQUERIMIENTO" Type="int" Nullable="false" />
           <Property Name="SECUENCIALTICKETTAREA" Type="int" />
-          <Property Name="DETALLE" Type="varchar" MaxLength="8000" Nullable="false" />
+          <Property Name="DETALLE" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="FECHAPEDIDOCLIENTE" Type="date" />
         </EntityType>
         <EntityType Name="PAIS">
@@ -834,15 +816,9 @@
           <Property Name="EstaActivo" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="NumeroVerificador" Type="int" Nullable="false" />
         </EntityType>
-        <!--Errors Found During Generation:
-warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="REQUERIMIENTO">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
-            
-            
-            
-            
           </Key>
           <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="CODIGO" Type="varchar" MaxLength="50" Nullable="false" />
@@ -1811,7 +1787,7 @@ warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have 
           <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="TITULO" Type="varchar" MaxLength="255" Nullable="false" />
           <Property Name="DETALLE" Type="varchar(max)" Nullable="false" />
-          <Property Name="FECHA" Type="date" Nullable="false" />
+          <Property Name="FECHA" Type="datetime" Nullable="false" />
           <Property Name="SECUENCIALMODULO" Type="int" Nullable="false" />
           <Property Name="ADJUNTO" Type="varchar" MaxLength="255" Nullable="false" />
           <Property Name="ADJUNTOASISTENCIA" Type="varchar" MaxLength="255" />
@@ -2436,18 +2412,6 @@ warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have 
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_DIASDISPONIBLESVACACIONES_COLABORADOR">
-          <End Role="COLABORADOR" Type="Self.COLABORADOR" Multiplicity="1" />
-          <End Role="DIASDISPONIBLESVACACIONES" Type="Self.DIASDISPONIBLESVACACIONES" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="COLABORADOR">
-              <PropertyRef Name="SECUENCIAL" />
-            </Principal>
-            <Dependent Role="DIASDISPONIBLESVACACIONES">
-              <PropertyRef Name="SECUENCIALCOLABORADOR" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_ENTREGABLEMOTIVOTRABAJO_COLABORADOR">
           <End Role="COLABORADOR" Type="Self.COLABORADOR" Multiplicity="0..1" />
           <End Role="ENTREGABLEMOTIVOTRABAJO" Type="Self.ENTREGABLEMOTIVOTRABAJO" Multiplicity="*" />
@@ -2816,18 +2780,6 @@ warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have 
               <PropertyRef Name="SECUENCIAL" />
             </Principal>
             <Dependent Role="OFERTAS">
-              <PropertyRef Name="SECUENCIALCOLABORADOR" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PROPUESTAVACACIONES_COLABORADOR">
-          <End Role="COLABORADOR" Type="Self.COLABORADOR" Multiplicity="1" />
-          <End Role="PROPUESTAVACACIONES" Type="Self.PROPUESTAVACACIONES" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="COLABORADOR">
-              <PropertyRef Name="SECUENCIAL" />
-            </Principal>
-            <Dependent Role="PROPUESTAVACACIONES">
               <PropertyRef Name="SECUENCIALCOLABORADOR" />
             </Dependent>
           </ReferentialConstraint>
@@ -5178,14 +5130,12 @@ warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have 
           <EntitySet Name="FBSLOGEQUIPO" EntityType="Self.FBSLOGEQUIPO" Schema="FBSLOG" store:Type="Tables" />
           <EntitySet Name="FBSLOGERROR" EntityType="Self.FBSLOGERROR" Schema="FBSLOG" store:Type="Tables" />
           <EntitySet Name="DETALLEGESTIONPERMISO" EntityType="Self.DETALLEGESTIONPERMISO" Schema="RRHH" store:Type="Tables" />
-          <EntitySet Name="DIASDISPONIBLESVACACIONES" EntityType="Self.DIASDISPONIBLESVACACIONES" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="ESTADOPERMISO" EntityType="Self.ESTADOPERMISO" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="FERIADOS" EntityType="Self.FERIADOS" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="GESTIONPERMISO" EntityType="Self.GESTIONPERMISO" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="INCIDENCIASRECURSOS" EntityType="Self.INCIDENCIASRECURSOS" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="MARCAELECTRONICA" EntityType="Self.MARCAELECTRONICA" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="PERMISO" EntityType="Self.PERMISO" Schema="RRHH" store:Type="Tables" />
-          <EntitySet Name="PROPUESTAVACACIONES" EntityType="Self.PROPUESTAVACACIONES" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="TIPOPERMISO" EntityType="Self.TIPOPERMISO" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="VACACIONES" EntityType="Self.VACACIONES" Schema="RRHH" store:Type="Tables" />
           <EntitySet Name="DEVOPSACCESOPROYECTOS" EntityType="Self.DEVOPSACCESOPROYECTOS" Schema="SEGURIDADES" store:Type="Tables" />
@@ -5247,6 +5197,7 @@ warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have 
           <EntitySet Name="PERSONAGRUPOEMAIL" EntityType="Self.PERSONAGRUPOEMAIL" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="PROYECTOMODULOCLIENTE" EntityType="Self.PROYECTOMODULOCLIENTE" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="Reporte" EntityType="Self.Reporte" Schema="TAREAS" store:Type="Tables" />
+          <EntitySet Name="REQUERIMIENTO" EntityType="Self.REQUERIMIENTO" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="RESPONSABLEPROYECTOS" EntityType="Self.RESPONSABLEPROYECTOS" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="SEDE" EntityType="Self.SEDE" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="SERVICIOIMPLANTACIONCORE" EntityType="Self.SERVICIOIMPLANTACIONCORE" Schema="TAREAS" store:Type="Tables" />
@@ -5362,15 +5313,6 @@ warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have 
           <EntitySet Name="TIPOCONTRATOCLIENTE" EntityType="Self.TIPOCONTRATOCLIENTE" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="TIPONOTIFICACIONTICKET" EntityType="Self.TIPONOTIFICACIONTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="TIPORECURSO" EntityType="Self.TIPORECURSO" Schema="TICKET" store:Type="Tables" />
-          <EntitySet Name="REQUERIMIENTO" EntityType="Self.REQUERIMIENTO" store:Type="Tables" store:Schema="TAREAS">
-            <DefiningQuery>SELECT 
-[REQUERIMIENTO].[SECUENCIAL] AS [SECUENCIAL], 
-[REQUERIMIENTO].[CODIGO] AS [CODIGO], 
-[REQUERIMIENTO].[DESCRIPCION] AS [DESCRIPCION], 
-[REQUERIMIENTO].[ESTAACTIVO] AS [ESTAACTIVO], 
-[REQUERIMIENTO].[NUMEROVERIFICADOR] AS [NUMEROVERIFICADOR]
-FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
-          </EntitySet>
           <AssociationSet Name="FK_ACTA_CLIENTE" Association="Self.FK_ACTA_CLIENTE">
             <End Role="CLIENTE" EntitySet="CLIENTE" />
             <End Role="Acta" EntitySet="Acta" />
@@ -5470,10 +5412,6 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
           <AssociationSet Name="FK_DETALLEESTIMACIONTICKET_ENTREGABLEDETALLEESTIMACION" Association="Self.FK_DETALLEESTIMACIONTICKET_ENTREGABLEDETALLEESTIMACION">
             <End Role="ENTREGABLEDETALLEESTIMACION" EntitySet="ENTREGABLEDETALLEESTIMACION" />
             <End Role="DETALLEESTIMACIONTICKET" EntitySet="DETALLEESTIMACIONTICKET" />
-          </AssociationSet>
-          <AssociationSet Name="FK_DIASDISPONIBLESVACACIONES_COLABORADOR" Association="Self.FK_DIASDISPONIBLESVACACIONES_COLABORADOR">
-            <End Role="COLABORADOR" EntitySet="COLABORADOR" />
-            <End Role="DIASDISPONIBLESVACACIONES" EntitySet="DIASDISPONIBLESVACACIONES" />
           </AssociationSet>
           <AssociationSet Name="FK_ENTREGABLEMOTIVOTRABAJO_COLABORADOR" Association="Self.FK_ENTREGABLEMOTIVOTRABAJO_COLABORADOR">
             <End Role="COLABORADOR" EntitySet="COLABORADOR" />
@@ -5598,10 +5536,6 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
           <AssociationSet Name="FK_OFERTAS_COLABORADOR" Association="Self.FK_OFERTAS_COLABORADOR">
             <End Role="COLABORADOR" EntitySet="COLABORADOR" />
             <End Role="OFERTAS" EntitySet="OFERTAS" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PROPUESTAVACACIONES_COLABORADOR" Association="Self.FK_PROPUESTAVACACIONES_COLABORADOR">
-            <End Role="COLABORADOR" EntitySet="COLABORADOR" />
-            <End Role="PROPUESTAVACACIONES" EntitySet="PROPUESTAVACACIONES" />
           </AssociationSet>
           <AssociationSet Name="FK_PROYECTOMODULO_SUBMODULO" Association="Self.FK_PROYECTOMODULO_SUBMODULO">
             <End Role="SubModulo" EntitySet="SubModulo" />
@@ -12681,7 +12615,7 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
           <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Titulo" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="Detalle" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="SecuencialModulo" Type="Int32" Nullable="false" />
           <Property Name="Adjunto" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="modulo" Relationship="SifizPlanningModel.FK_RECURSOS_MODULO" FromRole="RECURSOS" ToRole="Modulo" />
@@ -13076,7 +13010,7 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
           <Property Name="SecuencialCLiente" Type="Int32" Nullable="false" />
           <Property Name="SecuencialRequerimiento" Type="Int32" Nullable="false" />
           <Property Name="SecuencialTicketTarea" Type="Int32" />
-          <Property Name="Detalle" Type="String" Nullable="false" MaxLength="8000" FixedLength="false" Unicode="false" />
+          <Property Name="Detalle" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Name="FechaPedidoCLiente" Type="DateTime" Precision="0" />
         </EntityType>
         <EntityType Name="ClienteReporteMantenimiento">
@@ -13208,6 +13142,8 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
           <Property Name="SerieTicket" Type="Int32" />
           <Property Name="SerieDesarrollo" Type="Int32" />
           <Property Name="SerieRequerimiento" Type="Int32" />
+          <Property Name="SecuencialTarea" Type="Int32" />
+          <Property Name="Detalle" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -15490,31 +15426,11 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="DiasDisponiblesVacaciones">
-            <EntityTypeMapping TypeName="SifizPlanningModel.DiasDisponiblesVacaciones">
-              <MappingFragment StoreEntitySet="DIASDISPONIBLESVACACIONES">
-                <ScalarProperty Name="DiasDisponibles" ColumnName="DIASDISPONIBLES" />
-                <ScalarProperty Name="SecuencialColaborador" ColumnName="SECUENCIALCOLABORADOR" />
-                <ScalarProperty Name="NumeroVerificador" ColumnName="NUMEROVERIFICADOR" />
-                <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
-                <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
-                <ScalarProperty Name="Codigo" ColumnName="CODIGO" />
-                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="PropuestaVacaciones">
-            <EntityTypeMapping TypeName="SifizPlanningModel.PropuestaVacaciones">
-              <MappingFragment StoreEntitySet="PROPUESTAVACACIONES">
-                <ScalarProperty Name="Fecha" ColumnName="FECHA" />
-                <ScalarProperty Name="SecuencialColaborador" ColumnName="SECUENCIALCOLABORADOR" />
-                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="DevopsAccesoProyectos">
             <EntityTypeMapping TypeName="SifizPlanningModel.DevopsAccesoProyectos">
               <MappingFragment StoreEntitySet="DEVOPSACCESOPROYECTOS">
+                <ScalarProperty Name="Detalle" ColumnName="DETALLE" />
+                <ScalarProperty Name="SecuencialTarea" ColumnName="SECUENCIALTAREA" />
                 <ScalarProperty Name="SerieRequerimiento" ColumnName="SERIEREQUERIMIENTO" />
                 <ScalarProperty Name="SerieDesarrollo" ColumnName="SERIEDESARROLLO" />
                 <ScalarProperty Name="SerieTicket" ColumnName="SERIETICKET" />
