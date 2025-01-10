@@ -952,48 +952,55 @@ namespace SifizPlanning.Controllers
 
         private async Task<bool> DarAccesoDevops(int tarea)
         {
-            string key = ConfigurationManager.AppSettings.Get("Devops");
-            var client = new HttpClient();
-            var requestUrl = "https://api-sifizops.sifizsoft.com/api/AsignacionPublicacion/AsignarTareaDePublicacion";
-            var data = new MultipartFormDataContent();
-
-            var dap = db.DevopsAccesoProyectos.Where(s => s.SecuencialTarea == tarea).FirstOrDefault();
-
-            data.Add(new StringContent(dap.Organizacion), "Organizacion");
-            data.Add(new StringContent(dap.NombreUsuario), "NombreUsuario");
-            data.Add(new StringContent(dap.Usuario), "Usuario");
-            data.Add(new StringContent(dap.Modulo), "Modulo");
-            data.Add(new StringContent(dap.EsTck ? "SI" : "NO"), "EsTCK");
-            data.Add(new StringContent(dap.EsReq ? "SI" : "NO"), "EsREQ");
-            data.Add(new StringContent(dap.EsDev ? "SI" : "NO"), "EsDEV");
-            data.Add(new StringContent(dap.SerieTicket.ToString()), "SerieTicket");
-            data.Add(new StringContent(dap.SerieRequerimiento.ToString()), "SerieRequerimiento");
-            data.Add(new StringContent(dap.SerieDesarrollo.ToString()), "SerieDesarrollo");
-            data.Add(new StringContent(dap.SecuencialTarea.ToString()), "Identificador");
-            client.DefaultRequestHeaders.Add("X-API-KEY", key);
-
-
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUrl);
-            requestMessage.Content = data;
-
-            var response = await client.SendAsync(requestMessage);
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                return true;
-            }
+                string key = ConfigurationManager.AppSettings.Get("Devops");
+                var client = new HttpClient();
+                var requestUrl = "https://api-sifizops.sifizsoft.com/api/AsignacionPermisos/AsociarPermiso";
+                var data = new MultipartFormDataContent();
 
-            return false;
+                var dap = db.DevopsAccesoProyectos.Where(s => s.SecuencialTarea == tarea).FirstOrDefault();
+
+                data.Add(new StringContent(dap.Organizacion), "organizacion");
+                data.Add(new StringContent(dap.NombreUsuario), "nombreUsuario");
+                data.Add(new StringContent(dap.Usuario), "usuario");
+                data.Add(new StringContent(dap.Modulo), "modulo");
+                data.Add(new StringContent(dap.EsTck ? "true" : "false"), "EsTCK");
+                data.Add(new StringContent(dap.EsReq ? "true" : "false"), "EsREQ");
+                data.Add(new StringContent(dap.EsDev ? "true" : "false"), "EsDEV");
+                data.Add(new StringContent(dap.SerieTicket.ToString()), "SerieTicket");
+                data.Add(new StringContent(dap.SerieRequerimiento.ToString()), "SerieRequerimiento");
+                data.Add(new StringContent(dap.SerieDesarrollo.ToString()), "SerieDesarrollo");
+                data.Add(new StringContent(dap.SecuencialTarea.ToString()), "Identificador");
+                client.DefaultRequestHeaders.Add("X-API-KEY", key);
+
+
+                var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+                requestMessage.Content = data;
+
+                var response = await client.SendAsync(requestMessage);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
 
         private async Task<bool> QuitarAccesoDevops(int tarea)
         {
             string key = ConfigurationManager.AppSettings.Get("Devops");
             var client = new HttpClient();
-            var requestUrl = "https://api-sifizops.sifizsoft.com/api/AsignacionPublicacion/AsignarTareaDePublicacion";
+            var requestUrl = "https://api-sifizops.sifizsoft.com/api/AsignacionPermisos/DisociarPermiso";
             var data = new MultipartFormDataContent();
 
-            data.Add(new StringContent(tarea.ToString()), "Identificador");
+            data.Add(new StringContent(tarea.ToString()), "identificador");
             client.DefaultRequestHeaders.Add("X-API-KEY", key);
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUrl);
