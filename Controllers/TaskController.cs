@@ -601,6 +601,7 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, REC")]
         public ActionResult DarTareasTrabajadores(string fechaLunes = "", int semanas = 1, string json = "", bool coordinados = false)
         {
+            db.Database.CommandTimeout = 240;
             DateTime lunes = DateTime.Today;
             if (fechaLunes != "")
             {
@@ -2021,7 +2022,7 @@ namespace SifizPlanning.Controllers
                             throw new Exception("No se encontró el ticket");
                         }
                     }
-
+                    db.SaveChanges();
                     tareaPrincipal = tar;
                 }
 
@@ -2333,6 +2334,7 @@ namespace SifizPlanning.Controllers
                         }
                     }
                 }
+                db.SaveChanges();
 
                 DevopsAccesoProyectos dap = new DevopsAccesoProyectos();
                 dap.SecuencialTarea = tareaPrincipal.Secuencial;
@@ -2341,7 +2343,7 @@ namespace SifizPlanning.Controllers
                                      where c.Secuencial == cliente
                                      select new
                                      {
-                                         nombreCliente = c.Descripcion
+                                         nombreCliente = c.Codigo
                                      }).FirstOrDefault();
                 dap.Organizacion = nombreCliente.nombreCliente;
                 var nombreUsuario = (from u in db.Usuario

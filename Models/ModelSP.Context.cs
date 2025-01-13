@@ -208,8 +208,8 @@ namespace SifizPlanning.Models
         public virtual DbSet<ClienteReporteMantenimiento> ClienteReporteMantenimiento { get; set; }
         public virtual DbSet<TareaCapacitacion> TareaCapacitacion { get; set; }
         public virtual DbSet<Requerimiento> Requerimiento { get; set; }
+        public virtual DbSet<DevopsAccesoProyectos> DevopsAccesoProyectos { get; set; }
         public virtual DbSet<DiasDisponiblesVacaciones> DiasDisponiblesVacaciones { get; set; }
         public virtual DbSet<PropuestaVacaciones> PropuestaVacaciones { get; set; }
-        public virtual DbSet<DevopsAccesoProyectos> DevopsAccesoProyectos { get; set; }
     }
 }

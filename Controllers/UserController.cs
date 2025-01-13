@@ -42,6 +42,7 @@ using System.Drawing;
 using DocumentFormat.OpenXml.ExtendedProperties;
 using System.Data.Entity.Migrations;
 using System.Data.Entity.SqlServer;
+using System.Net.Http.Headers;
 
 namespace SifizPlanning.Controllers
 {
@@ -584,7 +585,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public async Task<ActionResult> ActualizarTareaUsuarioAsync(int idTarea, int estado, bool publicar = false)
+        public async Task<ActionResult> ActualizarTareaUsuario(int idTarea, int estado, bool publicar = false)
         {
             try
             {
@@ -957,39 +958,38 @@ namespace SifizPlanning.Controllers
                 string key = ConfigurationManager.AppSettings.Get("Devops");
                 var client = new HttpClient();
                 var requestUrl = "https://api-sifizops.sifizsoft.com/api/AsignacionPermisos/AsociarPermiso";
-                var data = new MultipartFormDataContent();
 
-                var dap = db.DevopsAccesoProyectos.Where(s => s.SecuencialTarea == tarea).FirstOrDefault();
+                var dap = db.DevopsAccesoProyectos.Where(s => s.SecuencialTarea.HasValue && s.SecuencialTarea.Value == tarea).FirstOrDefault();
 
-                data.Add(new StringContent(dap.Organizacion), "organizacion");
-                data.Add(new StringContent(dap.NombreUsuario), "nombreUsuario");
-                data.Add(new StringContent(dap.Usuario), "usuario");
-                data.Add(new StringContent(dap.Modulo), "modulo");
-                data.Add(new StringContent(dap.EsTck ? "true" : "false"), "EsTCK");
-                data.Add(new StringContent(dap.EsReq ? "true" : "false"), "EsREQ");
-                data.Add(new StringContent(dap.EsDev ? "true" : "false"), "EsDEV");
-                data.Add(new StringContent(dap.SerieTicket.ToString()), "SerieTicket");
-                data.Add(new StringContent(dap.SerieRequerimiento.ToString()), "SerieRequerimiento");
-                data.Add(new StringContent(dap.SerieDesarrollo.ToString()), "SerieDesarrollo");
-                data.Add(new StringContent(dap.SecuencialTarea.ToString()), "Identificador");
-                client.DefaultRequestHeaders.Add("X-API-KEY", key);
-
-
-                var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUrl);
-                requestMessage.Content = data;
-
-                var response = await client.SendAsync(requestMessage);
-
-                if (response.IsSuccessStatusCode)
+                if (dap == null)
                 {
-                    return true;
+                    throw new Exception("No se encontró la configuración de acceso para la tarea especificada");
                 }
 
-                return false;
+                var requestBody = new
+                {
+                    organizacion = dap.Organizacion,
+                    nombreUsuario = dap.NombreUsuario,
+                    usuario = dap.Usuario,
+                    modulo = dap.Modulo,
+                    esTCK = dap.EsTck,
+                    esREQ = dap.EsReq,
+                    esDEV = dap.EsDev,
+                    serieTicket = dap.SerieTicket.ToString(),
+                    serieRequerimiento = dap.SerieRequerimiento.ToString(),
+                    serieDesarrollo = dap.SerieDesarrollo.ToString(),
+                    identificador = dap.SecuencialTarea.ToString()
+                };
+
+                client.DefaultRequestHeaders.Add("X-API-KEY", key);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                var response = await client.PostAsJsonAsync(requestUrl, requestBody);
+                return response.IsSuccessStatusCode;
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message);
+                throw new Exception($"Error al dar acceso Devops: {e.Message}", e);
             }
         }
 

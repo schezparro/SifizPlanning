@@ -437,11 +437,11 @@
         <AssociationConnector Association="SifizPlanningModel.FK_TAREACAPACITACION_TAREA" />
         <AssociationConnector Association="SifizPlanningModel.FK_TAREACAPACITACION_RECURSOS" />
         <EntityTypeShape EntityType="SifizPlanningModel.Requerimiento" Width="1.5" PointX="3.375" PointY="39.75" />
-        <EntityTypeShape EntityType="SifizPlanningModel.DiasDisponiblesVacaciones" Width="1.5" PointX="17.5" PointY="64.25" />
-        <EntityTypeShape EntityType="SifizPlanningModel.PropuestaVacaciones" Width="1.5" PointX="17.5" PointY="13.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.DevopsAccesoProyectos" Width="1.5" PointX="39.375" PointY="34.75" />
+        <EntityTypeShape EntityType="SifizPlanningModel.DiasDisponiblesVacaciones" Width="1.5" PointX="17.5" PointY="63.625" />
+        <EntityTypeShape EntityType="SifizPlanningModel.PropuestaVacaciones" Width="1.5" PointX="17.5" PointY="67" />
         <AssociationConnector Association="SifizPlanningModel.FK_DIASDISPONIBLESVACACIONES_COLABORADOR" />
         <AssociationConnector Association="SifizPlanningModel.FK_PROPUESTAVACACIONES_COLABORADOR" />
-        <EntityTypeShape EntityType="SifizPlanningModel.DevopsAccesoProyectos" Width="1.5" PointX="39.375" PointY="34.75" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
