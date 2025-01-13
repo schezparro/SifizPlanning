@@ -2346,9 +2346,10 @@ namespace SifizPlanning.Controllers
                                          nombreCliente = c.Codigo
                                      }).FirstOrDefault();
                 dap.Organizacion = nombreCliente.nombreCliente;
-                var nombreUsuario = (from u in db.Usuario
-                                     join p in db.Persona on u.SecuencialPersona equals p.Secuencial
-                                     where u.Secuencial == idTrabajador
+                var nombreUsuario = (from c in db.Colaborador
+                                     join p in db.Persona on c.SecuencialPersona equals p.Secuencial
+                                     join u in db.Usuario on p.Secuencial equals u.SecuencialPersona
+                                     where c.Secuencial == idTrabajador
                                      select new
                                      {
                                          nombreUsuario = p.Nombre1 + " " + p.Apellido1 + " " + p.Apellido2,
