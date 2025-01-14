@@ -995,26 +995,35 @@ namespace SifizPlanning.Controllers
 
         private async Task<bool> QuitarAccesoDevops(int tarea)
         {
-            string key = ConfigurationManager.AppSettings.Get("Devops");
-            var client = new HttpClient();
-            var requestUrl = "https://api-sifizops.sifizsoft.com/api/AsignacionPermisos/DisociarPermiso";
-            var data = new MultipartFormDataContent();
-
-            data.Add(new StringContent(tarea.ToString()), "identificador");
-            client.DefaultRequestHeaders.Add("X-API-KEY", key);
-
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUrl);
-            requestMessage.Content = data;
-
-            var response = await client.SendAsync(requestMessage);
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                return true;
-            }
+                string key = ConfigurationManager.AppSettings.Get("Devops");
+                var client = new HttpClient();
+                var requestUrl = "https://api-sifizops.sifizsoft.com/api/AsignacionPermisos/DisociarPermiso";
 
-            return false;
+                var requestBody = new
+                {
+                    identificador = tarea.ToString()
+                };
+
+                client.DefaultRequestHeaders.Add("X-API-KEY", key);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                var response = await client.PostAsJsonAsync(requestUrl, requestBody);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error al quitar acceso Devops: {e.Message}", e);
+            }
         }
+
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
