@@ -2299,6 +2299,43 @@ namespace SifizPlanning
             //------------------ FIN DE RUTAS DEL MODULO DE RRHH -------------------
 
             //-------------------COMERCIAL---------------------
+
+            routes.MapRoute(
+                name: "GuardarOferta",
+                url: "comercial/guardar-oferta/{id}",
+                defaults: new { controller = "Comercial", action = "GuardarOferta", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "EliminarOferta",
+                url: "comercial/eliminar-oferta/{id}",
+                defaults: new { controller = "Comercial", action = "EliminarOferta", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarDatosOferta",
+                url: "comercial/dar-datos-oferta/{id}",
+                defaults: new { controller = "Comercial", action = "DarDatosOferta", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "EditarOferta",
+                url: "comercial/obtener-datos-oferta/{id}",
+                defaults: new { controller = "Comercial", action = "EditarOferta", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "GenerarCodigoOferta",
+                url: "comercial/generar-codigo-oferta/{id}",
+                defaults: new { controller = "Comercial", action = "GenerarCodigoOferta", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+               name: "OfertasComercial",
+               url: "comercial/dar-ofertas-comercial/{id}",
+               defaults: new { controller = "Comercial", action = "OfertasComercial", id = UrlParameter.Optional }
+           );
+
             routes.MapRoute(
                 name: "DarDatosRequerimiento",
                 url: "comercial/dar-datos-requerimiento/{id}",
@@ -2324,11 +2361,17 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "DarRequerimientosOfertas",
+                url: "comercial/requerimientos_ofertas/{id}",
+                defaults: new { controller = "Comercial", action = "DarRequerimientosOfertas", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "RequerimientosComercial",
                 url: "comercial/requerimientos-comercial/{id}",
                 defaults: new { controller = "Comercial", action = "RequerimientosComercial", id = UrlParameter.Optional }
             );
-
+            
             routes.MapRoute(
                 name: "DarCatalogoRequerimientos",
                 url: "comercial/catalogo-requerimientos/{id}",

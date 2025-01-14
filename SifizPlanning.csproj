@@ -765,6 +765,9 @@
     <Compile Include="Models\OfertaCotizacionTicket.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\OfertaOferta.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\OfertaRequerimiento.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>

@@ -7,20 +7,26 @@
         <thead>
             <tr>
                 <th>Código de Oferta</th>
+                <th>Fecha Recepción Estimación</th>
                 <th>Fecha Generación Oferta</th>
-                <th>Fecha Aprobación Oferta</th>
-                <th>Fecha Envío Oferta Cliente</th>
+                <th>Fecha Envío revisión</th>
+                <th>Fecha Aprobación Gerencia</th>
+                <th>Fecha Envío cliente</th>
+                <th>Fecha Vencimiento</th>
                 <th>Tipo</th>
                 <th>Acciones</th>
             </tr>
         </thead>
 
         <tbody>
-            <tr ng-repeat="oferta in ofertasLista | filter: filtroOfertas" ng-dblclick="editarOferta(oferta.codigo)">
+            <tr ng-repeat="oferta in ofertasLista | filter: filtroOfertas" ng-dblclick="editarOferta(oferta.secuencial)">
                 <td>{{oferta.codigo}}</td>
+                <td>{{oferta.fechaEstimacion | date:'dd/MM/yyyy'}}</td>
                 <td>{{oferta.fechaGeneracion | date:'dd/MM/yyyy'}}</td>
-                <td>{{oferta.fechaAprobacion | date:'dd/MM/yyyy'}}</td>
-                <td>{{oferta.fechaEnvio | date:'dd/MM/yyyy'}}</td>
+                <td>{{oferta.fechaRevision | date:'dd/MM/yyyy'}}</td>
+                <td>{{oferta.fechaAprobacionGerencia | date:'dd/MM/yyyy'}}</td>
+                <td>{{oferta.fechaEnvioOferta | date:'dd/MM/yyyy'}}</td>
+                <td>{{oferta.fechaVencimiento | date:'dd/MM/yyyy'}}</td>
                 <td>{{oferta.tipo}}</td>
                 <td>
                     <button type="button" class="btn btn-xs btn-success" ng-click="editarOferta(oferta.codigo)"><span class="glyphicon glyphicon-edit"></span></button>
@@ -68,35 +74,46 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
-                    <div>
-                        <label>Código de Oferta:</label>
-                        <input type="text" class="form-control" ng-model="ofertaSeleccionada.codigo" readonly>
-                    </div>
-                    <br>
-                    <div>
-                        <label>Fecha Generación Oferta:</label>
-                        <input type="date" class="form-control" ng-model="ofertaSeleccionada.fechaGeneracion" required>
-                    </div>
-                    <br>
-                    <div>
-                        <label>Cliente:</label>
-                        <select class="form-control" ng-model="ofertaSeleccionada.cliente" required>
-                            <option value="">Seleccione un cliente</option>
-                            <option ng-repeat="cliente in clientes" value="{{cliente.id}}">{{cliente.nombre}}</option>
-                        </select>
-                    </div>
-                    <br>
-                    <div>
-                        <label>Tipo de Oferta:</label>
-                        <select class="form-control" ng-model="ofertaSeleccionada.tipoOferta" required>
-                            <option value="">Seleccione un tipo</option>
-                            <option ng-repeat="tipo in tiposOferta" value="{{tipo.id}}">{{tipo.descripcion}}</option>
-                        </select>
-                    </div>
-                    <br>
-                    <div>
-                        <label>Observaciones:</label>
-                        <textarea class="form-control" ng-model="ofertaSeleccionada.observaciones"></textarea>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Código de Oferta:</label>
+                                <input type="text" class="form-control" ng-model="ofertaSeleccionada.codigo" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha Recepción Estimación:</label>
+                                <input type="date" class="form-control" ng-model="ofertaSeleccionada.fechaEstimacion" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha Envío Revisión:</label>
+                                <input type="date" class="form-control" ng-model="ofertaSeleccionada.fechaRevision" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha Envío Oferta Cliente:</label>
+                                <input type="date" class="form-control" ng-model="ofertaSeleccionada.fechaEnvioOferta" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Requerimiento:</label>
+                                <select class="form-control" ng-model="ofertaSeleccionada.OfertaRequerimiento" required>
+                                    <option value="">Seleccione un tipo</option>
+                                    <option ng-repeat="tipo in ofertaRequerimientos" value="{{tipo.secuencial}}">{{tipo.detalle}}</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha Generación Oferta:</label>
+                                <input type="date" class="form-control" ng-model="ofertaSeleccionada.fechaGeneracion" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha Aprobación Oferta Gerencia:</label>
+                                <input type="date" class="form-control" ng-model="ofertaSeleccionada.fechaAprobacionGerencia" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha Vencimiento Oferta:</label>
+                                <input type="date" class="form-control" ng-model="ofertaSeleccionada.fechaVencimiento" required>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">

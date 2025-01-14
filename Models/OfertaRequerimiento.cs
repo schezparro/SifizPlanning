@@ -14,11 +14,18 @@ namespace SifizPlanning.Models
     
     public partial class OfertaRequerimiento
     {
+        public OfertaRequerimiento()
+        {
+            this.OFERTAOFERTA = new HashSet<OfertaOferta>();
+        }
+    
         public int Secuencial { get; set; }
         public int SecuencialCLiente { get; set; }
         public int SecuencialRequerimiento { get; set; }
         public Nullable<int> SecuencialTicketTarea { get; set; }
         public string Detalle { get; set; }
         public Nullable<System.DateTime> FechaPedidoCLiente { get; set; }
+    
+        public virtual ICollection<OfertaOferta> OFERTAOFERTA { get; set; }
     }
 }

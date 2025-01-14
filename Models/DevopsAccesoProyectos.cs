@@ -25,7 +25,7 @@ namespace SifizPlanning.Models
         public Nullable<int> SerieTicket { get; set; }
         public Nullable<int> SerieDesarrollo { get; set; }
         public Nullable<int> SerieRequerimiento { get; set; }
-        public Nullable<int> SecuencialTarea { get; set; }
         public string Detalle { get; set; }
+        public Nullable<int> SecuencialTarea { get; set; }
     }
 }
