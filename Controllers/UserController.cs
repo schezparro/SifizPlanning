@@ -700,7 +700,7 @@ namespace SifizPlanning.Controllers
                             }
                         }
                     }
-                    bool quitar = await QuitarAccesoDevops(tarea.Secuencial);
+                   // bool quitar = await QuitarAccesoDevops(tarea.Secuencial);
                 }
                 else if (estado == 2)//Desarrollo
                 {
@@ -826,7 +826,7 @@ namespace SifizPlanning.Controllers
                         }
                     }
 
-                    bool envio = await DarAccesoDevops(tarea.Secuencial);
+                   // bool envio = await DarAccesoDevops(tarea.Secuencial);
                 }
                 else if (estado == 5)//EN PAUSA
                 {
