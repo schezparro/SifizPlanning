@@ -67,13 +67,9 @@ clientApp.controller('clientController', ['$scope', '$http', function ($scope, $
     };
 
     $scope.VerReporteMtto = function () {
-        $http.get('/Report/GetReportAccess?cliente=' + $scope.idCliente)
-            .then(function (response) {
-                var code = response.data.code;
-                var reportUrl = "/Report/VerReporteMantenimientoCliente?code=" + code;
-                angular.element("#ver-reporte").attr({ "href": reportUrl });
-                angular.element("#ver-reporte")[0].click();
-            });
+        var reportUrl = "/Report/VerReporteMantenimientoCliente";
+        angular.element("#ver-reporte").attr({ "href": reportUrl });
+        angular.element("#ver-reporte")[0].click();
     };
 
     //Cambiar la contraseña del usuario
