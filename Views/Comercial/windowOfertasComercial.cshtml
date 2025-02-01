@@ -29,7 +29,7 @@
                 <td>{{oferta.fechaVencimiento | date:'dd/MM/yyyy'}}</td>
                 <td>{{oferta.tipo}}</td>
                 <td>
-                    <button type="button" class="btn btn-xs btn-success" ng-click="editarOferta(oferta.codigo)"><span class="glyphicon glyphicon-edit"></span></button>
+                    <button type="button" class="btn btn-xs btn-success" ng-click="verOferta(oferta.codigo)"><span class="glyphicon glyphicon-edit"></span></button>
                     <!-- Botón de borrar en la tabla -->
                     <button type="button" class="btn btn-xs btn-danger"
                             ng-click="borrarOferta(oferta.codigo)"
@@ -71,6 +71,67 @@
             <form ng-submit="guardarOferta()">
                 <div class="modal-header">
                     <label>NUEVA OFERTA</label>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Código de Oferta:</label>
+                                <input type="text" class="form-control" ng-model="ofertaSeleccionada.codigo" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha Recepción Estimación:</label>
+                                <input type="date" class="form-control" ng-model="ofertaSeleccionada.fechaEstimacion" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha Envío Revisión:</label>
+                                <input type="date" class="form-control" ng-model="ofertaSeleccionada.fechaRevision" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha Envío Oferta Cliente:</label>
+                                <input type="date" class="form-control" ng-model="ofertaSeleccionada.fechaEnvioOferta" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Requerimiento:</label>
+                                <select class="form-control" ng-model="ofertaSeleccionada.OfertaRequerimiento" required>
+                                    <option value="">Seleccione un tipo</option>
+                                    <option ng-repeat="tipo in ofertaRequerimientos" value="{{tipo.secuencial}}">{{tipo.detalle}}</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha Generación Oferta:</label>
+                                <input type="date" class="form-control" ng-model="ofertaSeleccionada.fechaGeneracion" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha Aprobación Oferta Gerencia:</label>
+                                <input type="date" class="form-control" ng-model="ofertaSeleccionada.fechaAprobacionGerencia" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha Vencimiento Oferta:</label>
+                                <input type="date" class="form-control" ng-model="ofertaSeleccionada.fechaVencimiento" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar Oferta -->
+<div id="modal-editar-oferta" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-l">
+        <div class="modal-content">
+            <form ng-submit="editarOferta()">
+                <div class="modal-header">
+                    <label>EDITAR OFERTA</label>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">

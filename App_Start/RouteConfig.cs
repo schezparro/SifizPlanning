@@ -2320,7 +2320,7 @@ namespace SifizPlanning
 
             routes.MapRoute(
                 name: "EditarOferta",
-                url: "comercial/obtener-datos-oferta/{id}",
+                url: "comercial/editar-oferta/{id}",
                 defaults: new { controller = "Comercial", action = "EditarOferta", id = UrlParameter.Optional }
             );
 

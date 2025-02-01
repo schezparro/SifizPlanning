@@ -4561,6 +4561,7 @@ namespace SifizPlanning.Controllers
                     correosDestinos.AddRange(Utiles.CorreoPorGrupoEmail("TFS"));
                     correosDestinos.AddRange(destinatarioCorreosColaboradores);
                     correosDestinos.Add(emailUser);
+                    correosDestinos.Add("ecordova@sifizsoft.com");
 
                     string textoEmailColab = @"<div class='textoCuerpo'><br/>";
                     textoEmailColab += "Estimados,";

@@ -151,7 +151,7 @@
     };
 
     // Método para editar oferta
-    $scope.editarOferta = function (codigo) {
+    $scope.verOferta = function (codigo) {
         console.log(codigo);
         $http.post("comercial/dar-datos-oferta", { codigo: codigo })
             .success(function (data) {
@@ -179,7 +179,7 @@
                         OfertaRequerimiento: data.oferta.OfertaRequerimiento
                     };
 
-                    angular.element("#modal-nueva-oferta").modal("show");
+                    angular.element("#modal-editar-oferta").modal("show");
                 } else {
                     messageDialog.show('Información', data.msg);
                 }
@@ -221,6 +221,36 @@
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
 
         $http.post("comercial/guardar-oferta", {
+            OfertaRequerimiento: $scope.ofertaSeleccionada.OfertaRequerimiento,
+            codigo: $scope.ofertaSeleccionada.codigo,
+            fechaEstimacion: $scope.ofertaSeleccionada.fechaEstimacion,
+            fechaRevision: $scope.ofertaSeleccionada.fechaRevision,
+            fechaEnvioOferta: $scope.ofertaSeleccionada.fechaEnvioOferta,
+            fechaGeneracion: $scope.ofertaSeleccionada.fechaGeneracion,
+            fechaAprobacionGerencia: $scope.ofertaSeleccionada.fechaAprobacionGerencia,
+            fechaVencimiento: $scope.ofertaSeleccionada.fechaVencimiento,
+        })
+            .success(function (data) {
+                waitingDialog.hide();
+                if (data.success === true) {
+                    angular.element("#modal-nueva-oferta").modal("hide");
+                    $scope.cargarOfertas();
+                    messageDialog.show('Éxito', 'Oferta guardada correctamente');
+                } else {
+                    messageDialog.show('Información', data.msg);
+                }
+            })
+            .error(function () {
+                waitingDialog.hide();
+                messageDialog.show('Error', 'Error al guardar la oferta');
+            });
+    };
+
+    $scope.editarOferta = function () {
+        console.log($scope.ofertaSeleccionada);
+        waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
+
+        $http.post("comercial/editar-oferta", {
             OfertaRequerimiento: $scope.ofertaSeleccionada.OfertaRequerimiento,
             codigo: $scope.ofertaSeleccionada.codigo,
             fechaEstimacion: $scope.ofertaSeleccionada.fechaEstimacion,
