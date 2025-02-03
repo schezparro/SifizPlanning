@@ -122,12 +122,6 @@ namespace SifizPlanning.Controllers
 
                 int cliente = persona.persona_cliente.cliente.Secuencial;
 
-                //var clienteObj = HttpContext.Cache[ReportAccessKey + code];
-                //if (clienteObj == null)
-                //{
-                //    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-                //}
-
                 string modulo = "Clientes";
                 string reporte = "Horas Mantenimiento Cliente Web";
                 var url = (from r in db.Reporte
