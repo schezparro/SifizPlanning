@@ -31,6 +31,7 @@ namespace SifizPlanning.Models
         public Nullable<decimal> EsPlan { get; set; }
         public Nullable<int> SecuencialColaborador { get; set; }
         public string Url { get; set; }
+        public string Pdf { get; set; }
     
         public virtual Modulo modulo { get; set; }
         public virtual ICollection<RecursosAsistencia> RECURSOSASISTENCIA { get; set; }

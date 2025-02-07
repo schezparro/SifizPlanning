@@ -10,8 +10,8 @@
 
 @if (Roles.IsUserInRole("ADMIN") || Roles.IsUserInRole("OPERACIONES") || Roles.IsUserInRole("RRHH"))
 {
-    <button class="btn btn-primary" ng-click="windowAgregarRecursos()">Agregar</button>
-    <button class="btn btn-primary" ng-click="windowAgregarPlan()">Tema Reunión/Capacitación</button>
+    <button class="btn btn-primary" ng-click="windowAgregarRecursos()">Registrar Reunión/Capacitación ejecutada</button>
+    <button class="btn btn-primary" ng-click="windowAgregarPlan()">Planificación Reunión/Capacitación</button>
 }
 <input type="text" ng-keyup="cargarRecursos()" ng-model="filtroRecursos" class="form-control right filtro" placeholder="Filtrar..." />
 <div class="clear"></div>
@@ -27,6 +27,7 @@
                 <th>Detalle</th>
                 <th>Fecha y Hora</th>
                 <th>Modulo</th>
+                <th ng-show="esPlan">Doc.Adjunto</th>
                 <th ng-show="!esPlan">Url</th>
                 <th>Link Meet</th>
                 <th ng-show="!esPlan && esUserAllow">Registro Asistencia</th>
@@ -42,6 +43,11 @@
                 <td>{{recurso.detalle | limitTo:100}}</td>
                 <td>{{recurso.fecha | strDateToStrTime}}</td>
                 <td>{{ recurso.modulo === 'N//A' ? 'Otros' : recurso.modulo }}</td>
+                <td ng-show="esPlan">
+                    <a target="_blank" href="~/Web/{{recurso.pdf}}">
+                        {{ recurso.pdf.substring(recurso.pdf.lastIndexOf('/') + 1) }}
+                    </a>
+                </td>
                 <td ng-show="!esPlan">
                     <div ng-if="!recurso.editandoUrl" style="display: inline-flex; align-items: center;">
                         <a class="btn btn-success btn-xs" target="_blank" href="{{recurso.adjunto}}" ng-show="recurso.adjunto != ''">
@@ -183,7 +189,7 @@
 <div id="modal-agregar-plan" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form ng-submit="GuardarNuevoPlan()" name="nuevoPlan">
+            <form ng-submit="GuardarNuevoPlan()" name="nuevoPlan" enctype="multipart/form-data">
                 <div class="modal-header">
                     <h5 class="modal-title">TEMA A CAPACITAR</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -220,7 +226,7 @@
                     </div>
                     <div class="form-group">
                         <label for="inputLink">LINK MEET:</label>
-                        <input type="text" class="form-control" ng-model="linkPlan" ng-required="true"></>
+                        <input type="text" class="form-control" ng-model="linkPlan" ng-required="true">
                     </div>
                     <div class="form-group">
                         <label for="inputModulo">CAPACITADOR:</label>
@@ -238,6 +244,10 @@
                         minutos
                     </div>
                     <div class="form-group">
+                        <label for="inputArchivo">ADJUNTAR ARCHIVO:</label>
+                        <input type="file" class="form-control" id="inputArchivo" ng-model="archivoPlan" name="archivo">
+                    </div>
+                    <div class="form-group">
                         <button type="button" class="btn btn-primary" ng-click="abrirModalSeleccionarAsistentes()">Convocados</button>
                     </div>
                 </div>
@@ -250,7 +260,6 @@
         </div>
     </div>
 </div>
-
 <div id="modal-datos-recurso" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
