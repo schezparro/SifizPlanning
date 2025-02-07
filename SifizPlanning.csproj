@@ -1024,6 +1024,7 @@
     <Compile Include="Models\ViewModel\SolicitudVacacionesDTO.cs" />
     <Compile Include="Util\ClientTfs.cs" />
     <Compile Include="Util\DataTarea.cs" />
+    <Compile Include="Util\Devops.cs" />
     <Compile Include="Util\DiaColaborador.cs" />
     <Compile Include="Util\EventoTicket.cs" />
     <Compile Include="Util\ReportServerCredentials.cs" />

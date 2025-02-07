@@ -700,7 +700,6 @@ namespace SifizPlanning.Controllers
                             }
                         }
                     }
-                   // bool quitar = await QuitarAccesoDevops(tarea.Secuencial);
                 }
                 else if (estado == 2)//Desarrollo
                 {
@@ -826,7 +825,12 @@ namespace SifizPlanning.Controllers
                         }
                     }
 
-                   // bool envio = await DarAccesoDevops(tarea.Secuencial);
+                //    var dap = db.DevopsAccesoProyectos.Where(s => s.SecuencialTarea.HasValue && s.SecuencialTarea.Value == tarea.Secuencial).FirstOrDefault();
+                //    if (dap == null)
+                //    {
+                //        throw new Exception("No se encontró la configuración de acceso para la tarea especificada");
+                //    }
+                //    bool envio = await Devops.DarAccesoDevops(dap);
                 }
                 else if (estado == 5)//EN PAUSA
                 {
@@ -950,80 +954,6 @@ namespace SifizPlanning.Controllers
                 return Json(result);
             }
         }
-
-        private async Task<bool> DarAccesoDevops(int tarea)
-        {
-            try
-            {
-                string key = ConfigurationManager.AppSettings.Get("Devops");
-                var client = new HttpClient();
-                var requestUrl = "https://api-sifizops.sifizsoft.com/api/AsignacionPermisos/AsociarPermiso";
-
-                var dap = db.DevopsAccesoProyectos.Where(s => s.SecuencialTarea.HasValue && s.SecuencialTarea.Value == tarea).FirstOrDefault();
-
-                if (dap == null)
-                {
-                    throw new Exception("No se encontró la configuración de acceso para la tarea especificada");
-                }
-
-                var requestBody = new
-                {
-                    organizacion = dap.Organizacion,
-                    nombreUsuario = dap.NombreUsuario,
-                    usuario = dap.Usuario,
-                    modulo = dap.Modulo,
-                    esTCK = dap.EsTck,
-                    esREQ = dap.EsReq,
-                    esDEV = dap.EsDev,
-                    serieTicket = dap.SerieTicket.ToString(),
-                    serieRequerimiento = dap.SerieRequerimiento.ToString(),
-                    serieDesarrollo = dap.SerieDesarrollo.ToString(),
-                    identificador = dap.SecuencialTarea.ToString()
-                };
-
-                client.DefaultRequestHeaders.Add("X-API-KEY", key);
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                var response = await client.PostAsJsonAsync(requestUrl, requestBody);
-                return response.IsSuccessStatusCode;
-            }
-            catch (Exception e)
-            {
-                throw new Exception($"Error al dar acceso Devops: {e.Message}", e);
-            }
-        }
-
-        private async Task<bool> QuitarAccesoDevops(int tarea)
-        {
-            try
-            {
-                string key = ConfigurationManager.AppSettings.Get("Devops");
-                var client = new HttpClient();
-                var requestUrl = "https://api-sifizops.sifizsoft.com/api/AsignacionPermisos/DisociarPermiso";
-
-                var requestBody = new
-                {
-                    identificador = tarea.ToString()
-                };
-
-                client.DefaultRequestHeaders.Add("X-API-KEY", key);
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                var response = await client.PostAsJsonAsync(requestUrl, requestBody);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
-                }
-
-                return false;
-            }
-            catch (Exception e)
-            {
-                throw new Exception($"Error al quitar acceso Devops: {e.Message}", e);
-            }
-        }
-
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
