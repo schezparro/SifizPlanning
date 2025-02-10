@@ -43,6 +43,7 @@ using DocumentFormat.OpenXml.ExtendedProperties;
 using System.Data.Entity.Migrations;
 using System.Data.Entity.SqlServer;
 using System.Net.Http.Headers;
+using System.Diagnostics;
 
 namespace SifizPlanning.Controllers
 {
@@ -825,12 +826,8 @@ namespace SifizPlanning.Controllers
                         }
                     }
 
-                    //    var dap = db.DevopsAccesoProyectos.Where(s => s.SecuencialTarea.HasValue && s.SecuencialTarea.Value == tarea.Secuencial).FirstOrDefault();
-                    //    if (dap == null)
-                    //    {
-                    //        throw new Exception("No se encontró la configuración de acceso para la tarea especificada");
-                    //    }
-                    //    bool envio = await Devops.DarAccesoDevops(dap);
+                    var dap = db.DevopsAccesoProyectos.Where(s => s.SecuencialTarea.HasValue && s.SecuencialTarea.Value == tarea.Secuencial).FirstOrDefault();
+                    bool envio = await Devops.DarAccesoDevops(dap);
                 }
                 else if (estado == 5)//EN PAUSA
                 {

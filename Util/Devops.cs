@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
 using System.Net.Http.Headers;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web;
-using System.Data.Entity;
 using SifizPlanning.Models;
+using System.Diagnostics;
 
 namespace SifizPlanning.Util
 {
@@ -27,19 +24,19 @@ namespace SifizPlanning.Util
                     throw new Exception("No se encontró la configuración de acceso para la tarea especificada");
                 }
 
-                var requestBody = new
+                var requestBody = new AsociacionRequest
                 {
-                    organizacion = dap.Organizacion,
-                    nombreUsuario = dap.NombreUsuario,
-                    usuario = dap.Usuario,
-                    modulo = dap.Modulo,
-                    esTCK = dap.EsTck,
-                    esREQ = dap.EsReq,
-                    esDEV = dap.EsDev,
-                    serieTicket = dap.SerieTicket.ToString(),
-                    serieRequerimiento = dap.SerieRequerimiento.ToString(),
-                    serieDesarrollo = dap.SerieDesarrollo.ToString(),
-                    identificador = dap.SecuencialTarea.ToString()
+                    Organizacion = dap.Organizacion,
+                    NombreUsuario = dap.NombreUsuario,
+                    Usuario = dap.Usuario,
+                    Modulo = dap.Modulo,
+                    EsTCK = dap.EsTck,
+                    EsCTR = dap.EsReq,
+                    EsDEV = dap.EsDev,
+                    SerieTicket = dap.EsTck ? dap.SerieTicket.ToString() : "",
+                    SerieContrato = dap.EsReq ? dap.SerieRequerimiento.ToString() : "",
+                    SerieDesarrollo = dap.EsDev ? dap.SerieDesarrollo.ToString() + "-" + dap.SerieTicket.ToString() : "",
+                    Identificador = dap.SecuencialTarea.ToString()
                 };
 
                 client.DefaultRequestHeaders.Add("X-API-KEY", key);
@@ -50,11 +47,12 @@ namespace SifizPlanning.Util
             }
             catch (Exception e)
             {
-                throw new Exception($"Error al dar acceso Devops: {e.Message}", e);
+                Debug.WriteLine($"Error al dar acceso Devops: {e.Message}");
+                return false;
             }
         }
 
-        public static async Task<bool> QuitarAccesoDevops(int identificador)
+        public static async Task<bool> QuitarAccesoDevops(string identificador)
         {
             try
             {
@@ -64,7 +62,7 @@ namespace SifizPlanning.Util
 
                 var requestBody = new
                 {
-                    identificador = identificador.ToString()
+                    Identificador = identificador
                 };
 
                 client.DefaultRequestHeaders.Add("X-API-KEY", key);
@@ -81,22 +79,23 @@ namespace SifizPlanning.Util
             }
             catch (Exception e)
             {
-                throw new Exception($"Error al quitar acceso Devops: {e.Message}", e);
+                Debug.WriteLine($"Error al quitar acceso Devops: {e.Message}");
+                return false;
             }
         }
     }
-    public class AccesoProyectoDtoRequest
+    public class AsociacionRequest
     {
         public string Organizacion { get; set; }
         public string NombreUsuario { get; set; }
         public string Usuario { get; set; }
         public string Modulo { get; set; }
-        public bool EsTCK { get; set; }
-        public bool EsREQ { get; set; }
-        public bool EsDEV { get; set; }
+        public bool EsTCK { get; set; } = false;
+        public bool EsCTR { get; set; } = false;
+        public bool EsDEV { get; set; } = false;
         public string SerieTicket { get; set; }
-        public string SerieRequerimiento { get; set; }
         public string SerieDesarrollo { get; set; }
+        public string SerieContrato { get; set; }
         public string Identificador { get; set; }
     }
 }
