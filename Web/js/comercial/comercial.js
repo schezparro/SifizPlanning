@@ -188,9 +188,9 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
         //document.getElementById("fecha-requerimiento").removeAttribute("disabled");
     };
 
-    $scope.habilitarTicket = false; 
+    $scope.habilitarTicket = false;
     $scope.ticketValido = true; // Estado inicial: el ticket es válido.
-    let debounceTimeout = null; 
+    let debounceTimeout = null;
     // Función para permitir solo números
     $scope.validarSoloNumeros = function (event) {
         const charCode = event.which || event.keyCode;
@@ -202,7 +202,7 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
 
     $scope.habilitarTicketCkc = function () {
         if ($scope.habilitarTicket == false) {
-            $scope.ticketSeleccionado=""
+            $scope.ticketSeleccionado = ""
             document.getElementById("select-cliente-requerimiento").removeAttribute("disabled");
             document.getElementById("detalle-requerimiento").removeAttribute("disabled");
             document.getElementById("fecha-requerimiento").removeAttribute("disabled");
@@ -215,7 +215,7 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
 
     $scope.habilitarTicketCkcE = function () {
         if ($scope.habilitarTicketE == false) {
-            $scope.ticketSeleccionadoE=""
+            $scope.ticketSeleccionadoE = ""
             document.getElementById("select-editar-cliente-requerimiento").removeAttribute("disabled");
             document.getElementById("detalle-editar-requerimiento").removeAttribute("disabled");
             document.getElementById("fecha-editar-requerimiento").removeAttribute("disabled");
@@ -225,7 +225,7 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
             document.getElementById("fecha-editar-requerimiento").setAttribute("disabled", "disabled");
         }
     };
-     
+
     // Función de debounce para retrasar la validación
     $scope.debounceValidarTicket = function (ticket) {
         if (debounceTimeout) {
@@ -316,7 +316,7 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
         var fechaSe = angular.element("#fecha-requerimiento")[0].value;
         var datos = {
-            cliente: $scope.clienteSeleccionado, 
+            cliente: $scope.clienteSeleccionado,
             requerimiento: $scope.pedReqSeleccionado,
             ticket: $scope.ticketSeleccionado,
             detalle: $scope.detalleSeleccionado,
@@ -440,16 +440,43 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
 
 }]);
 
-    //Filter de angular para las fechas
-    comercialApp.filter("strDateToStr", function () {
-        return function (textDate) {
-            if (textDate !== undefined) {
-                var fecha = new Date(parseInt(textDate.replace('/Date(', '')));
-                return dateToStr(fecha);
-            }
-            return "";
+//Filter de angular para las fechas
+comercialApp.filter("strDateToStr", function () {
+    return function (textDate) {
+        if (textDate !== undefined && textDate !== "" && textDate !== null) {
+            var fecha = new Date(parseInt(textDate.replace('/Date(', '')));
+            return dateToStr(fecha);
         }
-    });
+        return "";
+    }
+});
+
+function dateToStr(dateObj, format, separator) {
+    /**
+     * Convert a date object to a string
+     * @argument dateObj {Date} A date object
+     * @argument format {string} An string representation of the date format. Default: dd-mm-yyyy. More could be added as necessary
+     * @argument separator {string} Character used for join the parts of the date
+     * @returns {string} An string representation of a Date
+     */
+    var year = dateObj.getFullYear().toString();
+    var month = dateObj.getMonth() + 1;
+    var month = (month < 10) ? '0' + month : month;
+    var day = dateObj.getDate();
+    var day = (day < 10) ? '0' + day : day;
+    var sep = (separator) ? separator : '/';
+    switch (format) {
+        case 'mm/dd/yyyy':
+            var out = [month, day, year];
+            break;
+        case 'yyyy/mm/dd':
+            var out = [year, month, day];
+            break;
+        default: //dd/mm/yyyy
+            var out = [day, month, year];
+    }
+    return out.join(sep);
+};
 
 
 

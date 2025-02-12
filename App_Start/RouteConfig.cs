@@ -1760,6 +1760,12 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "DarDatosTicketOfertas",
+                url: "tickets/dar-datos-ticket-ofertas/{id}",
+                defaults: new { controller = "Ticket", action = "DarDatosTicketOfertas", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "DarTickets",
                 url: "tickets/dar-tickets/{id}",
                 defaults: new { controller = "Ticket", action = "DarTickets", id = UrlParameter.Optional }

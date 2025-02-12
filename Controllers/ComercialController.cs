@@ -395,15 +395,30 @@ namespace SifizPlanning.Controllers
                                         {
                                             secuencial = or.Secuencial,
                                             codigo = or.Codigo,
-                                            fechaEstimacion = or.FechaRecepcionEstimacion.HasValue ? or.FechaRecepcionEstimacion.Value.ToString() : "",
-                                            fechaRevision = or.FechaEnvioRevision.HasValue ? or.FechaEnvioRevision.Value.ToString() : "",
-                                            fechaEnvioOferta = or.FechaEnvioOfertaCliente.HasValue ? or.FechaEnvioOfertaCliente.Value.ToString() : "",
-                                            fechaGeneracion = or.FechaGeneracionOferta.HasValue ? or.FechaGeneracionOferta.Value.ToString() : "",
-                                            fechaAprobacionGerencia = or.FechaAprobacionOfertaGerencia.HasValue ? or.FechaAprobacionOfertaGerencia.Value.ToString() : "",
-                                            fechaVencimiento = or.FechaVencimientoOferta.HasValue ? or.FechaVencimientoOferta.Value.ToString() : "",
-                                            tipo = r.Secuencial + "-" + r.Detalle.Substring(0,30),
+                                            fechaEstimacion = or.FechaRecepcionEstimacion.HasValue ? or.FechaRecepcionEstimacion.Value : (DateTime?)null,
+                                            fechaRevision = or.FechaEnvioRevision.HasValue ? or.FechaEnvioRevision.Value : (DateTime?)null,
+                                            fechaEnvioOferta = or.FechaEnvioOfertaCliente.HasValue ? or.FechaEnvioOfertaCliente.Value : (DateTime?)null,
+                                            fechaGeneracion = or.FechaGeneracionOferta.HasValue ? or.FechaGeneracionOferta.Value : (DateTime?)null,
+                                            fechaAprobacionGerencia = or.FechaAprobacionOfertaGerencia.HasValue ? or.FechaAprobacionOfertaGerencia.Value : (DateTime?)null,
+                                            fechaVencimiento = or.FechaVencimientoOferta.HasValue ? or.FechaVencimientoOferta.Value : (DateTime?)null,
+                                            tipo = r.Secuencial + "-" + r.Detalle.Substring(0, 30),
                                             idTipo = r.Secuencial
                                         }).ToList();
+
+                var ofertas = (from oc in ofertasComercial
+                               select new
+                               {
+                                   secuencial = oc.secuencial,
+                                   codigo = oc.codigo,
+                                   fechaEstimacion = oc.fechaEstimacion.HasValue ? oc.fechaEstimacion.Value.ToString("dd/MM/yyyy") : null,
+                                   fechaRevision = oc.fechaRevision.HasValue ? oc.fechaRevision.Value.ToString("dd/MM/yyyy") : null,
+                                   fechaEnvioOferta = oc.fechaEnvioOferta.HasValue ? oc.fechaEnvioOferta.Value.ToString("dd/MM/yyyy") : null,
+                                   fechaGeneracion = oc.fechaGeneracion.HasValue ? oc.fechaGeneracion.Value.ToString("dd/MM/yyyy") : null,
+                                   fechaAprobacionGerencia = oc.fechaAprobacionGerencia.HasValue ? oc.fechaAprobacionGerencia.Value.ToString("dd/MM/yyyy") : null,
+                                   fechaVencimiento = oc.fechaVencimiento.HasValue ? oc.fechaVencimiento.Value.ToString("dd/MM/yyyy") : null,
+                                   tipo = oc.tipo,
+                                   idTipo = oc.idTipo
+                               }).ToList();
 
 
                 if (filtro != "")
@@ -447,7 +462,7 @@ namespace SifizPlanning.Controllers
         {
             try
             {
-                OfertaOferta o = db.OfertaOferta.Where(d=> d.Codigo.ToString() == codigo).FirstOrDefault();
+                OfertaOferta o = db.OfertaOferta.Where(d => d.Codigo.ToString() == codigo).FirstOrDefault();
                 if (o == null)
                 {
                     throw new Exception("No se encuentra la oferta en el sistema");
@@ -559,21 +574,21 @@ namespace SifizPlanning.Controllers
                 nuevaOferta.FechaVencimientoOferta = ConvertirFecha(fechaVencimiento);
 
                 int ofertaNumerico;
-                    
+
                 if (OfertaRequerimiento != "")
                 {
-                if (!int.TryParse(OfertaRequerimiento, out ofertaNumerico))
-                {
-                    return Json(new
+                    if (!int.TryParse(OfertaRequerimiento, out ofertaNumerico))
                     {
-                        success = false,
-                        msg = "El ticket debe ser un valor numérico válido."
-                    });
-                }
-                else
-                {
+                        return Json(new
+                        {
+                            success = false,
+                            msg = "El ticket debe ser un valor numérico válido."
+                        });
+                    }
+                    else
+                    {
                         nuevaOferta.SecuencialOfertaRequerimiento = ofertaNumerico;
-                }
+                    }
                 }
 
                 db.OfertaOferta.Add(nuevaOferta);
@@ -768,7 +783,7 @@ namespace SifizPlanning.Controllers
         {
             try
             {
-                var oferta = db.OfertaOferta.Where( d=> d.Codigo == codigo).FirstOrDefault();
+                var oferta = db.OfertaOferta.Where(d => d.Codigo == codigo).FirstOrDefault();
 
                 if (oferta == null)
                 {
@@ -853,31 +868,31 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult GenerarCodigoOferta()
         {
-                string annoActual = DateTime.Now.Year.ToString().Substring(2, 2);
+            string annoActual = DateTime.Now.Year.ToString().Substring(2, 2);
 
-                // Obtener el último código de la tabla OfertaOferta
-                var ultimoCodigo = db.OfertaOferta
-                                     .OrderByDescending(o => o.Codigo)
-                                     .Select(o => o.Codigo)
-                                     .FirstOrDefault();
+            // Obtener el último código de la tabla OfertaOferta
+            var ultimoCodigo = db.OfertaOferta
+                                 .OrderByDescending(o => o.Codigo)
+                                 .Select(o => o.Codigo)
+                                 .FirstOrDefault();
 
-                int nuevoNumero = 1; // Número inicial si no hay códigos previos
+            int nuevoNumero = 1; // Número inicial si no hay códigos previos
 
-                if (!string.IsNullOrEmpty(ultimoCodigo) && ultimoCodigo.Length >= 6)
+            if (!string.IsNullOrEmpty(ultimoCodigo) && ultimoCodigo.Length >= 6)
+            {
+                // Extraer los últimos 4 dígitos del último código y convertirlos a entero
+                string ultimoNumeroStr = ultimoCodigo.Substring(2, 4);
+                if (int.TryParse(ultimoNumeroStr, out int ultimoNumero))
                 {
-                    // Extraer los últimos 4 dígitos del último código y convertirlos a entero
-                    string ultimoNumeroStr = ultimoCodigo.Substring(2, 4);
-                    if (int.TryParse(ultimoNumeroStr, out int ultimoNumero))
-                    {
-                        nuevoNumero = ultimoNumero + 1;
-                    }
+                    nuevoNumero = ultimoNumero + 1;
                 }
+            }
 
-                // Formatear el nuevo número a 4 dígitos con ceros a la izquierda
-                string nuevoNumeroStr = nuevoNumero.ToString().PadLeft(4, '0');
+            // Formatear el nuevo número a 4 dígitos con ceros a la izquierda
+            string nuevoNumeroStr = nuevoNumero.ToString().PadLeft(4, '0');
 
-                // Concatenar el año actual con el nuevo número
-                string nuevoCodigo = $"{annoActual}{nuevoNumeroStr}";
+            // Concatenar el año actual con el nuevo número
+            string nuevoCodigo = $"{annoActual}{nuevoNumeroStr}";
 
             return Json(new
             {
