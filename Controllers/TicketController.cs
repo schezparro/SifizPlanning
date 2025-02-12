@@ -4721,7 +4721,7 @@ namespace SifizPlanning.Controllers
                 ticket.SecuencialEstadoTicket = 14;//EL TICKET ESTA CERRADO
                 ticket.SecuencialProximaActividad = 18;//NA
 
-                bool resultApi = await Devops.QuitarAccesoDevops(ticket.Secuencial.ToString());
+                BackgroundJob.Enqueue(() => Devops.QuitarAccesoDevops(ticket.Secuencial.ToString()));
 
                 //Adicionando el histórico del ticket                                
                 string emailUser = User.Identity.Name;
@@ -4825,7 +4825,7 @@ namespace SifizPlanning.Controllers
                 ticket.SecuencialEstadoTicket = 14;//EL TICKET ESTA CERRADO
                 ticket.SecuencialProximaActividad = 18;//NA
 
-                bool resultApi = await Devops.QuitarAccesoDevops(ticket.Secuencial.ToString());
+                BackgroundJob.Enqueue(() => Devops.QuitarAccesoDevops(ticket.Secuencial.ToString()));
 
                 //Adicionando el histórico del ticket                               
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser && x.EstaActivo == 1);

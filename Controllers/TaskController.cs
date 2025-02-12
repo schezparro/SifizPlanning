@@ -16,6 +16,7 @@ using System.Web.UI.WebControls;
 using System.Data.Entity;
 using System.Globalization;
 using System.Transactions;
+using Hangfire;
 
 namespace SifizPlanning.Controllers
 {
@@ -7214,7 +7215,7 @@ p in db.Persona on c.persona equals p
 
                 if (porciento == 100)
                 {
-                    bool resultApi = await Devops.QuitarAccesoDevops(motivoTrabajo.Codigo);
+                    BackgroundJob.Enqueue(() => Devops.QuitarAccesoDevops(motivoTrabajo.Codigo));
                 }
 
                 db.SaveChanges();
@@ -7322,7 +7323,7 @@ p in db.Persona on c.persona equals p
 
                     if (porciento == 100)
                     {
-                        bool resultApi = await Devops.QuitarAccesoDevops(motivoTrabajo.Codigo);
+                        BackgroundJob.Enqueue(() => Devops.QuitarAccesoDevops(motivoTrabajo.Codigo));
                     }
 
                     db.SaveChanges();
@@ -9115,7 +9116,7 @@ p in db.Persona on c.persona equals p
 
                 if (porciento == 100)
                 {
-                    bool resultApi = await Devops.QuitarAccesoDevops(motivoTrabajo.Codigo);
+                    BackgroundJob.Enqueue(() => Devops.QuitarAccesoDevops(motivoTrabajo.Codigo));
                 }
                 db.SaveChanges();
 
@@ -9215,7 +9216,7 @@ p in db.Persona on c.persona equals p
 
                 if (porciento == 100)
                 {
-                    bool resultApi = await Devops.QuitarAccesoDevops(motivoTrabajo.Codigo);
+                    BackgroundJob.Enqueue(() => Devops.QuitarAccesoDevops(motivoTrabajo.Codigo));
                 }
 
                 var motivo = db.MotivoTrabajo.Where(m => m.Codigo == codigoContrato).FirstOrDefault();
