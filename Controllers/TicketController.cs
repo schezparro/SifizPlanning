@@ -4707,7 +4707,7 @@ namespace SifizPlanning.Controllers
 
         //CERRAR EL TICKET
         [Authorize(Roles = "COORDINADOR, ADMIN, TICKET, GESTOR, CLIENTE")]
-        public async Task<ActionResult> CerrarTicketAsync(int idTicket)
+        public ActionResult CerrarTicket(int idTicket)
         {
             try
             {
@@ -4811,7 +4811,7 @@ namespace SifizPlanning.Controllers
 
         //CERRAR EL TICKET
         [Authorize(Roles = "COORDINADOR, ADMIN, TICKET, GESTOR, CLIENTE")]
-        public async Task<ActionResult> CerrarTicketPorClienteAsync(int idTicket, string emailUser)
+        public ActionResult CerrarTicketPorCliente(int idTicket, string emailUser)
         {
             try
             {
@@ -4961,7 +4961,7 @@ namespace SifizPlanning.Controllers
 
         [Authorize(Roles = "ADMIN, COORDINADOR, TICKET")]
         [HttpPost]
-        public async Task<ActionResult> CerrarTicketsResueltosAsync(int[] idTickets)
+        public ActionResult CerrarTicketsResueltos(int[] idTickets)
         {
             try
             {
@@ -4971,7 +4971,7 @@ namespace SifizPlanning.Controllers
                 }
                 foreach (int idTicket in idTickets)
                 {
-                    ActionResult action = await this.CerrarTicketAsync(idTicket);
+                    ActionResult action = this.CerrarTicket(idTicket);
                 }
 
                 var resp = new

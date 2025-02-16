@@ -4990,7 +4990,7 @@ r in db.Rol on ur.rol equals r
         public ActionResult GuardarPlanRecurso(
             string titulo,
             string detalle,
-            DateTime fecha,
+            string fecha,
             int modulo,
             int colaborador,
             int tiempo,
@@ -5024,7 +5024,7 @@ r in db.Rol on ur.rol equals r
                 {
                     Titulo = titulo,
                     Detalle = detalle,
-                    Fecha = fecha,
+                    Fecha = DateTime.Parse(fecha),
                     SecuencialModulo = modulo,
                     Adjunto = "",
                     Pdf = "/resources/datoscapacitaciones/" + newNameFile, // Guardar el nombre del archivo

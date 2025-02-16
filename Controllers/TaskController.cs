@@ -7087,7 +7087,7 @@ p in db.Persona on c.persona equals p
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
-        public async Task<ActionResult> NuevoEntregableMotivoTrabajoAsync(int motivo, string nombre, string descripcion, string fechaInicio, string fechaFin, string fechaProduccionEntregable, int avance = 0, int colaboradorMotivoTrabajo = 0, int idEntregable = 0, int numeroVerificador = 0)
+        public ActionResult NuevoEntregableMotivoTrabajo(int motivo, string nombre, string descripcion, string fechaInicio, string fechaFin, string fechaProduccionEntregable, int avance = 0, int colaboradorMotivoTrabajo = 0, int idEntregable = 0, int numeroVerificador = 0)
         {
             try
             {
@@ -7241,7 +7241,7 @@ p in db.Persona on c.persona equals p
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
-        public async Task<ActionResult> GuardarListaEntregablesAsync(string motivo = "", string entregables = "")
+        public ActionResult GuardarListaEntregables(string motivo = "", string entregables = "")
         {
             var s = new JavaScriptSerializer();
             var jsonEntregables = s.Deserialize<dynamic>(entregables);
@@ -9048,7 +9048,7 @@ p in db.Persona on c.persona equals p
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
-        public async Task<ActionResult> EliminarEntregableTrabajoAsync(int idEntregableTrabajo)
+        public ActionResult EliminarEntregableTrabajo(int idEntregableTrabajo)
         {
             try
             {
@@ -9139,7 +9139,7 @@ p in db.Persona on c.persona equals p
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, GESTOR")]
-        public async Task<ActionResult> EditarPorcentajeEntregableAsync(int idEntregableTrabajo, int porcentaje, int colaboradorID = 0, int? diasGarantia = 0, string codigoContrato = "")
+        public ActionResult EditarPorcentajeEntregable(int idEntregableTrabajo, int porcentaje, int colaboradorID = 0, int? diasGarantia = 0, string codigoContrato = "")
         {
             try
             {
