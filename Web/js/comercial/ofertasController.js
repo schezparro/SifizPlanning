@@ -301,28 +301,39 @@
             if (data.success === true) {
                 waitingDialog.hide();
 
+                console.log(data.datosTicket);
+
+                function convertirFecha(fechaStr) {
+                    if (fechaStr) {
+                        // Extraer los milisegundos entre paréntesis usando una expresión regular
+                        var milisegundos = parseInt(fechaStr.match(/\d+/)[0]);
+                        return new Date(milisegundos);
+                    }
+                    return null;
+                }
+
                 if (data.datosTicket.FechaRecepcionEstimacion) {
-                    $scope.ofertaSeleccionadaEditar.fechaEstimacion = data.datosTicket.FechaRecepcionEstimacion;
+                    $scope.ofertaSeleccionada.fechaEstimacion = convertirFecha(data.datosTicket.FechaRecepcionEstimacion);
                 } else {
-                    $scope.ofertaSeleccionadaEditar.fechaEstimacion = "";
+                    $scope.ofertaSeleccionada.fechaEstimacion = "";
                 }
 
                 if (data.datosTicket.FechaEnvioRevision) {
-                    $scope.ofertaSeleccionadaEditar.fechaRevision = data.datosTicket.FechaEnvioRevision;
+                    $scope.ofertaSeleccionada.fechaRevision = convertirFecha(data.datosTicket.FechaEnvioRevision);
                 } else {
-                    $scope.ofertaSeleccionadaEditar.fechaRevision = "";
+                    $scope.ofertaSeleccionada.fechaRevision = "";
                 }
 
                 if (data.datosTicket.FechaAprobacionGerencia) {
-                    $scope.ofertaSeleccionadaEditar.fechaAprobacionGerencia = data.datosTicket.FechaAprobacionGerencia;
+                    $scope.ofertaSeleccionada.fechaAprobacionGerencia = convertirFecha(data.datosTicket.FechaAprobacionGerencia);
                 } else {
-                    $scope.ofertaSeleccionadaEditar.fechaAprobacionGerencia = "";
+                    $scope.ofertaSeleccionada.fechaAprobacionGerencia = "";
                 }
 
                 if (data.datosTicket.FechaEnvioOfertaCliente) {
-                    $scope.ofertaSeleccionadaEditar.fechaEnvioOferta = data.datosTicket.FechaEnvioOfertaCliente;
+                    $scope.ofertaSeleccionada.fechaEnvioOferta = convertirFecha(data.datosTicket.FechaEnvioOfertaCliente);
                 } else {
-                    $scope.ofertaSeleccionadaEditar.fechaEnvioOferta = "";
+                    $scope.ofertaSeleccionada.fechaEnvioOferta = "";
                 }
 
             } else {

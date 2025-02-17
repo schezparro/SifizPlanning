@@ -1406,10 +1406,10 @@ namespace SifizPlanning.Controllers
 
                 var datosTicket = new
                 {
-                    FechaRecepcionEstimacion = fechaRecepcionEstimacion.HasValue ? fechaRecepcionEstimacion.Value.ToString("yyyy-MM-dd") : null,
-                    FechaEnvioRevision = fechaEnvioRevision.HasValue ? fechaEnvioRevision.Value.ToString("yyyy-MM-dd") : null,
-                    FechaAprobacionGerencia = fechaAprobacionGerenciaEnvioOferta.HasValue ? fechaAprobacionGerenciaEnvioOferta.Value.ToString("yyyy-MM-dd") : null,
-                    FechaEnvioOfertaCliente = fechaAprobacionGerenciaEnvioOferta.HasValue ? fechaAprobacionGerenciaEnvioOferta.Value.ToString("yyyy-MM-dd") : null
+                    FechaRecepcionEstimacion = fechaRecepcionEstimacion.HasValue ? fechaRecepcionEstimacion.Value : (DateTime?)null,
+                    FechaEnvioRevision = fechaEnvioRevision.HasValue ? fechaEnvioRevision.Value : (DateTime?)null,
+                    FechaAprobacionGerencia = fechaAprobacionGerenciaEnvioOferta.HasValue ? fechaAprobacionGerenciaEnvioOferta.Value : (DateTime?)null,
+                    FechaEnvioOfertaCliente = fechaAprobacionGerenciaEnvioOferta.HasValue ? fechaAprobacionGerenciaEnvioOferta.Value : (DateTime?)null
                 };
 
                 var resp = new
