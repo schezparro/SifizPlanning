@@ -921,7 +921,7 @@ namespace SifizPlanning.Controllers
                     string claseDia = "dia-normal";
                     long diaSemana = (int)fecha.DayOfWeek;
                     int hayVacaciones = vacaciones.Where(x => x.idColaborador == idTrabajador &&
-                                                        x.fecha == fecha).Count();
+                                                        x.fecha.Date == fecha.Date).Count();
                     if (hayVacaciones > 0)
                     {
                         claseDia = "dia-vacaciones";
