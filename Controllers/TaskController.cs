@@ -6697,7 +6697,7 @@ p in db.Persona on c.persona equals p
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, GESTOR")]
-        public ActionResult GuardarMotivoTrabajoInformacionAdicional(bool tieneCronograma, bool pagado, int secuencialFase, int estimacion, int estadoContrato, bool aceptaNormativos, string linkOpenKm, string fechaActa, string fechaProduccion, int diasGarantia, int secuencialMotivoTrabajo = 0, int colaborador = 0, int numeroVerificador = 0)
+        public ActionResult GuardarMotivoTrabajoInformacionAdicional(bool tieneCronograma, bool pagado, int secuencialFase, int estimacion, int estadoContrato, bool aceptaNormativos, string linkOpenKm, string fechaActa, string fechaProduccion, int diasGarantia, int secuencialMotivoTrabajo = 0, int colaborador = 0, int numeroVerificador = 0, string fechaEstimadaCierre = "")
         {
             try
             {
@@ -6744,6 +6744,15 @@ p in db.Persona on c.persona equals p
                         nuevoMotivoDetalle.FechaProduccion = fProduccion;
                     }
                     nuevoMotivoDetalle.DiasGarantia = diasGarantia;
+                    if (fechaEstimadaCierre != "")
+                    {
+                        string[] fechas = fechaEstimadaCierre.Split(new Char[] { '/' });
+                        int dia = Int32.Parse(fechas[0]);
+                        int mes = Int32.Parse(fechas[1]);
+                        int anno = Int32.Parse(fechas[2]);
+                        DateTime fEstimadaCierre = new System.DateTime(anno, mes, dia);
+                        nuevoMotivoDetalle.FechaEstimadaCierre = fEstimadaCierre;
+                    }
 
                     db.MotivoTrabajoInformacionAdicional.Add(nuevoMotivoDetalle);
                 }
@@ -6788,6 +6797,15 @@ p in db.Persona on c.persona equals p
                         motivoDetalle.FechaProduccion = new DateTime(0001, 01, 01);
                     }
                     motivoDetalle.DiasGarantia = diasGarantia;
+                    if (fechaEstimadaCierre != "")
+                    {
+                        string[] fechas = fechaEstimadaCierre.Split(new Char[] { '/' });
+                        int dia = Int32.Parse(fechas[0]);
+                        int mes = Int32.Parse(fechas[1]);
+                        int anno = Int32.Parse(fechas[2]);
+                        DateTime fEstimadaCierre = new System.DateTime(anno, mes, dia);
+                        motivoDetalle.FechaEstimadaCierre = fEstimadaCierre;
+                    }
 
                     msg = "Se ha actualizado correctamente la Información del Trabajo";
                 }
@@ -8876,6 +8894,7 @@ p in db.Persona on c.persona equals p
                                             numeroVerificador = mt.motivoTrabajoInformacionAdicional != null ? mt.motivoTrabajoInformacionAdicional.NumeroVerificador : 0,
                                             fechaActa = mt.motivoTrabajoInformacionAdicional != null ? mt.motivoTrabajoInformacionAdicional.FechaActa ?? new DateTime(0001, 01, 01) : new DateTime(0001, 01, 01),
                                             fechaProduccion = mt.motivoTrabajoInformacionAdicional != null ? mt.motivoTrabajoInformacionAdicional.FechaProduccion : new DateTime(0001, 01, 01),
+                                            fechaEstimadaCierre = mt.motivoTrabajoInformacionAdicional != null ? mt.motivoTrabajoInformacionAdicional.FechaEstimadaCierre : new DateTime(0001, 01, 01),
                                             diasGarantia = mt.motivoTrabajoInformacionAdicional != null ? mt.motivoTrabajoInformacionAdicional.DiasGarantia : 0,
                                             diasRestantes = DbFunctions.DiffDays(DateTime.Now, mt.FechaFin),
                                             formaPago = DbFunctions.Right(mt.Codigo, 1),
@@ -8911,7 +8930,8 @@ p in db.Persona on c.persona equals p
                     adendas = adendas,
                     datos = detallesContrato,
                     fechaProduccion = detallesContrato.fechaProduccion.ToString("dd/MM/yyyy"),
-                    fechaActa = detallesContrato.fechaActa.ToString("dd/MM/yyyy")
+                    fechaActa = detallesContrato.fechaActa.ToString("dd/MM/yyyy"),
+                    fechaEstimadaCierre = detallesContrato.fechaEstimadaCierre?.ToString("dd/MM/yyyy") ?? "01/01/0001"
                 };
                 return Json(resp);
             }

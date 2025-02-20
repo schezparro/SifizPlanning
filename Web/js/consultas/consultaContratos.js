@@ -329,6 +329,11 @@
                     } else {
                         $scope.diasGarantia = '';
                     };
+                    if (data.fechaEstimadaCierre !== "01/01/0001") {
+                        $scope.fechaEstimadaCierre = data.fechaEstimadaCierre;
+                    } else {
+                        $scope.fechaEstimadaCierre = '';
+                    };
 
                     $scope.cargarSeguimientos(0, 5, codigoContrato);
 
@@ -364,7 +369,8 @@
                 diasGarantia: $scope.diasGarantia !== null ? $scope.diasGarantia : 0,
                 secuencialMotivoTrabajo: $scope.secuencialContrato,
                 colaborador: $scope.colaborador,
-                numeroVerificador: $scope.numeroVerificadorContrato
+                numeroVerificador: $scope.numeroVerificadorContrato,
+                fechaEstimadaCierre: $scope.fechaEstimadaCierre
             });
 
         ajaxDetallesContrato.success(function (data) {
@@ -703,6 +709,12 @@
             }
         });
     });
+
+    angular.element('#fecha-estimada-cierre').datepicker({
+        format: 'dd/mm/yyyy',
+        forceParse: false
+    });
+
     $scope.validarContratos = function () {
         angular.element("#modal-contratos-cliente").modal('show');
     };

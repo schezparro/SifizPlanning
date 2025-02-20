@@ -32,6 +32,7 @@ namespace SifizPlanning.Models
         public Nullable<System.DateTime> FechaActa { get; set; }
         public Nullable<decimal> AceptaCambiosNormativos { get; set; }
         public Nullable<int> Estimacion { get; set; }
+        public Nullable<System.DateTime> FechaEstimadaCierre { get; set; }
     
         public virtual ICollection<Adenda> adenda { get; set; }
         public virtual FaseContrato faseContrato { get; set; }
