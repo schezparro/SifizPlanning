@@ -7858,7 +7858,7 @@ r in db.Rol on ur.rol equals r
             try
             {
                 string emailUser = User.Identity.Name;
-                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser && x.EstaActivo == 1);
 
                 Colaborador colab = user.persona.colaborador.FirstOrDefault();
                 if (colab == null)
