@@ -112,17 +112,15 @@ namespace SifizPlanning.Controllers
 
         //MUESTRA EL REPORTE SELECCIONADO
         [Authorize(Roles = "ADMIN, CLIENTE")]
-        public ActionResult VerReporteMantenimientoCliente(string code)
+        public ActionResult VerReporteMantenimientoCliente()
         {
             try
             {
-                var clienteObj = HttpContext.Cache[ReportAccessKey + code];
-                if (clienteObj == null)
-                {
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-                }
+                string emailUser = User.Identity.Name;
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+                Persona persona = user.persona;
 
-                int cliente = (int)clienteObj;
+                int cliente = persona.persona_cliente.cliente.Secuencial;
 
                 string modulo = "Clientes";
                 string reporte = "Horas Mantenimiento Cliente Web";
@@ -164,8 +162,6 @@ namespace SifizPlanning.Controllers
 
                 reportViewer.ServerReport.SetParameters(new ReportParameter[] { secuencialClienteParam, fechaInicioParam, fechaFinParam });
                 ViewBag.ReportViewer = reportViewer;
-
-                HttpContext.Cache.Remove(ReportAccessKey + code);
 
                 return View();
             }

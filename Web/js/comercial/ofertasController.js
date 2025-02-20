@@ -2,8 +2,10 @@
     $scope.funcionalidad = 'OFERTAS';
     $scope.rutaImages = "Web/images/";
 
+    $scope.esTicket = false;
     // Variables para manejo de ofertas
     $scope.ofertaSeleccionada = {};
+    $scope.ofertaSeleccionadaEditar = {};
     var numerosPorPagina = 10;
     var pagina = 1;
 
@@ -25,26 +27,6 @@
     };
     $scope.cargarCatalogos();
 
-    function convertirFecha1(fechaStr) {
-        // Extraer los componentes de la fecha usando una expresión regular
-        var match = fechaStr.match(/(\w{3}) (\d{1,2}) (\d{4}) (\d{1,2}):(\d{2})(AM|PM)/);
-        if (!match) return null; // Si no coincide el formato, devolver null
-
-        var meses = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
-
-        var mes = meses[match[1]];          // Convertir el mes a número (0-11)
-        var dia = parseInt(match[2], 10);   // Día del mes
-        var anio = parseInt(match[3], 10);  // Año
-        var hora = parseInt(match[4], 10);  // Hora
-        var minuto = parseInt(match[5], 10); // Minuto
-        var ampm = match[6];                // AM o PM
-
-        if (ampm === "PM" && hora < 12) hora += 12;
-        if (ampm === "AM" && hora === 12) hora = 0;
-
-        return new Date(anio, mes, dia, hora, minuto);
-    }
-
     // Función para cargar listado de ofertas
     $scope.cargarOfertas = function (start, lenght) {
         if (start === undefined) start = 0;
@@ -56,30 +38,7 @@
             filtro: $scope.filtroOfertas
         }).success(function (data) {
             if (data.success === true) {
-
-                console.log(data.ofertasComercial);
-                function convertirFecha(fechaStr) {
-                    if (fechaStr && fechaStr.startsWith('/Date(')) {
-                        var milisegundos = parseInt(fechaStr.match(/\d+/)[0], 10);
-                        return new Date(milisegundos);
-                    }
-                    return null; // Devolver null si la fecha es inválida o vacía
-                }
-
-                $scope.ofertasLista = data.ofertasComercial.map(function (oferta) {
-                    return {
-                        ...oferta,
-                        fechaEstimacion: convertirFecha1(oferta.fechaEstimacion),
-                        fechaGeneracion: convertirFecha1(oferta.fechaGeneracion),
-                        fechaRevision: convertirFecha1(oferta.fechaRevision),
-                        fechaAprobacionGerencia: convertirFecha1(oferta.fechaAprobacionGerencia),
-                        fechaEnvioOferta: convertirFecha1(oferta.fechaEnvioOferta),
-                        fechaVencimiento: convertirFecha1(oferta.fechaVencimiento)
-                    };
-                });
-
-
-
+                $scope.ofertasLista = data.ofertasComercial;
                 $scope.cantPaginas = Math.ceil(data.total / numerosPorPagina);
                 $scope.cantPaginas = $scope.cantPaginas || 1;
 
@@ -123,6 +82,7 @@
                 $scope.newCodigo = data.nuevoCodigo;
                 console.log(data.nuevoCodigo);
 
+                $scope.esTicket = false;
                 // Limpiar campos y asignar el nuevo código cuando se reciba la respuesta
                 $scope.ofertaSeleccionada = {
                     fechaGeneracion: new Date(),
@@ -168,7 +128,7 @@
                     }
 
                     // Crear el objeto con las fechas convertidas
-                    $scope.ofertaSeleccionada = {
+                    $scope.ofertaSeleccionadaEditar = {
                         fechaGeneracion: convertirFecha(data.oferta.fechaGeneracion),
                         codigo: data.oferta.codigo,
                         fechaEstimacion: convertirFecha(data.oferta.fechaEstimacion),
@@ -246,19 +206,20 @@
             });
     };
 
-    $scope.editarOferta = function () {
-        console.log($scope.ofertaSeleccionada);
+    // Modificar el método de guardar para manejar tanto nuevas ofertas como ediciones
+    $scope.guardarOfertaEditada = function () {
+        console.log($scope.ofertaSeleccionadaEditar);
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
 
-        $http.post("comercial/editar-oferta", {
-            OfertaRequerimiento: $scope.ofertaSeleccionada.OfertaRequerimiento,
-            codigo: $scope.ofertaSeleccionada.codigo,
-            fechaEstimacion: $scope.ofertaSeleccionada.fechaEstimacion,
-            fechaRevision: $scope.ofertaSeleccionada.fechaRevision,
-            fechaEnvioOferta: $scope.ofertaSeleccionada.fechaEnvioOferta,
-            fechaGeneracion: $scope.ofertaSeleccionada.fechaGeneracion,
-            fechaAprobacionGerencia: $scope.ofertaSeleccionada.fechaAprobacionGerencia,
-            fechaVencimiento: $scope.ofertaSeleccionada.fechaVencimiento,
+        $http.post("comercial/guardar-oferta", {
+            OfertaRequerimiento: $scope.ofertaSeleccionadaEditar.OfertaRequerimiento,
+            codigo: $scope.ofertaSeleccionadaEditar.codigo,
+            fechaEstimacion: $scope.ofertaSeleccionadaEditar.fechaEstimacion,
+            fechaRevision: $scope.ofertaSeleccionadaEditar.fechaRevision,
+            fechaEnvioOferta: $scope.ofertaSeleccionadaEditar.fechaEnvioOferta,
+            fechaGeneracion: $scope.ofertaSeleccionadaEditar.fechaGeneracion,
+            fechaAprobacionGerencia: $scope.ofertaSeleccionadaEditar.fechaAprobacionGerencia,
+            fechaVencimiento: $scope.ofertaSeleccionadaEditar.fechaVencimiento,
         })
             .success(function (data) {
                 waitingDialog.hide();
@@ -276,9 +237,135 @@
             });
     };
 
+    $scope.editarOferta = function () {
+        console.log($scope.ofertaSeleccionadaEditar);
+        waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
+
+        $http.post("comercial/editar-oferta", {
+            OfertaRequerimiento: $scope.ofertaSeleccionadaEditar.OfertaRequerimiento,
+            codigo: $scope.ofertaSeleccionadaEditar.codigo,
+            fechaEstimacion: $scope.ofertaSeleccionadaEditar.fechaEstimacion,
+            fechaRevision: $scope.ofertaSeleccionadaEditar.fechaRevision,
+            fechaEnvioOferta: $scope.ofertaSeleccionadaEditar.fechaEnvioOferta,
+            fechaGeneracion: $scope.ofertaSeleccionadaEditar.fechaGeneracion,
+            fechaAprobacionGerencia: $scope.ofertaSeleccionadaEditar.fechaAprobacionGerencia,
+            fechaVencimiento: $scope.ofertaSeleccionadaEditar.fechaVencimiento,
+        })
+            .success(function (data) {
+                waitingDialog.hide();
+                if (data.success === true) {
+                    angular.element("#modal-nueva-oferta").modal("hide");
+                    $scope.cargarOfertas();
+                    messageDialog.show('Éxito', 'Oferta guardada correctamente');
+                } else {
+                    messageDialog.show('Información', data.msg);
+                }
+            })
+            .error(function () {
+                waitingDialog.hide();
+                messageDialog.show('Error', 'Error al guardar la oferta');
+            });
+    };
+
+    $scope.toggleTicketFields = function () {
+        if ($scope.esTicket) {
+            $scope.ofertaSeleccionada.fechaEstimacion = null;
+            $scope.ofertaSeleccionada.fechaRevision = null;
+            $scope.ofertaSeleccionada.fechaAprobacionGerencia = null;
+            $scope.ofertaSeleccionada.fechaEnvioOferta = null;
+        }
+    };
+
+    $scope.toggleTicketFieldsEditar = function () {
+        if ($scope.esTicketEditar) {
+            $scope.ofertaSeleccionadaEditar.fechaEstimacion = null;
+            $scope.ofertaSeleccionadaEditar.fechaRevision = null;
+            $scope.ofertaSeleccionadaEditar.fechaAprobacionGerencia = null;
+            $scope.ofertaSeleccionadaEditar.fechaEnvioOferta = null;
+        }
+    };
+
+    $scope.buscarDatosTicket = function (ticket) {
+        waitingDialog.show('Validando el número de ticket ingresado...', { dialogSize: 'sm', progressType: 'success' });
+        if (!ticket || isNaN(ticket)) {
+            $scope.ticketValido = false;
+            return;
+        }
+
+        var ajaxObtenerTicket = $http.post("tickets/dar-datos-ticket-ofertas",
+            {
+                idTicket: ticket
+            });
+
+        ajaxObtenerTicket.success(function (data) {
+            if (data.success === true) {
+                waitingDialog.hide();
+
+                console.log(data.datosTicket);
+
+                function convertirFecha(fechaStr) {
+                    if (fechaStr) {
+                        // Extraer los milisegundos entre paréntesis usando una expresión regular
+                        var milisegundos = parseInt(fechaStr.match(/\d+/)[0]);
+                        return new Date(milisegundos);
+                    }
+                    return null;
+                }
+
+                if (data.datosTicket.FechaRecepcionEstimacion) {
+                    $scope.ofertaSeleccionada.fechaEstimacion = convertirFecha(data.datosTicket.FechaRecepcionEstimacion);
+                } else {
+                    $scope.ofertaSeleccionada.fechaEstimacion = "";
+                }
+
+                if (data.datosTicket.FechaEnvioRevision) {
+                    $scope.ofertaSeleccionada.fechaRevision = convertirFecha(data.datosTicket.FechaEnvioRevision);
+                } else {
+                    $scope.ofertaSeleccionada.fechaRevision = "";
+                }
+
+                if (data.datosTicket.FechaAprobacionGerencia) {
+                    $scope.ofertaSeleccionada.fechaAprobacionGerencia = convertirFecha(data.datosTicket.FechaAprobacionGerencia);
+                } else {
+                    $scope.ofertaSeleccionada.fechaAprobacionGerencia = "";
+                }
+
+                if (data.datosTicket.FechaEnvioOfertaCliente) {
+                    $scope.ofertaSeleccionada.fechaEnvioOferta = convertirFecha(data.datosTicket.FechaEnvioOfertaCliente);
+                } else {
+                    $scope.ofertaSeleccionada.fechaEnvioOferta = "";
+                }
+
+            } else {
+                waitingDialog.hide();
+                messageDialog.show('Información', data.msg);
+            }
+        });
+    };
+
     // Configurar datepicker
     angular.element('#fecha-oferta').datepicker({
         format: 'dd/mm/yyyy',
         locale: 'es'
+    });
+    angular.element('#fechaActa').datepicker({
+        format: 'dd/mm/yyyy',
+        forceParse: false
+    });
+    angular.element('#fechaActa').datepicker({
+        format: 'dd/mm/yyyy',
+        forceParse: false
+    });
+    angular.element('#fechaActa').datepicker({
+        format: 'dd/mm/yyyy',
+        forceParse: false
+    });
+    angular.element('#fechaActa').datepicker({
+        format: 'dd/mm/yyyy',
+        forceParse: false
+    });
+    angular.element('#fechaActa').datepicker({
+        format: 'dd/mm/yyyy',
+        forceParse: false
     });
 }]);

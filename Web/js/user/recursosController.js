@@ -304,6 +304,7 @@
 
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
 
+        // Crear el objeto FormData
         var formData = new FormData();
         formData.append('titulo', $scope.newTituloPlan);
         formData.append('detalle', $scope.newDetallePlan);
@@ -313,6 +314,12 @@
         formData.append('asistentesJson', asistentesSeleccionadosJson);
         formData.append('link', $scope.linkPlan);
 
+        // Agregar el archivo adjunto al FormData
+        var archivoInput = document.getElementById('inputArchivo');
+        if (archivoInput && archivoInput.files.length > 0) {
+            formData.append('archivo', archivoInput.files[0]);
+        }
+
         var tiempo = toTotalMinutes($scope.horasPlan, $scope.minutosPlan);
         formData.append('tiempo', tiempo);
 
@@ -320,7 +327,7 @@
             method: 'POST',
             url: "user/guardar-plan-recurso",
             data: formData,
-            headers: { 'Content-Type': undefined },
+            headers: { 'Content-Type': undefined }, // Importante para enviar FormData
             transformRequest: angular.identity
         });
 

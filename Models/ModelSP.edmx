@@ -165,8 +165,8 @@
           <Property Name="SERIETICKET" Type="int" />
           <Property Name="SERIEDESARROLLO" Type="int" />
           <Property Name="SERIEREQUERIMIENTO" Type="int" />
-          <Property Name="DETALLE" Type="nvarchar(max)" />
           <Property Name="SECUENCIALTAREA" Type="int" />
+          <Property Name="DETALLE" Type="nvarchar(max)" />
         </EntityType>
         <EntityType Name="MENSAJE">
           <Key>
@@ -790,7 +790,7 @@
           <Property Name="SECUENCIALCLIENTE" Type="int" Nullable="false" />
           <Property Name="SECUENCIALREQUERIMIENTO" Type="int" Nullable="false" />
           <Property Name="SECUENCIALTICKETTAREA" Type="int" />
-          <Property Name="DETALLE" Type="varchar" MaxLength="8000" Nullable="false" />
+          <Property Name="DETALLE" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="FECHAPEDIDOCLIENTE" Type="date" />
         </EntityType>
         <EntityType Name="PAIS">
@@ -852,15 +852,9 @@
           <Property Name="EstaActivo" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="NumeroVerificador" Type="int" Nullable="false" />
         </EntityType>
-        <!--Errors Found During Generation:
-warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="REQUERIMIENTO">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
-            
-            
-            
-            
           </Key>
           <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="CODIGO" Type="varchar" MaxLength="50" Nullable="false" />
@@ -1829,7 +1823,7 @@ warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have 
           <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="TITULO" Type="varchar" MaxLength="255" Nullable="false" />
           <Property Name="DETALLE" Type="varchar(max)" Nullable="false" />
-          <Property Name="FECHA" Type="date" Nullable="false" />
+          <Property Name="FECHA" Type="datetime" Nullable="false" />
           <Property Name="SECUENCIALMODULO" Type="int" Nullable="false" />
           <Property Name="ADJUNTO" Type="varchar" MaxLength="255" Nullable="false" />
           <Property Name="ADJUNTOASISTENCIA" Type="varchar" MaxLength="255" />
@@ -1837,6 +1831,7 @@ warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have 
           <Property Name="ESPLAN" Type="numeric" Precision="1" Scale="0" />
           <Property Name="SECUENCIALCOLABORADOR" Type="int" />
           <Property Name="URL" Type="varchar" MaxLength="255" />
+          <Property Name="PDF" Type="varchar" MaxLength="255" />
         </EntityType>
         <EntityType Name="RECURSOSASISTENCIA">
           <Key>
@@ -5278,6 +5273,7 @@ warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have 
           <EntitySet Name="PERSONAGRUPOEMAIL" EntityType="Self.PERSONAGRUPOEMAIL" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="PROYECTOMODULOCLIENTE" EntityType="Self.PROYECTOMODULOCLIENTE" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="Reporte" EntityType="Self.Reporte" Schema="TAREAS" store:Type="Tables" />
+          <EntitySet Name="REQUERIMIENTO" EntityType="Self.REQUERIMIENTO" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="RESPONSABLEPROYECTOS" EntityType="Self.RESPONSABLEPROYECTOS" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="SEDE" EntityType="Self.SEDE" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="SERVICIOIMPLANTACIONCORE" EntityType="Self.SERVICIOIMPLANTACIONCORE" Schema="TAREAS" store:Type="Tables" />
@@ -5393,15 +5389,6 @@ warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have 
           <EntitySet Name="TIPOCONTRATOCLIENTE" EntityType="Self.TIPOCONTRATOCLIENTE" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="TIPONOTIFICACIONTICKET" EntityType="Self.TIPONOTIFICACIONTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="TIPORECURSO" EntityType="Self.TIPORECURSO" Schema="TICKET" store:Type="Tables" />
-          <EntitySet Name="REQUERIMIENTO" EntityType="Self.REQUERIMIENTO" store:Type="Tables" store:Schema="TAREAS">
-            <DefiningQuery>SELECT 
-[REQUERIMIENTO].[SECUENCIAL] AS [SECUENCIAL], 
-[REQUERIMIENTO].[CODIGO] AS [CODIGO], 
-[REQUERIMIENTO].[DESCRIPCION] AS [DESCRIPCION], 
-[REQUERIMIENTO].[ESTAACTIVO] AS [ESTAACTIVO], 
-[REQUERIMIENTO].[NUMEROVERIFICADOR] AS [NUMEROVERIFICADOR]
-FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
-          </EntitySet>
           <AssociationSet Name="FK_ACTA_CLIENTE" Association="Self.FK_ACTA_CLIENTE">
             <End Role="CLIENTE" EntitySet="CLIENTE" />
             <End Role="Acta" EntitySet="Acta" />
@@ -12722,7 +12709,7 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
           <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Titulo" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="Detalle" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="Fecha" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="SecuencialModulo" Type="Int32" Nullable="false" />
           <Property Name="Adjunto" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="modulo" Relationship="SifizPlanningModel.FK_RECURSOS_MODULO" FromRole="RECURSOS" ToRole="Modulo" />
@@ -12734,6 +12721,7 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
           <NavigationProperty Name="colaborador" Relationship="SifizPlanningModel.FK_RECURSOS_COLABORADOR" FromRole="Recursos" ToRole="Colaborador" />
           <Property Name="Url" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="TAREACAPACITACION" Relationship="SifizPlanningModel.FK_TAREACAPACITACION_RECURSOS" FromRole="Recursos" ToRole="TAREACAPACITACION" />
+          <Property Name="Pdf" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
         </EntityType>
         <Association Name="FK_RECURSOS_MODULO">
           <End Type="SifizPlanningModel.Modulo" Role="Modulo" Multiplicity="1" />
@@ -13117,7 +13105,7 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
           <Property Name="SecuencialCLiente" Type="Int32" Nullable="false" />
           <Property Name="SecuencialRequerimiento" Type="Int32" Nullable="false" />
           <Property Name="SecuencialTicketTarea" Type="Int32" />
-          <Property Name="Detalle" Type="String" Nullable="false" MaxLength="8000" FixedLength="false" Unicode="false" />
+          <Property Name="Detalle" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Name="FechaPedidoCLiente" Type="DateTime" Precision="0" />
           <NavigationProperty Name="OFERTAOFERTA" Relationship="SifizPlanningModel.FK_OFERTAOFERTA_OFERTAREQUERIMIENTO" FromRole="OfertaRequerimiento" ToRole="OFERTAOFERTA" />
         </EntityType>
@@ -15354,6 +15342,7 @@ FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
           <EntitySetMapping Name="Recursos">
             <EntityTypeMapping TypeName="SifizPlanningModel.Recursos">
               <MappingFragment StoreEntitySet="RECURSOS">
+                <ScalarProperty Name="Pdf" ColumnName="PDF" />
                 <ScalarProperty Name="Url" ColumnName="URL" />
                 <ScalarProperty Name="SecuencialColaborador" ColumnName="SECUENCIALCOLABORADOR" />
                 <ScalarProperty Name="EsPlan" ColumnName="ESPLAN" />

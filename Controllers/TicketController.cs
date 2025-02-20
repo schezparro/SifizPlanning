@@ -1374,6 +1374,62 @@ namespace SifizPlanning.Controllers
             }
         }
 
+        [Authorize(Roles = "COORDINADOR, ADMIN, COTIZADOR, TICKET, GESTOR, COMERCIAL")]
+        [HttpPost]
+        public ActionResult DarDatosTicketOfertas(int idTicket)
+        {
+            try
+            {
+                Ticket ticket = db.Ticket.Find(idTicket);
+                if (ticket == null)
+                {
+                    throw new Exception("El ticket no se encuentra en el sistema");
+                }
+
+                DateTime? fechaRecepcionEstimacion = db.TicketHistorico
+                    .Where(h => h.SecuencialTicket == idTicket && h.SecuencialProximaActividad == 3)
+                    .OrderByDescending(h => h.Version)
+                    .Select(h => (DateTime?)h.FechaOperacion)
+                    .FirstOrDefault();
+
+                DateTime? fechaEnvioRevision = db.TicketHistorico
+                    .Where(h => h.SecuencialTicket == idTicket && h.SecuencialProximaActividad == 7)
+                    .OrderByDescending(h => h.Version)
+                    .Select(h => (DateTime?)h.FechaOperacion)
+                    .FirstOrDefault();
+
+                DateTime? fechaAprobacionGerenciaEnvioOferta = db.TicketHistorico
+                    .Where(h => h.SecuencialTicket == idTicket && h.SecuencialProximaActividad == 30)
+                    .OrderByDescending(h => h.Version)
+                    .Select(h => (DateTime?)h.FechaOperacion)
+                    .FirstOrDefault();
+
+                var datosTicket = new
+                {
+                    FechaRecepcionEstimacion = fechaRecepcionEstimacion.HasValue ? fechaRecepcionEstimacion.Value : (DateTime?)null,
+                    FechaEnvioRevision = fechaEnvioRevision.HasValue ? fechaEnvioRevision.Value : (DateTime?)null,
+                    FechaAprobacionGerencia = fechaAprobacionGerenciaEnvioOferta.HasValue ? fechaAprobacionGerenciaEnvioOferta.Value : (DateTime?)null,
+                    FechaEnvioOfertaCliente = fechaAprobacionGerenciaEnvioOferta.HasValue ? fechaAprobacionGerenciaEnvioOferta.Value : (DateTime?)null
+                };
+
+                var resp = new
+                {
+                    success = true,
+                    datosTicket = datosTicket
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
         //Dar Contratos Mantenimiento Para Ticket
         [Authorize(Roles = "COORDINADOR, ADMIN, COTIZADOR, TICKET, GESTOR")]
         [HttpPost]

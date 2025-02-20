@@ -700,7 +700,6 @@ namespace SifizPlanning.Controllers
                             }
                         }
                     }
-                    bool quitar = await QuitarAccesoDevops(tarea.Secuencial);
                 }
                 else if (estado == 2)//Desarrollo
                 {
@@ -826,7 +825,12 @@ namespace SifizPlanning.Controllers
                         }
                     }
 
-                    bool envio = await DarAccesoDevops(tarea.Secuencial);
+                    //    var dap = db.DevopsAccesoProyectos.Where(s => s.SecuencialTarea.HasValue && s.SecuencialTarea.Value == tarea.Secuencial).FirstOrDefault();
+                    //    if (dap == null)
+                    //    {
+                    //        throw new Exception("No se encontró la configuración de acceso para la tarea especificada");
+                    //    }
+                    //    bool envio = await Devops.DarAccesoDevops(dap);
                 }
                 else if (estado == 5)//EN PAUSA
                 {
@@ -950,80 +954,6 @@ namespace SifizPlanning.Controllers
                 return Json(result);
             }
         }
-
-        private async Task<bool> DarAccesoDevops(int tarea)
-        {
-            try
-            {
-                string key = ConfigurationManager.AppSettings.Get("Devops");
-                var client = new HttpClient();
-                var requestUrl = "https://api-sifizops.sifizsoft.com/api/AsignacionPermisos/AsociarPermiso";
-
-                var dap = db.DevopsAccesoProyectos.Where(s => s.SecuencialTarea.HasValue && s.SecuencialTarea.Value == tarea).FirstOrDefault();
-
-                if (dap == null)
-                {
-                    throw new Exception("No se encontró la configuración de acceso para la tarea especificada");
-                }
-
-                var requestBody = new
-                {
-                    organizacion = dap.Organizacion,
-                    nombreUsuario = dap.NombreUsuario,
-                    usuario = dap.Usuario,
-                    modulo = dap.Modulo,
-                    esTCK = dap.EsTck,
-                    esREQ = dap.EsReq,
-                    esDEV = dap.EsDev,
-                    serieTicket = dap.SerieTicket.ToString(),
-                    serieRequerimiento = dap.SerieRequerimiento.ToString(),
-                    serieDesarrollo = dap.SerieDesarrollo.ToString(),
-                    identificador = dap.SecuencialTarea.ToString()
-                };
-
-                client.DefaultRequestHeaders.Add("X-API-KEY", key);
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                var response = await client.PostAsJsonAsync(requestUrl, requestBody);
-                return response.IsSuccessStatusCode;
-            }
-            catch (Exception e)
-            {
-                throw new Exception($"Error al dar acceso Devops: {e.Message}", e);
-            }
-        }
-
-        private async Task<bool> QuitarAccesoDevops(int tarea)
-        {
-            try
-            {
-                string key = ConfigurationManager.AppSettings.Get("Devops");
-                var client = new HttpClient();
-                var requestUrl = "https://api-sifizops.sifizsoft.com/api/AsignacionPermisos/DisociarPermiso";
-
-                var requestBody = new
-                {
-                    identificador = tarea.ToString()
-                };
-
-                client.DefaultRequestHeaders.Add("X-API-KEY", key);
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                var response = await client.PostAsJsonAsync(requestUrl, requestBody);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
-                }
-
-                return false;
-            }
-            catch (Exception e)
-            {
-                throw new Exception($"Error al quitar acceso Devops: {e.Message}", e);
-            }
-        }
-
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
@@ -4857,6 +4787,7 @@ r in db.Rol on ur.rol equals r
                                            tiempo = rec.TiempoCapacitacion.ToString().Substring(0, 5),
                                            adjuntoAsistencia = rec.AdjuntoAsistencia,
                                            url = rec.Url ?? "",
+                                           pdf = rec.Pdf ?? "",
                                            darCertificado = db.RecursosAsistencia
                                                .Any(ra => ra.SecuencialRecurso == rec.Secuencial
                                                           && ra.SecuencialColaborador == colab
@@ -5058,15 +4989,39 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult GuardarPlanRecurso(string titulo, string detalle, DateTime fecha, int modulo, int colaborador, int tiempo, string asistentesJson, string link = "")
+        public ActionResult GuardarPlanRecurso(
+            string titulo,
+            string detalle,
+            DateTime fecha,
+            int modulo,
+            int colaborador,
+            int tiempo,
+            string asistentesJson,
+            string link = "",
+            HttpPostedFileBase archivo = null) // Nuevo parámetro para el archivo
         {
             try
             {
-                // Decodificar la cadena JSON de asistentes
-                var serializer = new JavaScriptSerializer();
-                int[] asistentesIds = serializer.Deserialize<int[]>(asistentesJson);
+                // 1. Procesar el archivo adjunto
+                string newNameFile = "";
+                if (archivo != null && archivo.ContentLength > 0)
+                {
+                    // Validar tipo y tamaño (ejemplo: máximo 10MB)
+                    if (archivo.ContentLength > 10 * 1024 * 1024)
+                    {
+                        return Json(new { success = false, msg = "El archivo excede el tamaño máximo (10MB)" });
+                    }
 
-                // Crear el nuevo recurso (plan)
+                    string extFile = Path.GetExtension(archivo.FileName);
+                    newNameFile = (archivo.FileName.Length > 15 ? archivo.FileName.Substring(0, 15) : archivo.FileName) + Path.GetExtension(archivo.FileName);
+                    //newNameFile = Utiles.RandomString(10) + extFile;
+
+                    // Ruta de guardado (ajusta esta ruta según tu estructura)
+                    string rutaGuardado = Path.Combine(Server.MapPath("~/Web/resources/datoscapacitaciones"), newNameFile);
+                    archivo.SaveAs(rutaGuardado);
+                }
+
+                // 2. Crear el recurso
                 Recursos nuevoRecurso = new Recursos
                 {
                     Titulo = titulo,
@@ -5074,14 +5029,19 @@ r in db.Rol on ur.rol equals r
                     Fecha = fecha,
                     SecuencialModulo = modulo,
                     Adjunto = "",
-                    //EsPlan = fechaCapacitacion.Date > DateTime.Now.Date ? 1 : 0,
+                    Pdf = "/resources/datoscapacitaciones/" + newNameFile, // Guardar el nombre del archivo
                     EsPlan = 1,
                     SecuencialColaborador = colaborador,
                     TiempoCapacitacion = tiempo,
                     Url = link
                 };
+
                 db.Recursos.Add(nuevoRecurso);
                 db.SaveChanges();
+
+                // 3. Procesar asistentes (código existente)
+                var serializer = new JavaScriptSerializer();
+                int[] asistentesIds = serializer.Deserialize<int[]>(asistentesJson);
 
                 foreach (int asistenteId in asistentesIds)
                 {
@@ -5100,19 +5060,11 @@ r in db.Rol on ur.rol equals r
 
                 db.SaveChanges();
 
-                return Json(new
-                {
-                    success = true,
-                    msg = "Se ha realizado la operación correctamente."
-                });
+                return Json(new { success = true, msg = "Plan guardado con archivo adjunto" });
             }
             catch (Exception e)
             {
-                return Json(new
-                {
-                    success = false,
-                    msg = e.Message
-                });
+                return Json(new { success = false, msg = "Error: " + e.Message });
             }
         }
 
