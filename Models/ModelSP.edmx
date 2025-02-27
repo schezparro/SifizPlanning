@@ -719,6 +719,7 @@
           <Property Name="FECHAACTA" Type="date" />
           <Property Name="ACEPTACAMBIOSNORMATIVOS" Type="numeric" Precision="1" Scale="0" />
           <Property Name="ESTIMACION" Type="int" />
+          <Property Name="FECHAESTIMADACIERRE" Type="date" />
         </EntityType>
         <EntityType Name="MOTIVOTRABAJOSEGUIMIENTO">
           <Key>
@@ -11542,6 +11543,7 @@
           <Property Name="FechaActa" Type="DateTime" Precision="0" />
           <Property Name="AceptaCambiosNormativos" Type="Decimal" Precision="1" Scale="0" />
           <Property Name="Estimacion" Type="Int32" />
+          <Property Name="FechaEstimadaCierre" Type="DateTime" Precision="0" />
         </EntityType>
         <Association Name="FK_ADENDA_MOTIVOTRABAJOINFADICIONAL">
           <End Type="SifizPlanningModel.MotivoTrabajoInformacionAdicional" Role="MOTIVOTRABAJOINFADICIONAL" Multiplicity="1" />
@@ -14836,6 +14838,7 @@
           <EntitySetMapping Name="MotivoTrabajoInformacionAdicional">
             <EntityTypeMapping TypeName="SifizPlanningModel.MotivoTrabajoInformacionAdicional">
               <MappingFragment StoreEntitySet="MOTIVOTRABAJOINFADICIONAL">
+                <ScalarProperty Name="FechaEstimadaCierre" ColumnName="FECHAESTIMADACIERRE" />
                 <ScalarProperty Name="Estimacion" ColumnName="ESTIMACION" />
                 <ScalarProperty Name="AceptaCambiosNormativos" ColumnName="ACEPTACAMBIOSNORMATIVOS" />
                 <ScalarProperty Name="FechaActa" ColumnName="FECHAACTA" />

@@ -210,6 +210,9 @@ namespace SifizPlanning
 
         public void AsignacionesSemana(string password, string fechaLunes = "", string jsonCC = "")
         {
+            string emailFuente = System.Configuration.ConfigurationManager.AppSettings["emailApp"];
+            string passwordSifiz = System.Configuration.ConfigurationManager.AppSettings["passwordEmailApp"];
+
             DateTime lunes = DateTime.Today;
             if (fechaLunes != "")
             {
@@ -629,8 +632,8 @@ namespace SifizPlanning
 
                     //string[] emailDestinos = new string[] { "rcespedes@sifizsoft.com" };//Borrar Aqui
                     string[] emailDestinos = new string[1] { trabajador.email };
-                    
-                    Utiles.EnviarEmail(emailUser, emailDestinos, htmlMail, asunto, password, true, imagenes);
+
+                    Utiles.EnviarEmail(emailFuente, emailDestinos, htmlMail, asunto, passwordSifiz, true, imagenes);
                     
                     if (true)
                     {
@@ -854,9 +857,9 @@ namespace SifizPlanning
 
                 string asuntoEmailDirectivo = "Asignaciones planificadas para la semana del " + lunes.ToString("dd/MM") + ".";
                 string[] adjuntos = new string[] { nombreExcel };
-                
+
                 //Envío a directivos                
-                Utiles.EnviarEmail(emailUser, directivos, emailDirectivos, asuntoEmailDirectivo, password, true, imagenes, adjuntos);
+                Utiles.EnviarEmail(emailFuente, directivos, emailDirectivos, asuntoEmailDirectivo, passwordSifiz, true, imagenes, adjuntos);
                 
                 //--------- Fin de enviando email del excel--------------
 

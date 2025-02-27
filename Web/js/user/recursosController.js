@@ -248,12 +248,12 @@
 
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
 
-        var fecha = $scope.fechaHora ? new Date($scope.fechaHora).toISOString() : new Date().toISOString();
-
+        //var fecha = $scope.fechaHora ? new Date($scope.fechaHora).toISOString() : new Date().toISOString();
+        console.log($scope.fechaHora);
         var formData = new FormData();
         formData.append('titulo', $scope.newTitulo);
         formData.append('detalle', $scope.newDetalle);
-        formData.append('fecha', fecha);
+        formData.append('fecha', $scope.fechaHora.toISOString());
         formData.append('modulo', modulo);
         formData.append('url', $scope.url);
         formData.append('link', $scope.link);
