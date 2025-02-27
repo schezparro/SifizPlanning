@@ -4395,41 +4395,41 @@ namespace SifizPlanning.Controllers
                     };
                     db.TicketTarea.Add(ticketTarea);
 
-                    //Adicionando la tarea al TFS del colaborador
-                    //string usuarioTFS = db.Colaborador.Find(idColaborador).usuarioTFS.Where(x => x.FechaInicio <= DateTime.Now && x.FechaFin >= DateTime.Now).FirstOrDefault().Usuario;
-                    //ProyectoTFS proyectoTFS = null;
-                    //if (idProyectoTFS == 0)
-                    //{
-                    //    proyectoTFS = db.ProyectoTFS.Where(x => x.SecuencialCliente == cliente.Secuencial && x.EstaActivo == 1).FirstOrDefault();
-                    //}
-                    //else
-                    //{
-                    //    proyectoTFS = db.ProyectoTFS.Find(idProyectoTFS);
-                    //}
 
-                    //string servidorTfs = proyectoTFS.servidorTFS.Url;
-                    //string coleccionTfs = proyectoTFS.coleccionTFS.Nombre;
-                    //string nombreProyectoTFS = proyectoTFS.Nombre;
-                    //int tiempoTarea = Utiles.DarHorasTarea(tar.FechaInicio, tar.FechaFin);
+                    //DEVOPS ACCESO PROYECTO
+                    DevopsAccesoProyectos dap = new DevopsAccesoProyectos();
+                    dap.SecuencialTarea = tareaPrincipal.Secuencial;
+                    dap.Detalle = detalle;
+                    dap.Organizacion = cliente.Codigo;
+                    var nombreUsuario = (from c in db.Colaborador
+                                         join p in db.Persona on c.SecuencialPersona equals p.Secuencial
+                                         join u in db.Usuario on p.Secuencial equals u.SecuencialPersona
+                                         where c.Secuencial == idColaborador
+                                         select new
+                                         {
+                                             nombreUsuario = p.Nombre1 + " " + p.Apellido1 + " " + p.Apellido2,
+                                             usuario = u.Email
+                                         }).FirstOrDefault();
+                    dap.NombreUsuario = nombreUsuario.nombreUsuario;
+                    dap.Usuario = nombreUsuario.usuario;
+                    var nombreModulo = (from m in db.Modulo
+                                        where m.Secuencial == idModulo
+                                        select new
+                                        {
+                                            nombreModulo = m.Descripcion
+                                        }).FirstOrDefault();
+                    dap.Modulo = nombreModulo.nombreModulo;
 
-                    //int idWorkItem = 0;
-                    //try
-                    //{
-                    //    idWorkItem = ClientTfs.AdicionarTrabajo(servidorTfs, coleccionTfs, nombreProyectoTFS, "Task", usuarioTFS, "TK-" + ticket.Secuencial.ToString() + " " + ticket.Asunto, ticket.Detalle, ticket.Secuencial.ToString(), tiempoTarea);
-                    //}
-                    //catch (Exception) { }
+                    dap.EsDev = false;
+                    dap.EsReq = false;
+                    dap.EsTck = false;
 
-                    //int idWorkItem = ClientTfs.AdicionarTrabajo("http://100.100.100.2:8080/tfs", "Financial2010", "PruebasWorkItem", "Task", "rafael.cespedes", "TK-" + ticket.Secuencial.ToString() + " " + ticket.Asunto, ticket.Detalle, ticket.Secuencial.ToString(), tiempoTarea);
-                    //int idWorkItem = 0;
+                    dap.SerieTicket = ticket.Secuencial;
+                    dap.EsTck = true;
 
-                    //Relacionando el ticket con sus workItemId
-                    //TicketAsignacionTFS ticketAsignacion = new TicketAsignacionTFS
-                    //{
-                    //    proyectoTFS = proyectoTFS,
-                    //    ticketTarea = ticketTarea,
-                    //    WorkItemID = idWorkItem
-                    //};
-                    //db.TicketAsignacionTFS.Add(ticketAsignacion);
+                    db.DevopsAccesoProyectos.Add(dap);
+                    db.SaveChanges();
+
                 }
 
                 //En el flujo básico que no se realiza el proceso de estimación
@@ -4777,6 +4777,8 @@ namespace SifizPlanning.Controllers
                 ticket.SecuencialEstadoTicket = 14;//EL TICKET ESTA CERRADO
                 ticket.SecuencialProximaActividad = 18;//NA
 
+                BackgroundJob.Enqueue(() => Devops.QuitarAccesoDevops(ticket.Secuencial.ToString()));
+
                 //Adicionando el histórico del ticket                                
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
@@ -4878,6 +4880,8 @@ namespace SifizPlanning.Controllers
                 //Cambiando el estado del ticket
                 ticket.SecuencialEstadoTicket = 14;//EL TICKET ESTA CERRADO
                 ticket.SecuencialProximaActividad = 18;//NA
+
+                BackgroundJob.Enqueue(() => Devops.QuitarAccesoDevops(ticket.Secuencial.ToString()));
 
                 //Adicionando el histórico del ticket                               
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser && x.EstaActivo == 1);

@@ -1657,6 +1657,8 @@ namespace SifizPlanning.Controllers
 					ticket.SecuencialEstadoTicket = 14;//EL TICKET ESTA CERRADO
 					ticket.SecuencialProximaActividad = 18;//NA porque está cerrado
 
+					BackgroundJob.Enqueue(() => Devops.QuitarAccesoDevops(ticket.Secuencial.ToString()));
+
 					//Adicionando el histórico del ticket                                
 					Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailCliente);
 					int numeroVersion = db.TicketHistorico.Where(x => x.SecuencialTicket == ticket.Secuencial).Count();

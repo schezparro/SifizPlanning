@@ -43,6 +43,8 @@ using DocumentFormat.OpenXml.ExtendedProperties;
 using System.Data.Entity.Migrations;
 using System.Data.Entity.SqlServer;
 using System.Net.Http.Headers;
+using System.Diagnostics;
+using Hangfire;
 
 namespace SifizPlanning.Controllers
 {
@@ -825,12 +827,8 @@ namespace SifizPlanning.Controllers
                         }
                     }
 
-                    //    var dap = db.DevopsAccesoProyectos.Where(s => s.SecuencialTarea.HasValue && s.SecuencialTarea.Value == tarea.Secuencial).FirstOrDefault();
-                    //    if (dap == null)
-                    //    {
-                    //        throw new Exception("No se encontró la configuración de acceso para la tarea especificada");
-                    //    }
-                    //    bool envio = await Devops.DarAccesoDevops(dap);
+                    var dap = db.DevopsAccesoProyectos.Where(s => s.SecuencialTarea.HasValue && s.SecuencialTarea.Value == tarea.Secuencial).FirstOrDefault();
+                    BackgroundJob.Enqueue(() => Devops.DarAccesoDevops(dap));
                 }
                 else if (estado == 5)//EN PAUSA
                 {
@@ -4992,7 +4990,7 @@ r in db.Rol on ur.rol equals r
         public ActionResult GuardarPlanRecurso(
             string titulo,
             string detalle,
-            DateTime fecha,
+            string fecha,
             int modulo,
             int colaborador,
             int tiempo,
@@ -5026,7 +5024,7 @@ r in db.Rol on ur.rol equals r
                 {
                     Titulo = titulo,
                     Detalle = detalle,
-                    Fecha = fecha,
+                    Fecha = DateTime.Parse(fecha),
                     SecuencialModulo = modulo,
                     Adjunto = "",
                     Pdf = "/resources/datoscapacitaciones/" + newNameFile, // Guardar el nombre del archivo
@@ -7860,7 +7858,7 @@ r in db.Rol on ur.rol equals r
             try
             {
                 string emailUser = User.Identity.Name;
-                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser && x.EstaActivo == 1);
 
                 Colaborador colab = user.persona.colaborador.FirstOrDefault();
                 if (colab == null)

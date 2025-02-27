@@ -220,23 +220,6 @@
 
                     <div class="clear"></div>
 
-                    <div class="fila">
-                        <div class="left">
-                            <div style="display: inline-block; margin-right: 10px;">
-                                <input type="radio" id="tipoTicket" name="tipoTarea" value="ticket" ng-model="tipoTarea" required>
-                                <label for="tipoTicket">Ticket</label>
-                            </div>
-                            <div style="display: inline-block; margin-right: 10px;">
-                                <input type="radio" id="tipoContrato" name="tipoTarea" value="contrato" ng-model="tipoTarea" required>
-                                <label for="tipoContrato">Contrato</label>
-                            </div>
-                            <div style="display: inline-block; margin-right: 10px;">
-                                <input type="radio" id="tipoProyecto" name="tipoTarea" value="proyecto" ng-model="tipoTarea" required>
-                                <label for="tipoProyecto">Proyecto</label>
-                            </div>
-                        </div>
-                    </div>
-
                     <div id="edicion-user-edicion-tarea" style="display: none;" class="fila">
                         <div class="left">
                             <label>Colaborador:</label>
@@ -391,7 +374,12 @@
                                 Reproceso
                             </label>
                         </div>
-
+                        <div class="left">
+                            <input style="margin-top: 35px; margin-left: 8px;" type="checkbox" ng-model="esProyecto" ng-checked="esProyecto" />
+                            <label>
+                                Es Proyecto
+                            </label>
+                        </div>
                     </div>
                     <div class="clear"></div>
                 </div>

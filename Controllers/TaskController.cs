@@ -16,6 +16,7 @@ using System.Web.UI.WebControls;
 using System.Data.Entity;
 using System.Globalization;
 using System.Transactions;
+using Hangfire;
 
 namespace SifizPlanning.Controllers
 {
@@ -920,7 +921,7 @@ namespace SifizPlanning.Controllers
                     string claseDia = "dia-normal";
                     long diaSemana = (int)fecha.DayOfWeek;
                     int hayVacaciones = vacaciones.Where(x => x.idColaborador == idTrabajador &&
-                                                        x.fecha == fecha).Count();
+                                                        x.fecha.Date == fecha.Date).Count();
                     if (hayVacaciones > 0)
                     {
                         claseDia = "dia-vacaciones";
@@ -1398,6 +1399,46 @@ namespace SifizPlanning.Controllers
                     }
                 }
 
+                //DEVOPS ACCESO PROYECTO
+                DevopsAccesoProyectos dap = new DevopsAccesoProyectos();
+                dap.SecuencialTarea = tareaPrincipal.Secuencial;
+                dap.Detalle = detalle;
+                var nombreCliente = (from c in db.Cliente
+                                     where c.Secuencial == cliente
+                                     select new
+                                     {
+                                         nombreCliente = c.Codigo
+                                     }).FirstOrDefault();
+                dap.Organizacion = nombreCliente.nombreCliente;
+                var nombreUsuario = (from c in db.Colaborador
+                                     join p in db.Persona on c.SecuencialPersona equals p.Secuencial
+                                     join u in db.Usuario on p.Secuencial equals u.SecuencialPersona
+                                     where c.Secuencial == idTrabajador
+                                     select new
+                                     {
+                                         nombreUsuario = p.Nombre1 + " " + p.Apellido1 + " " + p.Apellido2,
+                                         usuario = u.Email
+                                     }).FirstOrDefault();
+                dap.NombreUsuario = nombreUsuario.nombreUsuario;
+                dap.Usuario = nombreUsuario.usuario;
+                var nombreModulo = (from m in db.Modulo
+                                    where m.Secuencial == modulo
+                                    select new
+                                    {
+                                        nombreModulo = m.Descripcion
+                                    }).FirstOrDefault();
+                dap.Modulo = nombreModulo.nombreModulo;
+
+                dap.EsDev = false;
+                dap.EsReq = false;
+                dap.EsTck = false;
+
+                dap.SerieDesarrollo = cliente;
+                dap.SerieTicket = modulo;
+                dap.EsDev = true;
+
+                db.DevopsAccesoProyectos.Add(dap);
+
                 string msg = "Se ha creado correctamente la tarea";
                 if (repetir != "")
                 {
@@ -1452,7 +1493,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
-        public JsonResult NuevaTarea(int idTrabajador, string fecha, int cliente, int ubicacion, int modulo, int actividad, int horas, int minutos, int horasEstimadas, int minutosEstimados, string detalle, int referencia = 0, int coordinador = 0, string repetir = "", int finSemana = 0, int repetirTipoFin = 0, int numVeces = 0, string fechaHasta = "", bool extraordinaria = false, int ticketTarea = 0, int idTarea = 0, int verificador = 0, bool esReproceso = false, string tipoTarea = "")
+        public JsonResult NuevaTarea(int idTrabajador, string fecha, int cliente, int ubicacion, int modulo, int actividad, int horas, int minutos, int horasEstimadas, int minutosEstimados, string detalle, int referencia = 0, int coordinador = 0, string repetir = "", int finSemana = 0, int repetirTipoFin = 0, int numVeces = 0, string fechaHasta = "", bool extraordinaria = false, int ticketTarea = 0, int idTarea = 0, int verificador = 0, bool esReproceso = false, bool esProyecto = false)
         {
             try
             {
@@ -2336,6 +2377,7 @@ namespace SifizPlanning.Controllers
                 }
                 db.SaveChanges();
 
+                //DEVOPS ACCESO PROYECTO
                 DevopsAccesoProyectos dap = new DevopsAccesoProyectos();
                 dap.SecuencialTarea = tareaPrincipal.Secuencial;
                 dap.Detalle = detalle;
@@ -2365,38 +2407,26 @@ namespace SifizPlanning.Controllers
                                     }).FirstOrDefault();
                 dap.Modulo = nombreModulo.nombreModulo;
 
-                if (tipoTarea == "proyecto")
-                {
-                    if (tareaPrincipal.entregableMotivoTrabajo != null)
-                        dap.SerieDesarrollo = tareaPrincipal.entregableMotivoTrabajo.Secuencial;
-                    dap.EsDev = true;
-                }
-                else
-                    dap.EsDev = false;
+                dap.EsDev = false;
+                dap.EsReq = false;
+                dap.EsTck = false;
 
-                if (tipoTarea == "ticket")
+                if (tareaPrincipal.entregableMotivoTrabajo != null)
                 {
-                    if (ticketTarea != 0)
-                    {
-                        Ticket t = db.Ticket.Where(s => s.Secuencial == ticketTarea).FirstOrDefault();
-                        if (t != null)
-                        {
-                            dap.SerieTicket = t.Secuencial;
-                        }
-                    }
-                    dap.EsTck = true;
-                }
-                else
-                    dap.EsTck = false;
-
-                if (tipoTarea == "contrato")
-                {
-                    if (tareaPrincipal.entregableMotivoTrabajo != null)
-                        dap.SerieDesarrollo = tareaPrincipal.entregableMotivoTrabajo.Secuencial;
+                    dap.SerieRequerimiento = tareaPrincipal.entregableMotivoTrabajo.Secuencial;
                     dap.EsReq = true;
                 }
-                else
-                    dap.EsReq = false;
+                if (ticketTarea != 0)
+                {
+                    dap.SerieTicket = ticketTarea;
+                    dap.EsTck = true;
+                }
+                if (esProyecto)
+                {
+                    dap.SerieDesarrollo = cliente;
+                    dap.SerieTicket = modulo;
+                    dap.EsDev = true;
+                }
 
                 db.DevopsAccesoProyectos.Add(dap);
                 db.SaveChanges();
@@ -7200,6 +7230,12 @@ p in db.Persona on c.persona equals p
                 int porciento = (int)Math.Ceiling(Math.Round(totalDiasAvance * 100 / totalDias, 2));
 
                 motivoTrabajo.Avance = porciento;
+
+                if (porciento == 100)
+                {
+                    BackgroundJob.Enqueue(() => Devops.QuitarAccesoDevops(motivoTrabajo.Codigo));
+                }
+
                 db.SaveChanges();
 
                 var resp = new
@@ -7302,6 +7338,12 @@ p in db.Persona on c.persona equals p
                     int porciento = (int)Math.Ceiling(Math.Round(totalDiasAvance * 100 / totalDias, 2));
 
                     motivoTrabajo.Avance = porciento;
+
+                    if (porciento == 100)
+                    {
+                        BackgroundJob.Enqueue(() => Devops.QuitarAccesoDevops(motivoTrabajo.Codigo));
+                    }
+
                     db.SaveChanges();
                 }
                 else
@@ -9091,6 +9133,11 @@ p in db.Persona on c.persona equals p
                     porciento = (int)Math.Ceiling((double)totalDiasAvance * 100 / (double)totalDias);
 
                 motivoTrabajo.Avance = porciento;
+
+                if (porciento == 100)
+                {
+                    BackgroundJob.Enqueue(() => Devops.QuitarAccesoDevops(motivoTrabajo.Codigo));
+                }
                 db.SaveChanges();
 
                 var resp = new
@@ -9186,6 +9233,11 @@ p in db.Persona on c.persona equals p
                     porciento = (int)Math.Ceiling((double)totalDiasAvance * 100 / (double)totalDias);
 
                 motivoTrabajo.Avance = porciento;
+
+                if (porciento == 100)
+                {
+                    BackgroundJob.Enqueue(() => Devops.QuitarAccesoDevops(motivoTrabajo.Codigo));
+                }
 
                 var motivo = db.MotivoTrabajo.Where(m => m.Codigo == codigoContrato).FirstOrDefault();
                 var entregables = (from e in db.EntregableMotivoTrabajo
