@@ -2377,11 +2377,59 @@ namespace SifizPlanning
                 url: "comercial/requerimientos-comercial/{id}",
                 defaults: new { controller = "Comercial", action = "RequerimientosComercial", id = UrlParameter.Optional }
             );
-            
+
             routes.MapRoute(
                 name: "DarCatalogoRequerimientos",
                 url: "comercial/catalogo-requerimientos/{id}",
                 defaults: new { controller = "Comercial", action = "DarCatalogoRequerimientos", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarOfertasOfertas",
+                url: "comercial/dar-oferta-oferta/{id}",
+                defaults: new { controller = "Comercial", action = "DarOfertasOfertas", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarEstadoOfertaComercial",
+                url: "comercial/estado-oferta-comercial/{id}",
+                defaults: new { controller = "Comercial", action = "DarEstadoOfertaComercial", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "GuardarFormalizacion",
+                url: "comercial/guardar-formalizacion/{id}",
+                defaults: new { controller = "Comercial", action = "GuardarFormalizacion", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "EliminarFormalizacion",
+                url: "comercial/eliminar-formalizacion/{id}",
+                defaults: new { controller = "Comercial", action = "EliminarFormalizacion", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarDatosFormalizacion",
+                url: "comercial/dar-datos-formalizacion/{id}",
+                defaults: new { controller = "Comercial", action = "DarDatosFormalizacion", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "EditarFormalizacion",
+                url: "comercial/editar-formalizacion/{id}",
+                defaults: new { controller = "Comercial", action = "EditarFormalizacion", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "GenerarCodigoFormalizacion",
+                url: "comercial/generar-formalizacion-oferta/{id}",
+                defaults: new { controller = "Comercial", action = "GenerarCodigoFormalizacion", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+               name: "FormalizacionComercial",
+               url: "comercial/dar-formalizacion-comercial/{id}",
+               defaults: new { controller = "Comercial", action = "FormalizacionComercial", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(
@@ -2863,7 +2911,7 @@ namespace SifizPlanning
             //);
 
 
-            
+
         }
     }
 }

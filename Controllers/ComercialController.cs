@@ -902,6 +902,487 @@ namespace SifizPlanning.Controllers
 
         }
 
+        [HttpPost]
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
+        public ActionResult DarEstadoOfertaComercial()
+        {
+            try
+            {
+                var ofr = (from or in db.EstadoOferta
+                           select new
+                           {
+                               descripcion = or.Descripcion,
+                               secuencial = or.Secuencial
+                           }).ToList();
+
+                var result = new
+                {
+                    success = true,
+                    estadosOferta = ofr
+                };
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+                var result = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(result);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
+        public ActionResult FormalizacionComercial(int start, int lenght, string filtro = "")
+        {
+
+            try
+            {
+                var formalizacionComercial = (from f in db.FormalizacionOfertas
+                                              join o in db.OfertaOferta on f.SecuencialOferta equals o.Secuencial
+                                              join r in db.EstadoOferta on f.SecuencialEstadoOferta equals r.Secuencial into estadoJoin
+                                              from r in estadoJoin.DefaultIfEmpty() 
+                                              select new
+                                              {
+                                                  secuencial = f.Secuencial,
+                                                  valor = f.Valor,
+                                                  estadoSecuencial = f.SecuencialEstadoOferta,
+                                                  estadoDescripcion = r != null ? r.Descripcion : null, // Si no hay estado (null), asignamos null a la descripción
+                                                  secuencialOferta = f.SecuencialOferta,
+                                                  fechaAprobacionOferta = f.FechaAprobacionOferta.HasValue ? f.FechaAprobacionOferta.Value : (DateTime?)null,
+                                                  noContrato = f.NoContrato,
+                                                  fomalizacionContrato = f.Formalizado,
+                                                  seguimientoContrato = f.SeguimientoFormalizacion,
+                                                  valorAnticipo = f.ValorAnticipo,
+                                                  fechaFacturacionAnticipo = f.FechaOrdenFacturacionAnticipo.HasValue ? f.FechaOrdenFacturacionAnticipo.Value : (DateTime?)null,
+                                                  ordenFacturacionAnticipo = f.NoOrdenFacturacionAnticipo,
+                                                  valorEntrega = f.ValorEntrega,
+                                                  ordenFacturacionEntrega = f.NoOrdenFacturacionEntrega,
+                                                  valorFacturacionProgramada = f.ValorFacturacionProgramada,
+                                                  ordenFacturacionProgramada = f.NoOrdenFacturacionProgramada
+                                              }).ToList();
+
+                var formalizaciones = (from f in formalizacionComercial
+                                       select new
+                                       {
+                                           secuencial = f.secuencial,
+                                           valor = f.valor,
+                                           estadoSecuencial = f.estadoSecuencial,
+                                           estadoDescripcion = f.estadoDescripcion,
+                                           fechaAprobacionOferta = f.fechaAprobacionOferta.HasValue ? f.fechaAprobacionOferta.Value.ToString("dd/MM/yyyy") : null,
+                                           noContrato = f.noContrato,
+                                           formalizacionContrato = f.fomalizacionContrato == 1 ? true : false,
+                                           seguimientoContrato = f.seguimientoContrato,
+                                           valorAnticipo = f.valorAnticipo,
+                                           fechaFacturacionAnticipo = f.fechaFacturacionAnticipo.HasValue ? f.fechaFacturacionAnticipo.Value.ToString("dd/MM/yyyy") : null,
+                                           ordenFacturacionAnticipo = f.ordenFacturacionAnticipo,
+                                           valorEntrega = f.valorEntrega,
+                                           ordenFacturacionEntrega = f.ordenFacturacionEntrega,
+                                           valorFacturacionProgramada = f.valorFacturacionProgramada,
+                                           ordenFacturacionProgramada = f.ordenFacturacionProgramada
+                                       }).ToList();
+
+
+                if (filtro != "")
+                {
+                    formalizacionComercial = formalizacionComercial.Where(x =>
+                                            x.valor.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.estadoDescripcion.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.fechaAprobacionOferta.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.noContrato.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.seguimientoContrato.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.valorAnticipo.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.fechaFacturacionAnticipo.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.ordenFacturacionAnticipo.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.valorEntrega.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.ordenFacturacionEntrega.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.valorFacturacionProgramada.ToString().ToLower().Contains(filtro.ToLower()) ||
+                                            x.ordenFacturacionProgramada.ToString().ToLower().Contains(filtro.ToLower())
+                                          ).ToList();
+                }
+
+                int total = formalizacionComercial.Count();
+                formalizacionComercial = formalizacionComercial.Skip(start).Take(lenght).ToList();
+
+                var result = new
+                {
+                    success = true,
+                    total = total,
+                    formalizacionLista = formalizacionComercial
+                };
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+                var result = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(result);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
+        public ActionResult DarDatosFormalizacion(string secuencial)
+        {
+            try
+            {
+                var sec = int.Parse(secuencial);
+                FormalizacionOfertas o = db.FormalizacionOfertas.Where(d => d.Secuencial == sec).FirstOrDefault();
+                if (o == null)
+                {
+                    throw new Exception("No se encuentra la formalización en el sistema");
+                }
+
+                var form = (from f in db.FormalizacionOfertas
+                            join oo in db.OfertaOferta on f.SecuencialOferta equals oo.Secuencial
+                            join r in db.EstadoOferta on f.SecuencialEstadoOferta equals r.Secuencial into estadoJoin
+                            from r in estadoJoin.DefaultIfEmpty() 
+                            where f.Secuencial == sec
+                            select new
+                            {
+                                secuencial = f.Secuencial,
+                                valor = f.Valor,
+                                estadoSecuencial = f.SecuencialEstadoOferta,
+                                ofertaSecuencial = f.SecuencialOferta,
+                                estadoDescripcion = r != null ? r.Descripcion : null, // Si no hay coincidencia con EstadoOferta, asignamos null
+                                fechaAprobacionOferta = f.FechaAprobacionOferta.HasValue ? f.FechaAprobacionOferta.Value : (DateTime?)null,
+                                noContrato = f.NoContrato,
+                                fomalizacionContrato = f.Formalizado,
+                                seguimientoContrato = f.SeguimientoFormalizacion,
+                                valorAnticipo = f.ValorAnticipo,
+                                fechaFacturacionAnticipo = f.FechaOrdenFacturacionAnticipo.HasValue ? f.FechaOrdenFacturacionAnticipo.Value : (DateTime?)null,
+                                ordenFacturacionAnticipo = f.NoOrdenFacturacionAnticipo,
+                                valorEntrega = f.ValorEntrega,
+                                ordenFacturacionEntrega = f.NoOrdenFacturacionEntrega,
+                                valorFacturacionProgramada = f.ValorFacturacionProgramada,
+                                ordenFacturacionProgramada = f.NoOrdenFacturacionProgramada
+                            }).FirstOrDefault();
+
+
+                var result = new
+                {
+                    success = true,
+                    formalizacion = form
+                };
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+                var result = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(result);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
+        public ActionResult GuardarFormalizacion(string valor, string estadoSecuencial, string secuencialOferta, string fechaAprobacionOferta, string noContrato, int formalizacionContrato,
+    string seguimientoContrato, string valorAnticipo, string fechaFacturacionAnticipo, string ordenFacturacionAnticipo, string valorEntrega,
+    string ordenFacturacionEntrega, string valorFacturacionProgramada, string ordenFacturacionProgramada)
+        {
+            try
+            {
+                FormalizacionOfertas nuevaFormalizacion = new FormalizacionOfertas();
+
+                // Método auxiliar para convertir fechas, permitiendo nulos
+                DateTime? ConvertirFecha(string fecha)
+                {
+                    if (DateTime.TryParse(fecha, out DateTime fechaConvertida))
+                    {
+                        return fechaConvertida;
+                    }
+                    return null; // Retorna nulo si la fecha no es válida
+                }
+
+                // Método auxiliar para convertir a Double, permitiendo valores vacíos
+                double? ConvertirDouble(string val)
+                {
+                    if (!string.IsNullOrEmpty(val))
+                    {
+                        return Double.Parse(val);
+                    }
+                    return null; // Retorna nulo si el valor es vacío o nulo
+                }
+
+                // Usar el método ConvertirDouble para la conversión de valores
+                nuevaFormalizacion.Valor = ConvertirDouble(valor) ?? 0;
+                nuevaFormalizacion.SecuencialEstadoOferta = string.IsNullOrEmpty(estadoSecuencial) ? (int?)null : int.Parse(estadoSecuencial);
+                nuevaFormalizacion.SecuencialOferta = int.Parse(secuencialOferta);
+                nuevaFormalizacion.FechaAprobacionOferta = ConvertirFecha(fechaAprobacionOferta);
+                nuevaFormalizacion.NoContrato = noContrato;
+                nuevaFormalizacion.Formalizado = formalizacionContrato;
+                nuevaFormalizacion.SeguimientoFormalizacion = seguimientoContrato;
+                nuevaFormalizacion.ValorAnticipo = ConvertirDouble(valorAnticipo) ?? 0;
+                nuevaFormalizacion.FechaOrdenFacturacionAnticipo = ConvertirFecha(fechaFacturacionAnticipo);
+                nuevaFormalizacion.NoOrdenFacturacionAnticipo = ordenFacturacionAnticipo;
+                nuevaFormalizacion.ValorEntrega = ConvertirDouble(valorEntrega) ?? 0;
+                nuevaFormalizacion.NoOrdenFacturacionEntrega = ordenFacturacionEntrega;
+                nuevaFormalizacion.ValorFacturacionProgramada = ConvertirDouble(valorFacturacionProgramada) ?? 0;
+                nuevaFormalizacion.NoOrdenFacturacionProgramada = ordenFacturacionProgramada;
+
+                db.FormalizacionOfertas.Add(nuevaFormalizacion);
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
+            }
+            catch (DbEntityValidationException ex)
+            {
+                var errorMessages = ex.EntityValidationErrors
+                    .SelectMany(e => e.ValidationErrors)
+                    .Select(e => $"{e.PropertyName}: {e.ErrorMessage}");
+
+                var fullErrorMessage = string.Join("; ", errorMessages);
+                var exceptionMessage = $"Error de validación: {fullErrorMessage}";
+
+                return Json(new
+                {
+                    success = false,
+                    msg = exceptionMessage
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
+        public ActionResult EditarFormalizacion(int secuencial, string valor, string estadoSecuencial, string secuencialOferta, string fechaAprobacionOferta, string noContrato, int formalizacionContrato,
+    string seguimientoContrato, string valorAnticipo, string fechaFacturacionAnticipo, string ordenFacturacionAnticipo, string valorEntrega,
+    string ordenFacturacionEntrega, string valorFacturacionProgramada, string ordenFacturacionProgramada)
+        {
+            try
+            {
+                var formalizacion = db.FormalizacionOfertas.FirstOrDefault(s => s.Secuencial == secuencial);
+
+                if (formalizacion == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        msg = "La formalización especificada no existe."
+                    });
+                }
+
+                // Método auxiliar para convertir fechas, permitiendo nulos
+                DateTime? ConvertirFecha(string fecha)
+                {
+                    if (DateTime.TryParse(fecha, out DateTime fechaConvertida))
+                    {
+                        return fechaConvertida;
+                    }
+                    return null; // Retorna nulo si la fecha no es válida
+                }
+
+                // Método auxiliar para convertir a Double, permitiendo valores vacíos
+                double? ConvertirDouble(string val)
+                {
+                    if (!string.IsNullOrEmpty(val))
+                    {
+                        return Double.Parse(val);
+                    }
+                    return null; // Retorna nulo si el valor es vacío o nulo
+                }
+
+                // Método auxiliar para convertir a int, permitiendo valores vacíos
+                int? ConvertirInt(string val)
+                {
+                    if (!string.IsNullOrEmpty(val))
+                    {
+                        return int.Parse(val);
+                    }
+                    return null; // Retorna nulo si el valor es vacío o nulo
+                }
+
+                // Usar los métodos ConvertirDouble y ConvertirInt para la conversión de valores
+                formalizacion.Valor = ConvertirDouble(valor) ?? (double?)null;
+                formalizacion.SecuencialEstadoOferta = ConvertirInt(estadoSecuencial);
+                formalizacion.SecuencialOferta = int.Parse(secuencialOferta);
+                formalizacion.FechaAprobacionOferta = ConvertirFecha(fechaAprobacionOferta);
+                formalizacion.NoContrato = noContrato;
+                formalizacion.Formalizado = formalizacionContrato;
+                formalizacion.SeguimientoFormalizacion = seguimientoContrato;
+                formalizacion.ValorAnticipo = ConvertirDouble(valorAnticipo) ?? (double?)null;
+                formalizacion.FechaOrdenFacturacionAnticipo = ConvertirFecha(fechaFacturacionAnticipo);
+                formalizacion.NoOrdenFacturacionAnticipo = ordenFacturacionAnticipo;
+                formalizacion.ValorEntrega = ConvertirDouble(valorEntrega) ?? (double?)null;
+                formalizacion.NoOrdenFacturacionEntrega = ordenFacturacionEntrega;
+                formalizacion.ValorFacturacionProgramada = ConvertirDouble(valorFacturacionProgramada) ?? (double?)null;
+                formalizacion.NoOrdenFacturacionProgramada = ordenFacturacionProgramada;
+
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
+            }
+            catch (DbEntityValidationException ex)
+            {
+                var errorMessages = ex.EntityValidationErrors
+                    .SelectMany(e => e.ValidationErrors)
+                    .Select(e => $"{e.PropertyName}: {e.ErrorMessage}");
+
+                var fullErrorMessage = string.Join("; ", errorMessages);
+                var exceptionMessage = $"Error de validación: {fullErrorMessage}";
+
+                return Json(new
+                {
+                    success = false,
+                    msg = exceptionMessage
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
+        public ActionResult EliminarFormalizacion(string secuencial)
+        {
+            try
+            {
+                var sec = int.Parse(secuencial);
+                var formalizacion = db.FormalizacionOfertas.Where(d => d.Secuencial == sec).FirstOrDefault();
+
+                if (formalizacion == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        msg = "La formalización especificada no existe."
+                    });
+                }
+
+                db.FormalizacionOfertas.Remove(formalizacion);
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
+            }
+            catch (DbEntityValidationException ex)
+            {
+                var errorMessages = ex.EntityValidationErrors
+                    .SelectMany(e => e.ValidationErrors)
+                    .Select(e => $"{e.PropertyName}: {e.ErrorMessage}");
+
+                var fullErrorMessage = string.Join("; ", errorMessages);
+                var exceptionMessage = $"Error de validación: {fullErrorMessage}";
+
+                return Json(new
+                {
+                    success = false,
+                    msg = exceptionMessage
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
+        public ActionResult DarOfertasOfertas()
+        {
+            try
+            {
+                var ofertasComercial = (from or in db.OfertaOferta
+                                        select new
+                                        {
+                                            secuencial = or.Secuencial,
+                                            detalle = or.Secuencial + "-" + or.Codigo.Substring(0, 30)
+                                        }).ToList();
+                return Json(new
+                {
+                    success = true,
+                    ofertasComercial = ofertasComercial,
+                    msg = "Se ha realizado la operación correctamente."
+                });
+            }
+            catch (DbEntityValidationException ex)
+            {
+                return Json(new
+                {
+                    success = false
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
+        public ActionResult GenerarCodigoFormalizacion()
+        {
+            string annoActual = DateTime.Now.Year.ToString().Substring(2, 2);
+
+            // Obtener el último código de la tabla OfertaOferta
+            var ultimoCodigo = db.FormalizacionOfertas
+                                 .OrderByDescending(o => o.Secuencial)
+                                 .Select(o => o.Secuencial)
+                                 .FirstOrDefault();
+
+            int nuevoNumero = 1; // Número inicial si no hay códigos previos
+
+            if (ultimoCodigo != 0)
+            {
+                // Extraer los últimos 4 dígitos del último código y convertirlos a entero
+                nuevoNumero = ultimoCodigo + 1;
+            }
+
+            // Formatear el nuevo número a 4 dígitos con ceros a la izquierda
+            string nuevoNumeroStr = nuevoNumero.ToString().PadLeft(4, '0');
+
+            // Concatenar el año actual con el nuevo número
+            string nuevoCodigo = $"{annoActual}-{nuevoNumeroStr}";
+
+            return Json(new
+            {
+                success = true,
+                nuevoCodigo = nuevoCodigo
+            });
+
+        }
+
     }
 
 }

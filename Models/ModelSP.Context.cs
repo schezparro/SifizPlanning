@@ -212,5 +212,7 @@ namespace SifizPlanning.Models
         public virtual DbSet<DiasDisponiblesVacaciones> DiasDisponiblesVacaciones { get; set; }
         public virtual DbSet<PropuestaVacaciones> PropuestaVacaciones { get; set; }
         public virtual DbSet<OfertaOferta> OfertaOferta { get; set; }
+        public virtual DbSet<EstadoOferta> EstadoOferta { get; set; }
+        public virtual DbSet<FormalizacionOfertas> FormalizacionOfertas { get; set; }
     }
 }

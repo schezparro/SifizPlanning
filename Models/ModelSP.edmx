@@ -569,6 +569,16 @@
           <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="ESTADOOFERTA">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CODIGO" Type="varchar" MaxLength="30" Nullable="false" />
+          <Property Name="DESCRIPCION" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="ESTADOTAREA">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
@@ -588,6 +598,28 @@
           <Property Name="DESCRIPCION" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="FORMALIZACIONOFERTAS">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CODIGO" Type="nchar" MaxLength="30" />
+          <Property Name="SECUENCIALOFERTA" Type="int" Nullable="false" />
+          <Property Name="SECUENCIALESTADOOFERTA" Type="int" />
+          <Property Name="VALOR" Type="float" />
+          <Property Name="FECHAAPROBACIONOFERTA" Type="datetime" />
+          <Property Name="NOCONTRATO" Type="nvarchar" MaxLength="30" />
+          <Property Name="FORMALIZADO" Type="numeric" Precision="1" Scale="0" />
+          <Property Name="SEGUIMIENTOFORMALIZACION" Type="nvarchar" MaxLength="4000" />
+          <Property Name="VALORANTICIPO" Type="float" />
+          <Property Name="FECHAORDENFACTURACIONANTICIPO" Type="datetime" />
+          <Property Name="NOORDENFACTURACIONANTICIPO" Type="nvarchar" MaxLength="30" />
+          <Property Name="VALORENTREGA" Type="float" />
+          <Property Name="NOORDENFACTURACIONENTREGA" Type="nvarchar" MaxLength="30" />
+          <Property Name="VALORFACTURACIONPROGRAMADA" Type="float" />
+          <Property Name="NOORDENFACTURACIONPROGRAMADA" Type="nvarchar" MaxLength="30" />
+          <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" />
         </EntityType>
         <EntityType Name="FOTOCOLABORADOR">
           <Key>
@@ -2506,6 +2538,30 @@
             </Principal>
             <Dependent Role="ETAPASPROYECTOCLIENTE">
               <PropertyRef Name="SECUENCIALCLIENTEAUXILIAR" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FORMALIZACIONOFERTAS_ESTADOOFERTA">
+          <End Role="ESTADOOFERTA" Type="Self.ESTADOOFERTA" Multiplicity="0..1" />
+          <End Role="FORMALIZACIONOFERTAS" Type="Self.FORMALIZACIONOFERTAS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ESTADOOFERTA">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="FORMALIZACIONOFERTAS">
+              <PropertyRef Name="SECUENCIALESTADOOFERTA" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FORMALIZACIONOFERTAS_OFERTAOFERTA">
+          <End Role="OFERTAOFERTA" Type="Self.OFERTAOFERTA" Multiplicity="1" />
+          <End Role="FORMALIZACIONOFERTAS" Type="Self.FORMALIZACIONOFERTAS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OFERTAOFERTA">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="FORMALIZACIONOFERTAS">
+              <PropertyRef Name="SECUENCIALOFERTA" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -5249,8 +5305,10 @@
           <EntitySet Name="EstadoActa" EntityType="Self.EstadoActa" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="ESTADOCONTRATO" EntityType="Self.ESTADOCONTRATO" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="ESTADOENTREGABLE" EntityType="Self.ESTADOENTREGABLE" Schema="TAREAS" store:Type="Tables" />
+          <EntitySet Name="ESTADOOFERTA" EntityType="Self.ESTADOOFERTA" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="ESTADOTAREA" EntityType="Self.ESTADOTAREA" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="FASECONTRATO" EntityType="Self.FASECONTRATO" Schema="TAREAS" store:Type="Tables" />
+          <EntitySet Name="FORMALIZACIONOFERTAS" EntityType="Self.FORMALIZACIONOFERTAS" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="FOTOCOLABORADOR" EntityType="Self.FOTOCOLABORADOR" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="FuncionalidadCliente" EntityType="Self.FuncionalidadCliente" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="GESTION_SOLICITUDTAREA" EntityType="Self.GESTION_SOLICITUDTAREA" Schema="TAREAS" store:Type="Tables" />
@@ -5508,6 +5566,14 @@
           <AssociationSet Name="FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1" Association="Self.FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1">
             <End Role="CLIENTEAUXILIAR" EntitySet="CLIENTEAUXILIAR" />
             <End Role="ETAPASPROYECTOCLIENTE" EntitySet="ETAPASPROYECTOCLIENTE" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FORMALIZACIONOFERTAS_ESTADOOFERTA" Association="Self.FK_FORMALIZACIONOFERTAS_ESTADOOFERTA">
+            <End Role="ESTADOOFERTA" EntitySet="ESTADOOFERTA" />
+            <End Role="FORMALIZACIONOFERTAS" EntitySet="FORMALIZACIONOFERTAS" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FORMALIZACIONOFERTAS_OFERTAOFERTA" Association="Self.FK_FORMALIZACIONOFERTAS_OFERTAOFERTA">
+            <End Role="OFERTAOFERTA" EntitySet="OFERTAOFERTA" />
+            <End Role="FORMALIZACIONOFERTAS" EntitySet="FORMALIZACIONOFERTAS" />
           </AssociationSet>
           <AssociationSet Name="FK_FUNCIONALIDADCLIENTE_CLIENTE" Association="Self.FK_FUNCIONALIDADCLIENTE_CLIENTE">
             <End Role="CLIENTE" EntitySet="CLIENTE" />
@@ -7609,6 +7675,16 @@
           <AssociationSet Name="FK_OFERTAOFERTA_OFERTAREQUERIMIENTO" Association="SifizPlanningModel.FK_OFERTAOFERTA_OFERTAREQUERIMIENTO">
             <End Role="OfertaRequerimiento" EntitySet="OFERTAREQUERIMIENTO" />
             <End Role="OFERTAOFERTA" EntitySet="OfertaOferta" />
+          </AssociationSet>
+          <EntitySet Name="EstadoOferta" EntityType="SifizPlanningModel.EstadoOferta" />
+          <EntitySet Name="FormalizacionOfertas" EntityType="SifizPlanningModel.FormalizacionOfertas" />
+          <AssociationSet Name="FK_FORMALIZACIONOFERTAS_ESTADOOFERTA" Association="SifizPlanningModel.FK_FORMALIZACIONOFERTAS_ESTADOOFERTA">
+            <End Role="ESTADOOFERTA" EntitySet="EstadoOferta" />
+            <End Role="FORMALIZACIONOFERTAS" EntitySet="FormalizacionOfertas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FORMALIZACIONOFERTAS_OFERTAOFERTA" Association="SifizPlanningModel.FK_FORMALIZACIONOFERTAS_OFERTAOFERTA">
+            <End Role="OfertaOferta" EntitySet="OfertaOferta" />
+            <End Role="FORMALIZACIONOFERTAS" EntitySet="FormalizacionOfertas" />
           </AssociationSet>
           </EntityContainer>
         <EntityType Name="Rol">
@@ -13256,6 +13332,7 @@
           <Property Name="SecuencialOfertaRequerimiento" Type="Int32" />
           <Property Name="EstaActivo" Type="Int32" />
           <NavigationProperty Name="OfertaRequerimiento" Relationship="SifizPlanningModel.FK_OFERTAOFERTA_OFERTAREQUERIMIENTO" FromRole="OFERTAOFERTA" ToRole="OfertaRequerimiento" />
+          <NavigationProperty Name="FORMALIZACIONOFERTAS" Relationship="SifizPlanningModel.FK_FORMALIZACIONOFERTAS_OFERTAOFERTA" FromRole="OfertaOferta" ToRole="FORMALIZACIONOFERTAS" />
         </EntityType>
         <Association Name="FK_OFERTAOFERTA_OFERTAREQUERIMIENTO">
           <End Type="SifizPlanningModel.OfertaRequerimiento" Role="OfertaRequerimiento" Multiplicity="0..1" />
@@ -13266,6 +13343,65 @@
             </Principal>
             <Dependent Role="OFERTAOFERTA">
               <PropertyRef Name="SecuencialOfertaRequerimiento" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="EstadoOferta">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Codigo" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Descripcion" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <Property Name="NumeroVerificador" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="formalizacionOfertas" Relationship="SifizPlanningModel.FK_FORMALIZACIONOFERTAS_ESTADOOFERTA" FromRole="ESTADOOFERTA" ToRole="FORMALIZACIONOFERTAS" />
+        </EntityType>
+        <EntityType Name="FormalizacionOfertas">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Codigo" Type="String" MaxLength="30" FixedLength="true" Unicode="true" />
+          <Property Name="SecuencialOferta" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialEstadoOferta" Type="Int32" />
+          <Property Name="Valor" Type="Double" />
+          <Property Name="FechaAprobacionOferta" Type="DateTime" Precision="3" />
+          <Property Name="NoContrato" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="Formalizado" Type="Decimal" Precision="1" Scale="0" />
+          <Property Name="SeguimientoFormalizacion" Type="String" MaxLength="4000" FixedLength="false" Unicode="true" />
+          <Property Name="ValorAnticipo" Type="Double" />
+          <Property Name="FechaOrdenFacturacionAnticipo" Type="DateTime" Precision="3" />
+          <Property Name="NoOrdenFacturacionAnticipo" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="ValorEntrega" Type="Double" />
+          <Property Name="NoOrdenFacturacionEntrega" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="ValorFacturacionProgramada" Type="Double" />
+          <Property Name="NoOrdenFacturacionProgramada" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="EstaActivo" Type="Decimal" Precision="1" Scale="0" />
+          <NavigationProperty Name="estadoOferta" Relationship="SifizPlanningModel.FK_FORMALIZACIONOFERTAS_ESTADOOFERTA" FromRole="FORMALIZACIONOFERTAS" ToRole="ESTADOOFERTA" />
+          <NavigationProperty Name="ofertaOferta" Relationship="SifizPlanningModel.FK_FORMALIZACIONOFERTAS_OFERTAOFERTA" FromRole="FORMALIZACIONOFERTAS" ToRole="OfertaOferta" />
+        </EntityType>
+        <Association Name="FK_FORMALIZACIONOFERTAS_ESTADOOFERTA">
+          <End Type="SifizPlanningModel.EstadoOferta" Role="ESTADOOFERTA" Multiplicity="0..1" />
+          <End Type="SifizPlanningModel.FormalizacionOfertas" Role="FORMALIZACIONOFERTAS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ESTADOOFERTA">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="FORMALIZACIONOFERTAS">
+              <PropertyRef Name="SecuencialEstadoOferta" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FORMALIZACIONOFERTAS_OFERTAOFERTA">
+          <End Type="SifizPlanningModel.OfertaOferta" Role="OfertaOferta" Multiplicity="1" />
+          <End Type="SifizPlanningModel.FormalizacionOfertas" Role="FORMALIZACIONOFERTAS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OfertaOferta">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="FORMALIZACIONOFERTAS">
+              <PropertyRef Name="SecuencialOferta" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -15604,6 +15740,40 @@
                 <ScalarProperty Name="FechaEnvioRevision" ColumnName="FECHAENVIOREVISION" />
                 <ScalarProperty Name="FechaGeneracionOferta" ColumnName="FECHAGENERACIONOFERTA" />
                 <ScalarProperty Name="FechaRecepcionEstimacion" ColumnName="FECHARECEPCIONESTIMACION" />
+                <ScalarProperty Name="Codigo" ColumnName="CODIGO" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="EstadoOferta">
+            <EntityTypeMapping TypeName="SifizPlanningModel.EstadoOferta">
+              <MappingFragment StoreEntitySet="ESTADOOFERTA">
+                <ScalarProperty Name="NumeroVerificador" ColumnName="NUMEROVERIFICADOR" />
+                <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
+                <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
+                <ScalarProperty Name="Codigo" ColumnName="CODIGO" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FormalizacionOfertas">
+            <EntityTypeMapping TypeName="SifizPlanningModel.FormalizacionOfertas">
+              <MappingFragment StoreEntitySet="FORMALIZACIONOFERTAS">
+                <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
+                <ScalarProperty Name="NoOrdenFacturacionProgramada" ColumnName="NOORDENFACTURACIONPROGRAMADA" />
+                <ScalarProperty Name="ValorFacturacionProgramada" ColumnName="VALORFACTURACIONPROGRAMADA" />
+                <ScalarProperty Name="NoOrdenFacturacionEntrega" ColumnName="NOORDENFACTURACIONENTREGA" />
+                <ScalarProperty Name="ValorEntrega" ColumnName="VALORENTREGA" />
+                <ScalarProperty Name="NoOrdenFacturacionAnticipo" ColumnName="NOORDENFACTURACIONANTICIPO" />
+                <ScalarProperty Name="FechaOrdenFacturacionAnticipo" ColumnName="FECHAORDENFACTURACIONANTICIPO" />
+                <ScalarProperty Name="ValorAnticipo" ColumnName="VALORANTICIPO" />
+                <ScalarProperty Name="SeguimientoFormalizacion" ColumnName="SEGUIMIENTOFORMALIZACION" />
+                <ScalarProperty Name="Formalizado" ColumnName="FORMALIZADO" />
+                <ScalarProperty Name="NoContrato" ColumnName="NOCONTRATO" />
+                <ScalarProperty Name="FechaAprobacionOferta" ColumnName="FECHAAPROBACIONOFERTA" />
+                <ScalarProperty Name="Valor" ColumnName="VALOR" />
+                <ScalarProperty Name="SecuencialEstadoOferta" ColumnName="SECUENCIALESTADOOFERTA" />
+                <ScalarProperty Name="SecuencialOferta" ColumnName="SECUENCIALOFERTA" />
                 <ScalarProperty Name="Codigo" ColumnName="CODIGO" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
               </MappingFragment>

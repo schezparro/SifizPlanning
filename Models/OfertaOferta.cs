@@ -14,6 +14,11 @@ namespace SifizPlanning.Models
     
     public partial class OfertaOferta
     {
+        public OfertaOferta()
+        {
+            this.FORMALIZACIONOFERTAS = new HashSet<FormalizacionOfertas>();
+        }
+    
         public int Secuencial { get; set; }
         public string Codigo { get; set; }
         public Nullable<System.DateTime> FechaRecepcionEstimacion { get; set; }
@@ -26,5 +31,6 @@ namespace SifizPlanning.Models
         public Nullable<int> EstaActivo { get; set; }
     
         public virtual OfertaRequerimiento OfertaRequerimiento { get; set; }
+        public virtual ICollection<FormalizacionOfertas> FORMALIZACIONOFERTAS { get; set; }
     }
 }

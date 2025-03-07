@@ -609,6 +609,9 @@
     <Compile Include="Models\EstadoEntregable.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\EstadoOferta.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\EstadoPermiso.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
@@ -643,6 +646,9 @@
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\FlujoEstadoTicket.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\FormalizacionOfertas.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\FotoColaborador.cs">
@@ -1035,6 +1041,7 @@
     <Compile Include="Security\MyRoleProvider.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Util\Utiles.cs" />
+    <Content Include="Web\js\comercial\formalizacionController.js" />
     <Content Include="Web\js\comercial\ofertasController.js" />
     <Content Include="Areas\HelpPage\HelpPage.css" />
     <Content Include="Content\bootstrap-grid.css" />
@@ -1269,6 +1276,7 @@
     <Content Include="Views\Rrhh\windowDiasVacaciones.cshtml" />
     <Content Include="Views\User\windowUserPropuestaVacaciones.cshtml" />
     <Content Include="Views\Rrhh\windowPropuestaVacaciones.cshtml" />
+    <Content Include="Views\Comercial\windowFormalizacionOfertasComercial.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
