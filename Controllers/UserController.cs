@@ -4987,16 +4987,7 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult GuardarPlanRecurso(
-            string titulo,
-            string detalle,
-            string fecha,
-            int modulo,
-            int colaborador,
-            int tiempo,
-            string asistentesJson,
-            string link = "",
-            HttpPostedFileBase archivo = null) // Nuevo parámetro para el archivo
+        public ActionResult GuardarPlanRecurso(string titulo, string detalle, string fecha, int modulo, int colaborador, int tiempo, string asistentesJson, string link = "", HttpPostedFileBase archivo = null)
         {
             try
             {
@@ -5401,6 +5392,7 @@ r in db.Rol on ur.rol equals r
 
             try
             {
+                List<string> errors = new List<string>();
                 // Deserializar datos
                 var asistentes = JsonConvert.DeserializeObject<List<dynamic>>(adjuntoAsistencia);
 
@@ -5416,6 +5408,11 @@ r in db.Rol on ur.rol equals r
                 foreach (var asistente in asistentes)
                 {
                     int colaboradorId = (int)asistente["idColaborador"];
+                    //var colaboradorJede = db.Colaborador.Where(s => s.Secuencial == colaboradorId).FirstOrDefault();
+                    //bool esJede = (colaboradorJede.departamento.Asignable == 1 && colaboradorJede.persona.usuario.FirstOrDefault().EstaActivo == 1);
+                    string textoEmail = ConstruirTextoEmail(recurso);
+                    string asuntoEmail = "Nueva Reunión/Capacitación";
+
                     bool convocado = (bool)asistente["convocado"];
 
                     RecursosAsistencia ra = db.RecursosAsistencia
@@ -5443,7 +5440,14 @@ r in db.Rol on ur.rol equals r
                             NumeroVerificador = 1,
                         };
 
-                        Utiles.AgregarTareaConReubicacion(tarea, db);
+                        try
+                        {
+                            Utiles.AgregarTareaConReubicacion(tarea, db);
+                        }
+                        catch (Exception e)
+                        {
+                            errors.Add(e.Message);
+                        }
                         db.SaveChanges();
 
                         // Relación entre tarea y capacitación
@@ -5462,7 +5466,8 @@ r in db.Rol on ur.rol equals r
 
                         if (!string.IsNullOrEmpty(email))
                         {
-                            nuevosConvocadosEmails.Add(email);
+                            string[] emails = new string[] { email };
+                            BackgroundJob.Enqueue(() => Utiles.EnviarEmailSistema(emails, textoEmail, asuntoEmail, null, null));
                         }
                     }
                     else if (!convocado && ra.Convocado == 1)
@@ -5483,14 +5488,6 @@ r in db.Rol on ur.rol equals r
                             db.SaveChanges();
                         }
                     }
-                }
-
-                // Enviar correos solo a los nuevos convocados
-                if (nuevosConvocadosEmails.Any())
-                {
-                    string textoEmail = ConstruirTextoEmail(recurso);
-                    string asuntoEmail = "Nueva Reunión/Capacitación";
-                    Utiles.EnviarEmailSistema(nuevosConvocadosEmails.ToArray(), textoEmail, asuntoEmail);
                 }
 
                 return Json(new { success = true, msg = "Operación realizada correctamente." });

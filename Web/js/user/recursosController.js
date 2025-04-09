@@ -599,6 +599,12 @@
         }
     };
 
+    $scope.selectAllAsistants = function () {
+        for (var i = 0; i < $scope.datosConvocadosReunion.length; i++) {
+            $scope.datosConvocadosReunion[i].convocado = $scope.allSelected;
+        }
+    };
+
     $('#modal-agregar-plan').on('hidden.bs.modal', function () {
         $scope.$apply(function () {
             for (var i = 0; i < $scope.asistentesCapacitacion.length; i++) {

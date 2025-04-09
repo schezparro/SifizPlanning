@@ -646,10 +646,10 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
     $scope.resetearAdjunto = function () {
         if (document.getElementById('selectedFile').files[0].name.length > 20) {
             document.getElementById('buttonAdjuntoModal').innerHTML = "..." + document.getElementById('selectedFile').files[0].name.substring(document.getElementById('selectedFile').files[0].name.length - 17, document.getElementById('selectedFile').files[0].name.length);
-            document.getElementById('buttonAdjunto').innerHTML = "..." + document.getElementById('selectedFile').files[0].name.substring(document.getElementById('selectedFile').files[0].name.length - 17, document.getElementById('selectedFile').files[0].name.length);
+            //document.getElementById('buttonAdjunto').innerHTML = "..." + document.getElementById('selectedFile').files[0].name.substring(document.getElementById('selectedFile').files[0].name.length - 17, document.getElementById('selectedFile').files[0].name.length);
         } else {
             document.getElementById('buttonAdjuntoModal').innerHTML = document.getElementById('selectedFile').files[0].name.substring(0, 20);
-            document.getElementById('buttonAdjunto').innerHTML = "..." + document.getElementById('selectedFile').files[0].name.substring(document.getElementById('selectedFile').files[0].name.length - 17, document.getElementById('selectedFile').files[0].name.length);
+            //document.getElementById('buttonAdjunto').innerHTML = "..." + document.getElementById('selectedFile').files[0].name.substring(document.getElementById('selectedFile').files[0].name.length - 17, document.getElementById('selectedFile').files[0].name.length);
         }
     }
 
@@ -1008,7 +1008,7 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
                                     angular.element.each($scope.asignaciones, function (key, value) {
                                         $scope.totalHorasAsignadas += parseInt(value.numeroHoras);
                                     });
-                                    document.getElementById('buttonAdjunto').innerHTML = '<span class="glyphicon glyphicon-paperclip"></span> Adjuntar';
+                                    //document.getElementById('buttonAdjunto').innerHTML = '<span class="glyphicon glyphicon-paperclip"></span> Adjuntar';
                                     document.getElementById('selectedFile').value = "";
                                     $scope.validarContratoMantenimiento();
 

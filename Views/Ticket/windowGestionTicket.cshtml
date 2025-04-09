@@ -358,7 +358,7 @@
                                         <div id="panel-adjuntos-ticket" class="left info-ticket">
                                             <div ng-repeat="adj in adjuntosTicket" class="left">
                                                 <a href="Web{{adj.Url}}" target="_blank" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-paperclip"></span> Adjunto {{$index+1}}</a>
-                                                <span ng-click="modalEliminarAdjunto(adj.Secuencial)" style="cursor:pointer; vertical-align: middle; margin-right: 5px" class="glyphicon glyphicon-remove center"></span>
+                                                @*<span ng-click="modalEliminarAdjunto(adj.Secuencial)" style="cursor:pointer; vertical-align: middle; margin-right: 5px" class="glyphicon glyphicon-remove center"></span>*@
                                             </div>
                                         </div>
                                     </div>
@@ -474,7 +474,7 @@
                     <button type="submit" class="btn btn-primary left"><span class="glyphicon glyphicon-save"></span> Grabar</button>
                     <button type="button" class="btn btn-info left" ng-click="$parent.verHistoricoTicket()"><span class="glyphicon glyphicon-calendar"></span> Histórico</button>
                     <button type="button" class="btn btn-warning left" ng-click="verComentarioTicket()"><span class="glyphicon glyphicon-comment"></span> Comentarios</button>
-                    <button type="button" id="buttonAdjunto" class="btn btn-success left" ng-click="cargarAdjunto()"><span class="glyphicon glyphicon-paperclip"></span> Adjuntar</button>
+                    @*<button type="button" id="buttonAdjunto" class="btn btn-success left" ng-click="cargarAdjunto()"><span class="glyphicon glyphicon-paperclip"></span> Adjuntar</button>*@
                     <button type="button" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
                 </div>
             </form>
