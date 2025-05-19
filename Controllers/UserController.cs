@@ -5393,25 +5393,50 @@ r in db.Rol on ur.rol equals r
             try
             {
                 List<string> errors = new List<string>();
-                // Deserializar datos
                 var asistentes = JsonConvert.DeserializeObject<List<dynamic>>(adjuntoAsistencia);
 
-                // Obtener recurso
                 var recurso = db.Recursos.FirstOrDefault(c => c.Secuencial == idRecurso);
                 if (recurso == null)
                 {
                     return Json(new { success = false, msg = "Recurso no encontrado" });
                 }
 
+                var capacitor = recurso.SecuencialColaborador;
+                string emailCapacitor = db.Colaborador
+                    .FirstOrDefault(c => c.Secuencial == capacitor)?
+                    .persona.usuario.FirstOrDefault()?.Email;
+
+                var tareaCapacitor = new Tarea
+                {
+                    SecuencialColaborador = capacitor ?? 0,
+                    SecuencialActividad = 6,
+                    SecuencialModulo = recurso.SecuencialModulo,
+                    SecuencialCliente = 78,
+                    SecuencialEstadoTarea = 1,
+                    SecuencialLugarTarea = 5,
+                    Detalle = $"{recurso.Titulo}\n\nurl: <a href=\"{recurso.Url}\" target=\"_blank\">{recurso.Url}</a>",
+                    FechaInicio = recurso.Fecha,
+                    FechaFin = recurso.Fecha.AddMinutes((double)recurso.TiempoCapacitacion),
+                    HorasUtilizadas = 0,
+                    NumeroVerificador = 1,
+                };
+
+                string textoEmail = ConstruirTextoEmail(recurso);
+                string asuntoEmail = "Nueva Reunión/Capacitación";
+
+                if (!string.IsNullOrEmpty(emailCapacitor))
+                {
+                    string[] emails = new string[] { emailCapacitor };
+                    BackgroundJob.Enqueue(() => Utiles.EnviarEmailSistema(emails, textoEmail, asuntoEmail, null, null));
+                }
+
+                Utiles.AgregarTareaConReubicacion(tareaCapacitor, db);
+
                 List<string> nuevosConvocadosEmails = new List<string>();
 
                 foreach (var asistente in asistentes)
                 {
                     int colaboradorId = (int)asistente["idColaborador"];
-                    //var colaboradorJede = db.Colaborador.Where(s => s.Secuencial == colaboradorId).FirstOrDefault();
-                    //bool esJede = (colaboradorJede.departamento.Asignable == 1 && colaboradorJede.persona.usuario.FirstOrDefault().EstaActivo == 1);
-                    string textoEmail = ConstruirTextoEmail(recurso);
-                    string asuntoEmail = "Nueva Reunión/Capacitación";
 
                     bool convocado = (bool)asistente["convocado"];
 
@@ -5501,15 +5526,15 @@ r in db.Rol on ur.rol equals r
         private string ConstruirTextoEmail(Recursos recurso)
         {
             return $@"
-        <div class='textoCuerpo'>
-            <p>Estimado(a):</p>
-            <p>Por medio del presente correo se establece la reunión programada con el siguiente detalle:</p>
-            <strong>Tema:</strong> {recurso.Titulo}<br/>
-            <strong>Fecha:</strong> {recurso.Fecha:dd/MM/yyyy HH:mm}<br/>
-            <strong>Duración:</strong> {Math.Floor((double)recurso.TiempoCapacitacion / 60)} horas y {recurso.TiempoCapacitacion % 60} minutos<br/>
-            <strong>Modulador:</strong> {recurso.SecuencialModulo}<br/>
-            <strong>Enlace de la reunión:</strong> <a href='{recurso.Url}' target='_blank'>{recurso.Url}</a><br/>
-        </div>";
+                    <div class='textoCuerpo'>
+                        <p>Estimado(a):</p>
+                        <p>Por medio del presente correo se establece la reunión programada con el siguiente detalle:</p>
+                        <strong>Tema:</strong> {recurso.Titulo}<br/>
+                        <strong>Fecha:</strong> {recurso.Fecha:dd/MM/yyyy HH:mm}<br/>
+                        <strong>Duración:</strong> {Math.Floor((double)recurso.TiempoCapacitacion / 60)} horas y {recurso.TiempoCapacitacion % 60} minutos<br/>
+                        <strong>Modulador:</strong> {recurso.SecuencialModulo}<br/>
+                        <strong>Enlace de la reunión:</strong> <a href='{recurso.Url}' target='_blank'>{recurso.Url}</a><br/>
+                    </div>";
         }
 
         //ESTIMACIONES DE LOS USUARIOS
