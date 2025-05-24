@@ -70,6 +70,13 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "USER, ADMIN, RRHH")]
         public ActionResult DarUltimoLunes()
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo(
+                "Consulta Último Lunes",
+                $"Usuario: {emailUser}",
+                emailUser
+            );
+        
             DateTime hoy = DateTime.Today;
             DayOfWeek diaSemana = hoy.DayOfWeek;
             DateTime lunes = hoy;
@@ -84,13 +91,20 @@ namespace SifizPlanning.Controllers
                 DateTime domingo = hoy.Subtract(time);
                 lunes = domingo.AddDays(1);
             }
-
+        
             var resp = new
             {
                 success = true,
                 lunes = lunes.ToString("dd/MM/yyyy"),
                 hoy = hoy.ToString("dd/MM/yyyy")
             };
+        
+            LoggerManager.LogInfo(
+                "Resultado Último Lunes",
+                $"Usuario: {emailUser}, Lunes: {lunes:dd/MM/yyyy}, Hoy: {hoy:dd/MM/yyyy}",
+                emailUser
+            );
+        
             return Json(resp);
         }
 
@@ -98,6 +112,13 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "USER, ADMIN")]
         public ActionResult DarTareasUsuario(string fechaLunes = "", int semanas = 1, string json = "", bool coordinados = false)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo(
+                "Inicio Consulta Tareas",
+                $"Usuario: {emailUser}, Fecha: {fechaLunes}, Semanas: {semanas}, Coordinados: {coordinados}",
+                emailUser
+            );
+
             DateTime lunes = DateTime.Today;
             if (fechaLunes != "")
             {
@@ -160,7 +181,6 @@ namespace SifizPlanning.Controllers
                 }
             }
 
-            string emailUser = User.Identity.Name;
             Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
             Persona persona = user.persona;
             Colaborador colaborador = db.Colaborador.FirstOrDefault(x => x.persona.Secuencial == persona.Secuencial);
@@ -171,8 +191,13 @@ namespace SifizPlanning.Controllers
             {
                 colabSubordinados = (from cji in db.Colaborador_JefeInmediato
                                      where cji.SecuencialJefeInmediato == colaborador.Secuencial
-                                     select cji.SecuencialColaborador
-                                    ).ToList();
+                                     select cji.SecuencialColaborador).ToList();
+
+                LoggerManager.LogInfo(
+                    "Consulta Subordinados",
+                    $"Usuario: {emailUser}, Total subordinados: {colabSubordinados.Count}",
+                    emailUser
+                );
             }
             else
             {
@@ -576,7 +601,13 @@ namespace SifizPlanning.Controllers
 
             if (trabUser != null)
                 tareasProgramadores.Insert(0, trabUser);//Se pone el colaborador de primero
-
+        
+            LoggerManager.LogInfo(
+                "Finaliza Consulta Tareas",
+                $"Usuario: {emailUser}, Total trabajadores: {tareasProgramadores.Count}",
+                emailUser
+            );
+        
             var resp = new
             {
                 success = true,
