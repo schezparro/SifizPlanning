@@ -1040,6 +1040,7 @@
     <Compile Include="Util\Devops.cs" />
     <Compile Include="Util\DiaColaborador.cs" />
     <Compile Include="Util\EventoTicket.cs" />
+    <Compile Include="Util\LoggerManager.cs" />
     <Compile Include="Util\ReportServerCredentials.cs" />
     <Compile Include="Websocket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

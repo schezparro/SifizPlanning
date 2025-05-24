@@ -2,6 +2,7 @@
 using Microsoft.Owin;
 using SifizPlanning.Models;
 using SifizPlanning.Security;
+using SifizPlanning.Util;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -341,6 +342,14 @@ namespace SifizPlanning.Controllers
         {
             try
             {
+                var secuencialEstado = (from es in db.EstadoEntregable
+                                        where es.Descripcion == estado
+                                        select es.Secuencial).ToList()[0];
+
+                var secuencialCliente = (from pmc in db.ProyectoModuloCliente
+                                         where pmc.Secuencial == secuencialModuloCliente
+                                         select pmc.SecuencialCliente).ToList()[0];
+
                 string emailUser = User.Identity.Name;
                 // Log inicio de operación
                 LoggerManager.LogInfo($"Usuario {emailUser} iniciando actualización de datos para módulo cliente {secuencialModuloCliente}");
@@ -363,15 +372,15 @@ namespace SifizPlanning.Controllers
                 if (proyectoModuloCliente != null)
                 {
                     var estadoAnterior = proyectoModuloCliente.SecuencialEstadoEntregable;
-                    if (estadoAnterior != int.Parse(estado))
+                    if (estadoAnterior != secuencialEstado)
                     {
                         LoggerManager.LogSensitiveOperation(
                             "Cambio Estado Módulo",
-                            $"Módulo: {secuencialModuloCliente}, Estado anterior: {estadoAnterior}, Nuevo estado: {estado}",
+                            $"Módulo: {secuencialModuloCliente}, Estado anterior: {estadoAnterior}, Nuevo estado: {secuencialEstado}",
                             emailUser
                         );
                     }
-                    proyectoModuloCliente.SecuencialEstadoEntregable = int.Parse(estado);
+                    proyectoModuloCliente.SecuencialEstadoEntregable = secuencialEstado;
                     proyectoModuloCliente.SecuencialSubModulo = subModulo;
                     db.SaveChanges();
                 }
@@ -420,7 +429,7 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
-                LoggerManager.LogError($"Error al guardar datos del módulo cliente {secuencialModuloCliente}: {e.Message}");
+                LoggerManager.LogError(e, $"Error al guardar datos del módulo cliente {secuencialModuloCliente}: {e.Message}");
                 return Json(new
                 {
                     success = false,
@@ -872,7 +881,7 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
-                LoggerManager.LogError($"Error al crear oferta de ticket: {e.Message}");
+                LoggerManager.LogError(e, $"Error al crear oferta de ticket: {e.Message}");
                 return Json(new {
                     success = false,
                     msg = e.Message
@@ -963,7 +972,7 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
-                LoggerManager.LogError($"Error al editar oferta ID {ID}: {e.Message}");
+                LoggerManager.LogError(e, $"Error al editar oferta ID {ID}: {e.Message}");
                 return Json(new {
                     success = false,
                     msg = e.Message
@@ -1002,7 +1011,7 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
-                LoggerManager.LogError($"Error al eliminar oferta ID {ID}: {e.Message}");
+                LoggerManager.LogError(e, $"Error al eliminar oferta ID {ID}: {e.Message}");
                 return Json(new {
                     success = false,
                     msg = e.Message
