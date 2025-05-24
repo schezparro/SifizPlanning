@@ -341,24 +341,9 @@ namespace SifizPlanning.Controllers
         {
             try
             {
-
-                var funcionalidadesArray = funcionalidades.Split('/');
-                funcionalidadesArray = funcionalidadesArray.Skip(1).ToArray();
-
-                var secuencialEstado = (from es in db.EstadoEntregable
-                                        where es.Descripcion == estado
-                                        select es.Secuencial).ToList()[0];
-
-                var secuencialCliente = (from pmc in db.ProyectoModuloCliente
-                                         where pmc.Secuencial == secuencialModuloCliente
-                                         select pmc.SecuencialCliente).ToList()[0];
-
-                ProyectoModuloCliente proyectoModuloCliente = db.ProyectoModuloCliente.Find(secuencialModuloCliente);
-                if (subModulo != 0)
-                {
-                    proyectoModuloCliente.SecuencialSubModulo = subModulo;
-                    db.SaveChanges();
-                }
+                string emailUser = User.Identity.Name;
+                // Log inicio de operación
+                LoggerManager.LogInfo($"Usuario {emailUser} iniciando actualización de datos para módulo cliente {secuencialModuloCliente}");
 
                 Type typeAccesoDatos = db.GetType();
                 PropertyInfo propertyTabla = typeAccesoDatos.GetProperty("ProyectoModuloCliente");
@@ -373,17 +358,27 @@ namespace SifizPlanning.Controllers
                 object[] pId = new object[1] { new object[1] { secuencialModuloCliente } };
                 newObj = metodoFind.Invoke(dbSetTable, pId);
 
-                typeNewObj.GetProperty("SecuencialEstadoEntregable").SetValue(newObj, secuencialEstado);
+                // Log cambio de estado
+                ProyectoModuloCliente proyectoModuloCliente = db.ProyectoModuloCliente.Find(secuencialModuloCliente);
+                if (proyectoModuloCliente != null)
+                {
+                    var estadoAnterior = proyectoModuloCliente.SecuencialEstadoEntregable;
+                    if (estadoAnterior != int.Parse(estado))
+                    {
+                        LoggerManager.LogSensitiveOperation(
+                            "Cambio Estado Módulo",
+                            $"Módulo: {secuencialModuloCliente}, Estado anterior: {estadoAnterior}, Nuevo estado: {estado}",
+                            emailUser
+                        );
+                    }
+                    proyectoModuloCliente.SecuencialEstadoEntregable = int.Parse(estado);
+                    proyectoModuloCliente.SecuencialSubModulo = subModulo;
+                    db.SaveChanges();
+                }
 
-                db.SaveChanges();
-
-                typeAccesoDatos = db.GetType();
-                propertyTabla = typeAccesoDatos.GetProperty("FuncionalidadCliente");
-                methodPropertyTabla = propertyTabla.GetMethod;
-                dbSetTable = methodPropertyTabla.Invoke(db, new object[] { });
-                typePropertyTabla = dbSetTable.GetType();//Esto es un tipo dbSet 
-
+                // Log eliminación de funcionalidades existentes
                 var funcionalidadesEliminar = db.FuncionalidadCliente.Where(x => x.SecuencialCliente == secuencialCliente).ToList();
+                LoggerManager.LogInfo($"Eliminando {funcionalidadesEliminar.Count} funcionalidades existentes del cliente");
 
                 for (int i = 0; i < funcionalidadesEliminar.Count; i++)
                 {
@@ -392,6 +387,10 @@ namespace SifizPlanning.Controllers
                 }
                 db.SaveChanges();
 
+
+                // Log agregado de nuevas funcionalidades
+                string[] funcionalidadesArray = funcionalidades.Split(',');
+                LoggerManager.LogInfo($"Agregando {funcionalidadesArray.Length} nuevas funcionalidades al cliente");
 
                 for (int i = 0; i < funcionalidadesArray.Length; i++)
                 {
@@ -412,6 +411,8 @@ namespace SifizPlanning.Controllers
 
                 db.SaveChanges();
 
+                LoggerManager.LogInfo($"Actualización de datos completada exitosamente para módulo cliente {secuencialModuloCliente}");
+
                 return Json(new
                 {
                     success = true
@@ -419,6 +420,7 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError($"Error al guardar datos del módulo cliente {secuencialModuloCliente}: {e.Message}");
                 return Json(new
                 {
                     success = false,
@@ -803,13 +805,16 @@ namespace SifizPlanning.Controllers
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"Usuario {emailUser} iniciando creación de nueva oferta de ticket");
+
                 var adjuntoUrl = "";
                 if (adjunto != null)
                 {
                     string path = Path.Combine(Server.MapPath("~/Web/resources/ofertas"), adjunto.FileName);
                     adjunto.SaveAs(path);
-
                     adjuntoUrl = "/resources/ofertas" + "/" + adjunto.FileName;
+                    LoggerManager.LogInfo($"Archivo adjunto guardado: {adjuntoUrl}");
                 }
 
                 DateTime dateRegistro = new DateTime(0001 / 01 / 01);
@@ -850,19 +855,25 @@ namespace SifizPlanning.Controllers
                 oferta.colaborador = colaborador != null ? db.Colaborador.Find(colaborador) : db.Colaborador.Find(2122);
                 oferta.Adjunto = adjuntoUrl;
 
+                // Log datos de la oferta
+                LoggerManager.LogSensitiveOperation(
+                    "Creación Oferta",
+                    $"Cliente: {oferta.cliente.Descripcion}, Colaborador: {oferta.colaborador.persona.Nombre1} {oferta.colaborador.persona.Apellido1}, " +
+                    $"Horas: {oferta.HorasEstimacion}, Detalle: {detalle.Substring(0, Math.Min(100, detalle.Length))}...",
+                    emailUser
+                );
+
                 db.Ofertas.Add(oferta);
                 db.SaveChanges();
 
-                var resp = new
-                {
-                    success = true,
-                };
-                return Json(resp);
+                LoggerManager.LogInfo($"Oferta de ticket creada exitosamente");
+
+                return Json(new { success = true });
             }
             catch (Exception e)
             {
-                return Json(new
-                {
+                LoggerManager.LogError($"Error al crear oferta de ticket: {e.Message}");
+                return Json(new {
                     success = false,
                     msg = e.Message
                 });
@@ -873,11 +884,22 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, GESTOR")]
         public ActionResult EditarOfertaTickets(int ID, string FechaRegistro, string FechaProduccion, string FechaDisponibilidad, string FechaAprobacion, string Detalle, int HorasEstimacion, int cliente, int colaborador, HttpPostedFileBase adjunto = null)
         {
-            try
+            try 
             {
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"Usuario {emailUser} iniciando edición de oferta ID: {ID}");
+
                 Ofertas oferta = db.Ofertas.FirstOrDefault(s => s.Secuencial == ID);
                 if (oferta != null)
                 {
+                    // Log estado anterior
+                    LoggerManager.LogSensitiveOperation(
+                        "Estado Anterior Oferta",
+                        $"ID: {ID}, Cliente: {oferta.cliente?.Descripcion}, Colaborador: {oferta.colaborador?.persona.Nombre1} {oferta.colaborador?.persona.Apellido1}, " +
+                        $"Horas: {oferta.HorasEstimacion}, Detalle: {oferta.Detalle?.Substring(0, Math.Min(100, oferta.Detalle.Length))}...",
+                        emailUser
+                    );
+
                     DateTime dateRegistro = new DateTime(0001 / 01 / 01);
                     DateTime dateProduccion = new DateTime(0001 / 01 / 01);
                     DateTime dateDisponibilidad = new DateTime(0001 / 01 / 01);
@@ -922,20 +944,27 @@ namespace SifizPlanning.Controllers
 
                         adjuntoUrl = "/resources/ofertas" + "/" + adjunto.FileName;
                         oferta.Adjunto = adjuntoUrl;
+                        LoggerManager.LogInfo($"Nuevo archivo adjunto guardado: {adjuntoUrl}");
                     }
-                }
-                db.SaveChanges();
 
-                var resp = new
-                {
-                    success = true,
-                };
-                return Json(resp);
+                    // Log nuevos datos
+                    LoggerManager.LogSensitiveOperation(
+                        "Nuevos Datos Oferta",
+                        $"ID: {ID}, Cliente: {oferta.cliente.Descripcion}, Colaborador: {oferta.colaborador.persona.Nombre1} {oferta.colaborador.persona.Apellido1}, " +
+                        $"Horas: {HorasEstimacion}, Detalle: {Detalle.Substring(0, Math.Min(100, Detalle.Length))}...",
+                        emailUser
+                    );
+                }
+
+                db.SaveChanges();
+                LoggerManager.LogInfo($"Oferta ID: {ID} actualizada exitosamente");
+
+                return Json(new { success = true });
             }
             catch (Exception e)
             {
-                return Json(new
-                {
+                LoggerManager.LogError($"Error al editar oferta ID {ID}: {e.Message}");
+                return Json(new {
                     success = false,
                     msg = e.Message
                 });
@@ -949,20 +978,32 @@ namespace SifizPlanning.Controllers
         {
             try
             {
-                Ofertas oferta = db.Ofertas.Find(ID);
-                db.Ofertas.Remove(oferta);
-                db.SaveChanges();
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"Usuario {emailUser} iniciando eliminación de oferta ID: {ID}");
 
-                var resp = new
+                Ofertas oferta = db.Ofertas.Find(ID);
+                if (oferta != null)
                 {
-                    success = true,
-                };
-                return Json(resp);
+                    // Log datos de la oferta a eliminar
+                    LoggerManager.LogSensitiveOperation(
+                        "Eliminación Oferta",
+                        $"ID: {ID}, Cliente: {oferta.cliente?.Descripcion}, Colaborador: {oferta.colaborador?.persona.Nombre1} {oferta.colaborador?.persona.Apellido1}, " +
+                        $"Horas: {oferta.HorasEstimacion}, Detalle: {oferta.Detalle?.Substring(0, Math.Min(100, oferta.Detalle.Length))}...",
+                        emailUser
+                    );
+
+                    db.Ofertas.Remove(oferta);
+                    db.SaveChanges();
+
+                    LoggerManager.LogInfo($"Oferta ID: {ID} eliminada exitosamente");
+                }
+
+                return Json(new { success = true });
             }
             catch (Exception e)
             {
-                return Json(new
-                {
+                LoggerManager.LogError($"Error al eliminar oferta ID {ID}: {e.Message}");
+                return Json(new {
                     success = false,
                     msg = e.Message
                 });
