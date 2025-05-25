@@ -110,6 +110,12 @@ consultasApp.controller('mainConsultasController', ['$scope', '$http', function 
         $scope.cargarDatosOfertas();
     };
 
+    $scope.IrProyectosExcel = function () {
+        ocultar();
+        angular.element("#panel_proyectos_excel").removeClass('invisible');
+        $scope.funcionalidad = 'PROYECTOS EXCEL';
+    };
+
     //PARA LOS CLIENTES
     cargarDatosModulosClientes = function () {
 

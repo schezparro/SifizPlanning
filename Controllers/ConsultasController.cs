@@ -30,6 +30,84 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
+        public ActionResult DarProyectosExcel()
+        {
+            try
+            {
+                var datosRaw = (from ca in db.ClienteAuxiliar
+                                join c in db.Cliente on ca.SecuencialCliente equals c.Secuencial
+                                join vd in db.VersionDesarrollo on ca.SecuencialVersionDesarrollo equals vd.Secuencial into vd_join
+                                from vd in vd_join.DefaultIfEmpty()
+                                join r in db.Repositorio on ca.SecuencialRepositorio equals r.Secuencial into r_join
+                                from r in r_join.DefaultIfEmpty()
+                                join rc in db.ResponsableProyectos on ca.SecuencialResponsableCodigo equals rc.Secuencial into rc_join
+                                from rc in rc_join.DefaultIfEmpty()
+                                join rp in db.ResponsableProyectos on ca.SecuencialResponsablePublicacion equals rp.Secuencial into rp_join
+                                from rp in rp_join.DefaultIfEmpty()
+                                join lp in db.Colaborador on ca.SecuencialLiderProyecto equals lp.Secuencial into lp_join
+                                from lp in lp_join.DefaultIfEmpty()
+                                where c.EstaActivo == 1
+                                select new
+                                {
+                                    ca,
+                                    c,
+                                    vd,
+                                    r,
+                                    rc,
+                                    rp,
+                                    lp
+                                }).ToList(); // Se ejecuta en la base
+
+                var proyectos = datosRaw.Select(x =>
+                {
+                    var personaCliente = x.c.persona_cliente.FirstOrDefault();
+                    var usuarioCliente = personaCliente?.persona?.usuario.FirstOrDefault();
+
+                    var gestor = x.c.gestorServicios.FirstOrDefault();
+                    var personaGestor = gestor?.colaborador?.persona;
+                    var usuarioGestor = personaGestor?.usuario.FirstOrDefault();
+
+                    return new
+                    {
+                        cooperativa = x.c.Descripcion,
+                        codificacion = x.c.Codigo,
+                        contactoCliente = usuarioCliente?.Email ?? "",
+                        correoContactoCliente = usuarioCliente?.Email ?? "",
+                        version = x.vd?.Descripcion ?? "",
+                        repositorio = x.r?.Descripcion ?? "",
+                        admCod = x.rc?.Nombre ?? "",
+                        publicacion = x.rp?.Nombre ?? "",
+                        solucion = x.ca.TieneCodigoFuente == 1 ? "Sí" : "No",
+                        liderProyecto = x.lp?.persona != null
+                            ? $"{x.lp.persona.Nombre1} {x.lp.persona.Apellido1}"
+                            : "",
+                        gestorServicio = personaGestor != null
+                            ? $"{personaGestor.Nombre1} {personaGestor.Apellido1}"
+                            : "",
+                        correoGestorServicio = usuarioGestor?.Email ?? "",
+                        fechaSalida =  x.ca.FechaProduccion.ToString("dd/MM/yyyy")
+                    };
+                }).ToList();
+
+                return Json(new
+                {
+                    success = true,
+                    proyectos = proyectos
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
         public ActionResult DarModulosClientes(int start, int lenght, string filtro = "", int order = 0, int asc = 1)
         {
 

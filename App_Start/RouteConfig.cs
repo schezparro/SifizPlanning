@@ -2715,6 +2715,12 @@ namespace SifizPlanning
             //RUTAS DEL MODULO CONSULTAS
 
             routes.MapRoute(
+                name: "DarProyectosExcel",
+                url: "consultas/DarProyectosExcel",
+                defaults: new { controller = "Consultas", action = "DarProyectosExcel" }
+            );
+
+            routes.MapRoute(
                 name: "Consultas",
                 url: "consultas/{id}",
                 defaults: new { controller = "Consultas", action = "Index", id = UrlParameter.Optional }

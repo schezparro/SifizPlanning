@@ -40,6 +40,7 @@
                 <li role="presentation"><a id="a-ir-consulta-garantias" href="#" ng-click="IrConsultaGarantias()">Garantía de Contratos</a></li>
                 <li role="presentation"><a id="a-ir-garantia-tickets" href="#" ng-click="IrGarantiaTickets()">Garantía de Tickets</a></li>
                 <li role="presentation"><a id="a-ir-oferta-tickets" href="#" ng-click="IrOfertaTickets()">Ver Ofertas</a></li>
+                <li role="presentation"><a id="a-ir-proyectos-excel" href="#" ng-click="IrProyectosExcel()">Proyectos Excel</a></li>
             </ul>
 
             <div class="right">
@@ -78,6 +79,10 @@
 
                 <div id="panel_oferta_tickets" class="invisible" ng-controller="ofertaTicketsController">
                     @{Html.RenderPartial("windowOfertaTickets");}
+                </div>
+
+                <div id="panel_proyectos_excel" class="invisible" ng-controller="proyectosExcelController">
+                    @{Html.RenderPartial("windowProyectosExcel");}
                 </div>
 
                 <div id="loadingDiv">
@@ -155,6 +160,7 @@
     <script type="text/javascript" src="~/Web/js/consultas/consultaGarantias.js"></script>
     <script type="text/javascript" src="~/Web/js/consultas/garantiaTickets.js"></script>
     <script type="text/javascript" src="~/Web/js/consultas/ofertaTickets.js"></script>
+    <script type="text/javascript" src="~/Web/js/consultas/proyectosExcel.js"></script>
 </body>
 </html>
 
