@@ -18,6 +18,7 @@ using System.Windows.Forms;
 
 namespace SifizPlanning.Controllers
 {
+
     public class ConsultasController : Controller
     {
         SifizPlanningEntidades db = DbCnx.getCnx();
@@ -26,6 +27,119 @@ namespace SifizPlanning.Controllers
         public ActionResult Index()
         {
             return View();
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
+        public ActionResult CrearProyecto([System.Web.Http.FromBody] dynamic proyecto)
+        {
+            try
+            {
+                if (proyecto == null)
+                {
+                    return Json(new { success = false, msg = "Datos del proyecto no proporcionados." });
+                }
+
+                string cooperativa = proyecto.cooperativa;
+                string version = proyecto.version;
+                string repositorioStr = proyecto.repositorio;
+                string admCodStr = proyecto.admCod;
+                string publicacionStr = proyecto.publicacion;
+                string solucionStr = proyecto.solucion;
+                string liderProyectoStr = proyecto.liderProyecto;
+                string fechaSalida = proyecto.fechaSalida;
+
+                var cliente = db.Cliente.FirstOrDefault(c => c.Descripcion == cooperativa);
+                if (cliente == null)
+                {
+                    return Json(new { success = false, msg = "Cliente no encontrado." });
+                }
+
+                var versionDesarrollo = db.VersionDesarrollo.FirstOrDefault(v => v.Descripcion == version);
+                var repositorio = db.Repositorio.FirstOrDefault(r => r.Descripcion == repositorioStr);
+                var responsableCodigo = db.ResponsableProyectos.FirstOrDefault(rp => rp.Nombre == admCodStr);
+                var responsablePublicacion = db.ResponsableProyectos.FirstOrDefault(rp => rp.Nombre == publicacionStr);
+                var liderProyecto = db.Colaborador.FirstOrDefault(c => (c.persona.Nombre1 + " " + c.persona.Apellido1) == liderProyectoStr);
+
+                var nuevoProyecto = new ClienteAuxiliar
+                {
+                    SecuencialCliente = cliente.Secuencial,
+                    SecuencialVersionDesarrollo = versionDesarrollo?.Secuencial ?? 0,
+                    SecuencialRepositorio = repositorio?.Secuencial ?? 0,
+                    SecuencialResponsableCodigo = responsableCodigo?.Secuencial ?? 0,
+                    SecuencialResponsablePublicacion = responsablePublicacion?.Secuencial ?? 0,
+                    SecuencialLiderProyecto = liderProyecto?.Secuencial ?? 0,
+                    TieneCodigoFuente = solucionStr == "Sí" ? 1 : 0,
+                    FechaProduccion = DateTime.ParseExact(fechaSalida, "dd/MM/yyyy", null)
+                };
+
+                db.ClienteAuxiliar.Add(nuevoProyecto);
+                db.SaveChanges();
+
+                return Json(new { success = true });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
+        public ActionResult ActualizarProyecto([System.Web.Http.FromBody] dynamic proyecto)
+        {
+            try
+            {
+                if (proyecto == null || proyecto.id == 0)
+                {
+                    return Json(new { success = false, msg = "Datos del proyecto no válidos." });
+                }
+
+                int id = proyecto.id;
+                string cooperativa = proyecto.cooperativa;
+                string version = proyecto.version;
+                string repositorioStr = proyecto.repositorio;
+                string admCodStr = proyecto.admCod;
+                string publicacionStr = proyecto.publicacion;
+                string solucionStr = proyecto.solucion;
+                string liderProyectoStr = proyecto.liderProyecto;
+                string fechaSalida = proyecto.fechaSalida;
+
+                var proyectoExistente = db.ClienteAuxiliar.Find(id);
+                if (proyectoExistente == null)
+                {
+                    return Json(new { success = false, msg = "Proyecto no encontrado." });
+                }
+
+                var cliente = db.Cliente.FirstOrDefault(c => c.Descripcion == cooperativa);
+                if (cliente == null)
+                {
+                    return Json(new { success = false, msg = "Cliente no encontrado." });
+                }
+
+                var versionDesarrollo = db.VersionDesarrollo.FirstOrDefault(v => v.Descripcion == version);
+                var repositorio = db.Repositorio.FirstOrDefault(r => r.Descripcion == repositorioStr);
+                var responsableCodigo = db.ResponsableProyectos.FirstOrDefault(rp => rp.Nombre == admCodStr);
+                var responsablePublicacion = db.ResponsableProyectos.FirstOrDefault(rp => rp.Nombre == publicacionStr);
+                var liderProyecto = db.Colaborador.FirstOrDefault(c => (c.persona.Nombre1 + " " + c.persona.Apellido1) == liderProyectoStr);
+
+                proyectoExistente.SecuencialCliente = cliente.Secuencial;
+                proyectoExistente.SecuencialVersionDesarrollo = versionDesarrollo?.Secuencial ?? 0;
+                proyectoExistente.SecuencialRepositorio = repositorio?.Secuencial ?? 0;
+                proyectoExistente.SecuencialResponsableCodigo = responsableCodigo?.Secuencial ?? 0;
+                proyectoExistente.SecuencialResponsablePublicacion = responsablePublicacion?.Secuencial ?? 0;
+                proyectoExistente.SecuencialLiderProyecto = liderProyecto?.Secuencial ?? 0;
+                proyectoExistente.TieneCodigoFuente = solucionStr == "Sí" ? 1 : 0;
+                proyectoExistente.FechaProduccion = DateTime.ParseExact(fechaSalida, "dd/MM/yyyy", null);
+
+                db.SaveChanges();
+
+                return Json(new { success = true });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message });
+            }
         }
 
         [HttpPost]
