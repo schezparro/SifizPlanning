@@ -29,6 +29,106 @@ namespace SifizPlanning.Controllers
             return View();
         }
 
+        [HttpGet]
+        [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
+        public ActionResult GetClientes()
+        {
+            try
+            {
+                var clientes = db.Cliente
+                    .Where(c => c.EstaActivo == 1)
+                    .Select(c => new { c.Secuencial, c.Descripcion })
+                    .OrderBy(c => c.Descripcion)
+                    .ToList();
+
+                return Json(new { success = true, clientes = clientes }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
+        public ActionResult GetVersionesDesarrollo()
+        {
+            try
+            {
+                var versiones = db.VersionDesarrollo
+                    .Where(v => v.EstaActivo == 1)
+                    .Select(v => new { v.Secuencial, v.Descripcion })
+                    .OrderBy(v => v.Descripcion)
+                    .ToList();
+
+                return Json(new { success = true, versiones = versiones }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
+        public ActionResult GetRepositorios()
+        {
+            try
+            {
+                var repositorios = db.Repositorio
+                    .Where(r => r.EstaActivo == 1)
+                    .Select(r => new { r.Secuencial, r.Descripcion })
+                    .OrderBy(r => r.Descripcion)
+                    .ToList();
+
+                return Json(new { success = true, repositorios = repositorios }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
+        public ActionResult GetResponsablesProyectos()
+        {
+            try
+            {
+                var responsables = db.ResponsableProyectos
+                    .Where(rp => rp.EstaActivo == 1)
+                    .Select(rp => new { rp.Secuencial, rp.Nombre })
+                    .OrderBy(rp => rp.Nombre)
+                    .ToList();
+
+                return Json(new { success = true, responsables = responsables }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
+        public ActionResult GetColaboradores()
+        {
+            try
+            {
+                var colaboradores = db.Colaborador
+                    .Where(c => c.persona.usuario.First().EstaActivo == 1)
+                    .Select(c => new { c.Secuencial, NombreCompleto = c.persona.Nombre1 + " " + c.persona.Apellido1 })
+                    .OrderBy(c => c.NombreCompleto)
+                    .ToList();
+
+                return Json(new { success = true, colaboradores = colaboradores }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
         [HttpPost]
         [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
         public ActionResult CrearProyecto([System.Web.Http.FromBody] dynamic proyecto)
@@ -199,7 +299,7 @@ namespace SifizPlanning.Controllers
                             ? $"{personaGestor.Nombre1} {personaGestor.Apellido1}"
                             : "",
                         correoGestorServicio = usuarioGestor?.Email ?? "",
-                        fechaSalida =  x.ca.FechaProduccion.ToString("dd/MM/yyyy")
+                        fechaSalida = x.ca.FechaProduccion.ToString("dd/MM/yyyy")
                     };
                 }).ToList();
 
@@ -1074,7 +1174,8 @@ namespace SifizPlanning.Controllers
             catch (Exception e)
             {
                 LoggerManager.LogError(e, $"Error al crear oferta de ticket: {e.Message}");
-                return Json(new {
+                return Json(new
+                {
                     success = false,
                     msg = e.Message
                 });
@@ -1085,7 +1186,7 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, GESTOR")]
         public ActionResult EditarOfertaTickets(int ID, string FechaRegistro, string FechaProduccion, string FechaDisponibilidad, string FechaAprobacion, string Detalle, int HorasEstimacion, int cliente, int colaborador, HttpPostedFileBase adjunto = null)
         {
-            try 
+            try
             {
                 string emailUser = User.Identity.Name;
                 LoggerManager.LogInfo($"Usuario {emailUser} iniciando edición de oferta ID: {ID}");
@@ -1165,7 +1266,8 @@ namespace SifizPlanning.Controllers
             catch (Exception e)
             {
                 LoggerManager.LogError(e, $"Error al editar oferta ID {ID}: {e.Message}");
-                return Json(new {
+                return Json(new
+                {
                     success = false,
                     msg = e.Message
                 });
@@ -1204,7 +1306,8 @@ namespace SifizPlanning.Controllers
             catch (Exception e)
             {
                 LoggerManager.LogError(e, $"Error al eliminar oferta ID {ID}: {e.Message}");
-                return Json(new {
+                return Json(new
+                {
                     success = false,
                     msg = e.Message
                 });

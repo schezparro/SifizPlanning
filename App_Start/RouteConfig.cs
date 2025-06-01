@@ -2721,6 +2721,44 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "CrearProyecto",
+                url: "consultas/CrearProyecto",
+                defaults: new { controller = "Consultas", action = "CrearProyecto" }
+            );
+
+            routes.MapRoute(
+                name: "ActualizarProyecto",
+                url: "consultas/ActualizarProyecto",
+                defaults: new { controller = "Consultas", action = "ActualizarProyecto" }
+            );
+
+            routes.MapRoute(
+                name: "GetClientes",
+                url: "consultas/GetClientes",
+                defaults: new { controller = "Consultas", action = "GetClientes" }
+            );
+            routes.MapRoute(
+                name: "GetVersionesDesarrollo",
+                url: "consultas/GetVersionesDesarrollo",
+                defaults: new { controller = "Consultas", action = "GetVersionesDesarrollo" }
+            );
+            routes.MapRoute(
+                name: "GetRepositorios",
+                url: "consultas/GetRepositorios",
+                defaults: new { controller = "Consultas", action = "GetRepositorios" }
+            );
+            routes.MapRoute(
+                name: "GetResponsablesProyectos",
+                url: "consultas/GetResponsablesProyectos",
+                defaults: new { controller = "Consultas", action = "GetResponsablesProyectos" }
+            );
+            routes.MapRoute(
+                name: "GetColaboradores",
+                url: "consultas/GetColaboradores",
+                defaults: new { controller = "Consultas", action = "GetColaboradores" }
+            );
+
+            routes.MapRoute(
                 name: "Consultas",
                 url: "consultas/{id}",
                 defaults: new { controller = "Consultas", action = "Index", id = UrlParameter.Optional }

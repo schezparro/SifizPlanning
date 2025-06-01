@@ -4,7 +4,9 @@
         <div class="form-row">
             <div class="form-group col-md-3">
                 <label>Cooperativa/Institución</label>
-                <input type="text" class="form-control" ng-model="proyectoFormData.cooperativa" required />
+                <select class="form-control" ng-model="proyectoFormData.cooperativa" ng-options="c.Descripcion for c in clientes track by c.Descripcion" required>
+                    <option value="">Seleccione una cooperativa</option>
+                </select>
             </div>
             <div class="form-group col-md-3">
                 <label>Codificación</label>
@@ -22,29 +24,43 @@
         <div class="form-row">
             <div class="form-group col-md-3">
                 <label>Versión</label>
-                <input type="text" class="form-control" ng-model="proyectoFormData.version" />
+                <select class="form-control" ng-model="proyectoFormData.version" ng-options="v.Descripcion for v in versiones track by v.Descripcion">
+                    <option value="">Seleccione una versión</option>
+                </select>
             </div>
             <div class="form-group col-md-3">
                 <label>Repositorio</label>
-                <input type="text" class="form-control" ng-model="proyectoFormData.repositorio" />
+                <select class="form-control" ng-model="proyectoFormData.repositorio" ng-options="r.Descripcion for r in repositorios track by r.Descripcion">
+                    <option value="">Seleccione un repositorio</option>
+                </select>
             </div>
             <div class="form-group col-md-3">
                 <label>Adm Cod</label>
-                <input type="text" class="form-control" ng-model="proyectoFormData.admCod" />
+                <select class="form-control" ng-model="proyectoFormData.admCod" ng-options="resp.Nombre for resp in responsables track by resp.Nombre">
+                    <option value="">Seleccione un responsable</option>
+                </select>
             </div>
             <div class="form-group col-md-3">
                 <label>Publicación</label>
-                <input type="text" class="form-control" ng-model="proyectoFormData.publicacion" />
+                <select class="form-control" ng-model="proyectoFormData.publicacion" ng-options="resp.Nombre for resp in responsables track by resp.Nombre">
+                    <option value="">Seleccione un responsable</option>
+                </select>
             </div>
         </div>
         <div class="form-row">
             <div class="form-group col-md-3">
                 <label>Solución</label>
-                <input type="text" class="form-control" ng-model="proyectoFormData.solucion" />
+                <select class="form-control" ng-model="proyectoFormData.solucion">
+                    <option value="">Seleccione una opción</option>
+                    <option value="Sí">Sí</option>
+                    <option value="No">No</option>
+                </select>
             </div>
             <div class="form-group col-md-3">
                 <label>Líder de Proyecto</label>
-                <input type="text" class="form-control" ng-model="proyectoFormData.liderProyecto" />
+                <select class="form-control" ng-model="proyectoFormData.liderProyecto" ng-options="col.NombreCompleto for col in colaboradores track by col.NombreCompleto">
+                    <option value="">Seleccione un líder</option>
+                </select>
             </div>
             <div class="form-group col-md-3">
                 <label>Gestor de Servicio</label>
