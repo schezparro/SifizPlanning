@@ -116,6 +116,13 @@ adminApp.controller('adminController', ['$scope', '$http', function ($scope, $ht
         angular.element("#panel_user_clientes").addClass('invisible');
         angular.element("#panel_contratos_clientes").addClass('invisible');
         angular.element("#panel_catalogos").addClass('invisible');
+        angular.element("#panel_proyectos_excel").addClass('invisible');
+    };
+
+     $scope.IrProyectosExcel = function () {
+        ocultar();
+        angular.element("#panel_proyectos_excel").removeClass('invisible');
+        $scope.funcionalidad = 'PROYECTOS EXCEL';
     };
 
     $scope.IrTrabajador = function () {

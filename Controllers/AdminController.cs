@@ -28,6 +28,296 @@ namespace SifizPlanning.Controllers
             return View();
         }
 
+        [HttpGet]
+        [Authorize(Roles = "ADMIN")]
+        public ActionResult GetClientes()
+        {
+            try
+            {
+                var clientes = db.Cliente
+                    .Where(c => c.EstaActivo == 1)
+                    .Select(c => new { c.Secuencial, c.Descripcion })
+                    .OrderBy(c => c.Descripcion)
+                    .ToList();
+
+                return Json(new { success = true, clientes = clientes }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN")]
+        public ActionResult GetVersionesDesarrollo()
+        {
+            try
+            {
+                var versiones = db.VersionDesarrollo
+                    .Where(v => v.EstaActivo == 1)
+                    .Select(v => new { v.Secuencial, v.Descripcion })
+                    .OrderBy(v => v.Descripcion)
+                    .ToList();
+
+                return Json(new { success = true, versiones = versiones }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN")]
+        public ActionResult GetRepositorios()
+        {
+            try
+            {
+                var repositorios = db.Repositorio
+                    .Where(r => r.EstaActivo == 1)
+                    .Select(r => new { r.Secuencial, r.Descripcion })
+                    .OrderBy(r => r.Descripcion)
+                    .ToList();
+
+                return Json(new { success = true, repositorios = repositorios }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN")]
+        public ActionResult GetResponsablesProyectos()
+        {
+            try
+            {
+                var responsables = db.ResponsableProyectos
+                    .Where(rp => rp.EstaActivo == 1)
+                    .Select(rp => new { rp.Secuencial, rp.Nombre })
+                    .OrderBy(rp => rp.Nombre)
+                    .ToList();
+
+                return Json(new { success = true, responsables = responsables }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN")]
+        public ActionResult GetColaboradores()
+        {
+            try
+            {
+                var colaboradores = db.Colaborador
+                    .Where(c => c.persona.usuario.FirstOrDefault().EstaActivo == 1)
+                    .Select(c => new { c.Secuencial, NombreCompleto = c.persona.Nombre1 + " " + c.persona.Apellido1 })
+                    .OrderBy(c => c.NombreCompleto)
+                    .ToList();
+
+                return Json(new { success = true, colaboradores = colaboradores }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN")]
+        public ActionResult CrearProyecto([System.Web.Http.FromBody] dynamic proyecto)
+        {
+            try
+            {
+                if (proyecto == null)
+                {
+                    return Json(new { success = false, msg = "Datos del proyecto no proporcionados." });
+                }
+
+                string cooperativa = proyecto.cooperativa;
+                string version = proyecto.version;
+                string repositorioStr = proyecto.repositorio;
+                string admCodStr = proyecto.admCod;
+                string publicacionStr = proyecto.publicacion;
+                string solucionStr = proyecto.solucion;
+                string liderProyectoStr = proyecto.liderProyecto;
+                string fechaSalida = proyecto.fechaSalida;
+
+                var cliente = db.Cliente.FirstOrDefault(c => c.Descripcion == cooperativa);
+                if (cliente == null)
+                {
+                    return Json(new { success = false, msg = "Cliente no encontrado." });
+                }
+
+                var versionDesarrollo = db.VersionDesarrollo.FirstOrDefault(v => v.Descripcion == version);
+                var repositorio = db.Repositorio.FirstOrDefault(r => r.Descripcion == repositorioStr);
+                var responsableCodigo = db.ResponsableProyectos.FirstOrDefault(rp => rp.Nombre == admCodStr);
+                var responsablePublicacion = db.ResponsableProyectos.FirstOrDefault(rp => rp.Nombre == publicacionStr);
+                var liderProyecto = db.Colaborador.FirstOrDefault(c => (c.persona.Nombre1 + " " + c.persona.Apellido1) == liderProyectoStr);
+
+                var nuevoProyecto = new ClienteAuxiliar
+                {
+                    SecuencialCliente = cliente.Secuencial,
+                    SecuencialVersionDesarrollo = versionDesarrollo?.Secuencial ?? 0,
+                    SecuencialRepositorio = repositorio?.Secuencial ?? 0,
+                    SecuencialResponsableCodigo = responsableCodigo?.Secuencial ?? 0,
+                    SecuencialResponsablePublicacion = responsablePublicacion?.Secuencial ?? 0,
+                    SecuencialLiderProyecto = liderProyecto?.Secuencial ?? 0,
+                    TieneCodigoFuente = solucionStr == "Sí" ? 1 : 0,
+                    FechaProduccion = DateTime.ParseExact(fechaSalida, "dd/MM/yyyy", null)
+                };
+
+                db.ClienteAuxiliar.Add(nuevoProyecto);
+                db.SaveChanges();
+
+                return Json(new { success = true });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN")]
+        public ActionResult ActualizarProyecto([System.Web.Http.FromBody] dynamic proyecto)
+        {
+            try
+            {
+                if (proyecto == null || proyecto.id == 0)
+                {
+                    return Json(new { success = false, msg = "Datos del proyecto no válidos." });
+                }
+
+                int id = proyecto.id;
+                string cooperativa = proyecto.cooperativa;
+                string version = proyecto.version;
+                string repositorioStr = proyecto.repositorio;
+                string admCodStr = proyecto.admCod;
+                string publicacionStr = proyecto.publicacion;
+                string solucionStr = proyecto.solucion;
+                string liderProyectoStr = proyecto.liderProyecto;
+                string fechaSalida = proyecto.fechaSalida;
+
+                var proyectoExistente = db.ClienteAuxiliar.Find(id);
+                if (proyectoExistente == null)
+                {
+                    return Json(new { success = false, msg = "Proyecto no encontrado." });
+                }
+
+                var cliente = db.Cliente.FirstOrDefault(c => c.Descripcion == cooperativa);
+                if (cliente == null)
+                {
+                    return Json(new { success = false, msg = "Cliente no encontrado." });
+                }
+
+                var versionDesarrollo = db.VersionDesarrollo.FirstOrDefault(v => v.Descripcion == version);
+                var repositorio = db.Repositorio.FirstOrDefault(r => r.Descripcion == repositorioStr);
+                var responsableCodigo = db.ResponsableProyectos.FirstOrDefault(rp => rp.Nombre == admCodStr);
+                var responsablePublicacion = db.ResponsableProyectos.FirstOrDefault(rp => rp.Nombre == publicacionStr);
+                var liderProyecto = db.Colaborador.FirstOrDefault(c => (c.persona.Nombre1 + " " + c.persona.Apellido1) == liderProyectoStr);
+
+                proyectoExistente.SecuencialCliente = cliente.Secuencial;
+                proyectoExistente.SecuencialVersionDesarrollo = versionDesarrollo?.Secuencial ?? 0;
+                proyectoExistente.SecuencialRepositorio = repositorio?.Secuencial ?? 0;
+                proyectoExistente.SecuencialResponsableCodigo = responsableCodigo?.Secuencial ?? 0;
+                proyectoExistente.SecuencialResponsablePublicacion = responsablePublicacion?.Secuencial ?? 0;
+                proyectoExistente.SecuencialLiderProyecto = liderProyecto?.Secuencial ?? 0;
+                proyectoExistente.TieneCodigoFuente = solucionStr == "Sí" ? 1 : 0;
+                proyectoExistente.FechaProduccion = DateTime.ParseExact(fechaSalida, "dd/MM/yyyy", null);
+
+                db.SaveChanges();
+
+                return Json(new { success = true });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN")]
+        public ActionResult DarProyectosExcel()
+        {
+            try
+            {
+                var datosRaw = (from ca in db.ClienteAuxiliar
+                                join c in db.Cliente on ca.SecuencialCliente equals c.Secuencial
+                                join vd in db.VersionDesarrollo on ca.SecuencialVersionDesarrollo equals vd.Secuencial into vd_join
+                                from vd in vd_join.DefaultIfEmpty()
+                                join r in db.Repositorio on ca.SecuencialRepositorio equals r.Secuencial into r_join
+                                from r in r_join.DefaultIfEmpty()
+                                join rc in db.ResponsableProyectos on ca.SecuencialResponsableCodigo equals rc.Secuencial into rc_join
+                                from rc in rc_join.DefaultIfEmpty()
+                                join rp in db.ResponsableProyectos on ca.SecuencialResponsablePublicacion equals rp.Secuencial into rp_join
+                                from rp in rp_join.DefaultIfEmpty()
+                                join lp in db.Colaborador on ca.SecuencialLiderProyecto equals lp.Secuencial into lp_join
+                                from lp in lp_join.DefaultIfEmpty()
+                                where c.EstaActivo == 1
+                                select new
+                                {
+                                    ca,
+                                    c,
+                                    vd,
+                                    r,
+                                    rc,
+                                    rp,
+                                    lp
+                                }).ToList(); // Se ejecuta en la base
+
+                var proyectos = datosRaw.Select(x =>
+                {
+                    var personaCliente = x.c.persona_cliente.FirstOrDefault();
+                    var usuarioCliente = personaCliente?.persona?.usuario.FirstOrDefault();
+
+                    var gestor = x.c.gestorServicios.FirstOrDefault();
+                    var personaGestor = gestor?.colaborador?.persona;
+                    var usuarioGestor = personaGestor?.usuario.FirstOrDefault();
+
+                    return new
+                    {
+                        cooperativa = x.c.Descripcion,
+                        codificacion = x.c.Codigo,
+                        contactoCliente = usuarioCliente?.Email ?? "",
+                        correoContactoCliente = usuarioCliente?.Email ?? "",
+                        version = x.vd?.Descripcion ?? "",
+                        repositorio = x.r?.Descripcion ?? "",
+                        admCod = x.rc?.Nombre ?? "",
+                        publicacion = x.rp?.Nombre ?? "",
+                        solucion = x.ca.TieneCodigoFuente == 1 ? "Sí" : "No",
+                        liderProyecto = x.lp?.persona != null
+                            ? $"{x.lp.persona.Nombre1} {x.lp.persona.Apellido1}"
+                            : "",
+                        gestorServicio = personaGestor != null
+                            ? $"{personaGestor.Nombre1} {personaGestor.Apellido1}"
+                            : "",
+                        correoGestorServicio = usuarioGestor?.Email ?? "",
+                        fechaSalida = x.ca.FechaProduccion.ToString("dd/MM/yyyy")
+                    };
+                }).ToList();
+
+                return Json(new
+                {
+                    success = true,
+                    proyectos = proyectos
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
         public ActionResult DarModulosReportes()
         {
             try

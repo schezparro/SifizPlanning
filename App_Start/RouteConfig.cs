@@ -178,12 +178,6 @@ namespace SifizPlanning
                 defaults: new { controller = "Admin", action = "EliminarAdjuntoContratoCliente", id = UrlParameter.Optional }
             );
 
-            routes.MapRoute(
-                name: "Admin",
-                url: "admin/{id}",
-                defaults: new { controller = "Admin", action = "Index", id = UrlParameter.Optional }
-            );
-
             //---------RUTAS DE AL ADMINISTRACION DE LOS CATALOGOS
             routes.MapRoute(
                 name: "DarDatosTabla",
@@ -436,6 +430,56 @@ namespace SifizPlanning
                 name: "DarDatosCatalogo",
                 url: "catalogos/datos-catalogos/{id}",
                 defaults: new { controller = "Admin", action = "DarDatosCatalogo", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarProyectosExcel",
+                url: "admin/DarProyectosExcel",
+                defaults: new { controller = "Admin", action = "DarProyectosExcel" }
+            );
+
+            routes.MapRoute(
+                name: "CrearProyecto",
+                url: "admin/CrearProyecto",
+                defaults: new { controller = "Admin", action = "CrearProyecto" }
+            );
+
+            routes.MapRoute(
+                name: "ActualizarProyecto",
+                url: "admin/ActualizarProyecto",
+                defaults: new { controller = "Admin", action = "ActualizarProyecto" }
+            );
+
+            routes.MapRoute(
+                name: "GetClientes",
+                url: "admin/GetClientes",
+                defaults: new { controller = "Admin", action = "GetClientes" }
+            );
+            routes.MapRoute(
+                name: "GetVersionesDesarrollo",
+                url: "admin/GetVersionesDesarrollo",
+                defaults: new { controller = "Admin", action = "GetVersionesDesarrollo" }
+            );
+            routes.MapRoute(
+                name: "GetRepositorios",
+                url: "admin/GetRepositorios",
+                defaults: new { controller = "Admin", action = "GetRepositorios" }
+            );
+            routes.MapRoute(
+                name: "GetResponsablesProyectos",
+                url: "admin/GetResponsablesProyectos",
+                defaults: new { controller = "Admin", action = "GetResponsablesProyectos" }
+            );
+            routes.MapRoute(
+                name: "GetColaboradores",
+                url: "admin/GetColaboradores",
+                defaults: new { controller = "Admin", action = "GetColaboradores" }
+            );
+
+            routes.MapRoute(
+                name: "Admin",
+                url: "admin/{id}",
+                defaults: new { controller = "Admin", action = "Index", id = UrlParameter.Optional }
             );
 
             //RUTAS DE TASK----------GESTION DE TAREAS--------------------------------------------
@@ -2714,49 +2758,6 @@ namespace SifizPlanning
 
             //RUTAS DEL MODULO CONSULTAS
 
-            routes.MapRoute(
-                name: "DarProyectosExcel",
-                url: "consultas/DarProyectosExcel",
-                defaults: new { controller = "Consultas", action = "DarProyectosExcel" }
-            );
-
-            routes.MapRoute(
-                name: "CrearProyecto",
-                url: "consultas/CrearProyecto",
-                defaults: new { controller = "Consultas", action = "CrearProyecto" }
-            );
-
-            routes.MapRoute(
-                name: "ActualizarProyecto",
-                url: "consultas/ActualizarProyecto",
-                defaults: new { controller = "Consultas", action = "ActualizarProyecto" }
-            );
-
-            routes.MapRoute(
-                name: "GetClientes",
-                url: "consultas/GetClientes",
-                defaults: new { controller = "Consultas", action = "GetClientes" }
-            );
-            routes.MapRoute(
-                name: "GetVersionesDesarrollo",
-                url: "consultas/GetVersionesDesarrollo",
-                defaults: new { controller = "Consultas", action = "GetVersionesDesarrollo" }
-            );
-            routes.MapRoute(
-                name: "GetRepositorios",
-                url: "consultas/GetRepositorios",
-                defaults: new { controller = "Consultas", action = "GetRepositorios" }
-            );
-            routes.MapRoute(
-                name: "GetResponsablesProyectos",
-                url: "consultas/GetResponsablesProyectos",
-                defaults: new { controller = "Consultas", action = "GetResponsablesProyectos" }
-            );
-            routes.MapRoute(
-                name: "GetColaboradores",
-                url: "consultas/GetColaboradores",
-                defaults: new { controller = "Consultas", action = "GetColaboradores" }
-            );
 
             routes.MapRoute(
                 name: "Consultas",

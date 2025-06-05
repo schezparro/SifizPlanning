@@ -6,7 +6,6 @@
 
 <html ng-app="admin">
 <head>
-    <!--<meta name="viewport" content="width=device-width" />-->
     <title>@ViewBag.Title</title>
     <link href="~/Web/css/bootstrap.min.css" rel="stylesheet" />
     <link href="~/Web/css/bootstrap-theme.min.css" rel="stylesheet" />
@@ -42,11 +41,12 @@
                         <li>
                             <a href="#" ng-click="IrContratosClientes()">Contratos Clientes</a>
                         </li>
-                    </ul>
+            </ul>
                 </li>
                 <li role="presentation"><a href="#" ng-click="IrCatalogos()">Gestionar Catálogos</a></li>
                 <li role="presentation"><a href="#" ng-click="IrCorreosNoEnviados()">Gestionar Correos No Enviados</a></li>
-                
+                <li role="presentation"><a href="#" ng-click="IrProyectosExcel()">Proyectos</a></li>
+
                 <a href="cerrar/sesion/" class="right btn btn-danger"><span class="glyphicon glyphicon-off"></span> Cerrar Sesión</a>
                 <a href="main-menu" style="margin-right: 4px;" class="right btn btn-warning"><span class="glyphicon glyphicon-menu-hamburger"></span> Menú Principal</a>
             </ul>            
@@ -57,7 +57,7 @@
                 <h3 class="panel-title">{{ funcionalidad }}</h3>
             </div>
 
-            <div id="funcionalidad">                
+            <div id="funcionalidad">
 
                 <div id="panel_workers" ng-controller="workerController">
                     @{Html.RenderPartial("windowAddWorker");}
@@ -79,6 +79,11 @@
                     @{Html.RenderPartial("windowAddCorreosNoEnviados");}
                 </div>
 
+
+                <div id="panel_proyectos_excel" ng-controller="proyectosExcelController" class="invisible">
+                    @{Html.RenderPartial("windowProyectosExcel");}
+                </div>
+
                 <div id="loadingDiv">
                     <img src="~/Web/images/ajax-loader.gif" />
                 </div>
@@ -87,8 +92,8 @@
 
         </div>
 
-    </div> 
-    
+    </div>
+
     <!-- CODIGO DEL CHAT -->
     <div id="sifiz-chat" style="display: none;">
         <div id="head-sifiz-chat" class="btns-chat">
@@ -148,5 +153,6 @@
     <script type="text/javascript" src="~/Web/js/admin/clientController.js"></script>
     <script type="text/javascript" src="~/Web/js/admin/catalogosController.js"></script>
     <script type="text/javascript" src="~/Web/js/admin/correosNoEnviadosController.js"></script>
+    <script type="text/javascript" src="~/Web/js/admin/proyectosExcel.js"></script>
 </body>
 </html>

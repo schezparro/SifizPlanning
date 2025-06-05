@@ -1,4 +1,4 @@
-angular.module("consultas").controller("proyectosExcelController", [
+angular.module("admin").controller("proyectosExcelController", [
   "$scope",
   "$http",
   function ($scope, $http) {
@@ -13,7 +13,7 @@ angular.module("consultas").controller("proyectosExcelController", [
     $scope.colaboradores = [];
 
     $scope.cargarClientes = function () {
-      $http.get("/Consultas/GetClientes").then(
+      $http.get("/Admin/GetClientes").then(
         function (response) {
           if (response.data.success) {
             $scope.clientes = response.data.clientes;
@@ -28,7 +28,7 @@ angular.module("consultas").controller("proyectosExcelController", [
     };
 
     $scope.cargarVersiones = function () {
-      $http.get("/Consultas/GetVersionesDesarrollo").then(
+      $http.get("/Admin/GetVersionesDesarrollo").then(
         function (response) {
           if (response.data.success) {
             $scope.versiones = response.data.versiones;
@@ -43,7 +43,7 @@ angular.module("consultas").controller("proyectosExcelController", [
     };
 
     $scope.cargarRepositorios = function () {
-      $http.get("/Consultas/GetRepositorios").then(
+      $http.get("/Admin/GetRepositorios").then(
         function (response) {
           if (response.data.success) {
             $scope.repositorios = response.data.repositorios;
@@ -58,7 +58,7 @@ angular.module("consultas").controller("proyectosExcelController", [
     };
 
     $scope.cargarResponsables = function () {
-      $http.get("/Consultas/GetResponsablesProyectos").then(
+      $http.get("/Admin/GetResponsablesProyectos").then(
         function (response) {
           if (response.data.success) {
             $scope.responsables = response.data.responsables;
@@ -73,7 +73,7 @@ angular.module("consultas").controller("proyectosExcelController", [
     };
 
     $scope.cargarColaboradores = function () {
-      $http.get("/Consultas/GetColaboradores").then(
+      $http.get("/Admin/GetColaboradores").then(
         function (response) {
           if (response.data.success) {
             $scope.colaboradores = response.data.colaboradores;
@@ -88,7 +88,7 @@ angular.module("consultas").controller("proyectosExcelController", [
     };
 
     $scope.cargarProyectos = function () {
-      $http.post("/Consultas/DarProyectosExcel").then(
+      $http.post("/Admin/DarProyectosExcel").then(
         function (response) {
           if (response.data.success) {
             $scope.proyectos = response.data.proyectos;
@@ -128,8 +128,8 @@ angular.module("consultas").controller("proyectosExcelController", [
       }
 
       var url = $scope.proyectoFormData.id
-        ? "/Consultas/ActualizarProyecto"
-        : "/Consultas/CrearProyecto";
+        ? "/Admin/ActualizarProyecto"
+        : "/Admin/CrearProyecto";
 
       $http.post(url, $scope.proyectoFormData).then(
         function (response) {
