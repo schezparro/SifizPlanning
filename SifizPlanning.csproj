@@ -1285,6 +1285,7 @@
     <Content Include="Views\User\windowUserPropuestaVacaciones.cshtml" />
     <Content Include="Views\Rrhh\windowPropuestaVacaciones.cshtml" />
     <Content Include="Views\Comercial\windowFormalizacionOfertasComercial.cshtml" />
+    <Content Include="Views\Admin\windowProyectosExcel.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
