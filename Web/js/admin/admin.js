@@ -1,4 +1,4 @@
-﻿var adminApp = angular.module('admin', []);
+﻿var adminApp = angular.module('admin', ['angularUtils.directives.dirPagination']);
 
 adminApp.config(function ($provide, $httpProvider) {
 

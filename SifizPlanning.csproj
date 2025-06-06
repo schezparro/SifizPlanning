@@ -1313,6 +1313,7 @@
     <Content Include="Web\js\consultas\consultaContratos.js" />
     <Content Include="Web\js\consultas\consultas.js" />
     <Content Include="Web\js\consultas\modulosClientes.js" />
+    <Content Include="Web\js\dirPagination.js" />
     <Content Include="Web\js\highcharts-more.js" />
     <Content Include="Web\js\jspdf.debug.js" />
     <Content Include="Web\js\jspdf.min.js" />

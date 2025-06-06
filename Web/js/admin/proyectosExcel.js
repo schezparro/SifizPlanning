@@ -1,4 +1,5 @@
-angular.module("admin").controller("proyectosExcelController", [
+// 1. AÑADIMOS LA DEPENDENCIA PARA QUE FUNCIONE LA PAGINACIÓN
+adminApp.controller("proyectosExcelController", [
   "$scope",
   "$http",
   function ($scope, $http) {
@@ -6,16 +7,19 @@ angular.module("admin").controller("proyectosExcelController", [
     $scope.proyectos = [];
     $scope.filtro = {};
 
-    // Arrays para poblar los menús desplegables
+    // 2. AÑADIMOS EL MODELO PARA EL NUEVO BUSCADOR GENERAL
+    $scope.buscadorGeneral = "";
+
+    // Arrays para poblar los menús desplegables (sin cambios)
     $scope.clientes = [];
     $scope.versiones = [];
     $scope.visuales = [];
     $scope.repositorios = [];
     $scope.responsables = [];
     $scope.colaboradores = [];
-    $scope.versionesBd = []; // <-- AÑADIDO para Versión de BD
+    $scope.versionesBd = [];
 
-    // Objeto que representa el estado limpio del formulario
+    // Objeto que representa el estado limpio del formulario (sin cambios)
     var initialFormData = {
       id: null,
       cooperativa: null,
@@ -28,17 +32,17 @@ angular.module("admin").controller("proyectosExcelController", [
       liderProyecto: null,
       solucion: "",
       pathFuentesFinDia: "",
-      ubicacion: null, // Campo añadido previamente
-      versionBd: null, // <-- AÑADIDO para Versión de BD
+      ubicacion: null,
+      versionBd: null,
     };
 
     $scope.proyectoFormData = angular.copy(initialFormData);
 
     /*
-        |--------------------------------------------------------------------------
-        | FUNCIONES PARA CARGAR DATOS
-        |--------------------------------------------------------------------------
-        */
+      |--------------------------------------------------------------------------
+      | FUNCIONES PARA CARGAR DATOS (Sin cambios)
+      |--------------------------------------------------------------------------
+      */
     $scope.cargarClientes = function () {
       $http.get("/Admin/GetClientes").then(function (r) {
         if (r.data.success) {
@@ -47,7 +51,11 @@ angular.module("admin").controller("proyectosExcelController", [
       });
     };
     $scope.cargarVersiones = function () {
-      $scope.versiones = [{ Descripcion: "2.0" }, { Descripcion: "2.5" }, { Descripcion: "Canales" }];
+      $scope.versiones = [
+        { Descripcion: "2.0" },
+        { Descripcion: "2.5" },
+        { Descripcion: "Canales" },
+      ];
     };
     $scope.cargarVisuales = function () {
       $http.get("/Admin/GetVersionesDesarrollo").then(function (r) {
@@ -84,10 +92,7 @@ angular.module("admin").controller("proyectosExcelController", [
         }
       });
     };
-
-    // --- FUNCIÓN AÑADIDA para Versión de BD ---
     $scope.cargarVersionesBd = function () {
-      // Asegúrate de que la ruta coincida con la que creaste en RouteConfig.cs
       $http.get("/Admin/GetVersionesBaseDatos").then(function (response) {
         if (response.data.success) {
           $scope.versionesBd = response.data.versionesBd;
@@ -96,10 +101,10 @@ angular.module("admin").controller("proyectosExcelController", [
     };
 
     /*
-        |--------------------------------------------------------------------------
-        | MANEJO DEL FORMULARIO
-        |--------------------------------------------------------------------------
-        */
+      |--------------------------------------------------------------------------
+      | MANEJO DEL FORMULARIO (Sin cambios)
+      |--------------------------------------------------------------------------
+      */
     $scope.limpiarFormulario = function () {
       $scope.proyectoFormData = angular.copy(initialFormData);
       if ($scope.proyectoForm) {
@@ -146,8 +151,6 @@ angular.module("admin").controller("proyectosExcelController", [
       $scope.proyectoFormData.ubicacion = $scope.responsables.find(
         (r) => r.Nombre === proyecto.ubicacion
       );
-
-      // --- LÓGICA AÑADIDA para Versión de BD ---
       $scope.proyectoFormData.versionBd = $scope.versionesBd.find(
         (v) => v.Descripcion === proyecto.versionBd
       );
@@ -168,7 +171,7 @@ angular.module("admin").controller("proyectosExcelController", [
 
       var payload = angular.copy($scope.proyectoFormData);
 
-      // Aplanado de datos para enviar al backend
+      // Aplanado de datos para enviar al backend (sin cambios)
       payload.cooperativa = payload.cooperativa
         ? payload.cooperativa.Descripcion
         : null;
@@ -188,8 +191,6 @@ angular.module("admin").controller("proyectosExcelController", [
         ? payload.liderProyecto.NombreCompleto
         : null;
       payload.ubicacion = payload.ubicacion ? payload.ubicacion.Nombre : null;
-
-      // --- LÓGICA AÑADIDA para Versión de BD ---
       payload.versionBd = payload.versionBd
         ? payload.versionBd.Descripcion
         : null;
@@ -213,29 +214,22 @@ angular.module("admin").controller("proyectosExcelController", [
       );
     };
 
-    // Dentro de tu controlador de AngularJS, junto a las otras funciones del $scope
-
     $scope.eliminarProyecto = function (proyecto, $event) {
-      // Detiene la propagación para evitar que se abra la modal de edición
       if ($event) {
         $event.stopPropagation();
       }
 
-      // 1. Pide confirmación al usuario
       var confirmacion = window.confirm(
         "¿Estás seguro de que deseas eliminar el proyecto para '" +
           proyecto.cooperativa +
           "'?"
       );
 
-      // 2. Si el usuario confirma, procede a eliminar
       if (confirmacion) {
-        // 3. Llama al nuevo endpoint del backend para eliminar
         $http.post("/Admin/EliminarProyecto", { id: proyecto.id }).then(
           function (response) {
             if (response.data.success) {
               alert("Proyecto eliminado correctamente.");
-              // 4. Recarga la lista de proyectos para que el eliminado desaparezca
               $scope.cargarProyectos();
             } else {
               alert("Error al eliminar el proyecto: " + response.data.msg);
@@ -249,10 +243,10 @@ angular.module("admin").controller("proyectosExcelController", [
     };
 
     /*
-        |--------------------------------------------------------------------------
-        | INICIALIZACIÓN DEL CONTROLADOR
-        |--------------------------------------------------------------------------
-        */
+      |--------------------------------------------------------------------------
+      | INICIALIZACIÓN DEL CONTROLADOR (Sin cambios)
+      |--------------------------------------------------------------------------
+      */
     $scope.cargarClientes();
     $scope.cargarVersiones();
     $scope.cargarVisuales();
@@ -260,6 +254,6 @@ angular.module("admin").controller("proyectosExcelController", [
     $scope.cargarResponsables();
     $scope.cargarColaboradores();
     $scope.cargarProyectos();
-    $scope.cargarVersionesBd(); // <-- LLAMADA A LA NUEVA FUNCIÓN
+    $scope.cargarVersionesBd();
   },
 ]);
