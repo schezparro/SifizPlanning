@@ -174,7 +174,6 @@ namespace SifizPlanning.Models
         public virtual DbSet<VersionDesarrollo> VersionDesarrollo { get; set; }
         public virtual DbSet<ComentarioTicketCliente> ComentarioTicketCliente { get; set; }
         public virtual DbSet<EntregableDetalleEstimacion> EntregableDetalleEstimacion { get; set; }
-        public virtual DbSet<ClienteAuxiliar> ClienteAuxiliar { get; set; }
         public virtual DbSet<ResponsableProyectos> ResponsableProyectos { get; set; }
         public virtual DbSet<TicketVersionCliente> TicketVersionCliente { get; set; }
         public virtual DbSet<Semaforo> Semaforo { get; set; }
@@ -212,6 +211,8 @@ namespace SifizPlanning.Models
         public virtual DbSet<DiasDisponiblesVacaciones> DiasDisponiblesVacaciones { get; set; }
         public virtual DbSet<PropuestaVacaciones> PropuestaVacaciones { get; set; }
         public virtual DbSet<OfertaOferta> OfertaOferta { get; set; }
+        public virtual DbSet<ClienteAuxiliar> ClienteAuxiliar { get; set; }
+        public virtual DbSet<CLIENTEREPORTEMTTO> CLIENTEREPORTEMTTO { get; set; }
         public virtual DbSet<EstadoOferta> EstadoOferta { get; set; }
         public virtual DbSet<FormalizacionOfertas> FormalizacionOfertas { get; set; }
     }

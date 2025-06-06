@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -13,6 +13,8 @@ using SifizPlanning.Security;
 
 using SifizPlanning.Controllers;
 using System.Threading.Tasks;
+using System.Globalization;
+
 
 namespace SifizPlanning.Controllers
 {
@@ -110,6 +112,16 @@ namespace SifizPlanning.Controllers
 
         [HttpGet]
         [Authorize(Roles = "ADMIN")]
+        public JsonResult GetVersionesBaseDatos()
+        {
+            var versionesBd = db.VersionBaseDatos
+                                .Select(v => new { v.Secuencial, v.Descripcion })
+                                .ToList();
+            return Json(new { success = true, versionesBd = versionesBd }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN")]
         public ActionResult GetColaboradores()
         {
             try
@@ -130,114 +142,277 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
-        public ActionResult CrearProyecto([System.Web.Http.FromBody] dynamic proyecto)
+        public JsonResult CrearProyecto(ProyectoFormModel proyecto)
         {
+            // --- 1. VALIDACIÓN INICIAL ---
+            if (proyecto == null)
+            {
+                return Json(new { success = false, msg = "No se recibieron datos del proyecto." });
+            }
+
+            // Verificamos que todos los campos del formulario (ahora incluyendo versionBd) no estén vacíos.
+            if (string.IsNullOrWhiteSpace(proyecto.cooperativa) ||
+                string.IsNullOrWhiteSpace(proyecto.version) ||
+                string.IsNullOrWhiteSpace(proyecto.visual) ||
+                string.IsNullOrWhiteSpace(proyecto.repositorio) ||
+                string.IsNullOrWhiteSpace(proyecto.admCod) ||
+                string.IsNullOrWhiteSpace(proyecto.integracion) ||
+                string.IsNullOrWhiteSpace(proyecto.publicacion) ||
+                string.IsNullOrWhiteSpace(proyecto.liderProyecto) ||
+                string.IsNullOrWhiteSpace(proyecto.solucion) ||
+                string.IsNullOrWhiteSpace(proyecto.ubicacion) ||
+                string.IsNullOrWhiteSpace(proyecto.pathFuentesFinDia) ||
+                string.IsNullOrWhiteSpace(proyecto.versionBd)) // <-- CAMBIO: Añadida la validación para versionBd
+            {
+                return Json(new { success = false, msg = "Todos los campos son obligatorios. Por favor, complete el formulario." });
+            }
+
             try
             {
-                if (proyecto == null)
-                {
-                    return Json(new { success = false, msg = "Datos del proyecto no proporcionados." });
-                }
+                // --- 2. BÚSQUEDA DE TODOS LOS IDs ---
+                // Buscamos todos los secuenciales primero.
+                var cliente = db.Cliente.FirstOrDefault(c => c.Descripcion == proyecto.cooperativa);
+                int? secVersionDesarrollo = GetSecuencialVersionDesarrollo(proyecto.visual);
+                int? secRepositorio = GetSecuencialRepositorio(proyecto.repositorio);
+                int? secResponsableCodigo = GetSecuencialResponsable(proyecto.admCod);
+                int? secResponsablePublicacion = GetSecuencialResponsable(proyecto.publicacion);
+                int? secResponsableAcceso = GetSecuencialResponsable(proyecto.integracion);
+                int? secLiderProyecto = GetSecuencialLider(proyecto.liderProyecto);
+                int? secUbicacion = GetSecuencialResponsable(proyecto.ubicacion);
+                int? secVersionBd = GetSecuencialVersionBaseDatos(proyecto.versionBd); // <-- CAMBIO: Añadida la búsqueda para versionBd
 
-                string cooperativa = proyecto.cooperativa;
-                string version = proyecto.version;
-                string repositorioStr = proyecto.repositorio;
-                string admCodStr = proyecto.admCod;
-                string publicacionStr = proyecto.publicacion;
-                string solucionStr = proyecto.solucion;
-                string liderProyectoStr = proyecto.liderProyecto;
-                string fechaSalida = proyecto.fechaSalida;
-
-                var cliente = db.Cliente.FirstOrDefault(c => c.Descripcion == cooperativa);
+                // --- 3. VALIDACIÓN DE IDs ---
+                // Ahora validamos todos los resultados de las búsquedas en un solo lugar.
                 if (cliente == null)
-                {
-                    return Json(new { success = false, msg = "Cliente no encontrado." });
-                }
+                    return Json(new { success = false, msg = $"El cliente '{proyecto.cooperativa}' no fue encontrado." });
 
-                var versionDesarrollo = db.VersionDesarrollo.FirstOrDefault(v => v.Descripcion == version);
-                var repositorio = db.Repositorio.FirstOrDefault(r => r.Descripcion == repositorioStr);
-                var responsableCodigo = db.ResponsableProyectos.FirstOrDefault(rp => rp.Nombre == admCodStr);
-                var responsablePublicacion = db.ResponsableProyectos.FirstOrDefault(rp => rp.Nombre == publicacionStr);
-                var liderProyecto = db.Colaborador.FirstOrDefault(c => (c.persona.Nombre1 + " " + c.persona.Apellido1) == liderProyectoStr);
+                if (secVersionDesarrollo == null)
+                    return Json(new { success = false, msg = "La Versión de Desarrollo seleccionada no es válida." });
 
+                if (secRepositorio == null)
+                    return Json(new { success = false, msg = "El Repositorio seleccionado no es válido." });
+
+                if (secResponsableCodigo == null || secResponsablePublicacion == null || secResponsableAcceso == null)
+                    return Json(new { success = false, msg = "Uno de los Responsables (Código, Publicación o Integración) no es válido." });
+
+                if (secLiderProyecto == null)
+                    return Json(new { success = false, msg = "El Líder de Proyecto seleccionado no es válido." });
+
+                if (secUbicacion == null)
+                    return Json(new { success = false, msg = "La Ubicación seleccionada no es válida." });
+
+                if (secVersionBd == null)
+                    return Json(new { success = false, msg = "La Versión de Base de Datos seleccionada no es válida." });
+
+                // --- 4. CREACIÓN DE LA ENTIDAD ---
                 var nuevoProyecto = new ClienteAuxiliar
                 {
+                    // Datos directos
                     SecuencialCliente = cliente.Secuencial,
-                    SecuencialVersionDesarrollo = versionDesarrollo?.Secuencial ?? 0,
-                    SecuencialRepositorio = repositorio?.Secuencial ?? 0,
-                    SecuencialResponsableCodigo = responsableCodigo?.Secuencial ?? 0,
-                    SecuencialResponsablePublicacion = responsablePublicacion?.Secuencial ?? 0,
-                    SecuencialLiderProyecto = liderProyecto?.Secuencial ?? 0,
-                    TieneCodigoFuente = solucionStr == "Sí" ? 1 : 0,
-                    FechaProduccion = DateTime.ParseExact(fechaSalida, "dd/MM/yyyy", null)
+                    VersionFBS = proyecto.version,
+                    PathFuentes = proyecto.pathFuentesFinDia,
+                    TieneCodigoFuente = proyecto.solucion == "Si" ? 1 : 0,
+                    FechaProduccion = DateTime.Now,
+                    EstaActivo = 1,
+                    NumeroVerificador = 0, // Asignar un valor por defecto si es necesario
+                    TieneSolucionProxies = 0, // Asignar un valor por defecto si es necesario
+
+                    // Asignación de llaves foráneas.
+                    // Usamos .Value porque en el paso anterior ya nos aseguramos de que no son null.
+                    SecuencialVersionDesarrollo = secVersionDesarrollo.Value,
+                    SecuencialRepositorio = secRepositorio.Value,
+                    SecuencialResponsableCodigo = secResponsableCodigo.Value,
+                    SecuencialResponsablePublicacion = secResponsablePublicacion.Value,
+                    SecuencialResponsableAcceso = secResponsableAcceso.Value,
+                    SecuencialLiderProyecto = secLiderProyecto.Value,
+                    SecuencialUbicacion = secUbicacion.Value,
+                    SecuencialVersionBaseDatos = secVersionBd.Value // <-- CAMBIO: Añadida la asignación final
                 };
 
-                db.ClienteAuxiliar.Add(nuevoProyecto);
+                // --- 5. GUARDADO EN BASE DE DATOS ---
+                using (var transaction = db.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        db.ClienteAuxiliar.Add(nuevoProyecto);
+                        db.SaveChanges();
+                        transaction.Commit();
+                        return Json(new { success = true, id = nuevoProyecto.Secuencial });
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        // LogError(ex);
+                        return Json(new { success = false, msg = "Error de base de datos al guardar: " + ex.Message });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                // LogError(e);
+                return Json(new { success = false, msg = "Error inesperado en el servidor: " + e.Message });
+            }
+        }
+
+        private int? GetSecuencialVersionBaseDatos(string version)
+        {
+            if (string.IsNullOrWhiteSpace(version)) return null;
+            var entidad = db.VersionBaseDatos.FirstOrDefault(v => v.Descripcion == version);
+            return entidad?.Secuencial;
+        }
+
+        // Métodos auxiliares específicos para MVC 5
+        private int? GetSecuencialVersionDesarrollo(string version)
+        {
+            if (string.IsNullOrWhiteSpace(version)) return null;
+            var entidad = db.VersionDesarrollo.FirstOrDefault(v => v.Descripcion == version);
+            return entidad?.Secuencial;
+        }
+
+        private int? GetSecuencialRepositorio(string repositorio)
+        {
+            if (string.IsNullOrWhiteSpace(repositorio)) return null;
+            var entidad = db.Repositorio.FirstOrDefault(r => r.Descripcion == repositorio);
+            return entidad?.Secuencial;
+        }
+
+        private int? GetSecuencialResponsable(string responsable)
+        {
+            if (string.IsNullOrWhiteSpace(responsable)) return null;
+            var entidad = db.ResponsableProyectos.FirstOrDefault(r => r.Nombre == responsable);
+            return entidad?.Secuencial;
+        }
+
+        private int? GetSecuencialLider(string lider)
+        {
+            if (string.IsNullOrWhiteSpace(lider)) return null;
+            var entidad = db.Colaborador
+                           .FirstOrDefault(c => (c.persona.Nombre1 + " " + c.persona.Apellido1) == lider);
+            return entidad?.Secuencial;
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN")]
+        public JsonResult ActualizarProyecto(ProyectoFormModel proyecto)
+        {
+            // --- 1. VALIDACIÓN INICIAL ---
+            // Verificamos que los datos y el ID para actualizar sean válidos.
+            if (proyecto == null || !proyecto.id.HasValue || proyecto.id.Value == 0)
+            {
+                return Json(new { success = false, msg = "Datos o ID del proyecto no válidos para la actualización." });
+            }
+
+            // Validación de campos obligatorios (igual que en CrearProyecto)
+            if (string.IsNullOrWhiteSpace(proyecto.cooperativa) ||
+                string.IsNullOrWhiteSpace(proyecto.version) ||
+                string.IsNullOrWhiteSpace(proyecto.visual) ||
+                string.IsNullOrWhiteSpace(proyecto.repositorio) ||
+                string.IsNullOrWhiteSpace(proyecto.admCod) ||
+                string.IsNullOrWhiteSpace(proyecto.integracion) ||
+                string.IsNullOrWhiteSpace(proyecto.publicacion) ||
+                string.IsNullOrWhiteSpace(proyecto.liderProyecto) ||
+                string.IsNullOrWhiteSpace(proyecto.solucion) ||
+                string.IsNullOrWhiteSpace(proyecto.ubicacion) ||
+                string.IsNullOrWhiteSpace(proyecto.pathFuentesFinDia) ||
+                string.IsNullOrWhiteSpace(proyecto.versionBd))
+            {
+                return Json(new { success = false, msg = "Todos los campos son obligatorios. Por favor, complete el formulario." });
+            }
+
+            try
+            {
+                // --- 2. BÚSQUEDA DEL REGISTRO A ACTUALIZAR ---
+                var proyectoExistente = db.ClienteAuxiliar.Find(proyecto.id.Value);
+                if (proyectoExistente == null)
+                {
+                    return Json(new { success = false, msg = $"No se encontró un proyecto con el ID {proyecto.id.Value} para actualizar." });
+                }
+
+                // --- 3. BÚSQUEDA Y VALIDACIÓN DE IDs ---
+                // Se realiza la misma lógica de búsqueda y validación que en CrearProyecto.
+                var cliente = db.Cliente.FirstOrDefault(c => c.Descripcion == proyecto.cooperativa);
+                int? secVersionDesarrollo = GetSecuencialVersionDesarrollo(proyecto.visual);
+                int? secRepositorio = GetSecuencialRepositorio(proyecto.repositorio);
+                int? secResponsableCodigo = GetSecuencialResponsable(proyecto.admCod);
+                int? secResponsablePublicacion = GetSecuencialResponsable(proyecto.publicacion);
+                int? secResponsableAcceso = GetSecuencialResponsable(proyecto.integracion);
+                int? secLiderProyecto = GetSecuencialLider(proyecto.liderProyecto);
+                int? secUbicacion = GetSecuencialResponsable(proyecto.ubicacion);
+                int? secVersionBd = GetSecuencialVersionBaseDatos(proyecto.versionBd);
+
+                if (cliente == null || secVersionDesarrollo == null || secRepositorio == null || secResponsableCodigo == null ||
+                    secResponsablePublicacion == null || secResponsableAcceso == null || secLiderProyecto == null ||
+                    secUbicacion == null || secVersionBd == null)
+                {
+                    return Json(new { success = false, msg = "Uno de los valores seleccionados no es válido o no fue encontrado en la base de datos." });
+                }
+
+                // --- 4. ACTUALIZACIÓN DE LA ENTIDAD ---
+                // En lugar de crear un 'new ClienteAuxiliar', modificamos el 'proyectoExistente'.
+
+                // Datos directos
+                proyectoExistente.SecuencialCliente = cliente.Secuencial;
+                proyectoExistente.VersionFBS = proyecto.version;
+                proyectoExistente.PathFuentes = proyecto.pathFuentesFinDia;
+                proyectoExistente.TieneCodigoFuente = proyecto.solucion == "Si" ? 1 : 0;
+
+                // Asignación de llaves foráneas. Usamos .Value porque ya validamos que no son nulos.
+                proyectoExistente.SecuencialVersionDesarrollo = secVersionDesarrollo.Value;
+                proyectoExistente.SecuencialRepositorio = secRepositorio.Value;
+                proyectoExistente.SecuencialResponsableCodigo = secResponsableCodigo.Value;
+                proyectoExistente.SecuencialResponsablePublicacion = secResponsablePublicacion.Value;
+                proyectoExistente.SecuencialResponsableAcceso = secResponsableAcceso.Value;
+                proyectoExistente.SecuencialLiderProyecto = secLiderProyecto.Value;
+                proyectoExistente.SecuencialUbicacion = secUbicacion.Value;
+                proyectoExistente.SecuencialVersionBaseDatos = secVersionBd.Value;
+
+                // --- 5. GUARDADO EN BASE DE DATOS ---
                 db.SaveChanges();
 
                 return Json(new { success = true });
             }
             catch (Exception e)
             {
-                return Json(new { success = false, msg = e.Message });
+                // LogError(e);
+                return Json(new { success = false, msg = "Error inesperado en el servidor al actualizar: " + e.Message });
             }
         }
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
-        public ActionResult ActualizarProyecto([System.Web.Http.FromBody] dynamic proyecto)
+        public JsonResult EliminarProyecto(int id) // Recibe el ID enviado desde Angular
         {
+            // Verificamos que se haya proporcionado un ID válido
+            if (id <= 0)
+            {
+                return Json(new { success = false, msg = "ID de proyecto no válido." });
+            }
+
             try
             {
-                if (proyecto == null || proyecto.id == 0)
+                // 1. Buscamos el proyecto en la base de datos
+                var proyectoAEliminar = db.ClienteAuxiliar.Find(id);
+
+                // 2. Verificamos si el proyecto existe
+                if (proyectoAEliminar == null)
                 {
-                    return Json(new { success = false, msg = "Datos del proyecto no válidos." });
+                    return Json(new { success = false, msg = "No se encontró el proyecto para eliminar." });
                 }
 
-                int id = proyecto.id;
-                string cooperativa = proyecto.cooperativa;
-                string version = proyecto.version;
-                string repositorioStr = proyecto.repositorio;
-                string admCodStr = proyecto.admCod;
-                string publicacionStr = proyecto.publicacion;
-                string solucionStr = proyecto.solucion;
-                string liderProyectoStr = proyecto.liderProyecto;
-                string fechaSalida = proyecto.fechaSalida;
+                // 3. Eliminamos la entidad del contexto
+                db.ClienteAuxiliar.Remove(proyectoAEliminar);
 
-                var proyectoExistente = db.ClienteAuxiliar.Find(id);
-                if (proyectoExistente == null)
-                {
-                    return Json(new { success = false, msg = "Proyecto no encontrado." });
-                }
-
-                var cliente = db.Cliente.FirstOrDefault(c => c.Descripcion == cooperativa);
-                if (cliente == null)
-                {
-                    return Json(new { success = false, msg = "Cliente no encontrado." });
-                }
-
-                var versionDesarrollo = db.VersionDesarrollo.FirstOrDefault(v => v.Descripcion == version);
-                var repositorio = db.Repositorio.FirstOrDefault(r => r.Descripcion == repositorioStr);
-                var responsableCodigo = db.ResponsableProyectos.FirstOrDefault(rp => rp.Nombre == admCodStr);
-                var responsablePublicacion = db.ResponsableProyectos.FirstOrDefault(rp => rp.Nombre == publicacionStr);
-                var liderProyecto = db.Colaborador.FirstOrDefault(c => (c.persona.Nombre1 + " " + c.persona.Apellido1) == liderProyectoStr);
-
-                proyectoExistente.SecuencialCliente = cliente.Secuencial;
-                proyectoExistente.SecuencialVersionDesarrollo = versionDesarrollo?.Secuencial ?? 0;
-                proyectoExistente.SecuencialRepositorio = repositorio?.Secuencial ?? 0;
-                proyectoExistente.SecuencialResponsableCodigo = responsableCodigo?.Secuencial ?? 0;
-                proyectoExistente.SecuencialResponsablePublicacion = responsablePublicacion?.Secuencial ?? 0;
-                proyectoExistente.SecuencialLiderProyecto = liderProyecto?.Secuencial ?? 0;
-                proyectoExistente.TieneCodigoFuente = solucionStr == "Sí" ? 1 : 0;
-                proyectoExistente.FechaProduccion = DateTime.ParseExact(fechaSalida, "dd/MM/yyyy", null);
-
+                // 4. Guardamos los cambios en la base de datos
                 db.SaveChanges();
 
+                // 5. Devolvemos una respuesta exitosa
                 return Json(new { success = true });
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return Json(new { success = false, msg = e.Message });
+                // En caso de un error (ej. si el proyecto tiene otras tablas relacionadas que impiden el borrado),
+                // se devuelve un mensaje de error. Es importante registrar 'ex' en un log.
+                return Json(new { success = false, msg = "Error de base de datos al eliminar: " + ex.Message });
             }
         }
 
@@ -247,60 +422,91 @@ namespace SifizPlanning.Controllers
         {
             try
             {
-                var datosRaw = (from ca in db.ClienteAuxiliar
-                                join c in db.Cliente on ca.SecuencialCliente equals c.Secuencial
-                                join vd in db.VersionDesarrollo on ca.SecuencialVersionDesarrollo equals vd.Secuencial into vd_join
-                                from vd in vd_join.DefaultIfEmpty()
-                                join r in db.Repositorio on ca.SecuencialRepositorio equals r.Secuencial into r_join
-                                from r in r_join.DefaultIfEmpty()
-                                join rc in db.ResponsableProyectos on ca.SecuencialResponsableCodigo equals rc.Secuencial into rc_join
-                                from rc in rc_join.DefaultIfEmpty()
-                                join rp in db.ResponsableProyectos on ca.SecuencialResponsablePublicacion equals rp.Secuencial into rp_join
-                                from rp in rp_join.DefaultIfEmpty()
-                                join lp in db.Colaborador on ca.SecuencialLiderProyecto equals lp.Secuencial into lp_join
-                                from lp in lp_join.DefaultIfEmpty()
-                                where c.EstaActivo == 1
-                                select new
-                                {
-                                    ca,
-                                    c,
-                                    vd,
-                                    r,
-                                    rc,
-                                    rp,
-                                    lp
-                                }).ToList(); // Se ejecuta en la base
+                var proyectos = (from ca in db.ClienteAuxiliar
+                                 join c in db.Cliente on ca.SecuencialCliente equals c.Secuencial
 
-                var proyectos = datosRaw.Select(x =>
-                {
-                    var personaCliente = x.c.persona_cliente.FirstOrDefault();
-                    var usuarioCliente = personaCliente?.persona?.usuario.FirstOrDefault();
+                                 // LEFT JOINs para obtener las descripciones
+                                 join vd in db.VersionDesarrollo on ca.SecuencialVersionDesarrollo equals vd.Secuencial into vd_join
+                                 from vd in vd_join.DefaultIfEmpty()
 
-                    var gestor = x.c.gestorServicios.FirstOrDefault();
-                    var personaGestor = gestor?.colaborador?.persona;
-                    var usuarioGestor = personaGestor?.usuario.FirstOrDefault();
+                                 join r in db.Repositorio on ca.SecuencialRepositorio equals r.Secuencial into r_join
+                                 from r in r_join.DefaultIfEmpty()
 
-                    return new
-                    {
-                        cooperativa = x.c.Descripcion,
-                        codificacion = x.c.Codigo,
-                        contactoCliente = usuarioCliente?.Email ?? "",
-                        correoContactoCliente = usuarioCliente?.Email ?? "",
-                        version = x.vd?.Descripcion ?? "",
-                        repositorio = x.r?.Descripcion ?? "",
-                        admCod = x.rc?.Nombre ?? "",
-                        publicacion = x.rp?.Nombre ?? "",
-                        solucion = x.ca.TieneCodigoFuente == 1 ? "Sí" : "No",
-                        liderProyecto = x.lp?.persona != null
-                            ? $"{x.lp.persona.Nombre1} {x.lp.persona.Apellido1}"
-                            : "",
-                        gestorServicio = personaGestor != null
-                            ? $"{personaGestor.Nombre1} {personaGestor.Apellido1}"
-                            : "",
-                        correoGestorServicio = usuarioGestor?.Email ?? "",
-                        fechaSalida = x.ca.FechaProduccion.ToString("dd/MM/yyyy")
-                    };
-                }).ToList();
+                                 join rc in db.ResponsableProyectos on ca.SecuencialResponsableCodigo equals rc.Secuencial into rc_join
+                                 from rc in rc_join.DefaultIfEmpty()
+
+                                 join rp in db.ResponsableProyectos on ca.SecuencialResponsablePublicacion equals rp.Secuencial into rp_join
+                                 from rp in rp_join.DefaultIfEmpty()
+
+                                 join ri in db.ResponsableProyectos on ca.SecuencialResponsableAcceso equals ri.Secuencial into ri_join
+                                 from ri in ri_join.DefaultIfEmpty()
+
+                                 join lp in db.Colaborador on ca.SecuencialLiderProyecto equals lp.Secuencial into lp_join
+                                 from lp in lp_join.DefaultIfEmpty()
+
+                                     // --- JOIN AÑADIDO para Ubicacion ---
+                                 join ru in db.ResponsableProyectos on ca.SecuencialUbicacion equals ru.Secuencial into ru_join
+                                 from ru in ru_join.DefaultIfEmpty()
+
+                                     // --- JOIN AÑADIDO para Version de Base de Datos ---
+                                 join vbd in db.VersionBaseDatos on ca.SecuencialVersionBaseDatos equals vbd.Secuencial into vbd_join
+                                 from vbd in vbd_join.DefaultIfEmpty()
+
+                                 where c.EstaActivo == 1
+                                 select new
+                                 {
+                                     id = ca.Secuencial,
+                                     cooperativa = c.Descripcion,
+                                     codificacion = c.Codigo,
+                                     version = ca.VersionFBS ?? "",
+                                     visual = vd.Descripcion ?? "",
+                                     repositorio = r.Descripcion ?? "",
+                                     admCod = rc.Nombre ?? "",
+                                     publicacion = rp.Nombre ?? "",
+                                     integracion = ri.Nombre ?? "",
+                                     solucion = ca.TieneCodigoFuente == 1 ? "Si" : "No",
+                                     pathFuentesFinDia = ca.PathFuentes,
+                                     fechaSalida = ca.FechaProduccion, // Se envía la fecha, se formatea en Angular si es necesario
+
+                                     // --- PROPIEDAD AÑADIDA para Ubicacion ---
+                                     ubicacion = ru.Nombre ?? "",
+
+                                     // --- PROPIEDAD AÑADIDA para Version de BD ---
+                                     versionBd = vbd.Descripcion ?? "",
+
+                                     // Lógica para nombres se mantiene, pero se simplifica
+                                     liderProyecto = (lp.persona.Nombre1 ?? "") + " " + (lp.persona.Apellido1 ?? ""),
+
+                                     // Campos derivados (se dejan al final por claridad)
+                                     contactoCliente = c.persona_cliente.FirstOrDefault().persona.usuario.FirstOrDefault().Email ?? "",
+                                     correoContactoCliente = c.persona_cliente.FirstOrDefault().persona.usuario.FirstOrDefault().Email ?? "",
+                                     gestorServicio = c.gestorServicios.FirstOrDefault().colaborador.persona.Nombre1 + " " + c.gestorServicios.FirstOrDefault().colaborador.persona.Apellido1,
+                                     correoGestorServicio = c.gestorServicios.FirstOrDefault().colaborador.persona.usuario.FirstOrDefault().Email ?? ""
+                                 })
+                                 .ToList() // La consulta se ejecuta aquí, en la base de datos
+                                 .Select(p => new
+                                 { // Segunda proyección en memoria para formatear la fecha
+                                     p.id,
+                                     p.cooperativa,
+                                     p.codificacion,
+                                     p.version,
+                                     p.visual,
+                                     p.repositorio,
+                                     p.admCod,
+                                     p.publicacion,
+                                     p.integracion,
+                                     p.solucion,
+                                     p.pathFuentesFinDia,
+                                     fechaSalida = p.fechaSalida.ToString("dd/MM/yyyy"), // Formateo de fecha
+                                     p.ubicacion,
+                                     p.versionBd,
+                                     liderProyecto = p.liderProyecto.Trim(), // .Trim() para limpiar espacios extra
+                                     p.contactoCliente,
+                                     p.correoContactoCliente,
+                                     p.gestorServicio,
+                                     p.correoGestorServicio
+                                 })
+                                 .ToList();
 
                 return Json(new
                 {
@@ -310,10 +516,12 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                // Es muy útil registrar el error interno para depurarlo
+                // LogError(e);
                 return Json(new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al leer los proyectos: " + e.Message
                 });
             }
         }
@@ -2831,7 +3039,7 @@ f in db.FotoColaborador on t equals f.colaborador
                 //Adicionando los parámetros
                 foreach (var d in data)
                 {
-                    
+
                     string keyAdd = d.Key;
                     if (keyAdd == "idTuplaCatalogo")
                         keyAdd = "Secuencial";
@@ -4247,5 +4455,22 @@ te in db.TipoError on tei.tipoError equals te
                 return Json(resp);
             }
         }
+    }
+
+    public class ProyectoFormModel // Le cambié el nombre para mayor claridad, pero puedes usar el anterior.
+    {
+        public int? id { get; set; } // Null para crear, con valor para editar.
+        public string cooperativa { get; set; }
+        public string version { get; set; }
+        public string visual { get; set; }
+        public string repositorio { get; set; }
+        public string admCod { get; set; }
+        public string integracion { get; set; }
+        public string publicacion { get; set; }
+        public string solucion { get; set; }
+        public string liderProyecto { get; set; }
+        public string pathFuentesFinDia { get; set; }
+        public string ubicacion { get; set; }
+        public string versionBd { get; set; }
     }
 }

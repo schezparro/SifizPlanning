@@ -12,19 +12,13 @@ namespace SifizPlanning.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Repositorio
+    public partial class CLIENTEREPORTEMTTO
     {
-        public Repositorio()
-        {
-            this.CLIENTEAUXILIAR = new HashSet<ClienteAuxiliar>();
-        }
-    
-        public int Secuencial { get; set; }
-        public string Codigo { get; set; }
-        public string Descripcion { get; set; }
-        public decimal EstaActivo { get; set; }
-        public int NumeroVerificador { get; set; }
-    
-        public virtual ICollection<ClienteAuxiliar> CLIENTEAUXILIAR { get; set; }
+        public int SECUENCIAL { get; set; }
+        public string CODIGO { get; set; }
+        public string DESCRIPCION { get; set; }
+        public decimal ESTAACTIVO { get; set; }
+        public int NUMEROVERIFICADOR { get; set; }
+        public int SECUENCIALCLIENTE { get; set; }
     }
 }

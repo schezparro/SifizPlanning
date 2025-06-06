@@ -1,4 +1,4 @@
-﻿using SifizPlanning.Models;
+using SifizPlanning.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -361,12 +361,6 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
-                name: "DarVersionesBaseDatos",
-                url: "catalogos/versionesBaseDatos/{id}",
-                defaults: new { controller = "Admin", action = "DarVersionesBaseDatos", id = UrlParameter.Optional }
-            );
-
-            routes.MapRoute(
                 name: "DarMotivosDevolucionTicket",
                 url: "catalogos/motivos-devolucion-ticket/{id}",
                 defaults: new { controller = "Admin", action = "DarMotivosDevolucionTicket", id = UrlParameter.Optional }
@@ -445,6 +439,12 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "EliminarProyecto",
+                url: "admin/EliminarProyecto",
+                defaults: new { controller = "Admin", action = "EliminarProyecto" }
+            );
+
+            routes.MapRoute(
                 name: "ActualizarProyecto",
                 url: "admin/ActualizarProyecto",
                 defaults: new { controller = "Admin", action = "ActualizarProyecto" }
@@ -474,6 +474,12 @@ namespace SifizPlanning
                 name: "GetColaboradores",
                 url: "admin/GetColaboradores",
                 defaults: new { controller = "Admin", action = "GetColaboradores" }
+            );
+
+            routes.MapRoute(
+                name: "GetVersionesBaseDatos",
+                url: "admin/GetVersionesBaseDatos",
+                defaults: new { controller = "Admin", action = "GetVersionesBaseDatos", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(

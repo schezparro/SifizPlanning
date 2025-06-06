@@ -26,6 +26,6 @@ namespace SifizPlanning.Models
     
         public virtual Colaborador Colaborador { get; set; }
         public virtual ServicioImplantacionCore ServicioImplantacionCore { get; set; }
-        public virtual ClienteAuxiliar clienteAuxiliar { get; set; }
+        public virtual ClienteAuxiliar CLIENTEAUXILIAR { get; set; }
     }
 }

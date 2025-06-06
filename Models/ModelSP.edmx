@@ -361,7 +361,7 @@
           <Property Name="SECUENCIALCLIENTE" Type="int" Nullable="false" />
           <Property Name="SECUENCIALVERSIONDESARROLLO" Type="int" Nullable="false" />
           <Property Name="SECUENCIALREPOSITORIO" Type="int" Nullable="false" />
-          <Property Name="SECUENCIALUBICACION" Type="int" Nullable="false" />
+          <Property Name="SECUENCIALUBICACION" Type="int" />
           <Property Name="TIENECODIGOFUENTE" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="SECUENCIALRESPONSABLEACCESO" Type="int" Nullable="false" />
           <Property Name="SECUENCIALRESPONSABLECODIGO" Type="int" Nullable="false" />
@@ -370,6 +370,8 @@
           <Property Name="SECUENCIALLIDERPROYECTO" Type="int" Nullable="false" />
           <Property Name="TIENESOLUCIONPROXIES" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="FECHAPRODUCCION" Type="date" Nullable="false" />
+          <Property Name="PATHFUENTES" Type="nvarchar" MaxLength="250" />
+          <Property Name="VERSIONFBS" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="CLIENTEREPORTEMANTENIMIENTO">
           <Key>
@@ -751,7 +753,7 @@
           <Property Name="FECHAACTA" Type="date" />
           <Property Name="ACEPTACAMBIOSNORMATIVOS" Type="numeric" Precision="1" Scale="0" />
           <Property Name="ESTIMACION" Type="int" />
-          <Property Name="FECHAESTIMADACIERRE" Type="date" />
+          <Property Name="FechaEstimadaCierre" Type="date" />
         </EntityType>
         <EntityType Name="MOTIVOTRABAJOSEGUIMIENTO">
           <Key>
@@ -884,9 +886,15 @@
           <Property Name="EstaActivo" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="NumeroVerificador" Type="int" Nullable="false" />
         </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'SifizPlanning.TAREAS.REQUERIMIENTO' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="REQUERIMIENTO">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
+            
+            
+            
+            
           </Key>
           <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="CODIGO" Type="varchar" MaxLength="50" Nullable="false" />
@@ -1412,6 +1420,24 @@
           <Property Name="DESCRIPCION" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'SifizPlanning.TICKET.CLIENTEREPORTEMTTO' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="CLIENTEREPORTEMTTO">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+            <PropertyRef Name="CODIGO" />
+            <PropertyRef Name="DESCRIPCION" />
+            <PropertyRef Name="ESTAACTIVO" />
+            <PropertyRef Name="NUMEROVERIFICADOR" />
+            <PropertyRef Name="SECUENCIALCLIENTE" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CODIGO" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="DESCRIPCION" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
+          <Property Name="SECUENCIALCLIENTE" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="COMENTARIOHORASMANTENIMIENTO">
           <Key>
@@ -2338,7 +2364,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS">
-          <End Role="RESPONSABLEPROYECTOS" Type="Self.RESPONSABLEPROYECTOS" Multiplicity="1" />
+          <End Role="RESPONSABLEPROYECTOS" Type="Self.RESPONSABLEPROYECTOS" Multiplicity="0..1" />
           <End Role="CLIENTEAUXILIAR" Type="Self.CLIENTEAUXILIAR" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="RESPONSABLEPROYECTOS">
@@ -5331,7 +5357,6 @@
           <EntitySet Name="PERSONAGRUPOEMAIL" EntityType="Self.PERSONAGRUPOEMAIL" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="PROYECTOMODULOCLIENTE" EntityType="Self.PROYECTOMODULOCLIENTE" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="Reporte" EntityType="Self.Reporte" Schema="TAREAS" store:Type="Tables" />
-          <EntitySet Name="REQUERIMIENTO" EntityType="Self.REQUERIMIENTO" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="RESPONSABLEPROYECTOS" EntityType="Self.RESPONSABLEPROYECTOS" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="SEDE" EntityType="Self.SEDE" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="SERVICIOIMPLANTACIONCORE" EntityType="Self.SERVICIOIMPLANTACIONCORE" Schema="TAREAS" store:Type="Tables" />
@@ -5447,6 +5472,25 @@
           <EntitySet Name="TIPOCONTRATOCLIENTE" EntityType="Self.TIPOCONTRATOCLIENTE" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="TIPONOTIFICACIONTICKET" EntityType="Self.TIPONOTIFICACIONTICKET" Schema="TICKET" store:Type="Tables" />
           <EntitySet Name="TIPORECURSO" EntityType="Self.TIPORECURSO" Schema="TICKET" store:Type="Tables" />
+          <EntitySet Name="REQUERIMIENTO" EntityType="Self.REQUERIMIENTO" store:Type="Tables" store:Schema="TAREAS">
+            <DefiningQuery>SELECT 
+[REQUERIMIENTO].[SECUENCIAL] AS [SECUENCIAL], 
+[REQUERIMIENTO].[CODIGO] AS [CODIGO], 
+[REQUERIMIENTO].[DESCRIPCION] AS [DESCRIPCION], 
+[REQUERIMIENTO].[ESTAACTIVO] AS [ESTAACTIVO], 
+[REQUERIMIENTO].[NUMEROVERIFICADOR] AS [NUMEROVERIFICADOR]
+FROM [TAREAS].[REQUERIMIENTO] AS [REQUERIMIENTO]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="CLIENTEREPORTEMTTO" EntityType="Self.CLIENTEREPORTEMTTO" store:Type="Tables" store:Schema="TICKET">
+            <DefiningQuery>SELECT 
+[CLIENTEREPORTEMTTO].[SECUENCIAL] AS [SECUENCIAL], 
+[CLIENTEREPORTEMTTO].[CODIGO] AS [CODIGO], 
+[CLIENTEREPORTEMTTO].[DESCRIPCION] AS [DESCRIPCION], 
+[CLIENTEREPORTEMTTO].[ESTAACTIVO] AS [ESTAACTIVO], 
+[CLIENTEREPORTEMTTO].[NUMEROVERIFICADOR] AS [NUMEROVERIFICADOR], 
+[CLIENTEREPORTEMTTO].[SECUENCIALCLIENTE] AS [SECUENCIALCLIENTE]
+FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
+          </EntitySet>
           <AssociationSet Name="FK_ACTA_CLIENTE" Association="Self.FK_ACTA_CLIENTE">
             <End Role="CLIENTE" EntitySet="CLIENTE" />
             <End Role="Acta" EntitySet="Acta" />
@@ -7450,44 +7494,7 @@
             <End Role="ENTREGABLEDETALLEESTIMACION" EntitySet="EntregableDetalleEstimacion" />
             <End Role="DetalleEstimacionTicket" EntitySet="DetalleEstimacionTicket" />
           </AssociationSet>
-          <EntitySet Name="ClienteAuxiliar" EntityType="SifizPlanningModel.ClienteAuxiliar" />
           <EntitySet Name="ResponsableProyectos" EntityType="SifizPlanningModel.ResponsableProyectos" />
-          <AssociationSet Name="FK_CLIENTEAUXILIAR_COLABORADOR" Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_COLABORADOR">
-            <End Role="Colaborador" EntitySet="Colaborador" />
-            <End Role="CLIENTEAUXILIAR" EntitySet="ClienteAuxiliar" />
-          </AssociationSet>
-          <AssociationSet Name="FK_CLIENTEAUXILIAR_REPOSITORIO" Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_REPOSITORIO">
-            <End Role="Repositorio" EntitySet="Repositorio" />
-            <End Role="CLIENTEAUXILIAR" EntitySet="ClienteAuxiliar" />
-          </AssociationSet>
-          <AssociationSet Name="FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS" Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS">
-            <End Role="RESPONSABLEPROYECTOS" EntitySet="ResponsableProyectos" />
-            <End Role="CLIENTEAUXILIAR" EntitySet="ClienteAuxiliar" />
-          </AssociationSet>
-          <AssociationSet Name="FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS1" Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS1">
-            <End Role="RESPONSABLEPROYECTOS" EntitySet="ResponsableProyectos" />
-            <End Role="CLIENTEAUXILIAR" EntitySet="ClienteAuxiliar" />
-          </AssociationSet>
-          <AssociationSet Name="FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS2" Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS2">
-            <End Role="RESPONSABLEPROYECTOS" EntitySet="ResponsableProyectos" />
-            <End Role="CLIENTEAUXILIAR" EntitySet="ClienteAuxiliar" />
-          </AssociationSet>
-          <AssociationSet Name="FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS3" Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS3">
-            <End Role="RESPONSABLEPROYECTOS" EntitySet="ResponsableProyectos" />
-            <End Role="CLIENTEAUXILIAR" EntitySet="ClienteAuxiliar" />
-          </AssociationSet>
-          <AssociationSet Name="FK_CLIENTEAUXILIAR_VERSIONBASEDATOS" Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_VERSIONBASEDATOS">
-            <End Role="VersionBaseDatos" EntitySet="VersionBaseDatos" />
-            <End Role="CLIENTEAUXILIAR" EntitySet="ClienteAuxiliar" />
-          </AssociationSet>
-          <AssociationSet Name="FK_CLIENTEAUXILIAR_VERSIONDESARROLLO" Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_VERSIONDESARROLLO">
-            <End Role="VersionDesarrollo" EntitySet="VersionDesarrollo" />
-            <End Role="CLIENTEAUXILIAR" EntitySet="ClienteAuxiliar" />
-          </AssociationSet>
-          <AssociationSet Name="FK_CLIENTEAUXILIAR_CLIENTE" Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_CLIENTE">
-            <End Role="Cliente" EntitySet="Cliente" />
-            <End Role="ClienteAuxiliar" EntitySet="ClienteAuxiliar" />
-          </AssociationSet>
           <EntitySet Name="TicketVersionCliente" EntityType="SifizPlanningModel.TicketVersionCliente" />
           <AssociationSet Name="FK_TICKET_TICKETVERSIONCLIENTE" Association="SifizPlanningModel.FK_TICKET_TICKETVERSIONCLIENTE">
             <End Role="TICKETVERSIONCLIENTE" EntitySet="TicketVersionCliente" />
@@ -7600,10 +7607,6 @@
           <EntitySet Name="EtapasProyectoCliente" EntityType="SifizPlanningModel.EtapasProyectoCliente" />
           <EntitySet Name="RecursosSubEtapasProyecto" EntityType="SifizPlanningModel.RecursosSubEtapasProyecto" />
           <EntitySet Name="SUBETAPASPROYECTOSCLIENTE" EntityType="SifizPlanningModel.SubEtapasProyectosCliente" />
-          <AssociationSet Name="FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1" Association="SifizPlanningModel.FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1">
-            <End Role="ClienteAuxiliar" EntitySet="ClienteAuxiliar" />
-            <End Role="ETAPASPROYECTOCLIENTE" EntitySet="EtapasProyectoCliente" />
-          </AssociationSet>
           <AssociationSet Name="FK_SUBETAPASPROYECTOSCLIENTE_ETAPASPROYECTOCLIENTE" Association="SifizPlanningModel.FK_SUBETAPASPROYECTOSCLIENTE_ETAPASPROYECTOCLIENTE">
             <End Role="ETAPASPROYECTOCLIENTE" EntitySet="EtapasProyectoCliente" />
             <End Role="SUBETAPASPROYECTOSCLIENTE" EntitySet="SUBETAPASPROYECTOSCLIENTE" />
@@ -7635,10 +7638,6 @@
           <AssociationSet Name="FK_TIEMPOSPROYECTO_SERVICIOIMPLANTACIONCORE" Association="SifizPlanningModel.FK_TIEMPOSPROYECTO_SERVICIOIMPLANTACIONCORE">
             <End Role="ServicioImplantacionCore" EntitySet="ServicioImplantacionCore" />
             <End Role="TIEMPOSPROYECTO" EntitySet="TiemposProyecto" />
-          </AssociationSet>
-          <AssociationSet Name="FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR" Association="SifizPlanningModel.FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR">
-            <End Role="ClienteAuxiliar" EntitySet="ClienteAuxiliar" />
-            <End Role="TiemposProyecto" EntitySet="TiemposProyecto" />
           </AssociationSet>
           <AssociationSet Name="FK_RECURSOS_COLABORADOR" Association="SifizPlanningModel.FK_RECURSOS_COLABORADOR">
             <End Role="Colaborador" EntitySet="Colaborador" />
@@ -7676,6 +7675,52 @@
             <End Role="OfertaRequerimiento" EntitySet="OFERTAREQUERIMIENTO" />
             <End Role="OFERTAOFERTA" EntitySet="OfertaOferta" />
           </AssociationSet>
+          <EntitySet Name="ClienteAuxiliar" EntityType="SifizPlanningModel.ClienteAuxiliar" />
+          <AssociationSet Name="FK_CLIENTEAUXILIAR_CLIENTE" Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_CLIENTE">
+            <End Role="Cliente" EntitySet="Cliente" />
+            <End Role="CLIENTEAUXILIAR" EntitySet="ClienteAuxiliar" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CLIENTEAUXILIAR_COLABORADOR" Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_COLABORADOR">
+            <End Role="Colaborador" EntitySet="Colaborador" />
+            <End Role="CLIENTEAUXILIAR" EntitySet="ClienteAuxiliar" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CLIENTEAUXILIAR_REPOSITORIO" Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_REPOSITORIO">
+            <End Role="Repositorio" EntitySet="Repositorio" />
+            <End Role="CLIENTEAUXILIAR" EntitySet="ClienteAuxiliar" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS" Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS">
+            <End Role="ResponsableProyectos" EntitySet="ResponsableProyectos" />
+            <End Role="CLIENTEAUXILIAR" EntitySet="ClienteAuxiliar" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS1" Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS1">
+            <End Role="ResponsableProyectos" EntitySet="ResponsableProyectos" />
+            <End Role="CLIENTEAUXILIAR" EntitySet="ClienteAuxiliar" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS2" Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS2">
+            <End Role="ResponsableProyectos" EntitySet="ResponsableProyectos" />
+            <End Role="CLIENTEAUXILIAR" EntitySet="ClienteAuxiliar" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS3" Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS3">
+            <End Role="ResponsableProyectos" EntitySet="ResponsableProyectos" />
+            <End Role="CLIENTEAUXILIAR" EntitySet="ClienteAuxiliar" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CLIENTEAUXILIAR_VERSIONBASEDATOS" Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_VERSIONBASEDATOS">
+            <End Role="VersionBaseDatos" EntitySet="VersionBaseDatos" />
+            <End Role="CLIENTEAUXILIAR" EntitySet="ClienteAuxiliar" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CLIENTEAUXILIAR_VERSIONDESARROLLO" Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_VERSIONDESARROLLO">
+            <End Role="VersionDesarrollo" EntitySet="VersionDesarrollo" />
+            <End Role="CLIENTEAUXILIAR" EntitySet="ClienteAuxiliar" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1" Association="SifizPlanningModel.FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1">
+            <End Role="CLIENTEAUXILIAR" EntitySet="ClienteAuxiliar" />
+            <End Role="EtapasProyectoCliente" EntitySet="EtapasProyectoCliente" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR" Association="SifizPlanningModel.FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR">
+            <End Role="CLIENTEAUXILIAR" EntitySet="ClienteAuxiliar" />
+            <End Role="TiemposProyecto" EntitySet="TiemposProyecto" />
+          </AssociationSet>
+          <EntitySet Name="CLIENTEREPORTEMTTO" EntityType="SifizPlanningModel.CLIENTEREPORTEMTTO" />
           <EntitySet Name="EstadoOferta" EntityType="SifizPlanningModel.EstadoOferta" />
           <EntitySet Name="FormalizacionOfertas" EntityType="SifizPlanningModel.FormalizacionOfertas" />
           <AssociationSet Name="FK_FORMALIZACIONOFERTAS_ESTADOOFERTA" Association="SifizPlanningModel.FK_FORMALIZACIONOFERTAS_ESTADOOFERTA">
@@ -7780,11 +7825,11 @@
           <NavigationProperty Name="gestorServicios" Relationship="SifizPlanningModel.FK_GESTORSERVICIOS_CLIENTE" FromRole="Cliente" ToRole="GESTORSERVICIOS" />
           <NavigationProperty Name="comentarioHorasMantenimiento" Relationship="SifizPlanningModel.FK_COMENTARIOHORASMANTENIMIENTO_CLIENTE" FromRole="Cliente" ToRole="COMENTARIOHORASMANTENIMIENTO" />
           <NavigationProperty Name="comentarioTicketCliente" Relationship="SifizPlanningModel.FK_COMENTARIOTICKETCLIENTE_CLIENTE" FromRole="Cliente" ToRole="COMENTARIOTICKETCLIENTE" />
-          <NavigationProperty Name="clienteAuxiliar" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_CLIENTE" FromRole="Cliente" ToRole="ClienteAuxiliar" />
           <NavigationProperty Name="ofertas" Relationship="SifizPlanningModel.FK_OFERTAS_CLIENTE" FromRole="Cliente" ToRole="OFERTAS" />
           <NavigationProperty Name="INCIDENCIAS" Relationship="SifizPlanningModel.FK_INCIDENCIAS_CLIENTE" FromRole="Cliente" ToRole="Incidencias" />
           <NavigationProperty Name="TIEMPOCERRADOTICKET" Relationship="SifizPlanningModel.FK_TIEMPOCERRADOTICKET_CLIENTE" FromRole="Cliente" ToRole="TIEMPOCERRADOTICKET" />
           <NavigationProperty Name="clienteReporteMantenimiento" Relationship="SifizPlanningModel.FK_CLIENTEREPORTEMANTENIMIENTO_CLIENTE" FromRole="Cliente" ToRole="CLIENTEREPORTEMANTENIMIENTO" />
+          <NavigationProperty Name="clienteAuxiliar" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_CLIENTE" FromRole="Cliente" ToRole="CLIENTEAUXILIAR" />
         </EntityType>
         <EntityType Name="Colaborador">
           <Key>
@@ -7827,7 +7872,6 @@
           <NavigationProperty Name="entregableMotivoTrabajo" Relationship="SifizPlanningModel.FK_ENTREGABLEMOTIVOTRABAJO_COLABORADOR" FromRole="Colaborador" ToRole="EntregableMotivoTrabajo" />
           <NavigationProperty Name="motivoTrabajo" Relationship="SifizPlanningModel.FK_MOTIVOTRABAJO_COLABORADOR" FromRole="Colaborador" ToRole="MotivoTrabajo" />
           <NavigationProperty Name="gestorServicios" Relationship="SifizPlanningModel.FK_GESTORSERVICIOS_COLABORADOR" FromRole="Colaborador" ToRole="GESTORSERVICIOS" />
-          <NavigationProperty Name="clientesLider" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_COLABORADOR" FromRole="Colaborador" ToRole="CLIENTEAUXILIAR" />
           <NavigationProperty Name="ofertas" Relationship="SifizPlanningModel.FK_OFERTAS_COLABORADOR" FromRole="Colaborador" ToRole="OFERTAS" />
           <Property Name="PublicacionesDosCinco" Type="Boolean" />
           <NavigationProperty Name="NIVELCOLABORADORTECNOLOGIA" Relationship="SifizPlanningModel.FK_NIVELCOLABORADORTECNOLOGIA_COLABORADOR" FromRole="Colaborador" ToRole="NIVELCOLABORADORTECNOLOGIA" />
@@ -7839,6 +7883,7 @@
           <NavigationProperty Name="recursos" Relationship="SifizPlanningModel.FK_RECURSOS_COLABORADOR" FromRole="Colaborador" ToRole="Recursos" />
           <NavigationProperty Name="DIASDISPONIBLESVACACIONES" Relationship="SifizPlanningModel.FK_DIASDISPONIBLESVACACIONES_COLABORADOR" FromRole="Colaborador" ToRole="DIASDISPONIBLESVACACIONES" />
           <NavigationProperty Name="PROPUESTAVACACIONES" Relationship="SifizPlanningModel.FK_PROPUESTAVACACIONES_COLABORADOR" FromRole="Colaborador" ToRole="PROPUESTAVACACIONES" />
+          <NavigationProperty Name="clienteAuxiliar" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_COLABORADOR" FromRole="Colaborador" ToRole="CLIENTEAUXILIAR" />
           </EntityType>
         <EntityType Name="Colaborador_JefeInmediato">
           <Key>
@@ -12157,7 +12202,7 @@
           <Property Name="Descripcion" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
           <Property Name="NumeroVerificador" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="clientes" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_REPOSITORIO" FromRole="Repositorio" ToRole="CLIENTEAUXILIAR" />
+          <NavigationProperty Name="CLIENTEAUXILIAR" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_REPOSITORIO" FromRole="Repositorio" ToRole="CLIENTEAUXILIAR" />
         </EntityType>
         <EntityType Name="VersionBaseDatos">
           <Key>
@@ -12168,7 +12213,7 @@
           <Property Name="Descripcion" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
           <Property Name="NumeroVerificador" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="clientes" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_VERSIONBASEDATOS" FromRole="VersionBaseDatos" ToRole="CLIENTEAUXILIAR" />
+          <NavigationProperty Name="CLIENTEAUXILIAR" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_VERSIONBASEDATOS" FromRole="VersionBaseDatos" ToRole="CLIENTEAUXILIAR" />
         </EntityType>
         <EntityType Name="VersionDesarrollo">
           <Key>
@@ -12179,7 +12224,7 @@
           <Property Name="Descripcion" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
           <Property Name="NumeroVerificador" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="clientes" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_VERSIONDESARROLLO" FromRole="VersionDesarrollo" ToRole="CLIENTEAUXILIAR" />
+          <NavigationProperty Name="CLIENTEAUXILIAR" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_VERSIONDESARROLLO" FromRole="VersionDesarrollo" ToRole="CLIENTEAUXILIAR" />
         </EntityType>
         <EntityType Name="ComentarioTicketCliente">
           <Key>
@@ -12235,37 +12280,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="ClienteAuxiliar">
-          <Key>
-            <PropertyRef Name="Secuencial" />
-          </Key>
-          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
-          <Property Name="NumeroVerificador" Type="Int32" Nullable="false" />
-          <Property Name="SecuencialCliente" Type="Int32" Nullable="false" />
-          <Property Name="SecuencialVersionDesarrollo" Type="Int32" Nullable="false" />
-          <Property Name="SecuencialRepositorio" Type="Int32" Nullable="false" />
-          <Property Name="SecuencialUbicacion" Type="Int32" Nullable="false" />
-          <Property Name="TieneCodigoFuente" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
-          <Property Name="SecuencialResponsableAcceso" Type="Int32" Nullable="false" />
-          <Property Name="SecuencialResponsableCodigo" Type="Int32" Nullable="false" />
-          <Property Name="SecuencialResponsablePublicacion" Type="Int32" Nullable="false" />
-          <Property Name="SecuencialVersionBaseDatos" Type="Int32" Nullable="false" />
-          <Property Name="SecuencialLiderProyecto" Type="Int32" Nullable="false" />
-          <Property Name="TieneSolucionProxies" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
-          <Property Name="FechaProduccion" Type="DateTime" Nullable="false" Precision="0" />
-          <NavigationProperty Name="liderProyecto" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_COLABORADOR" FromRole="CLIENTEAUXILIAR" ToRole="Colaborador" />
-          <NavigationProperty Name="repositorio" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_REPOSITORIO" FromRole="CLIENTEAUXILIAR" ToRole="Repositorio" />
-          <NavigationProperty Name="ubicacion" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS" FromRole="CLIENTEAUXILIAR" ToRole="RESPONSABLEPROYECTOS" />
-          <NavigationProperty Name="responsableAcceso" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS1" FromRole="CLIENTEAUXILIAR" ToRole="RESPONSABLEPROYECTOS" />
-          <NavigationProperty Name="responsableCodigo" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS2" FromRole="CLIENTEAUXILIAR" ToRole="RESPONSABLEPROYECTOS" />
-          <NavigationProperty Name="responsablePublicacion" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS3" FromRole="CLIENTEAUXILIAR" ToRole="RESPONSABLEPROYECTOS" />
-          <NavigationProperty Name="versionBaseDatos" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_VERSIONBASEDATOS" FromRole="CLIENTEAUXILIAR" ToRole="VersionBaseDatos" />
-          <NavigationProperty Name="versionDesarrollo" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_VERSIONDESARROLLO" FromRole="CLIENTEAUXILIAR" ToRole="VersionDesarrollo" />
-          <NavigationProperty Name="cliente" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_CLIENTE" FromRole="ClienteAuxiliar" ToRole="Cliente" />
-          <NavigationProperty Name="etapasProyectoCliente" Relationship="SifizPlanningModel.FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1" FromRole="ClienteAuxiliar" ToRole="ETAPASPROYECTOCLIENTE" />
-          <NavigationProperty Name="TIEMPOSPROYECTO" Relationship="SifizPlanningModel.FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR" FromRole="ClienteAuxiliar" ToRole="TiemposProyecto" />
-        </EntityType>
         <EntityType Name="ResponsableProyectos">
           <Key>
             <PropertyRef Name="Secuencial" />
@@ -12275,120 +12289,12 @@
           <Property Name="Descripcion" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
           <Property Name="NumeroVerificador" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="clientesUbicacion" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS" FromRole="RESPONSABLEPROYECTOS" ToRole="CLIENTEAUXILIAR" />
-          <NavigationProperty Name="clientesResponsableAcceso" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS1" FromRole="RESPONSABLEPROYECTOS" ToRole="CLIENTEAUXILIAR" />
-          <NavigationProperty Name="clientesResponsableCodigo" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS2" FromRole="RESPONSABLEPROYECTOS" ToRole="CLIENTEAUXILIAR" />
-          <NavigationProperty Name="clientesResponsablePublicacion" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS3" FromRole="RESPONSABLEPROYECTOS" ToRole="CLIENTEAUXILIAR" />
           <Property Name="EsTecnico" Type="Decimal" Precision="1" Scale="0" Nullable="false" />
+          <NavigationProperty Name="CLIENTEAUXILIAR" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS" FromRole="ResponsableProyectos" ToRole="CLIENTEAUXILIAR" />
+          <NavigationProperty Name="CLIENTEAUXILIAR1" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS1" FromRole="ResponsableProyectos" ToRole="CLIENTEAUXILIAR" />
+          <NavigationProperty Name="CLIENTEAUXILIAR2" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS2" FromRole="ResponsableProyectos" ToRole="CLIENTEAUXILIAR" />
+          <NavigationProperty Name="CLIENTEAUXILIAR3" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS3" FromRole="ResponsableProyectos" ToRole="CLIENTEAUXILIAR" />
         </EntityType>
-        <Association Name="FK_CLIENTEAUXILIAR_COLABORADOR">
-          <End Type="SifizPlanningModel.Colaborador" Role="Colaborador" Multiplicity="1" />
-          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="CLIENTEAUXILIAR" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Colaborador">
-              <PropertyRef Name="Secuencial" />
-            </Principal>
-            <Dependent Role="CLIENTEAUXILIAR">
-              <PropertyRef Name="SecuencialLiderProyecto" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_CLIENTEAUXILIAR_REPOSITORIO">
-          <End Type="SifizPlanningModel.Repositorio" Role="Repositorio" Multiplicity="1" />
-          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="CLIENTEAUXILIAR" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Repositorio">
-              <PropertyRef Name="Secuencial" />
-            </Principal>
-            <Dependent Role="CLIENTEAUXILIAR">
-              <PropertyRef Name="SecuencialRepositorio" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS">
-          <End Type="SifizPlanningModel.ResponsableProyectos" Role="RESPONSABLEPROYECTOS" Multiplicity="1" />
-          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="CLIENTEAUXILIAR" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="RESPONSABLEPROYECTOS">
-              <PropertyRef Name="Secuencial" />
-            </Principal>
-            <Dependent Role="CLIENTEAUXILIAR">
-              <PropertyRef Name="SecuencialUbicacion" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS1">
-          <End Type="SifizPlanningModel.ResponsableProyectos" Role="RESPONSABLEPROYECTOS" Multiplicity="1" />
-          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="CLIENTEAUXILIAR" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="RESPONSABLEPROYECTOS">
-              <PropertyRef Name="Secuencial" />
-            </Principal>
-            <Dependent Role="CLIENTEAUXILIAR">
-              <PropertyRef Name="SecuencialResponsableAcceso" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS2">
-          <End Type="SifizPlanningModel.ResponsableProyectos" Role="RESPONSABLEPROYECTOS" Multiplicity="1" />
-          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="CLIENTEAUXILIAR" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="RESPONSABLEPROYECTOS">
-              <PropertyRef Name="Secuencial" />
-            </Principal>
-            <Dependent Role="CLIENTEAUXILIAR">
-              <PropertyRef Name="SecuencialResponsableCodigo" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS3">
-          <End Type="SifizPlanningModel.ResponsableProyectos" Role="RESPONSABLEPROYECTOS" Multiplicity="1" />
-          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="CLIENTEAUXILIAR" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="RESPONSABLEPROYECTOS">
-              <PropertyRef Name="Secuencial" />
-            </Principal>
-            <Dependent Role="CLIENTEAUXILIAR">
-              <PropertyRef Name="SecuencialResponsablePublicacion" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_CLIENTEAUXILIAR_VERSIONBASEDATOS">
-          <End Type="SifizPlanningModel.VersionBaseDatos" Role="VersionBaseDatos" Multiplicity="1" />
-          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="CLIENTEAUXILIAR" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="VersionBaseDatos">
-              <PropertyRef Name="Secuencial" />
-            </Principal>
-            <Dependent Role="CLIENTEAUXILIAR">
-              <PropertyRef Name="SecuencialVersionBaseDatos" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_CLIENTEAUXILIAR_VERSIONDESARROLLO">
-          <End Type="SifizPlanningModel.VersionDesarrollo" Role="VersionDesarrollo" Multiplicity="1" />
-          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="CLIENTEAUXILIAR" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="VersionDesarrollo">
-              <PropertyRef Name="Secuencial" />
-            </Principal>
-            <Dependent Role="CLIENTEAUXILIAR">
-              <PropertyRef Name="SecuencialVersionDesarrollo" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_CLIENTEAUXILIAR_CLIENTE">
-          <End Type="SifizPlanningModel.Cliente" Role="Cliente" Multiplicity="1" />
-          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="ClienteAuxiliar" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Cliente">
-              <PropertyRef Name="Secuencial" />
-            </Principal>
-            <Dependent Role="ClienteAuxiliar">
-              <PropertyRef Name="SecuencialCliente" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityType Name="TicketVersionCliente">
           <Key>
             <PropertyRef Name="Secuencial" />
@@ -12965,11 +12871,11 @@
           <Property Name="FechaFin" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
           <Property Name="SecuencialClienteAuxiliar" Type="Int32" />
-          <NavigationProperty Name="clienteAuxiliar" Relationship="SifizPlanningModel.FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1" FromRole="ETAPASPROYECTOCLIENTE" ToRole="ClienteAuxiliar" />
           <NavigationProperty Name="subEtapasProyectosCliente" Relationship="SifizPlanningModel.FK_SUBETAPASPROYECTOSCLIENTE_ETAPASPROYECTOCLIENTE" FromRole="ETAPASPROYECTOCLIENTE" ToRole="SUBETAPASPROYECTOSCLIENTE" />
           <Property Name="Detalle" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="Seleccionado" Type="Decimal" Precision="1" Scale="0" />
           <Property Name="Porciento" Type="Double" />
+          <NavigationProperty Name="CLIENTEAUXILIAR" Relationship="SifizPlanningModel.FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1" FromRole="EtapasProyectoCliente" ToRole="CLIENTEAUXILIAR" />
         </EntityType>
         <EntityType Name="RecursosSubEtapasProyecto">
           <Key>
@@ -12999,18 +12905,6 @@
           <Property Name="Seleccionado" Type="Decimal" Precision="1" Scale="0" />
           <Property Name="Porciento" Type="Double" />
         </EntityType>
-        <Association Name="FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1">
-          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="ClienteAuxiliar" Multiplicity="0..1" />
-          <End Type="SifizPlanningModel.EtapasProyectoCliente" Role="ETAPASPROYECTOCLIENTE" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ClienteAuxiliar">
-              <PropertyRef Name="Secuencial" />
-            </Principal>
-            <Dependent Role="ETAPASPROYECTOCLIENTE">
-              <PropertyRef Name="SecuencialClienteAuxiliar" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_SUBETAPASPROYECTOSCLIENTE_ETAPASPROYECTOCLIENTE">
           <End Type="SifizPlanningModel.EtapasProyectoCliente" Role="ETAPASPROYECTOCLIENTE" Multiplicity="1" />
           <End Type="SifizPlanningModel.SubEtapasProyectosCliente" Role="SUBETAPASPROYECTOSCLIENTE" Multiplicity="*" />
@@ -13123,7 +13017,7 @@
           <NavigationProperty Name="Colaborador" Relationship="SifizPlanningModel.FK_TIEMPOSPROYECTO_COLABORADOR" FromRole="TIEMPOSPROYECTO" ToRole="Colaborador" />
           <NavigationProperty Name="ServicioImplantacionCore" Relationship="SifizPlanningModel.FK_TIEMPOSPROYECTO_SERVICIOIMPLANTACIONCORE" FromRole="TIEMPOSPROYECTO" ToRole="ServicioImplantacionCore" />
           <Property Name="SecuencialClienteAuxiliar" Type="Int32" />
-          <NavigationProperty Name="clienteAuxiliar" Relationship="SifizPlanningModel.FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR" FromRole="TiemposProyecto" ToRole="ClienteAuxiliar" />
+          <NavigationProperty Name="CLIENTEAUXILIAR" Relationship="SifizPlanningModel.FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR" FromRole="TiemposProyecto" ToRole="CLIENTEAUXILIAR" />
         </EntityType>
         <Association Name="FK_TIEMPOSPROYECTO_COLABORADOR">
           <End Type="SifizPlanningModel.Colaborador" Role="Colaborador" Multiplicity="1" />
@@ -13146,18 +13040,6 @@
             </Principal>
             <Dependent Role="TIEMPOSPROYECTO">
               <PropertyRef Name="SecuencialServicioImplantacionCore" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR">
-          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="ClienteAuxiliar" Multiplicity="0..1" />
-          <End Type="SifizPlanningModel.TiemposProyecto" Role="TiemposProyecto" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ClienteAuxiliar">
-              <PropertyRef Name="Secuencial" />
-            </Principal>
-            <Dependent Role="TiemposProyecto">
-              <PropertyRef Name="SecuencialClienteAuxiliar" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -13346,6 +13228,187 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="ClienteAuxiliar">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <Property Name="NumeroVerificador" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialCliente" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialVersionDesarrollo" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialRepositorio" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialUbicacion" Type="Int32" />
+          <Property Name="TieneCodigoFuente" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <Property Name="SecuencialResponsableAcceso" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialResponsableCodigo" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialResponsablePublicacion" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialVersionBaseDatos" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialLiderProyecto" Type="Int32" Nullable="false" />
+          <Property Name="TieneSolucionProxies" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <Property Name="FechaProduccion" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="PathFuentes" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="VersionFBS" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="cliente" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_CLIENTE" FromRole="CLIENTEAUXILIAR" ToRole="Cliente" />
+          <NavigationProperty Name="colaborador" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_COLABORADOR" FromRole="CLIENTEAUXILIAR" ToRole="Colaborador" />
+          <NavigationProperty Name="repositorio" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_REPOSITORIO" FromRole="CLIENTEAUXILIAR" ToRole="Repositorio" />
+          <NavigationProperty Name="ubicacion" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS" FromRole="CLIENTEAUXILIAR" ToRole="ResponsableProyectos" />
+          <NavigationProperty Name="responsableAcceso" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS1" FromRole="CLIENTEAUXILIAR" ToRole="ResponsableProyectos" />
+          <NavigationProperty Name="responsableCodigo" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS2" FromRole="CLIENTEAUXILIAR" ToRole="ResponsableProyectos" />
+          <NavigationProperty Name="responsablePublicacion" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS3" FromRole="CLIENTEAUXILIAR" ToRole="ResponsableProyectos" />
+          <NavigationProperty Name="versionBaseDatos" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_VERSIONBASEDATOS" FromRole="CLIENTEAUXILIAR" ToRole="VersionBaseDatos" />
+          <NavigationProperty Name="versionDesarrollo" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_VERSIONDESARROLLO" FromRole="CLIENTEAUXILIAR" ToRole="VersionDesarrollo" />
+          <NavigationProperty Name="etapasProyectoCliente" Relationship="SifizPlanningModel.FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1" FromRole="CLIENTEAUXILIAR" ToRole="EtapasProyectoCliente" />
+          <NavigationProperty Name="tiemposProyecto" Relationship="SifizPlanningModel.FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR" FromRole="CLIENTEAUXILIAR" ToRole="TiemposProyecto" />
+        </EntityType>
+        <Association Name="FK_CLIENTEAUXILIAR_CLIENTE">
+          <End Type="SifizPlanningModel.Cliente" Role="Cliente" Multiplicity="1" />
+          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="CLIENTEAUXILIAR" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Cliente">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="CLIENTEAUXILIAR">
+              <PropertyRef Name="SecuencialCliente" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CLIENTEAUXILIAR_COLABORADOR">
+          <End Type="SifizPlanningModel.Colaborador" Role="Colaborador" Multiplicity="1" />
+          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="CLIENTEAUXILIAR" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Colaborador">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="CLIENTEAUXILIAR">
+              <PropertyRef Name="SecuencialLiderProyecto" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CLIENTEAUXILIAR_REPOSITORIO">
+          <End Type="SifizPlanningModel.Repositorio" Role="Repositorio" Multiplicity="1" />
+          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="CLIENTEAUXILIAR" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Repositorio">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="CLIENTEAUXILIAR">
+              <PropertyRef Name="SecuencialRepositorio" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS">
+          <End Type="SifizPlanningModel.ResponsableProyectos" Role="ResponsableProyectos" Multiplicity="0..1" />
+          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="CLIENTEAUXILIAR" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ResponsableProyectos">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="CLIENTEAUXILIAR">
+              <PropertyRef Name="SecuencialUbicacion" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS1">
+          <End Type="SifizPlanningModel.ResponsableProyectos" Role="ResponsableProyectos" Multiplicity="1" />
+          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="CLIENTEAUXILIAR" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ResponsableProyectos">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="CLIENTEAUXILIAR">
+              <PropertyRef Name="SecuencialResponsableAcceso" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS2">
+          <End Type="SifizPlanningModel.ResponsableProyectos" Role="ResponsableProyectos" Multiplicity="1" />
+          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="CLIENTEAUXILIAR" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ResponsableProyectos">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="CLIENTEAUXILIAR">
+              <PropertyRef Name="SecuencialResponsableCodigo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CLIENTEAUXILIAR_RESPONSABLEPROYECTOS3">
+          <End Type="SifizPlanningModel.ResponsableProyectos" Role="ResponsableProyectos" Multiplicity="1" />
+          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="CLIENTEAUXILIAR" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ResponsableProyectos">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="CLIENTEAUXILIAR">
+              <PropertyRef Name="SecuencialResponsablePublicacion" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CLIENTEAUXILIAR_VERSIONBASEDATOS">
+          <End Type="SifizPlanningModel.VersionBaseDatos" Role="VersionBaseDatos" Multiplicity="1" />
+          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="CLIENTEAUXILIAR" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="VersionBaseDatos">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="CLIENTEAUXILIAR">
+              <PropertyRef Name="SecuencialVersionBaseDatos" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CLIENTEAUXILIAR_VERSIONDESARROLLO">
+          <End Type="SifizPlanningModel.VersionDesarrollo" Role="VersionDesarrollo" Multiplicity="1" />
+          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="CLIENTEAUXILIAR" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="VersionDesarrollo">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="CLIENTEAUXILIAR">
+              <PropertyRef Name="SecuencialVersionDesarrollo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ETAPASPROYECTOCLIENTE_ETAPASPROYECTO1">
+          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="CLIENTEAUXILIAR" Multiplicity="0..1" />
+          <End Type="SifizPlanningModel.EtapasProyectoCliente" Role="EtapasProyectoCliente" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CLIENTEAUXILIAR">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="EtapasProyectoCliente">
+              <PropertyRef Name="SecuencialClienteAuxiliar" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TIEMPOSPROYECTO_CLIENTEAUXILIAR">
+          <End Type="SifizPlanningModel.ClienteAuxiliar" Role="CLIENTEAUXILIAR" Multiplicity="0..1" />
+          <End Type="SifizPlanningModel.TiemposProyecto" Role="TiemposProyecto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CLIENTEAUXILIAR">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="TiemposProyecto">
+              <PropertyRef Name="SecuencialClienteAuxiliar" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="CLIENTEREPORTEMTTO">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+            <PropertyRef Name="CODIGO" />
+            <PropertyRef Name="DESCRIPCION" />
+            <PropertyRef Name="ESTAACTIVO" />
+            <PropertyRef Name="NUMEROVERIFICADOR" />
+            <PropertyRef Name="SECUENCIALCLIENTE" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CODIGO" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DESCRIPCION" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="ESTAACTIVO" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <Property Name="NUMEROVERIFICADOR" Type="Int32" Nullable="false" />
+          <Property Name="SECUENCIALCLIENTE" Type="Int32" Nullable="false" />
+        </EntityType>
         <EntityType Name="EstadoOferta">
           <Key>
             <PropertyRef Name="Secuencial" />
@@ -14974,7 +15037,7 @@
           <EntitySetMapping Name="MotivoTrabajoInformacionAdicional">
             <EntityTypeMapping TypeName="SifizPlanningModel.MotivoTrabajoInformacionAdicional">
               <MappingFragment StoreEntitySet="MOTIVOTRABAJOINFADICIONAL">
-                <ScalarProperty Name="FechaEstimadaCierre" ColumnName="FECHAESTIMADACIERRE" />
+                <ScalarProperty Name="FechaEstimadaCierre" ColumnName="FechaEstimadaCierre" />
                 <ScalarProperty Name="Estimacion" ColumnName="ESTIMACION" />
                 <ScalarProperty Name="AceptaCambiosNormativos" ColumnName="ACEPTACAMBIOSNORMATIVOS" />
                 <ScalarProperty Name="FechaActa" ColumnName="FECHAACTA" />
@@ -15220,27 +15283,6 @@
             <EntityTypeMapping TypeName="SifizPlanningModel.EntregableDetalleEstimacion">
               <MappingFragment StoreEntitySet="ENTREGABLEDETALLEESTIMACION">
                 <ScalarProperty Name="Nombre" ColumnName="NOMBRE" />
-                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="ClienteAuxiliar">
-            <EntityTypeMapping TypeName="SifizPlanningModel.ClienteAuxiliar">
-              <MappingFragment StoreEntitySet="CLIENTEAUXILIAR">
-                <ScalarProperty Name="FechaProduccion" ColumnName="FECHAPRODUCCION" />
-                <ScalarProperty Name="TieneSolucionProxies" ColumnName="TIENESOLUCIONPROXIES" />
-                <ScalarProperty Name="SecuencialLiderProyecto" ColumnName="SECUENCIALLIDERPROYECTO" />
-                <ScalarProperty Name="SecuencialVersionBaseDatos" ColumnName="SECUENCIALVERSIONBASEDATOS" />
-                <ScalarProperty Name="SecuencialResponsablePublicacion" ColumnName="SECUENCIALRESPONSABLEPUBLICACION" />
-                <ScalarProperty Name="SecuencialResponsableCodigo" ColumnName="SECUENCIALRESPONSABLECODIGO" />
-                <ScalarProperty Name="SecuencialResponsableAcceso" ColumnName="SECUENCIALRESPONSABLEACCESO" />
-                <ScalarProperty Name="TieneCodigoFuente" ColumnName="TIENECODIGOFUENTE" />
-                <ScalarProperty Name="SecuencialUbicacion" ColumnName="SECUENCIALUBICACION" />
-                <ScalarProperty Name="SecuencialRepositorio" ColumnName="SECUENCIALREPOSITORIO" />
-                <ScalarProperty Name="SecuencialVersionDesarrollo" ColumnName="SECUENCIALVERSIONDESARROLLO" />
-                <ScalarProperty Name="SecuencialCliente" ColumnName="SECUENCIALCLIENTE" />
-                <ScalarProperty Name="NumeroVerificador" ColumnName="NUMEROVERIFICADOR" />
-                <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -15742,6 +15784,41 @@
                 <ScalarProperty Name="FechaRecepcionEstimacion" ColumnName="FECHARECEPCIONESTIMACION" />
                 <ScalarProperty Name="Codigo" ColumnName="CODIGO" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ClienteAuxiliar">
+            <EntityTypeMapping TypeName="SifizPlanningModel.ClienteAuxiliar">
+              <MappingFragment StoreEntitySet="CLIENTEAUXILIAR">
+                <ScalarProperty Name="VersionFBS" ColumnName="VERSIONFBS" />
+                <ScalarProperty Name="PathFuentes" ColumnName="PATHFUENTES" />
+                <ScalarProperty Name="FechaProduccion" ColumnName="FECHAPRODUCCION" />
+                <ScalarProperty Name="TieneSolucionProxies" ColumnName="TIENESOLUCIONPROXIES" />
+                <ScalarProperty Name="SecuencialLiderProyecto" ColumnName="SECUENCIALLIDERPROYECTO" />
+                <ScalarProperty Name="SecuencialVersionBaseDatos" ColumnName="SECUENCIALVERSIONBASEDATOS" />
+                <ScalarProperty Name="SecuencialResponsablePublicacion" ColumnName="SECUENCIALRESPONSABLEPUBLICACION" />
+                <ScalarProperty Name="SecuencialResponsableCodigo" ColumnName="SECUENCIALRESPONSABLECODIGO" />
+                <ScalarProperty Name="SecuencialResponsableAcceso" ColumnName="SECUENCIALRESPONSABLEACCESO" />
+                <ScalarProperty Name="TieneCodigoFuente" ColumnName="TIENECODIGOFUENTE" />
+                <ScalarProperty Name="SecuencialUbicacion" ColumnName="SECUENCIALUBICACION" />
+                <ScalarProperty Name="SecuencialRepositorio" ColumnName="SECUENCIALREPOSITORIO" />
+                <ScalarProperty Name="SecuencialVersionDesarrollo" ColumnName="SECUENCIALVERSIONDESARROLLO" />
+                <ScalarProperty Name="SecuencialCliente" ColumnName="SECUENCIALCLIENTE" />
+                <ScalarProperty Name="NumeroVerificador" ColumnName="NUMEROVERIFICADOR" />
+                <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CLIENTEREPORTEMTTO">
+            <EntityTypeMapping TypeName="SifizPlanningModel.CLIENTEREPORTEMTTO">
+              <MappingFragment StoreEntitySet="CLIENTEREPORTEMTTO">
+                <ScalarProperty Name="SECUENCIALCLIENTE" ColumnName="SECUENCIALCLIENTE" />
+                <ScalarProperty Name="NUMEROVERIFICADOR" ColumnName="NUMEROVERIFICADOR" />
+                <ScalarProperty Name="ESTAACTIVO" ColumnName="ESTAACTIVO" />
+                <ScalarProperty Name="DESCRIPCION" ColumnName="DESCRIPCION" />
+                <ScalarProperty Name="CODIGO" ColumnName="CODIGO" />
+                <ScalarProperty Name="SECUENCIAL" ColumnName="SECUENCIAL" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
