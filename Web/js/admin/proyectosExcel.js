@@ -47,7 +47,7 @@ angular.module("admin").controller("proyectosExcelController", [
       });
     };
     $scope.cargarVersiones = function () {
-      $scope.versiones = [{ Descripcion: "2.0" }, { Descripcion: "2.S" }];
+      $scope.versiones = [{ Descripcion: "2.0" }, { Descripcion: "2.5" }, { Descripcion: "Canales" }];
     };
     $scope.cargarVisuales = function () {
       $http.get("/Admin/GetVersionesDesarrollo").then(function (r) {

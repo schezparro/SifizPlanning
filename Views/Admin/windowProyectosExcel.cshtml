@@ -163,7 +163,7 @@
                             </div>
 
                             <div class="form-group col-sm-6" ng-class="{'has-error': proyectoForm.ubicacion.$touched && proyectoForm.ubicacion.$invalid}">
-                                <label for="ubicacion">UBICACIÓN</label>
+                                <label for="ubicacion">UBICACION</label>
                                 <select id="ubicacion" name="ubicacion" class="form-control" ng-model="proyectoFormData.ubicacion" ng-options="resp.Nombre for resp in responsables track by resp.Nombre" required>
                                     <option value="">Seleccione...</option>
                                 </select>
@@ -171,7 +171,7 @@
                             </div>
 
                             <div class="form-group col-sm-6" ng-class="{'has-error': proyectoForm.versionBd.$touched && proyectoForm.versionBd.$invalid}">
-                                <label for="versionBd">VERSIÓN BASE DE DATOS</label>
+                                <label for="versionBd">VERSION BASE DE DATOS</label>
                                 <select id="versionBd" name="versionBd" class="form-control" ng-model="proyectoFormData.versionBd" ng-options="vbd.Descripcion for vbd in versionesBd track by vbd.Descripcion" required>
                                     <option value="">Seleccione...</option>
                                 </select>
