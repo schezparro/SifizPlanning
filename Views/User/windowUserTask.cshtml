@@ -67,32 +67,29 @@
                          ng-repeat="tarea in tareas.tareas" data-container="#task-container" data-toggle="popover"
                          data-placement="right" data-title="{{tarea.dCliente}}"
                          ng-init="data = tarea.detalle.indexOf('CORRESPONDIENTE AL TICKET:') !== -1 ? '&lt;span class=&quot;glyphicon glyphicon-envelope btn-mensaje-ticket&quot; title=&quot;Mensaje desarrollo del ticket&quot;&gt;&lt;/span&gt;&nbsp;&nbsp;&lt;span class=&quot;glyphicon glyphicon-wrench btn-info-ticket&quot; title=&quot;Informaci&#243;n resolución de ticket&quot;&gt;&lt;/span&gt;' : ''; "
-                         data-content="{{tarea.tipo === &quot;t&quot; ?
-                                            &quot;Actividad:&quot; + tarea.dActividad + &quot;<br>&quot; +
-                                            &quot;Módulo:&quot; + tarea.dModulo + &quot;<br>&quot; +
-                                            &quot;Desarrollarse en:&quot; + tarea.dLugar + &quot;<br>&quot; +
-                                            (tarea.coordinador != null?&quot;Coordinar con:&quot;+tarea.coordinador+&quot;<br/>&quot;:&quot;&quot;) +
-                                            &quot;Detalles:&quot; + tarea.detalle + &quot;<br>&quot; +
-                                            &quot;Hora Inicio:&quot; + tarea.finicio + &quot;<br>&quot; +
-                                            &quot;Hora Fin:&quot; + tarea.ffin + &quot;<br>&quot; +
-                                            &quot;
-                                                <div class='left estado-tarea' data-id-tarea='&quot; + tarea.id + &quot;'>
-                                                    &quot; + data + &quot;
-                                                </div>
-                                                <div class='right estado-tarea'>
-                                                    <span class='glyphicon glyphicon-cog btn-tarea-desarrollo' data-id-tarea='&quot; + tarea.id + &quot;' title='En desarrollo'></span>
-                                                    &nbsp;
-                                                    <span class='glyphicon glyphicon-pause btn-tarea-pausa' data-id-tarea='&quot; + tarea.id + &quot;' title='En pausa'></span>
-                                                    &nbsp;
-                                                    <span class='glyphicon glyphicon-search btn-tarea-finish' data-id-tarea='&quot; + tarea.id + &quot;' title='Ver actividades'></span>
-                                                </div>
-                                            &quot;
-
-                                        :
-                                            &quot;Motivo:&quot; + tarea.detalle + &quot;<br>&quot; +
-                                            &quot;Hora Inicio:&quot; + tarea.finicio + &quot;<br>&quot; +
-                                            &quot;Hora Fin:&quot; + tarea.ffin + &quot;<br>&quot;
-}}" data-html="true" data-trigger="manual">
+                         data-content="{{tarea.tipo === 't' ?
+                           'Actividad:' + tarea.dActividad + '&lt;br&gt;' +
+                           'Módulo:' + tarea.dModulo + '&lt;br&gt;' +
+                           'Desarrollarse en:' + tarea.dLugar + '&lt;br&gt;' +
+                           (tarea.coordinador != null ? 'Coordinar con:' + tarea.coordinador + '&lt;br/&gt;' : '') +
+                           'Detalles:' + tarea.detalle + '&lt;br&gt;' +
+                           'Hora Inicio:' + tarea.finicio + '&lt;br&gt;' +
+                           'Hora Fin:' + tarea.ffin + '&lt;br&gt;' +
+                           '<div class=&quot;left estado-tarea&quot; data-id-tarea=&quot;' + tarea.id + '&quot;>' + data + '</div>' +
+                           '<div class=&quot;right estado-tarea&quot;>' +
+                               '<span class=&quot;glyphicon glyphicon-eye-open btn-ver-proyecto&quot; data-id-tarea=&quot;' + tarea.id + '&quot; title=&quot;Ver Información del Proyecto&quot;></span>' +
+                               '&nbsp;' +
+                               '<span class=&quot;glyphicon glyphicon-cog btn-tarea-desarrollo&quot; data-id-tarea=&quot;' + tarea.id + '&quot; title=&quot;En desarrollo&quot;></span>' +
+                               '&nbsp;' +
+                               '<span class=&quot;glyphicon glyphicon-pause btn-tarea-pausa&quot; data-id-tarea=&quot;' + tarea.id + '&quot; title=&quot;En pausa&quot;></span>' +
+                               '&nbsp;' +
+                               '<span class=&quot;glyphicon glyphicon-search btn-tarea-finish&quot; data-id-tarea=&quot;' + tarea.id + '&quot; title=&quot;Ver actividades&quot;></span>' +
+                           '</div>'
+                       :
+                           'Motivo:' + tarea.detalle + '&lt;br&gt;' +
+                           'Hora Inicio:' + tarea.finicio + '&lt;br&gt;' +
+                           'Hora Fin:' + tarea.ffin + '&lt;br&gt;'
+        }}" data-html="true" data-trigger="manual">
 
                         <div class="cabecera-tarea">
                             <div class="nombre-cliente">{{tarea.cliente}}</div>
@@ -119,6 +116,97 @@
 
             </tr>
         </table>
+    </div>
+</div>
+
+<div class="modal fade" id="modalVerProyectos" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document"> <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Proyectos de: {{ clienteSeleccionado }}</h4>
+            </div>
+            <div class="modal-body" style="max-height: 600px; overflow-y: auto;">
+                
+                <div ng-if="cargandoProyectos">
+                    <p class="text-center"><i class="glyphicon glyphicon-refresh gly-spin"></i> Cargando proyectos...</p>
+                </div>
+
+                <div ng-if="!cargandoProyectos && proyectosDelCliente.length > 0">
+                    <h5 ng-if="proyectosDelCliente.length > 1">Se encontraron {{proyectosDelCliente.length}} proyectos:</h5>
+                    
+                    <div class="panel panel-default" ng-repeat="proyecto in proyectosDelCliente">
+                        <div class="panel-heading">
+                            <strong>Proyecto: {{proyecto.cooperativa}} - {{proyecto.version}}</strong>
+                        </div>
+                        <div class="panel-body">
+                            <dl class="dl-horizontal">
+                                <dt>Codificación:</dt>
+                                <dd>{{proyecto.codificacion}}</dd>
+                                
+                                <dt>Versión FBS:</dt>
+                                <dd>{{proyecto.version}}</dd>
+
+                                <dt>Líder de Proyecto:</dt>
+                                <dd>{{proyecto.liderProyecto}}</dd>
+                                
+                                <dt>Visual:</dt>
+                                <dd>{{proyecto.visual}}</dd>
+
+                                <dt>Repositorio:</dt>
+                                <dd>{{proyecto.repositorio}}</dd>
+                                
+                                <dt>Ubicación:</dt>
+                                <dd>{{proyecto.ubicacion}}</dd>
+
+                                <dt>Versión BD:</dt>
+                                <dd>{{proyecto.versionBd}}</dd>
+
+                                <dt>Fecha Salida Prod.:</dt>
+                                <dd>{{proyecto.fechaSalida}}</dd>
+                                
+                                <hr/>
+
+                                <dt>Contacto Cliente:</dt>
+                                <dd>{{proyecto.contactoCliente}}</dd>
+                                
+                                <dt>Gestor de Servicio:</dt>
+                                <dd>{{proyecto.gestorServicio}}</dd>
+                                
+                                <dt>Correo Gestor:</dt>
+                                <dd>{{proyecto.correoGestorServicio}}</dd>
+
+                                <hr/>
+
+                                <dt>Adm. Código:</dt>
+                                <dd>{{proyecto.admCod}}</dd>
+                                
+                                <dt>Publicación:</dt>
+                                <dd>{{proyecto.publicacion}}</dd>
+                                
+                                <dt>Integración:</dt>
+                                <dd>{{proyecto.integracion}}</dd>
+
+                                <dt>Tiene Solución:</dt>
+                                <dd>{{proyecto.solucion}}</dd>
+                                
+                                <dt>Path Fuentes:</dt>
+                                <dd><small>{{proyecto.pathFuentesFinDia}}</small></dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
+                <div ng-if="!cargandoProyectos && proyectosDelCliente.length === 0">
+                    <p class="text-center">No se encontraron proyectos para este cliente.</p>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
     </div>
 </div>
 

@@ -1023,6 +1023,12 @@ namespace SifizPlanning
             //
 
             routes.MapRoute(
+                name: "ObtenerProyectosPorClientePorTarea",
+                url: "user/ObtenerProyectosPorClientePorTarea",
+                defaults: new { controller = "User", action = "ObtenerProyectosPorClientePorTarea", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "DarAnnosMesPropuestaVacaciones",
                 url: "user/dar-annos-meses/{id}",
                 defaults: new { controller = "User", action = "DarAnnosMesPropuestaVacaciones", id = UrlParameter.Optional }

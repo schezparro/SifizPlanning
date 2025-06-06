@@ -76,7 +76,7 @@ namespace SifizPlanning.Controllers
                 $"Usuario: {emailUser}",
                 emailUser
             );
-        
+
             DateTime hoy = DateTime.Today;
             DayOfWeek diaSemana = hoy.DayOfWeek;
             DateTime lunes = hoy;
@@ -91,20 +91,20 @@ namespace SifizPlanning.Controllers
                 DateTime domingo = hoy.Subtract(time);
                 lunes = domingo.AddDays(1);
             }
-        
+
             var resp = new
             {
                 success = true,
                 lunes = lunes.ToString("dd/MM/yyyy"),
                 hoy = hoy.ToString("dd/MM/yyyy")
             };
-        
+
             LoggerManager.LogInfo(
                 "Resultado Último Lunes",
                 $"Usuario: {emailUser}, Lunes: {lunes:dd/MM/yyyy}, Hoy: {hoy:dd/MM/yyyy}",
                 emailUser
             );
-        
+
             return Json(resp);
         }
 
@@ -601,13 +601,13 @@ namespace SifizPlanning.Controllers
 
             if (trabUser != null)
                 tareasProgramadores.Insert(0, trabUser);//Se pone el colaborador de primero
-        
+
             LoggerManager.LogInfo(
                 "Finaliza Consulta Tareas",
                 $"Usuario: {emailUser}, Total trabajadores: {tareasProgramadores.Count}",
                 emailUser
             );
-        
+
             var resp = new
             {
                 success = true,
@@ -4998,7 +4998,8 @@ r in db.Rol on ur.rol equals r
                         db.RecursosAsistencia.Add(ra);
                         db.SaveChanges();
                     }
-                };
+                }
+                ;
 
                 return Json(new
                 {
@@ -5393,7 +5394,8 @@ r in db.Rol on ur.rol equals r
                         db.SaveChanges();
 
                     }
-                };
+                }
+                ;
 
                 return Json(new
                 {
@@ -5566,6 +5568,120 @@ r in db.Rol on ur.rol equals r
                         <strong>Modulador:</strong> {recurso.SecuencialModulo}<br/>
                         <strong>Enlace de la reunión:</strong> <a href='{recurso.Url}' target='_blank'>{recurso.Url}</a><br/>
                     </div>";
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER,ADMIN")] // Rol ajustado para incluir USER
+        public ActionResult ObtenerProyectosPorClientePorTarea(int idTarea)
+        {
+            try
+            {
+                // PASO 1: Usar el idTarea para encontrar la tarea y el ID del cliente.
+                // IMPORTANTE: Confirma que tu tabla de Tareas se llama 'Tarea' en tu contexto (db.Tarea).
+                var tarea = db.Tarea.FirstOrDefault(t => t.Secuencial == idTarea);
+
+                // Si la tarea no se encuentra o no tiene un cliente, devolvemos una respuesta vacía pero exitosa.
+                if (tarea == null)
+                {
+                    return Json(new { success = true, proyectos = new List<object>(), nombreCliente = "Tarea no encontrada o sin cliente." });
+                }
+
+                // Obtenemos el ID del cliente para usarlo en las siguientes consultas.
+                int idCliente = tarea.SecuencialCliente;
+
+                // PASO 2: Obtenemos el nombre del cliente para devolverlo en la respuesta.
+                var nombreDelCliente = db.Cliente
+                                         .Where(c => c.Secuencial == idCliente)
+                                         .Select(c => c.Descripcion)
+                                         .FirstOrDefault();
+
+
+                // PASO 3: Ejecutar la consulta completa de proyectos, filtrando por el idCliente encontrado.
+                var proyectosQuery = (from ca in db.ClienteAuxiliar
+                                      join c in db.Cliente on ca.SecuencialCliente equals c.Secuencial
+
+                                      // LEFT JOINs para obtener las descripciones
+                                      join vd in db.VersionDesarrollo on ca.SecuencialVersionDesarrollo equals vd.Secuencial into vd_join
+                                      from vd in vd_join.DefaultIfEmpty()
+
+                                      join r in db.Repositorio on ca.SecuencialRepositorio equals r.Secuencial into r_join
+                                      from r in r_join.DefaultIfEmpty()
+
+                                      join rc in db.ResponsableProyectos on ca.SecuencialResponsableCodigo equals rc.Secuencial into rc_join
+                                      from rc in rc_join.DefaultIfEmpty()
+
+                                      join rp in db.ResponsableProyectos on ca.SecuencialResponsablePublicacion equals rp.Secuencial into rp_join
+                                      from rp in rp_join.DefaultIfEmpty()
+
+                                      join ri in db.ResponsableProyectos on ca.SecuencialResponsableAcceso equals ri.Secuencial into ri_join
+                                      from ri in ri_join.DefaultIfEmpty()
+
+                                      join lp in db.Colaborador on ca.SecuencialLiderProyecto equals lp.Secuencial into lp_join
+                                      from lp in lp_join.DefaultIfEmpty()
+
+                                          // JOIN para Ubicacion
+                                      join ru in db.ResponsableProyectos on ca.SecuencialUbicacion equals ru.Secuencial into ru_join
+                                      from ru in ru_join.DefaultIfEmpty()
+
+                                          // JOIN para Version de Base de Datos
+                                      join vbd in db.VersionBaseDatos on ca.SecuencialVersionBaseDatos equals vbd.Secuencial into vbd_join
+                                      from vbd in vbd_join.DefaultIfEmpty()
+
+                                      where ca.SecuencialCliente == idCliente && c.EstaActivo == 1
+
+                                      select new
+                                      {
+                                          id = ca.Secuencial,
+                                          cooperativa = c.Descripcion,
+                                          codificacion = c.Codigo,
+                                          version = ca.VersionFBS ?? "",
+                                          visual = vd.Descripcion ?? "",
+                                          repositorio = r.Descripcion ?? "",
+                                          admCod = rc.Nombre ?? "",
+                                          publicacion = rp.Nombre ?? "",
+                                          integracion = ri.Nombre ?? "",
+                                          solucion = ca.TieneCodigoFuente == 1 ? "Si" : "No",
+                                          pathFuentesFinDia = ca.PathFuentes,
+                                          fechaSalida = (DateTime?)ca.FechaProduccion, // Convertido a Nullable para seguridad
+                                          ubicacion = ru.Nombre ?? "",
+                                          versionBd = vbd.Descripcion ?? "",
+                                          liderProyecto = (lp.persona.Nombre1 ?? "") + " " + (lp.persona.Apellido1 ?? ""),
+                                          contactoCliente = c.persona_cliente.FirstOrDefault().persona.usuario.FirstOrDefault().Email ?? "",
+                                          correoContactoCliente = c.persona_cliente.FirstOrDefault().persona.usuario.FirstOrDefault().Email ?? "",
+                                          gestorServicio = c.gestorServicios.FirstOrDefault().colaborador.persona.Nombre1 + " " + c.gestorServicios.FirstOrDefault().colaborador.persona.Apellido1,
+                                          correoGestorServicio = c.gestorServicios.FirstOrDefault().colaborador.persona.usuario.FirstOrDefault().Email ?? ""
+                                      });
+
+                var proyectos = proyectosQuery.ToList().Select(p => new
+                {
+                    p.id,
+                    p.cooperativa,
+                    p.codificacion,
+                    p.version,
+                    p.visual,
+                    p.repositorio,
+                    p.admCod,
+                    p.publicacion,
+                    p.integracion,
+                    p.solucion,
+                    p.pathFuentesFinDia,
+                    fechaSalida = p.fechaSalida.HasValue ? p.fechaSalida.Value.ToString("dd/MM/yyyy") : "N/A",
+                    p.ubicacion,
+                    p.versionBd,
+                    liderProyecto = p.liderProyecto.Trim(),
+                    p.contactoCliente,
+                    p.correoContactoCliente,
+                    p.gestorServicio,
+                    p.correoGestorServicio
+                }).ToList();
+
+                // PASO 4: Devolver el JSON con los proyectos y el nombre del cliente.
+                return Json(new { success = true, proyectos = proyectos, nombreCliente = nombreDelCliente });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = "Error al leer los proyectos: " + e.Message });
+            }
         }
 
         //ESTIMACIONES DE LOS USUARIOS
@@ -6685,7 +6801,8 @@ r in db.Rol on ur.rol equals r
                 if (!rgx.IsMatch(destinatariosEmailTicket))
                 {
                     throw new Exception("Debe ingresar una lista de correos válida separados por punto y coma(;)");
-                };
+                }
+                ;
                 string[] emails = destinatariosEmailTicket.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var email in emails)
                 {
