@@ -1,0 +1,270 @@
+@{
+    Layout = null;
+}
+
+<div id="div-ofertas-excel">
+    <div class="clearfix mb-3">
+        <button class="btn btn-primary pull-left" ng-click="agregarOferta()">
+            <span class="glyphicon glyphicon-plus"></span> Oferta
+        </button>
+        <div class="form-group mb-0 pull-right" style="width: 300px;">
+            <input type="text" class="form-control" ng-model="buscadorGeneral" placeholder="Buscar..." />
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="table-responsive">
+        <div class="table-container">
+            <table id="tabla-ofertas-excel" class="table table-striped table-hover table-sm">
+                <thead>
+                    <tr>
+                        <th>CÓDIGO OFERTA</th>
+                        <th>CLIENTE</th>
+                        <th>TEMA</th>
+                        <th>FECHA OFERTA</th>
+                        <th>PRECIO OFERTA</th>
+                        <th>FORMA DE PAGO</th>
+                        <th>VALIDEZ OFERTA</th>
+                        <th>DESCUENTO</th>
+                        <th>ESTADO</th>
+                        <th>ACCIONES</th>
+                    </tr>
+                    <tr>
+                        <th><input type="text" class="form-control" ng-model="filtro.codigoOferta" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.cliente" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.tema" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.fechaOferta" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.precioOferta" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.formaPago" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.validezOferta" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.descuento" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.estado" /></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>                    <tr ng-repeat="oferta in ofertasLista" style="cursor:pointer;">
+                        <td>{{oferta.codigoOferta}}</td>
+                        <td>{{oferta.cliente}}</td>
+                        <td>{{oferta.tema}}</td>
+                        <td>{{oferta.fechaOferta | date:'dd/MM/yyyy'}}</td>
+                        <td class="text-right">{{oferta.precioOferta | currency}}</td>
+                        <td>{{oferta.formaPago}}</td>
+                        <td>{{oferta.validezOferta | date:'dd/MM/yyyy'}}</td>
+                        <td>{{oferta.descuento}}</td>
+                        <td>
+                            <span class="badge" ng-class="{
+                                'bg-warning': oferta.estado === 'VENCIDA',
+                                'bg-success': oferta.estado.includes('ACEPTADA'),
+                                'bg-danger': oferta.estado === 'RECHAZADA'
+                            }">{{oferta.estado}}</span>
+                        </td>
+                        <td style="white-space: nowrap;">
+                            <button class="btn btn-warning" ng-click="editarOferta(oferta, $event)">Editar</button>
+                            <button class="btn btn-danger" ng-click="eliminarOferta(oferta, $event)">Eliminar</button>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="11" class="text-center">
+                            <nav>
+                                <ul class="pagination">
+                                    <li ng-click="atrazarPagina()">
+                                        <a href="#" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                    <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
+                                    <li ng-click="avanzarPagina()">
+                                        <a href="#" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                            <div class="form-inline" style="padding: 22px 0px 0px 0px">
+                                <label>Cantidad Por Página:</label>
+                                <select class="form-control" ng-model="cantidadMostrarPorPagina" ng-change="actualizarCantidadMostrar()">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <dir-pagination-controls
+            max-size="8"
+            direction-links="true"
+            boundary-links="true"
+            next-text="Siguiente"
+            previous-text="Anterior">
+        </dir-pagination-controls>
+    </div>
+
+    <!-- Modal para CRUD de Ofertas -->
+    <div class="modal fade" id="modal-excel-offer" tabindex="-1" role="dialog" aria-labelledby="ofertaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <form name="offerForm" novalidate ng-submit="guardarOferta()">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="ofertaModalLabel">
+                            {{ editingOffer.id ? 'Editar Oferta' : 'Crear Oferta' }}
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="form-group col-sm-4" ng-class="{'has-error': offerForm.codigoOferta.$touched && offerForm.codigoOferta.$invalid}">
+                                <label for="codigoOferta">CÓDIGO OFERTA</label>
+                                <input id="codigoOferta" name="codigoOferta" type="text" class="form-control" ng-model="editingOffer.codigoOferta" required />
+                                <div class="help-block" ng-show="offerForm.codigoOferta.$touched && offerForm.codigoOferta.$error.required">Este campo es obligatorio.</div>
+                            </div>
+                            <div class="form-group col-sm-4" ng-class="{'has-error': offerForm.cliente.$touched && offerForm.cliente.$invalid}">
+                                <label for="cliente">CLIENTE</label>
+                                <select id="cliente" name="cliente" class="form-control" ng-model="editingOffer.cliente" required>
+                                    <option value="">Seleccione...</option>
+                                    <option ng-repeat="cliente in clientes">{{cliente}}</option>
+                                </select>
+                                <div class="help-block" ng-show="offerForm.cliente.$touched && offerForm.cliente.$error.required">Este campo es obligatorio.</div>
+                            </div>
+                            <div class="form-group col-sm-4" ng-class="{'has-error': offerForm.fechaOferta.$touched && offerForm.fechaOferta.$invalid}">
+                                <label for="fechaOferta">FECHA OFERTA</label>
+                                <input id="fechaOferta" name="fechaOferta" type="text" class="form-control datepicker" ng-model="editingOffer.fechaOferta" required />
+                                <div class="help-block" ng-show="offerForm.fechaOferta.$touched && offerForm.fechaOferta.$error.required">Este campo es obligatorio.</div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{'has-error': offerForm.tema.$touched && offerForm.tema.$invalid}">
+                            <label for="tema">TEMA</label>
+                            <textarea id="tema" name="tema" class="form-control" ng-model="editingOffer.tema" rows="3" required></textarea>
+                            <div class="help-block" ng-show="offerForm.tema.$touched && offerForm.tema.$error.required">Este campo es obligatorio.</div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-3" ng-class="{'has-error': offerForm.precioOferta.$touched && offerForm.precioOferta.$invalid}">
+                                <label for="precioOferta">PRECIO OFERTA</label>
+                                <input id="precioOferta" name="precioOferta" type="number" step="0.01" class="form-control" ng-model="editingOffer.precioOferta" required />
+                                <div class="help-block" ng-show="offerForm.precioOferta.$touched && offerForm.precioOferta.$error.required">Este campo es obligatorio.</div>
+                            </div>
+                            <div class="form-group col-sm-3" ng-class="{'has-error': offerForm.formaPago.$touched && offerForm.formaPago.$invalid}">
+                                <label for="formaPago">FORMA DE PAGO</label>
+                                <select id="formaPago" name="formaPago" class="form-control" ng-model="editingOffer.formaPago" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="70/30">70/30</option>
+                                    <option value="Mensual">Mensual</option>
+                                    <option value="100 % a la entrega">100 % a la entrega</option>
+                                </select>
+                                <div class="help-block" ng-show="offerForm.formaPago.$touched && offerForm.formaPago.$error.required">Este campo es obligatorio.</div>
+                            </div>
+                            <div class="form-group col-sm-3" ng-class="{'has-error': offerForm.validezOferta.$touched && offerForm.validezOferta.$invalid}">
+                                <label for="validezOferta">VALIDEZ OFERTA</label>
+                                <input id="validezOferta" name="validezOferta" type="text" class="form-control datepicker" ng-model="editingOffer.validezOferta" required />
+                                <div class="help-block" ng-show="offerForm.validezOferta.$touched && offerForm.validezOferta.$error.required">Este campo es obligatorio.</div>
+                            </div>
+                            <div class="form-group col-sm-3">
+                                <label for="descuento">DESCUENTO</label>
+                                <select id="descuento" name="descuento" class="form-control" ng-model="editingOffer.descuento">
+                                    <option value="NO">NO</option>
+                                    <option value="SI">SI</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-12" ng-class="{'has-error': offerForm.estado.$touched && offerForm.estado.$invalid}">
+                                <label for="estado">ESTADO</label>
+                                <select id="estado" name="estado" class="form-control" ng-model="editingOffer.estado" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="VENCIDA">VENCIDA</option>
+                                    <option value="ACEPTADA / CONTRATO">ACEPTADA / CONTRATO</option>
+                                    <option value="ACEPTADA / TICKET">ACEPTADA / TICKET</option>
+                                    <option value="RECHAZADA">RECHAZADA</option>
+                                </select>
+                                <div class="help-block" ng-show="offerForm.estado.$touched && offerForm.estado.$error.required">Este campo es obligatorio.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" ng-disabled="offerForm.$invalid">
+                            {{ editingOffer.id ? 'Actualizar' : 'Crear' }}
+                        </button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.table-container {
+    margin-bottom: 20px;
+}
+.table-sm {
+    font-size: 0.9em;
+}
+.badge {
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+.bg-warning {
+    background-color: #f0ad4e;
+    color: #fff;
+}
+.bg-success {
+    background-color: #5cb85c;
+    color: #fff;
+}
+.bg-danger {
+    background-color: #d9534f;
+    color: #fff;
+}
+.table > thead > tr > th input.form-control {
+    padding: 2px 8px;
+    height: 24px;
+    font-size: 0.9em;
+}
+.table > tbody > tr > td {
+    vertical-align: middle;
+}
+.form-control {
+    height: 30px;
+    padding: 5px 10px;
+}
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+.mb-3 {
+    margin-bottom: 1rem;
+}
+.mb-0 {
+    margin-bottom: 0;
+}
+hr {
+    margin-top: 10px;
+    margin-bottom: 15px;
+    border-top: 1px solid #ddd;
+}
+.pull-left {
+    float: left;
+}
+.pull-right {
+    float: right;
+}
+.text-right {
+    text-align: right;
+}
+.table > tbody > tr > td .btn {
+    margin: 0 2px;
+}
+</style>

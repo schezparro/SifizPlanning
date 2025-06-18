@@ -52,6 +52,7 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
         angular.element("#panel-requerimientos").addClass('invisible');
         angular.element("#panel-ofertas").addClass('invisible');
         angular.element("#panel-formalizacion-ofertas").addClass('invisible');
+        angular.element("#panel-ofertas-excel").addClass('invisible');
     };
 
     $scope.funcionalidad = 'REQUERIMIENTOS';
@@ -72,6 +73,16 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
         ocultar(); // Oculta ambos paneles
         $scope.funcionalidad = 'FORMALIZACION DE OFERTAS';
         angular.element("#panel-formalizacion-ofertas").removeClass('invisible');
+    };
+
+    $scope.IrOfertasExcel = function () {
+        ocultar(); // Oculta todos los paneles
+        $scope.funcionalidad = 'OFERTAS EXCEL';
+        angular.element("#panel-ofertas-excel").removeClass('invisible');
+        
+        // Load mock data for clients and developers
+        $scope.clients = ['Cliente A', 'Cliente B', 'Cliente C'];
+        $scope.developers = ['Dev 1', 'Dev 2', 'Dev 3'];
     };
 
     $scope.IrRequerimientosComercial();
