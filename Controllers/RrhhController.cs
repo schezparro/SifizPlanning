@@ -38,14 +38,18 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, RRHH")]
         public ActionResult GuardarFeriado(DateTime fecha)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"Usuario {emailUser} iniciando operación de guardar feriado para la fecha {fecha.ToShortDateString()}");
+
             try
             {
                 // Verificar si ya existe un feriado con la misma fecha
                 bool existe = db.Feriados.Any(f => f.Fecha == fecha);
 
-                // Si ya existe un feriado con la misma fecha, devolver un error
                 if (existe)
                 {
+                    LoggerManager.LogInfo($"Feriado ya existente para la fecha {fecha.ToShortDateString()}. Operación cancelada por el usuario {emailUser}");
+
                     var resp = new
                     {
                         success = false,
@@ -55,13 +59,19 @@ namespace SifizPlanning.Controllers
                 }
                 else
                 {
-                    // Si no existe un feriado con la misma fecha, agregar el nuevo feriado
+                    // Agregar nuevo feriado
                     var feriado = new Feriados
                     {
                         Fecha = fecha
                     };
                     db.Feriados.Add(feriado);
                     db.SaveChanges();
+
+                    LoggerManager.LogSensitiveOperation(
+                        "Creación de feriado",
+                        $"Se agregó un nuevo feriado para la fecha {fecha.ToShortDateString()}",
+                        emailUser
+                    );
 
                     var resp = new
                     {
@@ -73,10 +83,12 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"Error al guardar feriado para la fecha {fecha.ToShortDateString()} por el usuario {emailUser}: {e.Message}");
+
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al guardar feriado para la fecha especificada."
                 };
                 return Json(resp);
             }
@@ -86,58 +98,79 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, RRHH")]
         public ActionResult EliminarFeriado(int id)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"Usuario {emailUser} iniciando eliminación del feriado con ID {id}");
+
             try
             {
                 var feriado = db.Feriados.Find(id);
+                if (feriado == null)
+                {
+                    LoggerManager.LogInfo($"No se encontró el feriado con ID {id} para eliminar. Usuario: {emailUser}");
+                    return Json(new
+                    {
+                        success = false,
+                        msg = "Feriado no encontrado."
+                    });
+                }
+
                 db.Feriados.Remove(feriado);
                 db.SaveChanges();
 
-                var resp = new
+                LoggerManager.LogSensitiveOperation(
+                    "Eliminación de feriado",
+                    $"Feriado con ID {id} y fecha {feriado.Fecha.ToShortDateString()} eliminado",
+                    emailUser
+                );
+
+                return Json(new
                 {
                     success = true,
-                    msg = "Feriado eliminado.",
-                };
-                return Json(resp);
+                    msg = "Feriado eliminado."
+                });
             }
             catch (TargetInvocationException e)
             {
-                var resp = new
+                string errorMsg = e.InnerException?.Message ?? e.Message;
+
+                LoggerManager.LogError(e, $"Error al eliminar feriado con ID {id} por el usuario {emailUser}: {errorMsg}");
+
+                return Json(new
                 {
                     success = false,
-                    msg = e.InnerException?.Message ?? e.Message
-                };
-                return Json(resp);
+                    msg = "Error al eliminar feriado."
+                });
             }
         }
-
-
-
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, RRHH, USER")]
         public ActionResult DarFeriados()
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"Usuario {emailUser} solicitando listado de feriados");
+
             try
             {
                 var feriados = db.Feriados
                        .Select(f => new { id = f.Secuencial, fecha = f.Fecha })
                        .ToList();
 
-                var resp = new
+                return Json(new
                 {
                     success = true,
                     feriados = feriados
-                };
-                return Json(resp);
+                });
             }
             catch (Exception e)
             {
-                var resp = new
+                LoggerManager.LogError(e, $"Error al obtener listado de feriados por el usuario {emailUser}: {e.Message}");
+
+                return Json(new
                 {
                     success = false,
-                    msg = e.Message
-                };
-                return Json(resp);
+                    msg = "Error al obtener listado de feriados."
+                });
             }
         }
 
@@ -145,14 +178,16 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "RRHH, ADMIN")]
         public ActionResult VacacionesUsuarios(string filtro = "")
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"Usuario {emailUser} solicitando listado de solicitudes de vacaciones con filtro: '{filtro}'");
+
             try
             {
                 var solicitudes = db.SolicitudVacaciones.AsNoTracking().ToList();
 
-                if (filtro != "")
+                if (!string.IsNullOrWhiteSpace(filtro))
                 {
                     solicitudes = solicitudes.Where(s =>
-                                            //s.FechaIngresoSolicitud.Date.ToString("dd/MM/YYY").Equals(filtro) ||
                                             s.Cargo.ToString().ToUpper().Contains(filtro.ToUpper())
                                         ).ToList();
                 }
@@ -161,44 +196,49 @@ namespace SifizPlanning.Controllers
 
                 foreach (var solicitud in solicitudes)
                 {
-                    SolicitudVacacionesDTO solVacaciones = new SolicitudVacacionesDTO();
-                    solVacaciones.ID = solicitud.Secuencial;
-                    solVacaciones.AlAnio = solicitud.AlAnio;
-                    solVacaciones.FechaInicioVacaciones = solicitud.FechaInicioVacaciones;
-                    solVacaciones.FechaFinVacaciones = solicitud.FechaFinVacaciones;
-                    solVacaciones.FechaPresentarseTrabajar = solicitud.FechaPresentarseTrabajar;
-                    solVacaciones.Cargo = solicitud.Cargo;
-                    solVacaciones.Empresa = solicitud.Empresa;
-                    solVacaciones.Cedula = solicitud.Cedula;
-                    solVacaciones.AniosServicio = solicitud.AniosServicio;
-                    solVacaciones.ApellidosNombres = solicitud.ApellidosNombres;
-                    solVacaciones.DiasCorresponden = solicitud.DiasCorresponden;
-                    solVacaciones.DiasDisfrutar = solicitud.DiasDisfrutar;
-                    solVacaciones.DiasPendientes = solicitud.DiasPendientes;
-                    solVacaciones.FechaIngresoInstitucion = solicitud.FechaPresentarseTrabajar;//No usar -> solicitud.FechaIngresoInstitucion;
-                    solVacaciones.FechaIngresoSolicitud = solicitud.FechaIngresoSolicitud;
-                    solVacaciones.Observaciones = solicitud.Observaciones;
-                    solVacaciones.DelAnio = solicitud.DelAnio;
-                    solVacaciones.Jefe = solicitud.Jefe;
-                    solVacaciones.Estado = solicitud.Estado != null ? solicitud.Estado == 1 ? "APROBADA" : "RECHAZADA" : "PENDIENTE";
+                    SolicitudVacacionesDTO solVacaciones = new SolicitudVacacionesDTO
+                    {
+                        ID = solicitud.Secuencial,
+                        AlAnio = solicitud.AlAnio,
+                        FechaInicioVacaciones = solicitud.FechaInicioVacaciones,
+                        FechaFinVacaciones = solicitud.FechaFinVacaciones,
+                        FechaPresentarseTrabajar = solicitud.FechaPresentarseTrabajar,
+                        Cargo = solicitud.Cargo,
+                        Empresa = solicitud.Empresa,
+                        Cedula = solicitud.Cedula,
+                        AniosServicio = solicitud.AniosServicio,
+                        ApellidosNombres = solicitud.ApellidosNombres,
+                        DiasCorresponden = solicitud.DiasCorresponden,
+                        DiasDisfrutar = solicitud.DiasDisfrutar,
+                        DiasPendientes = solicitud.DiasPendientes,
+                        FechaIngresoInstitucion = solicitud.FechaPresentarseTrabajar, // intencional
+                        FechaIngresoSolicitud = solicitud.FechaIngresoSolicitud,
+                        Observaciones = solicitud.Observaciones,
+                        DelAnio = solicitud.DelAnio,
+                        Jefe = solicitud.Jefe,
+                        Estado = solicitud.Estado != null
+                                 ? solicitud.Estado == 1 ? "APROBADA" : "RECHAZADA"
+                                 : "PENDIENTE"
+                    };
+
                     solicitudesVacacionesDTO.Add(solVacaciones);
                 }
 
-                var result = new
+                return Json(new
                 {
                     success = true,
                     solicitudes = solicitudesVacacionesDTO
-                };
-                return Json(result);
+                });
             }
             catch (Exception e)
             {
-                var result = new
+                LoggerManager.LogError(e, $"Error al obtener solicitudes de vacaciones por el usuario {emailUser}: {e.Message}");
+
+                return Json(new
                 {
                     success = false,
-                    msg = e.Message
-                };
-                return Json(result);
+                    msg = "Error al obtener solicitudes de vacaciones."
+                });
             }
         }
 
@@ -206,6 +246,9 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "RRHH, ADMIN")]
         public ActionResult PermisosUsuarios()
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"Usuario {emailUser} solicitando listado de permisos de usuarios");
+
             try
             {
                 var solicitudes = db.SolicitudPermisos
@@ -216,45 +259,50 @@ namespace SifizPlanning.Controllers
 
                 foreach (var solicitud in solicitudes)
                 {
-                    SolicitudPermisosDTO solPermisos = new SolicitudPermisosDTO();
-                    solPermisos.ID = solicitud.Secuencial;
-                    solPermisos.ApellidosNombres = solicitud.ApellidosNombres;
-                    solPermisos.Area = solicitud.Area;
-                    solPermisos.Cargo = solicitud.Cargo;
-                    solPermisos.Cedula = solicitud.Cedula;
-                    solPermisos.Comida = solicitud.Comida ? "SI" : "NO";
-                    solPermisos.Empresa = solicitud.Empresa;
-                    solPermisos.FechaDesde = solicitud.FechaDesde;
-                    solPermisos.FechaHasta = solicitud.FechaHasta;
-                    solPermisos.FechaIngresoSolicitud = solicitud.FechaIngresoSolicitud;
-                    solPermisos.HoraRetorno = solicitud.HoraRetorno.ToString();
-                    solPermisos.HoraSalida = solicitud.HoraSalida.ToString();
-                    solPermisos.Jefe = solicitud.Jefe;
-                    solPermisos.Matrimonio = solicitud.Matrimonio ? "SI" : "NO";
-                    solPermisos.Motivo = solicitud.Motivo;
-                    solPermisos.Otros = solicitud.Otros ? "SI" : "NO";
-                    solPermisos.Paternidad = solicitud.Paternidad ? "SI" : "NO";
-                    solPermisos.Personal = solicitud.Personal ? "SI" : "NO";
-                    solPermisos.Estado = solicitud.Estado != null ? solicitud.Estado == 1 ? "APROBADA" : "RECHAZADA" : "PENDIENTE";
-                    solPermisos.TotalHoras = (solicitud.FechaHasta.Add(solicitud.HoraRetorno) - solicitud.FechaDesde.Add(solicitud.HoraSalida)).TotalHours;
+                    SolicitudPermisosDTO solPermisos = new SolicitudPermisosDTO
+                    {
+                        ID = solicitud.Secuencial,
+                        ApellidosNombres = solicitud.ApellidosNombres,
+                        Area = solicitud.Area,
+                        Cargo = solicitud.Cargo,
+                        Cedula = solicitud.Cedula,
+                        Comida = solicitud.Comida ? "SI" : "NO",
+                        Empresa = solicitud.Empresa,
+                        FechaDesde = solicitud.FechaDesde,
+                        FechaHasta = solicitud.FechaHasta,
+                        FechaIngresoSolicitud = solicitud.FechaIngresoSolicitud,
+                        HoraRetorno = solicitud.HoraRetorno.ToString(),
+                        HoraSalida = solicitud.HoraSalida.ToString(),
+                        Jefe = solicitud.Jefe,
+                        Matrimonio = solicitud.Matrimonio ? "SI" : "NO",
+                        Motivo = solicitud.Motivo,
+                        Otros = solicitud.Otros ? "SI" : "NO",
+                        Paternidad = solicitud.Paternidad ? "SI" : "NO",
+                        Personal = solicitud.Personal ? "SI" : "NO",
+                        Estado = solicitud.Estado != null ?
+                                 (solicitud.Estado == 1 ? "APROBADA" : "RECHAZADA") : "PENDIENTE",
+                        TotalHoras = (solicitud.FechaHasta.Add(solicitud.HoraRetorno) -
+                                      solicitud.FechaDesde.Add(solicitud.HoraSalida)).TotalHours
+                    };
+
                     solicitudesPermisosDTO.Add(solPermisos);
                 }
 
-                var result = new
+                return Json(new
                 {
                     success = true,
                     solicitudes = solicitudesPermisosDTO
-                };
-                return Json(result);
+                });
             }
             catch (Exception e)
             {
-                var result = new
+                LoggerManager.LogError(e, $"Error al obtener permisos de usuarios por el usuario {emailUser}: {e.Message}");
+
+                return Json(new
                 {
                     success = false,
-                    msg = e.Message
-                };
-                return Json(result);
+                    msg = "Error al obtener permisos de usuarios."
+                });
             }
         }
 
@@ -262,32 +310,34 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, RRHH")]
         public ActionResult GuardarVacaciones(int idColaborador, string desde, string hasta)
         {
+            string emailUser = User.Identity.Name;
+
             try
             {
-                string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
-
                 Colaborador colaborador = db.Colaborador.Find(idColaborador);
+
                 if (colaborador == null)
                 {
                     throw new Exception("No se encontró el colaborador");
                 }
+
                 if (colaborador.persona.usuario.First().EstaActivo == 0)
                 {
                     throw new Exception("Error, el colaborador no está activo en el sistema");
                 }
 
-                string[] fechas = desde.Split(new Char[] { '/' });
+                string[] fechas = desde.Split('/');
                 int dia = Int32.Parse(fechas[0]);
                 int mes = Int32.Parse(fechas[1]);
                 int anno = Int32.Parse(fechas[2]);
-                DateTime fechaDesde = new System.DateTime(anno, mes, dia);
+                DateTime fechaDesde = new DateTime(anno, mes, dia);
 
-                fechas = hasta.Split(new Char[] { '/' });
+                fechas = hasta.Split('/');
                 dia = Int32.Parse(fechas[0]);
                 mes = Int32.Parse(fechas[1]);
                 anno = Int32.Parse(fechas[2]);
-                DateTime fechaHasta = new System.DateTime(anno, mes, dia);
+                DateTime fechaHasta = new DateTime(anno, mes, dia);
 
                 if (fechaDesde > fechaHasta)
                 {
@@ -307,29 +357,35 @@ namespace SifizPlanning.Controllers
 
                 db.SaveChanges();
 
-                //Enviar email al grupo de RRHH y a l usuario de las vacaciones
+                // Registrar operación sensible
+                LoggerManager.LogSensitiveOperation(
+                    "Registro de vacaciones",
+                    $"Se registraron vacaciones para el colaborador {colaborador.persona.Nombre1} desde {desde} hasta {hasta}",
+                    emailUser
+                );
+
+                // Enviar notificación por correo
                 string[] emails = new string[2] { colaborador.persona.usuario.First().Email, user.Email };
                 string email = "<div class=\"textoCuerpo\">NOTIFICACIÓN VAPER: <br/>" +
                                 @"Le informamos que las vacaciones solicitadas por usted han sido aprobadas,
-                                los datos son los siguientes:<br/>
-                                Fecha de Inicio: " + desde + @"<br/>
-                                Fecha de Fin: " + hasta + @"<br/>
-                                Aprobado por: " + user.persona.Nombre1 + " " + user.persona.Apellido1 + @"</div><br/><br/>
-                                Esperamos disfrute sus vacaciones junto a su familia y amigos...";
+                        los datos son los siguientes:<br/>
+                        Fecha de Inicio: " + desde + @"<br/>
+                        Fecha de Fin: " + hasta + @"<br/>
+                        Aprobado por: " + user.persona.Nombre1 + " " + user.persona.Apellido1 + @"</div><br/><br/>
+                        Esperamos disfrute sus vacaciones junto a su familia y amigos...";
 
                 Utiles.EnviarEmailSistema(emails, email, "Vacaciones aprobadas");
 
-                var resp = new { success = true };
-                return Json(resp);
+                return Json(new { success = true });
             }
             catch (Exception e)
             {
-                var resp = new
+                LoggerManager.LogError(e, $"[GuardarVacaciones] Error al guardar vacaciones para el colaborador {idColaborador} por el usuario {emailUser}: {e.Message}");
+                return Json(new
                 {
                     success = false,
-                    msg = e.Message
-                };
-                return Json(resp);
+                    msg = "Error al guardar vacaciones para el colaborador."
+                });
             }
         }
 
@@ -337,26 +393,29 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, RRHH")]
         public ActionResult GuardarPermiso(int idColaborador, int tipoPermiso, string desde, string hasta, string motivo)
         {
+            string emailUser = User.Identity.Name;
             try
             {
-                string[] datosFechaDesde = desde.Split(new Char[] { ' ' });
-                string[] fechas = datosFechaDesde[0].Split(new Char[] { '/' });
+                string[] datosFechaDesde = desde.Split(' ');
+                string[] fechas = datosFechaDesde[0].Split('/');
                 int dia = Int32.Parse(fechas[0]);
                 int mes = Int32.Parse(fechas[1]);
                 int anno = Int32.Parse(fechas[2]);
-                DateTime fechaDesde = new System.DateTime(anno, mes, dia);
-                string[] horas = datosFechaDesde[1].Split(new Char[] { ':' });
+                DateTime fechaDesde = new DateTime(anno, mes, dia);
+
+                string[] horas = datosFechaDesde[1].Split(':');
                 int hora = Int32.Parse(horas[0]);
                 int minutos = Int32.Parse(horas[1]);
                 fechaDesde = fechaDesde.AddMinutes(hora * 60 + minutos);
 
-                string[] datosFechaHasta = hasta.Split(new Char[] { ' ' });
-                fechas = datosFechaHasta[0].Split(new Char[] { '/' });
+                string[] datosFechaHasta = hasta.Split(' ');
+                fechas = datosFechaHasta[0].Split('/');
                 dia = Int32.Parse(fechas[0]);
                 mes = Int32.Parse(fechas[1]);
                 anno = Int32.Parse(fechas[2]);
-                DateTime fechaHasta = new System.DateTime(anno, mes, dia);
-                horas = datosFechaHasta[1].Split(new Char[] { ':' });
+                DateTime fechaHasta = new DateTime(anno, mes, dia);
+
+                horas = datosFechaHasta[1].Split(':');
                 hora = Int32.Parse(horas[0]);
                 minutos = Int32.Parse(horas[1]);
                 fechaHasta = fechaHasta.AddMinutes(hora * 60 + minutos);
@@ -366,14 +425,14 @@ namespace SifizPlanning.Controllers
                     throw new Exception("Error, la fecha de inicio del permiso debe ser menor que la fecha fin del permiso");
                 }
 
-                //Buscando no se solapen los permisos
+                // Validar solapamiento de permisos
                 int cant = (from p in db.Permiso
                             where
-                                   ((p.FechaInicio <= fechaDesde && p.FechaFin > fechaDesde) ||
-                                   (p.FechaInicio < fechaHasta && p.FechaFin > fechaHasta) ||
-                                   (p.FechaInicio >= fechaDesde && p.FechaFin <= fechaHasta)) &&
-                                   p.SecuencialEstadoPermiso != 3 &&
-                                   p.SecuencialColaborador == idColaborador
+                                ((p.FechaInicio <= fechaDesde && p.FechaFin > fechaDesde) ||
+                                 (p.FechaInicio < fechaHasta && p.FechaFin > fechaHasta) ||
+                                 (p.FechaInicio >= fechaDesde && p.FechaFin <= fechaHasta)) &&
+                                p.SecuencialEstadoPermiso != 3 &&
+                                p.SecuencialColaborador == idColaborador
                             select p).Count();
 
                 if (cant > 1)
@@ -381,59 +440,70 @@ namespace SifizPlanning.Controllers
                     throw new Exception("Error, las fechas de este permiso se solapan con las de otro");
                 }
 
+                // Reprogramar tareas en caso de permiso
                 List<Tarea> tareas = (from t in db.Tarea
                                       where t.colaborador.Secuencial == idColaborador
-                                      && t.FechaInicio >= fechaDesde && t.FechaInicio <= fechaHasta
-                                      select t).ToList<Tarea>();
+                                         && t.FechaInicio >= fechaDesde && t.FechaInicio <= fechaHasta
+                                      select t).ToList();
 
                 foreach (Tarea t in tareas)
                 {
                     DateTime nuevaFechaInicio = fechaHasta.AddDays(1);
-                    while (nuevaFechaInicio.DayOfWeek == DayOfWeek.Saturday || nuevaFechaInicio.DayOfWeek == DayOfWeek.Sunday || db.Feriados.Any(f => f.Fecha == nuevaFechaInicio))
+                    while (nuevaFechaInicio.DayOfWeek == DayOfWeek.Saturday ||
+                           nuevaFechaInicio.DayOfWeek == DayOfWeek.Sunday ||
+                           db.Feriados.Any(f => f.Fecha == nuevaFechaInicio))
                     {
                         nuevaFechaInicio = nuevaFechaInicio.AddDays(1);
                     }
-                    db.Tarea.Where(tarea => t.Secuencial == tarea.Secuencial).First().FechaInicio = nuevaFechaInicio;
+
+                    db.Tarea.First(tarea => tarea.Secuencial == t.Secuencial).FechaInicio = nuevaFechaInicio;
                 }
 
+                // Registrar el permiso
                 Permiso permiso = new Permiso
                 {
                     SecuencialTipoPermiso = tipoPermiso,
-                    SecuencialEstadoPermiso = 1,//Solicitado
+                    SecuencialEstadoPermiso = 1, // Solicitado
                     SecuencialColaborador = idColaborador,
                     FechaInicio = fechaDesde,
                     FechaFin = fechaHasta,
                     Motivo = motivo
                 };
 
-
                 db.Permiso.Add(permiso);
                 db.SaveChanges();
 
+                // Log de operación sensible
+                LoggerManager.LogSensitiveOperation(
+                    "Registro de permiso",
+                    $"Se registró un permiso para el colaborador {idColaborador} desde {desde} hasta {hasta}, motivo: {motivo}",
+                    emailUser
+                );
 
-                var resp = new
+                return Json(new
                 {
                     success = true,
                     idPermiso = permiso.Secuencial,
-                };
-                return Json(resp);
+                });
             }
             catch (Exception e)
             {
-                var resp = new
+                LoggerManager.LogError(e, $"[GuardarPermiso] Error al guardar permiso para el colaborador {idColaborador} por el usuario {emailUser}: {e.Message}");
+
+                return Json(new
                 {
                     success = false,
-                    msg = e.Message
-                };
-                return Json(resp);
+                    msg = "Error al guardar permiso para el colaborador."
+                });
             }
         }
-
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, RRHH")]
         public ActionResult DarVacacionesTrabajador(int idColaborador, int difYear = 0)
         {
+            string emailUser = User.Identity.Name;
+
             try
             {
                 Colaborador colaborador = db.Colaborador.Find(idColaborador);
@@ -459,9 +529,10 @@ namespace SifizPlanning.Controllers
                     List<object> diasVacacionesMes = new List<object>();
                     while (mes == fechaDia.Month)
                     {
-                        if (diasVacaciones.Where(x => x.Fecha.Date == fechaDia.Date).Count() > 0)
+                        if (diasVacaciones.Any(x => x.Fecha.Date == fechaDia.Date))
                         {
-                            diasVacacionesMes.Add(new { clase = "diaV", dia = fechaDia.ToString("dd/MM/yyyy"), id = diasVacaciones.Where(x => x.Fecha.Date == fechaDia.Date).FirstOrDefault().Secuencial });
+                            var vac = diasVacaciones.First(x => x.Fecha.Date == fechaDia.Date);
+                            diasVacacionesMes.Add(new { clase = "diaV", dia = fechaDia.ToString("dd/MM/yyyy"), id = vac.Secuencial });
                         }
                         else
                         {
@@ -470,10 +541,11 @@ namespace SifizPlanning.Controllers
                         fechaDia = fechaDia.AddDays(1);
                     }
 
-                    mesesVacaciones.Add(
-                                        new { mes = textMes, dias = diasVacacionesMes }
-                                       );
+                    mesesVacaciones.Add(new { mes = textMes, dias = diasVacacionesMes });
                 }
+
+                // Log sensible de la operación
+                LoggerManager.LogInfo($"Usuario {emailUser} solicitando listado de vacaciones del colaborador {idColaborador} para el año {year}");
 
                 var resp = new
                 {
@@ -486,10 +558,12 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarVacacionesTrabajador] Error al consultar vacaciones para colaborador {idColaborador} por usuario {emailUser}: {e.Message}");
+
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al consultar vacaciones de colaborador."
                 };
                 return Json(resp);
             }
@@ -499,11 +573,24 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, RRHH")]
         public ActionResult EliminarDiaVacacion(int id)
         {
+            string emailUser = User.Identity.Name;
+
             try
             {
                 Vacaciones vacacion = db.Vacaciones.Find(id);
+                if (vacacion == null)
+                {
+                    throw new Exception("No se encontró el día de vacaciones.");
+                }
+
                 db.Vacaciones.Remove(vacacion);
                 db.SaveChanges();
+
+                LoggerManager.LogSensitiveOperation(
+                    "Eliminación de día de vacaciones",
+                    $"Usuario {emailUser} eliminó el día de vacaciones con ID {id} correspondiente al colaborador {vacacion.colaborador?.Secuencial}",
+                    emailUser
+                );
 
                 var resp = new
                 {
@@ -513,10 +600,12 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EliminarDiaVacacion] Error al eliminar día de vacaciones con ID {id} por usuario {emailUser}: {e.Message}");
+
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al eliminar día de vacaciones."
                 };
                 return Json(resp);
             }
@@ -526,13 +615,12 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, RRHH")]
         public ActionResult ColaboradoresTiempoCompesatorio(int start = 0, int limit = 0)
         {
+            string emailUser = User.Identity.Name;
             try
             {
                 var trabajadores = (from c in db.Colaborador
-                                    join
-                                     p in db.Persona on c.persona equals p
-                                    join
-                                     u in db.Usuario on p.Secuencial equals u.SecuencialPersona
+                                    join p in db.Persona on c.persona equals p
+                                    join u in db.Usuario on p.Secuencial equals u.SecuencialPersona
                                     where u.EstaActivo == 1
                                     orderby u.Email
                                     select new
@@ -559,6 +647,7 @@ namespace SifizPlanning.Controllers
                                               tc.TiempoMinutos > tc.TiempoConsumido
                                         select (tc.Secuencial)
                                     ).Count();
+
                     if (cantTareas > 0)
                         tiempo = (
                             from tc in db.TareaCompensatoria
@@ -572,9 +661,7 @@ namespace SifizPlanning.Controllers
                     int horas = tiempo / 60;
                     int minutos = tiempo % 60;
 
-                    string strMinutos = minutos.ToString();
-                    if (minutos < 10)
-                        strMinutos = "0" + strMinutos;
+                    string strMinutos = minutos < 10 ? "0" + minutos : minutos.ToString();
 
                     trabajadoresTiempo.Add(new
                     {
@@ -589,6 +676,8 @@ namespace SifizPlanning.Controllers
                     });
                 }
 
+                LoggerManager.LogInfo($"[ColaboradoresTiempoCompesatorio] Usuario {emailUser} consultó tiempos compensatorios.");
+
                 var resp = new
                 {
                     success = true,
@@ -598,10 +687,12 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[ColaboradoresTiempoCompesatorio] Error consultando tiempos compensatorios por usuario {emailUser}: {e.Message}");
+
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error consultando tiempos compensatorios."
                 };
                 return Json(resp);
             }
@@ -611,12 +702,13 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, RRHH")]
         public ActionResult ColaboradorTareasCompensatorias(int idColaborador, bool todas = false)
         {
+            string emailUser = User.Identity.Name;
+
             try
             {
                 var tareasCompensatorias = (
                         from tc in db.TareaCompensatoria
-                        join
-                              t in db.Tarea on tc.tarea equals t
+                        join t in db.Tarea on tc.tarea equals t
                         where t.SecuencialEstadoTarea == 3 && t.SecuencialColaborador == idColaborador &&
                               tc.EstaActiva == 1
                         orderby tc.Secuencial descending
@@ -659,6 +751,8 @@ namespace SifizPlanning.Controllers
 
                 string tiempoCompensatorio = Utiles.DarHorasMinutosPorMinutos(totalTiempo - totalConsumido);
 
+                LoggerManager.LogInfo($"[ColaboradorTareasCompensatorias] Usuario {emailUser} consultó tareas compensatorias del colaborador {idColaborador}.");
+
                 var resp = new
                 {
                     success = true,
@@ -669,10 +763,12 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[ColaboradorTareasCompensatorias] Error consultando tareas compensatorias para colaborador {idColaborador} por usuario {emailUser}: {e.Message}");
+
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error consultando tareas compensatorias para colaborador."
                 };
                 return Json(resp);
             }
@@ -683,8 +779,12 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, RRHH")]
         public ActionResult DevolverMarcasElectronicas(string sede, string fechaDesde, string fechaHasta)
         {
+            var emailUser = User.Identity.Name;
             try
             {
+                // Log informativo de consulta
+                LoggerManager.LogInfo($"[DevolverMarcasElectronicas] Usuario {emailUser} consultó marcas electrónicas para sede '{sede}' desde {fechaDesde} hasta {fechaHasta}.");
+
                 var listaColaboradores = new List<object>();
                 if (fechaDesde != string.Empty && fechaHasta != string.Empty)
                 {
@@ -830,10 +930,13 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                // Log de error con detalles
+                LoggerManager.LogError(e, $"[DevolverMarcasElectronicas] Error al consultar marcas electrónicas. Sede: {sede}, Fechas: {fechaDesde}-{fechaHasta}, Usuario: {emailUser}. Mensaje: {e.Message}");
+
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al consultar marcas electrónicas."
                 };
                 return Json(resp);
             }
@@ -844,8 +947,11 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, RRHH")]
         public ActionResult DisponibilidadRecursosFechas(int semana = 0, int cantSemanas = 8, string fechaSemanaInicio = "")
         {
+            var emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[DisponibilidadRecursosFechas] Usuario {emailUser} consultó disponibilidad de recursos. Parámetros: semana={semana}, cantSemanas={cantSemanas}, fechaSemanaInicio='{fechaSemanaInicio}'");
+
                 DateTime fechaDesde = DateTime.Today;
 
                 if (fechaSemanaInicio != string.Empty)
@@ -1041,7 +1147,7 @@ namespace SifizPlanning.Controllers
 
                     fechaDesdeInicio = fechaDesdeInicio.AddDays(7);
                 }
-
+                LoggerManager.LogInfo($"[DisponibilidadRecursosFechas] Consulta completada exitosamente. {datosColaboradores.Count} registros de disponibilidad generados para usuario {emailUser}");
                 var resp = new
                 {
                     success = true,
@@ -1056,10 +1162,12 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DisponibilidadRecursosFechas] Error al consultar disponibilidad de recursos. Usuario: {emailUser}. Parámetros: semana={semana}, cantSemanas={cantSemanas}, fechaSemanaInicio='{fechaSemanaInicio}'. Error: {e.Message}");
+
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al consultar disponibilidad de recursos."
                 };
                 return Json(resp);
             }
@@ -1070,8 +1178,11 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, RRHH")]
         public ActionResult DarTiposPermisos()
         {
+            var emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[DarTiposPermisos] Usuario {emailUser} solicitó listado de tipos de permisos activos.");
+
                 var tiposPermisos = (from tp in db.TipoPermiso
                                      where tp.EstaActivo == 1
                                      select new
@@ -1079,6 +1190,9 @@ namespace SifizPlanning.Controllers
                                          id = tp.Secuencial,
                                          nombre = tp.Codigo
                                      }).ToList();
+
+                LoggerManager.LogInfo($"[DarTiposPermisos] Se encontraron {tiposPermisos.Count} tipos de permisos activos para usuario {emailUser}");
+
                 var resp = new
                 {
                     success = true,
@@ -1088,28 +1202,34 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarTiposPermisos] Error al obtener tipos de permisos. Usuario: {emailUser}. Error: {e.Message}");
+
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener tipos de permisos."
                 };
                 return Json(resp);
             }
         }
-    //Dar colaboradores al modal Nueva Incidencia
+
+        //Dar colaboradores al modal Nueva Incidencia
         [HttpPost]
         [Authorize(Roles = "ADMIN, RRHH")]
         public ActionResult DarIncidenciasColaboradores()
         {
+            var emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[DarIncidenciasColaboradores] Usuario {emailUser} solicitó listado de colaboradores para incidencias.");
                 var colaboradores = (from c in db.Colaborador
-                                     join p in db.Persona on c.SecuencialPersona equals p.Secuencial                                   
+                                     join p in db.Persona on c.SecuencialPersona equals p.Secuencial
                                      select new
                                      {
                                          id = c.Secuencial,
-                                         nombre = p.Nombre1 +" " + p.Nombre2 + " " + p.Apellido1 + " " + p.Apellido2 
+                                         nombre = p.Nombre1 + " " + p.Nombre2 + " " + p.Apellido1 + " " + p.Apellido2
                                      }).ToList();
+                LoggerManager.LogInfo($"[DarIncidenciasColaboradores] Se encontraron {colaboradores.Count} colaboradores para usuario {emailUser}");
                 var resp = new
                 {
                     success = true,
@@ -1119,10 +1239,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarIncidenciasColaboradores] Error al obtener listado de incidencias de colaboradores. Usuario: {emailUser}. Error: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener listado de incidencias de colaboradores."
                 };
                 return Json(resp);
             }
@@ -1133,8 +1254,14 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, RRHH")]
         public ActionResult GuardarIncidenciasColaboradores(string idColaborador, string incidencia, string descripcion, string fechaIncidencia, bool estaActivo)
         {
+            var emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogSensitiveOperation(
+                    "Registro de Incidencia",
+                    $"Usuario {emailUser} inició registro de incidencia para colaborador {idColaborador}. Tipo: {incidencia}, Fecha: {fechaIncidencia}",
+                    emailUser
+                );
                 int colaborador = int.Parse(idColaborador);
 
                 string[] fechas = fechaIncidencia.Split(new Char[] { '/' });
@@ -1145,16 +1272,20 @@ namespace SifizPlanning.Controllers
 
                 IncidenciasRecursos nuevaIncidencia = new IncidenciasRecursos
                 {
-                    SecuencialColaborador = colaborador,                  
+                    SecuencialColaborador = colaborador,
                     Incidencia = incidencia,
                     Descripcion = descripcion,
                     Fecha = fecha,
-                    EstaActivo = estaActivo ? 1 : 0                    
+                    EstaActivo = estaActivo ? 1 : 0
                 };
-
+                LoggerManager.LogInfo($"[GuardarIncidenciasColaboradores] Detalles de incidencia a registrar - Colaborador: {idColaborador}, Tipo: {incidencia}, Descripción: {descripcion}, Fecha: {fecha.ToString("dd/MM/yyyy")}, Estado: {(estaActivo ? "Activo" : "Inactivo")}");
                 db.IncidenciasRecursos.Add(nuevaIncidencia);
                 db.SaveChanges();
-
+                LoggerManager.LogSensitiveOperation(
+                    "Incidencia Registrada",
+                    $"Usuario {emailUser} registró exitosamente incidencia ID {nuevaIncidencia.Secuencial} para colaborador {idColaborador}",
+                    emailUser
+                );
                 return Json(new
                 {
                     success = true,
@@ -1163,10 +1294,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[GuardarIncidenciasColaboradores] Error al registrar incidencia. Usuario: {emailUser}, Colaborador: {idColaborador}, Tipo: {incidencia}. Error: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener incidencias."
                 };
                 return Json(resp);
             }
@@ -1175,49 +1307,50 @@ namespace SifizPlanning.Controllers
         //INCIDENCIAS DE LOS COLABORADORES
         [HttpPost]
         [Authorize(Roles = "ADMIN, RRHH")]
-        public ActionResult IncidenciasColaboradores(int start , string filtro = "")
+        public ActionResult IncidenciasColaboradores(int start, string filtro = "")
         {
-
+            var emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[IncidenciasColaboradores] Usuario {emailUser} consultó listado de incidencias. Parámetros: start={start}, filtro='{filtro}'");
                 var incidenciasColaboradores = (from inc in db.IncidenciasRecursos
-                                          join c in db.Colaborador on inc.SecuencialColaborador equals c.Secuencial
-                                          join pe in db.Persona on c.SecuencialPersona equals pe.Secuencial                                        
-                                          select new
-                                          {
-                                              secuencial = inc.Secuencial,
-                                              nombre = pe.Nombre1 + " " + pe.Nombre2 + " " + pe.Apellido1 + " " + pe.Apellido2,
-                                              incidencia = inc.Incidencia,
-                                              descripcion = inc.Descripcion,
-                                              fecha = inc.Fecha,
-                                              estaActivo = inc.EstaActivo ==1 ? "SI" : "NO"                                            
-                                          }).ToList();
+                                                join c in db.Colaborador on inc.SecuencialColaborador equals c.Secuencial
+                                                join pe in db.Persona on c.SecuencialPersona equals pe.Secuencial
+                                                select new
+                                                {
+                                                    secuencial = inc.Secuencial,
+                                                    nombre = pe.Nombre1 + " " + pe.Nombre2 + " " + pe.Apellido1 + " " + pe.Apellido2,
+                                                    incidencia = inc.Incidencia,
+                                                    descripcion = inc.Descripcion,
+                                                    fecha = inc.Fecha,
+                                                    estaActivo = inc.EstaActivo == 1 ? "SI" : "NO"
+                                                }).ToList();
 
-
-               
+                LoggerManager.LogInfo($"[IncidenciasColaboradores] Se encontraron {incidenciasColaboradores.Count} incidencias antes de aplicar filtros");
 
                 if (filtro != "")
                 {
                     incidenciasColaboradores = incidenciasColaboradores.Where(x =>
                                             x.nombre.ToString().ToLower().Contains(filtro.ToLower()) ||
                                             x.incidencia.ToString().ToLower().Contains(filtro.ToLower()) ||
-                                            x.descripcion.ToString().ToLower().Contains(filtro.ToLower())                                           
+                                            x.descripcion.ToString().ToLower().Contains(filtro.ToLower())
                                           ).ToList();
                 }
-             
+                LoggerManager.LogInfo($"[IncidenciasColaboradores] Consulta completada. Se devuelven {incidenciasColaboradores.Count} incidencias a usuario {emailUser}");
                 var result = new
                 {
-                    success = true,                   
+                    success = true,
                     incidencias = incidenciasColaboradores
                 };
                 return Json(result);
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[IncidenciasColaboradores] Error al obtener incidencias. Usuario: {emailUser}, Parámetros: start={start}, filtro='{filtro}'. Error: {e.Message}");
                 var result = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener incidencias."
                 };
                 return Json(result);
             }
@@ -1227,25 +1360,21 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, RRHH")]
         public ActionResult DiasVacacionesColaboradores(int start, string filtro = "")
         {
-
+            var emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[DiasVacacionesColaboradores] Usuario {emailUser} solicitó listado de días de vacaciones. Parámetros: start={start}, filtro='{filtro}'");
                 var diasVacacionesColaboradores = (from c in db.Colaborador
-                                                join pe in db.Persona on c.SecuencialPersona equals pe.Secuencial
-                                                join dv in db.DiasDisponiblesVacaciones
-                                                    on c.Secuencial equals dv.SecuencialColaborador into dvGroup
-                                                from dv in dvGroup.DefaultIfEmpty()
-                                                select new
-                                                {
-                                                    secuencialColaborador = c.Secuencial,
-                                                    nombre = pe.Nombre1 + " " + pe.Nombre2 + " " + pe.Apellido1 + " " + pe.Apellido2,
-                                                    cantidad = dv == null ? 0 : dv.DiasDisponibles
-                                                }).ToList();
-
-
-
-
-
+                                                   join pe in db.Persona on c.SecuencialPersona equals pe.Secuencial
+                                                   join dv in db.DiasDisponiblesVacaciones
+                                                       on c.Secuencial equals dv.SecuencialColaborador into dvGroup
+                                                   from dv in dvGroup.DefaultIfEmpty()
+                                                   select new
+                                                   {
+                                                       secuencialColaborador = c.Secuencial,
+                                                       nombre = pe.Nombre1 + " " + pe.Nombre2 + " " + pe.Apellido1 + " " + pe.Apellido2,
+                                                       cantidad = dv == null ? 0 : dv.DiasDisponibles
+                                                   }).ToList();
                 if (filtro != "")
                 {
                     diasVacacionesColaboradores = diasVacacionesColaboradores.Where(x =>
@@ -1253,7 +1382,7 @@ namespace SifizPlanning.Controllers
                                             x.cantidad.ToString().ToLower().Contains(filtro.ToLower())
                                           ).ToList();
                 }
-
+                LoggerManager.LogInfo($"[DiasVacacionesColaboradores] Consulta completada. Devolviendo {diasVacacionesColaboradores.Count} registros al usuario {emailUser}");
                 var result = new
                 {
                     success = true,
@@ -1263,10 +1392,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DiasVacacionesColaboradores] Error al obtener días de vacaciones. Usuario: {emailUser}, Parámetros: start={start}, filtro='{filtro}'. Error: {e.Message}");
                 var result = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener días de vacaciones."
                 };
                 return Json(result);
             }
@@ -1276,8 +1406,14 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, RRHH")]
         public ActionResult GuardarDiasDisponiblesVacacionesColaboradores(string idColaborador, string cantidad)
         {
+            var emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogSensitiveOperation(
+                    "Modificación de Días de Vacaciones",
+                    $"Usuario {emailUser} inició actualización de días disponibles. Colaborador ID: {idColaborador}, Cantidad: {cantidad} días",
+                    emailUser
+                );
                 if (!int.TryParse(idColaborador, out int colaborador))
                 {
                     return Json(new
@@ -1314,7 +1450,11 @@ namespace SifizPlanning.Controllers
                     db.DiasDisponiblesVacaciones.Add(nuevaIncidencia);
                     db.SaveChanges();
                 }
-
+                LoggerManager.LogSensitiveOperation(
+                    "Días de Vacaciones Actualizados",
+                    $"Usuario {emailUser} {(ddv != null ? "actualizó" : "asignó")} {cant} días de vacaciones al colaborador ID: {colaborador}",
+                    emailUser
+                );
                 return Json(new
                 {
                     success = true,
@@ -1323,10 +1463,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[GuardarDiasDisponiblesVacacionesColaboradores] Error al guardar días de vacaciones. Usuario: {emailUser}, Colaborador: {idColaborador}, Cantidad: {cantidad}. Error: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al guardar días de vacaciones."
                 };
                 return Json(resp);
             }

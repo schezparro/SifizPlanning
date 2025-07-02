@@ -568,6 +568,9 @@
                 $scope.pendiente = '';
             } else {
                 messageDialog.show('Información', 'Debe Agregar la fecha y al menos un seguimiento');
+                setTimeout(function () {
+                    messageDialog.hide(); 
+                }, 3000);
             }
         }
     };

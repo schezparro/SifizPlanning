@@ -184,8 +184,9 @@ namespace SifizPlanning.Controllers
 				string emailUser = User.Identity.Name;
 				Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 				Persona persona = user.persona;
+                LoggerManager.LogInfo($"[DarGarantiasTicketsCliente] Usuario {emailUser} consultó las garantías de tickets del cliente {persona.persona_cliente.cliente.Descripcion}.");
 
-				if(persona.persona_cliente != null)
+                if (persona.persona_cliente != null)
 				{
 					var garantias = (from mt in db.MotivoTrabajo
 									 join tt in db.TipoMotivoTrabajo on mt.SecuencialTipoMotivoTrabajo equals tt.Secuencial
@@ -219,19 +220,21 @@ namespace SifizPlanning.Controllers
 						success = true
 					};
 					return Json(resp);
-				}
-				else
+                    
+                }
+                else
 				{
 					throw new Exception("El usuario en es un cliente");
 				}
 			}
 			catch(Exception e)
 			{
-				var resp = new
+                LoggerManager.LogError(e, $"[DarCategoriasTicketSegunContratosClientes] Error al consultar categorías: {e.Message}");
+                var resp = new
 				{
 					success = false,
-					msg = e.Message
-				};
+					msg = "Error al consultar categorías."
+                };
 				return Json(resp);
 			}
 		}
@@ -239,23 +242,40 @@ namespace SifizPlanning.Controllers
 		[Authorize(Roles = "ADMIN, CLIENTE")]
 		public ActionResult DarCategoriasTicketSegunContratosClientes()
 		{
-			//Aqui retornar todas las categorías hasta que se informaticen bien los contratos
-			var categorias = (from c in db.CategoriaTicket
-							  where c.EstaActiva == 1
-							  select new
-							  {
-								  id = c.Secuencial,
-								  codigo = c.Codigo,
-								  nombre = c.Codigo + " - " + c.Descripcion
-							  });
-
-			var resp = new
+			try
 			{
-				success = true,
-				categorias = categorias
-			};
-			return Json(resp);
-		}
+				string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[DarCategoriasTicketSegunContratosClientes] Usuario {emailUser} consultó las categorías activas para tickets.");
+
+                //Aqui retornar todas las categorías hasta que se informaticen bien los contratos
+                var categorias = (from c in db.CategoriaTicket
+								  where c.EstaActiva == 1
+								  select new
+								  {
+									  id = c.Secuencial,
+									  codigo = c.Codigo,
+									  nombre = c.Codigo + " - " + c.Descripcion
+								  });
+
+				var resp = new
+				{
+					success = true,
+					categorias = categorias
+				};
+				return Json(resp);
+
+			}
+			catch (Exception e)
+			{
+				LoggerManager.LogError(e, $"[DarGarantiasTicketsCliente] Error al consultar garantías: {e.Message}");
+				var resp = new
+				{
+					success = false,
+					msg = e.Message
+				};
+				return Json(resp);
+			}
+        }
 
 		[Authorize(Roles = "ADMIN, CLIENTE")]
 		public ActionResult GuardarPeticionDeTicket(string reportadoPor, int prioridad, string categoriaTicket, string asunto, string detalle, string motivoPrioridad, string motivoTrabajo, string entregableGarantia, int esUrgente, int ticketVersionCliente, int moduloSecuencial, string telefono = "", HttpPostedFileBase[] adjuntos = null)
@@ -272,8 +292,9 @@ namespace SifizPlanning.Controllers
 				var motivo = int.TryParse(motivoTrabajo, out var resultMotivo) ? resultMotivo : 0;
 				var entregable = int.TryParse(entregableGarantia, out var resultEntregable) ? resultEntregable : 0;
 				var categoria = db.CategoriaTicket.Single(s => s.EstaActiva == 1 && s.Codigo == categoriaTicket).Secuencial;
+                LoggerManager.LogInfo($"[GuardarPeticionDeTicket] Usuario {emailUser} intenta registrar un nuevo ticket con asunto '{asunto}' y prioridad {prioridad}.");
 
-				const int estadoTicket = 1; //Abierto
+                const int estadoTicket = 1; //Abierto
 
 				if(telefono == "")
 					telefono = "-";
@@ -432,8 +453,12 @@ namespace SifizPlanning.Controllers
 				};
 				db.HistoricoInformacionTicket.Add(historicoCorreo);
 				db.SaveChanges();
-
-				return Json(new
+                LoggerManager.LogSensitiveOperation(
+					"Registro de ticket",
+					$"El usuario {emailUser} registró un nuevo ticket con asunto '{asunto}', prioridad {prioridad}, categoría {categoriaTicket}, motivo {motivo}, entregable {entregable}.",
+					emailUser
+				);
+                return Json(new
 				{
 					success = true,
 					msg
@@ -441,7 +466,8 @@ namespace SifizPlanning.Controllers
 			}
 			catch(Exception e)
 			{
-				return Json(new
+                LoggerManager.LogError(e, $"[GuardarPeticionDeTicket] Error al registrar ticket: {e.Message}");
+                return Json(new
 				{
 					success = false,
 					msg = e.Message
@@ -663,8 +689,8 @@ namespace SifizPlanning.Controllers
 				Cliente cliente = personaCliente.cliente;
 				DateTime defaultDate = new DateTime();
 				defaultDate = defaultDate.AddDays(30);
-
-				var tickets = (from t in db.Ticket
+                LoggerManager.LogInfo($"[DarSeguimientosTicketsCliente] Usuario {emailUser} solicita seguimiento de tickets (todos: {todos}, orden: {order}, ascendente: {asc}).");
+                var tickets = (from t in db.Ticket
 							   join pc in db.Persona_Cliente on t.persona_cliente equals pc
 							   join et in db.EstadoTicket on t.estadoTicket equals et
 							   join pr in db.PrioridadTicket on t.prioridadTicket equals pr
@@ -964,9 +990,10 @@ namespace SifizPlanning.Controllers
 			}
 			catch(Exception e)
 			{
-				return Json(new
+                LoggerManager.LogError(e, $"[DarDatosTicket] Error al obtener seguimiento de ticket: {e.Message}");
+                return Json(new
 				{
-					msg = e.Message,
+					msg = "Error al obtener seguimiento de ticket.",
 					success = false
 				});
 			}
@@ -982,8 +1009,9 @@ namespace SifizPlanning.Controllers
 				{
 					throw new Exception("No se encontró el ticket.");
 				}
+                LoggerManager.LogInfo($"[DarDatosTicket] Usuario consulta detalles del ticket {idTicket}.");
 
-				var datosTicket = (from t in db.Ticket
+                var datosTicket = (from t in db.Ticket
 								   join
 									   pcl in db.Persona_Cliente on t.persona_cliente equals pcl
 								   join
@@ -1049,12 +1077,12 @@ namespace SifizPlanning.Controllers
 			}
 			catch(Exception e)
 			{
-
-				var resp = new
+                LoggerManager.LogError(e, $"[DarDatosTicket] Error al obtener datos del ticket {idTicket}: {e.Message}");
+                var resp = new
 				{
 					success = false,
-					msg = e.Message
-				};
+					msg = "Error al obtener datos del ticket."
+                };
 				return Json(resp);
 			}
 		}
@@ -1066,7 +1094,8 @@ namespace SifizPlanning.Controllers
 		{
 			try
 			{
-				var comentarios = (from ct in db.ComentarioTicket
+                LoggerManager.LogInfo($"[CargarComentariosTicketsCliente] Usuario {User.Identity.Name} solicita comentarios visibles para el ticket {idTicket}.");
+                var comentarios = (from ct in db.ComentarioTicket
 								   where ct.SecuencialTicket == idTicket && ct.VerTodos == 1
 								   orderby ct.FechaHora descending
 								   select new
@@ -1086,11 +1115,12 @@ namespace SifizPlanning.Controllers
 			}
 			catch(Exception e)
 			{
-				var resp = new
+                LoggerManager.LogError(e, $"[CargarComentariosTicketsCliente] Error al cargar comentarios del ticket {idTicket}: {e.Message}");
+                var resp = new
 				{
 					success = false,
-					msg = e.Message
-				};
+					msg = "Error al cargar comentarios del ticket."
+                };
 				return Json(resp);
 			}
 		}
@@ -1099,16 +1129,17 @@ namespace SifizPlanning.Controllers
 		[HttpPost]
 		public ActionResult GuardarComentariosTicketsCliente(int idTicket, string comentario)
 		{
-			try
-			{
-				Ticket t = db.Ticket.Find(idTicket);
+            string emailUser = User.Identity.Name;
+            try
+            {
+                LoggerManager.LogInfo($"[GuardarComentariosTicketsCliente] Usuario {emailUser} guarda un nuevo comentario en el ticket {idTicket}.");
+                Ticket t = db.Ticket.Find(idTicket);
 				if(t == null)
 				{
 					throw new Exception("Error, no puede insertar un comentario porque no se encontró el ticket.");
 				}
 
 				//Adicionando el comentario al ticket                                
-				string emailUser = User.Identity.Name;
 				Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 				Persona personaUsuario = user.persona;
 
@@ -1158,11 +1189,12 @@ namespace SifizPlanning.Controllers
 			}
 			catch(Exception e)
 			{
-				var resp = new
+                LoggerManager.LogError(e, $"[GuardarComentariosTicketsCliente] Error al guardar comentario en el ticket {idTicket}: {e.Message}");
+                var resp = new
 				{
 					success = false,
-					msg = e.Message
-				};
+					msg = "Error al guardar comentario en el ticket."
+                };
 				return Json(resp);
 			}
 		}
@@ -1173,7 +1205,8 @@ namespace SifizPlanning.Controllers
 		{
 			try
 			{
-				Ticket t = db.Ticket.Find(idTicket);
+                LoggerManager.LogInfo($"[EnviarEmailComentario] Usuario {User.Identity.Name} envía comentario por email para el ticket {idTicket} a: {destinatariosEmailTicket}.");
+                Ticket t = db.Ticket.Find(idTicket);
 				if(t == null)
 				{
 					throw new Exception("Error, no puede insertar un comentario porque no se encontró el ticket.");
@@ -1205,8 +1238,13 @@ namespace SifizPlanning.Controllers
 				usuariosDestinos = usuariosDestinos.Distinct().ToList();
 				string asuntoEmail = asuntoEmailTicket;
 				Utiles.EnviarEmailSistema(usuariosDestinos.ToArray(), textoEmail, asuntoEmail);
+                LoggerManager.LogSensitiveOperation(
+					"Envío de comentario por email",
+					$"Usuario {User.Identity.Name} envió un comentario del ticket {idTicket} con asunto '{asuntoEmailTicket}' y cuerpo '{comentarioEmailTicket}' a: {destinatariosEmailTicket}.",
+					User.Identity.Name
+				);
 
-				var resp = new
+                var resp = new
 				{
 					success = true
 				};
@@ -1215,11 +1253,12 @@ namespace SifizPlanning.Controllers
 			}
 			catch(Exception e)
 			{
-				var resp = new
+                LoggerManager.LogError(e, $"[EnviarEmailComentario] Error al enviar email del ticket {idTicket}: {e.Message}");
+                var resp = new
 				{
 					success = false,
-					msg = e.Message
-				};
+					msg = "Error al enviar email del ticket."
+                };
 				return Json(resp);
 			}
 		}
@@ -1230,7 +1269,8 @@ namespace SifizPlanning.Controllers
 		{
 			try
 			{
-				Ticket ticket = db.Ticket.Find(idTicket);
+                LoggerManager.LogInfo($"[AdicionarAdjuntosTicket] Usuario {User.Identity.Name} adiciona adjuntos al ticket {idTicket}, edit: {edit}.");
+                Ticket ticket = db.Ticket.Find(idTicket);
 				if(ticket == null)
 				{
 					throw new Exception("Error, no se encontró el ticket");
@@ -1264,8 +1304,13 @@ namespace SifizPlanning.Controllers
 					}
 
 				db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+					"Adición de adjuntos al ticket",
+					$"Usuario {User.Identity.Name} agregó adjuntos al ticket {idTicket}. Asunto: '{asunto}', Detalle: '{detalle}', Archivos: {(adjuntos != null ? adjuntos.Length : 0)}.",
+					User.Identity.Name
+				);
 
-				var resp = new
+                var resp = new
 				{
 					success = true
 				};
@@ -1273,7 +1318,8 @@ namespace SifizPlanning.Controllers
 			}
 			catch(Exception e)
 			{
-				var resp = new
+                LoggerManager.LogError(e, $"[AdicionarAdjuntosTicket] Error al adicionar adjuntos al ticket {idTicket}: {e.Message}");
+                var resp = new
 				{
 					success = false,
 					msg = e.Message
@@ -1287,7 +1333,8 @@ namespace SifizPlanning.Controllers
 		{
 			try
 			{
-				Ticket ticket = db.Ticket.Find(idTicket);
+                LoggerManager.LogInfo($"[DarPropuestaCotizacion] Usuario {User.Identity.Name} consulta si el ticket {idTicket} tiene propuesta.");
+                Ticket ticket = db.Ticket.Find(idTicket);
 				if(ticket == null)
 				{
 					throw new Exception("No se encontró el ticket");
@@ -1315,11 +1362,12 @@ namespace SifizPlanning.Controllers
 			}
 			catch(Exception e)
 			{
-				var resp = new
+                LoggerManager.LogError(e, $"[DarPropuestaCotizacion] Error al consultar propuesta del ticket {idTicket}: {e.Message}");
+                var resp = new
 				{
 					success = false,
-					msg = e.Message
-				};
+					msg = "Error al consultar propuesta del ticket."
+                };
 				return Json(resp);
 			}
 		}
@@ -1328,7 +1376,8 @@ namespace SifizPlanning.Controllers
 		{
 			try
 			{
-				string msg = "Se ha aceptado correctamente la cotización";
+                LoggerManager.LogInfo($"[RespuestaCotizacion] Usuario {User.Identity.Name} responde a cotización del ticket {idTicket} con respuesta: {respuesta}.");
+                string msg = "Se ha aceptado correctamente la cotización";
 
 				Ticket ticket = db.Ticket.Find(idTicket);
 				if(ticket == null)
@@ -1489,11 +1538,12 @@ namespace SifizPlanning.Controllers
 			}
 			catch(Exception e)
 			{
-				var resp = new
+                LoggerManager.LogError(e, $"[RespuestaCotizacion] Error al responder cotización del ticket {idTicket}: {e.Message}");
+                var resp = new
 				{
 					success = false,
-					msg = e.Message
-				};
+					msg = "Error al responder cotización del ticket."
+                };
 				return Json(resp);
 			}
 		}
@@ -1502,9 +1552,10 @@ namespace SifizPlanning.Controllers
 		{
 			try
 			{
-				string msg = "Se ha enviado correctamente la solicitud de renegociar";
-
-				Ticket ticket = db.Ticket.Find(idTicket);
+                string emailUser = User.Identity.Name;
+                string msg = "Se ha enviado correctamente la solicitud de renegociar";
+                LoggerManager.LogInfo($"[RenegociarOferta] Usuario {emailUser} solicita renegociación para el ticket {idTicket}.");
+                Ticket ticket = db.Ticket.Find(idTicket);
 				if(ticket == null)
 				{
 					throw new Exception("No se encontró el ticket");
@@ -1534,7 +1585,11 @@ namespace SifizPlanning.Controllers
 					Fecha = DateTime.Now
 				};
 				db.Renegociacion.Add(renegociacion);
-				string emailUser = User.Identity.Name;
+                LoggerManager.LogSensitiveOperation(
+					"Renegociación de oferta",
+					$"Usuario {emailUser} envió texto de renegociación '{texto}' para el ticket {ticket.Secuencial}.",
+					emailUser
+				);
 
 				//ENVIANDO EL EMAIL DE RENEGOCIACION                
 				string htmlEmail = "<div class=\"textoCuerpo\">" + "Se ha realizado una petición de renegociación en el ticket: " + String.Format("{0:000000}", ticket.Secuencial) + "<br/>";
@@ -1603,11 +1658,12 @@ namespace SifizPlanning.Controllers
 			}
 			catch(Exception e)
 			{
-				var resp = new
+                LoggerManager.LogError(e, $"[RenegociarOferta] Error al procesar renegociación para el ticket {idTicket}: {e.Message}");
+                var resp = new
 				{
 					success = false,
-					msg = e.Message
-				};
+					msg = "Error al procesar renegociación para el ticket."
+                };
 				return Json(resp);
 			}
 		}
@@ -1636,8 +1692,8 @@ namespace SifizPlanning.Controllers
 				Persona personaCliente = ticket.persona_cliente.persona;
 				ViewBag.numero = string.Format("{0:000000}", ticket.Secuencial);
 				string email = personaCliente.usuario.FirstOrDefault().Email;
-
-				if(email == "soporte@insotec-ec.com")
+                LoggerManager.LogInfo($"[RespuestaResolucion] Usuario responde resolución del ticket {ticket.Secuencial} con estado {resultadosCliente[1]}.");
+                if (email == "soporte@insotec-ec.com")
 				{
 					if(!User.Identity.IsAuthenticated)
 					{
@@ -1758,12 +1814,18 @@ namespace SifizPlanning.Controllers
 
                     return View("TicketDevuelto");
 				}
+                LoggerManager.LogSensitiveOperation(
+					"Respuesta resolución de ticket",
+					$"Usuario con email {email} respondió '{resultadosCliente[1]}' al ticket {ticket.Secuencial}.",
+					email
+				);
 
-				return View();
+                return View();
 			}
 			catch(Exception e)
 			{
-				string mensaje = e.Message;
+                LoggerManager.LogError(e, $"[RespuestaResolucion] Error al procesar respuesta del ticket con código '{cod}': {e.Message}");
+                string mensaje = "Error al procesar respuesta del ticket.";
 				return RedirectToAction("Error", "Home", new RouteValueDictionary {
 					{"mensaje", mensaje}
 				});
@@ -1935,7 +1997,8 @@ namespace SifizPlanning.Controllers
 		{
 			try
 			{
-				int idTicket = numeroTicket;
+                LoggerManager.LogInfo($"[EnviarEmailTicketDevuelto] Usuario inicia enviar email devolución de ticket.");
+                int idTicket = numeroTicket;
 				Ticket ticket = db.Ticket.Find(idTicket);
 				if(ticket == null)
 				{
@@ -2070,8 +2133,13 @@ namespace SifizPlanning.Controllers
 					db.HistoricoAdjunto.Add(historicoAdjunto);
 				}
 				db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+					"Devolución de ticket cliente",
+					$"Usuario {User.Identity.Name} devolvió el ticket {ticket.Secuencial} con detalle '{detalle}'.",
+					User.Identity.Name
+				);
 
-				var resp = new
+                var resp = new
 				{
 					success = true
 				};
@@ -2079,11 +2147,12 @@ namespace SifizPlanning.Controllers
 			}
 			catch(Exception e)
 			{
-				var resp = new
+                LoggerManager.LogError(e, $"[EnviarEmailTicketDevueltoCliente] Error al devolver ticket cliente {numeroTicket}: {e.Message}");
+                var resp = new
 				{
 					success = false,
-					msg = e.Message
-				};
+					msg = "Error al devolver ticket cliente {numeroTicket}."
+                };
 				return Json(resp);
 			}
 		}
@@ -2096,8 +2165,9 @@ namespace SifizPlanning.Controllers
 		{
 			try
 			{
-				//Buscando si ya existe
-				CalificacionTicketCliente calificacionTicket = db.CalificacionTicketCliente.Where(x =>
+                LoggerManager.LogInfo($"[GuardarCalificacionTicket] Usuario {User.Identity.Name} guarda calificación {calificacion} para pregunta {idPregunta} en ticket {idticket}.");
+                //Buscando si ya existe
+                CalificacionTicketCliente calificacionTicket = db.CalificacionTicketCliente.Where(x =>
 															x.SecuencialTicket == idticket &&
 															x.SecuencialCalificacion == idPregunta).FirstOrDefault();
 				if(calificacionTicket != null)
@@ -2117,8 +2187,13 @@ namespace SifizPlanning.Controllers
 				}
 
 				db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+					"Guardar calificación ticket",
+					$"Usuario {User.Identity.Name} guardó calificación {calificacion} para pregunta {idPregunta} en ticket {idticket}.",
+					User.Identity.Name
+				);
 
-				var resp = new
+                var resp = new
 				{
 					success = true
 				};
@@ -2126,11 +2201,12 @@ namespace SifizPlanning.Controllers
 			}
 			catch(Exception e)
 			{
-				var resp = new
+                LoggerManager.LogError(e, $"[GuardarCalificacionTicket] Error al guardar calificación para pregunta {idPregunta} en ticket {idticket}: {e.Message}");
+                var resp = new
 				{
 					success = false,
-					msg = e.Message
-				};
+					msg = "Error al guardar calificación para pregunta."
+                };
 				return Json(resp);
 			}
 		}
@@ -2143,7 +2219,8 @@ namespace SifizPlanning.Controllers
 		{
 			try
 			{
-				List<object> calificacion = new List<object>();
+                LoggerManager.LogInfo($"[PreguntasCalificarTicket] Usuario {User.Identity.Name} solicita preguntas para calificar ticket {idticket}.");
+                List<object> calificacion = new List<object>();
 				var pregunta = db.CalificacionTicket.Where(x => x.EstaActivo == 1).OrderBy(x => x.Descripcion).ToList();
 
 				foreach(var preg in pregunta)
@@ -2174,7 +2251,8 @@ namespace SifizPlanning.Controllers
 			}
 			catch(Exception e)
 			{
-				var resp = new
+                LoggerManager.LogError(e, $"[PreguntasCalificarTicket] Error al obtener preguntas para calificar ticket {idticket}: {e.Message}");
+                var resp = new
 				{
 					success = false,
 					msg = e.Message
