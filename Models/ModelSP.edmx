@@ -815,6 +815,11 @@
           <Property Name="FECHAVENCIMIENTOOFERTA" Type="datetime" />
           <Property Name="SECUENCIALOFERTAREQUERIMIENTO" Type="int" />
           <Property Name="ESTAACTIVO" Type="int" />
+          <Property Name="PRECIO" Type="decimal" Precision="18" Scale="0" />
+          <Property Name="FORMAPAGO" Type="varchar" MaxLength="50" />
+          <Property Name="DESCUENTO" Type="bit" />
+          <Property Name="ESTADO" Type="varchar" MaxLength="50" />
+          <Property Name="TIPO" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="OFERTAREQUERIMIENTO">
           <Key>
@@ -13215,6 +13220,11 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
           <Property Name="EstaActivo" Type="Int32" />
           <NavigationProperty Name="OfertaRequerimiento" Relationship="SifizPlanningModel.FK_OFERTAOFERTA_OFERTAREQUERIMIENTO" FromRole="OFERTAOFERTA" ToRole="OfertaRequerimiento" />
           <NavigationProperty Name="FORMALIZACIONOFERTAS" Relationship="SifizPlanningModel.FK_FORMALIZACIONOFERTAS_OFERTAOFERTA" FromRole="OfertaOferta" ToRole="FORMALIZACIONOFERTAS" />
+          <Property Name="Precio" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="FormaPago" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Descuento" Type="Boolean" />
+          <Property Name="Estado" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Tipo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
         <Association Name="FK_OFERTAOFERTA_OFERTAREQUERIMIENTO">
           <End Type="SifizPlanningModel.OfertaRequerimiento" Role="OfertaRequerimiento" Multiplicity="0..1" />
@@ -15774,6 +15784,11 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
           <EntitySetMapping Name="OfertaOferta">
             <EntityTypeMapping TypeName="SifizPlanningModel.OfertaOferta">
               <MappingFragment StoreEntitySet="OFERTAOFERTA">
+                <ScalarProperty Name="Tipo" ColumnName="TIPO" />
+                <ScalarProperty Name="Estado" ColumnName="ESTADO" />
+                <ScalarProperty Name="Descuento" ColumnName="DESCUENTO" />
+                <ScalarProperty Name="FormaPago" ColumnName="FORMAPAGO" />
+                <ScalarProperty Name="Precio" ColumnName="PRECIO" />
                 <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
                 <ScalarProperty Name="SecuencialOfertaRequerimiento" ColumnName="SECUENCIALOFERTAREQUERIMIENTO" />
                 <ScalarProperty Name="FechaVencimientoOferta" ColumnName="FECHAVENCIMIENTOOFERTA" />

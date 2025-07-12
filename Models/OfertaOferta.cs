@@ -29,6 +29,11 @@ namespace SifizPlanning.Models
         public Nullable<System.DateTime> FechaVencimientoOferta { get; set; }
         public Nullable<int> SecuencialOfertaRequerimiento { get; set; }
         public Nullable<int> EstaActivo { get; set; }
+        public Nullable<decimal> Precio { get; set; }
+        public string FormaPago { get; set; }
+        public Nullable<bool> Descuento { get; set; }
+        public string Estado { get; set; }
+        public string Tipo { get; set; }
     
         public virtual OfertaRequerimiento OfertaRequerimiento { get; set; }
         public virtual ICollection<FormalizacionOfertas> FORMALIZACIONOFERTAS { get; set; }

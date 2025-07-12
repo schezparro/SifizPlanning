@@ -8,6 +8,7 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
     $scope.buscadorGeneral = '';
     $scope.filtro = {
         codigoOferta: '',
+        ticket: '',
         cliente: '',
         tema: '',
         fechaOferta: '',
@@ -18,328 +19,429 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
         estado: ''
     };
 
-    // Lista de clientes 
-    $scope.clientes = ['VFE', 'SKAWSAY', 'CHONE', 'UEJID', 'COOPAR', 'MARCA'];
-    
-    // Datos de ejemplo completos
-    $scope.allOffers = [
-        {
-            codigoOferta: '25-0001',
-            cliente: 'VFE',
-            tema: 'Actualización módulos FBS Contabilidad y FBS Facturación Electrónica',
-            fechaOferta: '2025-01-08',
-            precioOferta: 23940.00,
-            formaPago: '70/30',
-            validezOferta: '2025-01-20',
-            descuento: 'NO',
-            estado: 'VENCIDA'
-        },
-        {
-            codigoOferta: '25-0002',
-            cliente: 'SKAWSAY',
-            tema: 'Renovación Soporte y mantenimiento',
-            fechaOferta: '2025-01-06',
-            precioOferta: 600.00,
-            formaPago: 'Mensual',
-            validezOferta: '2025-01-17',
-            descuento: 'NO',
-            estado: 'ACEPTADA / CONTRATO'
-        },
-        {
-            codigoOferta: '25-0003',
-            cliente: 'CHONE',
-            tema: 'Modificaciones Banca Virtual y App Clientes',
-            fechaOferta: '2025-01-09',
-            precioOferta: 1170.00,
-            formaPago: '70/30',
-            validezOferta: '2025-01-20',
-            descuento: 'NO',
-            estado: 'VENCIDA'
-        },
-        {
-            codigoOferta: '25-0004',
-            cliente: 'UEJID',
-            tema: 'Automatización de cobro de fondo mortuorio mensual',
-            fechaOferta: '2025-01-07',
-            precioOferta: 2400.00,
-            formaPago: '70/30',
-            validezOferta: '2025-01-27',
-            descuento: 'NO',
-            estado: 'VENCIDA'
-        },
-        {
-            codigoOferta: '25-0005',
-            cliente: 'COOPAR',
-            tema: 'Capacitación funcional, administrativa y técnica del sistema Financial',
-            fechaOferta: '2025-01-08',
-            precioOferta: 2750.00,
-            formaPago: '70/30',
-            validezOferta: '2025-01-10',
-            descuento: 'NO',
-            estado: 'ACEPTADA / CONTRATO'
-        },
-        {
-            codigoOferta: '25-0006',
-            cliente: 'UEJID',
-            tema: 'Actualización funcionalidad Reprogramación para prorrateo de intereses',
-            fechaOferta: '2025-01-09',
-            precioOferta: 990.00,
-            formaPago: '100 % a la entrega',
-            validezOferta: '2025-01-20',
-            descuento: 'NO',
-            estado: 'ACEPTADA / TICKET'
-        },
-        {
-            codigoOferta: '25-0007',
-            cliente: 'MARCA',
-            tema: 'Renovación Soporte y mantenimiento',
-            fechaOferta: '2025-01-13',
-            precioOferta: 180.00,
-            formaPago: 'Mensual',
-            validezOferta: '2025-01-18',
-            descuento: 'NO',
-            estado: 'ACEPTADA / CONTRATO'
-        },
-        {
-            codigoOferta: '25-0008',
-            cliente: 'VFE',
-            tema: 'Implementación módulo de Inventarios',
-            fechaOferta: '2025-01-14',
-            precioOferta: 15000.00,
-            formaPago: '70/30',
-            validezOferta: '2025-01-28',
-            descuento: 'NO',
-            estado: 'PENDIENTE'
-        },
-        {
-            codigoOferta: '25-0009',
-            cliente: 'CHONE',
-            tema: 'Desarrollo de módulo de Recaudación Mobile',
-            fechaOferta: '2025-01-15',
-            precioOferta: 8500.00,
-            formaPago: '70/30',
-            validezOferta: '2025-01-30',
-            descuento: 'SI',
-            estado: 'PENDIENTE'
-        },
-        {
-            codigoOferta: '25-0010',
-            cliente: 'COOPAR',
-            tema: 'Actualización sistema de Cajas',
-            fechaOferta: '2025-01-16',
-            precioOferta: 4200.00,
-            formaPago: '70/30',
-            validezOferta: '2025-01-31',
-            descuento: 'NO',
-            estado: 'PENDIENTE'
-        },
-        {
-            codigoOferta: '25-0011',
-            cliente: 'SKAWSAY',
-            tema: 'Desarrollo API REST para integración de servicios',
-            fechaOferta: '2025-01-17',
-            precioOferta: 5600.00,
-            formaPago: '70/30',
-            validezOferta: '2025-02-01',
-            descuento: 'NO',
-            estado: 'PENDIENTE'
-        },
-        {
-            codigoOferta: '25-0012',
-            cliente: 'MARCA',
-            tema: 'Implementación módulo de Recursos Humanos',
-            fechaOferta: '2025-01-18',
-            precioOferta: 12000.00,
-            formaPago: '70/30',
-            validezOferta: '2025-02-02',
-            descuento: 'SI',
-            estado: 'PENDIENTE'
-        },
-        {
-            codigoOferta: '25-0013',
-            cliente: 'VFE',
-            tema: 'Actualización sistema de Reportería',
-            fechaOferta: '2025-01-19',
-            precioOferta: 3500.00,
-            formaPago: '100 % a la entrega',
-            validezOferta: '2025-02-03',
-            descuento: 'NO',
-            estado: 'PENDIENTE'
-        },
-        {
-            codigoOferta: '25-0014',
-            cliente: 'UEJID',
-            tema: 'Desarrollo módulo de Gestión de Cobranzas',
-            fechaOferta: '2025-01-20',
-            precioOferta: 9800.00,
-            formaPago: '70/30',
-            validezOferta: '2025-02-04',
-            descuento: 'NO',
-            estado: 'PENDIENTE'
-        },
-        {
-            codigoOferta: '25-0015',
-            cliente: 'CHONE',
-            tema: 'Implementación sistema de Notificaciones',
-            fechaOferta: '2025-01-21',
-            precioOferta: 2800.00,
-            formaPago: '70/30',
-            validezOferta: '2025-02-05',
-            descuento: 'NO',
-            estado: 'PENDIENTE'
-        }
-    ];
-
-    // Función para aplicar filtros y actualizar vista
-    function actualizarVista() {
-        var filteredOffers = $scope.allOffers;
-        
-        // Aplicar búsqueda general
-        if ($scope.buscadorGeneral) {
-            var search = $scope.buscadorGeneral.toLowerCase();
-            filteredOffers = filteredOffers.filter(function(offer) {
-                return offer.codigoOferta.toLowerCase().includes(search) ||
-                       offer.cliente.toLowerCase().includes(search) ||
-                       offer.tema.toLowerCase().includes(search) ||
-                       offer.estado.toLowerCase().includes(search);
-            });
-        }
-
-        // Aplicar filtros específicos
-        Object.keys($scope.filtro).forEach(function(key) {
-            if ($scope.filtro[key]) {
-                filteredOffers = filteredOffers.filter(function(offer) {
-                    var offerValue = offer[key];
-                    return offerValue && offerValue.toString().toLowerCase()
-                        .includes($scope.filtro[key].toLowerCase());
-                });
+    // --- Cargar requerimientos reales para el select de ofertas ---
+    $scope.requerimientos = [];
+    $scope.cargarRequerimientos = function() {
+        $http.post("comercial/requerimientos_ofertas", {}).success(function(data) {
+            if (data.success === true) {
+                $scope.requerimientos = data.requerimientosComercial;
             }
         });
+    };
+    $scope.cargarRequerimientos();
 
-        // Calcular paginación
-        $scope.totalOfertas = filteredOffers.length;
-        $scope.cantPaginas = Math.ceil($scope.totalOfertas / numerosPorPagina);
-        if ($scope.cantPaginas === 0 || !$scope.cantPaginas) {
-            $scope.cantPaginas = 1;
-        }
-
-        // Aplicar paginación
-        var startIndex = (pagina - 1) * numerosPorPagina;
-        $scope.ofertasLista = filteredOffers.slice(startIndex, startIndex + numerosPorPagina);
-
-        // Configurar números de página
-        $scope.listaPaginas = [];
-        if ($scope.cantPaginas <= 5) {
-            for (var i = 1; i <= $scope.cantPaginas; i++) {
-                $scope.listaPaginas.push(i);
-            }
-        } else if (pagina <= 3) {
-            for (var i = 1; i <= 5; i++) {
-                $scope.listaPaginas.push(i);
-            }
-        } else if (pagina >= $scope.cantPaginas - 2) {
-            for (var i = $scope.cantPaginas - 4; i <= $scope.cantPaginas; i++) {
-                $scope.listaPaginas.push(i);
-            }
+    // Al seleccionar un requerimiento, poblar fechas desde el ticket asociado al requerimiento
+    $scope.onRequerimientoChange = function() {
+        var req = $scope.requerimientos.find(r => r.Secuencial == $scope.editingOffer.OfertaRequerimiento);
+        if (req && req.ticket) {
+            $scope.editingOffer.ticket = req.ticket;
+            $http.post("tickets/dar-datos-ticket-ofertas", { idTicket: req.ticket }).success(function(data) {
+                if (data.success === true && data.datosTicket) {
+                    function convertirFecha(fechaStr) {
+                        if (fechaStr && typeof fechaStr === 'string' && fechaStr.indexOf('/Date(') === 0) {
+                            var milisegundos = parseInt(fechaStr.match(/\d+/)[0]);
+                            return new Date(milisegundos);
+                        }
+                        return fechaStr ? new Date(fechaStr) : null;
+                    }
+                    $scope.editingOffer.fechaEstimacion = convertirFecha(data.datosTicket.FechaRecepcionEstimacion);
+                    $scope.editingOffer.fechaRevision = convertirFecha(data.datosTicket.FechaEnvioRevision);
+                    $scope.editingOffer.fechaAprobacionGerencia = convertirFecha(data.datosTicket.FechaAprobacionGerencia);
+                    $scope.editingOffer.fechaEnvioOferta = convertirFecha(data.datosTicket.FechaEnvioOfertaCliente);
+                } else {
+                    $scope.editingOffer.fechaEstimacion = '';
+                    $scope.editingOffer.fechaRevision = '';
+                    $scope.editingOffer.fechaAprobacionGerencia = '';
+                    $scope.editingOffer.fechaEnvioOferta = '';
+                }
+            });
         } else {
-            for (var i = pagina - 2; i <= pagina + 2; i++) {
-                $scope.listaPaginas.push(i);
+            $scope.editingOffer.ticket = '';
+            $scope.editingOffer.fechaEstimacion = '';
+            $scope.editingOffer.fechaRevision = '';
+            $scope.editingOffer.fechaAprobacionGerencia = '';
+            $scope.editingOffer.fechaEnvioOferta = '';
+        }
+    };
+
+    // --- Listar ofertas reales desde backend ---
+    $scope.ofertasLista = [];
+    $scope.cantPaginas = 1;
+    $scope.listaPaginas = [];
+    $scope.totalOfertas = 0;
+    $scope.cargarOfertas = function (start, lenght) {
+        if (start === undefined) start = 0;
+        if (lenght === undefined) lenght = $scope.cantidadMostrarPorPagina;
+        $http.post("comercial/dar-ofertas-comercial", {
+            start: start,
+            lenght: lenght,
+            filtro: $scope.buscadorGeneral || '',
+            filtrosColumna: JSON.stringify($scope.filtro)
+        }).success(function (data) {
+            if (data.success === true) {
+                $scope.ofertasLista = data.ofertasComercial.map(function(oferta) {
+                    function convertirFecha(fechaStr) {
+                        if (fechaStr && typeof fechaStr === 'string' && fechaStr.indexOf('/Date(') === 0) {
+                            var milisegundos = parseInt(fechaStr.match(/\d+/)[0]);
+                            return new Date(milisegundos);
+                        }
+                        return fechaStr ? new Date(fechaStr) : null;
+                    }
+                    // Mapear precio a precioOferta para consistencia en la vista
+                    return {
+                        ...oferta,
+                        precioOferta: oferta.precio,
+                        fechaEstimacion: convertirFecha(oferta.fechaEstimacion),
+                        fechaGeneracion: convertirFecha(oferta.fechaGeneracion),
+                        fechaRevision: convertirFecha(oferta.fechaRevision),
+                        fechaAprobacionGerencia: convertirFecha(oferta.fechaAprobacionGerencia),
+                        fechaEnvioOferta: convertirFecha(oferta.fechaEnvioOferta),
+                        fechaVencimiento: convertirFecha(oferta.fechaVencimiento),
+                        codigo: oferta.codigo || oferta.codigoOferta,
+                        proximaActividad: oferta.proximaActividad
+                    };
+                });
+                $scope.totalOfertas = data.total;
+                $scope.cantPaginas = Math.ceil(data.total / $scope.cantidadMostrarPorPagina) || 1;
+                $scope.listaPaginas = Array.from({length: $scope.cantPaginas}, (_, i) => i + 1);
+                pagina = 1;
+            } else {
+                messageDialog.show('Información', data.msg);
             }
-        }
+        });
+    };
+    $scope.cargarOfertas();
 
-        // Asegurar que la página actual es válida
-        if (pagina > $scope.cantPaginas) {
-            pagina = $scope.cantPaginas;
-        }
-    }
-
-    // Inicializar datos y asegurar que Angular haya compilado la vista
-    $timeout(function() {
-        actualizarVista();
-    });
-
-    // Watch para filtros
+    // Debounce para filtros y búsqueda general
+    var debounceTimeout = null;
     $scope.$watch('buscadorGeneral', function(newVal, oldVal) {
         if (newVal !== oldVal) {
-            pagina = 1;
-            actualizarVista();
+            if (debounceTimeout) $timeout.cancel(debounceTimeout);
+            debounceTimeout = $timeout(function() {
+                pagina = 1;
+                $scope.cargarOfertas();
+            }, 2000);
         }
     });
-
     $scope.$watch('filtro', function(newVal, oldVal) {
         if (newVal !== oldVal) {
-            pagina = 1;
-            actualizarVista();
+            if (debounceTimeout) $timeout.cancel(debounceTimeout);
+            debounceTimeout = $timeout(function() {
+                pagina = 1;
+                $scope.cargarOfertas();
+            }, 2000);
         }
     }, true);
 
     // Funciones de paginación
     $scope.cambiarPagina = function(pag) {
         pagina = pag;
-        actualizarVista();
+        $scope.cargarOfertas((pagina - 1) * $scope.cantidadMostrarPorPagina, $scope.cantidadMostrarPorPagina);
     };
-
     $scope.atrazarPagina = function() {
         if (pagina > 1) {
             pagina--;
-            actualizarVista();
+            $scope.cargarOfertas((pagina - 1) * $scope.cantidadMostrarPorPagina, $scope.cantidadMostrarPorPagina);
         }
     };
-
     $scope.avanzarPagina = function() {
         if (pagina < $scope.cantPaginas) {
             pagina++;
-            actualizarVista();
+            $scope.cargarOfertas((pagina - 1) * $scope.cantidadMostrarPorPagina, $scope.cantidadMostrarPorPagina);
         }
     };
-
     $scope.actualizarCantidadMostrar = function() {
         numerosPorPagina = parseInt($scope.cantidadMostrarPorPagina);
         pagina = 1;
-        actualizarVista();
+        $scope.cargarOfertas(0, numerosPorPagina);
     };
 
-    // Funciones para el CRUD
+    // CRUD
     $scope.agregarOferta = function() {
-        $scope.editingOffer = {
-            fechaOferta: new Date(),
-            validezOferta: new Date(new Date().setDate(new Date().getDate() + 15)),
-            descuento: 'NO'
-        };
-        angular.element('#modal-excel-offer').modal('show');
+        $http.post("comercial/generar-codigo-oferta", {}).success(function (data) {
+            if (data.success === true) {
+                $scope.editingOffer = {
+                    codigo: data.nuevoCodigo,
+                    OfertaRequerimiento: '',
+                    fechaGeneracion: '',
+                    fechaVencimiento: '',
+                    fechaEstimacion: '',
+                    fechaRevision: '',
+                    fechaAprobacionGerencia: '',
+                    fechaEnvioOferta: '',
+                    precioOferta: '',
+                    formaPago: '',
+                    descuento: 'NO',
+                    estado: '',
+                    tipo: '',
+                    tema: '',
+                    _esNuevo: true,
+                    _esTicketPendiente: false // Por defecto no es ticket pendiente
+                };
+                angular.element('#modal-excel-offer').modal('show');
+            }
+        });
     };
 
+    // Nueva función para agregar oferta desde ticket pendiente
+    $scope.agregarOfertaDesdeTicketPendiente = function(ticket) {
+        $http.post("comercial/generar-codigo-oferta", {}).success(function (data) {
+            if (data.success === true) {
+                $scope.editingOffer = {
+                    codigo: data.nuevoCodigo,
+                    OfertaRequerimiento: '',
+                    fechaGeneracion: '',
+                    fechaVencimiento: '',
+                    fechaEstimacion: '',
+                    fechaRevision: '',
+                    fechaAprobacionGerencia: '',
+                    fechaEnvioOferta: '',
+                    precioOferta: '',
+                    formaPago: '',
+                    descuento: 'NO',
+                    estado: '',
+                    tipo: '',
+                    tema: '',
+                    _esNuevo: true,
+                    _esTicketPendiente: true,
+                    ticketPendienteNumero: ticket
+                };
+                // Cargar requerimientos para el select
+                $scope.cargarRequerimientos();
+                angular.element('#modal-excel-offer').modal('show');
+            }
+        });
+    };
+
+    $scope.guardarOferta = function () {
+        waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
+        // Validar y convertir precioOferta a número decimal
+        var precioStr = ($scope.editingOffer.precioOferta || '').toString().replace(',', '.');
+        var precio = parseFloat(precioStr);
+        if (isNaN(precio)) {
+            waitingDialog.hide();
+            messageDialog.show('Error', 'El campo PRECIO OFERTA debe ser un número válido.');
+            return;
+        }
+        var datosOferta = {
+            OfertaRequerimiento: $scope.editingOffer.OfertaPedidoRequerimiento || $scope.editingOffer.OfertaRequerimiento,
+            codigo: $scope.editingOffer.codigo,
+            fechaEstimacion: $scope.editingOffer.fechaEstimacion,
+            fechaRevision: $scope.editingOffer.fechaRevision,
+            fechaEnvioOferta: $scope.editingOffer.fechaEnvioOferta,
+            fechaGeneracion: $scope.editingOffer.fechaGeneracion,
+            fechaAprobacionGerencia: $scope.editingOffer.fechaAprobacionGerencia,
+            fechaVencimiento: $scope.editingOffer.fechaVencimiento,
+            precio: precio,
+            formaPago: $scope.editingOffer.formaPago,
+            descuento: $scope.editingOffer.descuento,
+            estado: $scope.editingOffer.estado,
+            tipo: $scope.editingOffer.tipo,
+            tema: $scope.editingOffer.tema
+        };
+        $http.post("comercial/guardar-oferta", datosOferta)
+            .success(function (data) {
+                waitingDialog.hide();
+                if (data.success === true) {
+                    angular.element("#modal-excel-offer").modal("hide");
+                    $scope.cargarOfertas();
+                    messageDialog.show('Éxito', 'Oferta guardada correctamente');
+                } else {
+                    messageDialog.show('Información', data.msg);
+                }
+            })
+            .error(function () {
+                waitingDialog.hide();
+                messageDialog.show('Error', 'Error al guardar la oferta');
+            });
+    };
     $scope.editarOferta = function(oferta) {
         $scope.editingOffer = angular.copy(oferta);
-        angular.element('#modal-excel-offer').modal('show');
+        // Determinar si es ticket pendiente (sin código de oferta)
+        if (!$scope.editingOffer.codigo) {
+            $http.post("comercial/generar-codigo-oferta", {}).success(function (data) {
+                if (data.success === true) {
+                    $scope.editingOffer.codigo = data.nuevoCodigo;
+                    $scope.editingOffer._esNuevo = true;
+                    $scope.editingOffer._esTicketPendiente = true;
+                    // Cargar pedidos/requerimientos para el select
+                    $http.post("comercial/catalogo-requerimientos", {}).success(function (dataReq) {
+                        if (dataReq.success === true) {
+                            $scope.pedidosRequerimientos = dataReq.requerimientos;
+                        }
+                    });
+                    angular.element('#modal-excel-offer').modal('show');
+                }
+            });
+        } else {
+            $scope.editingOffer._esNuevo = false;
+            $scope.editingOffer._esTicketPendiente = false;
+            // Cargar requerimientos para el select
+            $scope.cargarRequerimientos();
+            angular.element('#modal-excel-offer').modal('show');
+        }
     };
 
+    // Guardar nueva oferta usando la ruta moderna
+    $scope.guardarOferta = function () {
+        waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
+        $http.post("comercial/guardar-oferta", {
+            OfertaRequerimiento: $scope.editingOffer.OfertaRequerimiento,
+            codigo: $scope.editingOffer.codigo,
+            fechaEstimacion: $scope.editingOffer.fechaEstimacion,
+            fechaRevision: $scope.editingOffer.fechaRevision,
+            fechaEnvioOferta: $scope.editingOffer.fechaEnvioOferta,
+            fechaGeneracion: $scope.editingOffer.fechaGeneracion,
+            fechaAprobacionGerencia: $scope.editingOffer.fechaAprobacionGerencia,
+            fechaVencimiento: $scope.editingOffer.fechaVencimiento,
+            precio: $scope.editingOffer.precioOferta,
+            formaPago: $scope.editingOffer.formaPago,
+            descuento: $scope.editingOffer.descuento,
+            estado: $scope.editingOffer.estado,
+            tipo: $scope.editingOffer.tipo,
+            tema: $scope.editingOffer.tema
+        })
+        .success(function (data) {
+            waitingDialog.hide();
+            if (data.success === true) {
+                angular.element("#modal-excel-offer").modal("hide");
+                $scope.cargarOfertas();
+                messageDialog.show('Éxito', 'Oferta guardada correctamente');
+            } else {
+                messageDialog.show('Información', data.msg);
+            }
+        })
+        .error(function () {
+            waitingDialog.hide();
+            messageDialog.show('Error', 'Error al guardar la oferta');
+        });
+    };
+
+    // Editar oferta usando la ruta moderna
+    $scope.actualizarOferta = function () {
+        waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
+        $http.post("comercial/editar-oferta", {
+            id: $scope.editingOffer.id,
+            OfertaRequerimiento: $scope.editingOffer.OfertaRequerimiento,
+            codigo: $scope.editingOffer.codigo,
+            fechaEstimacion: $scope.editingOffer.fechaEstimacion,
+            fechaRevision: $scope.editingOffer.fechaRevision,
+            fechaEnvioOferta: $scope.editingOffer.fechaEnvioOferta,
+            fechaGeneracion: $scope.editingOffer.fechaGeneracion,
+            fechaAprobacionGerencia: $scope.editingOffer.fechaAprobacionGerencia,
+            fechaVencimiento: $scope.editingOffer.fechaVencimiento,
+            precio: $scope.editingOffer.precioOferta,
+            formaPago: $scope.editingOffer.formaPago,
+            descuento: $scope.editingOffer.descuento,
+            estado: $scope.editingOffer.estado,
+            tipo: $scope.editingOffer.tipo,
+            tema: $scope.editingOffer.tema
+        })
+        .success(function (data) {
+            waitingDialog.hide();
+            if (data.success === true) {
+                angular.element("#modal-excel-offer").modal("hide");
+                $scope.cargarOfertas();
+                messageDialog.show('Éxito', 'Oferta editada correctamente');
+            } else {
+                messageDialog.show('Información', data.msg);
+            }
+        })
+        .error(function () {
+            waitingDialog.hide();
+            messageDialog.show('Error', 'Error al editar la oferta');
+        });
+    };
     $scope.eliminarOferta = function(oferta) {
         if (confirm('¿Está seguro que desea eliminar esta oferta?')) {
-            var index = $scope.allOffers.findIndex(o => o.codigoOferta === oferta.codigoOferta);
-            if (index !== -1) {
-                $scope.allOffers.splice(index, 1);
-                actualizarVista();
-            }
+            $http.post("comercial/EliminarOferta", { codigo: oferta.codigo })
+                .success(function (data) {
+                    if (data.success === true) {
+                        $scope.cargarOfertas();
+                        messageDialog.show('Éxito', 'Oferta eliminada correctamente');
+                    } else {
+                        messageDialog.show('Información', data.msg);
+                    }
+                });
         }
     };
-
-    $scope.guardarOferta = function() {
-        if ($scope.editingOffer.id) {
-            // Editar oferta existente
-            var index = $scope.allOffers.findIndex(o => o.codigoOferta === $scope.editingOffer.codigoOferta);
-            if (index !== -1) {
-                $scope.allOffers[index] = angular.copy($scope.editingOffer);
-            }
-        } else {
-            // Agregar nueva oferta
-            $scope.editingOffer.id = Date.now();
-            $scope.allOffers.unshift(angular.copy($scope.editingOffer));
-        }
-        actualizarVista();
-        angular.element('#modal-excel-offer').modal('hide');
+    // Exportar Excel/PDF/Imprimir usando datos reales
+    $scope.exportarExcel = function() {
+        const rows = $scope.ofertasLista.map(oferta => ({
+            'CÓDIGO OFERTA': oferta.codigo,
+            'TICKET': oferta.ticket,
+            'CLIENTE': oferta.cliente,
+            'TEMA': oferta.tema,
+            'F.Rec Estimación': oferta.fechaEstimacion,
+            'F.Gen Oferta': oferta.fechaGeneracion,
+            'F.Env Revisión': oferta.fechaRevision,
+            'F.Apr Gerencia': oferta.fechaAprobacionGerencia,
+            'F.Env Cliente': oferta.fechaEnvioOferta,
+            'F.Vencimiento': oferta.fechaVencimiento,
+            'TIPO': oferta.tipo,
+            'PRECIO OFERTA': oferta.precio,
+            'FORMA DE PAGO': oferta.formaPago,
+            'DESCUENTO': oferta.descuento ? 'SI' : 'NO',
+            'ESTADO': oferta.estado
+        }));
+        const worksheet = XLSX.utils.json_to_sheet(rows);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Ofertas");
+        worksheet['!cols'] = [
+            { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 40 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 15 }, { wch: 10 }, { wch: 20 }
+        ];
+        XLSX.writeFile(workbook, 'Ofertas.xlsx');
     };
-
+    $scope.exportarPDF = function() {
+        const htmlTabla = document.getElementById('tabla-ofertas-excel').outerHTML;
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlTabla;
+        const opt = {
+            margin: 0.5,
+            filename: 'Ofertas.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+        };
+        html2pdf().set(opt).from(tempDiv).save();
+    };
+    $scope.imprimir = function() {
+        const htmlTabla = document.getElementById('tabla-ofertas-excel').outerHTML;
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Ofertas</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f2f2f2; }
+                        .badge {
+                            padding: 3px 7px;
+                            border-radius: 10px;
+                            color: white;
+                            font-size: 12px;
+                        }
+                        .bg-success { background-color: #5cb85c; }
+                        .bg-warning { background-color: #f0ad4e; }
+                        .bg-danger { background-color: #d9534f; }
+                        .text-right { text-align: right; }
+                    </style>
+                </head>
+                <body>
+                    <h2 style="text-align: center;">Listado de Ofertas</h2>
+                    ${htmlTabla}
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 250);
+    };
     // Initialize datepicker
     $('.datepicker').datepicker({
         format: 'yyyy-mm-dd',
