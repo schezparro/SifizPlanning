@@ -1289,6 +1289,7 @@
     <Content Include="Views\Rrhh\windowPropuestaVacaciones.cshtml" />
     <Content Include="Views\Comercial\windowFormalizacionOfertasComercial.cshtml" />
     <Content Include="Views\Admin\windowProyectosExcel.cshtml" />
+    <Content Include="Views\Comercial\windowOffersExcel.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1307,6 +1308,7 @@
     <Content Include="Web\js\chartjs-plugin-datalabels.js" />
     <Content Include="Web\js\client\clientNewTicket.js" />
     <Content Include="Web\js\client\clientSeguimiento.js" />
+    <Content Include="Web\js\comercial\offersController.js" />
     <Content Include="Web\js\consultas\ofertaTickets.js" />
     <Content Include="Web\js\consultas\garantiaTickets.js" />
     <Content Include="Web\js\consultas\consultaGarantias.js" />
