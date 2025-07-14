@@ -21,124 +21,113 @@
 
     <hr />
 
-    <div class="table-responsive">
-        <div class="table-container">
-            <table id="tabla-ofertas-excel" class="table table-striped table-hover table-sm">
+    <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
+        <div class="table-container" style="margin-bottom:0;">
+            <table id="tabla-ofertas-excel" class="table table-striped table-hover table-sm" style="font-size:15px; margin-bottom:0;">
                 <thead>
-                    <tr>
-                        <th>CODIGO OFERTA</th>
-                        <th>NUMERO TICKET</th>
-                        <th>CLIENTE</th>
-                        <th>TEMA</th>
-                        <th>F.Rec Estimación</th>
-                        <th>F.Gen Oferta</th>
-                        <th>F.Env Revisión</th>
-                        <th>F.Apr Gerencia</th>
-                        <th>F.Env Cliente</th>
-                        <th>F.Vencimiento</th>
-                        <th>TIPO</th>
-                        <th>PRECIO OFERTA</th>
-                        <th>FORMA DE PAGO</th>
-                        <th>VALIDEZ OFERTA</th>
-                        <th>DESCUENTO</th>
-                        <th>PRÓXIMA ACTIVIDAD</th>
-                        <th>ESTADO</th>
-                        <th>ACCIONES</th>
+                    <tr style="font-size:14px; text-transform:uppercase;">
+                        <th style="padding:2px 4px;">CODIGO OFERTA</th>
+                        <th style="padding:2px 4px;">NUMERO TICKET</th>
+                        <th style="padding:2px 4px;">CLIENTE</th>
+                        <th style="padding:2px 4px;">TEMA</th>
+                        <th style="padding:2px 4px;">F.REC ESTIMACION</th>
+                        <th style="padding:2px 4px;">F.GEN OFERTA</th>
+                        <th style="padding:2px 4px;">F.ENV REVISION</th>
+                        <th style="padding:2px 4px;">F.APR GERENCIA</th>
+                        <th style="padding:2px 4px;">F.ENV CLIENTE</th>
+                        <th style="padding:2px 4px;">FECHA VENCIMIENTO</th>
+                        <th style="padding:2px 4px;">TIPO</th>
+                        <th style="padding:2px 4px;">PRECIO</th>
+                        <th style="padding:2px 4px;">PAGO</th>
+                        <th style="padding:2px 4px;">VALIDEZ</th>
+                        <th style="padding:2px 4px;">DESC</th>
+                        <th style="padding:2px 4px;">PROXIMA ACTIVIDAD</th>
+                        <th style="padding:2px 4px;">ESTADO</th>
+                        <th style="padding:2px 4px;">ACCIONES</th>
                     </tr>
                     <tr>
-                        <th><input type="text" class="form-control" ng-model="filtro.codigoOferta" /></th>
-                        <th><input type="text" class="form-control" ng-model="filtro.ticket" /></th>
-                        <th><input type="text" class="form-control" ng-model="filtro.cliente" /></th>
-                        <th><input type="text" class="form-control" ng-model="filtro.tema" /></th>
-                        <th><input type="text" class="form-control" ng-model="filtro.fechaEstimacion" /></th>
-                        <th><input type="text" class="form-control" ng-model="filtro.fechaGeneracion" /></th>
-                        <th><input type="text" class="form-control" ng-model="filtro.fechaRevision" /></th>
-                        <th><input type="text" class="form-control" ng-model="filtro.fechaAprobacionGerencia" /></th>
-                        <th><input type="text" class="form-control" ng-model="filtro.fechaEnvioOferta" /></th>
-                        <th><input type="text" class="form-control" ng-model="filtro.fechaVencimiento" /></th>
-                        <th><input type="text" class="form-control" ng-model="filtro.tipo" /></th>
-                        <th><input type="text" class="form-control" ng-model="filtro.precioOferta" /></th>
-                        <th><input type="text" class="form-control" ng-model="filtro.formaPago" /></th>
-                        <th><input type="text" class="form-control" ng-model="filtro.validezOferta" /></th>
-                        <th><input type="text" class="form-control" ng-model="filtro.descuento" /></th>
-                        <th><input type="text" class="form-control" ng-model="filtro.proximaActividad" /></th>
-                        <th><input type="text" class="form-control" ng-model="filtro.estado" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.codigoOferta" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.ticket" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.cliente" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.tema" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.fechaEstimacion" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.fechaGeneracion" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.fechaRevision" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.fechaAprobacionGerencia" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.fechaEnvioOferta" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.fechaVencimiento" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.tipo" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.precioOferta" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.formaPago" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.validezOferta" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.descuento" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.proximaActividad" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
+                        <th><input type="text" class="form-control" ng-model="filtro.estado" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="oferta in ofertasLista" style="cursor:pointer;">
-                        <td>{{oferta.codigo}}</td>
-                        <td>{{oferta.ticket}}</td>
-                        <td>{{oferta.cliente}}</td>
-                        <td>{{oferta.tema}}</td>
-                        <td>{{oferta.fechaEstimacion | date:'dd/MM/yyyy'}}</td>
-                        <td>{{oferta.fechaGeneracion | date:'dd/MM/yyyy'}}</td>
-                        <td>{{oferta.fechaRevision | date:'dd/MM/yyyy'}}</td>
-                        <td>{{oferta.fechaAprobacionGerencia | date:'dd/MM/yyyy'}}</td>
-                        <td>{{oferta.fechaEnvioOferta | date:'dd/MM/yyyy'}}</td>
-                        <td>{{oferta.fechaVencimiento | date:'dd/MM/yyyy'}}</td>
-                        <td>{{oferta.tipo}}</td>
-                        <td class="text-right">{{oferta.precio | currency}}</td>
-                        <td>{{oferta.formaPago}}</td>
-                        <td>{{oferta.validezOferta | date:'dd/MM/yyyy'}}</td>
-                        <td>{{oferta.descuento}}</td>
-                        <td>{{oferta.proximaActividad}}</td>
-                        <td>
+                    <tr ng-repeat="oferta in ofertasLista" style="font-size:13px;">
+                        <td style="padding:2px 4px;">{{oferta.codigo === 'NO APLICA' ? '' : oferta.codigo}}</td>
+                        <td style="padding:2px 4px;">{{oferta.ticket}}</td>
+                        <td style="padding:2px 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{oferta.cliente}}</td>
+                        <td style="padding:2px 4px; max-width:300px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="{{oferta.tema}}">{{oferta.tema.length > 80 ? (oferta.tema | limitTo:80) + '…' : oferta.tema}}</td>
+                        <td style="padding:2px 4px;">{{oferta.fechaEstimacion | date:'dd/MM/yyyy'}}</td>
+                        <td style="padding:2px 4px;">{{oferta.fechaGeneracion | date:'dd/MM/yyyy'}}</td>
+                        <td style="padding:2px 4px;">{{oferta.fechaRevision | date:'dd/MM/yyyy'}}</td>
+                        <td style="padding:2px 4px;">{{oferta.fechaAprobacionGerencia | date:'dd/MM/yyyy'}}</td>
+                        <td style="padding:2px 4px;">{{oferta.fechaEnvioOferta | date:'dd/MM/yyyy'}}</td>
+                        <td style="padding:2px 4px;">{{oferta.fechaVencimiento | date:'dd/MM/yyyy'}}</td>
+                        <td style="padding:2px 4px; max-width:90px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{oferta.tipo}}</td>
+                        <td style="padding:2px 4px; text-align:right; min-width:60px;">{{oferta.precioOferta | currency}}</td>
+                        <td style="padding:2px 4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{oferta.formaPago}}</td>
+                        <td style="padding:2px 4px;">{{oferta.validezOferta | date:'dd/MM/yyyy'}}</td>
+                        <td style="padding:2px 4px; text-align:center;">{{oferta.descuento}}</td>
+                        <td style="padding:2px 4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{oferta.proximaActividad}}</td>
+                        <td style="padding:2px 4px;">
                             <span class="badge" ng-class="{
                                 'bg-warning': oferta.estado === 'VENCIDA',
                                 'bg-success': oferta.estado && oferta.estado.includes('ACEPTADA'),
                                 'bg-danger': oferta.estado === 'RECHAZADA'
-                            }">{{oferta.estado}}</span>
+                            }" style="font-size:10px; padding:2px 6px;">{{oferta.estado}}</span>
                         </td>
-                        <td style="white-space: nowrap;">
-                            <button class="btn btn-warning" ng-click="editarOferta(oferta, $event)">Editar</button>
-                            <button class="btn btn-danger" ng-click="eliminarOferta(oferta, $event)">Eliminar</button>
+                        <td style="padding:2px 2px; white-space:nowrap;">
+                            <button class="btn btn-info btn-xs" ng-click="verDetalleOferta(oferta, $event)" style="padding:1px 6px;font-size:13px;">Detalle</button>
+                            <button class="btn btn-warning btn-xs" ng-click="editarOferta(oferta, $event)" style="padding:1px 6px;font-size:13px;">Editar</button>
+                            <button class="btn btn-danger btn-xs" ng-click="eliminarOferta(oferta, $event)" style="padding:1px 6px;font-size:13px;">Eliminar</button>
                         </td>
                     </tr>
                 </tbody>
-                <tfoot>
-                    <tr>
-                        <th colspan="11" class="text-center">
-                            <nav>
-                                <ul class="pagination">
-                                    <li ng-click="atrazarPagina()">
-                                        <a href="#" aria-label="Previous">
-                                            <span aria-hidden="true">&laquo;</span>
-                                        </a>
-                                    </li>
-                                    <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)"><a href="#">{{pagina}}</a></li>
-                                    <li ng-click="avanzarPagina()">
-                                        <a href="#" aria-label="Next">
-                                            <span aria-hidden="true">&raquo;</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </nav>
-                            <div class="form-inline" style="padding: 22px 0px 0px 0px">
-                                <label>Cantidad Por Página:</label>
-                                <select class="form-control" ng-model="cantidadMostrarPorPagina" ng-change="actualizarCantidadMostrar()">
-                                    <option value="10">10</option>
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
-                            </div>
-                        </th>
-                    </tr>
-                </tfoot>
+                <!-- Eliminar paginación y selector de cantidad del tfoot, se moverán abajo -->
             </table>
         </div>
     </div>
 
-    <div class="text-center">
-        <dir-pagination-controls
-            max-size="8"
-            direction-links="true"
-            boundary-links="true"
-            next-text="Siguiente"
-            previous-text="Anterior">
-        </dir-pagination-controls>
+
+    <!-- Nueva paginación y selector de cantidad por página debajo de la tabla, como en proyectos -->
+    <div class="row" style="margin-top: 8px; margin-bottom: 8px;">
+        <div class="col-xs-12 text-center" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <ul class="pagination pagination-sm" style="margin: 0; display: inline-block; vertical-align: middle;">
+                <li ng-click="atrazarPagina()">
+                    <a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+                </li>
+                <li ng-repeat="pagina in listaPaginas" ng-click="cambiarPagina(pagina)" ng-class="{'active-pag': pagina === paginaActual}">
+                    <a href="#">{{pagina}}</a>
+                </li>
+                <li ng-click="avanzarPagina()">
+                    <a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+                </li>
+            </ul>
+            <div class="form-inline" style="display: inline-block; vertical-align: middle; margin: 0;">
+                <label style="font-size:13px; text-transform:uppercase; margin-bottom:0; margin-right: 4px;">Cantidad por pagina:</label>
+                <select class="form-control input-sm" style="width: auto; display: inline-block; height: 28px; font-size: 13px; padding: 2px 8px;" ng-model="cantidadMostrarPorPagina" ng-change="actualizarCantidadMostrar()">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+        </div>
     </div>
 
     <!-- Modal para CRUD de Ofertas -->
@@ -151,114 +140,107 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                         <h4 class="modal-title" id="ofertaModalLabel">
-                            {{ editingOffer.id ? 'Editar Oferta' : 'Crear Oferta' }}
+                            {{ (editingOffer && (editingOffer.id || editingOffer.ID || editingOffer.Id)) ? 'EDITAR OFERTA' : 'CREAR OFERTA' }}
                         </h4>
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                        <div class="form-group col-sm-12" ng-if="!editingOffer._esTicketPendiente">
-                            <label for="OfertaRequerimiento">REQUERIMIENTO</label>
-                            <select id="OfertaRequerimiento" name="OfertaRequerimiento" class="form-control" ng-model="editingOffer.OfertaRequerimiento" ng-change="onRequerimientoChange()" required>
-                                <option value="">Seleccione un requerimiento...</option>
-                                <option ng-repeat="req in requerimientos" value="{{req.Secuencial}}">
-                                    {{req.ClienteNombre}} | Ticket: {{req.TicketNumero || 'N/A'}} | {{req.Detalle | limitTo:40}}
-                                </option>
-                            </select>
-                            <div class="help-block" ng-show="offerForm.OfertaRequerimiento.$touched && offerForm.OfertaRequerimiento.$error.required">Este campo es obligatorio.</div>
-                        </div>
-                        <div class="form-group col-sm-12" ng-if="editingOffer._esTicketPendiente">
-                            <label for="OfertaPedidoRequerimiento">PEDIDO/REQUERIMIENTO</label>
-                            <select id="OfertaPedidoRequerimiento" name="OfertaPedidoRequerimiento" class="form-control" ng-model="editingOffer.OfertaPedidoRequerimiento" required>
-                                <option value="">Seleccione un pedido/requerimiento...</option>
-                                <option ng-repeat="pedido in pedidosRequerimientos" value="{{pedido.id}}">
-                                    {{pedido.descripcion}}
-                                </option>
-                            </select>
-                            <div class="help-block" ng-show="offerForm.OfertaPedidoRequerimiento.$touched && offerForm.OfertaPedidoRequerimiento.$error.required">Este campo es obligatorio.</div>
-                        </div>
-                        </div>
-                        <div class="row">
-                            <div class="form-group col-sm-4" ng-class="{'has-error': offerForm.codigoOferta.$touched && offerForm.codigoOferta.$invalid}">
-                                <label for="codigoOferta">CODIGO OFERTA</label>
-                                <input id="codigoOferta" name="codigoOferta" type="text" class="form-control" ng-model="editingOffer.codigo" readonly required />
-                                <div class="help-block" ng-show="offerForm.codigoOferta.$touched && offerForm.codigoOferta.$error.required">Este campo es obligatorio.</div>
-                            </div>
-                            <div class="form-group col-sm-4">
-                                <label for="fechaGeneracion">F.Generación</label>
-                                <input id="fechaGeneracion" name="fechaGeneracion" type="date" class="form-control" ng-model="editingOffer.fechaGeneracion" required />
-                            </div>
-                            <div class="form-group col-sm-4">
-                                <label for="fechaVencimiento">F.Vencimiento</label>
-                                <input id="fechaVencimiento" name="fechaVencimiento" type="date" class="form-control" ng-model="editingOffer.fechaVencimiento" required />
-                            </div>
-                        </div>
-                        <div class="row">
-                            <!-- Eliminar campo TICKET del formulario, solo mostrar en el listado -->
-                            <!-- Fechas dependientes del ticket -->
-                        <div>
-                            <div class="form-group col-sm-4" ng-if="editingOffer.fechaEstimacion">
-                                <label for="fechaEstimacion">F.Rec Estimación</label>
-                                <p class="form-control-static">{{editingOffer.fechaEstimacion | date:'dd/MM/yyyy'}}</p>
-                            </div>
-                            <div class="form-group col-sm-4" ng-if="editingOffer.fechaRevision">
-                                <label for="fechaRevision">F.Env Revisión</label>
-                                <p class="form-control-static">{{editingOffer.fechaRevision | date:'dd/MM/yyyy'}}</p>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="row">
-                                <div class="form-group col-sm-4" ng-if="editingOffer.fechaAprobacionGerencia">
-                                    <label for="fechaAprobacionGerencia">F.Apr Gerencia</label>
-                                    <p class="form-control-static">{{editingOffer.fechaAprobacionGerencia | date:'dd/MM/yyyy'}}</p>
+                            <div class="col-md-6">
+                                <div class="form-group" ng-if="!editingOffer._esTicketPendiente">
+                                    <label for="OfertaRequerimiento">REQUERIMIENTO</label>
+                                    <select id="OfertaRequerimiento" name="OfertaRequerimiento" class="form-control" ng-model="editingOffer.OfertaRequerimiento" ng-options="req.Secuencial as (req.ClienteNombre + ' | TICKET: ' + (req.TicketNumero || 'N/A') + ' | ' + (req.Detalle | limitTo:40)) for req in requerimientos" ng-change="onRequerimientoChange()" required>
+                                        <option value="">SELECCIONE UN REQUERIMIENTO...</option>
+                                    </select>
+                                    <div class="help-block" ng-show="offerForm.OfertaRequerimiento.$touched && offerForm.OfertaRequerimiento.$error.required">ESTE CAMPO ES OBLIGATORIO.</div>
                                 </div>
-                                <div class="form-group col-sm-4" ng-if="editingOffer.fechaEnvioOferta">
-                                    <label for="fechaEnvioOferta">F.Env Cliente</label>
-                                    <p class="form-control-static">{{editingOffer.fechaEnvioOferta | date:'dd/MM/yyyy'}}</p>
+                                <div class="form-group" ng-if="editingOffer._esTicketPendiente">
+                                    <label for="OfertaPedidoRequerimiento">PEDIDO/REQUERIMIENTO</label>
+                                    <select id="OfertaPedidoRequerimiento" name="OfertaPedidoRequerimiento" class="form-control" ng-model="editingOffer.OfertaPedidoRequerimiento" ng-options="pedido.id as pedido.descripcion for pedido in pedidosRequerimientos" required>
+                                        <option value="">SELECCIONE UN PEDIDO/REQUERIMIENTO...</option>
+                                    </select>
+                                    <div class="help-block" ng-show="offerForm.OfertaPedidoRequerimiento.$touched && offerForm.OfertaPedidoRequerimiento.$error.required">ESTE CAMPO ES OBLIGATORIO.</div>
                                 </div>
-                                <div class="form-group col-sm-4">
+                                <div class="form-group" ng-class="{'has-error': offerForm.codigoOferta.$touched && offerForm.codigoOferta.$invalid}">
+                                    <label for="codigoOferta">CODIGO OFERTA</label>
+                                    <div class="input-group">
+                                        <input id="codigoOferta" name="codigoOferta" type="text" class="form-control" ng-model="editingOffer.codigo" readonly required ng-value="editingOffer.codigo === 'NO APLICA' ? '' : editingOffer.codigo" />
+                                        <span class="input-group-addon" style="background: #f9f9f9;">
+                                            <input type="checkbox" ng-model="editingOffer.esOfertaMayor" ng-change="onOfertaMayorChange()" style="margin-right:4px;" /> ES OFERTA MAYOR
+                                        </span>
+                                    </div>
+                                    <div class="help-block" ng-show="offerForm.codigoOferta.$touched && offerForm.codigoOferta.$error.required">Este campo es obligatorio.</div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="fechaGeneracion">F. GENERACION</label>
+                                    <input id="fechaGeneracion" name="fechaGeneracion" type="date" class="form-control" ng-model="editingOffer.fechaGeneracion" required />
+                                </div>
+                                <div class="form-group">
+                                    <label for="fechaVencimiento">F. VENCIMIENTO</label>
+                                    <input id="fechaVencimiento" name="fechaVencimiento" type="date" class="form-control" ng-model="editingOffer.fechaVencimiento" required />
+                                </div>
+                                <div class="form-group">
                                     <label for="precioOferta">PRECIO OFERTA</label>
-                                    <input id="precioOferta" name="precioOferta" type="text" class="form-control" ng-model="editingOffer.precioOferta" required pattern="^\d+(\.|,)?\d*$" title="Ingrese un número válido" />
+                                    <input id="precioOferta" name="precioOferta" type="text" class="form-control" ng-model="editingOffer.precioOferta" required pattern="^\d+(\.|,)?\d*$" title="INGRESE UN NUMERO VALIDO" />
                                 </div>
-                                <div class="form-group col-sm-4">
+                                <div class="form-group">
                                     <label for="formaPago">FORMA DE PAGO</label>
                                     <select id="formaPago" name="formaPago" class="form-control" ng-model="editingOffer.formaPago" required>
-                                        <option value="">Seleccione...</option>
+                                        <option value="">SELECCIONE...</option>
                                         <option value="70/30">70/30</option>
-                                        <option value="Mensual">Mensual</option>
-                                        <option value="100 % a la entrega">100 % a la entrega</option>
+                                        <option value="MENSUAL">MENSUAL</option>
+                                        <option value="100 % A LA ENTREGA">100 % A LA ENTREGA</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="form-group col-sm-4">
+                            <div class="col-md-6">
+                                <div class="row">
+                                <div class="form-group col-sm-6" ng-if="editingOffer.fechaEstimacion">
+                                    <label for="fechaEstimacion">F. REC ESTIMACION</label>
+                                    <p class="form-control-static">{{editingOffer.fechaEstimacion | date:'dd/MM/yyyy'}}</p>
+                                </div>
+                                <div class="form-group col-sm-6" ng-if="editingOffer.fechaRevision">
+                                    <label for="fechaRevision">F. ENV REVISION</label>
+                                    <p class="form-control-static">{{editingOffer.fechaRevision | date:'dd/MM/yyyy'}}</p>
+                                </div>
+                                </div>
+                                <div class="row">
+                                <div class="form-group col-sm-6" ng-if="editingOffer.fechaAprobacionGerencia">
+                                    <label for="fechaAprobacionGerencia">F. APR GERENCIA</label>
+                                    <p class="form-control-static">{{editingOffer.fechaAprobacionGerencia | date:'dd/MM/yyyy'}}</p>
+                                </div>
+                                <div class="form-group col-sm-6" ng-if="editingOffer.fechaEnvioOferta">
+                                    <label for="fechaEnvioOferta">F. ENV CLIENTE</label>
+                                    <p class="form-control-static">{{editingOffer.fechaEnvioOferta | date:'dd/MM/yyyy'}}</p>
+                                </div>
+                                </div>
+                                <div class="form-group">
                                     <label for="descuento">DESCUENTO</label>
                                     <select id="descuento" name="descuento" class="form-control" ng-model="editingOffer.descuento">
                                         <option value="NO">NO</option>
                                         <option value="SI">SI</option>
                                     </select>
                                 </div>
-                                <div class="form-group col-sm-4">
+                                <div class="form-group">
                                     <label for="estado">ESTADO</label>
                                     <select id="estado" name="estado" class="form-control" ng-model="editingOffer.estado" required>
-                                        <option value="">Seleccione...</option>
+                                        <option value="">SELECCIONE...</option>
                                         <option value="VENCIDA">VENCIDA</option>
                                         <option value="ACEPTADA / CONTRATO">ACEPTADA / CONTRATO</option>
                                         <option value="ACEPTADA / TICKET">ACEPTADA / TICKET</option>
                                         <option value="RECHAZADA">RECHAZADA</option>
                                     </select>
                                 </div>
-                                <div class="form-group col-sm-4">
+                                <div class="form-group">
                                     <label for="tipo">TIPO</label>
                                     <input id="tipo" name="tipo" type="text" class="form-control" ng-model="editingOffer.tipo" />
                                 </div>
-                            </div>
-                            <div class="form-group" ng-class="{'has-error': offerForm.tema.$touched && offerForm.tema.$invalid}">
-                                <label for="tema">TEMA</label>
-                                <textarea id="tema" name="tema" class="form-control" ng-model="editingOffer.tema" rows="3" required></textarea>
-                                <div class="help-block" ng-show="offerForm.tema.$touched && offerForm.tema.$error.required">Este campo es obligatorio.</div>
+                                <div class="form-group" ng-class="{'has-error': offerForm.tema.$touched && offerForm.tema.$invalid}">
+                                    <label for="tema">TEMA</label>
+                                    <textarea id="tema" name="tema" class="form-control" ng-model="editingOffer.tema" rows="3" required></textarea>
+                                    <div class="help-block" ng-show="offerForm.tema.$touched && offerForm.tema.$error.required">ESTE CAMPO ES OBLIGATORIO.</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary" ng-disabled="offerForm.$invalid" ng-click="submitOferta()">
                             {{ editingOffer._esNuevo ? 'Crear' : 'Actualizar' }}
@@ -271,17 +253,56 @@
     </div>
 </div>
 
+<div class="modal fade" id="modal-detalle-oferta" tabindex="-1" role="dialog" aria-labelledby="detalleOfertaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="detalleOfertaLabel">DETALLE DE LA OFERTA</h4>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered table-striped">
+                    <tbody>
+                        <tr><th>CODIGO</th><td>{{detalleOferta.codigo || detalleOferta.Codigo}}</td></tr>
+                        <tr><th>CLIENTE</th><td>{{detalleOferta.cliente || detalleOferta.Cliente}}</td></tr>
+                        <tr><th>REQUERIMIENTO</th><td>{{detalleOferta.requerimiento || detalleOferta.Requerimiento}}</td></tr>
+                        <tr><th>DETALLE REQUERIMIENTO</th><td>{{detalleOferta.detalleRequerimiento || detalleOferta.DetalleRequerimiento || detalleOferta.tema || detalleOferta.Tema}}</td></tr>
+                        <tr><th>TICKET</th><td>{{detalleOferta.ticket || detalleOferta.Ticket}}</td></tr>
+                        <tr><th>TEMA</th><td>{{detalleOferta.tema || detalleOferta.Tema}}</td></tr>
+                        <tr><th>TIPO</th><td>{{detalleOferta.tipo || detalleOferta.Tipo}}</td></tr>
+                        <tr><th>PRECIO</th><td>{{detalleOferta.precio || detalleOferta.Precio | currency}}</td></tr>
+                        <tr><th>FORMA DE PAGO</th><td>{{detalleOferta.formaPago || detalleOferta.FormaPago}}</td></tr>
+                        <tr><th>DESCUENTO</th><td>{{detalleOferta.descuento || detalleOferta.Descuento}}</td></tr>
+                        <tr><th>ESTADO</th><td>{{detalleOferta.estado || detalleOferta.Estado}}</td></tr>
+                        <tr><th>F. GENERACION</th><td>{{detalleOferta.fechaGeneracion | date:'dd/MM/yyyy'}}</td></tr>
+                        <tr><th>F. VENCIMIENTO</th><td>{{detalleOferta.fechaVencimiento | date:'dd/MM/yyyy'}}</td></tr>
+                        <tr><th>F. REC ESTIMACION</th><td>{{detalleOferta.fechaEstimacion | date:'dd/MM/yyyy'}}</td></tr>
+                        <tr><th>F. ENV REVISION</th><td>{{detalleOferta.fechaRevision | date:'dd/MM/yyyy'}}</td></tr>
+                        <tr><th>F. APR GERENCIA</th><td>{{detalleOferta.fechaAprobacionGerencia | date:'dd/MM/yyyy'}}</td></tr>
+                        <tr><th>F. ENV CLIENTE</th><td>{{detalleOferta.fechaEnvioOferta | date:'dd/MM/yyyy'}}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
 .table-container {
     margin-bottom: 20px;
 }
 .table-sm {
-    font-size: 0.9em;
+    font-size: 1em;
 }
 .badge {
     padding: 5px 10px;
     border-radius: 3px;
-    font-size: 0.9em;
+    font-size: 0.95em;
 }
 .bg-warning {
     background-color: #f0ad4e;
@@ -297,14 +318,14 @@
 }
 .table > thead > tr > th input.form-control {
     padding: 2px 8px;
-    height: 24px;
-    font-size: 0.9em;
+    height: 28px;
+    font-size: 1em;
 }
 .table > tbody > tr > td {
     vertical-align: middle;
 }
 .form-control {
-    height: 30px;
+    height: 32px;
     padding: 5px 10px;
 }
 .clearfix::after {
@@ -335,4 +356,22 @@ hr {
 .table > tbody > tr > td .btn {
     margin: 0 2px;
 }
+.pagination > li > a, .pagination > li > span {
+    color: #007bff;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    min-width: 32px;
+    text-align: center;
+    font-weight: bold;
+}
+.pagination > .active-pag > a, .pagination > .active-pag > span {
+    background: #007bff !important;
+    color: #fff !important;
+    border-color: #007bff !important;
+}
+.pagination > li > a:focus, .pagination > li > a:hover {
+    background: #e9ecef;
+}
+.d-inline-block { display: inline-block; }
+/* Responsive styles eliminadas para compatibilidad con Razor */
 </style>

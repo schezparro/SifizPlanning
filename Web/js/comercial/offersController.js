@@ -1,5 +1,7 @@
 /* Offers Excel Controller */
 comercialApp.controller('offersController', ['$scope', '$http', '$timeout', function ($scope, $http, $timeout) {
+    // Control de pagina actual para paginacion visual
+    $scope.paginaActual = 1;
     var numerosPorPagina = 10;
     var pagina = 1;
     $scope.cantidadMostrarPorPagina = 10;
@@ -19,16 +21,83 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
         estado: ''
     };
 
-    // --- Cargar requerimientos reales para el select de ofertas ---
+   $scope.detalleOferta = {};
+    $scope.verDetalleOferta = function (oferta, $event) {
+        if ($event) $event.stopPropagation();
+
+        const id =
+            oferta.secuencial ||
+            oferta.Secuencial ||
+            oferta.id ||
+            oferta.Id ||
+            oferta.ID ||
+            oferta.ticket;
+
+        if (!id) {
+            alert('No se pudo determinar el identificador de la oferta o ticket.');
+            return;
+        }
+
+        $http.post('comercial/detalle-oferta', { id: id }).then(
+            function (response) {
+                const data = response.data;
+
+                if (data && typeof data === 'object' && data.success) {
+                    $scope.detalleOferta = data.detalle;
+
+                    // Mostrar modal de forma limpia
+                    angular.element('#modal-detalle-oferta').modal('show');
+                } else if (data && typeof data === 'object' && data.msg) {
+                    alert(data.msg);
+                } else {
+                    alert('No se pudo obtener el detalle de la oferta o ticket.');
+                }
+            },
+            function () {
+                alert('No se pudo obtener el detalle de la oferta o ticket.');
+            }
+        );
+    };
+
+    // --- Cargar requerimientos para el select de ofertas (relación o catálogo según caso) ---
     $scope.requerimientos = [];
-    $scope.cargarRequerimientos = function() {
-        $http.post("comercial/requerimientos_ofertas", {}).success(function(data) {
+    $scope.pedidosRequerimientos = [];
+    // Carga requerimientos relación (para ofertas existentes)
+    $scope.cargarRequerimientosOfertas = function(cb, selectedId) {
+        $http.post("comercial/requerimientos-ofertas", {}).success(function(data) {
             if (data.success === true) {
-                $scope.requerimientos = data.requerimientosComercial;
+                $scope.requerimientos = data.requerimientos.map(function(r) {
+                    // Aseguramos que Secuencial sea string para evitar problemas de binding
+                    return {
+                        Secuencial: r.id != null ? r.id.toString() : '',
+                        ClienteNombre: r.cliente,
+                        TicketNumero: r.ticket,
+                        Detalle: r.detalle,
+                        descripcion: r.descripcion
+                    };
+                });
+                if (cb) cb(selectedId);
+            } else {
+                $scope.requerimientos = [];
             }
         });
     };
-    $scope.cargarRequerimientos();
+    // Carga requerimientos puros (para tickets pendientes)
+    $scope.cargarCatalogoRequerimientos = function(cb) {
+        $http.post("comercial/catalogo-requerimientos", {}).success(function(data) {
+            if (data.success === true) {
+                $scope.pedidosRequerimientos = data.requerimientos.map(function(r) {
+                    return {
+                        id: r.id != null ? r.id.toString() : '',
+                        descripcion: r.descripcion
+                    };
+                });
+                if (cb) cb();
+            } else {
+                $scope.pedidosRequerimientos = [];
+            }
+        });
+    };
 
     // Al seleccionar un requerimiento, poblar fechas desde el ticket asociado al requerimiento
     $scope.onRequerimientoChange = function() {
@@ -79,6 +148,10 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
             filtrosColumna: JSON.stringify($scope.filtro)
         }).success(function (data) {
             if (data.success === true) {
+                // Si la pagina actual es mayor al total de paginas, volver a la primera
+                if ($scope.paginaActual > Math.ceil(data.total / $scope.cantidadMostrarPorPagina)) {
+                    $scope.paginaActual = 1;
+                }
                 $scope.ofertasLista = data.ofertasComercial.map(function(oferta) {
                     function convertirFecha(fechaStr) {
                         if (fechaStr && typeof fechaStr === 'string' && fechaStr.indexOf('/Date(') === 0) {
@@ -104,7 +177,6 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
                 $scope.totalOfertas = data.total;
                 $scope.cantPaginas = Math.ceil(data.total / $scope.cantidadMostrarPorPagina) || 1;
                 $scope.listaPaginas = Array.from({length: $scope.cantPaginas}, (_, i) => i + 1);
-                pagina = 1;
             } else {
                 messageDialog.show('Información', data.msg);
             }
@@ -136,17 +208,20 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
     // Funciones de paginación
     $scope.cambiarPagina = function(pag) {
         pagina = pag;
+        $scope.paginaActual = pag;
         $scope.cargarOfertas((pagina - 1) * $scope.cantidadMostrarPorPagina, $scope.cantidadMostrarPorPagina);
     };
     $scope.atrazarPagina = function() {
         if (pagina > 1) {
             pagina--;
+            $scope.paginaActual = pagina;
             $scope.cargarOfertas((pagina - 1) * $scope.cantidadMostrarPorPagina, $scope.cantidadMostrarPorPagina);
         }
     };
     $scope.avanzarPagina = function() {
         if (pagina < $scope.cantPaginas) {
             pagina++;
+            $scope.paginaActual = pagina;
             $scope.cargarOfertas((pagina - 1) * $scope.cantidadMostrarPorPagina, $scope.cantidadMostrarPorPagina);
         }
     };
@@ -175,10 +250,14 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
                     estado: '',
                     tipo: '',
                     tema: '',
+                    esOfertaMayor: true,
                     _esNuevo: true,
-                    _esTicketPendiente: false // Por defecto no es ticket pendiente
+                    _esTicketPendiente: false
                 };
-                angular.element('#modal-excel-offer').modal('show');
+                $scope.cargarRequerimientosOfertas(function() {
+                    $scope.onOfertaMayorChange();
+                    angular.element('#modal-excel-offer').modal('show');
+                });
             }
         });
     };
@@ -190,6 +269,7 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
                 $scope.editingOffer = {
                     codigo: data.nuevoCodigo,
                     OfertaRequerimiento: '',
+                    OfertaPedidoRequerimiento: '',
                     fechaGeneracion: '',
                     fechaVencimiento: '',
                     fechaEstimacion: '',
@@ -206,9 +286,9 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
                     _esTicketPendiente: true,
                     ticketPendienteNumero: ticket
                 };
-                // Cargar requerimientos para el select
-                $scope.cargarRequerimientos();
-                angular.element('#modal-excel-offer').modal('show');
+                $scope.cargarCatalogoRequerimientos(function() {
+                    angular.element('#modal-excel-offer').modal('show');
+                });
             }
         });
     };
@@ -223,9 +303,10 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
             messageDialog.show('Error', 'El campo PRECIO OFERTA debe ser un número válido.');
             return;
         }
+        var codigoFinal = $scope.editingOffer.esOfertaMayor ? $scope.editingOffer.codigo : 'NO APLICA';
         var datosOferta = {
             OfertaRequerimiento: $scope.editingOffer.OfertaPedidoRequerimiento || $scope.editingOffer.OfertaRequerimiento,
-            codigo: $scope.editingOffer.codigo,
+            codigo: codigoFinal,
             fechaEstimacion: $scope.editingOffer.fechaEstimacion,
             fechaRevision: $scope.editingOffer.fechaRevision,
             fechaEnvioOferta: $scope.editingOffer.fechaEnvioOferta,
@@ -255,31 +336,22 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
                 messageDialog.show('Error', 'Error al guardar la oferta');
             });
     };
+    // --- Al editar una oferta, seleccionar correctamente el requerimiento asociado ---
+    var originalEditarOferta = $scope.editarOferta;
     $scope.editarOferta = function(oferta) {
         $scope.editingOffer = angular.copy(oferta);
-        // Determinar si es ticket pendiente (sin código de oferta)
-        if (!$scope.editingOffer.codigo) {
-            $http.post("comercial/generar-codigo-oferta", {}).success(function (data) {
-                if (data.success === true) {
-                    $scope.editingOffer.codigo = data.nuevoCodigo;
-                    $scope.editingOffer._esNuevo = true;
-                    $scope.editingOffer._esTicketPendiente = true;
-                    // Cargar pedidos/requerimientos para el select
-                    $http.post("comercial/catalogo-requerimientos", {}).success(function (dataReq) {
-                        if (dataReq.success === true) {
-                            $scope.pedidosRequerimientos = dataReq.requerimientos;
-                        }
-                    });
-                    angular.element('#modal-excel-offer').modal('show');
-                }
-            });
-        } else {
-            $scope.editingOffer._esNuevo = false;
-            $scope.editingOffer._esTicketPendiente = false;
-            // Cargar requerimientos para el select
-            $scope.cargarRequerimientos();
+        $scope.editingOffer.esOfertaMayor = ($scope.editingOffer.codigo && $scope.editingOffer.codigo !== 'NO APLICA');
+        $scope.editingOffer._esNuevo = false;
+        $scope.editingOffer._esTicketPendiente = false;
+        // Cargar requerimientos y seleccionar el correcto solo cuando estén realmente cargados
+        $scope.cargarRequerimientosOfertas(function(selectedId) {
+            var idReq = $scope.editingOffer.secuencialRequerimiento || $scope.editingOffer.OfertaRequerimiento;
+            if (idReq) {
+                $scope.editingOffer.OfertaRequerimiento = idReq.toString();
+            }
+            $scope.onOfertaMayorChange();
             angular.element('#modal-excel-offer').modal('show');
-        }
+        });
     };
 
     // Guardar nueva oferta usando la ruta moderna
@@ -368,70 +440,118 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
     // Exportar Excel/PDF/Imprimir usando datos reales
     $scope.exportarExcel = function() {
         const rows = $scope.ofertasLista.map(oferta => ({
-            'CÓDIGO OFERTA': oferta.codigo,
-            'TICKET': oferta.ticket,
+            'CODIGO OFERTA': oferta.codigo,
+            'NUMERO TICKET': oferta.ticket,
             'CLIENTE': oferta.cliente,
             'TEMA': oferta.tema,
-            'F.Rec Estimación': oferta.fechaEstimacion,
-            'F.Gen Oferta': oferta.fechaGeneracion,
-            'F.Env Revisión': oferta.fechaRevision,
-            'F.Apr Gerencia': oferta.fechaAprobacionGerencia,
-            'F.Env Cliente': oferta.fechaEnvioOferta,
-            'F.Vencimiento': oferta.fechaVencimiento,
+            'F.REC ESTIMACION': oferta.fechaEstimacion ? moment(oferta.fechaEstimacion).format('DD/MM/YYYY') : '',
+            'F.GEN OFERTA': oferta.fechaGeneracion ? moment(oferta.fechaGeneracion).format('DD/MM/YYYY') : '',
+            'F.ENV REVISION': oferta.fechaRevision ? moment(oferta.fechaRevision).format('DD/MM/YYYY') : '',
+            'F.APR GERENCIA': oferta.fechaAprobacionGerencia ? moment(oferta.fechaAprobacionGerencia).format('DD/MM/YYYY') : '',
+            'F.ENV CLIENTE': oferta.fechaEnvioOferta ? moment(oferta.fechaEnvioOferta).format('DD/MM/YYYY') : '',
+            'FECHA VENCIMIENTO': oferta.fechaVencimiento ? moment(oferta.fechaVencimiento).format('DD/MM/YYYY') : '',
             'TIPO': oferta.tipo,
-            'PRECIO OFERTA': oferta.precio,
-            'FORMA DE PAGO': oferta.formaPago,
-            'DESCUENTO': oferta.descuento ? 'SI' : 'NO',
+            'PRECIO': oferta.precioOferta != null ? oferta.precioOferta : oferta.precio,
+            'PAGO': oferta.formaPago,
+            'VALIDEZ': oferta.validezOferta ? moment(oferta.validezOferta).format('DD/MM/YYYY') : '',
+            'DESC': oferta.descuento,
+            'PROXIMA ACTIVIDAD': oferta.proximaActividad,
             'ESTADO': oferta.estado
         }));
         const worksheet = XLSX.utils.json_to_sheet(rows);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Ofertas");
         worksheet['!cols'] = [
-            { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 40 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 15 }, { wch: 10 }, { wch: 20 }
+            { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 40 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 10 }, { wch: 10 }, { wch: 20 }, { wch: 15 }
         ];
         XLSX.writeFile(workbook, 'Ofertas.xlsx');
     };
     $scope.exportarPDF = function() {
-        const htmlTabla = document.getElementById('tabla-ofertas-excel').outerHTML;
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlTabla;
-        const opt = {
-            margin: 0.5,
-            filename: 'Ofertas.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
-        };
-        html2pdf().set(opt).from(tempDiv).save();
+        // Usar el patrón robusto de proyectosController.js, pero mejorando el ajuste de columnas
+        const { jsPDF } = window.jspdf;
+        var doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a3' });
+
+        // Clonar la tabla y limpiar filtros y columna de acciones
+        var table = document.getElementById('tabla-ofertas-excel').cloneNode(true);
+        // Eliminar la fila de filtros (segunda fila del thead)
+        if (table.tHead && table.tHead.rows.length > 1) {
+            table.tHead.deleteRow(1);
+        }
+        // Eliminar la última columna (acciones) de thead y tbody
+        for (var r = 0; r < table.tHead.rows.length; r++) {
+            table.tHead.rows[r].deleteCell(table.tHead.rows[r].cells.length - 1);
+        }
+        for (var i = 0; i < table.tBodies[0].rows.length; i++) {
+            table.tBodies[0].rows[i].deleteCell(table.tBodies[0].rows[i].cells.length - 1);
+        }
+
+        // Añadir título
+        doc.setFontSize(14);
+        doc.text('Listado de Ofertas', 40, 30);
+
+        // Exportar tabla con autoTable, forzando ajuste horizontal
+        doc.autoTable({
+            html: table,
+            startY: 40,
+            styles: { fontSize: 7, cellPadding: 2, overflow: 'linebreak' },
+            headStyles: { fillColor: [0, 123, 255] },
+            margin: { left: 10, right: 10 },
+            tableWidth: 'stretch',
+            theme: 'grid'
+        });
+
+        doc.save('Ofertas.pdf');
     };
     $scope.imprimir = function() {
-        const htmlTabla = document.getElementById('tabla-ofertas-excel').outerHTML;
+        // Construir tabla solo con datos, sin HTML extra y asegurando todos los campos
+        const columnas = [
+            'CODIGO OFERTA', 'NUMERO TICKET', 'CLIENTE', 'TEMA', 'F.REC ESTIMACION', 'F.GEN OFERTA',
+            'F.ENV REVISION', 'F.APR GERENCIA', 'F.ENV CLIENTE', 'FECHA VENCIMIENTO', 'TIPO', 'PRECIO',
+            'PAGO', 'VALIDEZ', 'DESC', 'PROXIMA ACTIVIDAD', 'ESTADO'
+        ];
+        let tabla = '<table style="width:100%;border-collapse:collapse;">';
+        tabla += '<thead><tr>' + columnas.map(c => `<th style="border:1px solid #ddd;padding:4px;background:#f2f2f2;">${c}</th>`).join('') + '</tr></thead>';
+        tabla += '<tbody>';
+        $scope.ofertasLista.forEach(oferta => {
+            tabla += '<tr>' + [
+                oferta.codigo,
+                oferta.ticket,
+                oferta.cliente,
+                oferta.tema,
+                oferta.fechaEstimacion ? moment(oferta.fechaEstimacion).format('DD/MM/YYYY') : '',
+                oferta.fechaGeneracion ? moment(oferta.fechaGeneracion).format('DD/MM/YYYY') : '',
+                oferta.fechaRevision ? moment(oferta.fechaRevision).format('DD/MM/YYYY') : '',
+                oferta.fechaAprobacionGerencia ? moment(oferta.fechaAprobacionGerencia).format('DD/MM/YYYY') : '',
+                oferta.fechaEnvioOferta ? moment(oferta.fechaEnvioOferta).format('DD/MM/YYYY') : '',
+                oferta.fechaVencimiento ? moment(oferta.fechaVencimiento).format('DD/MM/YYYY') : '',
+                oferta.tipo,
+                oferta.precioOferta != null ? oferta.precioOferta : oferta.precio,
+                oferta.formaPago,
+                oferta.validezOferta ? moment(oferta.validezOferta).format('DD/MM/YYYY') : '',
+                oferta.descuento,
+                oferta.proximaActividad,
+                oferta.estado
+            ].map(d => `<td style="border:1px solid #ddd;padding:4px;">${d != null ? d : ''}</td>`).join('') + '</tr>';
+        });
+        tabla += '</tbody></table>';
+        // Imprimir tabla en ventana nueva, sin divs de scroll ni estilos de recorte
         const printWindow = window.open('', '_blank');
         printWindow.document.write(`
             <html>
                 <head>
                     <title>Ofertas</title>
                     <style>
-                        body { font-family: Arial, sans-serif; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        @page { size: A3 landscape; margin: 10mm; }
+                        body { font-family: Arial, sans-serif; margin: 0; }
+                        html, body { width: 100%; }
+                        table { width: 100% !important; border-collapse: collapse; margin-top: 20px; table-layout: fixed; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 10px; word-break: break-word; }
                         th { background-color: #f2f2f2; }
-                        .badge {
-                            padding: 3px 7px;
-                            border-radius: 10px;
-                            color: white;
-                            font-size: 12px;
-                        }
-                        .bg-success { background-color: #5cb85c; }
-                        .bg-warning { background-color: #f0ad4e; }
-                        .bg-danger { background-color: #d9534f; }
-                        .text-right { text-align: right; }
                     </style>
                 </head>
                 <body>
                     <h2 style="text-align: center;">Listado de Ofertas</h2>
-                    ${htmlTabla}
+                    ${tabla}
                 </body>
             </html>
         `);
@@ -448,5 +568,22 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
         autoclose: true,
         todayHighlight: true
     });
+
+    // --- Lógica para el checkbox "ES OFERTA MAYOR" ---
+    $scope.onOfertaMayorChange = function() {
+        if ($scope.editingOffer) {
+            if ($scope.editingOffer.esOfertaMayor) {
+                if (!$scope.editingOffer.codigo || $scope.editingOffer.codigo === 'NO APLICA') {
+                    $http.post("comercial/generar-codigo-oferta", {}).success(function (data) {
+                        if (data.success === true) {
+                            $scope.editingOffer.codigo = data.nuevoCodigo;
+                        }
+                    });
+                }
+            } else {
+                $scope.editingOffer.codigo = 'NO APLICA';
+            }
+        }
+    };
 
 }]);

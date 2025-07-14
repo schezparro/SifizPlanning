@@ -2424,7 +2424,7 @@ namespace SifizPlanning
 
             routes.MapRoute(
                 name: "DarRequerimientosOfertas",
-                url: "comercial/requerimientos_ofertas/{id}",
+                url: "comercial/requerimientos-ofertas/{id}",
                 defaults: new { controller = "Comercial", action = "DarRequerimientosOfertas", id = UrlParameter.Optional }
             );
 
@@ -2432,6 +2432,13 @@ namespace SifizPlanning
                 name: "RequerimientosComercial",
                 url: "comercial/requerimientos-comercial/{id}",
                 defaults: new { controller = "Comercial", action = "RequerimientosComercial", id = UrlParameter.Optional }
+            );
+
+            // Ruta para detalle de oferta
+            routes.MapRoute(
+                name: "DetalleOferta",
+                url: "comercial/detalle-oferta/{id}",
+                defaults: new { controller = "Comercial", action = "DetalleOferta", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(
