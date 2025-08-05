@@ -102,9 +102,16 @@
     $scope.enviarSolicitudVacaciones = function () {
         waitingDialog.show('Solicitando vacaciones...', { dialogSize: 'sm', progressType: 'success' });
 
+        // Normalizar fechas para evitar problemas de zona horaria
+        var solicitudNormalizada = angular.copy($scope.solVacaciones);
+        solicitudNormalizada.fechaIngresoSolicitud = normalizarFecha(solicitudNormalizada.fechaIngresoSolicitud);
+        solicitudNormalizada.fechaInicioVacaciones = normalizarFecha(solicitudNormalizada.fechaInicioVacaciones);
+        solicitudNormalizada.fechaFinVacaciones = normalizarFecha(solicitudNormalizada.fechaFinVacaciones);
+        solicitudNormalizada.fechaPresentarseTrabajar = normalizarFecha(solicitudNormalizada.fechaPresentarseTrabajar);
+
         var solicitudVacaciones = $http.post("user/solicitar-vacaciones",
             {
-                solicitud: $scope.solVacaciones
+                solicitud: solicitudNormalizada
             });
         solicitudVacaciones.success(function (data) {
             waitingDialog.hide();
@@ -123,9 +130,16 @@
         event.preventDefault();
         waitingDialog.show('Solicitando vacaciones...', { dialogSize: 'sm', progressType: 'success' });
 
+        // Normalizar fechas para evitar problemas de zona horaria
+        var solicitudNormalizada = angular.copy($scope.solVacaciones);
+        solicitudNormalizada.fechaIngresoSolicitud = normalizarFecha(solicitudNormalizada.fechaIngresoSolicitud);
+        solicitudNormalizada.fechaInicioVacaciones = normalizarFecha(solicitudNormalizada.fechaInicioVacaciones);
+        solicitudNormalizada.fechaFinVacaciones = normalizarFecha(solicitudNormalizada.fechaFinVacaciones);
+        solicitudNormalizada.fechaPresentarseTrabajar = normalizarFecha(solicitudNormalizada.fechaPresentarseTrabajar);
+
         var solicitudVacaciones = $http.post("user/editar-solicitar-vacaciones",
             {
-                solicitud: $scope.solVacaciones
+                solicitud: solicitudNormalizada
             });
         solicitudVacaciones.success(function (data) {
             waitingDialog.hide();
@@ -233,9 +247,16 @@
 
     $scope.enviarSolicitudPermiso = function () {
         waitingDialog.show('Solicitando permisos...', { dialogSize: 'sm', progressType: 'success' });
+        
+        // Normalizar fechas para evitar problemas de zona horaria
+        var solicitudNormalizada = angular.copy($scope.solicitudPer);
+        solicitudNormalizada.fechaIngresoSolicitud = normalizarFecha(solicitudNormalizada.fechaIngresoSolicitud);
+        solicitudNormalizada.fechaDesde = normalizarFecha(solicitudNormalizada.fechaDesde);
+        solicitudNormalizada.fechaHasta = normalizarFecha(solicitudNormalizada.fechaHasta);
+        
         var solicitudPermisos = $http.post("user/solicitar-permisos",
             {
-                solicitud: $scope.solicitudPer
+                solicitud: solicitudNormalizada
             });
         solicitudPermisos.success(function (data) {
             waitingDialog.hide();
@@ -253,9 +274,16 @@
     $scope.editarSolPermisos = function (event) {
         event.preventDefault();
         waitingDialog.show('Solicitando permisos...', { dialogSize: 'sm', progressType: 'success' });
+        
+        // Normalizar fechas para evitar problemas de zona horaria
+        var solicitudNormalizada = angular.copy($scope.solicitudPer);
+        solicitudNormalizada.fechaIngresoSolicitud = normalizarFecha(solicitudNormalizada.fechaIngresoSolicitud);
+        solicitudNormalizada.fechaDesde = normalizarFecha(solicitudNormalizada.fechaDesde);
+        solicitudNormalizada.fechaHasta = normalizarFecha(solicitudNormalizada.fechaHasta);
+        
         var solicitudPermisos = $http.post("user/editar-solicitar-permisos",
             {
-                solicitud: $scope.solicitudPer
+                solicitud: solicitudNormalizada
             });
         solicitudPermisos.success(function (data) {
             waitingDialog.hide();
@@ -541,6 +569,30 @@ function dateToStr(dateObj, format, separator) {
     }
     return out.join(sep);
 };
+
+/**
+ * Normaliza una fecha para enviar al servidor evitando problemas de zona horaria
+ * @param {Date|string} fecha - La fecha a normalizar
+ * @returns {string} - Fecha en formato ISO sin zona horaria (YYYY-MM-DD)
+ */
+function normalizarFecha(fecha) {
+    if (!fecha) return null;
+    
+    var fechaObj;
+    if (typeof fecha === 'string') {
+        fechaObj = new Date(fecha);
+    } else {
+        fechaObj = fecha;
+    }
+    
+    // Crear una nueva fecha en UTC para evitar problemas de zona horaria
+    var year = fechaObj.getFullYear();
+    var month = ('0' + (fechaObj.getMonth() + 1)).slice(-2);
+    var day = ('0' + fechaObj.getDate()).slice(-2);
+    
+    // Retornar en formato ISO date (YYYY-MM-DD) sin hora para evitar conversiones de zona horaria
+    return year + '-' + month + '-' + day;
+}
 
 devApp.filter("strLimit", ['$filter', function ($filter) {
     return function (input, limit) {

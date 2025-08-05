@@ -22,6 +22,10 @@ namespace SifizPlanning
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
 
+            // TODO: Registrar ModelBinder personalizado para fechas (pendiente corrección de compatibilidad)
+            // ModelBinders.Binders.Add(typeof(DateTime), new SifizPlanning.Util.DateTimeModelBinder());
+            // ModelBinders.Binders.Add(typeof(DateTime?), new SifizPlanning.Util.DateTimeModelBinder());
+
             // Inicializar NLog
             LogManager.LoadConfiguration("NLog.config");
             LoggerManager.LogInfo("Aplicación iniciada");

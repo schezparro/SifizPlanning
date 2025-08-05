@@ -1146,5 +1146,40 @@ namespace SifizPlanning.Util
 
             return clon;
         }
+
+        /// <summary>
+        /// Normaliza una fecha para evitar problemas de zona horaria
+        /// Convierte cualquier fecha a la zona horaria del servidor (Ecuador)
+        /// </summary>
+        /// <param name="fecha">Fecha a normalizar</param>
+        /// <returns>Fecha normalizada en zona horaria del servidor</returns>
+        public static DateTime NormalizarFecha(DateTime fecha)
+        {
+            // Si la fecha tiene información de zona horaria, convertir a local
+            if (fecha.Kind == DateTimeKind.Utc)
+            {
+                return fecha.ToLocalTime().Date;
+            }
+            else if (fecha.Kind == DateTimeKind.Unspecified)
+            {
+                // Asumir que es una fecha local y tomar solo la parte de fecha
+                return fecha.Date;
+            }
+            else
+            {
+                // Ya es local, tomar solo la parte de fecha
+                return fecha.Date;
+            }
+        }
+
+        /// <summary>
+        /// Normaliza una fecha nullable para evitar problemas de zona horaria
+        /// </summary>
+        /// <param name="fecha">Fecha nullable a normalizar</param>
+        /// <returns>Fecha normalizada en zona horaria del servidor o null</returns>
+        public static DateTime? NormalizarFecha(DateTime? fecha)
+        {
+            return fecha.HasValue ? NormalizarFecha(fecha.Value) : (DateTime?)null;
+        }
     }
 }

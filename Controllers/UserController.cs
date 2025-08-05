@@ -2662,6 +2662,11 @@ r in db.Rol on ur.rol equals r
         {
             try
             {
+                // Log para debugging de fechas
+                LoggerManager.LogInfo($"Solicitud de vacaciones recibida - Usuario: {User.Identity.Name}, " +
+                    $"FechaInicio: {solicitud.FechaInicioVacaciones:yyyy-MM-dd HH:mm:ss} (Kind: {solicitud.FechaInicioVacaciones.Kind}), " +
+                    $"FechaFin: {solicitud.FechaFinVacaciones:yyyy-MM-dd HH:mm:ss} (Kind: {solicitud.FechaFinVacaciones.Kind})");
+
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser && x.EstaActivo == 1);
                 Persona persona = user.persona;
@@ -2671,9 +2676,10 @@ r in db.Rol on ur.rol equals r
                 if (solicitud.ID == null)
                 {
                     solVacaciones.AlAnio = solicitud.AlAnio;
-                    solVacaciones.FechaInicioVacaciones = solicitud.FechaInicioVacaciones;
-                    solVacaciones.FechaFinVacaciones = solicitud.FechaFinVacaciones;
-                    solVacaciones.FechaPresentarseTrabajar = solicitud.FechaPresentarseTrabajar;
+                    // Normalizar fechas antes de guardar
+                    solVacaciones.FechaInicioVacaciones = Utiles.NormalizarFecha(solicitud.FechaInicioVacaciones);
+                    solVacaciones.FechaFinVacaciones = Utiles.NormalizarFecha(solicitud.FechaFinVacaciones);
+                    solVacaciones.FechaPresentarseTrabajar = Utiles.NormalizarFecha(solicitud.FechaPresentarseTrabajar);
                     solVacaciones.Cargo = solicitud.Cargo;
                     solVacaciones.Empresa = solicitud.Empresa;
                     solVacaciones.Cedula = solicitud.Cedula;
@@ -2682,8 +2688,8 @@ r in db.Rol on ur.rol equals r
                     solVacaciones.DiasCorresponden = solicitud.DiasCorresponden;
                     solVacaciones.DiasDisfrutar = solicitud.DiasDisfrutar;
                     solVacaciones.DiasPendientes = solicitud.DiasPendientes;
-                    solVacaciones.FechaIngresoInstitucion = solicitud.FechaPresentarseTrabajar; //No usar -> solicitud.FechaIngresoInstitucion;
-                    solVacaciones.FechaIngresoSolicitud = solicitud.FechaIngresoSolicitud;
+                    solVacaciones.FechaIngresoInstitucion = Utiles.NormalizarFecha(solicitud.FechaPresentarseTrabajar); //No usar -> solicitud.FechaIngresoInstitucion;
+                    solVacaciones.FechaIngresoSolicitud = Utiles.NormalizarFecha(solicitud.FechaIngresoSolicitud);
                     solVacaciones.Observaciones = solicitud.Observaciones;
                     solVacaciones.DelAnio = solicitud.DelAnio;
                     solVacaciones.Jefe = solicitud.Jefe;
@@ -2812,6 +2818,12 @@ r in db.Rol on ur.rol equals r
         {
             try
             {
+                // Log para debugging de fechas
+                LoggerManager.LogInfo($"Edición solicitud de vacaciones - Usuario: {User.Identity.Name}, " +
+                    $"ID: {solicitud.ID}, " +
+                    $"FechaInicio: {solicitud.FechaInicioVacaciones:yyyy-MM-dd HH:mm:ss} (Kind: {solicitud.FechaInicioVacaciones.Kind}), " +
+                    $"FechaFin: {solicitud.FechaFinVacaciones:yyyy-MM-dd HH:mm:ss} (Kind: {solicitud.FechaFinVacaciones.Kind})");
+
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser && x.EstaActivo == 1);
                 Persona persona = user.persona;

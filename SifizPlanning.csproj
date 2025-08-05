@@ -1045,6 +1045,7 @@
     <Compile Include="Util\EventoTicket.cs" />
     <Compile Include="Util\LoggerManager.cs" />
     <Compile Include="Util\ReportServerCredentials.cs" />
+    <!-- <Compile Include="Util\DateTimeModelBinder.cs" /> -->
     <Compile Include="Websocket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\Checksum.cs" />
