@@ -42,6 +42,7 @@
                 @* <li role="presentation"><a href="#" ng-click="IrOfertasComercial()">Ofertas</a></li> *@
                 <li role="presentation"><a href="#" ng-click="IrOfertasExcel()">Ofertas</a></li>
                 <li role="presentation"><a href="#" ng-click="IrFormalizacionOfertasComercial()">Formalización</a></li>
+                <li role="presentation"><a href="#" ng-click="IrListadoVersiones()">Listado Versiones de Fuentes</a></li>
 
                 <a href="cerrar/sesion/" class="right btn btn-danger"><span class="glyphicon glyphicon-off"></span>Cerrar Sesión</a>
                 <a href="main-menu" style="margin-right: 4px;" class="right btn btn-warning"><span class="glyphicon glyphicon-menu-hamburger"></span> Menú Principal</a>
@@ -56,14 +57,14 @@
                 <div id="panel-requerimientos" ng-controller="comercialController">
                     @{Html.RenderPartial("windowRequerimientoComercial");}
                 </div>
-                @* <div id="panel-ofertas" ng-controller="ofertasController">
-                    @{Html.RenderPartial("windowOfertasComercial");}
-                </div>  *@
                 <div id="panel-formalizacion-ofertas" ng-controller="formalizacionController">
                     @{Html.RenderPartial("windowFormalizacionOfertasComercial");}
                 </div>
                 <div id="panel-ofertas-excel" class="invisible" ng-controller="offersController">
                     @{Html.RenderPartial("windowOffersExcel");}
+                </div>
+                <div id="panel-listado-versiones" class="invisible" ng-controller="listadoVersionesController">
+                       @{Html.RenderPartial("listadoVersiones");}
                 </div>
             </div>
 
@@ -125,13 +126,12 @@
     <script type="text/javascript" src="~/Web/js/jasny-bootstrap.min.js"></script>
     <script type="text/javascript" src="~/Web/js/highcharts.js"></script>
     <script type="text/javascript" src="~/Web/js/jquery.hotkeys.js"></script>
-    <script type="text/javascript" src="~/Web/js/bootstrap-wysiwyg.js"></script>
-    <script type="text/javascript" src="~/Web/js/chat.js"></script>
-    <script type="text/javascript" src="~/Web/js/waiting.js"></script>    <script type="text/javascript" src="~/Web/js/comercial/comercial.js"></script>
-    <script type="text/javascript" src="~/Web/js/comercial/ofertasController.js"></script>
+    <script type="text/javascript" src="~/Web/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/Web/js/comercial/comercial.js"></script>
     <script type="text/javascript" src="~/Web/js/comercial/formalizacionController.js"></script>
     <script type="text/javascript" src="~/Web/js/comercial/offersController.js"></script>
-
-
+    <script type="text/javascript" src="~/Web/js/comercial/listadoVersiones.js"></script>
+    <script type="text/javascript" src="~/Web/js/chat.js"></script>
+    <script type="text/javascript" src="~/Web/js/waiting.js"></script>    
 </body>
 </html>

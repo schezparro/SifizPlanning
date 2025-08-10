@@ -53,6 +53,7 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
         angular.element("#panel-ofertas").addClass('invisible');
         angular.element("#panel-formalizacion-ofertas").addClass('invisible');
         angular.element("#panel-ofertas-excel").addClass('invisible');
+        angular.element("#panel-listado-versiones").addClass('invisible');
     };
 
     $scope.funcionalidad = 'REQUERIMIENTOS';
@@ -83,6 +84,15 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
         // Load mock data for clients and developers
         $scope.clients = ['Cliente A', 'Cliente B', 'Cliente C'];
         $scope.developers = ['Dev 1', 'Dev 2', 'Dev 3'];
+    };
+    
+    // Panel SPA para Listado Versiones
+
+    $scope.IrListadoVersiones = function () {
+        ocultar(); // Oculta todos los paneles
+        $scope.funcionalidad = 'Listado Versiones de Fuentes';
+        angular.element("#panel-listado-versiones").removeClass('invisible');
+        // No sobreescribir el scope del panel, dejar que ListadoVersionesController maneje los datos y la búsqueda
     };
 
     $scope.IrRequerimientosComercial();

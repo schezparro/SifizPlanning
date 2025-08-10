@@ -156,7 +156,16 @@ namespace SifizPlanning.Controllers
                         nuevaOfertaRequerimiento.SecuencialCLiente = cliente;
                         nuevaOfertaRequerimiento.SecuencialRequerimiento = requerimiento;
                         nuevaOfertaRequerimiento.SecuencialTicketTarea = ticketNumerico;
-                        nuevaOfertaRequerimiento.Detalle = t.Detalle.Substring(0, 250);
+                            if (t.Detalle != null)
+                        {
+                            nuevaOfertaRequerimiento.Detalle = t.Detalle.Length > 100
+                                ? t.Detalle.Substring(0, 100)
+                                : t.Detalle;
+                        }
+                        else
+                        {
+                            nuevaOfertaRequerimiento.Detalle = null; }
+                        //nuevaOfertaRequerimiento.Detalle = t.Detalle.Substring(0, 100);
                         nuevaOfertaRequerimiento.FechaPedidoCLiente = t.FechaCreado;
                     }
                     else

@@ -1,0 +1,165 @@
+@{
+    ViewBag.Title = "Listado de Versiones de Fuentes - Clientes SifizSoft";
+}
+
+<style>
+    .versiones-table th, .versiones-table td { font-size: 13px; border: 1px solid #ddd !important; }
+    .versiones-table { margin-bottom: 0; border: 2px solid #000 !important; }
+    .table-responsive { max-height: 60vh; overflow-y: auto; }
+    .toolbar { margin-bottom: 10px; }
+    .modal-body label { font-weight: 600; }
+    .form-group { margin-bottom: 8px; }
+    #panel-listado-versiones { 
+        padding: 15px;
+        background-color: #fff;
+    }
+    #panel-listado-versiones.invisible { display: none !important; }
+</style>
+
+<div class="row" id="panel-listado-versiones">
+    <h3 class="text-center">Listado de Versiones de Fuentes - Clientes SifizSoft</h3>
+    <div class="toolbar row">
+        <div class="col-sm-3">
+            <input type="text" class="form-control" ng-model="filtro" placeholder="Buscar..." ng-change="buscar()">
+        </div>
+        <div class="col-sm-2">
+            <select class="form-control" ng-model="filtroInfra" ng-change="buscar()">
+                <option value="">Infraestructura (todas)</option>
+                <option value="nube">Nube</option>
+                <option value="onpremise">OnPremise</option>
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <button class="btn btn-primary" ng-click="abrirModal()"><span class="glyphicon glyphicon-plus"></span> Nuevo</button>
+        </div>
+        <div class="col-sm-5 text-right">
+            <b>Total: {{paginado.total}} registros</b>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover versiones-table">
+            <thead>
+                <tr>
+                    <th>Cooperativa</th>
+                    <th>Código</th>
+                    <th>Contacto</th>
+                    <th>Correo</th>
+                    <th>Versión</th>
+                    <th>VS</th>
+                    <th>Repositorio</th>
+                    <th>Adm Codigo</th>
+                    <th>Integracion</th>
+                    <th>Publicacion</th>
+                    <th>Solucion Proxies</th>
+                    <th>Lider Proyecto</th>
+                    <th>Gestor Servicio</th>
+                    <th>Correo Gestor</th>
+                    <th>Path</th>
+                    <th>Infraestructura</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="v in paginado.datos">
+                    <td>{{v.cooperativa}}</td>
+                    <td>{{v.codigo}}</td>
+                    <td>{{v.contacto}}</td>
+                    <td>{{v.correo}}</td>
+                    <td>{{v.version}}</td>
+                    <td>{{v.visualStudio}}</td>
+                    <td>{{v.repositorio}}</td>
+                    <td>{{v.admCodigo}}</td>
+                    <td>{{v.integracion}}</td>
+                    <td>{{v.publicacion}}</td>
+                    <td>{{v.solucionProxies}}</td>
+                    <td>{{v.liderProyecto}}</td>
+                    <td>{{v.gestorServicio}}</td>
+                    <td>{{v.correoGestor}}</td>
+                    <td>{{v.path}}</td>
+                    <td>{{v.infraestructura}}</td>
+                    <td>
+                        <button class="btn btn-xs btn-info" ng-click="verDetalle(v)"><span class="glyphicon glyphicon-eye-open"></span></button>
+                        <button class="btn btn-xs btn-warning" ng-click="abrirModal(v)"><span class="glyphicon glyphicon-pencil"></span></button>
+                        <button class="btn btn-xs btn-danger" ng-click="eliminar(v)"><span class="glyphicon glyphicon-trash"></span></button>
+                    </td>
+                </tr>
+                <tr ng-if="paginado.datos.length==0"><td colspan="12" class="text-center">Sin datos</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="text-center" style="margin-top:10px">
+        <ul class="pagination pagination-sm">
+            <li ng-class="{disabled: paginado.pagina==1}"><a href ng-click="cambiarPagina(1)">&laquo;</a></li>
+            <li ng-class="{disabled: paginado.pagina==1}"><a href ng-click="cambiarPagina(paginado.pagina-1)">&lsaquo;</a></li>
+            <li ng-repeat="n in paginado.paginas" ng-class="{active: n==paginado.pagina}"><a href ng-click="cambiarPagina(n)">{{n}}</a></li>
+            <li ng-class="{disabled: paginado.pagina==paginado.totalPaginas}"><a href ng-click="cambiarPagina(paginado.pagina+1)">&rsaquo;</a></li>
+            <li ng-class="{disabled: paginado.pagina==paginado.totalPaginas}"><a href ng-click="cambiarPagina(paginado.totalPaginas)">&raquo;</a></li>
+        </ul>
+    </nav>
+
+    <!-- Modal Crear/Editar -->
+    <div class="modal fade" id="modalVersion" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <form ng-submit="guardar()">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+              <h4 class="modal-title">{{editando ? 'Editar' : 'Nueva'}} Versión</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group"><label>Cooperativa</label><input type="text" class="form-control" ng-model="form.cooperativa" required></div>
+                <div class="form-group"><label>Código</label><input type="text" class="form-control" ng-model="form.codigo" required></div>
+                <div class="form-group"><label>Contacto</label><input type="text" class="form-control" ng-model="form.contacto" required></div>
+                <div class="form-group"><label>Correo</label><input type="email" class="form-control" ng-model="form.correo" required></div>
+                <div class="form-group"><label>Versión</label><input type="text" class="form-control" ng-model="form.version" required></div>
+                <div class="form-group"><label>Visual Studio</label><input type="text" class="form-control" ng-model="form.visualStudio" required></div>
+                <div class="form-group"><label>Repositorio</label><input type="text" class="form-control" ng-model="form.repositorio" required></div>
+                <div class="form-group"><label>Infraestructura</label>
+                    <select class="form-control" ng-model="form.infraestructura" required>
+                        <option value="nube">Nube</option>
+                        <option value="onpremise">OnPremise</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Gestor</label><input type="text" class="form-control" ng-model="form.gestor" required></div>
+                <div class="form-group"><label>Correo Gestor</label><input type="email" class="form-control" ng-model="form.correoGestor" required></div>
+                <div class="form-group"><label>Path</label><input type="text" class="form-control" ng-model="form.path" required></div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-success">Guardar</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Detalle -->
+    <div class="modal fade" id="modalDetalle" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            <h4 class="modal-title">Detalle de Versión</h4>
+          </div>
+          <div class="modal-body">
+            <table class="table table-bordered">
+                <tr><th>Cooperativa</th><td>{{detalle.cooperativa}}</td></tr>
+                <tr><th>Código</th><td>{{detalle.codigo}}</td></tr>
+                <tr><th>Contacto</th><td>{{detalle.contacto}}</td></tr>
+                <tr><th>Correo</th><td>{{detalle.correo}}</td></tr>
+                <tr><th>Versión</th><td>{{detalle.version}}</td></tr>
+                <tr><th>Visual Studio</th><td>{{detalle.visualStudio}}</td></tr>
+                <tr><th>Repositorio</th><td>{{detalle.repositorio}}</td></tr>
+                <tr><th>Infraestructura</th><td>{{detalle.infraestructura}}</td></tr>
+                <tr><th>Gestor</th><td>{{detalle.gestor}}</td></tr>
+                <tr><th>Correo Gestor</th><td>{{detalle.correoGestor}}</td></tr>
+                <tr><th>Path</th><td>{{detalle.path}}</td></tr>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
