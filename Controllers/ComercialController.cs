@@ -886,17 +886,16 @@ namespace SifizPlanning.Controllers
         {
             try
             {
-                // Devuelve la relación cliente-requerimiento-ticket, NO el catálogo puro
+                // Devuelve la relación cliente-requerimiento, incluyendo los que no tienen ticket
                 var requerimientos = (from orq in db.OFERTAREQUERIMIENTO
                                       join cli in db.Cliente on orq.SecuencialCLiente equals cli.Secuencial
                                       join req in db.Requerimiento on orq.SecuencialRequerimiento equals req.Secuencial
-                                      join t in db.Ticket on orq.SecuencialTicketTarea equals t.Secuencial
                                       select new
                                       {
                                           id = orq.Secuencial,
                                           descripcion = req.Descripcion,
                                           cliente = cli.Descripcion,
-                                          ticket = t.Secuencial,
+                                          ticket = orq.SecuencialTicketTarea,
                                           detalle = orq.Detalle
                                       }).ToList();
                 return Json(new
