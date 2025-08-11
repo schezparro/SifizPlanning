@@ -192,7 +192,7 @@
                         <select id="select-requerimiento" ng-model="pedReqSeleccionado" class="form-control"
                             required="required">
                             <option value="">Seleccione...</option>
-                            <option value="{{req.id}}" ng-repeat="req in requerimientos">{{req.descripcion}}</option>
+                            <option value="{{req.id}}" ng-repeat="req in catalogoRequerimientos">{{req.descripcion}}</option>
                         </select>
                     </div>
                     <br>
@@ -283,7 +283,7 @@
                         <select id="select-editar-requerimiento" ng-model="pedReqSeleccionadoE" class="form-control"
                             required="required">
                             <option value="">Seleccione...</option>
-                            <option value="{{req.id}}" ng-repeat="req in requerimientos">{{req.descripcion}}</option>
+                            <option value="{{req.id}}" ng-repeat="req in catalogoRequerimientos">{{req.descripcion}}</option>
                         </select>
                     </div>
                     <br>

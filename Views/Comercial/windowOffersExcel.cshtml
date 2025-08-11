@@ -146,19 +146,12 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group" ng-if="!editingOffer._esTicketPendiente">
+                                <div class="form-group">
                                     <label for="OfertaRequerimiento">REQUERIMIENTO</label>
                                     <select id="OfertaRequerimiento" name="OfertaRequerimiento" class="form-control" ng-model="editingOffer.OfertaRequerimiento" ng-options="req.Secuencial as (req.ClienteNombre + ' | TICKET: ' + (req.TicketNumero || 'N/A') + ' | ' + (req.Detalle | limitTo:40)) for req in requerimientos" ng-change="onRequerimientoChange()" required>
                                         <option value="">SELECCIONE UN REQUERIMIENTO...</option>
                                     </select>
                                     <div class="help-block" ng-show="offerForm.OfertaRequerimiento.$touched && offerForm.OfertaRequerimiento.$error.required">ESTE CAMPO ES OBLIGATORIO.</div>
-                                </div>
-                                <div class="form-group" ng-if="editingOffer._esTicketPendiente">
-                                    <label for="OfertaPedidoRequerimiento">PEDIDO/REQUERIMIENTO</label>
-                                    <select id="OfertaPedidoRequerimiento" name="OfertaPedidoRequerimiento" class="form-control" ng-model="editingOffer.OfertaPedidoRequerimiento" ng-options="pedido.id as pedido.descripcion for pedido in pedidosRequerimientos" required>
-                                        <option value="">SELECCIONE UN PEDIDO/REQUERIMIENTO...</option>
-                                    </select>
-                                    <div class="help-block" ng-show="offerForm.OfertaPedidoRequerimiento.$touched && offerForm.OfertaPedidoRequerimiento.$error.required">ESTE CAMPO ES OBLIGATORIO.</div>
                                 </div>
                                 <div class="form-group" ng-class="{'has-error': offerForm.codigoOferta.$touched && offerForm.codigoOferta.$invalid}">
                                     <label for="codigoOferta">CODIGO OFERTA</label>
@@ -180,7 +173,21 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="precioOferta">PRECIO OFERTA</label>
-                                    <input id="precioOferta" name="precioOferta" type="text" class="form-control" ng-model="editingOffer.precioOferta" required pattern="^\d+(\.|,)?\d*$" title="INGRESE UN NUMERO VALIDO" />
+                                    <input id="precioOferta" name="precioOferta" type="text"
+                                           class="form-control"
+                                           ng-class="{'has-error-input': isPrecioOfertaInvalido()}"
+                                           ng-model="editingOffer.precioOferta"
+                                           required pattern="^\d+(\.|,)?\d*$" title="INGRESE UN NUMERO VALIDO" />
+                                    <div class="help-block" ng-show="isPrecioOfertaInvalido()" style="color: #d9534f;">
+                                        Si la opción "ES OFERTA MAYOR" no está seleccionada, el precio no puede ser mayor o igual a 1000.
+                                    </div>
+</style>
+<style>
+.has-error-input {
+    border: 2px solid #d9534f !important;
+    background: #fff0f0 !important;
+}
+</style>
                                 </div>
                                 <div class="form-group">
                                     <label for="formaPago">FORMA DE PAGO</label>

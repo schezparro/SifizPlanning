@@ -3582,6 +3582,53 @@ f in db.FotoColaborador on t equals f.colaborador
 
         [HttpPost]
         [Authorize]
+        public ActionResult DarRequerimientos(string filtro = "")
+        {
+            try
+            {
+                List<object> requerimientos = new List<object>();
+                if (filtro != "")
+                {
+                    requerimientos = (from r in db.Requerimiento
+                                      where r.Descripcion.Contains(filtro)
+                                      orderby r.Descripcion
+                                      select new
+                                      {
+                                          id = r.Secuencial,
+                                          descripcion = r.Descripcion
+                                      }).ToList<object>();
+                }
+                else
+                {
+                    requerimientos = (from r in db.Requerimiento
+                                      orderby r.Descripcion
+                                      select new
+                                      {
+                                          id = r.Secuencial,
+                                          descripcion = r.Descripcion
+                                      }).ToList<object>();
+                }
+
+                var resp = new
+                {
+                    success = true,
+                    requerimientos = requerimientos
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarRequerimientos] Error inesperado al obtener los requerimientos: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener los requerimientos."
+                });
+            }
+        }
+
+        [HttpPost]
+        [Authorize]
         public ActionResult DarEstadosContrato(string filtro = "")
         {
             List<object> estadosContrato = new List<object>();

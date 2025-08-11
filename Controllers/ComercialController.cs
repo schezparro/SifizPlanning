@@ -202,8 +202,9 @@ namespace SifizPlanning.Controllers
                     nuevaOfertaRequerimiento.SecuencialRequerimiento = requerimiento;
                     nuevaOfertaRequerimiento.Detalle = detalle;
                     nuevaOfertaRequerimiento.FechaPedidoCLiente = fechaPC;
-                    nuevaOfertaRequerimiento.SecuencialColaborador = colaborador;
                 }
+                // Siempre asignar el colaborador si viene informado
+                nuevaOfertaRequerimiento.SecuencialColaborador = colaborador;
 
 
                 db.OFERTAREQUERIMIENTO.Add(nuevaOfertaRequerimiento);
@@ -886,18 +887,54 @@ namespace SifizPlanning.Controllers
         {
             try
             {
-                // Devuelve la relación cliente-requerimiento, incluyendo los que no tienen ticket
-                var requerimientos = (from orq in db.OFERTAREQUERIMIENTO
-                                      join cli in db.Cliente on orq.SecuencialCLiente equals cli.Secuencial
-                                      join req in db.Requerimiento on orq.SecuencialRequerimiento equals req.Secuencial
-                                      select new
-                                      {
-                                          id = orq.Secuencial,
-                                          descripcion = req.Descripcion,
-                                          cliente = cli.Descripcion,
-                                          ticket = orq.SecuencialTicketTarea,
-                                          detalle = orq.Detalle
-                                      }).ToList();
+                string emailUser = User.Identity.Name;
+                
+                // Obtener el colaborador actual
+                var colaboradorActual = (from u in db.Usuario
+                                        join p in db.Persona on u.SecuencialPersona equals p.Secuencial
+                                        join c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
+                                        where u.Email == emailUser
+                                        select c).FirstOrDefault();
+
+                // Verificar si el usuario tiene rol ADMIN o ADMINCOMERCIAL
+                bool esAdmin = User.IsInRole("ADMIN") || User.IsInRole("ADMINCOMERCIAL");
+
+                IQueryable<dynamic> requerimientosQuery;
+
+                if (esAdmin)
+                {
+                    // Si es ADMIN o ADMINCOMERCIAL, mostrar todos los requerimientos
+                    requerimientosQuery = from orq in db.OFERTAREQUERIMIENTO
+                                         join cli in db.Cliente on orq.SecuencialCLiente equals cli.Secuencial
+                                         join req in db.Requerimiento on orq.SecuencialRequerimiento equals req.Secuencial
+                                         select new
+                                         {
+                                             id = orq.Secuencial,
+                                             descripcion = req.Descripcion,
+                                             cliente = cli.Descripcion,
+                                             ticket = orq.SecuencialTicketTarea,
+                                             detalle = orq.Detalle
+                                         };
+                }
+                else
+                {
+                    // Si no es admin, solo mostrar los requerimientos donde es responsable
+                    requerimientosQuery = from orq in db.OFERTAREQUERIMIENTO
+                                         join cli in db.Cliente on orq.SecuencialCLiente equals cli.Secuencial
+                                         join req in db.Requerimiento on orq.SecuencialRequerimiento equals req.Secuencial
+                                         where orq.SecuencialColaborador == colaboradorActual.Secuencial
+                                         select new
+                                         {
+                                             id = orq.Secuencial,
+                                             descripcion = req.Descripcion,
+                                             cliente = cli.Descripcion,
+                                             ticket = orq.SecuencialTicketTarea,
+                                             detalle = orq.Detalle
+                                         };
+                }
+
+                var requerimientos = requerimientosQuery.ToList();
+
                 return Json(new
                 {
                     success = true,

@@ -21,6 +21,22 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
         estado: ''
     };
 
+        // Validación visual para el campo precioOferta
+    $scope.isPrecioOfertaInvalido = function() {
+        if (!$scope.editingOffer) return false;
+        var precioStr = ($scope.editingOffer.precioOferta || '').toString().replace(',', '.');
+        var precio = parseFloat(precioStr);
+        return (!$scope.editingOffer.esOfertaMayor && precio >= 1000);
+    };
+
+    // Observar cambios en precioOferta y esOfertaMayor para actualizar la validación visual
+    $scope.$watchGroup([
+        'editingOffer.precioOferta',
+        'editingOffer.esOfertaMayor'
+    ], function() {
+        // Solo para disparar el digest y actualizar la UI
+    });
+
    $scope.detalleOferta = {};
     $scope.verDetalleOferta = function (oferta, $event) {
         if ($event) $event.stopPropagation();
@@ -301,6 +317,12 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
         if (isNaN(precio)) {
             waitingDialog.hide();
             messageDialog.show('Error', 'El campo PRECIO OFERTA debe ser un número válido.');
+            return;
+        }
+        // Validación: si no es oferta mayor, el precio no puede ser mayor a 1000
+        if (!$scope.editingOffer.esOfertaMayor && precio > 1000) {
+            waitingDialog.hide();
+            messageDialog.show('Error', 'Solo se permite precio mayor a 1000 si se marca "ES OFERTA MAYOR"');
             return;
         }
         var codigoFinal = $scope.editingOffer.esOfertaMayor ? $scope.editingOffer.codigo : 'NO APLICA';

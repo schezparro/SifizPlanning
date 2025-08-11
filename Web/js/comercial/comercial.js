@@ -197,8 +197,17 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
         }
     });
 
-    var ajaxRequerimientos = $http.post("comercial/catalogo-requerimientos", {});
-    ajaxRequerimientos.success(function (data) {
+    // Cargar catálogo base de requerimientos para el modal de crear requerimientos
+    var ajaxCatalogoRequerimientos = $http.post("catalogos/requerimientos", {});
+    ajaxCatalogoRequerimientos.success(function (data) {
+        if (data.success === true) {
+            $scope.catalogoRequerimientos = data.requerimientos;
+        }
+    });
+
+    // Cargar requerimientos para ofertas (todos, asociados o no a tickets)
+    var ajaxRequerimientosOfertas = $http.post("comercial/darRequerimientosOfertas", {});
+    ajaxRequerimientosOfertas.success(function (data) {
         if (data.success === true) {
             $scope.requerimientos = data.requerimientos;
         }

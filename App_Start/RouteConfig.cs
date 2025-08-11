@@ -289,6 +289,12 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "DarRequerimientos",
+                url: "catalogos/requerimientos/{id}",
+                defaults: new { controller = "Admin", action = "DarRequerimientos", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "DarNombresClientes",
                 url: "catalogos/nombres-clientes/{id}",
                 defaults: new { controller = "Admin", action = "DarNombresClientes", id = UrlParameter.Optional }
