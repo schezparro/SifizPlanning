@@ -156,7 +156,7 @@ namespace SifizPlanning.Controllers
                         nuevaOfertaRequerimiento.SecuencialCLiente = cliente;
                         nuevaOfertaRequerimiento.SecuencialRequerimiento = requerimiento;
                         nuevaOfertaRequerimiento.SecuencialTicketTarea = ticketNumerico;
-                            if (t.Detalle != null)
+                        if (t.Detalle != null)
                         {
                             nuevaOfertaRequerimiento.Detalle = t.Detalle.Length > 100
                                 ? t.Detalle.Substring(0, 100)
@@ -164,7 +164,8 @@ namespace SifizPlanning.Controllers
                         }
                         else
                         {
-                            nuevaOfertaRequerimiento.Detalle = null; }
+                            nuevaOfertaRequerimiento.Detalle = null;
+                        }
                         //nuevaOfertaRequerimiento.Detalle = t.Detalle.Substring(0, 100);
                         nuevaOfertaRequerimiento.FechaPedidoCLiente = t.FechaCreado;
                     }
@@ -360,18 +361,16 @@ namespace SifizPlanning.Controllers
             }
         }
 
-        
         [HttpPost]
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult DetalleOferta(int id)
         {
             try
             {
-                // Buscar oferta real
+                // Buscar la oferta real y sus datos relacionados en una sola consulta
                 var oferta = (from or in db.OfertaOferta
                               join r in db.OFERTAREQUERIMIENTO on or.SecuencialOfertaRequerimiento equals r.Secuencial
                               join cli in db.Cliente on r.SecuencialCLiente equals cli.Secuencial
-                              join ti in db.Ticket on r.SecuencialTicketTarea equals ti.Secuencial
                               where or.Secuencial == id
                               select new
                               {
@@ -386,78 +385,58 @@ namespace SifizPlanning.Controllers
                                   cliente = cli.Descripcion,
                                   ticket = r.SecuencialTicketTarea,
                                   detalleRequerimiento = r.Detalle,
-                                  // Fechas desde TicketHistorico
-                                  fechaEstimacion = db.TicketHistorico.Where(h => h.SecuencialTicket == r.SecuencialTicketTarea && h.SecuencialProximaActividad == 3).OrderByDescending(h => h.Version).Select(h => (DateTime?)h.FechaOperacion).FirstOrDefault(),
-                                  fechaRevision = db.TicketHistorico.Where(h => h.SecuencialTicket == r.SecuencialTicketTarea && h.SecuencialProximaActividad == 7).OrderByDescending(h => h.Version).Select(h => (DateTime?)h.FechaOperacion).FirstOrDefault(),
-                                  fechaAprobacionGerencia = db.TicketHistorico.Where(h => h.SecuencialTicket == r.SecuencialTicketTarea && h.SecuencialProximaActividad == 30).OrderByDescending(h => h.Version).Select(h => (DateTime?)h.FechaOperacion).FirstOrDefault(),
-                                  fechaEnvioOferta = db.TicketHistorico.Where(h => h.SecuencialTicket == r.SecuencialTicketTarea && h.SecuencialProximaActividad == 30).OrderByDescending(h => h.Version).Select(h => (DateTime?)h.FechaOperacion).FirstOrDefault(),
                                   fechaGeneracion = or.FechaGeneracionOferta,
-                                  fechaVencimiento = or.FechaVencimientoOferta
+                                  fechaVencimiento = or.FechaVencimientoOferta,
+                                  // Se optimiza trayendo todo el historial relevante en una lista
+                                  historicoTicket = db.TicketHistorico
+                                                      .Where(h => h.SecuencialTicket == r.SecuencialTicketTarea)
+                                                      .OrderByDescending(h => h.Version)
+                                                      .ToList()
                               }).FirstOrDefault();
-                if (oferta != null)
-                    return Json(new { success = true, detalle = oferta });
 
-                // Si no es oferta, buscar como ticket pendiente
-                var t = db.Ticket.FirstOrDefault(x => x.Secuencial == id);
-                if (t != null)
+                if (oferta == null)
                 {
-                    var estadosExcluidos = new[] { "ANULADO", "CERRADO", "DEVUELTO", "RECHAZADO", "SUSPENDIDO", "INCONCLUSO" };
-                    if (t.estadoTicket != null && !estadosExcluidos.Contains(t.estadoTicket.Codigo) && t.proximaActividad.Codigo == "COTIZAR")
-                    {
-                        DateTime? fechaRecepcionEstimacion = db.TicketHistorico
-                            .Where(h => h.SecuencialTicket == t.Secuencial && h.SecuencialProximaActividad == 3)
-                            .OrderByDescending(h => h.Version)
-                            .Select(h => (DateTime?)h.FechaOperacion)
-                            .FirstOrDefault();
-                        DateTime? fechaEnvioRevision = db.TicketHistorico
-                            .Where(h => h.SecuencialTicket == t.Secuencial && h.SecuencialProximaActividad == 7)
-                            .OrderByDescending(h => h.Version)
-                            .Select(h => (DateTime?)h.FechaOperacion)
-                            .FirstOrDefault();
-                        DateTime? fechaAprobacionGerencia = db.TicketHistorico
-                            .Where(h => h.SecuencialTicket == t.Secuencial && h.SecuencialProximaActividad == 30)
-                            .OrderByDescending(h => h.Version)
-                            .Select(h => (DateTime?)h.FechaOperacion)
-                            .FirstOrDefault();
-                        DateTime? fechaEnvioOferta = fechaAprobacionGerencia;
-                        string proximaActividad = null;
-                        var historico = db.TicketHistorico
-                            .Where(h => h.SecuencialTicket == t.Secuencial)
-                            .OrderByDescending(h => h.Version)
-                            .FirstOrDefault();
-                        if (historico != null && historico.proximaActividad != null)
-                        {
-                            proximaActividad = historico.proximaActividad.Descripcion;
-                        }
-                        var detalleTicket = new
-                        {
-                            secuencial = 0,
-                            codigo = (string)null,
-                            precio = (decimal?)null,
-                            formaPago = (string)null,
-                            descuento = "NO",
-                            estado = t.estadoTicket.Codigo,
-                            tipo = "TICKET",
-                            tema = t.Asunto,
-                            cliente = t.persona_cliente != null && t.persona_cliente.cliente != null ? t.persona_cliente.cliente.Descripcion : "",
-                            ticket = t.Secuencial,
-                            detalleRequerimiento = t.Asunto,
-                            fechaEstimacion = fechaRecepcionEstimacion,
-                            fechaRevision = fechaEnvioRevision,
-                            fechaAprobacionGerencia = fechaAprobacionGerencia,
-                            fechaEnvioOferta = fechaEnvioOferta,
-                            fechaGeneracion = (DateTime?)null,
-                            fechaVencimiento = (DateTime?)null,
-                            proximaActividad = proximaActividad
-                        };
-                        return Json(new { success = true, detalle = detalleTicket });
-                    }
+                    return Json(new { success = false, msg = "No se encontró la oferta con el ID proporcionado." });
                 }
-                return Json(new { success = false, msg = "No se encontró la oferta ni ticket pendiente." });
+
+                // Extraer las fechas específicas y la próxima actividad de la lista en memoria
+                var fechas = new
+                {
+                    fechaEstimacion = oferta.historicoTicket.FirstOrDefault(h => h.SecuencialProximaActividad == 3)?.FechaOperacion,
+                    fechaRevision = oferta.historicoTicket.FirstOrDefault(h => h.SecuencialProximaActividad == 7)?.FechaOperacion,
+                    fechaAprobacionGerencia = oferta.historicoTicket.FirstOrDefault(h => h.SecuencialProximaActividad == 30)?.FechaOperacion,
+                    fechaEnvioOferta = oferta.historicoTicket.FirstOrDefault(h => h.SecuencialProximaActividad == 30)?.FechaOperacion,
+                    proximaActividad = oferta.historicoTicket.FirstOrDefault()?.proximaActividad?.Descripcion,
+                };
+
+                // Construir el objeto de respuesta final
+                var resultadoOferta = new
+                {
+                    oferta.secuencial,
+                    oferta.codigo,
+                    oferta.precio,
+                    oferta.formaPago,
+                    oferta.descuento,
+                    oferta.estado,
+                    oferta.tipo,
+                    oferta.tema,
+                    oferta.cliente,
+                    oferta.ticket,
+                    oferta.detalleRequerimiento,
+                    fechas.fechaEstimacion,
+                    fechas.fechaRevision,
+                    fechas.fechaAprobacionGerencia,
+                    fechas.fechaEnvioOferta,
+                    oferta.fechaGeneracion,
+                    oferta.fechaVencimiento,
+                    fechas.proximaActividad
+                };
+
+                return Json(new { success = true, detalle = resultadoOferta });
             }
             catch (Exception e)
             {
-                return Json(new { success = false, msg = e.Message });
+                return Json(new { success = false, msg = "Ocurrió un error inesperado al obtener los detalles de la oferta. " + e.Message });
             }
         }
 
@@ -498,82 +477,81 @@ namespace SifizPlanning.Controllers
         {
             try
             {
-                // Deserializar filtros de columna si vienen
                 var filtros = new Dictionary<string, string>();
                 if (!string.IsNullOrEmpty(filtrosColumna))
                 {
                     filtros = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(filtrosColumna);
                 }
 
-                var estadosExcluidos = new[] { "ANULADO", "CERRADO", "DEVUELTO", "RECHAZADO", "SUSPENDIDO", "INCONCLUSO" };
-                var ofertasComercial = (from or in db.OfertaOferta
-                                        join r in db.OFERTAREQUERIMIENTO on or.SecuencialOfertaRequerimiento equals r.Secuencial
-                                        join cli in db.Cliente on r.SecuencialCLiente equals cli.Secuencial
-                                        join t in db.Ticket on r.SecuencialTicketTarea equals t.Secuencial
-                                        select new
-                                        {
-                                            secuencial = or.Secuencial,
-                                            codigo = or.Codigo,
-                                            requerimientoTicket = r.SecuencialTicketTarea,
-                                            secuencialRequerimiento = r.Secuencial, // <-- AGREGADO
-                                            fechaGeneracion = or.FechaGeneracionOferta,
-                                            fechaVencimiento = or.FechaVencimientoOferta,
-                                            tipo = r.Secuencial + "-" + (r.Detalle.Length > 30 ? r.Detalle.Substring(0, 30) : r.Detalle),
-                                            idTipo = r.Secuencial,
-                                            precio = or.Precio,
-                                            formaPago = or.FormaPago,
-                                            descuento = (or.Descuento.HasValue && or.Descuento.Value) ? "SI" : "NO",
-                                            estado = or.Estado,
-                                            tema = or.OfertaRequerimiento != null ? or.OfertaRequerimiento.Detalle : "",
-                                            cliente = cli.Descripcion,
-                                            ticket = r.SecuencialTicketTarea
-                                        }).ToList();
+                // Crear una consulta LINQ que se ejecutará de forma diferida
+                var ofertasQuery = from or in db.OfertaOferta
+                                   join r in db.OFERTAREQUERIMIENTO on or.SecuencialOfertaRequerimiento equals r.Secuencial
+                                   join cli in db.Cliente on r.SecuencialCLiente equals cli.Secuencial
+                                   select new
+                                   {
+                                       secuencial = or.Secuencial,
+                                       codigo = or.Codigo,
+                                       secuencialRequerimiento = r.Secuencial,
+                                       fechaGeneracion = or.FechaGeneracionOferta,
+                                       fechaVencimiento = or.FechaVencimientoOferta,
+                                       tipo = r.Secuencial + "-" + (r.Detalle.Length > 50 ? r.Detalle.Substring(0, 50) : r.Detalle),
+                                       idTipo = r.Secuencial,
+                                       precio = or.Precio,
+                                       formaPago = or.FormaPago,
+                                       descuento = (or.Descuento.HasValue && or.Descuento.Value) ? "SI" : "NO",
+                                       estado = or.Estado,
+                                       tema = or.OfertaRequerimiento != null ? or.OfertaRequerimiento.Detalle : "",
+                                       cliente = cli.Descripcion,
+                                       ticket = r.SecuencialTicketTarea,
+                                   };
 
-                // Poblar fechas y próxima actividad desde TicketHistorico para ofertas
-                var ofertasConFechas = ofertasComercial.Select(oferta =>
+                // Aplicar filtros a la consulta ANTES de la paginación y ejecución
+                if (!string.IsNullOrEmpty(filtro))
                 {
-                    DateTime? fechaRecepcionEstimacion = null;
-                    DateTime? fechaEnvioRevision = null;
-                    DateTime? fechaAprobacionGerencia = null;
-                    DateTime? fechaEnvioOferta = null;
-                    string proximaActividad = null;
-                    if (oferta.requerimientoTicket != null)
-                    {
-                        int idTicket = oferta.requerimientoTicket.Value;
-                        fechaRecepcionEstimacion = db.TicketHistorico
-                            .Where(h => h.SecuencialTicket == idTicket && h.SecuencialProximaActividad == 3)
-                            .OrderByDescending(h => h.Version)
-                            .Select(h => (DateTime?)h.FechaOperacion)
-                            .FirstOrDefault();
-                        fechaEnvioRevision = db.TicketHistorico
-                            .Where(h => h.SecuencialTicket == idTicket && h.SecuencialProximaActividad == 7)
-                            .OrderByDescending(h => h.Version)
-                            .Select(h => (DateTime?)h.FechaOperacion)
-                            .FirstOrDefault();
-                        fechaAprobacionGerencia = db.TicketHistorico
-                            .Where(h => h.SecuencialTicket == idTicket && h.SecuencialProximaActividad == 30)
-                            .OrderByDescending(h => h.Version)
-                            .Select(h => (DateTime?)h.FechaOperacion)
-                            .FirstOrDefault();
-                        fechaEnvioOferta = fechaAprobacionGerencia;
-                        // Obtener la última actividad del ticket
-                        var historico = db.TicketHistorico
-                            .Where(h => h.SecuencialTicket == idTicket)
-                            .OrderByDescending(h => h.Version)
-                            .FirstOrDefault();
-                        if (historico != null && historico.proximaActividad != null)
-                        {
-                            proximaActividad = historico.proximaActividad.Descripcion;
-                        }
-                    }
+                    var filtroLower = filtro.ToLower();
+                    ofertasQuery = ofertasQuery.Where(x =>
+                        (x.codigo != null && x.codigo.ToLower().Contains(filtroLower)) ||
+                        (x.cliente != null && x.cliente.ToLower().Contains(filtroLower)) ||
+                        (x.ticket != null && x.ticket.ToString().Contains(filtro)) ||
+                        (x.tema != null && x.tema.ToLower().Contains(filtroLower))
+                    );
+                }
+
+                if (filtros != null && filtros.Count > 0)
+                {
+                    if (filtros.ContainsKey("codigoOferta") && !string.IsNullOrEmpty(filtros["codigoOferta"]))
+                        ofertasQuery = ofertasQuery.Where(x => x.codigo != null && x.codigo.ToLower().Contains(filtros["codigoOferta"].ToLower()));
+
+                    if (filtros.ContainsKey("ticket") && !string.IsNullOrEmpty(filtros["ticket"]))
+                        ofertasQuery = ofertasQuery.Where(x => x.ticket != null && x.ticket.ToString().Contains(filtros["ticket"]));
+
+                    if (filtros.ContainsKey("cliente") && !string.IsNullOrEmpty(filtros["cliente"]))
+                        ofertasQuery = ofertasQuery.Where(x => x.cliente != null && x.cliente.ToLower().Contains(filtros["cliente"].ToLower()));
+
+                    if (filtros.ContainsKey("tema") && !string.IsNullOrEmpty(filtros["tema"]))
+                        ofertasQuery = ofertasQuery.Where(x => x.tema != null && x.tema.ToLower().Contains(filtros["tema"].ToLower()));
+                }
+
+                int total = ofertasQuery.Count();
+
+                // Paginación y ejecución de la consulta
+                var pagedOfertas = ofertasQuery.OrderByDescending(o => o.secuencial).Skip(start).Take(lenght).ToList();
+
+                // Poblar fechas y próxima actividad en memoria para CADA oferta
+                var ofertasConFechas = pagedOfertas.Select(oferta =>
+                {
+                    var historicoTicket = (oferta.ticket.HasValue)
+                        ? db.TicketHistorico.Where(h => h.SecuencialTicket == oferta.ticket.Value).OrderByDescending(h => h.Version).ToList()
+                        : new List<TicketHistorico>();
+
                     return new
                     {
                         oferta.secuencial,
                         oferta.codigo,
-                        fechaEstimacion = fechaRecepcionEstimacion,
-                        fechaRevision = fechaEnvioRevision,
-                        fechaAprobacionGerencia = fechaAprobacionGerencia,
-                        fechaEnvioOferta = fechaEnvioOferta,
+                        fechaEstimacion = historicoTicket.FirstOrDefault(h => h.SecuencialProximaActividad == 3)?.FechaOperacion,
+                        fechaRevision = historicoTicket.FirstOrDefault(h => h.SecuencialProximaActividad == 7)?.FechaOperacion,
+                        fechaAprobacionGerencia = historicoTicket.FirstOrDefault(h => h.SecuencialProximaActividad == 30)?.FechaOperacion,
+                        fechaEnvioOferta = historicoTicket.FirstOrDefault(h => h.SecuencialProximaActividad == 30)?.FechaOperacion,
                         oferta.fechaGeneracion,
                         oferta.fechaVencimiento,
                         oferta.tipo,
@@ -585,161 +563,22 @@ namespace SifizPlanning.Controllers
                         oferta.tema,
                         oferta.cliente,
                         oferta.ticket,
-                        oferta.secuencialRequerimiento, // <-- PROPAGADO
-                        proximaActividad // nueva columna
+                        oferta.secuencialRequerimiento,
+                        proximaActividad = historicoTicket.FirstOrDefault()?.proximaActividad?.Descripcion,
                     };
                 }).ToList();
 
-                // 2. Tickets pendientes de oferta
-                var ticketsConOferta = db.OFERTAREQUERIMIENTO
-                    .Where(orq => db.OfertaOferta.Any(of => of.SecuencialOfertaRequerimiento == orq.Secuencial))
-                    .Select(orq => orq.SecuencialTicketTarea)
-                    .ToList();
-
-                var ticketsPendientes = (from t in db.Ticket
-                                         where t.estadoTicket != null && !estadosExcluidos.Contains(t.estadoTicket.Codigo)
-                                         && !ticketsConOferta.Contains(t.Secuencial)
-                                         && (t.proximaActividad.Codigo == "COTIZAR")
-                                         select new
-                                         {
-                                             secuencial = 0, // No hay oferta aún
-                                             codigo = (string)null,
-                                             requerimientoTicket = t.Secuencial,
-                                             fechaGeneracion = (DateTime?)null,
-                                             fechaVencimiento = (DateTime?)null,
-                                             tipo = "TICKET",
-                                             idTipo = 0,
-                                             precio = (decimal?)null,
-                                             formaPago = (string)null,
-                                             descuento = "NO",
-                                             estado = t.estadoTicket.Codigo,
-                                             tema = t.Asunto,
-                                             cliente = t.persona_cliente != null && t.persona_cliente.cliente != null ? t.persona_cliente.cliente.Descripcion : "",
-                                             ticket = t.Secuencial,
-                                             secuencialRequerimiento = 0 // <-- AGREGADO para igualar estructura
-                                         }).ToList();
-
-                // Tickets pendientes: poblar fechas desde TicketHistorico
-                var ticketsConFechas = ticketsPendientes.Select(t =>
-                {
-                    DateTime? fechaRecepcionEstimacion = db.TicketHistorico
-                        .Where(h => h.SecuencialTicket == t.ticket && h.SecuencialProximaActividad == 3)
-                        .OrderByDescending(h => h.Version)
-                        .Select(h => (DateTime?)h.FechaOperacion)
-                        .FirstOrDefault();
-                    DateTime? fechaEnvioRevision = db.TicketHistorico
-                        .Where(h => h.SecuencialTicket == t.ticket && h.SecuencialProximaActividad == 7)
-                        .OrderByDescending(h => h.Version)
-                        .Select(h => (DateTime?)h.FechaOperacion)
-                        .FirstOrDefault();
-                    DateTime? fechaAprobacionGerencia = db.TicketHistorico
-                        .Where(h => h.SecuencialTicket == t.ticket && h.SecuencialProximaActividad == 30)
-                        .OrderByDescending(h => h.Version)
-                        .Select(h => (DateTime?)h.FechaOperacion)
-                        .FirstOrDefault();
-                    DateTime? fechaEnvioOferta = fechaAprobacionGerencia;
-                    string proximaActividad = null;
-                    var historico = db.TicketHistorico
-                        .Where(h => h.SecuencialTicket == t.ticket)
-                        .OrderByDescending(h => h.Version)
-                        .FirstOrDefault();
-                    if (historico != null && historico.proximaActividad != null)
-                    {
-                        proximaActividad = historico.proximaActividad.Descripcion;
-                    }
-                    return new
-                    {
-                        t.secuencial,
-                        t.codigo,
-                        fechaEstimacion = fechaRecepcionEstimacion,
-                        fechaRevision = fechaEnvioRevision,
-                        fechaAprobacionGerencia = fechaAprobacionGerencia,
-                        fechaEnvioOferta = fechaEnvioOferta,
-                        t.fechaGeneracion,
-                        t.fechaVencimiento,
-                        t.tipo,
-                        t.idTipo,
-                        t.precio,
-                        t.formaPago,
-                        t.descuento,
-                        t.estado,
-                        t.tema,
-                        t.cliente,
-                        ticket = (int?)t.ticket,
-                        secuencialRequerimiento = t.secuencialRequerimiento, // <-- ahora existe y es int
-                        proximaActividad
-                    };
-                }).ToList();
-
-                // Unir ambos listados
-                var listadoSinInconclusos = ofertasConFechas.Concat(ticketsConFechas).ToList();
-
-                // Filtro global
-                if (!string.IsNullOrEmpty(filtro))
-                {
-                    listadoSinInconclusos = listadoSinInconclusos.Where(x =>
-                        (x.codigo != null && x.codigo.ToLower().Contains(filtro.ToLower())) ||
-                        (x.cliente != null && x.cliente.ToLower().Contains(filtro.ToLower())) ||
-                        (x.ticket != null && x.ticket.ToString().Contains(filtro)) ||
-                        (x.tema != null && x.tema.ToLower().Contains(filtro.ToLower()))
-                    ).ToList();
-                }
-                // Filtros por columna
-                if (filtros != null && filtros.Count > 0)
-                {
-                    if (filtros.ContainsKey("codigoOferta") && !string.IsNullOrEmpty(filtros["codigoOferta"]))
-                        listadoSinInconclusos = listadoSinInconclusos.Where(x => x.codigo != null && x.codigo.ToLower().Contains(filtros["codigoOferta"].ToLower())).ToList();
-                    if (filtros.ContainsKey("ticket") && !string.IsNullOrEmpty(filtros["ticket"]))
-                        listadoSinInconclusos = listadoSinInconclusos.Where(x => x.ticket != null && x.ticket.ToString().Contains(filtros["ticket"])).ToList();
-                    if (filtros.ContainsKey("cliente") && !string.IsNullOrEmpty(filtros["cliente"]))
-                        listadoSinInconclusos = listadoSinInconclusos.Where(x => x.cliente != null && x.cliente.ToLower().Contains(filtros["cliente"].ToLower())).ToList();
-                    if (filtros.ContainsKey("tema") && !string.IsNullOrEmpty(filtros["tema"]))
-                        listadoSinInconclusos = listadoSinInconclusos.Where(x => x.tema != null && x.tema.ToLower().Contains(filtros["tema"].ToLower())).ToList();
-                    if (filtros.ContainsKey("fechaEstimacion") && !string.IsNullOrEmpty(filtros["fechaEstimacion"]))
-                        listadoSinInconclusos = listadoSinInconclusos.Where(x => x.fechaEstimacion != null && x.fechaEstimacion.Value.ToString("dd/MM/yyyy").Contains(filtros["fechaEstimacion"])).ToList();
-                    if (filtros.ContainsKey("fechaGeneracion") && !string.IsNullOrEmpty(filtros["fechaGeneracion"]))
-                        listadoSinInconclusos = listadoSinInconclusos.Where(x => x.fechaGeneracion != null && x.fechaGeneracion.Value.ToString("dd/MM/yyyy").Contains(filtros["fechaGeneracion"])).ToList();
-                    if (filtros.ContainsKey("fechaRevision") && !string.IsNullOrEmpty(filtros["fechaRevision"]))
-                        listadoSinInconclusos = listadoSinInconclusos.Where(x => x.fechaRevision != null && x.fechaRevision.Value.ToString("dd/MM/yyyy").Contains(filtros["fechaRevision"])).ToList();
-                    if (filtros.ContainsKey("fechaAprobacionGerencia") && !string.IsNullOrEmpty(filtros["fechaAprobacionGerencia"]))
-                        listadoSinInconclusos = listadoSinInconclusos.Where(x => x.fechaAprobacionGerencia != null && x.fechaAprobacionGerencia.Value.ToString("dd/MM/yyyy").Contains(filtros["fechaAprobacionGerencia"])).ToList();
-                    if (filtros.ContainsKey("fechaEnvioOferta") && !string.IsNullOrEmpty(filtros["fechaEnvioOferta"]))
-                        listadoSinInconclusos = listadoSinInconclusos.Where(x => x.fechaEnvioOferta != null && x.fechaEnvioOferta.Value.ToString("dd/MM/yyyy").Contains(filtros["fechaEnvioOferta"])).ToList();
-                    if (filtros.ContainsKey("fechaVencimiento") && !string.IsNullOrEmpty(filtros["fechaVencimiento"]))
-                        listadoSinInconclusos = listadoSinInconclusos.Where(x => x.fechaVencimiento != null && x.fechaVencimiento.Value.ToString("dd/MM/yyyy").Contains(filtros["fechaVencimiento"])).ToList();
-                    if (filtros.ContainsKey("tipo") && !string.IsNullOrEmpty(filtros["tipo"]))
-                        listadoSinInconclusos = listadoSinInconclusos.Where(x => x.tipo != null && x.tipo.ToLower().Contains(filtros["tipo"].ToLower())).ToList();
-                    if (filtros.ContainsKey("precioOferta") && !string.IsNullOrEmpty(filtros["precioOferta"]))
-                        listadoSinInconclusos = listadoSinInconclusos.Where(x => x.precio != null && x.precio.ToString().Contains(filtros["precioOferta"])).ToList();
-                    if (filtros.ContainsKey("formaPago") && !string.IsNullOrEmpty(filtros["formaPago"]))
-                        listadoSinInconclusos = listadoSinInconclusos.Where(x => x.formaPago != null && x.formaPago.ToLower().Contains(filtros["formaPago"].ToLower())).ToList();
-                    if (filtros.ContainsKey("validezOferta") && !string.IsNullOrEmpty(filtros["validezOferta"]))
-                        listadoSinInconclusos = listadoSinInconclusos.Where(x => x.fechaVencimiento != null && x.fechaVencimiento.Value.ToString("dd/MM/yyyy").Contains(filtros["validezOferta"])).ToList();
-                    if (filtros.ContainsKey("descuento") && !string.IsNullOrEmpty(filtros["descuento"]))
-                        listadoSinInconclusos = listadoSinInconclusos.Where(x => x.descuento != null && x.descuento.ToString().ToLower().Contains(filtros["descuento"].ToLower())).ToList();
-                    if (filtros.ContainsKey("estado") && !string.IsNullOrEmpty(filtros["estado"]))
-                        listadoSinInconclusos = listadoSinInconclusos.Where(x => x.estado != null && x.estado.ToLower().Contains(filtros["estado"].ToLower())).ToList();
-                    if (filtros.ContainsKey("proximaActividad") && !string.IsNullOrEmpty(filtros["proximaActividad"]))
-                        listadoSinInconclusos = listadoSinInconclusos.Where(x => x.proximaActividad != null && x.proximaActividad.ToLower().Contains(filtros["proximaActividad"].ToLower())).ToList();
-                }
-                int total = listadoSinInconclusos.Count();
-                var paged = listadoSinInconclusos.Skip(start).Take(lenght).ToList();
                 var result = new
                 {
                     success = true,
                     total = total,
-                    ofertasComercial = paged
+                    ofertasComercial = ofertasConFechas
                 };
                 return Json(result);
             }
             catch (Exception e)
             {
-                var result = new
-                {
-                    success = false,
-                    msg = e.Message
-                };
-                return Json(result);
+                return Json(new { success = false, msg = e.Message });
             }
         }
 
