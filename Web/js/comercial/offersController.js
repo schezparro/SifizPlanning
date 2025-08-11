@@ -177,6 +177,7 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
                         return fechaStr ? new Date(fechaStr) : null;
                     }
                     // Mapear precio a precioOferta para consistencia en la vista
+                    var codigoOferta = oferta.codigo || oferta.codigoOferta;
                     return {
                         ...oferta,
                         precioOferta: oferta.precio,
@@ -186,7 +187,7 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
                         fechaAprobacionGerencia: convertirFecha(oferta.fechaAprobacionGerencia),
                         fechaEnvioOferta: convertirFecha(oferta.fechaEnvioOferta),
                         fechaVencimiento: convertirFecha(oferta.fechaVencimiento),
-                        codigo: oferta.codigo || oferta.codigoOferta,
+                        codigo: (!codigoOferta || codigoOferta === '') ? 'NO APLICA' : codigoOferta,
                         proximaActividad: oferta.proximaActividad
                     };
                 });
@@ -325,7 +326,11 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
             messageDialog.show('Error', 'Solo se permite precio mayor a 1000 si se marca "ES OFERTA MAYOR"');
             return;
         }
-        var codigoFinal = $scope.editingOffer.esOfertaMayor ? $scope.editingOffer.codigo : 'NO APLICA';
+        var codigoFinal = $scope.editingOffer.esOfertaMayor ? $scope.editingOffer.codigo : '';
+        // Convertir "NO APLICA" a cadena vacía para el backend
+        if (codigoFinal === 'NO APLICA') {
+            codigoFinal = '';
+        }
         var datosOferta = {
             OfertaRequerimiento: $scope.editingOffer.OfertaPedidoRequerimiento || $scope.editingOffer.OfertaRequerimiento,
             codigo: codigoFinal,
@@ -362,7 +367,7 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
     var originalEditarOferta = $scope.editarOferta;
     $scope.editarOferta = function(oferta) {
         $scope.editingOffer = angular.copy(oferta);
-        $scope.editingOffer.esOfertaMayor = ($scope.editingOffer.codigo && $scope.editingOffer.codigo !== 'NO APLICA');
+        $scope.editingOffer.esOfertaMayor = ($scope.editingOffer.codigo && $scope.editingOffer.codigo !== 'NO APLICA' && $scope.editingOffer.codigo !== '');
         $scope.editingOffer._esNuevo = false;
         $scope.editingOffer._esTicketPendiente = false;
         // Cargar requerimientos y seleccionar el correcto solo cuando estén realmente cargados
@@ -595,7 +600,7 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
     $scope.onOfertaMayorChange = function() {
         if ($scope.editingOffer) {
             if ($scope.editingOffer.esOfertaMayor) {
-                if (!$scope.editingOffer.codigo || $scope.editingOffer.codigo === 'NO APLICA') {
+                if (!$scope.editingOffer.codigo || $scope.editingOffer.codigo === 'NO APLICA' || $scope.editingOffer.codigo === '') {
                     $http.post("comercial/generar-codigo-oferta", {}).success(function (data) {
                         if (data.success === true) {
                             $scope.editingOffer.codigo = data.nuevoCodigo;

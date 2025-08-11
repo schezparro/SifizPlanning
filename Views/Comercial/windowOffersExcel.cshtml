@@ -68,7 +68,7 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat="oferta in ofertasLista" style="font-size:13px;">
-                        <td style="padding:2px 4px;">{{oferta.codigo === 'NO APLICA' ? '' : oferta.codigo}}</td>
+                        <td style="padding:2px 4px;">{{(!oferta.codigo || oferta.codigo === '') ? 'NO APLICA' : oferta.codigo}}</td>
                         <td style="padding:2px 4px;">{{oferta.ticket}}</td>
                         <td style="padding:2px 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{oferta.cliente}}</td>
                         <td style="padding:2px 4px; max-width:300px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="{{oferta.tema}}">{{oferta.tema.length > 80 ? (oferta.tema | limitTo:80) + '…' : oferta.tema}}</td>
@@ -156,7 +156,7 @@
                                 <div class="form-group" ng-class="{'has-error': offerForm.codigoOferta.$touched && offerForm.codigoOferta.$invalid}">
                                     <label for="codigoOferta">CODIGO OFERTA</label>
                                     <div class="input-group">
-                                        <input id="codigoOferta" name="codigoOferta" type="text" class="form-control" ng-model="editingOffer.codigo" readonly required ng-value="editingOffer.codigo === 'NO APLICA' ? '' : editingOffer.codigo" />
+                                        <input id="codigoOferta" name="codigoOferta" type="text" class="form-control" ng-model="editingOffer.codigo" readonly required ng-value="(!editingOffer.codigo || editingOffer.codigo === '') ? 'NO APLICA' : editingOffer.codigo" />
                                         <span class="input-group-addon" style="background: #f9f9f9;">
                                             <input type="checkbox" ng-model="editingOffer.esOfertaMayor" ng-change="onOfertaMayorChange()" style="margin-right:4px;" /> ES OFERTA MAYOR
                                         </span>
@@ -273,7 +273,7 @@
             <div class="modal-body">
                 <table class="table table-bordered table-striped">
                     <tbody>
-                        <tr><th>CODIGO</th><td>{{detalleOferta.codigo || detalleOferta.Codigo}}</td></tr>
+                        <tr><th>CODIGO</th><td>{{(!detalleOferta.codigo && !detalleOferta.Codigo) || (detalleOferta.codigo === '' || detalleOferta.Codigo === '') ? 'NO APLICA' : (detalleOferta.codigo || detalleOferta.Codigo)}}</td></tr>
                         <tr><th>CLIENTE</th><td>{{detalleOferta.cliente || detalleOferta.Cliente}}</td></tr>
                         <tr><th>REQUERIMIENTO</th><td>{{detalleOferta.requerimiento || detalleOferta.Requerimiento}}</td></tr>
                         <tr><th>DETALLE REQUERIMIENTO</th><td>{{detalleOferta.detalleRequerimiento || detalleOferta.DetalleRequerimiento || detalleOferta.tema || detalleOferta.Tema}}</td></tr>

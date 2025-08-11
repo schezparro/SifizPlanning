@@ -697,7 +697,8 @@ namespace SifizPlanning.Controllers
                 }
 
                 OfertaOferta nuevaOferta = new OfertaOferta();
-                nuevaOferta.Codigo = codigo;
+                // Para ofertas no mayores no asociadas a ticket, permitir código vacío
+                nuevaOferta.Codigo = string.IsNullOrEmpty(codigo) ? null : codigo;
                 DateTime? ConvertirFecha(string fecha)
                 {
                     if (DateTime.TryParse(fecha, out DateTime fechaConvertida))
