@@ -203,6 +203,14 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
             $scope.requerimientos = data.requerimientos;
         }
     });
+
+    // Cargar colaboradores
+    var ajaxColaboradores = $http.post("catalogos/dar-colaboradores", {});
+    ajaxColaboradores.success(function (data) {
+        if (data.success === true) {
+            $scope.colaboradores = data.colaboradores;
+        }
+    });
     $scope.windowAgregarRequerimiento = function () {
         $scope.habilitarTicket = false;
         $scope.clienteSeleccionado = '';
@@ -348,7 +356,8 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
             requerimiento: $scope.pedReqSeleccionado,
             ticket: $scope.ticketSeleccionado,
             detalle: $scope.detalleSeleccionado,
-            fechaPedidoCliente: fechaSe
+            fechaPedidoCliente: fechaSe,
+            colaborador: $scope.colaboradorSeleccionado
         };
 
         var insertReq = $http.post("comercial/guardar-requerimiento",
@@ -393,6 +402,7 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
                 $scope.clienteSeleccionadoE = data.requerimientoResult.clienteId;
                 $scope.pedReqSeleccionadoE = data.requerimientoResult.requerimientoId;
                 $scope.detalleSeleccionadoE = data.requerimientoResult.detalle;
+                $scope.colaboradorEditar = data.requerimientoResult.colaboradorId;
 
                 $scope.fechaSeleccionadaE = $scope.convertirFecha(data.requerimientoResult.fecha);
                 angular.element('#fecha-editar-requerimiento').datepicker('setValue', new Date(data.requerimientoResult.fecha));
@@ -405,16 +415,16 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
     };
 
     $scope.modificarRequerimiento = function () {
-
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
         var fechaSe = angular.element("#fecha-editar-requerimiento")[0].value;
         var datos = {
             id: $scope.secuencialRequerimiento,
-            cliente: $scope.clienteSeleccionadoE, // Usar el modelo Angular
+            cliente: $scope.clienteSeleccionadoE,
             requerimiento: $scope.pedReqSeleccionadoE,
             ticket: $scope.ticketSeleccionadoE,
             detalle: $scope.detalleSeleccionadoE,
-            fechaPedidoCliente: fechaSe
+            fechaPedidoCliente: fechaSe,
+            colaborador: $scope.colaboradorEditar
         };
 
         var insertReq = $http.post("comercial/editar-requerimiento",

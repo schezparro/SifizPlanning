@@ -48,6 +48,12 @@ namespace SifizPlanning.Controllers
                                                    requerimientoId = or.SecuencialRequerimiento,
                                                    requerimiento = r.Descripcion,
                                                    fecha = or.FechaPedidoCLiente.HasValue ? or.FechaPedidoCLiente.Value.ToString() : "",
+                                                   colaborador = or.SecuencialColaborador.HasValue ? 
+                                                       (from col in db.Colaborador
+                                                        join p in db.Persona on col.SecuencialPersona equals p.Secuencial
+                                                        where col.Secuencial == or.SecuencialColaborador
+                                                        select p.Nombre1 + " " + p.Apellido1).FirstOrDefault() : "",
+                                                   colaboradorId = or.SecuencialColaborador
                                                }).ToList();
 
 
@@ -109,6 +115,12 @@ namespace SifizPlanning.Controllers
                                requerimientoId = or.SecuencialRequerimiento,
                                requerimiento = r.Descripcion,
                                fecha = or.FechaPedidoCLiente.HasValue ? or.FechaPedidoCLiente : null,
+                               colaboradorId = or.SecuencialColaborador,
+                               colaborador = or.SecuencialColaborador.HasValue ? 
+                                   (from col in db.Colaborador
+                                    join p in db.Persona on col.SecuencialPersona equals p.Secuencial
+                                    where col.Secuencial == or.SecuencialColaborador
+                                    select p.Nombre1 + " " + p.Apellido1).FirstOrDefault() : ""
                            }).FirstOrDefault();
 
                 var result = new
@@ -131,7 +143,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "COMERCIAL, ADMIN")]
-        public ActionResult GuardarRequerimiento(int cliente, int requerimiento, string ticket, string detalle, string fechaPedidoCliente)
+        public ActionResult GuardarRequerimiento(int cliente, int requerimiento, string ticket, string detalle, string fechaPedidoCliente, int? colaborador)
         {
             try
             {
@@ -190,6 +202,7 @@ namespace SifizPlanning.Controllers
                     nuevaOfertaRequerimiento.SecuencialRequerimiento = requerimiento;
                     nuevaOfertaRequerimiento.Detalle = detalle;
                     nuevaOfertaRequerimiento.FechaPedidoCLiente = fechaPC;
+                    nuevaOfertaRequerimiento.SecuencialColaborador = colaborador;
                 }
 
 
@@ -230,7 +243,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "COMERCIAL, ADMIN")]
-        public ActionResult EditarRequerimiento(int id, int cliente, int requerimiento, string ticket, string detalle, string fechaPedidoCliente)
+        public ActionResult EditarRequerimiento(int id, int cliente, int requerimiento, string ticket, string detalle, string fechaPedidoCliente, int? colaborador)
         {
             try
             {
@@ -276,6 +289,7 @@ namespace SifizPlanning.Controllers
                 nuevaOfertaRequerimiento.SecuencialRequerimiento = requerimiento;
                 nuevaOfertaRequerimiento.Detalle = detalle;
                 nuevaOfertaRequerimiento.FechaPedidoCLiente = fechaPC;
+                nuevaOfertaRequerimiento.SecuencialColaborador = colaborador;
 
                 db.SaveChanges();
 

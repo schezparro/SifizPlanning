@@ -831,6 +831,7 @@
           <Property Name="SECUENCIALTICKETTAREA" Type="int" />
           <Property Name="DETALLE" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="FECHAPEDIDOCLIENTE" Type="date" />
+          <Property Name="SECUENCIALCOLABORADOR" Type="int" />
         </EntityType>
         <EntityType Name="PAIS">
           <Key>
@@ -13071,6 +13072,7 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
           <Property Name="Detalle" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Name="FechaPedidoCLiente" Type="DateTime" Precision="0" />
           <NavigationProperty Name="OFERTAOFERTA" Relationship="SifizPlanningModel.FK_OFERTAOFERTA_OFERTAREQUERIMIENTO" FromRole="OfertaRequerimiento" ToRole="OFERTAOFERTA" />
+          <Property Name="SecuencialColaborador" Type="Int32" />
         </EntityType>
         <EntityType Name="ClienteReporteMantenimiento">
           <Key>
@@ -15699,6 +15701,7 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
           <EntitySetMapping Name="OFERTAREQUERIMIENTO">
             <EntityTypeMapping TypeName="SifizPlanningModel.OfertaRequerimiento">
               <MappingFragment StoreEntitySet="OFERTAREQUERIMIENTO">
+                <ScalarProperty Name="SecuencialColaborador" ColumnName="SECUENCIALCOLABORADOR" />
                 <ScalarProperty Name="FechaPedidoCLiente" ColumnName="FECHAPEDIDOCLIENTE" />
                 <ScalarProperty Name="Detalle" ColumnName="DETALLE" />
                 <ScalarProperty Name="SecuencialTicketTarea" ColumnName="SECUENCIALTICKETTAREA" />
