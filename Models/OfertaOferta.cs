@@ -34,8 +34,11 @@ namespace SifizPlanning.Models
         public Nullable<bool> Descuento { get; set; }
         public string Estado { get; set; }
         public string Tipo { get; set; }
+        public Nullable<int> SecuencialEstadoGestion { get; set; }
+        public string Observacion { get; set; }
     
         public virtual OfertaRequerimiento OfertaRequerimiento { get; set; }
         public virtual ICollection<FormalizacionOfertas> FORMALIZACIONOFERTAS { get; set; }
+        public virtual EstadoGestionOferta estadoGestionOferta { get; set; }
     }
 }

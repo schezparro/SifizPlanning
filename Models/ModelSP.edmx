@@ -571,6 +571,16 @@
           <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
           <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="ESTADOGESTIONOFERTA">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CODIGO" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="DESCRIPCION" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="ESTAACTIVO" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="ESTADOOFERTA">
           <Key>
             <PropertyRef Name="SECUENCIAL" />
@@ -820,6 +830,8 @@
           <Property Name="DESCUENTO" Type="bit" />
           <Property Name="ESTADO" Type="varchar" MaxLength="50" />
           <Property Name="TIPO" Type="varchar" MaxLength="50" />
+          <Property Name="SECUENCIALESTADOGESTION" Type="int" />
+          <Property Name="OBSERVACION" Type="nvarchar(max)" />
         </EntityType>
         <EntityType Name="OFERTAREQUERIMIENTO">
           <Key>
@@ -2894,6 +2906,18 @@ warning 6002: The table/view 'SifizPlanning.TICKET.CLIENTEREPORTEMTTO' does not 
             </Principal>
             <Dependent Role="NIVELCOLABORADORTECNOLOGIA">
               <PropertyRef Name="SECUENCIALTECNOLOGIA" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OFERTAOFERTA_ESTADOGESTIONOFERTA">
+          <End Role="ESTADOGESTIONOFERTA" Type="Self.ESTADOGESTIONOFERTA" Multiplicity="0..1" />
+          <End Role="OFERTAOFERTA" Type="Self.OFERTAOFERTA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ESTADOGESTIONOFERTA">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="OFERTAOFERTA">
+              <PropertyRef Name="SECUENCIALESTADOGESTION" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -5337,6 +5361,7 @@ warning 6002: The table/view 'SifizPlanning.TICKET.CLIENTEREPORTEMTTO' does not 
           <EntitySet Name="EstadoActa" EntityType="Self.EstadoActa" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="ESTADOCONTRATO" EntityType="Self.ESTADOCONTRATO" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="ESTADOENTREGABLE" EntityType="Self.ESTADOENTREGABLE" Schema="TAREAS" store:Type="Tables" />
+          <EntitySet Name="ESTADOGESTIONOFERTA" EntityType="Self.ESTADOGESTIONOFERTA" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="ESTADOOFERTA" EntityType="Self.ESTADOOFERTA" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="ESTADOTAREA" EntityType="Self.ESTADOTAREA" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="FASECONTRATO" EntityType="Self.FASECONTRATO" Schema="TAREAS" store:Type="Tables" />
@@ -5724,6 +5749,10 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
           <AssociationSet Name="FK_NIVELCOLABORADORTECNOLOGIA_TECNOLOGIASYPROCESOS" Association="Self.FK_NIVELCOLABORADORTECNOLOGIA_TECNOLOGIASYPROCESOS">
             <End Role="TECNOLOGIASYPROCESOS" EntitySet="TECNOLOGIASYPROCESOS" />
             <End Role="NIVELCOLABORADORTECNOLOGIA" EntitySet="NIVELCOLABORADORTECNOLOGIA" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OFERTAOFERTA_ESTADOGESTIONOFERTA" Association="Self.FK_OFERTAOFERTA_ESTADOGESTIONOFERTA">
+            <End Role="ESTADOGESTIONOFERTA" EntitySet="ESTADOGESTIONOFERTA" />
+            <End Role="OFERTAOFERTA" EntitySet="OFERTAOFERTA" />
           </AssociationSet>
           <AssociationSet Name="FK_OFERTAOFERTA_OFERTAREQUERIMIENTO" Association="Self.FK_OFERTAOFERTA_OFERTAREQUERIMIENTO">
             <End Role="OFERTAREQUERIMIENTO" EntitySet="OFERTAREQUERIMIENTO" />
@@ -7736,6 +7765,11 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
           <AssociationSet Name="FK_FORMALIZACIONOFERTAS_OFERTAOFERTA" Association="SifizPlanningModel.FK_FORMALIZACIONOFERTAS_OFERTAOFERTA">
             <End Role="OfertaOferta" EntitySet="OfertaOferta" />
             <End Role="FORMALIZACIONOFERTAS" EntitySet="FormalizacionOfertas" />
+          </AssociationSet>
+          <EntitySet Name="ESTADOGESTIONOFERTA" EntityType="SifizPlanningModel.EstadoGestionOferta" />
+          <AssociationSet Name="FK_OFERTAOFERTA_ESTADOGESTIONOFERTA" Association="SifizPlanningModel.FK_OFERTAOFERTA_ESTADOGESTIONOFERTA">
+            <End Role="ESTADOGESTIONOFERTA" EntitySet="ESTADOGESTIONOFERTA" />
+            <End Role="OfertaOferta" EntitySet="OfertaOferta" />
           </AssociationSet>
           </EntityContainer>
         <EntityType Name="Rol">
@@ -13227,6 +13261,9 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
           <Property Name="Descuento" Type="Boolean" />
           <Property Name="Estado" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Tipo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="SecuencialEstadoGestion" Type="Int32" />
+          <Property Name="Observacion" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="estadoGestionOferta" Relationship="SifizPlanningModel.FK_OFERTAOFERTA_ESTADOGESTIONOFERTA" FromRole="OfertaOferta" ToRole="ESTADOGESTIONOFERTA" />
         </EntityType>
         <Association Name="FK_OFERTAOFERTA_OFERTAREQUERIMIENTO">
           <End Type="SifizPlanningModel.OfertaRequerimiento" Role="OfertaRequerimiento" Multiplicity="0..1" />
@@ -13477,6 +13514,29 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
             </Principal>
             <Dependent Role="FORMALIZACIONOFERTAS">
               <PropertyRef Name="SecuencialOferta" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="EstadoGestionOferta">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Codigo" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Descripcion" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="EstaActivo" Type="Decimal" Nullable="false" Precision="1" Scale="0" />
+          <Property Name="NumeroVerificador" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ofertaOferta" Relationship="SifizPlanningModel.FK_OFERTAOFERTA_ESTADOGESTIONOFERTA" FromRole="ESTADOGESTIONOFERTA" ToRole="OfertaOferta" />
+        </EntityType>
+        <Association Name="FK_OFERTAOFERTA_ESTADOGESTIONOFERTA">
+          <End Type="SifizPlanningModel.EstadoGestionOferta" Role="ESTADOGESTIONOFERTA" Multiplicity="0..1" />
+          <End Type="SifizPlanningModel.OfertaOferta" Role="OfertaOferta" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ESTADOGESTIONOFERTA">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="OfertaOferta">
+              <PropertyRef Name="SecuencialEstadoGestion" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -15787,6 +15847,8 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
           <EntitySetMapping Name="OfertaOferta">
             <EntityTypeMapping TypeName="SifizPlanningModel.OfertaOferta">
               <MappingFragment StoreEntitySet="OFERTAOFERTA">
+                <ScalarProperty Name="Observacion" ColumnName="OBSERVACION" />
+                <ScalarProperty Name="SecuencialEstadoGestion" ColumnName="SECUENCIALESTADOGESTION" />
                 <ScalarProperty Name="Tipo" ColumnName="TIPO" />
                 <ScalarProperty Name="Estado" ColumnName="ESTADO" />
                 <ScalarProperty Name="Descuento" ColumnName="DESCUENTO" />
@@ -15869,6 +15931,17 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
                 <ScalarProperty Name="Valor" ColumnName="VALOR" />
                 <ScalarProperty Name="SecuencialEstadoOferta" ColumnName="SECUENCIALESTADOOFERTA" />
                 <ScalarProperty Name="SecuencialOferta" ColumnName="SECUENCIALOFERTA" />
+                <ScalarProperty Name="Codigo" ColumnName="CODIGO" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ESTADOGESTIONOFERTA">
+            <EntityTypeMapping TypeName="SifizPlanningModel.EstadoGestionOferta">
+              <MappingFragment StoreEntitySet="ESTADOGESTIONOFERTA">
+                <ScalarProperty Name="NumeroVerificador" ColumnName="NUMEROVERIFICADOR" />
+                <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
+                <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
                 <ScalarProperty Name="Codigo" ColumnName="CODIGO" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
               </MappingFragment>

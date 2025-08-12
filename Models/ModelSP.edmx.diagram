@@ -430,7 +430,7 @@
         <EntityTypeShape EntityType="SifizPlanningModel.PropuestaVacaciones" Width="1.5" PointX="17.5" PointY="67" />
         <AssociationConnector Association="SifizPlanningModel.FK_DIASDISPONIBLESVACACIONES_COLABORADOR" />
         <AssociationConnector Association="SifizPlanningModel.FK_PROPUESTAVACACIONES_COLABORADOR" />
-        <EntityTypeShape EntityType="SifizPlanningModel.OfertaOferta" Width="1.5" PointX="3" PointY="43.375" />
+        <EntityTypeShape EntityType="SifizPlanningModel.OfertaOferta" Width="1.5" PointX="3.375" PointY="42.625" />
         <AssociationConnector Association="SifizPlanningModel.FK_OFERTAOFERTA_OFERTAREQUERIMIENTO" />
         <EntityTypeShape EntityType="SifizPlanningModel.ClienteAuxiliar" Width="3.375" PointX="26.5" PointY="50.375" />
         <AssociationConnector Association="SifizPlanningModel.FK_CLIENTEAUXILIAR_CLIENTE" />
@@ -449,6 +449,8 @@
         <EntityTypeShape EntityType="SifizPlanningModel.FormalizacionOfertas" Width="2.5" PointX="5.25" PointY="45.75" />
         <AssociationConnector Association="SifizPlanningModel.FK_FORMALIZACIONOFERTAS_ESTADOOFERTA" />
         <AssociationConnector Association="SifizPlanningModel.FK_FORMALIZACIONOFERTAS_OFERTAOFERTA" />
+        <EntityTypeShape EntityType="SifizPlanningModel.EstadoGestionOferta" Width="1.5" PointX="41.375" PointY="30.875" />
+        <AssociationConnector Association="SifizPlanningModel.FK_OFERTAOFERTA_ESTADOGESTIONOFERTA" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

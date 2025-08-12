@@ -619,6 +619,9 @@
     <Compile Include="Models\EstadoEntregable.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\EstadoGestionOferta.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\EstadoOferta.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
