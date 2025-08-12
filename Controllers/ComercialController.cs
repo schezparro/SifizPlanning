@@ -424,7 +424,7 @@ namespace SifizPlanning.Controllers
                     proximaActividad = oferta.historicoTicket.FirstOrDefault()?.proximaActividad?.Descripcion,
                 };
 
-                // Construir el objeto de respuesta final
+                // Construir el objeto de respuesta final con fechas formateadas
                 var resultadoOferta = new
                 {
                     oferta.secuencial,
@@ -438,12 +438,12 @@ namespace SifizPlanning.Controllers
                     oferta.cliente,
                     oferta.ticket,
                     oferta.detalleRequerimiento,
-                    fechas.fechaEstimacion,
-                    fechas.fechaRevision,
-                    fechas.fechaAprobacionGerencia,
-                    fechas.fechaEnvioOferta,
-                    oferta.fechaGeneracion,
-                    oferta.fechaVencimiento,
+                    fechaEstimacion = fechas.fechaEstimacion?.ToString("dd/MM/yyyy"),
+                    fechaRevision = fechas.fechaRevision?.ToString("dd/MM/yyyy"),
+                    fechaAprobacionGerencia = fechas.fechaAprobacionGerencia?.ToString("dd/MM/yyyy"),
+                    fechaEnvioOferta = fechas.fechaEnvioOferta?.ToString("dd/MM/yyyy"),
+                    fechaGeneracion = oferta.fechaGeneracion?.ToString("dd/MM/yyyy"),
+                    fechaVencimiento = oferta.fechaVencimiento?.ToString("dd/MM/yyyy"),
                     fechas.proximaActividad
                 };
 

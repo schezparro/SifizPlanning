@@ -59,7 +59,25 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
                 const data = response.data;
 
                 if (data && typeof data === 'object' && data.success) {
-                    $scope.detalleOferta = data.detalle;
+                    // Función para convertir fechas del formato /Date()/
+                    function convertirFecha(fechaStr) {
+                        if (fechaStr && typeof fechaStr === 'string' && fechaStr.indexOf('/Date(') === 0) {
+                            var milisegundos = parseInt(fechaStr.match(/\d+/)[0]);
+                            return new Date(milisegundos).toLocaleDateString('es-ES');
+                        }
+                        return fechaStr || null;
+                    }
+
+                    // Convertir fechas en el detalle
+                    $scope.detalleOferta = {
+                        ...data.detalle,
+                        fechaEstimacion: convertirFecha(data.detalle.fechaEstimacion),
+                        fechaRevision: convertirFecha(data.detalle.fechaRevision),
+                        fechaAprobacionGerencia: convertirFecha(data.detalle.fechaAprobacionGerencia),
+                        fechaEnvioOferta: convertirFecha(data.detalle.fechaEnvioOferta),
+                        fechaGeneracion: convertirFecha(data.detalle.fechaGeneracion),
+                        fechaVencimiento: convertirFecha(data.detalle.fechaVencimiento)
+                    };
 
                     // Mostrar modal de forma limpia
                     angular.element('#modal-detalle-oferta').modal('show');
