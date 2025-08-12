@@ -18,7 +18,9 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
         formaPago: '',
         validezOferta: '',
         descuento: '',
-        estado: ''
+    estado: '',
+    estadoGestion: '',
+    observacion: ''
     };
 
         // Validación visual para el campo precioOferta
@@ -206,7 +208,9 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
                         fechaEnvioOferta: convertirFecha(oferta.fechaEnvioOferta),
                         fechaVencimiento: convertirFecha(oferta.fechaVencimiento),
                         codigo: (!codigoOferta || codigoOferta === '') ? 'NO APLICA' : codigoOferta,
-                        proximaActividad: oferta.proximaActividad
+                        proximaActividad: oferta.proximaActividad,
+                        secuencialEstadoGestion: oferta.secuencialEstadoGestion,
+                        observacion: oferta.observacion
                     };
                 });
                 $scope.totalOfertas = data.total;
@@ -218,6 +222,40 @@ comercialApp.controller('offersController', ['$scope', '$http', '$timeout', func
         });
     };
     $scope.cargarOfertas();
+
+    // Catalogo estados de gestión de oferta
+    $scope.estadosGestion = [];
+    $scope.cargarEstadosGestion = function() {
+        $http.post('catalogos/estados-gestion-oferta', {}).success(function(data){
+            if (data && data.success) {
+                $scope.estadosGestion = data.estadosGestion || [];
+            }
+        });
+    };
+    $scope.cargarEstadosGestion();
+
+    // Inline update estado gestion / observacion (debounced)
+    var actualizarEstadoDebounced;
+    $scope.onChangeEstadoGestion = function(oferta) {
+        if (actualizarEstadoDebounced) $timeout.cancel(actualizarEstadoDebounced);
+        actualizarEstadoDebounced = $timeout(function(){
+            $http.post('comercial/actualizar-estado-gestion-oferta', {
+                idOferta: oferta.secuencial || oferta.id || oferta.Secuencial,
+                idEstado: oferta.secuencialEstadoGestion,
+                observacion: oferta.observacion || ''
+            }).success(function(resp){
+                if (!resp || !resp.success) {
+                    messageDialog && messageDialog.show ? messageDialog.show('Información', (resp && resp.msg) || 'No se pudo actualizar el estado de gestión') : alert((resp && resp.msg) || 'No se pudo actualizar el estado de gestión');
+                }
+            }).error(function(){
+                messageDialog && messageDialog.show ? messageDialog.show('Error', 'Error de red al actualizar estado de gestión') : alert('Error de red al actualizar estado de gestión');
+            });
+        }, 400);
+    };
+
+    $scope.onBlurObservacion = function(oferta) {
+        $scope.onChangeEstadoGestion(oferta);
+    };
 
     // Debounce para filtros y búsqueda general
     var debounceTimeout = null;

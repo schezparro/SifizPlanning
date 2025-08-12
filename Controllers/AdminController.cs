@@ -3477,6 +3477,30 @@ f in db.FotoColaborador on t equals f.colaborador
 
         [HttpPost]
         [Authorize]
+        public ActionResult DarEstadosGestionOferta()
+        {
+            try
+            {
+                var estados = (from e in db.EstadoGestionOferta
+                               where e.EstaActivo == 1
+                               orderby e.Descripcion
+                               select new
+                               {
+                                   id = e.Secuencial,
+                                   nombre = e.Descripcion
+                               }).ToList();
+
+                return Json(new { success = true, estadosGestion = estados });
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarEstadosGestionOferta] Error al consultar estados de gestión: {e.Message}");
+                return Json(new { success = false, msg = "Error al consultar estados de gestión." });
+            }
+        }
+
+        [HttpPost]
+        [Authorize]
         public ActionResult DarTecnologias()
         {
             var tecnologias = (from tec in db.TecnologiasYProcesos

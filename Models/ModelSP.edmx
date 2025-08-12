@@ -7766,9 +7766,9 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
             <End Role="OfertaOferta" EntitySet="OfertaOferta" />
             <End Role="FORMALIZACIONOFERTAS" EntitySet="FormalizacionOfertas" />
           </AssociationSet>
-          <EntitySet Name="ESTADOGESTIONOFERTA" EntityType="SifizPlanningModel.EstadoGestionOferta" />
+          <EntitySet Name="EstadoGestionOferta" EntityType="SifizPlanningModel.EstadoGestionOferta" />
           <AssociationSet Name="FK_OFERTAOFERTA_ESTADOGESTIONOFERTA" Association="SifizPlanningModel.FK_OFERTAOFERTA_ESTADOGESTIONOFERTA">
-            <End Role="ESTADOGESTIONOFERTA" EntitySet="ESTADOGESTIONOFERTA" />
+            <End Role="ESTADOGESTIONOFERTA" EntitySet="EstadoGestionOferta" />
             <End Role="OfertaOferta" EntitySet="OfertaOferta" />
           </AssociationSet>
           </EntityContainer>
@@ -15936,7 +15936,7 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="ESTADOGESTIONOFERTA">
+          <EntitySetMapping Name="EstadoGestionOferta">
             <EntityTypeMapping TypeName="SifizPlanningModel.EstadoGestionOferta">
               <MappingFragment StoreEntitySet="ESTADOGESTIONOFERTA">
                 <ScalarProperty Name="NumeroVerificador" ColumnName="NUMEROVERIFICADOR" />

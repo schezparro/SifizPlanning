@@ -43,6 +43,8 @@
                         <th style="padding:2px 4px;">DESC</th>
                         <th style="padding:2px 4px;">PROXIMA ACTIVIDAD</th>
                         <th style="padding:2px 4px;">ESTADO</th>
+                        <th style="padding:2px 4px;">EST. GESTION</th>
+                        <th style="padding:2px 4px;">OBSERVACION</th>
                         <th style="padding:2px 4px;">ACCIONES</th>
                     </tr>
                     <tr>
@@ -63,6 +65,14 @@
                         <th><input type="text" class="form-control" ng-model="filtro.descuento" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
                         <th><input type="text" class="form-control" ng-model="filtro.proximaActividad" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
                         <th><input type="text" class="form-control" ng-model="filtro.estado" style="height:26px;padding:2px 4px;font-size:13px;" /></th>
+                        <th>
+                            <select class="form-control" ng-model="filtro.estadoGestion" ng-options="e.id as e.nombre for e in estadosGestion" style="height:26px;padding:2px 4px;font-size:13px;">
+                                <option value="">Todos...</option>
+                            </select>
+                        </th>
+                        <th>
+                            <input type="text" class="form-control" ng-model="filtro.observacion" style="height:26px;padding:2px 4px;font-size:13px;" />
+                        </th>
                         <th></th>
                     </tr>
                 </thead>
@@ -90,6 +100,16 @@
                                 'bg-success': oferta.estado && oferta.estado.includes('ACEPTADA'),
                                 'bg-danger': oferta.estado === 'RECHAZADA'
                             }" style="font-size:10px; padding:2px 6px;">{{oferta.estado}}</span>
+                        </td>
+                        <td style="padding:2px 4px; min-width:160px;">
+                            <select class="form-control input-sm" ng-model="oferta.secuencialEstadoGestion" ng-change="onChangeEstadoGestion(oferta)"
+                                    ng-options="e.id as e.nombre for e in estadosGestion" style="height:26px;padding:2px 4px;font-size:13px;">
+                                <option value="">SIN ESTADO</option>
+                            </select>
+                        </td>
+                        <td style="padding:2px 4px; min-width:220px;">
+                            <input type="text" class="form-control input-sm" ng-model="oferta.observacion" ng-blur="onBlurObservacion(oferta)"
+                                   placeholder="" style="height:26px;padding:2px 6px;font-size:13px;" />
                         </td>
                         <td style="padding:2px 2px; white-space:nowrap;">
                             <button class="btn btn-info btn-xs" ng-click="verDetalleOferta(oferta, $event)" style="padding:1px 6px;font-size:13px;">Detalle</button>

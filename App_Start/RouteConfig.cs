@@ -293,6 +293,11 @@ namespace SifizPlanning
                 url: "catalogos/requerimientos/{id}",
                 defaults: new { controller = "Admin", action = "DarRequerimientos", id = UrlParameter.Optional }
             );
+                routes.MapRoute(
+                    name: "DarEstadosGestionOferta",
+                    url: "catalogos/estados-gestion-oferta/{id}",
+                    defaults: new { controller = "Admin", action = "DarEstadosGestionOferta", id = UrlParameter.Optional }
+                );
 
             routes.MapRoute(
                 name: "DarNombresClientes",
@@ -2463,6 +2468,11 @@ namespace SifizPlanning
                 name: "DarEstadoOfertaComercial",
                 url: "comercial/estado-oferta-comercial/{id}",
                 defaults: new { controller = "Comercial", action = "DarEstadoOfertaComercial", id = UrlParameter.Optional }
+            );
+            routes.MapRoute(
+                name: "ActualizarEstadoGestionOferta",
+                url: "comercial/actualizar-estado-gestion-oferta/{id}",
+                defaults: new { controller = "Comercial", action = "ActualizarEstadoGestionOferta", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(

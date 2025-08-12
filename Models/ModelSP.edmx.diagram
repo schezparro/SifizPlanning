@@ -449,7 +449,7 @@
         <EntityTypeShape EntityType="SifizPlanningModel.FormalizacionOfertas" Width="2.5" PointX="5.25" PointY="45.75" />
         <AssociationConnector Association="SifizPlanningModel.FK_FORMALIZACIONOFERTAS_ESTADOOFERTA" />
         <AssociationConnector Association="SifizPlanningModel.FK_FORMALIZACIONOFERTAS_OFERTAOFERTA" />
-        <EntityTypeShape EntityType="SifizPlanningModel.EstadoGestionOferta" Width="1.5" PointX="41.375" PointY="30.875" />
+        <EntityTypeShape EntityType="SifizPlanningModel.EstadoGestionOferta" Width="2" PointX="41.375" PointY="30.875" />
         <AssociationConnector Association="SifizPlanningModel.FK_OFERTAOFERTA_ESTADOGESTIONOFERTA" />
         </Diagram>
     </edmx:Diagrams>

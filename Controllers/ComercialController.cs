@@ -506,6 +506,8 @@ namespace SifizPlanning.Controllers
                                    {
                                        secuencial = or.Secuencial,
                                        codigo = or.Codigo,
+                                       secuencialEstadoGestion = or.SecuencialEstadoGestion,
+                                       observacion = or.Observacion,
                                        secuencialRequerimiento = r.Secuencial,
                                        fechaGeneracion = or.FechaGeneracionOferta,
                                        fechaVencimiento = or.FechaVencimientoOferta,
@@ -545,6 +547,18 @@ namespace SifizPlanning.Controllers
 
                     if (filtros.ContainsKey("tema") && !string.IsNullOrEmpty(filtros["tema"]))
                         ofertasQuery = ofertasQuery.Where(x => x.tema != null && x.tema.ToLower().Contains(filtros["tema"].ToLower()));
+
+                    if (filtros.ContainsKey("estadoGestion") && !string.IsNullOrEmpty(filtros["estadoGestion"]))
+                    {
+                        int idEstadoFiltro;
+                        if (int.TryParse(filtros["estadoGestion"], out idEstadoFiltro))
+                        {
+                            ofertasQuery = ofertasQuery.Where(x => x.secuencialEstadoGestion == idEstadoFiltro);
+                        }
+                    }
+
+                    if (filtros.ContainsKey("observacion") && !string.IsNullOrEmpty(filtros["observacion"]))
+                        ofertasQuery = ofertasQuery.Where(x => x.observacion != null && x.observacion.ToLower().Contains(filtros["observacion"].ToLower()));
                 }
 
                 int total = ofertasQuery.Count();
@@ -563,6 +577,8 @@ namespace SifizPlanning.Controllers
                     {
                         oferta.secuencial,
                         oferta.codigo,
+                        oferta.secuencialEstadoGestion,
+                        oferta.observacion,
                         fechaEstimacion = historicoTicket.FirstOrDefault(h => h.SecuencialProximaActividad == 3)?.FechaOperacion,
                         fechaRevision = historicoTicket.FirstOrDefault(h => h.SecuencialProximaActividad == 7)?.FechaOperacion,
                         fechaAprobacionGerencia = historicoTicket.FirstOrDefault(h => h.SecuencialProximaActividad == 30)?.FechaOperacion,
@@ -1024,6 +1040,30 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "COMERCIAL, ADMIN")]
+        public ActionResult ActualizarEstadoGestionOferta(int idOferta, int? idEstado, string observacion)
+        {
+            try
+            {
+                var oferta = db.OfertaOferta.FirstOrDefault(o => o.Secuencial == idOferta);
+                if (oferta == null)
+                {
+                    return Json(new { success = false, msg = "No se encontró la oferta especificada." });
+                }
+
+                oferta.SecuencialEstadoGestion = idEstado;
+                oferta.Observacion = observacion;
+                db.SaveChanges();
+
+                return Json(new { success = true });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult FormalizacionComercial(int start, int lenght, string filtro = "")
         {
 
@@ -1410,7 +1450,7 @@ namespace SifizPlanning.Controllers
                     msg = "Se ha realizado la operación correctamente."
                 });
             }
-            catch (DbEntityValidationException ex)
+            catch (DbEntityValidationException)
             {
                 return Json(new
                 {
