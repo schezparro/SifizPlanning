@@ -202,54 +202,68 @@ namespace SifizPlanning.Util
 
         public static bool EnviarEmailSistemaPersonalizadoAsync(string[] emailsDestinos, string emailBody, string emailCSS, string asunto = "Información", string[] adjuntos = null, string qr = null)
         {
-            string nameQr = Guid.NewGuid().ToString() + ".png";
-            string pathImagen = HostingEnvironment.MapPath("~/Web/images/email") + "/" + nameQr;
-            if (qr != null)
-            {
-                QRCodeGenerator qrGenerator = new QRCodeGenerator();
-                QRCodeData qrCodeData = qrGenerator.CreateQrCode(qr, QRCodeGenerator.ECCLevel.Q);
-                BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);
-                byte[] qrCodeImage = qrCode.GetGraphic(2);
-                File.WriteAllBytes(pathImagen, qrCodeImage);
-            }
-            string htmlCss = emailCSS;
+            // Usar la imagen corporativa fija en lugar del QR dinámico
+            string logoCorporativo = "sifizsoft.png";
+            string pathImagen = HostingEnvironment.MapPath("~/Web/images/email") + "/" + logoCorporativo;
+
+            // Combinar CSS personalizado con CSS base corporativo
+            string htmlCss = @"<style>
+                                            body {
+                                                font-family: ""Century Gothic"", sans-serif;
+                                                font-size: 12pt;
+                                                color: #353535;
+                                                text-align: left;
+                                            }
+                                            .firma-copyright {
+                                                font-family: ""Century Gothic"", sans-serif;
+                                                font-size: 9pt;
+                                                color: #000035;
+                                                text-align: center;
+                                            }
+                                       </style>" + emailCSS;
             string htmlfirma = @"<div class=WordSection1>
-                                    <p class=MsoNormal><o:p>&nbsp;</o:p></p><p class=MsoNormal><o:p>&nbsp;</o:p></p><p class=MsoNormal><span lang=ES-EC style='font-size:12.0pt;font-family:""Times New Roman"",serif;color:#1F497D;mso-fareast-language:ES-EC'>Atentamente,<o:p></o:p></span></p><p class=MsoNormal><i><span style='font-size:12.0pt;font-family:""Times New Roman"",serif;color:#1F497D;mso-fareast-language:ES-EC'>"
-                            +
-                            "Sifizplanning"
-                            +
-                            @"<o:p></o:p></span></i></p><p class=MsoNormal><span style='font-size:12.0pt;font-family:""Times New Roman"",serif;color:#1F497D;mso-fareast-language:ES-EC'>"
-                            +
-                            "Sistema Planificador Integral SifizSoft s.a."
-                            +
-                            @"<br> 
-                            <b style='color:#1F497D !important;'>
-                                <i>
-                                    02-450-4616 <br/>
-                                    Quito - Ecuador
-                                </i>
-                            </b>";
-            if (qr != null)
-            {
-                htmlfirma += "<br/><img style='width: 25px !important; height: 25px !important;'  src='cid:" + nameQr + "'><br/>";
-            }
+                                    <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                                    <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                                    <p class=MsoNormal>
+                                        <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>Atentamente,<o:p></o:p></span>
+                                    </p>
+                                    <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                                    <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                                    <p class=MsoNormal>
+                                        <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>Sifizplanning<o:p></o:p></span>
+                                    </p>
+                                    <p class=MsoNormal>
+                                        <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>SISTEMA PLANIFICADOR INTEGRAL SIFIZSOFT S.A.<o:p></o:p></span>
+                                    </p>
+                                    <p class=MsoNormal>
+                                        <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>Telf. (593) 2-450-4616<o:p></o:p></span>
+                                    </p>
+                                    <p class=MsoNormal>
+                                        <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>Quito - Ecuador<o:p></o:p></span>
+                                    </p>";
+            
+            // Siempre incluir el logo corporativo
+            htmlfirma += "<p class=MsoNormal align=center style='text-align:center'><img style='max-width: 100%; height: auto !important;'  src='cid:" + logoCorporativo + "'></p>";
 
-            htmlfirma += @"</span>                              
-                              <span lang=IT style='font-size:12.0pt;font-family:'Times New Roman',serif;color:#203864;mso-fareast-language:ES'><o:p></o:p></span></p><div class=MsoNormal align=center style='text-align:center'><span lang=EN style='font-size:9.0pt;font-family:'Verdana',sans-serif;color:#1F497D;mso-fareast-language:ES-EC'><hr size=3 width='100%' align=center></span></div><p class=MsoNormal><b><span lang=ES style='color:#1F497D;mso-fareast-language:ES-EC'>Somos líderes en la producción de software financiero-contable de última tecnología. </span></b><b><span lang=ES style='font-family:'Times New Roman',serif;color:#1F497D;mso-fareast-language:ES'><o:p></o:p></span></b></p><p class=MsoNormal><a href='http://www.sifizsoft.com/'><span style='font-size:12.0pt;color:#1F497D;position:relative;top:2.0pt;mso-text-raise:-2.0pt;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=129 height=49 id='Imagen_x0020_2' src='cid:sifizsoft.jpg' alt='cid:image001.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp;&nbsp;&nbsp;<span style='position:relative;top:-3.0pt;mso-text-raise:3.0pt'>&nbsp;</span></span><span lang=EN-US style='font-size:9.0pt;color:#1F497D;position:relative;top:-18.0pt;mso-text-raise:18.0pt;letter-spacing:.2pt;mso-fareast-language:ES-EC'>Like us in</span><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp; </span><a href='http://www.facebook.com/pages/SifizSoft/287494208026463?sk=app_129982580378550'><span style='font-size:12.0pt;color:#1F497D;position:relative;top:-8.0pt;mso-text-raise:8.0pt;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=41 height=41 id='Imagen_x0020_3' src='cid:fb.jpg' alt='cid:image002.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp;&nbsp;</span><span lang=EN-US style='font-size:9.0pt;color:#1F497D;position:relative;top:-18.0pt;mso-text-raise:18.0pt;mso-fareast-language:ES-EC'>and Follow us on</span><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'> </span><a href='https://twitter.com/SifizSoftSA'><span style='font-size:12.0pt;color:#1F497D;position:relative;top:-8.0pt;mso-text-raise:8.0pt;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=41 height=41 id='Imagen_x0020_4' src='cid:tw.jpg' alt='cid:image003.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp;&nbsp;</span><a href='http://lnkd.in/GYc2-s'><span style='font-size:12.0pt;color:#1F497D;position:relative;top:-8.0pt;mso-text-raise:8.0pt;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=106 height=41 id='Imagen_x0020_5' src='cid:linkedin.jpg' alt='cid:image004.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp; &nbsp;</span><a href='http://www.efqm.org/en/'><span style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=101 height=55 id='Imagen_x0020_6' src='cid:efqm.jpg' alt='cid:image005.png@01D244E9.77AAB2B0'></span></a><span style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'> </span><a href='http://www.openkm.com/en/'><span style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=109 height=53 id='Imagen_x0020_7' src='cid:openkm.jpg' alt='cid:image006.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'><o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=EN-US style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'><o:p>&nbsp;</o:p></span></p><p class=MsoNormal align=center style='text-align:center;line-height:17.0pt;mso-line-height-rule:exactly;text-autospace:none'><span style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>OFICINA QUITO: Rumipamba E2-214 y Av. República, edificio Signature, piso 09, oficina 901</span><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>.&nbsp; Teléfonos&nbsp; </span><span style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>02-351-7729, &nbsp;02-351-8919, 02-450-4616, 02-450-4727, </span><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>desde USA 1(407)255 8532<o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>OFICINA AMBATO: Av. Atahualpa y Pasaje Arajuno S/N a una cuadra del nuevo municipio.&nbsp; Teléfono 03-241-6586&nbsp; 03-241-9127<o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>PO&nbsp; BOX 780066&nbsp;Orlando, FL 32878-0066 Toll free (800) 793-8369<o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'><o:p>&nbsp;</o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>Este correo electrónico es solo para uso del destinatario y puede contener información confidencial. Cualquier distribución uso o lectura de este material está expresamente prohibido. Si usted no es el destinatario o si usted ha recibido este correo electrónico por error por favor contacte al remitente y destruya todas las copias y el mensaje original.</span><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES'><o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'><o:p>&nbsp;</o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=EN-US style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>This E-mail message is for the sole use of the intended recipient(s) and may contain confidential and privileged information. Any unauthorized review, use, disclosure or distribution is prohibited. If you are not the intended recipient, please contact the sender by reply E-mail and destroy all copies of the original message.<o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=EN-US style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>Copyrights ©SifizSoft&nbsp;2004-2016 carefully reserved and preserved</span><span lang=EN-US style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES'><o:p></o:p></span></p><p class=MsoNormal><o:p>&nbsp;</o:p></p></div></body></html>";
+            htmlfirma += @"<p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                              <p class=MsoNormal align=center style='text-align:center'>
+                                  <span style='font-family:""Century Gothic"",sans-serif;font-size:9.0pt;color:#000035;'>Copyrights ©SifizSoft 2004-2025 carefully reserved and preserved<o:p></o:p></span>
+                              </p>
+                              <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                          </div>";
 
+            // Siempre incluir el logo corporativo
             List<string> listImagenes = new List<string>();
-            listImagenes.AddRange(new string[] { "sifizsoft.jpg", "fb.jpg", "tw.jpg", "linkedin.jpg", "efqm.jpg", "openkm.jpg" });
-            if (qr != null)
-            {
-                listImagenes.Add(nameQr);
-            }
+            listImagenes.Add(logoCorporativo);
             string[] imagenes = listImagenes.ToArray();
             try
             {
                 string email = System.Configuration.ConfigurationManager.AppSettings["emailApp"];
                 string password = System.Configuration.ConfigurationManager.AppSettings["passwordEmailApp"];
                 string htmlMail = htmlCss + emailBody + htmlfirma;
-                EnviarEmail(email, emailsDestinos, htmlMail, asunto, password, true, imagenes, adjuntos);
+
+                // Siempre adjuntar la imagen corporativa con el parámetro -1
+                Utiles.EnviarEmail(email, emailsDestinos, htmlMail, asunto, password, true, imagenes, adjuntos, -1);
             }
             catch (Exception e)
             {
