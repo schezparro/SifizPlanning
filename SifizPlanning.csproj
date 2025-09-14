@@ -1056,6 +1056,7 @@
     <Compile Include="Security\MyRoleProvider.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Util\Utiles.cs" />
+    <Content Include="Web\images\email\sifizsoft.png" />
     <Content Include="Web\js\comercial\formalizacionController.js" />
     <Content Include="Areas\HelpPage\HelpPage.css" />
     <Content Include="Content\bootstrap-grid.css" />
@@ -1292,6 +1293,7 @@
     <Content Include="Views\Comercial\windowFormalizacionOfertasComercial.cshtml" />
     <Content Include="Views\Admin\windowProyectosExcel.cshtml" />
     <Content Include="Views\Comercial\windowOffersExcel.cshtml" />
+    <Content Include="Views\Indicadores\windowIndicadoresOfertas.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1319,6 +1321,7 @@
     <Content Include="Web\js\consultas\modulosClientes.js" />
     <Content Include="Web\js\dirPagination.js" />
     <Content Include="Web\js\highcharts-more.js" />
+    <Content Include="Web\js\indicadores\indicadoresOfertas.js" />
     <Content Include="Web\js\jspdf.debug.js" />
     <Content Include="Web\js\jspdf.min.js" />
     <Content Include="Web\js\jspdf.plugin.autotable.js" />
