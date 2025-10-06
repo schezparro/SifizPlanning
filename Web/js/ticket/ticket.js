@@ -636,6 +636,32 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
         ticketVersionCliente: ''
     };
 
+    $scope.tickets = [];
+    $scope.cantidadUrgentes = 0;
+
+    // Llamada inicial para contar tickets urgentes
+    $http.get('tickets/contar-tickets-urgentes-abiertos/')
+        .then(function (resp) {
+            if (resp.data.success) {
+                $scope.cantidadUrgentes = resp.data.cantidad;
+            }
+        }, function (err) {
+            console.error("Error al contar tickets urgentes", err);
+        });
+
+    $scope.mostrarUrgentes = function () {
+        console.log("mostrar urgentes");
+        $scope.selectedPrioridad = "URGENTE";
+        $scope.selectedEstado = ["ABIERTO"];
+        setTimeout(function () {
+            $('#mySelectEstado').selectpicker('val', $scope.selectedEstado);
+            $('.selectpicker[ng-model="selectedPrioridad"]').selectpicker('val', $scope.selectedPrioridad);
+        }, 100);
+
+        $scope.filterData(6);
+        $scope.filterData(8);
+    };
+
     angular.element('#fecha-asignacion-ticket').datepicker({
         format: 'dd/mm/yyyy'
     });
@@ -3619,9 +3645,17 @@ function dateToStr(dateObj, format, separator, includeHour) {
 
 ticketApp.filter("strDateToStrTime", function () {
     return function (textDate) {
-        var fecha = new Date(parseInt(textDate.replace('/Date(', '')));
+        if (!textDate) {
+            return "";
+        }
+        var match = /\/Date\((\d+)\)\//.exec(textDate);
+        if (!match) {
+            return "";
+        }
+
+        var fecha = new Date(parseInt(match[1]));
         return dateToStrTime(fecha);
-    }
+    };
 });
 
 function dateToStrTime(dateObj, format, separator) {

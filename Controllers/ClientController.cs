@@ -409,13 +409,24 @@ namespace SifizPlanning.Controllers
 				usuariosDestinos.AddRange(Utiles.CorreoPorGrupoEmail("COORD"));
 				var personaCliente = db.Persona_Cliente.Find(nuevoTicket.SecuencialPersona_Cliente);
 				var codigoCliente = personaCliente.cliente.Codigo;
-				var asuntoEmail = $"{codigoCliente} HESO {numeroTicket} - Adicionado el nuevo ticket ({nuevoTicket.Asunto})";
+                var asuntoEmail = nuevoTicket.SecuencialPrioridadTicket == 1
+								 ? $"{codigoCliente} HESO {numeroTicket} - Adicionado el nuevo ticket URGENTE ({nuevoTicket.Asunto})"
+								 : $"{codigoCliente} HESO {numeroTicket} - Adicionado el nuevo ticket ({nuevoTicket.Asunto})";
 
-				var gestores = nuevoTicket.persona_cliente.cliente.gestorServicios.ToList();
+                var gestores = nuevoTicket.persona_cliente.cliente.gestorServicios.ToList();
 				var colaboradores = gestores.Select(g => g.colaborador.persona.usuario.FirstOrDefault()?.Email).ToList();
 				usuariosDestinos.AddRange(colaboradores.Distinct());
 
-				Utiles.EnviarEmailSistema(usuariosDestinos.ToArray(), textoEmail, asuntoEmail, null, null);
+                if (nuevoTicket.SecuencialPrioridadTicket == 1)
+                {
+					var operaciones = Utiles.CorreoPorGrupoEmail("OPERACIONES");
+                    usuariosDestinos.AddRange(operaciones);
+                }
+
+                // Eliminar duplicados finales por si acaso
+                usuariosDestinos = usuariosDestinos.Distinct().ToList();
+
+                Utiles.EnviarEmailSistema(usuariosDestinos.ToArray(), textoEmail, asuntoEmail, null, null);
 
 				var destinos = string.Join(", ", usuariosDestinos.ToArray());
 				var textoHistoricoCorreo = "<b>Correo de creación de nuevo ticket</b><br/>";

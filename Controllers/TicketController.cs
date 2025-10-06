@@ -38,554 +38,578 @@ namespace SifizPlanning.Controllers
         {
             return View();
         }
+        [Authorize(Roles = "COORDINADOR, ADMIN, TICKET, GESTOR")]
+        public ActionResult ContarTicketsUrgentesAbiertos()
+        {
+            int cantidad = (from t in db.Ticket
+                            join et in db.EstadoTicket on t.estadoTicket equals et
+                            join pr in db.PrioridadTicket on t.prioridadTicket equals pr
+                            where et.Codigo == "ABIERTO" && pr.Codigo == "URGENTE"
+                            select t).Count();
+
+            return Json(new { success = true, cantidad = cantidad }, JsonRequestBehavior.AllowGet);
+        }
+
 
         [Authorize(Roles = "COORDINADOR, ADMIN, TICKET, GESTOR")]
         [HttpPost]
         public ActionResult DarTickets(int start = 0, int lenght = 12, string filtro = "", int order = 0, int asc = 1, bool todos = false, string tipoFacturable = "t")
         {
-            string emailUser = User.Identity.Name;
-            Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
-            Colaborador col = db.Colaborador.FirstOrDefault(c => c.SecuencialPersona == user.SecuencialPersona);
-            var clientes = db.GestorServicios.Where(x => x.SecuencialColaborador == col.Secuencial).Select(x => new { cliente = x.cliente.Descripcion }).ToList();
 
-            var s = new JavaScriptSerializer();
-            var jsonObj = s.Deserialize<dynamic>(filtro);
-
-            string filtroNumero = jsonObj["numero"].ToString();
-            string filtroCliente = jsonObj["cliente"];
-            string filtroFecha = jsonObj["fecha"];
-            string filtroAsunto = jsonObj["asunto"];
-            string filtroAsignado = jsonObj["asignado"];
-
-            /*Filtros de seleccion*/
-            List<string> filtroPrioridad = new List<string>();
-            bool tieneFiltroPrioridad = false;
-            dynamic prioridad = jsonObj["prioridad"];
-            if (prioridad != null && prioridad.GetType().FullName != "System.String")
+            try
             {
-                foreach (var pri in prioridad)
+                db.Database.CommandTimeout = 180;
+
+                string emailUser = User.Identity.Name;
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+                Colaborador col = db.Colaborador.FirstOrDefault(c => c.SecuencialPersona == user.SecuencialPersona);
+                var clientes = db.GestorServicios.Where(x => x.SecuencialColaborador == col.Secuencial).Select(x => new { cliente = x.cliente.Descripcion }).ToList();
+
+                var s = new JavaScriptSerializer();
+                var jsonObj = s.Deserialize<dynamic>(filtro);
+
+                string filtroNumero = jsonObj["numero"].ToString();
+                string filtroCliente = jsonObj["cliente"];
+                string filtroFecha = jsonObj["fecha"];
+                string filtroAsunto = jsonObj["asunto"];
+                string filtroAsignado = jsonObj["asignado"];
+
+                /*Filtros de seleccion*/
+                List<string> filtroPrioridad = new List<string>();
+                bool tieneFiltroPrioridad = false;
+                dynamic prioridad = jsonObj["prioridad"];
+                if (prioridad != null && prioridad != "")
                 {
-                    filtroPrioridad.Add(pri);
+                    tieneFiltroPrioridad = true;
                 }
-                tieneFiltroPrioridad = true;
-            }
 
-            List<string> filtroCategoria = new List<string>();
-            bool tieneFiltroCategoria = false;
-            dynamic categoria = jsonObj["categoria"];
-            if (categoria != null && categoria.GetType().FullName != "System.String")
-            {
-                foreach (var cat in categoria)
+                List<string> filtroCategoria = new List<string>();
+                bool tieneFiltroCategoria = false;
+                dynamic categoria = jsonObj["categoria"];
+                if (categoria != null && categoria.GetType().FullName != "System.String")
                 {
-                    filtroCategoria.Add(cat);
+                    foreach (var cat in categoria)
+                    {
+                        filtroCategoria.Add(cat);
+                    }
+                    tieneFiltroCategoria = true;
                 }
-                tieneFiltroCategoria = true;
-            }
 
-            List<string> filtroEstado = new List<string>();
-            bool tieneFiltroEstado = false;
-            dynamic estado = jsonObj["estado"];
-            if (estado != null && estado.GetType().FullName != "System.String")
-            {
-                foreach (var est in estado)
+                List<string> filtroEstado = new List<string>();
+                bool tieneFiltroEstado = false;
+                dynamic estado = jsonObj["estado"];
+                if (estado != null && estado.GetType().FullName != "System.String")
                 {
-                    filtroEstado.Add(est);
+                    foreach (var est in estado)
+                    {
+                        filtroEstado.Add(est);
+                    }
+                    tieneFiltroEstado = true;
                 }
-                tieneFiltroEstado = true;
-            }
 
-            List<string> filtroProximaActividad = new List<string>();
-            bool tieneFiltroProximaActividad = false;
-            dynamic proximaActividad = jsonObj["proximaActividad"];
-            if (proximaActividad != null && proximaActividad.GetType().FullName != "System.String")
-            {
-                foreach (var prox in proximaActividad)
+                List<string> filtroProximaActividad = new List<string>();
+                bool tieneFiltroProximaActividad = false;
+                dynamic proximaActividad = jsonObj["proximaActividad"];
+                if (proximaActividad != null && proximaActividad.GetType().FullName != "System.String")
                 {
-                    filtroProximaActividad.Add(prox);
+                    foreach (var prox in proximaActividad)
+                    {
+                        filtroProximaActividad.Add(prox);
+                    }
+                    tieneFiltroProximaActividad = true;
                 }
-                tieneFiltroProximaActividad = true;
-            }
 
-            List<string> filtroTicketVersionCliente = new List<string>();
-            bool tieneFiltroTicketVersionCliente = false;
-            dynamic ticketVersionCliente = jsonObj["ticketVersionCliente"];
-            if (ticketVersionCliente != null && ticketVersionCliente.GetType().FullName != "System.String")
-            {
-                foreach (var tvc in ticketVersionCliente)
+                List<string> filtroTicketVersionCliente = new List<string>();
+                bool tieneFiltroTicketVersionCliente = false;
+                dynamic ticketVersionCliente = jsonObj["ticketVersionCliente"];
+                if (ticketVersionCliente != null && ticketVersionCliente.GetType().FullName != "System.String")
                 {
-                    filtroTicketVersionCliente.Add(tvc);
+                    foreach (var tvc in ticketVersionCliente)
+                    {
+                        filtroTicketVersionCliente.Add(tvc);
+                    }
+                    tieneFiltroTicketVersionCliente = true;
                 }
-                tieneFiltroTicketVersionCliente = true;
-            }
-            var ticketsParcial = (from t in db.Ticket
-                                  join
-                                      et in db.EstadoTicket on t.estadoTicket equals et
-                                  join
-                                      pr in db.PrioridadTicket on t.prioridadTicket equals pr
-                                  join
-                                      ct in db.CategoriaTicket on t.categoriaTicket equals ct
-                                  join
-                                      pc in db.Persona_Cliente on t.persona_cliente equals pc
-                                  join
-                                      pa in db.ProximaActividad on t.proximaActividad equals pa
-                                  orderby t.Secuencial ascending
-                                  select new
-                                  {
-                                      numero = t.Secuencial,
-                                      cliente = pc.cliente.Descripcion,
-                                      fecha = t.FechaCreado,
-                                      asunto = t.Asunto,
-                                      seFactura = t.SeFactura,
-                                      facturado = t.Facturado,
-                                      asignado = "",
-                                      prioridad = pr.Codigo,
-                                      categoria = ct.Codigo,
-                                      estado = et.Codigo,
-                                      ticketVersionCliente = db.TicketVersionCliente.Where(tvc => tvc.Secuencial == t.SecuencialTicketVersionCliente).FirstOrDefault() != null ? db.TicketVersionCliente.Where(tvc => tvc.Secuencial == t.SecuencialTicketVersionCliente).FirstOrDefault().Descripcion : "NO ASIGNADO",
-                                      ticketVersionClienteId = db.TicketVersionCliente.Where(tvc => tvc.Secuencial == t.SecuencialTicketVersionCliente).FirstOrDefault() != null ? db.TicketVersionCliente.Where(tvc => tvc.Secuencial == t.SecuencialTicketVersionCliente).FirstOrDefault().Secuencial : 0,
-                                      proximaActividad = pa.Codigo,
-                                      clase = (t.estadoTicket.Codigo == "CERRADO") ? "fondoCerrado" :
-                                              (t.estadoTicket.Codigo == "ANULADO") ? "fondoAnulado" :
-                                              (t.estadoTicket.Codigo == "RECHAZADO") ? "fondoAnulado" :
-                                              (t.estadoTicket.Codigo == "ESPERANDO LLAMADA" || t.estadoTicket.Codigo == "ESPERANDO RESPUESTA") ? "fondoCliente" :
-                                              (t.estadoTicket.Codigo == "ABIERTO") ? "fondoAbierto" : "fondoDesarrollo",
-                                      semaforos = db.SemaforoPrioridad.Where(w => w.SecuencialPrioridad == pr.Secuencial).ToList(),
-                                      horasCreado = t.HorasCreado,
-                                      semaforosResolucion = db.ResolucionSemaforoPrioridad.Where(w => w.SecuencialPrioridad == pr.Secuencial).ToList(),
-                                      horasResolucion = t.HorasResolucion,
-                                      pendienteAPago = t.PendienteAPago,
-                                      errorInfraestructura = t.ErrorInfraestructura,
-                                      revisado = t.Revisado
-                                  }).ToList();
-
-            if (User.IsInRole("GESTOR") && !User.IsInRole("ADMIN"))
-            {
-                var ticketTempParcial = (from t in ticketsParcial
-                                         from c in clientes
-                                         where t.cliente == c.cliente
-                                         select t).ToList();
-                ticketsParcial = ticketTempParcial;
-            }
-
-            var tickets = ticketsParcial;
-
-            //En el caso que no se muestren todos los tickets se realiza la consulta de asignados aparte lo que optimiza el rendimiento, si se muestran los 6000 y mas tickets se realiza la consulta de asignados dentro de la de tickets
-            if (todos == false)
-            {
-                var asignados = (from t in db.Ticket
-                                 join ttar in db.TicketTarea on t.Secuencial equals ttar.SecuencialTicket
-                                 join tar in db.Tarea on ttar.SecuencialTarea equals tar.Secuencial
-                                 join c in db.Colaborador on tar.SecuencialColaborador equals c.Secuencial
-                                 join p in db.Persona on c.SecuencialPersona equals p.Secuencial
-                                 where tar.SecuencialEstadoTarea != 4
-                                 orderby tar.FechaInicio descending
-                                 select new
-                                 {
-                                     nombre = p.Nombre1 + " " + p.Apellido1,
-                                     numero = t.Secuencial
-                                 }).ToList();
-
-                ticketsParcial = ticketsParcial.Where(x => x.estado != "CERRADO" && x.estado != "ANULADO" && x.estado != "RECHAZADO").ToList();
-
-                //Se crea la variable tickets con su colaborador asignado
-                tickets = (from t in ticketsParcial
-                           select new
-                           {
-                               numero = t.numero,
-                               cliente = t.cliente,
-                               fecha = t.fecha,
-                               asunto = t.asunto,
-                               seFactura = t.seFactura,
-                               facturado = t.facturado,
-                               asignado = (
-                               db.TicketTarea.Where(x => x.SecuencialTicket == t.numero && x.EstaActiva == 1 && x.tarea.SecuencialEstadoTarea != 4).Count() > 0
-                          ) ?
-                              asignados.Where(x => x.numero.ToString().Equals(t.numero.ToString())).FirstOrDefault().nombre.ToString()
-                            : "NO ASIGNADO",
-                               prioridad = t.prioridad,
-                               categoria = t.categoria,
-                               estado = t.estado,
-                               ticketVersionCliente = t.ticketVersionCliente,
-                               ticketVersionClienteId = t.ticketVersionClienteId,
-                               proximaActividad = t.proximaActividad,
-                               clase = t.clase,
-                               semaforos = t.semaforos,
-                               horasCreado = t.horasCreado,
-                               semaforosResolucion = t.semaforosResolucion,
-                               horasResolucion = t.horasResolucion,
-                               pendienteAPago = t.pendienteAPago,
-                               errorInfraestructura = t.errorInfraestructura,
-                               revisado = t.revisado
-                           }).ToList();
-
-            }
-            else
-            {
-                tickets = (from t in db.Ticket
-                           join
-                               et in db.EstadoTicket on t.estadoTicket equals et
-                           join
-                               pr in db.PrioridadTicket on t.prioridadTicket equals pr
-                           join
-                               ct in db.CategoriaTicket on t.categoriaTicket equals ct
-                           join
-                               pc in db.Persona_Cliente on t.persona_cliente equals pc
-                           join
-                               pa in db.ProximaActividad on t.proximaActividad equals pa
-                           orderby t.FechaCreado ascending
-                           select new
-                           {
-                               numero = t.Secuencial,
-                               cliente = pc.cliente.Descripcion,
-                               fecha = t.FechaCreado,
-                               asunto = t.Asunto,
-                               seFactura = t.SeFactura,
-                               facturado = t.Facturado,
-                               asignado = (
-                                        db.TicketTarea.Where(x => x.SecuencialTicket == t.Secuencial && x.EstaActiva == 1 && x.tarea.SecuencialEstadoTarea != 4).Count() > 0
-                                   ) ?
-                                       (from p in db.Persona
-                                        join c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
-                                        join tar in db.Tarea on c.Secuencial equals tar.SecuencialColaborador
-                                        join ttar in db.TicketTarea on tar.Secuencial equals ttar.SecuencialTarea
-                                        orderby tar.FechaInicio descending
-                                        where ttar.SecuencialTicket == t.Secuencial
-                                        select p.Nombre1 + " " + p.Apellido1).FirstOrDefault()
-                                     : "NO ASIGNADO",
-                               prioridad = pr.Codigo,
-                               categoria = ct.Codigo,
-                               estado = et.Codigo,
-                               ticketVersionCliente = db.TicketVersionCliente.Where(tvc => tvc.Secuencial == t.SecuencialTicketVersionCliente).FirstOrDefault() != null ? db.TicketVersionCliente.Where(tvc => tvc.Secuencial == t.SecuencialTicketVersionCliente).FirstOrDefault().Descripcion : "NO ASIGNADO",
-                               ticketVersionClienteId = db.TicketVersionCliente.Where(tvc => tvc.Secuencial == t.SecuencialTicketVersionCliente).FirstOrDefault() != null ? db.TicketVersionCliente.Where(tvc => tvc.Secuencial == t.SecuencialTicketVersionCliente).FirstOrDefault().Secuencial : 0,
-                               proximaActividad = pa.Codigo,
-                               clase = (t.estadoTicket.Codigo == "CERRADO") ? "fondoCerrado" :
-                                       (t.estadoTicket.Codigo == "ANULADO") ? "fondoAnulado" :
-                                       (t.estadoTicket.Codigo == "RECHAZADO") ? "fondoAnulado" :
-                                       (t.estadoTicket.Codigo == "ESPERANDO LLAMADA" || t.estadoTicket.Codigo == "ESPERANDO RESPUESTA") ? "fondoCliente" :
-                                       (t.estadoTicket.Codigo == "ABIERTO") ? "fondoAbierto" : "fondoDesarrollo",
-                               semaforos = db.SemaforoPrioridad.Where(w => w.SecuencialPrioridad == pr.Secuencial).ToList(),
-                               horasCreado = t.HorasCreado,
-                               semaforosResolucion = db.ResolucionSemaforoPrioridad.Where(w => w.SecuencialPrioridad == pr.Secuencial).ToList(),
-                               horasResolucion = t.HorasResolucion,
-                               pendienteAPago = t.PendienteAPago,
-                               errorInfraestructura = t.ErrorInfraestructura,
-                               revisado = t.Revisado
-                           }).ToList();
+                var ticketsParcial = (from t in db.Ticket
+                                      join
+                                          et in db.EstadoTicket on t.estadoTicket equals et
+                                      join
+                                          pr in db.PrioridadTicket on t.prioridadTicket equals pr
+                                      join
+                                          ct in db.CategoriaTicket on t.categoriaTicket equals ct
+                                      join
+                                          pc in db.Persona_Cliente on t.persona_cliente equals pc
+                                      join
+                                          pa in db.ProximaActividad on t.proximaActividad equals pa
+                                      orderby t.Secuencial ascending
+                                      select new
+                                      {
+                                          numero = t.Secuencial,
+                                          cliente = pc.cliente.Descripcion,
+                                          fecha = t.FechaCreado,
+                                          asunto = t.Asunto,
+                                          seFactura = t.SeFactura,
+                                          facturado = t.Facturado,
+                                          asignado = "",
+                                          prioridad = pr.Codigo,
+                                          categoria = ct.Codigo,
+                                          estado = et.Codigo,
+                                          ticketVersionCliente = db.TicketVersionCliente.Where(tvc => tvc.Secuencial == t.SecuencialTicketVersionCliente).FirstOrDefault() != null ? db.TicketVersionCliente.Where(tvc => tvc.Secuencial == t.SecuencialTicketVersionCliente).FirstOrDefault().Descripcion : "NO ASIGNADO",
+                                          ticketVersionClienteId = db.TicketVersionCliente.Where(tvc => tvc.Secuencial == t.SecuencialTicketVersionCliente).FirstOrDefault() != null ? db.TicketVersionCliente.Where(tvc => tvc.Secuencial == t.SecuencialTicketVersionCliente).FirstOrDefault().Secuencial : 0,
+                                          proximaActividad = pa.Codigo,
+                                          clase = (t.estadoTicket.Codigo == "CERRADO") ? "fondoCerrado" :
+                                                  (t.estadoTicket.Codigo == "ANULADO") ? "fondoAnulado" :
+                                                  (t.estadoTicket.Codigo == "RECHAZADO") ? "fondoAnulado" :
+                                                  (t.estadoTicket.Codigo == "ESPERANDO LLAMADA" || t.estadoTicket.Codigo == "ESPERANDO RESPUESTA") ? "fondoCliente" :
+                                                  (t.estadoTicket.Codigo == "ABIERTO") ? "fondoAbierto" : "fondoDesarrollo",
+                                          semaforos = db.SemaforoPrioridad.Where(w => w.SecuencialPrioridad == pr.Secuencial).ToList(),
+                                          horasCreado = t.HorasCreado,
+                                          semaforosResolucion = db.ResolucionSemaforoPrioridad.Where(w => w.SecuencialPrioridad == pr.Secuencial).ToList(),
+                                          horasResolucion = t.HorasResolucion,
+                                          pendienteAPago = t.PendienteAPago,
+                                          errorInfraestructura = t.ErrorInfraestructura,
+                                          revisado = t.Revisado
+                                      }).ToList();
 
                 if (User.IsInRole("GESTOR") && !User.IsInRole("ADMIN"))
                 {
-                    var ticketsAll = (from t in tickets
-                                      from c in clientes
-                                      where t.cliente == c.cliente
-                                      select t).ToList();
-                    tickets = ticketsAll;
+                    var ticketTempParcial = (from t in ticketsParcial
+                                             from c in clientes
+                                             where t.cliente == c.cliente
+                                             select t).ToList();
+                    ticketsParcial = ticketTempParcial;
                 }
-            }
 
-            //Filtro de si se facturan
-            if (tipoFacturable != "t")//Todos
-            {
-                if (tipoFacturable == "F")//Facturables
+                var tickets = ticketsParcial;
+
+                //En el caso que no se muestren todos los tickets se realiza la consulta de asignados aparte lo que optimiza el rendimiento, si se muestran los 6000 y mas tickets se realiza la consulta de asignados dentro de la de tickets
+                if (todos == false)
                 {
-                    tickets = tickets.Where(x => x.seFactura == true).ToList();
+                    var asignados = (from t in db.Ticket
+                                     join ttar in db.TicketTarea on t.Secuencial equals ttar.SecuencialTicket
+                                     join tar in db.Tarea on ttar.SecuencialTarea equals tar.Secuencial
+                                     join c in db.Colaborador on tar.SecuencialColaborador equals c.Secuencial
+                                     join p in db.Persona on c.SecuencialPersona equals p.Secuencial
+                                     where tar.SecuencialEstadoTarea != 4
+                                     orderby tar.FechaInicio descending
+                                     select new
+                                     {
+                                         nombre = p.Nombre1 + " " + p.Apellido1,
+                                         numero = t.Secuencial
+                                     }).ToList();
+
+                    ticketsParcial = ticketsParcial.Where(x => x.estado != "CERRADO" && x.estado != "ANULADO" && x.estado != "RECHAZADO").ToList();
+
+                    //Se crea la variable tickets con su colaborador asignado
+                    tickets = (from t in ticketsParcial
+                               select new
+                               {
+                                   numero = t.numero,
+                                   cliente = t.cliente,
+                                   fecha = t.fecha,
+                                   asunto = t.asunto,
+                                   seFactura = t.seFactura,
+                                   facturado = t.facturado,
+                                   asignado = (
+                                   db.TicketTarea.Where(x => x.SecuencialTicket == t.numero && x.EstaActiva == 1 && x.tarea.SecuencialEstadoTarea != 4).Count() > 0
+                              ) ?
+                                  asignados.Where(x => x.numero.ToString().Equals(t.numero.ToString())).FirstOrDefault().nombre.ToString()
+                                : "NO ASIGNADO",
+                                   prioridad = t.prioridad,
+                                   categoria = t.categoria,
+                                   estado = t.estado,
+                                   ticketVersionCliente = t.ticketVersionCliente,
+                                   ticketVersionClienteId = t.ticketVersionClienteId,
+                                   proximaActividad = t.proximaActividad,
+                                   clase = t.clase,
+                                   semaforos = t.semaforos,
+                                   horasCreado = t.horasCreado,
+                                   semaforosResolucion = t.semaforosResolucion,
+                                   horasResolucion = t.horasResolucion,
+                                   pendienteAPago = t.pendienteAPago,
+                                   errorInfraestructura = t.errorInfraestructura,
+                                   revisado = t.revisado
+                               }).ToList();
+
                 }
-                else if (tipoFacturable == "FF")//Facturables Facturados
+                else
                 {
-                    tickets = tickets.Where(x => x.seFactura == true && x.facturado == true).ToList();
+                    tickets = (from t in db.Ticket
+                               join
+                                   et in db.EstadoTicket on t.estadoTicket equals et
+                               join
+                                   pr in db.PrioridadTicket on t.prioridadTicket equals pr
+                               join
+                                   ct in db.CategoriaTicket on t.categoriaTicket equals ct
+                               join
+                                   pc in db.Persona_Cliente on t.persona_cliente equals pc
+                               join
+                                   pa in db.ProximaActividad on t.proximaActividad equals pa
+                               orderby t.FechaCreado ascending
+                               select new
+                               {
+                                   numero = t.Secuencial,
+                                   cliente = pc.cliente.Descripcion,
+                                   fecha = t.FechaCreado,
+                                   asunto = t.Asunto,
+                                   seFactura = t.SeFactura,
+                                   facturado = t.Facturado,
+                                   asignado = (
+                                            db.TicketTarea.Where(x => x.SecuencialTicket == t.Secuencial && x.EstaActiva == 1 && x.tarea.SecuencialEstadoTarea != 4).Count() > 0
+                                       ) ?
+                                           (from p in db.Persona
+                                            join c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
+                                            join tar in db.Tarea on c.Secuencial equals tar.SecuencialColaborador
+                                            join ttar in db.TicketTarea on tar.Secuencial equals ttar.SecuencialTarea
+                                            orderby tar.FechaInicio descending
+                                            where ttar.SecuencialTicket == t.Secuencial
+                                            select p.Nombre1 + " " + p.Apellido1).FirstOrDefault()
+                                         : "NO ASIGNADO",
+                                   prioridad = pr.Codigo,
+                                   categoria = ct.Codigo,
+                                   estado = et.Codigo,
+                                   ticketVersionCliente = db.TicketVersionCliente.Where(tvc => tvc.Secuencial == t.SecuencialTicketVersionCliente).FirstOrDefault() != null ? db.TicketVersionCliente.Where(tvc => tvc.Secuencial == t.SecuencialTicketVersionCliente).FirstOrDefault().Descripcion : "NO ASIGNADO",
+                                   ticketVersionClienteId = db.TicketVersionCliente.Where(tvc => tvc.Secuencial == t.SecuencialTicketVersionCliente).FirstOrDefault() != null ? db.TicketVersionCliente.Where(tvc => tvc.Secuencial == t.SecuencialTicketVersionCliente).FirstOrDefault().Secuencial : 0,
+                                   proximaActividad = pa.Codigo,
+                                   clase = (t.estadoTicket.Codigo == "CERRADO") ? "fondoCerrado" :
+                                           (t.estadoTicket.Codigo == "ANULADO") ? "fondoAnulado" :
+                                           (t.estadoTicket.Codigo == "RECHAZADO") ? "fondoAnulado" :
+                                           (t.estadoTicket.Codigo == "ESPERANDO LLAMADA" || t.estadoTicket.Codigo == "ESPERANDO RESPUESTA") ? "fondoCliente" :
+                                           (t.estadoTicket.Codigo == "ABIERTO") ? "fondoAbierto" : "fondoDesarrollo",
+                                   semaforos = db.SemaforoPrioridad.Where(w => w.SecuencialPrioridad == pr.Secuencial).ToList(),
+                                   horasCreado = t.HorasCreado,
+                                   semaforosResolucion = db.ResolucionSemaforoPrioridad.Where(w => w.SecuencialPrioridad == pr.Secuencial).ToList(),
+                                   horasResolucion = t.HorasResolucion,
+                                   pendienteAPago = t.PendienteAPago,
+                                   errorInfraestructura = t.ErrorInfraestructura,
+                                   revisado = t.Revisado
+                               }).ToList();
+
+                    if (User.IsInRole("GESTOR") && !User.IsInRole("ADMIN"))
+                    {
+                        var ticketsAll = (from t in tickets
+                                          from c in clientes
+                                          where t.cliente == c.cliente
+                                          select t).ToList();
+                        tickets = ticketsAll;
+                    }
                 }
-                else if (tipoFacturable == "FNF")//Facturables No Facturados
+
+                //Filtro de si se facturan
+                if (tipoFacturable != "t")//Todos
                 {
-                    tickets = tickets.Where(x => x.seFactura == true && x.facturado == false).ToList();
+                    if (tipoFacturable == "F")//Facturables
+                    {
+                        tickets = tickets.Where(x => x.seFactura == true).ToList();
+                    }
+                    else if (tipoFacturable == "FF")//Facturables Facturados
+                    {
+                        tickets = tickets.Where(x => x.seFactura == true && x.facturado == true).ToList();
+                    }
+                    else if (tipoFacturable == "FNF")//Facturables No Facturados
+                    {
+                        tickets = tickets.Where(x => x.seFactura == true && x.facturado == false).ToList();
+                    }
+                    else if (tipoFacturable == "PAP")
+                    {
+                        tickets = tickets.Where(x => x.pendienteAPago == true).ToList();
+                    }
+                    else if (tipoFacturable == "SF")
+                    {
+                        tickets = tickets.Where(x => x.seFactura == false).ToList();
+                    }
                 }
-                else if (tipoFacturable == "PAP")
+
+                //Aplicando los filtros
+                if (filtroNumero != "")
                 {
-                    tickets = tickets.Where(x => x.pendienteAPago == true).ToList();
+                    tickets = (from t in tickets
+                               where t.numero.ToString().PadLeft(6, '0').Contains(filtroNumero)
+                               select t).ToList();
                 }
-                else if (tipoFacturable == "SF")
+                if (filtroCliente != "")
                 {
-                    tickets = tickets.Where(x => x.seFactura == false).ToList();
+                    tickets = (from t in tickets
+                               where t.cliente.ToString().ToLower().Contains(filtroCliente.ToLower())
+                               select t).ToList();
                 }
-            }
-
-            //Aplicando los filtros
-            if (filtroNumero != "")
-            {
-                tickets = (from t in tickets
-                           where t.numero.ToString().PadLeft(6, '0').Contains(filtroNumero)
-                           select t).ToList();
-            }
-            if (filtroCliente != "")
-            {
-                tickets = (from t in tickets
-                           where t.cliente.ToString().ToLower().Contains(filtroCliente.ToLower())
-                           select t).ToList();
-            }
-            if (filtroFecha != "")
-            {
-                tickets = (from t in tickets
-                           where t.fecha.ToString("dd/MM/yyyy").Contains(filtroFecha)
-                           select t).ToList();
-            }
-            if (filtroAsunto != "")
-            {
-                tickets = (from t in tickets
-                           where t.asunto.ToString().ToLower().Contains(filtroAsunto.ToLower())
-                           select t).ToList();
-            }
-            if (filtroAsignado != "")
-            {
-
-                tickets = (from t in tickets
-                           where t.asignado.ToString().ToUpper().Contains(filtroAsignado.ToUpper())
-                           select t).ToList();
-
-            }
-            if (tieneFiltroPrioridad)
-            {
-                tickets = (from t in tickets
-                           where filtroPrioridad.Contains(t.prioridad.ToString().ToUpper())
-                           select t).ToList();
-            }
-            if (tieneFiltroCategoria)
-            {
-                tickets = (from t in tickets
-                           where filtroCategoria.Contains(t.categoria.ToString().ToUpper())
-                           select t).ToList();
-            }
-            if (tieneFiltroEstado)
-            {
-                tickets = (from t in tickets
-                           where filtroEstado.Contains(t.estado.ToString().ToUpper())
-                           select t).ToList();
-            }
-            if (tieneFiltroProximaActividad)
-            {
-                tickets = (from t in tickets
-                           where filtroProximaActividad.Contains(t.proximaActividad.ToString().ToUpper())
-                           select t).ToList();
-            }
-            if (tieneFiltroTicketVersionCliente)
-            {
-                tickets = (from t in tickets
-                           where filtroTicketVersionCliente.Contains(t.ticketVersionCliente.ToString().ToUpper())
-                           select t).ToList();
-            }
-
-            //Se Ordena
-            if (order > 0)
-            {
-                switch (order)
+                if (filtroFecha != "")
                 {
-                    case 1:
-
-                        if (asc == 1)
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.numero
-                                       select t).ToList();
-                        }
-                        else
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.numero descending
-                                       select t).ToList();
-                        }
-
-                        break;
-
-                    case 2:
-
-                        if (asc == 1)
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.cliente
-                                       select t).ToList();
-                        }
-                        else
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.cliente descending
-                                       select t).ToList();
-                        }
-
-                        break;
-
-                    case 3:
-
-                        if (asc == 1)
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.fecha
-                                       select t).ToList();
-                        }
-                        else
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.fecha descending
-                                       select t).ToList();
-                        }
-
-                        break;
-
-                    case 4:
-
-                        if (asc == 1)
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.asunto
-                                       select t).ToList();
-                        }
-                        else
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.asunto descending
-                                       select t).ToList();
-                        }
-
-                        break;
-
-                    case 5:
-
-                        if (asc == 1)
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.asignado
-                                       select t).ToList();
-                        }
-                        else
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.asignado descending
-                                       select t).ToList();
-                        }
-
-                        break;
-
-                    case 6:
-
-                        if (asc == 1)
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.prioridad
-                                       select t).ToList();
-                        }
-                        else
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.prioridad descending
-                                       select t).ToList();
-                        }
-
-                        break;
-
-                    case 7:
-
-                        if (asc == 1)
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.categoria
-                                       select t).ToList();
-                        }
-                        else
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.categoria descending
-                                       select t).ToList();
-                        }
-
-                        break;
-
-                    case 8:
-
-                        if (asc == 1)
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.estado
-                                       select t).ToList();
-                        }
-                        else
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.estado descending
-                                       select t).ToList();
-                        }
-
-                        break;
-                    case 9:
-
-                        if (asc == 1)
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.proximaActividad
-                                       select t).ToList();
-                        }
-                        else
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.proximaActividad descending
-                                       select t).ToList();
-                        }
-
-                        break;
-                    case 10:
-
-                        if (asc == 1)
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.ticketVersionCliente
-                                       select t).ToList();
-                        }
-                        else
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.ticketVersionCliente descending
-                                       select t).ToList();
-                        }
-
-                        break;
+                    tickets = (from t in tickets
+                               where t.fecha.ToString("dd/MM/yyyy").Contains(filtroFecha)
+                               select t).ToList();
                 }
-            }
-
-            var proximasActividades = tickets.Select(x => x.proximaActividad).Distinct().ToList();
-            proximasActividades.Sort((x1, x2) => String.Compare(x1, x2));
-
-            int totalTickets = tickets.Count();
-            tickets = tickets.Skip(start).Take(lenght).ToList();
-
-
-
-            //Calculando los dias desde la fecha en el servidor
-            List<object> ticketsResp = new List<object>();
-            for (int i = 0; i < tickets.Count; i++)
-            {
-                var t = tickets[i];
-                ticketsResp.Add(new
+                if (filtroAsunto != "")
                 {
-                    numero = t.numero,
-                    cliente = t.cliente,
-                    fecha = t.fecha,
-                    dias = DateTime.Now.Subtract(t.fecha).Days,
-                    asunto = t.asunto,
-                    asignado = t.asignado,
-                    prioridad = t.prioridad,
-                    categoria = t.categoria,
-                    estado = t.estado,
-                    proximaActividad = t.proximaActividad,
-                    clase = t.clase,
-                    ticketVersionCliente = t.ticketVersionCliente,
-                    semaforo = t.semaforos != null ? t.semaforos.Where(w => w.horas <= t.horasCreado).OrderByDescending(d => d.horas).FirstOrDefault()?.semaforo.Codigo ?? "VERDE" : "VERDE",
-                    semaforoResolucion = t.semaforosResolucion != null ? t.semaforosResolucion.Where(w => w.Horas <= t.horasResolucion).OrderByDescending(d => d.Horas).FirstOrDefault()?.semaforo.Codigo ?? "VERDE" : "VERDE",
+                    tickets = (from t in tickets
+                               where t.asunto.ToString().ToLower().Contains(filtroAsunto.ToLower())
+                               select t).ToList();
+                }
+                if (filtroAsignado != "")
+                {
+
+                    tickets = (from t in tickets
+                               where t.asignado.ToString().ToUpper().Contains(filtroAsignado.ToUpper())
+                               select t).ToList();
+
+                }
+                if (tieneFiltroPrioridad)
+                {
+                    tickets = (from t in tickets
+                               where t.prioridad.ToString().ToUpper().Equals(prioridad)
+                               //where filtroPrioridad.Contains(t.prioridad.ToString().ToUpper())
+                               select t).ToList();
+                }
+                if (tieneFiltroCategoria)
+                {
+                    tickets = (from t in tickets
+                               where filtroCategoria.Contains(t.categoria.ToString().ToUpper())
+                               select t).ToList();
+                }
+                if (tieneFiltroEstado)
+                {
+                    tickets = (from t in tickets
+                               where filtroEstado.Contains(t.estado.ToString().ToUpper())
+                               select t).ToList();
+                }
+                if (tieneFiltroProximaActividad)
+                {
+                    tickets = (from t in tickets
+                               where filtroProximaActividad.Contains(t.proximaActividad.ToString().ToUpper())
+                               select t).ToList();
+                }
+                if (tieneFiltroTicketVersionCliente)
+                {
+                    tickets = (from t in tickets
+                               where filtroTicketVersionCliente.Contains(t.ticketVersionCliente.ToString().ToUpper())
+                               select t).ToList();
+                }
+
+                //Se Ordena
+                if (order > 0)
+                {
+                    switch (order)
+                    {
+                        case 1:
+
+                            if (asc == 1)
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.numero
+                                           select t).ToList();
+                            }
+                            else
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.numero descending
+                                           select t).ToList();
+                            }
+
+                            break;
+
+                        case 2:
+
+                            if (asc == 1)
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.cliente
+                                           select t).ToList();
+                            }
+                            else
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.cliente descending
+                                           select t).ToList();
+                            }
+
+                            break;
+
+                        case 3:
+
+                            if (asc == 1)
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.fecha
+                                           select t).ToList();
+                            }
+                            else
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.fecha descending
+                                           select t).ToList();
+                            }
+
+                            break;
+
+                        case 4:
+
+                            if (asc == 1)
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.asunto
+                                           select t).ToList();
+                            }
+                            else
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.asunto descending
+                                           select t).ToList();
+                            }
+
+                            break;
+
+                        case 5:
+
+                            if (asc == 1)
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.asignado
+                                           select t).ToList();
+                            }
+                            else
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.asignado descending
+                                           select t).ToList();
+                            }
+
+                            break;
+
+                        case 6:
+
+                            if (asc == 1)
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.prioridad
+                                           select t).ToList();
+                            }
+                            else
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.prioridad descending
+                                           select t).ToList();
+                            }
+
+                            break;
+
+                        case 7:
+
+                            if (asc == 1)
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.categoria
+                                           select t).ToList();
+                            }
+                            else
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.categoria descending
+                                           select t).ToList();
+                            }
+
+                            break;
+
+                        case 8:
+
+                            if (asc == 1)
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.estado
+                                           select t).ToList();
+                            }
+                            else
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.estado descending
+                                           select t).ToList();
+                            }
+
+                            break;
+                        case 9:
+
+                            if (asc == 1)
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.proximaActividad
+                                           select t).ToList();
+                            }
+                            else
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.proximaActividad descending
+                                           select t).ToList();
+                            }
+
+                            break;
+                        case 10:
+
+                            if (asc == 1)
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.ticketVersionCliente
+                                           select t).ToList();
+                            }
+                            else
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.ticketVersionCliente descending
+                                           select t).ToList();
+                            }
+
+                            break;
+                    }
+                }
+
+                var proximasActividades = tickets.Select(x => x.proximaActividad).Distinct().ToList();
+                proximasActividades.Sort((x1, x2) => String.Compare(x1, x2));
+
+                int totalTickets = tickets.Count();
+                tickets = tickets.Skip(start).Take(lenght).ToList();
+
+
+
+                //Calculando los dias desde la fecha en el servidor
+                List<object> ticketsResp = new List<object>();
+                for (int i = 0; i < tickets.Count; i++)
+                {
+                    var t = tickets[i];
+                    ticketsResp.Add(new
+                    {
+                        numero = t.numero,
+                        cliente = t.cliente,
+                        fecha = t.fecha,
+                        dias = DateTime.Now.Subtract(t.fecha).Days,
+                        asunto = t.asunto,
+                        asignado = t.asignado,
+                        prioridad = t.prioridad,
+                        categoria = t.categoria,
+                        estado = t.estado,
+                        proximaActividad = t.proximaActividad,
+                        clase = t.clase,
+                        ticketVersionCliente = t.ticketVersionCliente,
+                        semaforo = t.semaforos != null ? t.semaforos.Where(w => w.horas <= t.horasCreado).OrderByDescending(d => d.horas).FirstOrDefault()?.semaforo.Codigo ?? "VERDE" : "VERDE",
+                        semaforoResolucion = t.semaforosResolucion != null ? t.semaforosResolucion.Where(w => w.Horas <= t.horasResolucion).OrderByDescending(d => d.Horas).FirstOrDefault()?.semaforo.Codigo ?? "VERDE" : "VERDE",
+                    });
+                }
+
+                var resp = new
+                {
+                    success = true,
+                    tickets = ticketsResp,
+                    totalTickets = totalTickets,
+                    proximasActividades = proximasActividades
+                };
+                return Json(resp);
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = ex.Message + " | " + (ex.InnerException != null ? ex.InnerException.Message : "")
                 });
-            }
 
-            var resp = new
-            {
-                success = true,
-                tickets = ticketsResp,
-                totalTickets = totalTickets,
-                proximasActividades = proximasActividades
-            };
-            return Json(resp);
+            }
         }
 
         [Authorize(Roles = "COORDINADOR, ADMIN, TICKET, GESTOR")]

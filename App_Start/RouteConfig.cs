@@ -1833,6 +1833,12 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "ContarTicketsUrgentesAbiertos",
+                url: "tickets/contar-tickets-urgentes-abiertos/{id}",
+                defaults: new { controller = "Ticket", action = "ContarTicketsUrgentesAbiertos", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "DarTickets",
                 url: "tickets/dar-tickets/{id}",
                 defaults: new { controller = "Ticket", action = "DarTickets", id = UrlParameter.Optional }
