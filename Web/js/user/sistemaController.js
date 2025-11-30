@@ -83,6 +83,11 @@ devApp.controller('desarrolladoresController', ['$scope', '$http', 'filtroServic
         angular.element("#panel_publicaciones").removeClass('invisible');
         $scope.funcionalidad = "Publicaciones";
         $scope.buscarTicketPorPublicar();
+        // Llamar a buscarPublicacionesCliente del publicacionesController
+        var publicacionesScope = angular.element("#panel_publicaciones").scope();
+        if (publicacionesScope && publicacionesScope.buscarPublicacionesCliente) {
+            publicacionesScope.buscarPublicacionesCliente();
+        }
     };
 
     $scope.IrPanelTickets = function () {
@@ -261,7 +266,7 @@ devApp.controller('desarrolladoresController', ['$scope', '$http', 'filtroServic
     $scope.loading = new $scope.loadingAjax();
 }]);
 
-devApp.controller('publicacionesController', ['$scope', '$http', function ($scope, $http) {
+devApp.controller('publicacionesController', ['$scope', '$http', '$sce', function ($scope, $http, $sce) {
     $scope.idTicket = 0;
     $scope.publicarEnUno = false;
     //Una publicación se ha realizado...
@@ -338,6 +343,118 @@ devApp.controller('publicacionesController', ['$scope', '$http', function ($scop
 
         }
     });
+
+    // FUNCIONES PARA PUBLICACIONES CLIENTE
+    $scope.publicacionesCliente = [];
+    $scope.publicacionClienteActual = {};
+    $scope.resultadoPublicacion = { success: false, titulo: '', mensaje: '' };
+    $scope.mensajeConfirmacionPublicacion = '';
+    $scope.mensajeAccionPublicacion = $sce.trustAsHtml('Esta acción notificará al cliente sobre la publicación en producción.');
+    
+    $scope.buscarPublicacionesCliente = function () {
+        var jsonPublicacionesCliente = $http.post("user/publicaciones-cliente", {});
+        jsonPublicacionesCliente.success(function (data) {
+            if (data.success === true) {
+                $scope.publicacionesCliente = data.publicacionesCliente;
+            }
+            else {
+                messageDialog.show('Información', data.msg);
+            }
+        });
+        jsonPublicacionesCliente.error(function (data) {
+            messageDialog.show('Información', 'Error al cargar publicaciones cliente');
+        });
+    };
+
+    $scope.marcarPublicacionClienteComoPublicado = function (secuencial, numeroTicket) {
+        $scope.publicacionClienteActual = {
+            secuencial: secuencial,
+            numeroTicket: numeroTicket
+        };
+        $scope.mensajeConfirmacionPublicacion = $sce.trustAsHtml('¿Desea marcar la publicación del ticket <strong>' + numeroTicket + '</strong> como publicado?');
+        angular.element("#modal-marcar-publicado-cliente").modal('show');
+    };
+
+    $scope.confirmarMarcarPublicado = function () {
+        angular.element("#modal-marcar-publicado-cliente").modal('hide');
+        $scope.$parent.loading.show();
+        
+        var jsonMarcar = $http.post("user/marcar-publicacion-cliente", { id: $scope.publicacionClienteActual.secuencial });
+        jsonMarcar.success(function (data) {
+            $scope.$parent.loading.hide();
+            if (data.success === true) {
+                $scope.resultadoPublicacion = {
+                    success: true,
+                    titulo: 'Éxito',
+                    mensaje: 'Publicación marcada como completada. Se han enviado notificaciones al cliente y al equipo de operaciones.'
+                };
+                angular.element("#modal-resultado-publicacion-cliente").modal('show');
+                $scope.buscarPublicacionesCliente();
+            }
+            else {
+                $scope.resultadoPublicacion = {
+                    success: false,
+                    titulo: 'Error',
+                    mensaje: data.msg
+                };
+                angular.element("#modal-resultado-publicacion-cliente").modal('show');
+            }
+        });
+        jsonMarcar.error(function (data) {
+            $scope.$parent.loading.hide();
+            $scope.resultadoPublicacion = {
+                success: false,
+                titulo: 'Error',
+                mensaje: 'Error al marcar la publicación. Por favor, intente nuevamente.'
+            };
+            angular.element("#modal-resultado-publicacion-cliente").modal('show');
+        });
+    };
+
+    // Variables de paginación para publicaciones cliente
+    $scope.paginaActualPublicacionesCliente = 1;
+    $scope.itemsPorPaginaPublicacionesCliente = 10;
+    $scope.listaPaginasPublicacionesCliente = [];
+    $scope.publicacionesClientePaginado = [];
+
+    // Actualizar paginación cuando cambia la lista de publicaciones cliente
+    $scope.$watch('publicacionesCliente', function (newVal) {
+        if (newVal && newVal.length > 0) {
+            var numPaginas = Math.ceil(newVal.length / $scope.itemsPorPaginaPublicacionesCliente);
+            $scope.listaPaginasPublicacionesCliente = [];
+            for (var i = 1; i <= numPaginas; i++) {
+                $scope.listaPaginasPublicacionesCliente.push(i);
+            }
+            $scope.paginaActualPublicacionesCliente = 1;
+            $scope.actualizarPaginacionPublicacionesCliente();
+        }
+    }, true);
+
+    $scope.actualizarPaginacionPublicacionesCliente = function () {
+        var inicio = ($scope.paginaActualPublicacionesCliente - 1) * $scope.itemsPorPaginaPublicacionesCliente;
+        var fin = inicio + $scope.itemsPorPaginaPublicacionesCliente;
+        $scope.publicacionesClientePaginado = $scope.publicacionesCliente.slice(inicio, fin);
+    };
+
+    $scope.cambiarPaginaPublicacionesCliente = function (pagina) {
+        $scope.paginaActualPublicacionesCliente = pagina;
+        $scope.actualizarPaginacionPublicacionesCliente();
+    };
+
+    $scope.atrazarPaginaPublicacionesCliente = function () {
+        if ($scope.paginaActualPublicacionesCliente > 1) {
+            $scope.paginaActualPublicacionesCliente--;
+            $scope.actualizarPaginacionPublicacionesCliente();
+        }
+    };
+
+    $scope.avanzarPaginaPublicacionesCliente = function () {
+        var numPaginas = Math.ceil($scope.publicacionesCliente.length / $scope.itemsPorPaginaPublicacionesCliente);
+        if ($scope.paginaActualPublicacionesCliente < numPaginas) {
+            $scope.paginaActualPublicacionesCliente++;
+            $scope.actualizarPaginacionPublicacionesCliente();
+        }
+    };
 
 }]);
 

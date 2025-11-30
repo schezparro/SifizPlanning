@@ -823,6 +823,9 @@
     <Compile Include="Models\ProyectoTFS.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\PublicacionesCliente.cs">
+      <DependentUpon>ModelSP.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Recursos.cs">
       <DependentUpon>ModelSP.tt</DependentUpon>
     </Compile>

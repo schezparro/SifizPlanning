@@ -1647,6 +1647,18 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "PublicacionesCliente",
+                url: "user/publicaciones-cliente/{id}",
+                defaults: new { controller = "User", action = "PublicacionesCliente", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "MarcarPublicacionCliente",
+                url: "user/marcar-publicacion-cliente/{id}",
+                defaults: new { controller = "User", action = "MarcarPublicacionCliente", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "guardarComentarioNoTerminacion",
                 url: "user/guardar-comentario-no-terminacion/{id}",
                 defaults: new { controller = "User", action = "guardarComentarioNoTerminacion", id = UrlParameter.Optional }

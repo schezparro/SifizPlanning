@@ -216,5 +216,6 @@ namespace SifizPlanning.Models
         public virtual DbSet<EstadoOferta> EstadoOferta { get; set; }
         public virtual DbSet<FormalizacionOfertas> FormalizacionOfertas { get; set; }
         public virtual DbSet<EstadoGestionOferta> EstadoGestionOferta { get; set; }
+        public virtual DbSet<PublicacionesCliente> PublicacionesCliente { get; set; }
     }
 }

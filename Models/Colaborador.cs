@@ -52,6 +52,7 @@ namespace SifizPlanning.Models
             this.DIASDISPONIBLESVACACIONES = new HashSet<DiasDisponiblesVacaciones>();
             this.PROPUESTAVACACIONES = new HashSet<PropuestaVacaciones>();
             this.clienteAuxiliar = new HashSet<ClienteAuxiliar>();
+            this.PUBLICACIONESCLIENTE = new HashSet<PublicacionesCliente>();
         }
     
         public int Secuencial { get; set; }
@@ -104,5 +105,6 @@ namespace SifizPlanning.Models
         public virtual ICollection<DiasDisponiblesVacaciones> DIASDISPONIBLESVACACIONES { get; set; }
         public virtual ICollection<PropuestaVacaciones> PROPUESTAVACACIONES { get; set; }
         public virtual ICollection<ClienteAuxiliar> clienteAuxiliar { get; set; }
+        public virtual ICollection<PublicacionesCliente> PUBLICACIONESCLIENTE { get; set; }
     }
 }

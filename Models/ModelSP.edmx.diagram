@@ -451,6 +451,10 @@
         <AssociationConnector Association="SifizPlanningModel.FK_FORMALIZACIONOFERTAS_OFERTAOFERTA" />
         <EntityTypeShape EntityType="SifizPlanningModel.EstadoGestionOferta" Width="2" PointX="41.375" PointY="30.875" />
         <AssociationConnector Association="SifizPlanningModel.FK_OFERTAOFERTA_ESTADOGESTIONOFERTA" />
+        <EntityTypeShape EntityType="SifizPlanningModel.PublicacionesCliente" Width="1.5" PointX="41.5" PointY="5.25" />
+        <AssociationConnector Association="SifizPlanningModel.RefCLIENTE_PUBLICACIONESCLIENTE" />
+        <AssociationConnector Association="SifizPlanningModel.RefCOLABORADOR_PUBLICACIONESCLIENTE" />
+        <AssociationConnector Association="SifizPlanningModel.RefTICKET_PUBLICACIONESCLIENTE" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

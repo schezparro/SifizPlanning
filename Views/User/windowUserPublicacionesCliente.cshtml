@@ -1,0 +1,118 @@
+@{
+    ViewBag.Title = "Publicaciones Cliente";
+}
+<div>
+    <div class="form-inline">
+        <input type="text" class="form-control" ng-model="filterPublicacionesCliente" placeholder="Filtrar..." />
+        <div class="clear"></div>
+    </div>
+    <div id="tabla-publicaciones-cliente-div" style="max-height: 500px; overflow-y: auto;">
+        <table id="tabla-publicaciones-cliente" class="table table-striped table-condensed">
+            <thead>
+                <tr>
+                    <th style="white-space: nowrap;">TICKET</th>
+                    <th style="white-space: nowrap;">CLIENTE</th>
+                    <th style="white-space: nowrap;">ASUNTO</th>
+                    <th style="white-space: nowrap;">FECHA SOLICITUD</th>
+                    <th style="white-space: nowrap;">ESTADO</th>
+                    <th style="white-space: nowrap;">FECHA PUBLICACION</th>
+                    <th style="white-space: nowrap;">PUBLICADO POR</th>
+                    <th style="white-space: nowrap;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="pubc in publicacionesClientePaginado | filter: filterPublicacionesCliente" data-id="{{pubc.secuencial}}" style="white-space: nowrap;">
+                    <td style="white-space: nowrap;">{{pubc.numeroTicket}}</td>
+                    <td style="white-space: nowrap;">{{pubc.nombreCliente | limitTo: 15}}</td>
+                    <td style="white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis;">{{pubc.asuntoTicket}}</td>
+                    <td style="white-space: nowrap;">{{pubc.fechaSolicitud | strDateToStrTime}}</td>
+                    <td style="white-space: nowrap;">
+                        <span ng-if="!pubc.estaPublicado" class="label label-warning">Pendiente</span>
+                        <span ng-if="pubc.estaPublicado" class="label label-success">Publicado</span>
+                    </td>
+                    <td style="white-space: nowrap;"><span ng-if="pubc.fechaPublicacion">{{pubc.fechaPublicacion | strDateToStrTime}}</span><span ng-if="!pubc.fechaPublicacion" class="text-muted">-</span></td>
+                    <td style="white-space: nowrap;">{{pubc.colaborador | limitTo: 12}}</td>
+                    <td style="white-space: nowrap;">
+                        <button ng-if="!pubc.estaPublicado" type="button" class="btn btn-xs btn-info" 
+                                ng-click="marcarPublicacionClienteComoPublicado(pubc.secuencial, pubc.numeroTicket)">
+                            <span class="glyphicon glyphicon-ok"></span> Publicado
+                        </button>
+                        <span ng-if="pubc.estaPublicado" class="text-muted">✓</span>
+                    </td>
+                </tr>
+                <tr ng-if="!publicacionesCliente || publicacionesCliente.length === 0">
+                    <td colspan="8" class="text-center text-muted">No hay publicaciones cliente pendientes</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="8">
+                        <nav>
+                            <ul class="pagination pagination-sm">
+                                <li ng-click="atrazarPaginaPublicacionesCliente()">
+                                    <a href="#" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                <li ng-repeat="pagina in listaPaginasPublicacionesCliente" ng-click="cambiarPaginaPublicacionesCliente(pagina)" ng-class="{active: pagina === paginaActualPublicacionesCliente}">
+                                    <a href="#">{{pagina}}</a>
+                                </li>
+                                <li ng-click="avanzarPaginaPublicacionesCliente()">
+                                    <a href="#" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<!-- Modal de confirmacion para marcar como publicado -->
+<div class="modal fade" id="modal-marcar-publicado-cliente" tabindex="-1" role="dialog" aria-labelledby="modalMarcaPublicadoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modalMarcaPublicadoLabel">
+                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Marcar como Publicado
+                </h4>
+            </div>
+            <div class="modal-body">
+                <p ng-bind-html="mensajeConfirmacionPublicacion"></p>
+                <p class="text-muted small" ng-bind-html="mensajeAccionPublicacion"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" ng-click="confirmarMarcarPublicado()">
+                    <span class="glyphicon glyphicon-ok"></span> Marcar como Publicado
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de resultado -->
+<div class="modal fade" id="modal-resultado-publicacion-cliente" tabindex="-1" role="dialog" aria-labelledby="modalResultadoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" ng-class="{'bg-success': resultadoPublicacion.success, 'bg-danger': !resultadoPublicacion.success}">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modalResultadoLabel">
+                    <span ng-if="resultadoPublicacion.success" class="glyphicon glyphicon-ok-circle"></span>
+                    <span ng-if="!resultadoPublicacion.success" class="glyphicon glyphicon-exclamation-sign"></span>
+                    {{resultadoPublicacion.titulo}}
+                </h4>
+            </div>
+            <div class="modal-body">
+                <p>{{resultadoPublicacion.mensaje}}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

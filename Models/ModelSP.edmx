@@ -893,6 +893,18 @@
           <Property Name="NUMEROVERIFICADOR" Type="int" Nullable="false" />
           <Property Name="SecuencialSubmodulo" Type="int" />
         </EntityType>
+        <EntityType Name="PUBLICACIONESCLIENTE">
+          <Key>
+            <PropertyRef Name="SECUENCIAL" />
+          </Key>
+          <Property Name="SECUENCIAL" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SECUENCIALTICKET" Type="int" Nullable="false" />
+          <Property Name="SECUENCIALCLIENTE" Type="int" Nullable="false" />
+          <Property Name="FECHASOLICITUD" Type="datetime" Nullable="false" />
+          <Property Name="ESTAPUBLICADO" Type="bit" Nullable="false" />
+          <Property Name="FECHAPUBLICACION" Type="datetime" />
+          <Property Name="SECUENCIALCOLABORADOR" Type="int" />
+        </EntityType>
         <EntityType Name="Reporte">
           <Key>
             <PropertyRef Name="Secuencial" />
@@ -3473,6 +3485,18 @@ warning 6002: The table/view 'SifizPlanning.TICKET.CLIENTEREPORTEMTTO' does not 
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="RefCLIENTE_PUBLICACIONESCLIENTE">
+          <End Role="CLIENTE" Type="Self.CLIENTE" Multiplicity="1" />
+          <End Role="PUBLICACIONESCLIENTE" Type="Self.PUBLICACIONESCLIENTE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CLIENTE">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="PUBLICACIONESCLIENTE">
+              <PropertyRef Name="SECUENCIALCLIENTE" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="RefCLIENTE131">
           <End Role="CLIENTE" Type="Self.CLIENTE" Multiplicity="1" />
           <End Role="MOTIVOTRABAJO" Type="Self.MOTIVOTRABAJO" Multiplicity="*" />
@@ -3554,6 +3578,18 @@ warning 6002: The table/view 'SifizPlanning.TICKET.CLIENTEREPORTEMTTO' does not 
             </Principal>
             <Dependent Role="CONTRATOCLIENTE">
               <PropertyRef Name="SECUENCIALCLIENTE" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="RefCOLABORADOR_PUBLICACIONESCLIENTE">
+          <End Role="COLABORADOR" Type="Self.COLABORADOR" Multiplicity="0..1" />
+          <End Role="PUBLICACIONESCLIENTE" Type="Self.PUBLICACIONESCLIENTE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="COLABORADOR">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="PUBLICACIONESCLIENTE">
+              <PropertyRef Name="SECUENCIALCOLABORADOR" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -4805,6 +4841,18 @@ warning 6002: The table/view 'SifizPlanning.TICKET.CLIENTEREPORTEMTTO' does not 
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="RefTICKET_PUBLICACIONESCLIENTE">
+          <End Role="TICKET" Type="Self.TICKET" Multiplicity="1" />
+          <End Role="PUBLICACIONESCLIENTE" Type="Self.PUBLICACIONESCLIENTE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TICKET">
+              <PropertyRef Name="SECUENCIAL" />
+            </Principal>
+            <Dependent Role="PUBLICACIONESCLIENTE">
+              <PropertyRef Name="SECUENCIALTICKET" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="RefTICKET_RESOLUCION200">
           <End Role="TICKET_RESOLUCION" Type="Self.TICKET_RESOLUCION" Multiplicity="1" />
           <End Role="TICKET_RESOLUCIONDESACUERDO" Type="Self.TICKET_RESOLUCIONDESACUERDO" Multiplicity="*" />
@@ -5387,6 +5435,7 @@ warning 6002: The table/view 'SifizPlanning.TICKET.CLIENTEREPORTEMTTO' does not 
           <EntitySet Name="PERSONA" EntityType="Self.PERSONA" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="PERSONAGRUPOEMAIL" EntityType="Self.PERSONAGRUPOEMAIL" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="PROYECTOMODULOCLIENTE" EntityType="Self.PROYECTOMODULOCLIENTE" Schema="TAREAS" store:Type="Tables" />
+          <EntitySet Name="PUBLICACIONESCLIENTE" EntityType="Self.PUBLICACIONESCLIENTE" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="Reporte" EntityType="Self.Reporte" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="RESPONSABLEPROYECTOS" EntityType="Self.RESPONSABLEPROYECTOS" Schema="TAREAS" store:Type="Tables" />
           <EntitySet Name="SEDE" EntityType="Self.SEDE" Schema="TAREAS" store:Type="Tables" />
@@ -5938,6 +5987,10 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
             <End Role="CAUSANOTERMINACION" EntitySet="CAUSANOTERMINACION" />
             <End Role="NOTERMINACIONTAREA" EntitySet="NOTERMINACIONTAREA" />
           </AssociationSet>
+          <AssociationSet Name="RefCLIENTE_PUBLICACIONESCLIENTE" Association="Self.RefCLIENTE_PUBLICACIONESCLIENTE">
+            <End Role="CLIENTE" EntitySet="CLIENTE" />
+            <End Role="PUBLICACIONESCLIENTE" EntitySet="PUBLICACIONESCLIENTE" />
+          </AssociationSet>
           <AssociationSet Name="RefCLIENTE131" Association="Self.RefCLIENTE131">
             <End Role="CLIENTE" EntitySet="CLIENTE" />
             <End Role="MOTIVOTRABAJO" EntitySet="MOTIVOTRABAJO" />
@@ -5965,6 +6018,10 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
           <AssociationSet Name="RefCLIENTE56" Association="Self.RefCLIENTE56">
             <End Role="CLIENTE" EntitySet="CLIENTE" />
             <End Role="CONTRATOCLIENTE" EntitySet="CONTRATOCLIENTE" />
+          </AssociationSet>
+          <AssociationSet Name="RefCOLABORADOR_PUBLICACIONESCLIENTE" Association="Self.RefCOLABORADOR_PUBLICACIONESCLIENTE">
+            <End Role="COLABORADOR" EntitySet="COLABORADOR" />
+            <End Role="PUBLICACIONESCLIENTE" EntitySet="PUBLICACIONESCLIENTE" />
           </AssociationSet>
           <AssociationSet Name="RefCOLABORADOR1121" Association="Self.RefCOLABORADOR1121">
             <End Role="COLABORADOR" EntitySet="COLABORADOR" />
@@ -6381,6 +6438,10 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
           <AssociationSet Name="RefTAREACOMPENSATORIA167" Association="Self.RefTAREACOMPENSATORIA167">
             <End Role="TAREACOMPENSATORIA" EntitySet="TAREACOMPENSATORIA" />
             <End Role="TAREACOMPENSATORIAPERMISO" EntitySet="TAREACOMPENSATORIAPERMISO" />
+          </AssociationSet>
+          <AssociationSet Name="RefTICKET_PUBLICACIONESCLIENTE" Association="Self.RefTICKET_PUBLICACIONESCLIENTE">
+            <End Role="TICKET" EntitySet="TICKET" />
+            <End Role="PUBLICACIONESCLIENTE" EntitySet="PUBLICACIONESCLIENTE" />
           </AssociationSet>
           <AssociationSet Name="RefTICKET_RESOLUCION200" Association="Self.RefTICKET_RESOLUCION200">
             <End Role="TICKET_RESOLUCION" EntitySet="TICKET_RESOLUCION" />
@@ -7771,6 +7832,19 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
             <End Role="ESTADOGESTIONOFERTA" EntitySet="EstadoGestionOferta" />
             <End Role="OfertaOferta" EntitySet="OfertaOferta" />
           </AssociationSet>
+          <EntitySet Name="PublicacionesCliente" EntityType="SifizPlanningModel.PublicacionesCliente" />
+          <AssociationSet Name="RefCLIENTE_PUBLICACIONESCLIENTE" Association="SifizPlanningModel.RefCLIENTE_PUBLICACIONESCLIENTE">
+            <End Role="Cliente" EntitySet="Cliente" />
+            <End Role="PUBLICACIONESCLIENTE" EntitySet="PublicacionesCliente" />
+          </AssociationSet>
+          <AssociationSet Name="RefCOLABORADOR_PUBLICACIONESCLIENTE" Association="SifizPlanningModel.RefCOLABORADOR_PUBLICACIONESCLIENTE">
+            <End Role="Colaborador" EntitySet="Colaborador" />
+            <End Role="PUBLICACIONESCLIENTE" EntitySet="PublicacionesCliente" />
+          </AssociationSet>
+          <AssociationSet Name="RefTICKET_PUBLICACIONESCLIENTE" Association="SifizPlanningModel.RefTICKET_PUBLICACIONESCLIENTE">
+            <End Role="Ticket" EntitySet="Ticket" />
+            <End Role="PUBLICACIONESCLIENTE" EntitySet="PublicacionesCliente" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="Rol">
           <Key>
@@ -7870,6 +7944,7 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
           <NavigationProperty Name="TIEMPOCERRADOTICKET" Relationship="SifizPlanningModel.FK_TIEMPOCERRADOTICKET_CLIENTE" FromRole="Cliente" ToRole="TIEMPOCERRADOTICKET" />
           <NavigationProperty Name="clienteReporteMantenimiento" Relationship="SifizPlanningModel.FK_CLIENTEREPORTEMANTENIMIENTO_CLIENTE" FromRole="Cliente" ToRole="CLIENTEREPORTEMANTENIMIENTO" />
           <NavigationProperty Name="clienteAuxiliar" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_CLIENTE" FromRole="Cliente" ToRole="CLIENTEAUXILIAR" />
+          <NavigationProperty Name="PUBLICACIONESCLIENTE" Relationship="SifizPlanningModel.RefCLIENTE_PUBLICACIONESCLIENTE" FromRole="Cliente" ToRole="PUBLICACIONESCLIENTE" />
         </EntityType>
         <EntityType Name="Colaborador">
           <Key>
@@ -7924,6 +7999,7 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
           <NavigationProperty Name="DIASDISPONIBLESVACACIONES" Relationship="SifizPlanningModel.FK_DIASDISPONIBLESVACACIONES_COLABORADOR" FromRole="Colaborador" ToRole="DIASDISPONIBLESVACACIONES" />
           <NavigationProperty Name="PROPUESTAVACACIONES" Relationship="SifizPlanningModel.FK_PROPUESTAVACACIONES_COLABORADOR" FromRole="Colaborador" ToRole="PROPUESTAVACACIONES" />
           <NavigationProperty Name="clienteAuxiliar" Relationship="SifizPlanningModel.FK_CLIENTEAUXILIAR_COLABORADOR" FromRole="Colaborador" ToRole="CLIENTEAUXILIAR" />
+          <NavigationProperty Name="PUBLICACIONESCLIENTE" Relationship="SifizPlanningModel.RefCOLABORADOR_PUBLICACIONESCLIENTE" FromRole="Colaborador" ToRole="PUBLICACIONESCLIENTE" />
           </EntityType>
         <EntityType Name="Colaborador_JefeInmediato">
           <Key>
@@ -8621,6 +8697,7 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
           <Property Name="Revisado" Type="Boolean" />
           <NavigationProperty Name="CALIFICACIONTICKETCLIENTE" Relationship="SifizPlanningModel.FK_CALIFICACIONTICKETCLIENTE_TICKET" FromRole="Ticket" ToRole="CALIFICACIONTICKETCLIENTE" />
           <Property Name="OfertaMasiva" Type="Boolean" />
+          <NavigationProperty Name="PUBLICACIONESCLIENTE" Relationship="SifizPlanningModel.RefTICKET_PUBLICACIONESCLIENTE" FromRole="Ticket" ToRole="PUBLICACIONESCLIENTE" />
         </EntityType>
         <EntityType Name="Ticket_ContratoCliente">
           <Key>
@@ -13540,6 +13617,57 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="PublicacionesCliente">
+          <Key>
+            <PropertyRef Name="Secuencial" />
+          </Key>
+          <Property Name="Secuencial" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SecuencialTicket" Type="Int32" Nullable="false" />
+          <Property Name="SecuencialCliente" Type="Int32" Nullable="false" />
+          <Property Name="FechaSolicitud" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="EstaPublicado" Type="Boolean" Nullable="false" />
+          <Property Name="FechaPublicacion" Type="DateTime" Precision="3" />
+          <Property Name="SecuencialColaborador" Type="Int32" />
+          <NavigationProperty Name="cliente" Relationship="SifizPlanningModel.RefCLIENTE_PUBLICACIONESCLIENTE" FromRole="PUBLICACIONESCLIENTE" ToRole="Cliente" />
+          <NavigationProperty Name="colaborador" Relationship="SifizPlanningModel.RefCOLABORADOR_PUBLICACIONESCLIENTE" FromRole="PUBLICACIONESCLIENTE" ToRole="Colaborador" />
+          <NavigationProperty Name="ticket" Relationship="SifizPlanningModel.RefTICKET_PUBLICACIONESCLIENTE" FromRole="PUBLICACIONESCLIENTE" ToRole="Ticket" />
+        </EntityType>
+        <Association Name="RefCLIENTE_PUBLICACIONESCLIENTE">
+          <End Type="SifizPlanningModel.Cliente" Role="Cliente" Multiplicity="1" />
+          <End Type="SifizPlanningModel.PublicacionesCliente" Role="PUBLICACIONESCLIENTE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Cliente">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="PUBLICACIONESCLIENTE">
+              <PropertyRef Name="SecuencialCliente" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="RefCOLABORADOR_PUBLICACIONESCLIENTE">
+          <End Type="SifizPlanningModel.Colaborador" Role="Colaborador" Multiplicity="0..1" />
+          <End Type="SifizPlanningModel.PublicacionesCliente" Role="PUBLICACIONESCLIENTE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Colaborador">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="PUBLICACIONESCLIENTE">
+              <PropertyRef Name="SecuencialColaborador" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="RefTICKET_PUBLICACIONESCLIENTE">
+          <End Type="SifizPlanningModel.Ticket" Role="Ticket" Multiplicity="1" />
+          <End Type="SifizPlanningModel.PublicacionesCliente" Role="PUBLICACIONESCLIENTE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ticket">
+              <PropertyRef Name="Secuencial" />
+            </Principal>
+            <Dependent Role="PUBLICACIONESCLIENTE">
+              <PropertyRef Name="SecuencialTicket" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -15943,6 +16071,19 @@ FROM [TICKET].[CLIENTEREPORTEMTTO] AS [CLIENTEREPORTEMTTO]</DefiningQuery>
                 <ScalarProperty Name="EstaActivo" ColumnName="ESTAACTIVO" />
                 <ScalarProperty Name="Descripcion" ColumnName="DESCRIPCION" />
                 <ScalarProperty Name="Codigo" ColumnName="CODIGO" />
+                <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PublicacionesCliente">
+            <EntityTypeMapping TypeName="SifizPlanningModel.PublicacionesCliente">
+              <MappingFragment StoreEntitySet="PUBLICACIONESCLIENTE">
+                <ScalarProperty Name="SecuencialColaborador" ColumnName="SECUENCIALCOLABORADOR" />
+                <ScalarProperty Name="FechaPublicacion" ColumnName="FECHAPUBLICACION" />
+                <ScalarProperty Name="EstaPublicado" ColumnName="ESTAPUBLICADO" />
+                <ScalarProperty Name="FechaSolicitud" ColumnName="FECHASOLICITUD" />
+                <ScalarProperty Name="SecuencialCliente" ColumnName="SECUENCIALCLIENTE" />
+                <ScalarProperty Name="SecuencialTicket" ColumnName="SECUENCIALTICKET" />
                 <ScalarProperty Name="Secuencial" ColumnName="SECUENCIAL" />
               </MappingFragment>
             </EntityTypeMapping>

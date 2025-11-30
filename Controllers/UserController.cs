@@ -1240,6 +1240,7 @@ namespace SifizPlanning.Controllers
 
                     string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
                     string linkAceptar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO"));
+                    string linkAceptarPublicar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO_PUBLICA"));
                     string linkRechazar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":NOACEPTADO"));
                     //string linksConcatenados = linkAceptar + ", " + linkRechazar;
 
@@ -7485,6 +7486,7 @@ r in db.Rol on ur.rol equals r
                         string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
 
                         string linkAceptar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO"));
+                        string linkAceptarPublicar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO_PUBLICA"));
                         string linkRechazar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":NOACEPTADO"));
                         string textoEmailCliente = textoEmail + @"<br/><div style='font-size: 11pt; font-family: sans-serif; color: #1F497D;'>
 			                                                <span style='color:#128812'>
@@ -7492,6 +7494,13 @@ r in db.Rol on ur.rol equals r
 			                                                </span><br/>                                                            
 			                                                <a href='" + linkAceptar + @"'>
                                                                 <i>" + linkAceptar + @"</i>
+			                                                </a>			
+			                                                <br/><br/>
+			                                                <span style='color:#1F7B1F'>
+				                                                Si usted <b>ACEPTA Y DESEA PUBLICAR</b> en producción, presione el siguiente link:
+			                                                </span><br/>                                                            
+			                                                <a href='" + linkAceptarPublicar + @"'>
+                                                                <i>" + linkAceptarPublicar + @"</i>
 			                                                </a>			
 			                                                <br/><br/>
 			                                                <span style='color:#EE1212'>Si por el contrario <b>NO ACEPTA</b> este requerimiento por favor presione el siguiente link:</span><br/>
@@ -7612,6 +7621,7 @@ r in db.Rol on ur.rol equals r
                     string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
 
                     string linkAceptar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO"));
+                    string linkAceptarPublicar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO_PUBLICA"));
                     string linkRechazar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":NOACEPTADO"));
                     string textoEmailCliente = textoEmail + @"<br/><div style='font-size: 11pt; font-family: sans-serif; color: #1F497D;'>
 			                                                <span style='color:#128812'>
@@ -7619,6 +7629,13 @@ r in db.Rol on ur.rol equals r
 			                                                </span><br/>                                                            
 			                                                <a href='" + linkAceptar + @"'>
                                                                 <i>" + linkAceptar + @"</i>
+			                                                </a>			
+			                                                <br/><br/>
+			                                                <span style='color:#1F7B1F'>
+				                                                Si usted <b>ACEPTA Y DESEA PUBLICAR</b> en producción, presione el siguiente link:
+			                                                </span><br/>                                                            
+			                                                <a href='" + linkAceptarPublicar + @"'>
+                                                                <i>" + linkAceptarPublicar + @"</i>
 			                                                </a>			
 			                                                <br/><br/>
 			                                                <span style='color:#EE1212'>Si por el contrario <b>NO ACEPTA</b> este requerimiento por favor presione el siguiente link:</span><br/>
@@ -7670,6 +7687,138 @@ r in db.Rol on ur.rol equals r
                 var resp = new
                 {
                     success = true
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMINTFS, ADMIN")]
+        public ActionResult PublicacionesCliente()
+        {
+            try
+            {
+                var data = (from pc in db.PublicacionesCliente
+                            join t in db.Ticket on pc.SecuencialTicket equals t.Secuencial
+                            join pcli in db.Persona_Cliente on pc.SecuencialCliente equals pcli.SecuencialCliente
+                            join p in db.Persona on pcli.SecuencialPersona equals p.Secuencial
+                            join col in db.Colaborador on pc.SecuencialColaborador equals col.Secuencial into colLeft
+                            from col in colLeft.DefaultIfEmpty()
+                            join pCol in db.Persona on col.SecuencialPersona equals pCol.Secuencial into pColLeft
+                            from pCol in pColLeft.DefaultIfEmpty()
+                            orderby pc.FechaSolicitud descending
+                            select new
+                            {
+                                secuencial = pc.Secuencial,
+                                numeroTicket = t.Secuencial,
+                                nombreCliente = p.Nombre1 + " " + p.Apellido1,
+                                asuntoTicket = t.Asunto,
+                                fechaSolicitud = pc.FechaSolicitud,
+                                estaPublicado = pc.EstaPublicado,
+                                fechaPublicacion = pc.FechaPublicacion,
+                                colaborador = pCol != null ? (pCol.Nombre1 + " " + pCol.Apellido1) : ""
+                            }).ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    publicacionesCliente = data
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMINTFS, ADMIN")]
+        public ActionResult MarcarPublicacionCliente(int id)
+        {
+            try
+            {
+                string emailUser = User.Identity.Name;
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+                Persona persona = user.persona;
+                Colaborador colaborador = db.Colaborador.FirstOrDefault(x => x.persona.Secuencial == persona.Secuencial);
+                
+                PublicacionesCliente publicacion = db.PublicacionesCliente.Find(id);
+                if (publicacion == null)
+                {
+                    throw new Exception("No se encontró la publicación cliente");
+                }
+
+                publicacion.EstaPublicado = true;
+                publicacion.FechaPublicacion = DateTime.Now;
+                publicacion.SecuencialColaborador = colaborador.Secuencial;
+
+                db.SaveChanges();
+
+                // Obtener información para enviar emails
+                Ticket ticket = publicacion.ticket;
+                Cliente cliente = db.Cliente.Find(publicacion.SecuencialCliente);
+                
+                // Obtener email de la persona cliente
+                Persona_Cliente personaClienteEntity = db.Set<Persona_Cliente>().FirstOrDefault(x => x.SecuencialCliente == cliente.Secuencial);
+                Persona personaCliente = personaClienteEntity.persona;
+                string emailCliente = personaCliente.usuario.FirstOrDefault().Email;
+
+                // Email al cliente
+                string asunto = "Publicación completada - Ticket #" + string.Format("{0:000000}", ticket.Secuencial);
+                string texto = @"<div class='textoCuerpo'><br/>
+                    Estimado(a):<br/><br/>
+                    Le informamos que su solicitud de publicación ha sido completada.<br/><br/>
+                    <b>Detalles:</b><br/>
+                    Ticket: #" + string.Format("{0:000000}", ticket.Secuencial) + @"<br/>
+                    Asunto: " + ticket.Asunto + @"<br/>
+                    Fecha de Publicación: " + publicacion.FechaPublicacion.Value.ToString("dd/MM/yyyy HH:mm") + @"<br/>
+                    Publicado por: " + persona.Nombre1 + " " + persona.Apellido1 + @"<br/><br/>
+                    Cualquier duda, por favor contáctenos.<br/><br/>
+                    Saludos cordiales.<br/>
+                    </div>";
+
+                Utiles.EnviarEmailSistema(new string[] { emailCliente }, texto, asunto);
+
+                // Email a operaciones
+                string asuntoOps = "Publicación completada - Ticket #" + string.Format("{0:000000}", ticket.Secuencial);
+                string textoOps = @"<div class='textoCuerpo'><br/>
+                    Se ha marcado como completada la siguiente publicación cliente:<br/><br/>
+                    <b>Detalles:</b><br/>
+                    Ticket: #" + string.Format("{0:000000}", ticket.Secuencial) + @"<br/>
+                    Cliente: " + cliente.Descripcion + @"<br/>
+                    Persona: " + personaCliente.Nombre1 + " " + personaCliente.Apellido1 + @"<br/>
+                    Asunto: " + ticket.Asunto + @"<br/>
+                    Fecha de Solicitud: " + publicacion.FechaSolicitud.ToString("dd/MM/yyyy HH:mm") + @"<br/>
+                    Fecha de Publicación: " + publicacion.FechaPublicacion.Value.ToString("dd/MM/yyyy HH:mm") + @"<br/>
+                    Publicado por: " + persona.Nombre1 + " " + persona.Apellido1 + @"<br/><br/>
+                    </div>";
+
+                List<string> correosOps = Utiles.CorreoPorGrupoEmail("OPERACIONES");
+                correosOps.AddRange(Utiles.CorreoPorGrupoEmail("DEVOPS"));
+                if (correosOps.Count > 0)
+                {
+                    Utiles.EnviarEmailSistema(correosOps.ToArray(), textoOps, asuntoOps);
+                }
+
+                var resp = new
+                {
+                    success = true,
+                    msg = "Publicación marcada como completada"
                 };
                 return Json(resp);
             }

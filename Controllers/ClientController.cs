@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -1630,7 +1630,7 @@ namespace SifizPlanning.Controllers
 			try
 			{
 				string codigoResultado = Utiles.DesencriptacionSimetrica(cod);
-				//El código llega de esta forma: numeroTicket:ACEPTADO ó numeroTicket:NOACEPTADO
+				//El código llega de esta forma: numeroTicket:ACEPTADO ó numeroTicket:ACEPTADO_PUBLICA ó numeroTicket:NOACEPTADO
 
 				string[] resultadosCliente = codigoResultado.Split(new char[] { ':' });
 				int idTicket = Convert.ToInt32(resultadosCliente[0]);
@@ -1658,8 +1658,10 @@ namespace SifizPlanning.Controllers
 				}
 
 				ViewBag.asunto = ticket.Asunto;
-				if(resultadosCliente[1] == "ACEPTADO")
+				if(resultadosCliente[1] == "ACEPTADO" || resultadosCliente[1] == "ACEPTADO_PUBLICA")
 				{
+					bool solicitaPublicar = (resultadosCliente[1] == "ACEPTADO_PUBLICA");
+					
 					string emailCliente = email;
 					ViewBag.ingresado = personaCliente.Nombre1 + " " + personaCliente.Apellido1;
 					ViewBag.fechaIngreso = ticket.FechaCreado.ToString("dd/MM/yyyy");
@@ -1703,26 +1705,57 @@ namespace SifizPlanning.Controllers
 
 					db.SaveChanges();//Salvando los cambios
 
+					// Si el cliente solicita publicación, crear registro en PublicacionesCliente
+					if(solicitaPublicar)
+					{
+						PublicacionesCliente publicacionCliente = new PublicacionesCliente
+						{
+							SecuencialTicket = ticket.Secuencial,
+							SecuencialCliente = ticket.persona_cliente.cliente.Secuencial,
+							FechaSolicitud = DateTime.Now,
+							EstaPublicado = false
+						};
+						db.PublicacionesCliente.Add(publicacionCliente);
+						db.SaveChanges();
+
+						// Enviar correo a DevOps notificando la solicitud de publicación
+						List<string> correosDestinos = new List<string>();
+						correosDestinos.Add("publicacionesdoscinco@sifizsoft.com");
+						correosDestinos.AddRange(Utiles.CorreoPorGrupoEmail("DEVOPS"));
+
+						string textoEmailDevops = "<div class=\"textoCuerpo\"><br/>";
+						textoEmailDevops += "Se ha recibido una <b>solicitud de publicación en producción</b> del cliente.<br/><br/>";
+						textoEmailDevops += "<b>Número de Ticket:</b> " + string.Format("{0:000000}", ticket.Secuencial) + "<br/>";
+						textoEmailDevops += "<b>Cliente:</b> " + ticket.persona_cliente.cliente.Descripcion + "<br/>";
+						textoEmailDevops += "<b>Asunto:</b> " + ticket.Asunto + "<br/>";
+						textoEmailDevops += "<b>Fecha de Solicitud:</b> " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "<br/><br/>";
+						textoEmailDevops += "Por favor, proceder con la publicación en producción según lo requerido.<br/>";
+						textoEmailDevops += "</div>";
+
+						string asuntoEmail = ticket.persona_cliente.cliente.Codigo + " HESO " + string.Format("{0:000000}", ticket.Secuencial) + " - SOLICITUD DE PUBLICACIÓN EN PRODUCCIÓN";
+						Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmailDevops, asuntoEmail, null, string.Format("{0:000000}", ticket.Secuencial));
+					}
+
 					string textoEmail = "<div class=\"textoCuerpo\">" + @"Por medio de esta comunicación le informamos que el ticket <b>" + string.Format("{0:000000}", ticket.Secuencial) + @"</b> ha sido CERRADO; <br/> 
                                      esta acción se ha tomado porque hemos recibido su conformidad con el mismo o en su defecto no se recibió una respuesta de su parte dentro del período de espera de los cinco días laborables contados desde la fecha en la que enviamos nuestra solicitud de certificación de conformidad de este requerimiento vía correo electrónico.<br/>
                                      En el caso de requerir correcciones, solicitamos se ingrese un nuevo requerimiento y se incluya el código " + "\"HESO " + string.Format("{0:000000}", ticket.Secuencial) + "\" en el detalle del mismo.<br/> <b>Asunto del ticket: </b>" + ticket.Asunto + "</div>";
 
-					List<string> correosDestinos = Utiles.CorreoPorGrupoEmail("COORD");
-					correosDestinos.Insert(0, emailCliente);
+					List<string> correosDestinosCliente = Utiles.CorreoPorGrupoEmail("COORD");
+					correosDestinosCliente.Insert(0, emailCliente);
 
 					//Borrar aqui
 					var gestores = ticket.persona_cliente.cliente.gestorServicios.ToList();
 					foreach(var g in gestores)
 					{
-						correosDestinos.Add(g.colaborador.persona.usuario.FirstOrDefault().Email);
+						correosDestinosCliente.Add(g.colaborador.persona.usuario.FirstOrDefault().Email);
 					}
-					correosDestinos = correosDestinos.Distinct().ToList();
+					correosDestinosCliente = correosDestinosCliente.Distinct().ToList();
 
 					string codigoCliente = ticket.persona_cliente.cliente.Codigo;
-					Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmail, codigoCliente + " HESO " + string.Format("{0:000000}", ticket.Secuencial) + " - Ticket cerrado (" + ticket.Asunto + ")", null, String.Format("{0:000000}", ticket.Secuencial));
+					Utiles.EnviarEmailSistema(correosDestinosCliente.ToArray(), textoEmail, codigoCliente + " HESO " + string.Format("{0:000000}", ticket.Secuencial) + " - Ticket cerrado (" + ticket.Asunto + ")", null, String.Format("{0:000000}", ticket.Secuencial));
 
 					//adicionando el email a los historicos
-					string destinos = String.Join(", ", correosDestinos.ToArray());
+					string destinos = String.Join(", ", correosDestinosCliente.ToArray());
 					string textoHistoricoCorreo = "<b>Correo de información, Ticket Cerrado</b><br/>";
 					textoHistoricoCorreo += "<b>Destinos:</b> " + destinos + "<br/>";
 					textoHistoricoCorreo += "<b>Asunto:</b> " + "Ticket cerrado" + "<br/>";
