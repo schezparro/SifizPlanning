@@ -35,9 +35,9 @@
                     <td style="white-space: nowrap;">
                         <button ng-if="!pubc.estaPublicado" type="button" class="btn btn-xs btn-info" 
                                 ng-click="marcarPublicacionClienteComoPublicado(pubc.secuencial, pubc.numeroTicket)">
-                            <span class="glyphicon glyphicon-ok"></span> Publicado
+                                Publicar
                         </button>
-                        <span ng-if="pubc.estaPublicado" class="text-muted">✓</span>
+                        <span class="glyphicon glyphicon-ok" ng-if="pubc.estaPublicado" class="text-muted"></span>
                     </td>
                 </tr>
                 <tr ng-if="!publicacionesCliente || publicacionesCliente.length === 0">
