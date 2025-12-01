@@ -1297,6 +1297,7 @@
     <Content Include="Views\Admin\windowProyectosExcel.cshtml" />
     <Content Include="Views\Comercial\windowOffersExcel.cshtml" />
     <Content Include="Views\Indicadores\windowIndicadoresOfertas.cshtml" />
+    <Content Include="Views\User\windowUserPublicacionesCliente.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
