@@ -848,6 +848,14 @@ namespace SifizPlanning
                                                    where ge.Codigo == "ASGG" && ge.EstaActivo == 1 && u.EstaActivo == 1 && pge.EstaActivo == 1
                                                    select u.Email).ToList<string>();
 
+                // Correos adicionales soliitados por Rossy
+                listaEmailDestinos.Add("galvarez@sifizsoft.com");
+                listaEmailDestinos.Add("asistenterrhh@sifizsoft.com");
+
+                // Evitar duplicados
+                listaEmailDestinos = listaEmailDestinos.Distinct().ToList();
+
+
                 var s = new JavaScriptSerializer();
                 var jsonObj = s.Deserialize<dynamic>(jsonCC);
                 foreach (string email in jsonObj)

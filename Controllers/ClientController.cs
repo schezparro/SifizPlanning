@@ -394,7 +394,7 @@ namespace SifizPlanning.Controllers
 					textoInicial.Append($"Como su ticket está catalogado con prioridad {codPrioridadTicket}, <br/>");
 					textoInicial.Append("usted debe comunicarse con nuestra oficina para continuar con la gestión del ticket.<br/> ");
 					textoInicial.Append("(Teléfonos: 02-351-7729, 02-351-8919, 02-450-4616, 02-450-4727) (Teléfono de emergencia: 098-603-7821)<br/>");
-					textoInicial.Append("(Correo Electrónico: vhidalgo@sifizsoft.com) (Skype: victorhidalgo)<br/>");
+					// textoInicial.Append("(Correo Electrónico: vhidalgo@sifizsoft.com) (Skype: victorhidalgo)<br/>");
 				}
 				else
 				{
