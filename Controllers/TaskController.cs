@@ -4354,7 +4354,7 @@ namespace SifizPlanning.Controllers
                                         <p class=MsoNormal align=center style='text-align:center'><img style='max-width: 100%; height: auto !important;'  src='cid:sifizsoft.png'></p>
                                         <p class=MsoNormal><o:p>&nbsp;</o:p></p>
                                         <p class=MsoNormal align=center style='text-align:center'>
-                                            <span style='font-family:""Century Gothic"",sans-serif;font-size:9.0pt;color:#000035;'>Copyrights ©SifizSoft 2004-2025 carefully reserved and preserved<o:p></o:p></span>
+                                            <span style='font-family:""Century Gothic"",sans-serif;font-size:9.0pt;color:#000035;'>Copyrights ©SifizSoft 2004-2026 carefully reserved and preserved<o:p></o:p></span>
                                         </p>
                                         <p class=MsoNormal><o:p>&nbsp;</o:p></p>
                                     </div>";
