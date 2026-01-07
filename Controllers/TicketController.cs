@@ -3323,7 +3323,7 @@ namespace SifizPlanning.Controllers
                 //{
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
-                if (user != null && (user.Email == "vhidalgo@sifizsoft.com" || user.Email == "rsanchez@sifizsoft.com"))
+                if (user != null && (user.Email == "operaciones@sifizsoft.com" || user.Email == "rsanchez@sifizsoft.com"))
                     permitirValidar = true;
                 //}
 
