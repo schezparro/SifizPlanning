@@ -1268,8 +1268,12 @@ namespace SifizPlanning.Controllers
                     {
                         foreach (var adjunto in adjuntoPublicacion)
                         {
-                            var stream = adjunto.InputStream;
-                            data.Add(new StreamContent(stream), "ArchivoAdjunto", adjunto.FileName);
+                            var ms = new MemoryStream();
+                            adjunto.InputStream.CopyTo(ms);
+                            ms.Position = 0;
+
+                            data.Add(new StreamContent(ms), "ArchivoAdjunto", adjunto.FileName);
+
                         }
                     }
 
@@ -1284,7 +1288,7 @@ namespace SifizPlanning.Controllers
                     }
                     else
                     {
-                        var dataContent = await data.ReadAsStringAsync();
+                        var responseContent = await response.Content.ReadAsStringAsync();
 
                         string textoEmailDevops = @"<div class='textoCuerpo'><br/>";
                         textoEmailDevops += @"<br/>";
@@ -1294,7 +1298,7 @@ namespace SifizPlanning.Controllers
                         textoEmailDevops += @"<br/>";
                         textoEmailDevops += response.StatusCode.ToString() + ": " + response.ReasonPhrase.ToString();
                         textoEmailDevops += @"<br/><i>Data:</i>";
-                        textoEmailDevops += dataContent; // Agregar el contenido de 'data' al correo
+                        textoEmailDevops += responseContent; // Agregar el contenido de 'data' al correo
                         textoEmailDevops += @"<br/>";
                         textoEmailDevops += @"</div>";
 
@@ -1503,8 +1507,11 @@ namespace SifizPlanning.Controllers
                     {
                         foreach (var adjunto in adjuntoPublicacion)
                         {
-                            var stream = adjunto.InputStream;
-                            data.Add(new StreamContent(stream), "ArchivoAdjunto", adjunto.FileName);
+                            var ms = new MemoryStream();
+                            adjunto.InputStream.CopyTo(ms);
+                            ms.Position = 0;
+
+                            data.Add(new StreamContent(ms), "ArchivoAdjunto", adjunto.FileName);
                         }
                     }
 
@@ -1519,7 +1526,7 @@ namespace SifizPlanning.Controllers
                     }
                     else
                     {
-                        var dataContent = await data.ReadAsStringAsync();
+                        var responseContent = await response.Content.ReadAsStringAsync();
 
                         string textoEmailDevops = @"<div class='textoCuerpo'><br/>";
                         textoEmailDevops += @"<br/>";
@@ -1529,7 +1536,7 @@ namespace SifizPlanning.Controllers
                         textoEmailDevops += @"<br/>";
                         textoEmailDevops += response.StatusCode.ToString() + ": " + response.ReasonPhrase.ToString();
                         textoEmailDevops += @"<br/><i>Data:</i>";
-                        textoEmailDevops += dataContent; // Agregar el contenido de 'data' al correo
+                        textoEmailDevops += responseContent; // Agregar el contenido de 'data' al correo
                         textoEmailDevops += @"<br/>";
                         textoEmailDevops += @"</div>";
 
