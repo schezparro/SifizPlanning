@@ -1,94 +1,116 @@
 ﻿<div>
-    <div class="form-inline">
-        <input type="text" class="form-control" ng-model="filterPublicaciones" placeholder="Filtrar..." />
+    <!-- Tabs para Publicaciones Técnicas y Publicaciones Cliente -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active">
+            <a href="#tab-publicaciones-tecnicas" role="tab" data-toggle="tab">Publicaciones Técnicas</a>
+        </li>
+        <li role="presentation">
+            <a href="#tab-publicaciones-cliente" role="tab" data-toggle="tab">Publicaciones Cliente</a>
+        </li>
+    </ul>
 
-        @*<button class="right btn btn-danger btn-sm"><span class="glyphicon glyphicon-remove"></span> Limpiar Selección</button>
-            <div class="right">&nbsp;</div>*@
-        <button class="right btn btn-primary btn-sm" ng-click="seleccionarPublicarEnUno()"><span class="glyphicon glyphicon-ok"></span> Publicados en 1</button>
+    <!-- TAB 1: Publicaciones Técnicas -->
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="tab-publicaciones-tecnicas">
+            <br />
+            <div class="form-inline">
+                <input type="text" class="form-control" ng-model="filterPublicaciones" placeholder="Filtrar..." />
 
-        <div class="clear"></div>
-    </div>
-    <div>
-        <table id="tabla-publicaciones" class="table">
-            <thead>
-                <tr>
-                    <th>No. Ticket</th>
-                    <th>Cliente</th>
-                    <th>Colaborador Asignado</th>
-                    <th>Estado Ticket</th>
-                    <th>Categoría</th>
-                    <th>Prioridad</th>
-                    <th>Asunto</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="fila-publicacion" ng-repeat="ticket in $parent.ticketsPorPublicar | filter: filterPublicaciones" data-id="{{ticket.idTicket}}">
-                    <td>{{ticket.idTicket}}</td>
-                    <td>{{ticket.cliente}}</td>
-                    <td>{{ticket.asignado}}</td>
-                    <td>{{ticket.estadoTicket}}</td>
-                    <td>{{ticket.categoria}}</td>
-                    <td>{{ticket.prioridad}}</td>
-                    <td>{{ticket.asunto}}</td>
-                    <td>
-                        <button type="button" class="btn btn-xs btn-success" ng-click="seleccionarParaPublicar(ticket.idTicket)"><span class="glyphicon glyphicon-ok"></span> publicado</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+                @*<button class="right btn btn-danger btn-sm"><span class="glyphicon glyphicon-remove"></span> Limpiar Selección</button>
+                    <div class="right">&nbsp;</div>*@
+                <button class="right btn btn-primary btn-sm" ng-click="seleccionarPublicarEnUno()"><span class="glyphicon glyphicon-ok"></span> Publicados en 1</button>
 
-    <div class="modal fade" id="modal-enviar-publicacion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Parámetros de Publicación</h4>
-                </div>
-                <form ng-submit="publicacionRealizada()">
-                    <div class="modal-body">
-                        <div class="form-inline">
-                            <div>
-                                <label style="width: 200px;">Tipo de publicación:</label>
-                                <select style="width: 250px; margin-bottom:5px;" class="form-control" ng-model="tipoPublicacion" ng-required="1">
-                                    <option value="Cliente/Servidor">Cliente/Servidor</option>
-                                    <option value="Cliente">Cliente</option>
-                                    <option value="Servidor">Servidor</option>
-                                    <option value="Servidor">Sitio Web</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label style="width: 200px;">Objetivo de publicación:</label>
-                                <select style="width: 250px; margin-bottom:5px;" class="form-control" ng-model="objetivoPublicacion" ng-required="1">
-                                    <option value="pruebas">Pruebas</option>
-                                    <option value="producción">Producción</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label style="width: 200px;">FTP:</label>
-                                <input style="width: 250px; margin-bottom:5px;" class="form-control" ng-model="ftpPublicacion" ng-required="1" />
-                            </div>
-                            <div>
-                                <label style="width: 200px;">Usuario:</label>
-                                <input style="width: 250px; margin-bottom:5px;" class="form-control" ng-model="usuarioFtp" ng-required="1" />
-                            </div>
-                            <div>
-                                <label style="width: 200px;">Clave:</label>
-                                <input style="width: 250px; margin-bottom:5px;" class="form-control" ng-model="claveFtp" ng-required="1" />
-                            </div>
-                            <div>
-                                <label style="width: 200px;">Path:</label>
-                                <input style="width: 250px; margin-bottom:5px;" class="form-control" ng-model="pathPublicacion" ng-required="1" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
-                        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Enviar</button>
-                    </div>
-                </form>
+                <div class="clear"></div>
             </div>
+            <div>
+                <table id="tabla-publicaciones" class="table">
+                    <thead>
+                        <tr>
+                            <th>No. Ticket</th>
+                            <th>Cliente</th>
+                            <th>Colaborador Asignado</th>
+                            <th>Estado Ticket</th>
+                            <th>Categoría</th>
+                            <th>Prioridad</th>
+                            <th>Asunto</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="fila-publicacion" ng-repeat="ticket in $parent.ticketsPorPublicar | filter: filterPublicaciones" data-id="{{ticket.idTicket}}">
+                            <td>{{ticket.idTicket}}</td>
+                            <td>{{ticket.cliente}}</td>
+                            <td>{{ticket.asignado}}</td>
+                            <td>{{ticket.estadoTicket}}</td>
+                            <td>{{ticket.categoria}}</td>
+                            <td>{{ticket.prioridad}}</td>
+                            <td>{{ticket.asunto}}</td>
+                            <td>
+                                <button type="button" class="btn btn-xs btn-success" ng-click="seleccionarParaPublicar(ticket.idTicket)"><span class="glyphicon glyphicon-ok"></span> publicado</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal fade" id="modal-enviar-publicacion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel">Parámetros de Publicación</h4>
+                        </div>
+                        <form ng-submit="publicacionRealizada()">
+                            <div class="modal-body">
+                                <div class="form-inline">
+                                    <div>
+                                        <label style="width: 200px;">Tipo de publicación:</label>
+                                        <select style="width: 250px; margin-bottom:5px;" class="form-control" ng-model="tipoPublicacion" ng-required="1">
+                                            <option value="Cliente/Servidor">Cliente/Servidor</option>
+                                            <option value="Cliente">Cliente</option>
+                                            <option value="Servidor">Servidor</option>
+                                            <option value="Servidor">Sitio Web</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style="width: 200px;">Objetivo de publicación:</label>
+                                        <select style="width: 250px; margin-bottom:5px;" class="form-control" ng-model="objetivoPublicacion" ng-required="1">
+                                            <option value="pruebas">Pruebas</option>
+                                            <option value="producción">Producción</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style="width: 200px;">FTP:</label>
+                                        <input style="width: 250px; margin-bottom:5px;" class="form-control" ng-model="ftpPublicacion" ng-required="1" />
+                                    </div>
+                                    <div>
+                                        <label style="width: 200px;">Usuario:</label>
+                                        <input style="width: 250px; margin-bottom:5px;" class="form-control" ng-model="usuarioFtp" ng-required="1" />
+                                    </div>
+                                    <div>
+                                        <label style="width: 200px;">Clave:</label>
+                                        <input style="width: 250px; margin-bottom:5px;" class="form-control" ng-model="claveFtp" ng-required="1" />
+                                    </div>
+                                    <div>
+                                        <label style="width: 200px;">Path:</label>
+                                        <input style="width: 250px; margin-bottom:5px;" class="form-control" ng-model="pathPublicacion" ng-required="1" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cerrar</button>
+                                <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Enviar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Publicaciones Cliente -->
+        <div role="tabpanel" class="tab-pane" id="tab-publicaciones-cliente">
+            <br />
+            @{ Html.RenderPartial("windowUserPublicacionesCliente"); }
         </div>
     </div>
 </div>

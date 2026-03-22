@@ -2,6 +2,7 @@
 using Microsoft.Owin;
 using SifizPlanning.Models;
 using SifizPlanning.Security;
+using SifizPlanning.Util;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -17,6 +18,7 @@ using System.Windows.Forms;
 
 namespace SifizPlanning.Controllers
 {
+
     public class ConsultasController : Controller
     {
         SifizPlanningEntidades db = DbCnx.getCnx();
@@ -26,6 +28,297 @@ namespace SifizPlanning.Controllers
         {
             return View();
         }
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
+        public ActionResult GetClientes()
+        {
+            try
+            {
+                var clientes = db.Cliente
+                    .Where(c => c.EstaActivo == 1)
+                    .Select(c => new { c.Secuencial, c.Descripcion })
+                    .OrderBy(c => c.Descripcion)
+                    .ToList();
+
+                return Json(new { success = true, clientes = clientes }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
+        public ActionResult GetVersionesDesarrollo()
+        {
+            try
+            {
+                var versiones = db.VersionDesarrollo
+                    .Where(v => v.EstaActivo == 1)
+                    .Select(v => new { v.Secuencial, v.Descripcion })
+                    .OrderBy(v => v.Descripcion)
+                    .ToList();
+
+                return Json(new { success = true, versiones = versiones }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
+        public ActionResult GetRepositorios()
+        {
+            try
+            {
+                var repositorios = db.Repositorio
+                    .Where(r => r.EstaActivo == 1)
+                    .Select(r => new { r.Secuencial, r.Descripcion })
+                    .OrderBy(r => r.Descripcion)
+                    .ToList();
+
+                return Json(new { success = true, repositorios = repositorios }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
+        public ActionResult GetResponsablesProyectos()
+        {
+            try
+            {
+                var responsables = db.ResponsableProyectos
+                    .Where(rp => rp.EstaActivo == 1)
+                    .Select(rp => new { rp.Secuencial, rp.Nombre })
+                    .OrderBy(rp => rp.Nombre)
+                    .ToList();
+
+                return Json(new { success = true, responsables = responsables }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
+        public ActionResult GetColaboradores()
+        {
+            try
+            {
+                var colaboradores = db.Colaborador
+                    .Where(c => c.persona.usuario.First().EstaActivo == 1)
+                    .Select(c => new { c.Secuencial, NombreCompleto = c.persona.Nombre1 + " " + c.persona.Apellido1 })
+                    .OrderBy(c => c.NombreCompleto)
+                    .ToList();
+
+                return Json(new { success = true, colaboradores = colaboradores }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
+        public ActionResult CrearProyecto([System.Web.Http.FromBody] dynamic proyecto)
+        {
+            try
+            {
+                if (proyecto == null)
+                {
+                    return Json(new { success = false, msg = "Datos del proyecto no proporcionados." });
+                }
+
+                string cooperativa = proyecto.cooperativa;
+                string version = proyecto.version;
+                string repositorioStr = proyecto.repositorio;
+                string admCodStr = proyecto.admCod;
+                string publicacionStr = proyecto.publicacion;
+                string solucionStr = proyecto.solucion;
+                string liderProyectoStr = proyecto.liderProyecto;
+                string fechaSalida = proyecto.fechaSalida;
+
+                var cliente = db.Cliente.FirstOrDefault(c => c.Descripcion == cooperativa);
+                if (cliente == null)
+                {
+                    return Json(new { success = false, msg = "Cliente no encontrado." });
+                }
+
+                var versionDesarrollo = db.VersionDesarrollo.FirstOrDefault(v => v.Descripcion == version);
+                var repositorio = db.Repositorio.FirstOrDefault(r => r.Descripcion == repositorioStr);
+                var responsableCodigo = db.ResponsableProyectos.FirstOrDefault(rp => rp.Nombre == admCodStr);
+                var responsablePublicacion = db.ResponsableProyectos.FirstOrDefault(rp => rp.Nombre == publicacionStr);
+                var liderProyecto = db.Colaborador.FirstOrDefault(c => (c.persona.Nombre1 + " " + c.persona.Apellido1) == liderProyectoStr);
+
+                var nuevoProyecto = new ClienteAuxiliar
+                {
+                    SecuencialCliente = cliente.Secuencial,
+                    SecuencialVersionDesarrollo = versionDesarrollo?.Secuencial ?? 0,
+                    SecuencialRepositorio = repositorio?.Secuencial ?? 0,
+                    SecuencialResponsableCodigo = responsableCodigo?.Secuencial ?? 0,
+                    SecuencialResponsablePublicacion = responsablePublicacion?.Secuencial ?? 0,
+                    SecuencialLiderProyecto = liderProyecto?.Secuencial ?? 0,
+                    TieneCodigoFuente = solucionStr == "Sí" ? 1 : 0,
+                    FechaProduccion = DateTime.ParseExact(fechaSalida, "dd/MM/yyyy", null)
+                };
+
+                db.ClienteAuxiliar.Add(nuevoProyecto);
+                db.SaveChanges();
+
+                return Json(new { success = true });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
+        public ActionResult ActualizarProyecto([System.Web.Http.FromBody] dynamic proyecto)
+        {
+            try
+            {
+                if (proyecto == null || proyecto.id == 0)
+                {
+                    return Json(new { success = false, msg = "Datos del proyecto no válidos." });
+                }
+
+                int id = proyecto.id;
+                string cooperativa = proyecto.cooperativa;
+                string version = proyecto.version;
+                string repositorioStr = proyecto.repositorio;
+                string admCodStr = proyecto.admCod;
+                string publicacionStr = proyecto.publicacion;
+                string solucionStr = proyecto.solucion;
+                string liderProyectoStr = proyecto.liderProyecto;
+                string fechaSalida = proyecto.fechaSalida;
+
+                var proyectoExistente = db.ClienteAuxiliar.Find(id);
+                if (proyectoExistente == null)
+                {
+                    return Json(new { success = false, msg = "Proyecto no encontrado." });
+                }
+
+                var cliente = db.Cliente.FirstOrDefault(c => c.Descripcion == cooperativa);
+                if (cliente == null)
+                {
+                    return Json(new { success = false, msg = "Cliente no encontrado." });
+                }
+
+                var versionDesarrollo = db.VersionDesarrollo.FirstOrDefault(v => v.Descripcion == version);
+                var repositorio = db.Repositorio.FirstOrDefault(r => r.Descripcion == repositorioStr);
+                var responsableCodigo = db.ResponsableProyectos.FirstOrDefault(rp => rp.Nombre == admCodStr);
+                var responsablePublicacion = db.ResponsableProyectos.FirstOrDefault(rp => rp.Nombre == publicacionStr);
+                var liderProyecto = db.Colaborador.FirstOrDefault(c => (c.persona.Nombre1 + " " + c.persona.Apellido1) == liderProyectoStr);
+
+                proyectoExistente.SecuencialCliente = cliente.Secuencial;
+                proyectoExistente.SecuencialVersionDesarrollo = versionDesarrollo?.Secuencial ?? 0;
+                proyectoExistente.SecuencialRepositorio = repositorio?.Secuencial ?? 0;
+                proyectoExistente.SecuencialResponsableCodigo = responsableCodigo?.Secuencial ?? 0;
+                proyectoExistente.SecuencialResponsablePublicacion = responsablePublicacion?.Secuencial ?? 0;
+                proyectoExistente.SecuencialLiderProyecto = liderProyecto?.Secuencial ?? 0;
+                proyectoExistente.TieneCodigoFuente = solucionStr == "Sí" ? 1 : 0;
+                proyectoExistente.FechaProduccion = DateTime.ParseExact(fechaSalida, "dd/MM/yyyy", null);
+
+                db.SaveChanges();
+
+                return Json(new { success = true });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
+        public ActionResult DarProyectosExcel()
+        {
+            try
+            {
+                var datosRaw = (from ca in db.ClienteAuxiliar
+                                join c in db.Cliente on ca.SecuencialCliente equals c.Secuencial
+                                join vd in db.VersionDesarrollo on ca.SecuencialVersionDesarrollo equals vd.Secuencial into vd_join
+                                from vd in vd_join.DefaultIfEmpty()
+                                join r in db.Repositorio on ca.SecuencialRepositorio equals r.Secuencial into r_join
+                                from r in r_join.DefaultIfEmpty()
+                                join rc in db.ResponsableProyectos on ca.SecuencialResponsableCodigo equals rc.Secuencial into rc_join
+                                from rc in rc_join.DefaultIfEmpty()
+                                join rp in db.ResponsableProyectos on ca.SecuencialResponsablePublicacion equals rp.Secuencial into rp_join
+                                from rp in rp_join.DefaultIfEmpty()
+                                join lp in db.Colaborador on ca.SecuencialLiderProyecto equals lp.Secuencial into lp_join
+                                from lp in lp_join.DefaultIfEmpty()
+                                where c.EstaActivo == 1
+                                select new
+                                {
+                                    ca,
+                                    c,
+                                    vd,
+                                    r,
+                                    rc,
+                                    rp,
+                                    lp
+                                }).ToList(); // Se ejecuta en la base
+
+                var proyectos = datosRaw.Select(x =>
+                {
+                    var personaCliente = x.c.persona_cliente.FirstOrDefault();
+                    var usuarioCliente = personaCliente?.persona?.usuario.FirstOrDefault();
+
+                    var gestor = x.c.gestorServicios.FirstOrDefault();
+                    var personaGestor = gestor?.colaborador?.persona;
+                    var usuarioGestor = personaGestor?.usuario.FirstOrDefault();
+
+                    return new
+                    {
+                        cooperativa = x.c.Descripcion,
+                        codificacion = x.c.Codigo,
+                        contactoCliente = usuarioCliente?.Email ?? "",
+                        correoContactoCliente = usuarioCliente?.Email ?? "",
+                        version = x.vd?.Descripcion ?? "",
+                        repositorio = x.r?.Descripcion ?? "",
+                        admCod = x.rc?.Nombre ?? "",
+                        publicacion = x.rp?.Nombre ?? "",
+                        solucion = x.ca.TieneCodigoFuente == 1 ? "Sí" : "No",
+                        liderProyecto = x.lp?.persona != null
+                            ? $"{x.lp.persona.Nombre1} {x.lp.persona.Apellido1}"
+                            : "",
+                        gestorServicio = personaGestor != null
+                            ? $"{personaGestor.Nombre1} {personaGestor.Apellido1}"
+                            : "",
+                        correoGestorServicio = usuarioGestor?.Email ?? "",
+                        fechaSalida = x.ca.FechaProduccion.ToString("dd/MM/yyyy")
+                    };
+                }).ToList();
+
+                return Json(new
+                {
+                    success = true,
+                    proyectos = proyectos
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
+        }
+
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
@@ -341,10 +634,6 @@ namespace SifizPlanning.Controllers
         {
             try
             {
-
-                var funcionalidadesArray = funcionalidades.Split('/');
-                funcionalidadesArray = funcionalidadesArray.Skip(1).ToArray();
-
                 var secuencialEstado = (from es in db.EstadoEntregable
                                         where es.Descripcion == estado
                                         select es.Secuencial).ToList()[0];
@@ -353,12 +642,9 @@ namespace SifizPlanning.Controllers
                                          where pmc.Secuencial == secuencialModuloCliente
                                          select pmc.SecuencialCliente).ToList()[0];
 
-                ProyectoModuloCliente proyectoModuloCliente = db.ProyectoModuloCliente.Find(secuencialModuloCliente);
-                if (subModulo != 0)
-                {
-                    proyectoModuloCliente.SecuencialSubModulo = subModulo;
-                    db.SaveChanges();
-                }
+                string emailUser = User.Identity.Name;
+                // Log inicio de operación
+                LoggerManager.LogInfo($"Usuario {emailUser} iniciando actualización de datos para módulo cliente {secuencialModuloCliente}");
 
                 Type typeAccesoDatos = db.GetType();
                 PropertyInfo propertyTabla = typeAccesoDatos.GetProperty("ProyectoModuloCliente");
@@ -373,17 +659,27 @@ namespace SifizPlanning.Controllers
                 object[] pId = new object[1] { new object[1] { secuencialModuloCliente } };
                 newObj = metodoFind.Invoke(dbSetTable, pId);
 
-                typeNewObj.GetProperty("SecuencialEstadoEntregable").SetValue(newObj, secuencialEstado);
+                // Log cambio de estado
+                ProyectoModuloCliente proyectoModuloCliente = db.ProyectoModuloCliente.Find(secuencialModuloCliente);
+                if (proyectoModuloCliente != null)
+                {
+                    var estadoAnterior = proyectoModuloCliente.SecuencialEstadoEntregable;
+                    if (estadoAnterior != secuencialEstado)
+                    {
+                        LoggerManager.LogSensitiveOperation(
+                            "Cambio Estado Módulo",
+                            $"Módulo: {secuencialModuloCliente}, Estado anterior: {estadoAnterior}, Nuevo estado: {secuencialEstado}",
+                            emailUser
+                        );
+                    }
+                    proyectoModuloCliente.SecuencialEstadoEntregable = secuencialEstado;
+                    proyectoModuloCliente.SecuencialSubModulo = subModulo;
+                    db.SaveChanges();
+                }
 
-                db.SaveChanges();
-
-                typeAccesoDatos = db.GetType();
-                propertyTabla = typeAccesoDatos.GetProperty("FuncionalidadCliente");
-                methodPropertyTabla = propertyTabla.GetMethod;
-                dbSetTable = methodPropertyTabla.Invoke(db, new object[] { });
-                typePropertyTabla = dbSetTable.GetType();//Esto es un tipo dbSet 
-
+                // Log eliminación de funcionalidades existentes
                 var funcionalidadesEliminar = db.FuncionalidadCliente.Where(x => x.SecuencialCliente == secuencialCliente).ToList();
+                LoggerManager.LogInfo($"Eliminando {funcionalidadesEliminar.Count} funcionalidades existentes del cliente");
 
                 for (int i = 0; i < funcionalidadesEliminar.Count; i++)
                 {
@@ -392,6 +688,10 @@ namespace SifizPlanning.Controllers
                 }
                 db.SaveChanges();
 
+
+                // Log agregado de nuevas funcionalidades
+                string[] funcionalidadesArray = funcionalidades.Split(',');
+                LoggerManager.LogInfo($"Agregando {funcionalidadesArray.Length} nuevas funcionalidades al cliente");
 
                 for (int i = 0; i < funcionalidadesArray.Length; i++)
                 {
@@ -412,6 +712,8 @@ namespace SifizPlanning.Controllers
 
                 db.SaveChanges();
 
+                LoggerManager.LogInfo($"Actualización de datos completada exitosamente para módulo cliente {secuencialModuloCliente}");
+
                 return Json(new
                 {
                     success = true
@@ -419,6 +721,7 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"Error al guardar datos del módulo cliente {secuencialModuloCliente}: {e.Message}");
                 return Json(new
                 {
                     success = false,
@@ -803,13 +1106,16 @@ namespace SifizPlanning.Controllers
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"Usuario {emailUser} iniciando creación de nueva oferta de ticket");
+
                 var adjuntoUrl = "";
                 if (adjunto != null)
                 {
                     string path = Path.Combine(Server.MapPath("~/Web/resources/ofertas"), adjunto.FileName);
                     adjunto.SaveAs(path);
-
                     adjuntoUrl = "/resources/ofertas" + "/" + adjunto.FileName;
+                    LoggerManager.LogInfo($"Archivo adjunto guardado: {adjuntoUrl}");
                 }
 
                 DateTime dateRegistro = new DateTime(0001 / 01 / 01);
@@ -850,17 +1156,24 @@ namespace SifizPlanning.Controllers
                 oferta.colaborador = colaborador != null ? db.Colaborador.Find(colaborador) : db.Colaborador.Find(2122);
                 oferta.Adjunto = adjuntoUrl;
 
+                // Log datos de la oferta
+                LoggerManager.LogSensitiveOperation(
+                    "Creación Oferta",
+                    $"Cliente: {oferta.cliente.Descripcion}, Colaborador: {oferta.colaborador.persona.Nombre1} {oferta.colaborador.persona.Apellido1}, " +
+                    $"Horas: {oferta.HorasEstimacion}, Detalle: {detalle.Substring(0, Math.Min(100, detalle.Length))}...",
+                    emailUser
+                );
+
                 db.Ofertas.Add(oferta);
                 db.SaveChanges();
 
-                var resp = new
-                {
-                    success = true,
-                };
-                return Json(resp);
+                LoggerManager.LogInfo($"Oferta de ticket creada exitosamente");
+
+                return Json(new { success = true });
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"Error al crear oferta de ticket: {e.Message}");
                 return Json(new
                 {
                     success = false,
@@ -875,9 +1188,20 @@ namespace SifizPlanning.Controllers
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"Usuario {emailUser} iniciando edición de oferta ID: {ID}");
+
                 Ofertas oferta = db.Ofertas.FirstOrDefault(s => s.Secuencial == ID);
                 if (oferta != null)
                 {
+                    // Log estado anterior
+                    LoggerManager.LogSensitiveOperation(
+                        "Estado Anterior Oferta",
+                        $"ID: {ID}, Cliente: {oferta.cliente?.Descripcion}, Colaborador: {oferta.colaborador?.persona.Nombre1} {oferta.colaborador?.persona.Apellido1}, " +
+                        $"Horas: {oferta.HorasEstimacion}, Detalle: {oferta.Detalle?.Substring(0, Math.Min(100, oferta.Detalle.Length))}...",
+                        emailUser
+                    );
+
                     DateTime dateRegistro = new DateTime(0001 / 01 / 01);
                     DateTime dateProduccion = new DateTime(0001 / 01 / 01);
                     DateTime dateDisponibilidad = new DateTime(0001 / 01 / 01);
@@ -922,18 +1246,26 @@ namespace SifizPlanning.Controllers
 
                         adjuntoUrl = "/resources/ofertas" + "/" + adjunto.FileName;
                         oferta.Adjunto = adjuntoUrl;
+                        LoggerManager.LogInfo($"Nuevo archivo adjunto guardado: {adjuntoUrl}");
                     }
-                }
-                db.SaveChanges();
 
-                var resp = new
-                {
-                    success = true,
-                };
-                return Json(resp);
+                    // Log nuevos datos
+                    LoggerManager.LogSensitiveOperation(
+                        "Nuevos Datos Oferta",
+                        $"ID: {ID}, Cliente: {oferta.cliente.Descripcion}, Colaborador: {oferta.colaborador.persona.Nombre1} {oferta.colaborador.persona.Apellido1}, " +
+                        $"Horas: {HorasEstimacion}, Detalle: {Detalle.Substring(0, Math.Min(100, Detalle.Length))}...",
+                        emailUser
+                    );
+                }
+
+                db.SaveChanges();
+                LoggerManager.LogInfo($"Oferta ID: {ID} actualizada exitosamente");
+
+                return Json(new { success = true });
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"Error al editar oferta ID {ID}: {e.Message}");
                 return Json(new
                 {
                     success = false,
@@ -949,18 +1281,31 @@ namespace SifizPlanning.Controllers
         {
             try
             {
-                Ofertas oferta = db.Ofertas.Find(ID);
-                db.Ofertas.Remove(oferta);
-                db.SaveChanges();
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"Usuario {emailUser} iniciando eliminación de oferta ID: {ID}");
 
-                var resp = new
+                Ofertas oferta = db.Ofertas.Find(ID);
+                if (oferta != null)
                 {
-                    success = true,
-                };
-                return Json(resp);
+                    // Log datos de la oferta a eliminar
+                    LoggerManager.LogSensitiveOperation(
+                        "Eliminación Oferta",
+                        $"ID: {ID}, Cliente: {oferta.cliente?.Descripcion}, Colaborador: {oferta.colaborador?.persona.Nombre1} {oferta.colaborador?.persona.Apellido1}, " +
+                        $"Horas: {oferta.HorasEstimacion}, Detalle: {oferta.Detalle?.Substring(0, Math.Min(100, oferta.Detalle.Length))}...",
+                        emailUser
+                    );
+
+                    db.Ofertas.Remove(oferta);
+                    db.SaveChanges();
+
+                    LoggerManager.LogInfo($"Oferta ID: {ID} eliminada exitosamente");
+                }
+
+                return Json(new { success = true });
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"Error al eliminar oferta ID {ID}: {e.Message}");
                 return Json(new
                 {
                     success = false,

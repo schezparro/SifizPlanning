@@ -29,7 +29,7 @@ namespace SifizPlanning.Models
         public Nullable<decimal> Seleccionado { get; set; }
         public Nullable<double> Porciento { get; set; }
     
-        public virtual ClienteAuxiliar clienteAuxiliar { get; set; }
         public virtual ICollection<SubEtapasProyectosCliente> subEtapasProyectosCliente { get; set; }
+        public virtual ClienteAuxiliar CLIENTEAUXILIAR { get; set; }
     }
 }

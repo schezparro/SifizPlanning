@@ -5,6 +5,8 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
+using NLog;
+using SifizPlanning.Util;
 
 namespace SifizPlanning
 {
@@ -19,6 +21,20 @@ namespace SifizPlanning
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
+
+            // TODO: Registrar ModelBinder personalizado para fechas (pendiente corrección de compatibilidad)
+            // ModelBinders.Binders.Add(typeof(DateTime), new SifizPlanning.Util.DateTimeModelBinder());
+            // ModelBinders.Binders.Add(typeof(DateTime?), new SifizPlanning.Util.DateTimeModelBinder());
+
+            // Inicializar NLog
+            LogManager.LoadConfiguration("NLog.config");
+            LoggerManager.LogInfo("Aplicación iniciada");
+        }
+
+        protected void Application_Error(object sender, EventArgs e)
+        {
+            Exception exception = Server.GetLastError();
+            LoggerManager.LogError(exception);
         }
     }
 }

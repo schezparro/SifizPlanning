@@ -137,6 +137,7 @@
         $scope.url = '';
         $scope.moduloSeleccionado = '';
         $scope.link = '';
+        $scope.esPlan = false;
 
         angular.element("#modal-agregar-recursos").modal("show");
     };
@@ -154,11 +155,10 @@
     };
 
     $scope.abrirRegistroAsistencia = function () {
-        $scope.limpiarDatosAsistencia();
-        angular.element("#guardar-registro").hide();
-        angular.element("#modal-asistencia-recurso").modal("show");
+        angular.element("#modal-agregar-asistencia-recurso").modal("show");
     };
 
+    $scope.datosAsistenciaReunion;
     $scope.mostrarRegistroAsistencia = function (recurso) {
         var ajaxObtenerRecurso = $http.post("user/dar-datos-asistencia-recursos", {
             secuencialRecurso: recurso.secuencial
@@ -174,20 +174,58 @@
                 data.datos.forEach(function (item) {
                     datosPorId[item.id] = item;
                 });
+                var datosAsist = [];
 
                 data.datos.forEach(function (itemData) {
-                    $scope.datosAsistencia.forEach(function (itemAsistencia) {
-                        if (itemAsistencia.id === itemData.idColaborador) {
-                            itemAsistencia.asistencia = itemData.asistencia;
-                            itemAsistencia.puntuacion = itemData.puntuacion;
-                            itemAsistencia.asignado = true;
-                        }
+
+                    datosAsist.push({
+                        id: itemData.id,
+                        idColaborador: itemData.idColaborador,
+                        nombre: itemData.nombre,
+                        asignado: itemData.asignado,
+                        asistencia: itemData.asistencia,
+                        puntuacion: itemData.puntuacion
                     });
                 });
 
+                $scope.datosAsistenciaReunion = datosAsist;
                 $scope.secuencialRecurso = recurso.secuencial;
                 angular.element("#guardar-registro").show();
                 angular.element("#modal-asistencia-recurso").modal("show");
+            }
+        });
+    };
+
+    $scope.mostrarRegistroConvocados = function (recurso) {
+        var ajaxObtenerRecurso = $http.post("user/dar-datos-convocados-recursos", {
+            secuencialRecurso: recurso.secuencial
+        });
+
+        $scope.recursoActual = recurso;
+        ajaxObtenerRecurso.success(function (data) {
+            if (data.success === true) {
+                $scope.limpiarDatosAsistencia();
+
+                var datosPorId = {};
+                data.datos.forEach(function (item) {
+                    datosPorId[item.id] = item;
+                });
+                var datosAsist = [];
+
+                data.datos.forEach(function (itemData) {
+
+                    datosAsist.push({
+                        id: itemData.id,
+                        idColaborador: itemData.idColaborador,
+                        nombre: itemData.nombre,
+                        convocado: itemData.convocado
+                    });
+                });
+
+                $scope.datosConvocadosReunion = datosAsist;
+
+                $scope.secuencialRecurso = recurso.secuencial;
+                angular.element("#modal-convocados-recurso").modal("show");
             }
         });
     };
@@ -208,14 +246,15 @@
 
     $scope.GuardarNuevoRecurso = function () {
         var modulo = angular.element("#select-modulo-recursos")[0].value;
-        var fechaSistema = new Date().toISOString();
 
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
 
+        //var fecha = $scope.fechaHora ? new Date($scope.fechaHora).toISOString() : new Date().toISOString();
+        console.log($scope.fechaHora);
         var formData = new FormData();
         formData.append('titulo', $scope.newTitulo);
         formData.append('detalle', $scope.newDetalle);
-        formData.append('fecha', fechaSistema);
+        formData.append('fecha', $scope.fechaHora.toISOString());
         formData.append('modulo', modulo);
         formData.append('url', $scope.url);
         formData.append('link', $scope.link);
@@ -256,7 +295,8 @@
     $scope.GuardarNuevoPlan = function () {
         var moduloPlan = angular.element("#select-modulo-plan")[0].value;
         var colaborador = angular.element("#select-capacitador-plan")[0].value;
-        var fecha = angular.element("#fecha-capacitacion")[0].value;
+
+        var fecha = $scope.fechaHoraCapacitacion ? new Date($scope.fechaHoraCapacitacion).toISOString() : new Date().toISOString();
 
         var asistentesSeleccionadosIds = $scope.asistentesCapacitacion
             .filter(asistente => asistente.seleccionado)
@@ -265,6 +305,7 @@
 
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
 
+        // Crear el objeto FormData
         var formData = new FormData();
         formData.append('titulo', $scope.newTituloPlan);
         formData.append('detalle', $scope.newDetallePlan);
@@ -274,6 +315,12 @@
         formData.append('asistentesJson', asistentesSeleccionadosJson);
         formData.append('link', $scope.linkPlan);
 
+        // Agregar el archivo adjunto al FormData
+        var archivoInput = document.getElementById('inputArchivo');
+        if (archivoInput && archivoInput.files.length > 0) {
+            formData.append('archivo', archivoInput.files[0]);
+        }
+
         var tiempo = toTotalMinutes($scope.horasPlan, $scope.minutosPlan);
         formData.append('tiempo', tiempo);
 
@@ -281,7 +328,7 @@
             method: 'POST',
             url: "user/guardar-plan-recurso",
             data: formData,
-            headers: { 'Content-Type': undefined },
+            headers: { 'Content-Type': undefined }, // Importante para enviar FormData
             transformRequest: angular.identity
         });
 
@@ -348,17 +395,15 @@
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
 
         var datosGuardar = [];
-
-        $scope.datosAsistencia.forEach(function (itemAsistencia) {
-            if (itemAsistencia.asignado === true) {
-                if (itemAsistencia.asistencia === true || itemAsistencia.puntuacion != 0.0)
-                    datosGuardar.push(itemAsistencia);
-            };
+        $scope.datosAsistenciaReunion.forEach(function (itemAsistencia) {
+            console.log(itemAsistencia);
+            if (itemAsistencia.asistencia === true || itemAsistencia.puntuacion != 0.0)
+                datosGuardar.push(itemAsistencia);
         });
 
         var formData = new FormData();
         formData.append('idRecurso', $scope.secuencialRecurso);
-        formData.append('adjuntoAsistencia', JSON.stringify($scope.datosAsistencia));
+        formData.append('adjuntoAsistencia', JSON.stringify($scope.datosAsistenciaReunion));
 
         var ajaxEnvioDatos = $http({
             method: 'POST',
@@ -377,6 +422,38 @@
         });
     };
 
+    $scope.registrarAsistenciaConvocados = function () {
+        waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
+
+        var datosGuardar = [];
+
+        $scope.datosConvocadosReunion.forEach(function (itemAsistencia) {
+            console.log(itemAsistencia);
+            if (itemAsistencia.convocado === true)
+                datosGuardar.push(itemAsistencia);
+        });
+
+        var formData = new FormData();
+        formData.append('idRecurso', $scope.secuencialRecurso);
+        formData.append('adjuntoAsistencia', JSON.stringify($scope.datosConvocadosReunion));
+
+        var ajaxEnvioDatos = $http({
+            method: 'POST',
+            url: "user/guardar-asignados-recurso",
+            data: formData,
+            headers: { 'Content-Type': undefined },
+            transformRequest: angular.identity
+        });
+
+        ajaxEnvioDatos.success(function (data) {
+            waitingDialog.hide();
+            if (data.success === true) {
+                angular.element("#modal-convocados-recurso").modal("hide");
+                $scope.cargarRecursos();
+            }
+        });
+    };
+
     $scope.limpiarDatosAsistencia = function () {
         if ($scope.datosAsistencia) {
             $scope.datosAsistencia.forEach(function (item) {
@@ -388,30 +465,129 @@
     };
 
     $scope.mostrarDetalleRecurso = function (secuencial) {
-        $scope.secuencialRecurso = secuencial;
+        if ($scope.esPlan) {
+            $scope.secuencialRecurso = secuencial;
 
-        var ajaxObtenerIncidencia = $http.post("user/dar-datos-recurso-usuario",
-            {
-                secuencialRecurso: secuencial
+            var ajaxObtenerIncidencia = $http.post("user/dar-datos-recurso-usuario",
+                {
+                    secuencialRecurso: secuencial
+                });
+            ajaxObtenerIncidencia.success(function (data) {
+                if (data.success === true) {
+
+                    $scope.editTituloPlan = data.recurso.titulo;
+                    $scope.editDetallePlan = data.recurso.detalle;
+                    $scope.editModuloSeleccionadoPlan = data.recurso.modulo;
+                    angular.element("#edit-fecha-hora-capacitacion").val(data.recurso.fecha);
+                    $scope.adjuntoV = data.recurso.adjunto;
+                    $scope.editHorasPlan = data.recurso.horas;
+                    $scope.editMinutosPlan = data.recurso.minutos;
+                    $scope.editLinkPlan = data.recurso.url;
+                    $scope.editCapacitadorSeleccionadoPlan = data.recurso.capacitor;
+
+                    $scope.asistenciaEdicionRecurso = data.asistencia
+
+                    angular.element("#modal-datos-recurso").modal("show");
+                }
+                else {
+                    messageDialog.show('Información', data.msg);
+                }
             });
-        ajaxObtenerIncidencia.success(function (data) {
+        }
+    };
+
+    $scope.EditarPlan = function () {
+        var moduloPlan = angular.element("#edit-select-modulo-plan")[0].value;
+        var colaborador = angular.element("#edit-select-capacitador-plan")[0].value;
+
+        var fecha = $scope.editFechaHoraCapacitacion ? new Date($scope.editFechaHoraCapacitacion).toISOString() : new Date().toISOString();
+
+        var asistentesSeleccionadosIds = $scope.datosAsistenciaEdicion
+            .filter(asistente => asistente.asignado)
+            .map(asistente => asistente.id);
+        var asistentesSeleccionadosJson = JSON.stringify(asistentesSeleccionadosIds);
+
+        waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
+
+        var formData = new FormData();
+        formData.append('id', $scope.secuencialRecurso);
+        formData.append('titulo', $scope.editTituloPlan);
+        formData.append('detalle', $scope.editDetallePlan);
+        formData.append('fecha', fecha);
+        formData.append('modulo', moduloPlan);
+        formData.append('colaborador', colaborador);
+        formData.append('asistentesJson', asistentesSeleccionadosJson);
+        formData.append('link', $scope.editLinkPlan);
+
+        var tiempo = toTotalMinutes($scope.editHorasPlan, $scope.editMinutosPlan);
+        formData.append('tiempo', tiempo);
+
+        var ajaxEnvioDatos = $http({
+            method: 'POST',
+            url: "user/editar-plan-recurso-capacitacion",
+            data: formData,
+            headers: { 'Content-Type': undefined },
+            transformRequest: angular.identity
+        });
+
+        ajaxEnvioDatos.success(function (data) {
+            waitingDialog.hide();
             if (data.success === true) {
+                angular.element("#modal-datos-recurso").modal("hide");
+                $scope.cargarRecursos();
 
-                $scope.tituloV = data.recursoResult.titulo;
-                $scope.detalleV = data.recursoResult.detalle;
-                $scope.moduloV = data.recursoResult.modulo;
-                $scope.fechaV = data.recursoResult.fecha;
-                $scope.adjuntoV = data.recursoResult.adjunto;
-                $scope.tiempoV = data.recursoResult.tiempo;
-                $scope.linkV = data.recursoResult.url;
-                $scope.adjuntoAsistenciaV = data.recursoResult.adjuntoAsistencia;
+                var datosAsistente = [];
+                data.colaboradores.forEach(function (item) {
+                    datosAsistente.push({
+                        id: item.id,
+                        nombre: item.nombre,
+                        asignado: false
+                    });
+                });
+                $scope.asistentesCapacitacion = datosAsistente;
 
-                angular.element("#modal-datos-recurso").modal("show");
-            }
-            else {
-                messageDialog.show('Información', data.msg);
+                $scope.horasPlan = 0;
+                $scope.minutosPlan = 0;
+            } else {
+                messageDialog.show("Información", data.msg);
             }
         });
+
+        ajaxEnvioDatos.error(function (data) {
+            waitingDialog.hide();
+            console.log('Error: ' + data);
+        });
+    };
+
+    $scope.abrirModalSeleccionarAsistentesEdicion = function () {
+        $scope.todosSeleccionadosEdicion = false;
+
+        var datos = [];
+
+        var asistenciaMap = {};
+        $scope.asistenciaEdicionRecurso.forEach(function (asistencia) {
+            asistenciaMap[asistencia.idColaborador] = true; // Asignar true si existe una asistencia
+        });
+
+        $scope.colaboradores.forEach(function (item) {
+            var asignado = asistenciaMap[item.id] || false; // Verificar si existe asistencia y asignar true
+
+            datos.push({
+                id: item.id,
+                nombre: item.nombre,
+                asignado: asignado
+            });
+        });
+
+        $scope.datosAsistenciaEdicion = datos;
+
+        angular.element("#modal-seleccionar-asistentes-edicion").modal("show");
+    };
+
+    $scope.seleccionarTodosAsistentesEdicion = function () {
+        for (var i = 0; i < $scope.asistenciaEdicionRecurso.length; i++) {
+            $scope.asistenciaEdicionRecurso[i].asignado = $scope.todosSeleccionadosEdicion;
+        }
     };
 
     $scope.abrirModalSeleccionarAsistentes = function () {
@@ -421,6 +597,12 @@
     $scope.seleccionarTodosAsistentes = function () {
         for (var i = 0; i < $scope.asistentesCapacitacion.length; i++) {
             $scope.asistentesCapacitacion[i].seleccionado = $scope.todosSeleccionados;
+        }
+    };
+
+    $scope.selectAllAsistants = function () {
+        for (var i = 0; i < $scope.datosConvocadosReunion.length; i++) {
+            $scope.datosConvocadosReunion[i].convocado = $scope.allSelected;
         }
     };
 
@@ -435,9 +617,10 @@
 
     $scope.getDatosAsistenciaFiltrados = function () {
         if ($scope.esPlan) {
-            return $scope.datosAsistencia.filter(item => item.asignado);
+            return $scope.datosConvocadosReunion;
+        } else {
+            return $scope.datosAsistenciaReunion;
         }
-        return $scope.datosAsistencia;
     };
 
     $scope.generarCertificado = function (recurso) {

@@ -707,6 +707,7 @@
         $scope.edicionTareaExtraordinaria = false;
         $scope.ticketTarea = "";
         $scope.reproceso = false;
+        $scope.esProyecto = false;
         angular.element("#modalNewTask").modal('show');
     };
 
@@ -840,6 +841,7 @@
         formData.append('idTarea', $scope.idTarea);
         formData.append('verificador', $scope.verificadorTarea);
         formData.append('esReproceso', $scope.reproceso);
+        formData.append('esProyecto', $scope.esProyecto);
 
         var newTask = $http.post("task/nueva-tarea",
             formData,

@@ -16,7 +16,7 @@ namespace SifizPlanning.Models
     {
         public Repositorio()
         {
-            this.clientes = new HashSet<ClienteAuxiliar>();
+            this.CLIENTEAUXILIAR = new HashSet<ClienteAuxiliar>();
         }
     
         public int Secuencial { get; set; }
@@ -25,6 +25,6 @@ namespace SifizPlanning.Models
         public decimal EstaActivo { get; set; }
         public int NumeroVerificador { get; set; }
     
-        public virtual ICollection<ClienteAuxiliar> clientes { get; set; }
+        public virtual ICollection<ClienteAuxiliar> CLIENTEAUXILIAR { get; set; }
     }
 }

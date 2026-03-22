@@ -1,359 +1,475 @@
-﻿<div class="left">
-    <button class="btn btn-primary" ng-click="windowSolicitarVacaciones()"><span class="glyphicon glyphicon-time aria-hidden=" true"></span>Vacaciones</button>
-    <button class="btn btn-primary" ng-click="windowSolicitarPermiso()"><span class="glyphicon glyphicon-time aria-hidden=" true"></span>Permisos</button>
-    <div style="display: flex; align-items: center">
-        <strong>Vacaciones/Permisos</strong>
-        <input type="checkbox" style="transform: scale(1.5); margin-bottom: 5px" ng-model="esVacaciones" ng-init="esVacaciones=true">
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+
+    <style>
+        .bg-danger {
+            background-color: #f8d7da !important;
+            color: #721c24;
+        }
+
+        .bg-primary {
+            background-color: #cce5ff !important;
+            color: #004085;
+        }
+
+        .bg-success {
+            background-color: #d4edda !important;
+            color: #155724;
+        }
+
+        #tabla-user-incidencias {
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .table {
+            table-layout: auto;
+            width: 100%;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="left">
+        <ul class="nav nav-tabs">
+            <li ng-class="{active: activeTab === 'vacaciones'}">
+                <a href="" ng-click="changeTab('vacaciones')">Vacaciones</a>
+            </li>
+            <li ng-class="{active: activeTab === 'permisos'}">
+                <a href="" ng-click="changeTab('permisos')">Permisos</a>
+            </li>
+            <li ng-class="{active: activeTab === 'planificacion'}">
+                <a href="" ng-click="changeTab('planificacion')">Planificación Vacaciones</a>
+            </li>
+        </ul>
     </div>
-</div>
 
-<div ng-show="esVacaciones" style="height: calc(100vh - 175px); width: 100%; overflow-y: auto; overflow-x: no-display;">
-    <table class="table table-striped table-condensed">
-        <thead>
-            <tr>
-                <th>Estado</th>
-                <th>Apellidos Nombres</th>
-                <th>Cargo</th>
-                <th>Cédula</th>
-                <th>Fecha Ingreso Solicitud</th>
-                <th>Empresa</th>
-                <th>Años Servicio</th>
-                <th>Dias Corresponden</th>
-                <th>Dias Disfrutar</th>
-                <th>Dias Pendientes</th>
-                <th>Del Año</th>
-                <th>Al Año</th>
-                <th>Fecha Inicio Vacaciones</th>
-                <th>Fecha Fin Vacaciones</th>
-                <th>Fecha Presentarse Trabajar</th>
-                <th>Jefe</th>
-                <th>Observaciones</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            <tr ng-repeat="solicitud in vacaciones" ng-dblclick="editarSolicitudVacaciones(solicitud)">
-                <td>{{solicitud.Estado}}</td>
-                <td>{{solicitud.ApellidosNombres}}</td>
-                <td>{{solicitud.Cargo}}</td>
-                <td>{{solicitud.Cedula}}</td>
-                <td>{{solicitud.FechaIngresoSolicitud | strDateToStr}}</td>
-                <td>{{solicitud.Empresa}}</td>
-                <td>{{solicitud.AniosServicio}}</td>
-                <td>{{solicitud.DiasCorresponden}}</td>
-                <td>{{solicitud.DiasDisfrutar}}</td>
-                <td>{{solicitud.DiasPendientes}}</td>
-                <td>{{solicitud.DelAnio}}</td>
-                <td>{{solicitud.AlAnio}}</td>
-                <td>{{solicitud.FechaInicioVacaciones | strDateToStr}}</td>
-                <td>{{solicitud.FechaFinVacaciones | strDateToStr}}</td>
-                <td>{{solicitud.FechaPresentarseTrabajar | strDateToStr}}</td>
-                <td>{{solicitud.Jefe}}</td>
-                <td>{{solicitud.Observaciones}}</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-<div ng-show="!esVacaciones" style="height: calc(100vh - 175px); width: 100%; overflow-y: auto; overflow-x: no-display;">
-    <table class="table table-striped table-condensed">
-        <thead>
-            <tr>
-                <th>Estado</th>
-                <th>Apellidos Nombres</th>
-                <th>Area</th>
-                <th>Cargo</th>
-                <th>Cedula</th>
-                <th>Empresa</th>
-                <th>Fecha Ingreso Solicitud</th>
-                <th>Fecha Desde</th>
-                <th>Fecha Hasta</th>
-                <th>Hora Retorno</th>
-                <th>Hora Salida</th>
-                <th>Motivo</th>
-                <th>Personal</th>
-                <th>Calamidad</th>
-                <th>Jefe</th>
-                <th>Matrimonio</th>
-                <th>Paternidad</th>
-                <th>Otros</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            <tr ng-repeat="solicitud in permisos" ng-dblclick="editarSolicitudPermiso(solicitud)">
-                <td>{{solicitud.Estado}}</td>
-                <td>{{solicitud.ApellidosNombres}}</td>
-                <td>{{solicitud.Area}}</td>
-                <td>{{solicitud.Cargo}}</td>
-                <td>{{solicitud.Cedula}}</td>
-                <td>{{solicitud.Empresa}}</td>
-                <td>{{solicitud.FechaIngresoSolicitud | strDateToStr}}</td>
-                <td>{{solicitud.FechaDesde | strDateToStr}}</td>
-                <td>{{solicitud.FechaHasta | strDateToStr}}</td>
-                <td>{{solicitud.HoraRetorno}}</td>
-                <td>{{solicitud.HoraSalida}}</td>
-                <td>{{solicitud.Motivo}}</td>
-                <td>{{solicitud.Personal}}</td>
-                <td>{{solicitud.Comida}}</td>
-                <td>{{solicitud.Jefe}}</td>
-                <td>{{solicitud.Matrimonio}}</td>
-                <td>{{solicitud.Paternidad}}</td>
-                <td>{{solicitud.Otros}}</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-<div id="modal-solicitud-vacaciones" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <form ng-submit="enviarSolicitudVacaciones()">
-                <div class="modal-header" style="padding: 10px, 10px">
-                    <label>SOLICITUD DE VACACIONES</label>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <div class="tab-content" style="margin-top: 20px;">
+        <div class="tab-pane" ng-class="{active: activeTab === 'vacaciones'}">
+            <div style="height: calc(100vh - 175px); width: 100%; overflow-y: auto; overflow-x: no-display;">
+                <div class="left">
+                    <button class="btn btn-primary" ng-click="windowSolicitarVacaciones()"><span class="glyphicon glyphicon-time aria-hidden=" true"></span> Vacaciones</button>
+                    <br />
                 </div>
-                <div class="modal-body">
-                    <table class="table table-condensed table-striped table-active">
+                <table class="table table-striped table-condensed">
+                    <thead>
                         <tr>
-                            <td colspan="5">
-                                NOMBRE Y APELLIDOS:
-                                <input type="text" class="form-control" ng-model="solVacaciones.apellidosNombres" ng-required="true" ng-readonly="true">
-                            </td>
+                            <th>Estado</th>
+                            <th>Apellidos Nombres</th>
+                            <th>Cargo</th>
+                            <th>Cédula</th>
+                            <th>Fecha Ingreso Solicitud</th>
+                            <th>Empresa</th>
+                            <th>Años Servicio</th>
+                            <th>Dias Corresponden</th>
+                            <th>Dias Disfrutar</th>
+                            <th>Dias Pendientes</th>
+                            <th>Del Año</th>
+                            <th>Al Año</th>
+                            <th>Fecha Inicio Vacaciones</th>
+                            <th>Fecha Fin Vacaciones</th>
+                            <th>Fecha Presentarse Trabajar</th>
+                            <th>Jefe</th>
+                            <th>Observaciones</th>
                         </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr ng-repeat="solicitud in vacaciones" ng-dblclick="editarSolicitudVacaciones(solicitud)">
+                            <td>{{solicitud.Estado}}</td>
+                            <td>{{solicitud.ApellidosNombres}}</td>
+                            <td>{{solicitud.Cargo}}</td>
+                            <td>{{solicitud.Cedula}}</td>
+                            <td>{{solicitud.FechaIngresoSolicitud | strDateToStr}}</td>
+                            <td>{{solicitud.Empresa}}</td>
+                            <td>{{solicitud.AniosServicio}}</td>
+                            <td>{{solicitud.DiasCorresponden}}</td>
+                            <td>{{solicitud.DiasDisfrutar}}</td>
+                            <td>{{solicitud.DiasPendientes}}</td>
+                            <td>{{solicitud.DelAnio}}</td>
+                            <td>{{solicitud.AlAnio}}</td>
+                            <td>{{solicitud.FechaInicioVacaciones | strDateToStr}}</td>
+                            <td>{{solicitud.FechaFinVacaciones | strDateToStr}}</td>
+                            <td>{{solicitud.FechaPresentarseTrabajar | strDateToStr}}</td>
+                            <td>{{solicitud.Jefe}}</td>
+                            <td>{{solicitud.Observaciones}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-pane" ng-class="{active: activeTab === 'permisos'}">
+            <div style="height: calc(100vh - 175px); width: 100%; overflow-y: auto; overflow-x: no-display;">
+                <div class="left">
+                    <button class="btn btn-primary" ng-click="windowSolicitarPermiso()"><span class="glyphicon glyphicon-time aria-hidden=" true"></span> Permisos</button>
+                    <br />
+                </div>
+                <table class="table table-striped table-condensed">
+                    <thead>
                         <tr>
-                            <td colspan="5">
-                                <div style="column-count: 2">
-                                    CARGO:
-                                    <input type="text" class="form-control" ng-model="solVacaciones.cargo" ng-required="true" ng-readonly="true">
-                                    CEDULA:
-                                    <input type="text" class="form-control" ng-model="solVacaciones.cedula" ng-required="true">
+                            <th>Estado</th>
+                            <th>Apellidos Nombres</th>
+                            <th>Area</th>
+                            <th>Cargo</th>
+                            <th>Cedula</th>
+                            <th>Empresa</th>
+                            <th>Fecha Ingreso Solicitud</th>
+                            <th>Fecha Desde</th>
+                            <th>Fecha Hasta</th>
+                            <th>Hora Retorno</th>
+                            <th>Hora Salida</th>
+                            <th>Motivo</th>
+                            <th>Personal</th>
+                            <th>Calamidad</th>
+                            <th>Jefe</th>
+                            <th>Matrimonio</th>
+                            <th>Paternidad</th>
+                            <th>Otros</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr ng-repeat="solicitud in permisos" ng-dblclick="editarSolicitudPermiso(solicitud)">
+                            <td>{{solicitud.Estado}}</td>
+                            <td>{{solicitud.ApellidosNombres}}</td>
+                            <td>{{solicitud.Area}}</td>
+                            <td>{{solicitud.Cargo}}</td>
+                            <td>{{solicitud.Cedula}}</td>
+                            <td>{{solicitud.Empresa}}</td>
+                            <td>{{solicitud.FechaIngresoSolicitud | strDateToStr}}</td>
+                            <td>{{solicitud.FechaDesde | strDateToStr}}</td>
+                            <td>{{solicitud.FechaHasta | strDateToStr}}</td>
+                            <td>{{solicitud.HoraRetorno}}</td>
+                            <td>{{solicitud.HoraSalida}}</td>
+                            <td>{{solicitud.Motivo}}</td>
+                            <td>{{solicitud.Personal}}</td>
+                            <td>{{solicitud.Comida}}</td>
+                            <td>{{solicitud.Jefe}}</td>
+                            <td>{{solicitud.Matrimonio}}</td>
+                            <td>{{solicitud.Paternidad}}</td>
+                            <td>{{solicitud.Otros}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-pane" ng-class="{active: activeTab === 'planificacion'}">
+            <div style="height: calc(100vh - 175px); width: 100%; overflow-y: auto; overflow-x: no-display;">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel panel-default" ng-show="verAnno">
+                                <div class="panel-body">
+                                    <form class="form-horizontal">
+                                        <div class="form-group">
+                                            <label for="fecha-inicio-etapa" class="col-sm-1 control-label">AÑO</label>
+                                            <div class="col-sm-4">
+                                                <!-- Select de Años -->
+                                                <select class="form-control" id="select-annos-propuesta-vacaciones"
+                                                        ng-model="anno" ng-change="cargarMeses(anno)">
+                                                    <option ng-repeat="a in annos" value="{{a}}">{{a}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">
-                                <div style="column-count: 3">
-                                    FECHA INGRESO DE LA SOLICITUD:
-                                    <input type="date" class="form-control" ng-model="solVacaciones.fechaIngresoSolicitud" ng-required="true">
-                                    EMPRESA:
-                                    <select ng-init="solVacaciones.empresa='SIFIZSOFT'" class="form-control" ng-model="solVacaciones.empresa" ng-required="true" ng-readonly="isEmpresaVacacionesSelectEditable">
-                                        <option value="SIFIZSOFT">SIFIZSOFT</option>
-                                        <option value="INTECSOFT">INTECSOFT</option>
-                                    </select>
-                                    FECHA INGRESO EMPRESA
-                                    <input type="text" class="form-control" ng-model="datosUsuario.fechaIngreso" ng-readonly="true" />
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">
-                                <div style="column-count: 2">
-                                    FECHA QUE DEBERÁ PRESENTARSE A TRABAJAR (dd/mm/aaaa):
-                                    <input type="date" class="form-control" ng-model="solVacaciones.fechaPresentarseTrabajar" ng-required="true">
-                                    <!--FECHA INGRESO A LA INSTITUCIÓN:
-                                    <input type="date" class="form-control" ng-model="solVacaciones.fechaIngresoInstitucion" ng-required="true">-->
-                                    <br />AÑOS DE SERVICIO:                                     
-                                    <input type="number" class="form-control" ng-model="solVacaciones.aniosServicio" ng-required="true">
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">
-                                <div style="column-count: 3">
-                                    DÍAS QUE CORRESPONDEN:
-                                    <input type="number" class="form-control" ng-model="solVacaciones.diasCorresponden" ng-required="true">
-                                    DÍAS A DISFRUTAR:
-                                    <input type="number" class="form-control" ng-model="solVacaciones.diasDisfrutar" ng-required="true">
-                                    DÍAS PENDIENTES:
-                                    <input type="number" class="form-control" ng-model="solVacaciones.diasPendientes" ng-required="true">
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">
-                                <div style="column-count: 2">
-                                    <span>PERIODO A DISFRUTAR:</span>
-                                    <br>del Año
-                                    <input type="number" class="form-control" ng-model="solVacaciones.delAnio" ng-required="true">
-                                    <br>al Año
-                                    <input type="number" class="form-control" ng-model="solVacaciones.alAnio" ng-required="true">
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">
-                                <div style="column-count: 2">
-                                    DÍAS QUE INICIAN SUS VACACIONES
-                                    <br>Fecha desde (dd/mm/aaaa):
-                                    <p class="bg-danger" id="alert-coincide-inicio-vacaciones" style="display: none">Coincide con un día feriado.</p>
-                                    <input type="date" class="form-control" ng-change="fechaInicioVacacionesChange(solVacaciones.fechaInicioVacaciones)" ng-model="solVacaciones.fechaInicioVacaciones" ng-required="true">
-                                    <br>Fecha hasta (dd/mm/aaaa):
-                                    <p class="bg-danger" id="alert-coincide-fin-vacaciones" style="display: none">Coincide con un día feriado.</p>
-                                    <input type="date" class="form-control" ng-change="fechaFinVacacionesChange(solVacaciones.fechaFinVacaciones)" ng-model="solVacaciones.fechaFinVacaciones" ng-required="true">
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">OBSERVACIONES: <textarea class="form-control" ng-model="solVacaciones.observaciones" ng-required="true"></textarea></td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">Nota: El recibir esta solicitud no implica que está aprobada, su jefe inmediato le comunicará por escrito si su solicitud ha sido aprobada o no.</td>
-                        </tr>
-                        <tr id="feriados-medio-vacaciones" style="display: none">
-                        </tr>
-                        <tr>
-                            <td colspan="5">POR EL PRESENTE EXPRESO MI CONFORMIDAD DE SOLICITAR Y GOZAR MIS VACACIONES DE ACUERDO A LO QUE ESTABLECE EL ARTICULO 69 DEL CODIGO DE TRABAJO.</td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">
-                                APELLIDOS Y NOMBRES JEFE (A) INMEDIATO:
-                                <input type="text" class="form-control" ng-model="solVacaciones.jefe" ng-required="true">
-                            </td>
-                        </tr>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="clear"></div>
+                <div id="tabla-user-incidencias" ng-show="verTabla" style="overflow-x: auto;">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Colaborador</th>
+                                <th ng-repeat="day in daysOfMonth">{{ day.day }}</th>
+                                <th>Total Marcados</th>
+                                <th>Días Disponibles</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="colaborador in colaboradores">
+                                <td>{{ colaborador.nombre }}</td>
+                                <td ng-repeat="day in daysOfMonth"
+                                    ng-class="{
+                                        'bg-danger': day.isHoliday,
+                                        'bg-primary': colaborador.diasDeVacaciones.includes(day.dayNumber),
+                                        'bg-warning': isSelecting && day.isHovering
+                                    }"
+                                    ng-bind="day.dayNumber">
+                                </td>
+                                <td>{{ colaborador.diasMarcadosCount }}</td>
+                                <td>{{ colaborador.diasDisponibles }}</td>
+                            </tr>
+                        </tbody>
                     </table>
+
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" ng-show="solVacaciones.id == 'undefined'" id="enviar-solicitud-vacaciones-btn" class="btn btn-primary">Enviar</button>
-                    <button class="btn btn-success" ng-show="solVacaciones.id != 'undefined'" ng-click="editarSolVacaciones()">Editar</button>
-                    <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
 
-<div id="modal-solicitud-permisos" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <form ng-submit="enviarSolicitudPermiso()">
-                <div class="modal-header" style="padding: 10px, 10px">
-                    <label>SOLICITUD DE PERMISOS</label>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                </div>
-                <div class="modal-body">
-                    <table class="table table-condensed table-striped table-active">
-                        <tr>
-                            <td colspan="5">
-                                <div style="column-count: 2">
+
+    <div id="modal-solicitud-vacaciones" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form ng-submit="enviarSolicitudVacaciones()">
+                    <div class="modal-header" style="padding: 10px, 10px">
+                        <label>SOLICITUD DE VACACIONES</label>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-condensed table-striped table-active">
+                            <tr>
+                                <td colspan="5">
                                     NOMBRE Y APELLIDOS:
-                                    <input type="text" class="form-control" ng-model="solicitudPer.apellidosNombres" ng-required="true" ng-readonly="true">
-                                    CEDULA:
-                                    <input type="text" class="form-control" ng-model="solicitudPer.cedula" ng-required="true">
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">
-                                <div style="column-count: 2">
-                                    CARGO:
-                                    <input type="text" class="form-control" ng-model="solicitudPer.cargo" ng-required="true" ng-readonly="true">
-                                    AREA:
-                                    <input type="text" class="form-control" ng-model="solicitudPer.area" ng-required="true" ng-readonly="true">
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">
-                                <div style="column-count: 3">
-                                    FECHA INGRESO DE LA SOLICITUD:
-                                    <input type="date" class="form-control" ng-model="solicitudPer.fechaIngresoSolicitud" ng-required="true">
-                                    EMPRESA:
-                                    <select ng-init="solicitudPer.empresa='SIFIZSOFT'" class="form-control" ng-model="solicitudPer.empresa" ng-required="true" ng-readonly="isEmpresaPermisoSelectEditable">
-                                        <option value="SIFIZSOFT">SIFIZSOFT</option>
-                                        <option value="INTECSOFT">INTECSOFT</option>
-                                    </select>
-                                    FECHA INGRESO EMPRESA
-                                    <input type="text" class="form-control" ng-model="datosUsuario.fechaIngreso" ng-readonly="true" />
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5" style="background-color: gainsboro">
-                                <span>PERMISO CON CARGO A VACACIONES:</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">
-                                <div style="display: flex; align-items: center">
-                                    ASUNTO:<br>
-                                    <span style="margin-left: 25px">PERSONALES:</span>
-                                    <input style="transform: scale(2); margin-bottom: 5px; margin-left: 5px" type="checkbox" ng-model="solicitudPer.personal">
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5" style="background-color: gainsboro">
-                                PERMISO SIN CARGO A VACACIONES:
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">
-                                <div style="display: flex; align-items: center">
-                                    <span>ASUNTO:</span>
-                                    <span style="margin-left: 25px">MATRIMONIO:</span>
-                                    <input style="transform: scale(2); margin-bottom: 5px; margin-left: 5px" type="checkbox" ng-model="solicitudPer.matrimonio">
-                                    <span style="margin-left: 15px">CALAMIDAD DOMESTICA:</span>
-                                    <input style="transform: scale(2); margin-bottom: 5px; margin-left: 5px" type="checkbox" ng-model="solicitudPer.comida">
-                                    <span style="margin-left: 15px">MATERNIDAD Y/O PATERNIDAD:</span>
-                                    <input style="transform: scale(2); margin-bottom: 5px; margin-left: 5px" type="checkbox" ng-model="solicitudPer.paternidad">
-                                    <span style="margin-left: 15px">OTROS:</span>
-                                    <input style="transform: scale(2); margin-bottom: 5px; margin-left: 5px" type="checkbox" ng-model="solicitudPer.otros">
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5" style="background-color: gainsboro">
-                                AUSENCIA APROXIMADA DE:
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">
-                                <div style="display: flow; column-count: 2; align-items: center">
-                                    FECHA DESDE:
-                                    <br>
-                                    <p class="bg-danger" id="alert-coincide-inicio-permiso" style="display: none">Coincide con un día feriado.</p>
-                                    <input type="date" class="form-control" ng-change="fechaInicioPermisoChange(solicitudPer.fechaDesde)" ng-model="solicitudPer.fechaDesde" ng-required="true">
-                                    HORA DE SALIDA:
-                                    <br><input type="text" class="timepicker form-control" ng-model="solicitudPer.horaSalida" ng-required="true">
-                                    FECHA HASTA:
-                                    <br>
-                                    <p class="bg-danger" id="alert-coincide-fin-permiso" style="display: none">Coincide con un día feriado.</p>
-                                    <input type="date" class="form-control" ng-change="fechaFinPermisoChange(solicitudPer.fechaHasta)" ng-model="solicitudPer.fechaHasta" ng-required="true">
-                                    HORA DE RETORNO:
-                                    <br><input width="20" type="text" class="timepicker form-control" ng-model="solicitudPer.horaRetorno" ng-required="true">
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">MOTIVO: <textarea class="form-control" ng-model="solicitudPer.motivo" ng-required="true"></textarea></td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">Nota: El recibir esta solicitud no implica que está aprobada, su jefe inmediato le comunicará por escrito si su solicitud ha sido aprobada o no.</td>
-                        </tr>
-                        <tr id="feriados-medio-permiso" style="display: none">
-                        </tr>
-                        <tr>
-                            <td colspan="5">
-                                APELLIDOS Y NOMBRES JEFE (A) INMEDIATO:
-                                <input type="text" class="form-control" ng-model="solicitudPer.jefe" ng-required="true">
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" ng-show="solicitudPer.id == 'undefined'" id="enviar-solicitud-permiso-btn" class="btn btn-primary">Enviar</button>
-                    <button class="btn btn-success" ng-show="solicitudPer.id != 'undefined'" ng-click="editarSolPermisos()">Editar</button>
-                    <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-                </div>
-            </form>
+                                    <input type="text" class="form-control" ng-model="solVacaciones.apellidosNombres" ng-required="true" ng-readonly="true">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">
+                                    <div style="column-count: 2">
+                                        CARGO:
+                                        <input type="text" class="form-control" ng-model="solVacaciones.cargo" ng-required="true" ng-readonly="true">
+                                        CEDULA:
+                                        <input type="text" class="form-control" ng-model="solVacaciones.cedula" ng-required="true">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">
+                                    <div style="column-count: 3">
+                                        FECHA INGRESO DE LA SOLICITUD:
+                                        <input type="date" class="form-control" ng-model="solVacaciones.fechaIngresoSolicitud" ng-required="true">
+                                        EMPRESA:
+                                        <select ng-init="solVacaciones.empresa='SIFIZSOFT'" class="form-control" ng-model="solVacaciones.empresa" ng-required="true" ng-readonly="isEmpresaVacacionesSelectEditable">
+                                            <option value="SIFIZSOFT">SIFIZSOFT</option>
+                                            <option value="INTECSOFT">INTECSOFT</option>
+                                        </select>
+                                        FECHA INGRESO EMPRESA
+                                        <input type="text" class="form-control" ng-model="datosUsuario.fechaIngreso" ng-readonly="true" />
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">
+                                    <div style="column-count: 2">
+                                        FECHA QUE DEBERÁ PRESENTARSE A TRABAJAR (dd/mm/aaaa):
+                                        <input type="date" class="form-control" ng-model="solVacaciones.fechaPresentarseTrabajar" ng-required="true">
+                                        <!--FECHA INGRESO A LA INSTITUCIÓN:
+                                        <input type="date" class="form-control" ng-model="solVacaciones.fechaIngresoInstitucion" ng-required="true">-->
+                                        <br />AÑOS DE SERVICIO:
+                                        <input type="number" class="form-control" ng-model="solVacaciones.aniosServicio" ng-required="true">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">
+                                    <div style="column-count: 3">
+                                        DÍAS QUE CORRESPONDEN:
+                                        <input type="number" class="form-control" ng-model="solVacaciones.diasCorresponden" ng-required="true">
+                                        DÍAS A DISFRUTAR:
+                                        <input type="number" class="form-control" ng-model="solVacaciones.diasDisfrutar" ng-required="true">
+                                        DÍAS PENDIENTES:
+                                        <input type="number" class="form-control" ng-model="solVacaciones.diasPendientes" ng-required="true">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">
+                                    <div style="column-count: 2">
+                                        <span>PERIODO A DISFRUTAR:</span>
+                                        <br>del Año
+                                        <input type="number" class="form-control" ng-model="solVacaciones.delAnio" ng-required="true">
+                                        <br>al Año
+                                        <input type="number" class="form-control" ng-model="solVacaciones.alAnio" ng-required="true">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">
+                                    <div style="column-count: 2">
+                                        DÍAS QUE INICIAN SUS VACACIONES
+                                        <br>Fecha desde (dd/mm/aaaa):
+                                        <p class="bg-danger" id="alert-coincide-inicio-vacaciones" style="display: none">Coincide con un día feriado.</p>
+                                        <input type="date" class="form-control" ng-change="fechaInicioVacacionesChange(solVacaciones.fechaInicioVacaciones)" ng-model="solVacaciones.fechaInicioVacaciones" ng-required="true">
+                                        <br>Fecha hasta (dd/mm/aaaa):
+                                        <p class="bg-danger" id="alert-coincide-fin-vacaciones" style="display: none">Coincide con un día feriado.</p>
+                                        <input type="date" class="form-control" ng-change="fechaFinVacacionesChange(solVacaciones.fechaFinVacaciones)" ng-model="solVacaciones.fechaFinVacaciones" ng-required="true">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">OBSERVACIONES: <textarea class="form-control" ng-model="solVacaciones.observaciones" ng-required="true"></textarea></td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">Nota: El recibir esta solicitud no implica que está aprobada, su jefe inmediato le comunicará por escrito si su solicitud ha sido aprobada o no.</td>
+                            </tr>
+                            <tr id="feriados-medio-vacaciones" style="display: none">
+                            </tr>
+                            <tr>
+                                <td colspan="5">POR EL PRESENTE EXPRESO MI CONFORMIDAD DE SOLICITAR Y GOZAR MIS VACACIONES DE ACUERDO A LO QUE ESTABLECE EL ARTICULO 69 DEL CODIGO DE TRABAJO.</td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">
+                                    APELLIDOS Y NOMBRES JEFE (A) INMEDIATO:
+                                    <input type="text" class="form-control" ng-model="solVacaciones.jefe" ng-required="true">
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" ng-show="solVacaciones.id == 'undefined'" id="enviar-solicitud-vacaciones-btn" class="btn btn-primary">Enviar</button>
+                        <button class="btn btn-success" ng-show="solVacaciones.id != 'undefined'" ng-click="editarSolVacaciones()">Editar</button>
+                        <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/css/bootstrap-timepicker.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/js/bootstrap-timepicker.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $('.timepicker').timepicker();
-    });
-</script>
+
+    <div id="modal-solicitud-permisos" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form ng-submit="enviarSolicitudPermiso()">
+                    <div class="modal-header" style="padding: 10px, 10px">
+                        <label>SOLICITUD DE PERMISOS</label>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-condensed table-striped table-active">
+                            <tr>
+                                <td colspan="5">
+                                    <div style="column-count: 2">
+                                        NOMBRE Y APELLIDOS:
+                                        <input type="text" class="form-control" ng-model="solicitudPer.apellidosNombres" ng-required="true" ng-readonly="true">
+                                        CEDULA:
+                                        <input type="text" class="form-control" ng-model="solicitudPer.cedula" ng-required="true">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">
+                                    <div style="column-count: 2">
+                                        CARGO:
+                                        <input type="text" class="form-control" ng-model="solicitudPer.cargo" ng-required="true" ng-readonly="true">
+                                        AREA:
+                                        <input type="text" class="form-control" ng-model="solicitudPer.area" ng-required="true" ng-readonly="true">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">
+                                    <div style="column-count: 3">
+                                        FECHA INGRESO DE LA SOLICITUD:
+                                        <input type="date" class="form-control" ng-model="solicitudPer.fechaIngresoSolicitud" ng-required="true">
+                                        EMPRESA:
+                                        <select ng-init="solicitudPer.empresa='SIFIZSOFT'" class="form-control" ng-model="solicitudPer.empresa" ng-required="true" ng-readonly="isEmpresaPermisoSelectEditable">
+                                            <option value="SIFIZSOFT">SIFIZSOFT</option>
+                                            <option value="INTECSOFT">INTECSOFT</option>
+                                        </select>
+                                        FECHA INGRESO EMPRESA
+                                        <input type="text" class="form-control" ng-model="datosUsuario.fechaIngreso" ng-readonly="true" />
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" style="background-color: gainsboro">
+                                    <span>PERMISO CON CARGO A VACACIONES:</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">
+                                    <div style="display: flex; align-items: center">
+                                        ASUNTO:<br>
+                                        <span style="margin-left: 25px">PERSONALES:</span>
+                                        <input style="transform: scale(2); margin-bottom: 5px; margin-left: 5px" type="checkbox" ng-model="solicitudPer.personal">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" style="background-color: gainsboro">
+                                    PERMISO SIN CARGO A VACACIONES:
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">
+                                    <div style="display: flex; align-items: center">
+                                        <span>ASUNTO:</span>
+                                        <span style="margin-left: 25px">MATRIMONIO:</span>
+                                        <input style="transform: scale(2); margin-bottom: 5px; margin-left: 5px" type="checkbox" ng-model="solicitudPer.matrimonio">
+                                        <span style="margin-left: 15px">CALAMIDAD DOMESTICA:</span>
+                                        <input style="transform: scale(2); margin-bottom: 5px; margin-left: 5px" type="checkbox" ng-model="solicitudPer.comida">
+                                        <span style="margin-left: 15px">MATERNIDAD Y/O PATERNIDAD:</span>
+                                        <input style="transform: scale(2); margin-bottom: 5px; margin-left: 5px" type="checkbox" ng-model="solicitudPer.paternidad">
+                                        <span style="margin-left: 15px">OTROS:</span>
+                                        <input style="transform: scale(2); margin-bottom: 5px; margin-left: 5px" type="checkbox" ng-model="solicitudPer.otros">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" style="background-color: gainsboro">
+                                    AUSENCIA APROXIMADA DE:
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">
+                                    <div style="display: flow; column-count: 2; align-items: center">
+                                        FECHA DESDE:
+                                        <br>
+                                        <p class="bg-danger" id="alert-coincide-inicio-permiso" style="display: none">Coincide con un día feriado.</p>
+                                        <input type="date" class="form-control" ng-change="fechaInicioPermisoChange(solicitudPer.fechaDesde)" ng-model="solicitudPer.fechaDesde" ng-required="true">
+                                        HORA DE SALIDA:
+                                        <br><input type="text" class="timepicker form-control" ng-model="solicitudPer.horaSalida" ng-required="true">
+                                        FECHA HASTA:
+                                        <br>
+                                        <p class="bg-danger" id="alert-coincide-fin-permiso" style="display: none">Coincide con un día feriado.</p>
+                                        <input type="date" class="form-control" ng-change="fechaFinPermisoChange(solicitudPer.fechaHasta)" ng-model="solicitudPer.fechaHasta" ng-required="true">
+                                        HORA DE RETORNO:
+                                        <br><input width="20" type="text" class="timepicker form-control" ng-model="solicitudPer.horaRetorno" ng-required="true">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">MOTIVO: <textarea class="form-control" ng-model="solicitudPer.motivo" ng-required="true"></textarea></td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">Nota: El recibir esta solicitud no implica que está aprobada, su jefe inmediato le comunicará por escrito si su solicitud ha sido aprobada o no.</td>
+                            </tr>
+                            <tr id="feriados-medio-permiso" style="display: none">
+                            </tr>
+                            <tr>
+                                <td colspan="5">
+                                    APELLIDOS Y NOMBRES JEFE (A) INMEDIATO:
+                                    <input type="text" class="form-control" ng-model="solicitudPer.jefe" ng-required="true">
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" ng-show="solicitudPer.id == 'undefined'" id="enviar-solicitud-permiso-btn" class="btn btn-primary">Enviar</button>
+                        <button class="btn btn-success" ng-show="solicitudPer.id != 'undefined'" ng-click="editarSolPermisos()">Editar</button>
+                        <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/css/bootstrap-timepicker.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/js/bootstrap-timepicker.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.timepicker').timepicker();
+        });
+    </script>
+
+</body>
+
+</html>

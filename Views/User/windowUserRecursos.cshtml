@@ -5,13 +5,13 @@
 </label>
  -->
 @{
-    bool esUserAllow = Roles.IsUserInRole("ADMIN") || Roles.IsUserInRole("OPERACIONES") || Roles.IsUserInRole("RRHH") ;
+    bool esUserAllow = Roles.IsUserInRole("ADMIN") || Roles.IsUserInRole("OPERACIONES") || Roles.IsUserInRole("RRHH");
 }
 
 @if (Roles.IsUserInRole("ADMIN") || Roles.IsUserInRole("OPERACIONES") || Roles.IsUserInRole("RRHH"))
 {
-    <button class="btn btn-primary" ng-click="windowAgregarRecursos()">Agregar</button>
-    <button class="btn btn-primary" ng-click="windowAgregarPlan()">Tema Reunión/Capacitación</button>
+    <button class="btn btn-primary" ng-click="windowAgregarRecursos()">Registrar Reunión/Capacitación ejecutada</button>
+    <button class="btn btn-primary" ng-click="windowAgregarPlan()">Planificación Reunión/Capacitación</button>
 }
 <input type="text" ng-keyup="cargarRecursos()" ng-model="filtroRecursos" class="form-control right filtro" placeholder="Filtrar..." />
 <div class="clear"></div>
@@ -19,19 +19,20 @@
     Temas a capacitar:
     <input style="vertical-align: -2px;" type="checkbox" ng-click="cargarRecursos()" ng-model="esPlan" ng-init="esPlan=false" />
 </label>
-<div id="tabla-user-recursos">
-    <table id="tabla-recursos-usuario" class="table table-striped table-condensed">
+<div id="tabla-user-recursos" style="height: 500px; overflow-y: auto; margin-bottom: 20px;">
+    <table id="tabla-recursos-usuario" class="table table-striped table-condensed table-sm table-responsive-sm" style="width: 100%;">
         <thead>
             <tr>
                 <th>Título</th>
                 <th>Detalle</th>
-                <th>Fecha</th>
+                <th>Fecha y Hora</th>
                 <th>Modulo</th>
+                <th ng-show="esPlan">Doc.Adjunto</th>
                 <th ng-show="!esPlan">Url</th>
                 <th>Link Meet</th>
                 <th ng-show="!esPlan && esUserAllow">Registro Asistencia</th>
                 <th ng-show="esPlan && esUserAllow">Asistencia</th>
-                <th>Tiempo</th>
+                <th>Duración</th>
                 <th ng-show="!esPlan">Certificado</th>
             </tr>
         </thead>
@@ -40,8 +41,13 @@
             <tr ng-repeat="recurso in recursos | filter: filtroRecursos" ng-dblclick="mostrarDetalleRecurso(recurso.secuencial)">
                 <td>{{recurso.titulo | limitTo:100}}</td>
                 <td>{{recurso.detalle | limitTo:100}}</td>
-                <td>{{recurso.fecha | strDateToStr}}</td>
+                <td>{{recurso.fecha | strDateToStrTime}}</td>
                 <td>{{ recurso.modulo === 'N//A' ? 'Otros' : recurso.modulo }}</td>
+                <td ng-show="esPlan">
+                    <a target="_blank" href="~/Web/{{recurso.pdf}}">
+                        {{ recurso.pdf.substring(recurso.pdf.lastIndexOf('/') + 1) }}
+                    </a>
+                </td>
                 <td ng-show="!esPlan">
                     <div ng-if="!recurso.editandoUrl" style="display: inline-flex; align-items: center;">
                         <a class="btn btn-success btn-xs" target="_blank" href="{{recurso.adjunto}}" ng-show="recurso.adjunto != ''">
@@ -70,8 +76,8 @@
                     </a>
                 </td>
                 <td ng-show="esPlan && esUserAllow">
-                    <a class="btn btn-primary btn-xs" ng-click="mostrarRegistroAsistencia(recurso)">
-                        <span class="glyphicon glyphicon-calendar"></span> Asistencia
+                    <a class="btn btn-primary btn-xs" ng-click="mostrarRegistroConvocados(recurso)">
+                        <span class="glyphicon glyphicon-calendar"></span> Convocados/Asignados
                     </a>
                 </td>
 
@@ -152,11 +158,16 @@
                     </div>
 
                     <div class="form-group">
-                        <button type="button" id="abrir-modal-registro-asistencia" ng-click="abrirRegistroAsistencia()" class="btn btn-primary">REGISTRO DE ASISTENCIA</button>
+                        <button type="button" id="abrir-modal-registro-asistencia" ng-click="abrirRegistroAsistencia()" class="btn btn-primary">Convocados/Asignados</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputFechaHora">FECHA Y HORA DE INICIO:</label>
+                        <input type="datetime-local" class="form-control" id="inputFechaHora" ng-model="fechaHora" ng-required="true">
                     </div>
 
                     <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                        TIEMPO:
+                        <label>DURACION:</label>
                         <input type="number" class="form-control" ng-model="horas" ng-required="true" style="width:10%; text-align:center;" min="0">
                         horas
                         :
@@ -178,7 +189,7 @@
 <div id="modal-agregar-plan" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form ng-submit="GuardarNuevoPlan()" name="nuevoPlan">
+            <form ng-submit="GuardarNuevoPlan()" name="nuevoPlan" enctype="multipart/form-data">
                 <div class="modal-header">
                     <h5 class="modal-title">TEMA A CAPACITAR</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -202,14 +213,20 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="fecha-capacitacion">FECHA</label>
+                        <label for="fecha-hora-capacitacion">FECHA Y HORA</label>
                         <div class='input-group date'>
-                            <input id="fecha-capacitacion" ng-model="fechaCapacitacion" class="form-control" ng-required="true" autocomplete="off" min="{{currentDate | date:'yyyy-MM-dd'}}" />
+                            <input id="fecha-hora-capacitacion"
+                                   type="datetime-local"
+                                   ng-model="fechaHoraCapacitacion"
+                                   class="form-control"
+                                   ng-required="true"
+                                   min="{{currentDate | date:'yyyy-MM-ddTHH:mm'}}"
+                                   step="60" />
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="inputLink">LINK MEET:</label>
-                        <input type="text" class="form-control" ng-model="linkPlan" ng-required="true"></>
+                        <input type="text" class="form-control" ng-model="linkPlan" ng-required="true">
                     </div>
                     <div class="form-group">
                         <label for="inputModulo">CAPACITADOR:</label>
@@ -227,7 +244,80 @@
                         minutos
                     </div>
                     <div class="form-group">
-                        <button type="button" class="btn btn-primary" ng-click="abrirModalSeleccionarAsistentes()">Asistentes</button>
+                        <label for="inputArchivo">ADJUNTAR ARCHIVO:</label>
+                        <input type="file" class="form-control" id="inputArchivo" ng-model="archivoPlan" name="archivo">
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-primary" ng-click="abrirModalSeleccionarAsistentes()">Convocados</button>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div id="modal-datos-recurso" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form ng-submit="EditarPlan()" name="editarPlan">
+                <div class="modal-header">
+                    <h5 class="modal-title">TEMA A CAPACITAR</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="inputTitulo">TÍTULO:</label>
+                        <input type="text" class="form-control" ng-model="editTituloPlan" ng-required="true" placeholder="Título">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputDetalle">DETALLE:</label>
+                        <textarea type="text" class="form-control" ng-model="editDetallePlan" ng-required="true" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputModulo">MÓDULO:</label>
+                        <select id="edit-select-modulo-plan" ng-model="editModuloSeleccionadoPlan" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{tipo.id}}" ng-repeat="tipo in tipoModulo">
+                                {{ tipo.nombre === 'N//A' ? 'Otros' : tipo.nombre }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-fecha-hora-capacitacion">FECHA Y HORA</label>
+                        <div class='input-group date'>
+                            <input id="edit-fecha-hora-capacitacion"
+                                   type="datetime-local"
+                                   ng-model="editFechaHoraCapacitacion"
+                                   class="form-control"
+                                   ng-required="true"
+                                   step="60" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputLink">LINK MEET:</label>
+                        <input type="text" class="form-control" ng-model="editLinkPlan" ng-required="true"></>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputModulo">CAPACITADOR:</label>
+                        <select id="edit-select-capacitador-plan" ng-model="editCapacitadorSeleccionadoPlan" class="form-control" required="required">
+                            <option value="">Seleccione...</option>
+                            <option value="{{capacitador.id}}" ng-repeat="capacitador in capacitadores">{{capacitador.nombre}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                        TIEMPO:
+                        <input type="number" class="form-control" ng-model="editHorasPlan" ng-required="true" style="width:10%; text-align:center;" min="0">
+                        horas
+                        :
+                        <input type="number" class="form-control" ng-model="editMinutosPlan" ng-required="true" style="width: 10%; text-align: center;" min="0" max="60">
+                        minutos
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-primary" ng-click="abrirModalSeleccionarAsistentesEdicion()">Convocados</button>
                     </div>
                 </div>
 
@@ -240,54 +330,6 @@
     </div>
 </div>
 
-<div id="modal-datos-recurso" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header" style="padding: 10px, 10px">
-                <label>Reunión/Capacitación</label>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            </div>
-            <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
-                <div class="row">
-                    <div class="col-sm-4"><strong>Título:</strong></div>
-                    <div class="col-sm-8">{{tituloV}}</div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4"><strong>Detalle:</strong></div>
-                    <div class="col-sm-8">{{detalleV}}</div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4"><strong>Módulo:</strong></div>
-                    <div class="col-sm-8">{{moduloV}}</div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4"><strong>Fecha:</strong></div>
-                    <div class="col-sm-8">{{fechaV | strDateToStr}}</div>
-                </div>
-                <div class="row" ng-show="adjuntoV != ''">
-                    <div class="col-sm-4"><strong>Url:</strong></div>
-                    <div class="col-sm-8">
-                        <a class="btn btn-success btn-xs" target="_blank" href="{{adjuntoV}}">
-                            <span class="glyphicon glyphicon-link"></span> Url
-                        </a>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4"><strong>Link Meet:</strong></div>
-                    <a target="_blank" href="{{linkV}}">{{linkV}}</a>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4"><strong>Tiempo:</strong></div>
-                    <div class="col-sm-8">{{tiempoV | toHoursAndMinutes}}</div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Modal Informe -->
 <div class="modal fade" id="modal-asistencia-recurso" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
@@ -295,7 +337,7 @@
             <div class="modal-header" style="padding: 10px, 10px">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 ng-show="!esPlan" class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Registro de asistencia </h4>
-                <h4 ng-show="esPlan" class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Asistentes </h4>
+                <h4 ng-show="esPlan" class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Convocados/asignados </h4>
             </div>
 
             <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
@@ -305,7 +347,6 @@
                             <tr>
                                 <th>No.</th>
                                 <th>PERSONAL SIFIZSOFT E INTESOFT</th>
-                                <th ng-show="!esPlan">ASIGNADO</th>
                                 <th ng-show="!esPlan">ASISTENCIA</th>
                                 <th ng-show="!esPlan">PUNTUACIÓN</th>
                             </tr>
@@ -316,7 +357,6 @@
                                 <tr ng-repeat="item in getDatosAsistenciaFiltrados() track by $index">
                                     <td>{{$index + 1}}</td> <!-- Autoincremental -->
                                     <td>{{item.nombre}}</td> <!-- Nombre del colaborador -->
-                                    <td ng-show="!esPlan"><input type="checkbox" ng-model="item.asignado"></td> <!-- Checkbox para asignado -->
                                     <td ng-show="!esPlan"><input type="checkbox" ng-model="item.asistencia"></td> <!-- Checkbox para asistencia -->
                                     <td ng-show="!esPlan"><input type="number" ng-model="item.puntuacion" min="0" max="5"></td> <!-- Input para puntuación -->
                                     <td ng-show="!esPlan"><input type="hidden" value="{{item.id}}"></td> <!-- Campo oculto con el ID -->
@@ -327,7 +367,6 @@
                                 <tr ng-repeat="item in getDatosAsistenciaFiltrados() track by $index">
                                     <td>{{$index + 1}}</td> <!-- Autoincremental -->
                                     <td>{{item.nombre}}</td> <!-- Nombre del colaborador -->
-                                    <td ng-show="!esPlan"><input type="checkbox" ng-disabled="true" ng-model="item.asignado"></td> <!-- Checkbox para asignado -->
                                     <td ng-show="!esPlan"><input type="checkbox" ng-disabled="true" ng-model="item.asistencia"></td> <!-- Checkbox para asistencia -->
                                     <td ng-show="!esPlan"><input type="number" ng-disabled="true" ng-model="item.puntuacion" min="0" max="5"></td> <!-- Input para puntuación -->
                                     <td ng-show="!esPlan"><input type="hidden" value="{{item.id}}"></td> <!-- Campo oculto con el ID -->
@@ -352,11 +391,112 @@
     </div>
 </div>
 
+
+<!-- Modal convocados temas -->
+<div class="modal fade" id="modal-convocados-recurso" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding: 10px, 10px">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Asignados </h4>
+            </div>
+
+            <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="allSelected" ng-model="allSelected" ng-change="selectAllAsistants()">
+                    <label class="form-check-label" for="allSelected">Todos</label>
+                </div>
+                <div id="div-user-informe-proyecto">
+                    <table id="tabla-registro-asistencia" class="table table-striped table-condensed">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>PERSONAL SIFIZSOFT E INTESOFT</th>
+                                <th>ASIGNADO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Roles.IsUserInRole("ADMIN") || Roles.IsUserInRole("RRHH"))
+                            {
+                                <tr ng-repeat="item in datosConvocadosReunion track by $index">
+                                    <td>{{$index + 1}}</td>
+                                    <td>{{item.nombre}}</td>
+                                    <td><input type="checkbox" ng-model="item.convocado"></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                @if (Roles.IsUserInRole("ADMIN") || Roles.IsUserInRole("RRHH"))
+                {
+                    <button type="button" id="guardar-registro" ng-click="registrarAsistenciaConvocados()" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Modal DE AGREGAR -->
+<div class="modal fade" id="modal-agregar-asistencia-recurso" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding: 10px, 10px">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 ng-show="!esPlan" class="modal-title"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> Registro de asistencia </h4>
+            </div>
+
+            <div class="modal-body" style="max-height: calc(100vh - 210px); overflow-y: auto;">
+                <div id="div-user-informe-proyecto">
+                    <table id="tabla-registro-asistencia" class="table table-striped table-condensed">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>PERSONAL SIFIZSOFT E INTESOFT</th>
+                                <th ng-show="!esPlan">ASIGNADO</th>
+                                <th ng-show="!esPlan">ASISTENCIA</th>
+                                <th ng-show="!esPlan">PUNTUACIÓN</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Roles.IsUserInRole("ADMIN") || Roles.IsUserInRole("RRHH"))
+                            {
+                                <tr ng-repeat="item in datosAsistencia">
+                                    <td>{{$index + 1}}</td> <!-- Autoincremental -->
+                                    <td>{{item.nombre}}</td> <!-- Nombre del colaborador -->
+                                    <td ng-show="!esPlan"><input type="checkbox" ng-model="item.asignado"></td> <!-- Checkbox para asignacion -->
+                                    <td ng-show="!esPlan"><input type="checkbox" ng-model="item.asistencia"></td> <!-- Checkbox para asistencia -->
+                                    <td ng-show="!esPlan"><input type="number" ng-model="item.puntuacion" min="0" max="5"></td> <!-- Input para puntuación -->
+                                    <td ng-show="!esPlan"><input type="hidden" value="{{item.id}}"></td> <!-- Campo oculto con el ID -->
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                @if (Roles.IsUserInRole("ADMIN") || Roles.IsUserInRole("RRHH"))
+                {
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="modal-seleccionar-asistentes" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">ASISTENTES</h4>
+                <h4 class="modal-title">CONVOCADO</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
@@ -369,7 +509,7 @@
                         <tr>
                             <th>No.</th>
                             <th>PERSONAL SIFIZSOFT E INTESOFT</th>
-                            <th>ASIGNADO</th>
+                            <th>CONVOCADO</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -387,7 +527,53 @@
         </div>
     </div>
 </div>
+
+<div id="modal-seleccionar-asistentes-edicion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">CONVOCADOS</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="seleccionarTodos" ng-model="todosSeleccionadosEdicion" ng-change="seleccionarTodosAsistentesEdicion()">
+                    <label class="form-check-label" for="seleccionarTodos">Todos</label>
+                </div>
+                <table class="table table-striped table-condensed">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>PERSONAL SIFIZSOFT E INTESOFT</th>
+                            <th>CONVOCADO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="asistente in datosAsistenciaEdicion">
+                            <td>{{$index + 1}}</td>
+                            <td>{{asistente.nombre}}</td>
+                            <td><input type="checkbox" ng-model="asistente.asignado"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
     var esUserAllow = @esUserAllow.ToString().ToLower();
 </script>
 
+<script type="text/javascript">
+    var esUserAllow = @esUserAllow.ToString().ToLower();
+
+    $('.modal-body').css({
+        'max-height': 'calc(100vh - 200px)',
+        'overflow-y': 'auto'
+    });
+
+</script>

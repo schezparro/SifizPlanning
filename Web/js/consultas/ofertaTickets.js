@@ -33,7 +33,7 @@
 
     $scope.paginar = function () {
         start = (pagina - 1) * numerosPorPagina;
-        length = numerosPorPagina; 
+        length = numerosPorPagina;
 
         $scope.recargarDatosOfertas();
     };
@@ -65,6 +65,8 @@
     };
 
     $scope.guardarCambios = function (oferta) {
+        waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
+
         angular.element('#fecha-registro-' + oferta.id).datepicker('destroy');
         angular.element('#fecha-produccion-' + oferta.id).datepicker('destroy');
         angular.element('#fecha-disponibilidad-' + oferta.id).datepicker('destroy');
@@ -98,6 +100,8 @@
 
         ajaxOfertas.success(function (data) {
             if (data.success === true) {
+
+                waitingDialog.hide();
                 $scope.paginar()
 
             } else {
@@ -109,6 +113,8 @@
     };
 
     $scope.agregarOferta = function () {
+        waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
+
         var clienteSeleccionado = 0;
         var colaboradorSeleccionado = 0;
         if ($scope.nuevaOferta.cliente !== "") {
@@ -172,6 +178,8 @@
 
         ajaxOfertas.success(function (data) {
             if (data.success === true) {
+
+                waitingDialog.hide();
                 $scope.paginar()
 
             } else {

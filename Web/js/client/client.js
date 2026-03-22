@@ -66,6 +66,12 @@ clientApp.controller('clientController', ['$scope', '$http', function ($scope, $
         angular.element("#ver-reporte")[0].click();
     };
 
+    $scope.VerReporteMtto = function () {
+        var reportUrl = "/Report/VerReporteMantenimientoCliente";
+        angular.element("#ver-reporte").attr({ "href": reportUrl });
+        angular.element("#ver-reporte")[0].click();
+    };
+
     //Cambiar la contraseña del usuario
     $scope.cambiarPassUsuario = function () {
         waitingDialog.show('Cambiando la contraseña del usuario...', { dialogSize: 'sm', progressType: 'success' });

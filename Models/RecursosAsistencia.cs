@@ -20,6 +20,7 @@ namespace SifizPlanning.Models
         public decimal Asistencia { get; set; }
         public double Puntuacion { get; set; }
         public decimal EstaActivo { get; set; }
+        public Nullable<decimal> Convocado { get; set; }
     
         public virtual Colaborador colaborador { get; set; }
         public virtual Recursos recursos { get; set; }

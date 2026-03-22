@@ -16,10 +16,10 @@ namespace SifizPlanning.Models
     {
         public ResponsableProyectos()
         {
-            this.clientesUbicacion = new HashSet<ClienteAuxiliar>();
-            this.clientesResponsableAcceso = new HashSet<ClienteAuxiliar>();
-            this.clientesResponsableCodigo = new HashSet<ClienteAuxiliar>();
-            this.clientesResponsablePublicacion = new HashSet<ClienteAuxiliar>();
+            this.CLIENTEAUXILIAR = new HashSet<ClienteAuxiliar>();
+            this.CLIENTEAUXILIAR1 = new HashSet<ClienteAuxiliar>();
+            this.CLIENTEAUXILIAR2 = new HashSet<ClienteAuxiliar>();
+            this.CLIENTEAUXILIAR3 = new HashSet<ClienteAuxiliar>();
         }
     
         public int Secuencial { get; set; }
@@ -29,9 +29,9 @@ namespace SifizPlanning.Models
         public int NumeroVerificador { get; set; }
         public decimal EsTecnico { get; set; }
     
-        public virtual ICollection<ClienteAuxiliar> clientesUbicacion { get; set; }
-        public virtual ICollection<ClienteAuxiliar> clientesResponsableAcceso { get; set; }
-        public virtual ICollection<ClienteAuxiliar> clientesResponsableCodigo { get; set; }
-        public virtual ICollection<ClienteAuxiliar> clientesResponsablePublicacion { get; set; }
+        public virtual ICollection<ClienteAuxiliar> CLIENTEAUXILIAR { get; set; }
+        public virtual ICollection<ClienteAuxiliar> CLIENTEAUXILIAR1 { get; set; }
+        public virtual ICollection<ClienteAuxiliar> CLIENTEAUXILIAR2 { get; set; }
+        public virtual ICollection<ClienteAuxiliar> CLIENTEAUXILIAR3 { get; set; }
     }
 }

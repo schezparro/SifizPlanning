@@ -2241,14 +2241,19 @@ namespace SifizPlanning.Controllers
                 DateTime manana = hoy.AddDays(1);
 
                 var capacitaciones = db.Recursos
-                    .Where(s => s.EsPlan == 1 && s.Fecha >= hoy && s.Fecha < DbFunctions.TruncateTime(manana))
+                    .Where(s => s.Fecha >= hoy && s.Fecha < DbFunctions.TruncateTime(manana))
                     .ToList();
 
                 int filasActualizadas = 0;
                 foreach (var item in capacitaciones)
                 {
+                    var cantAsignados = db.RecursosAsistencia.Where(ra => ra.SecuencialRecurso == item.Secuencial && ra.Convocado != 0).Count();
+
+                    if (cantAsignados > 0)
+                    {
                     item.EsPlan = 0;
                     filasActualizadas++;
+                    }
                 }
 
                 db.SaveChanges();

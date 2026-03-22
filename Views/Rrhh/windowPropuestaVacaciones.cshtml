@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .bg-danger {
+            background-color: #f8d7da !important;
+            color: #721c24;
+        }
+
+        .bg-primary {
+            background-color: #cce5ff !important;
+            color: #004085;
+        }
+
+        .bg-success {
+            background-color: #d4edda !important;
+            color: #155724;
+        }
+
+        #tabla-user-incidencias {
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .table {
+            table-layout: auto;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="fecha-inicio-etapa" class="col-sm-1 control-label">AÑOS</label>
+                                <div class="col-sm-4">
+                                    <select ng-class="'form-control'" id="select-annos-indicadores-tickets" ng-model="annos">
+                                        <option value="2025" selected>2025</option>
+                                        <option value="2026">2026</option>
+                                    </select>
+                                </div>
+
+                                <label for="fecha-inicio-etapa" class="col-sm-1 control-label">MESES</label>
+                                <div class="col-sm-4">
+                                    <select ng-class="'form-control'" id="select-meses-indicadores-tickets" ng-model="mes" ng-change="onChangeMes(mes)">
+                                        <option value="0" selected>Seleccione...</option>
+                                        <option value="01">Enero</option>
+                                        <option value="02">Febrero</option>
+                                        <option value="03">Marzo</option>
+                                        <option value="04">Abril</option>
+                                        <option value="05">Mayo</option>
+                                        <option value="06">Junio</option>
+                                        <option value="07">Julio</option>
+                                        <option value="08">Agosto</option>
+                                        <option value="09">Septiembre</option>
+                                        <option value="10">Octubre</option>
+                                        <option value="11">Noviembre</option>
+                                        <option value="12">Diciembre</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="clear"></div>
+    <div id="tabla-user-incidencias" ng-show="verTabla" style="overflow-x: auto;">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Colaborador</th>
+                    <th ng-repeat="day in daysOfMonth">{{ day.day }}</th>
+                    <th>Total Marcados</th>
+                    <th>Días Disponibles</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="colaborador in colaboradores">
+                    <td>{{ colaborador.nombre }}</td>
+                    <td ng-repeat="day in daysOfMonth"
+                        ng-class="{
+                            'bg-danger': day.isHoliday || day.isWeekend,
+                            'bg-primary': ((colaborador.diasDeVacaciones && colaborador.diasDeVacaciones.includes(day.dayNumber)) || (colaborador.tempSelectedDays && colaborador.tempSelectedDays.includes(day.dayNumber))) && !(colaborador.tempDeselectedDays && colaborador.tempDeselectedDays.includes(day.dayNumber)),
+                            'bg-warning': isSelecting && day.isHovering
+                        }"
+                        ng-click="endSelection(colaborador)"
+                        ng-mousedown="startSelection(colaborador, day)"
+                        ng-mouseenter="dragSelection(colaborador, day)"
+                        ng-mouseup="endSelection(colaborador)"
+                        ng-mouseleave="day.isHovering = false"
+                        ng-bind="day.dayNumber">
+                    </td>
+
+
+                    <td>{{ colaborador.diasMarcadosCount }}</td>
+                    <td>{{ colaborador.diasDisponibles }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>
+

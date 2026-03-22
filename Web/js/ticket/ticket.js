@@ -636,6 +636,32 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
         ticketVersionCliente: ''
     };
 
+    $scope.tickets = [];
+    $scope.cantidadUrgentes = 0;
+
+    // Llamada inicial para contar tickets urgentes
+    $http.get('tickets/contar-tickets-urgentes-abiertos/')
+        .then(function (resp) {
+            if (resp.data.success) {
+                $scope.cantidadUrgentes = resp.data.cantidad;
+            }
+        }, function (err) {
+            console.error("Error al contar tickets urgentes", err);
+        });
+
+    $scope.mostrarUrgentes = function () {
+        console.log("mostrar urgentes");
+        $scope.selectedPrioridad = "URGENTE";
+        $scope.selectedEstado = ["ABIERTO"];
+        setTimeout(function () {
+            $('#mySelectEstado').selectpicker('val', $scope.selectedEstado);
+            $('.selectpicker[ng-model="selectedPrioridad"]').selectpicker('val', $scope.selectedPrioridad);
+        }, 100);
+
+        $scope.filterData(6);
+        $scope.filterData(8);
+    };
+
     angular.element('#fecha-asignacion-ticket').datepicker({
         format: 'dd/mm/yyyy'
     });
@@ -646,10 +672,10 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
     $scope.resetearAdjunto = function () {
         if (document.getElementById('selectedFile').files[0].name.length > 20) {
             document.getElementById('buttonAdjuntoModal').innerHTML = "..." + document.getElementById('selectedFile').files[0].name.substring(document.getElementById('selectedFile').files[0].name.length - 17, document.getElementById('selectedFile').files[0].name.length);
-            document.getElementById('buttonAdjunto').innerHTML = "..." + document.getElementById('selectedFile').files[0].name.substring(document.getElementById('selectedFile').files[0].name.length - 17, document.getElementById('selectedFile').files[0].name.length);
+            //document.getElementById('buttonAdjunto').innerHTML = "..." + document.getElementById('selectedFile').files[0].name.substring(document.getElementById('selectedFile').files[0].name.length - 17, document.getElementById('selectedFile').files[0].name.length);
         } else {
             document.getElementById('buttonAdjuntoModal').innerHTML = document.getElementById('selectedFile').files[0].name.substring(0, 20);
-            document.getElementById('buttonAdjunto').innerHTML = "..." + document.getElementById('selectedFile').files[0].name.substring(document.getElementById('selectedFile').files[0].name.length - 17, document.getElementById('selectedFile').files[0].name.length);
+            //document.getElementById('buttonAdjunto').innerHTML = "..." + document.getElementById('selectedFile').files[0].name.substring(document.getElementById('selectedFile').files[0].name.length - 17, document.getElementById('selectedFile').files[0].name.length);
         }
     }
 
@@ -1008,7 +1034,7 @@ ticketApp.controller('gestionTicketController', ['$scope', '$http', function ($s
                                     angular.element.each($scope.asignaciones, function (key, value) {
                                         $scope.totalHorasAsignadas += parseInt(value.numeroHoras);
                                     });
-                                    document.getElementById('buttonAdjunto').innerHTML = '<span class="glyphicon glyphicon-paperclip"></span> Adjuntar';
+                                    //document.getElementById('buttonAdjunto').innerHTML = '<span class="glyphicon glyphicon-paperclip"></span> Adjuntar';
                                     document.getElementById('selectedFile').value = "";
                                     $scope.validarContratoMantenimiento();
 
@@ -3619,9 +3645,17 @@ function dateToStr(dateObj, format, separator, includeHour) {
 
 ticketApp.filter("strDateToStrTime", function () {
     return function (textDate) {
-        var fecha = new Date(parseInt(textDate.replace('/Date(', '')));
+        if (!textDate) {
+            return "";
+        }
+        var match = /\/Date\((\d+)\)\//.exec(textDate);
+        if (!match) {
+            return "";
+        }
+
+        var fecha = new Date(parseInt(match[1]));
         return dateToStrTime(fecha);
-    }
+    };
 });
 
 function dateToStrTime(dateObj, format, separator) {

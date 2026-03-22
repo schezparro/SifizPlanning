@@ -681,7 +681,7 @@
                     var cantidades = [];
 
                     $scope.infoTicketsEnGestionAlDia.forEach(function (ticket) {
-                        semanas.push(ticket.Descripcion);
+                        semanas.push(ticket.WeekIdentifier);
                         cantidades.push(ticket.Cantidad);
                     });
 
@@ -725,7 +725,17 @@
                                 y: {
                                     beginAtZero: true
                                 }
-                            }
+                            },
+                            onClick: function (evt, item) {
+                                if (item.length > 0) {
+                                    var index = item[0].index;
+                                    var weekIdentifier = $scope.ticketEnGestionChartAlDia.data.labels[index];
+                                    $scope.$apply(function () {
+                                        $scope.mostrarDetallesTicketsGestion(weekIdentifier);
+                                    });
+                                }
+                            },
+
                         },
                         plugins: [ChartDataLabels]
                     });
@@ -737,6 +747,21 @@
                 alert("Error: " + data.msg);
             }
         });
+    };
+
+    $scope.mostrarDetallesTicketsGestion = function (WeekIdentifier) {
+
+        var parts = WeekIdentifier.split('/');
+        var year = parseInt(parts[1]);
+        var week = parseInt(parts[0]);
+
+        var detallesSemana = $scope.infoTicketsEnGestionAlDia.filter(t => t.Anno === year && t.Semana === week);
+
+        if (detallesSemana.length > 0) {
+            var detalles = detallesSemana[0].Tickets;
+            $scope.detallesTickets = detalles;
+            $('#detallesModal').modal('show');
+        }
     };
 
     //Tickets por Categorias
@@ -818,8 +843,18 @@
                                 y: {
                                     beginAtZero: true
                                 }
+                            },
+                            onClick: function (evt, item) {
+                                if (item.length > 0) {
+                                    var index = item[0].index;
+                                    var weekIdentifier = $scope.ticketPorCategoriaBarrasChartAlDia.data.labels[index];
+                                    $scope.$apply(function () {
+                                        $scope.mostrarDetallesTicketsCategorias(weekIdentifier);
+                                    });
+                                }
                             }
                         },
+
                         plugins: [ChartDataLabels]
                     });
 
@@ -881,6 +916,16 @@
             };
 
         });
+    };
+
+    $scope.mostrarDetallesTicketsCategorias = function (categoria) {
+        var detallesSemana = $scope.infoTicketsPorCategoriasAlDia.filter(t => t.Categoria === categoria);
+
+        if (detallesSemana.length > 0) {
+            var detalles = detallesSemana[0].Tickets;
+            $scope.detallesCategoriasTickets = detalles;
+            $('#detallesCategoriasModal').modal('show');
+        }
     };
 
     //Tickets por Estados
@@ -964,6 +1009,15 @@
                                 y: {
                                     beginAtZero: true
                                 }
+                            },
+                            onClick: function (evt, item) {
+                                if (item.length > 0) {
+                                    var index = item[0].index;
+                                    var weekIdentifier = $scope.ticketPorEstadoBarrasChartAlDia.data.labels[index];
+                                    $scope.$apply(function () {
+                                        $scope.mostrarDetallesTicketsEstados(weekIdentifier);
+                                    });
+                                }
                             }
                         },
                         plugins: [ChartDataLabels]
@@ -999,7 +1053,7 @@
                                 x: {
                                     beginAtZero: true
                                 }
-                            }
+                            },
                         },
                         plugins: [ChartDataLabels]
                     });
@@ -1010,6 +1064,16 @@
                 alert("Error: " + data.msg);
             }
         });
+    };
+
+    $scope.mostrarDetallesTicketsEstados = function (estado) {
+        var detallesSemana = $scope.infoTicketsPorEstadosAlDia.filter(t => t.Estado === estado);
+
+        if (detallesSemana.length > 0) {
+            var detalles = detallesSemana[0].Tickets;
+            $scope.detallesEstadosTickets = detalles;
+            $('#detallesEstadosModal').modal('show');
+        }
     };
 
     //tickets de clientes por estados
@@ -1160,7 +1224,23 @@
                                     }
                                 },
                                 barPercentage: 0.7, // Reduce bar width (adjust as needed)
-                                categoryPercentage: 0.8 // Adjust spacing between bars (optional)
+                                categoryPercentage: 0.8, // Adjust spacing between bars (optional)
+                                onClick: function (evt, item) {
+                                    if (item.length > 0) {
+
+                                        console.log(clientes);
+                                        console.log(canvasId);
+                                        console.log(datasets);
+
+                                        var index = item[0].index;
+                                        var weekIdentifier = datasets.data[index];
+
+
+                                        $scope.$apply(function () {
+                                            $scope.mostrarDetallesTicketsClientesEstados(weekIdentifier);
+                                        });
+                                    }
+                                }
                             },
                             plugins: [ChartDataLabels]
                         });
@@ -1192,7 +1272,6 @@
                     } else {
                         $scope.verUnCliente = true;
 
-                        console.log(clientes);
                         var datasets = createDatasets(clientes);
 
                         if ($scope.ticketPorClienteEstadoBarrasChart3AlDia) {
@@ -1234,7 +1313,7 @@
                                     }
                                 },
                                 barPercentage: 0.7, // Reduce bar width (adjust as needed)
-                                categoryPercentage: 0.8 // Adjust spacing between bars (optional)
+                                categoryPercentage: 0.8, // Adjust spacing between bars (optional)
                             },
                             plugins: [ChartDataLabels]
                         });
@@ -1242,6 +1321,18 @@
                 }
             }
         });
+    };
+
+    $scope.mostrarDetallesTicketsClientesEstados = function (estado, cliente) {
+        var detallesSemana = $scope.infoTicketsPorClienteEstadoAlDia
+            .filter(g => g.Cliente === cliente) // Filtra por cliente
+            .filter(t => t.Estado === estado);
+
+        if (detallesSemana.length > 0) {
+            var detalles = detallesSemana[0].Tickets;
+            $scope.detallesClientesEstadosTickets = detalles;
+            $('#detallesClientesEstadosModal').modal('show');
+        }
     };
 
     $scope.TicketsPorAplicaAlDia = function () {
@@ -1317,6 +1408,15 @@
                                 y: {
                                     beginAtZero: true
                                 }
+                            },
+                            onClick: function (evt, item) {
+                                if (item.length > 0) {
+                                    var index = item[0].index;
+                                    var weekIdentifier = $scope.ticketAplicadosChartAlDia.data.labels[index];
+                                    $scope.$apply(function () {
+                                        $scope.mostrarDetallesTicketsAplicados(weekIdentifier);
+                                    });
+                                }
                             }
                         },
                         plugins: [ChartDataLabels]
@@ -1329,6 +1429,16 @@
                 alert("Error: " + data.msg);
             }
         });
+    };
+
+    $scope.mostrarDetallesTicketsAplicados = function (aplica) {
+        var detallesSemana = $scope.infoTicketsAplicadosAlDia.filter(t => t.Aplica === aplica);
+
+        if (detallesSemana.length > 0) {
+            var detalles = detallesSemana[0].Tickets;
+            $scope.detallesAplicadosTickets = detalles;
+            $('#detallesAplicadosModal').modal('show');
+        }
     };
 
     //Ranking de clientes
@@ -1359,17 +1469,19 @@
 
                 } else {
                     $scope.todosLosClientes = true;
+                    $scope.ticketsPorCategoriasDatos = data.ticketsPorCategorias;
+
                     // Procesar los datos para cada categoría
                     data.ticketsPorCategorias.forEach(function (categoria) {
                         switch (categoria.Tipo) {
                             case "REQUERIMIENTO NUEVO":
-                                procesarDatosCategoria(categoria, 'ReqNuevo');
+                                procesarDatosCategoria(categoria, 'ReqNuevo', 'REQUERIMIENTO NUEVO');
                                 break;
                             case "GARANTÍA TÉCNICA":
-                                procesarDatosCategoria(categoria, 'Garantia');
+                                procesarDatosCategoria(categoria, 'Garantia', 'GARANTÍA TÉCNICA');
                                 break;
                             case "MANTENIMIENTO":
-                                procesarDatosCategoria(categoria, 'Mantenimiento');
+                                procesarDatosCategoria(categoria, 'Mantenimiento', 'MANTENIMIENTO');
                                 break;
                         }
                     });
@@ -1381,7 +1493,23 @@
         });
     };
 
-    function procesarDatosCategoria(categoria, tipo) {
+    $scope.mostrarDetallesTicketsRanking = function (cliente, tipo) {
+        var detallesTipo = $scope.ticketsPorCategoriasDatos
+            .filter(t => t.Tipo === tipo);
+        var detallesCliente = detallesTipo.flatMap(t =>
+            t.Clientes.filter(c => c.Cliente === cliente)
+        );
+
+        if (detallesCliente.length > 0) {
+            var detalles = detallesCliente[0].Tickets;
+            $scope.detallesRankingTickets = detalles;
+            $('#detallesRankingModal').modal('show');
+        } else {
+            console.log("No tickets found for this cliente and tipo.");
+        }
+    };
+
+    function procesarDatosCategoria(categoria, tipo, tipo2) {
         // Actualizar datos de la tabla
         $scope['infoTicketsRanking' + tipo + 'AlDia'] = categoria.Clientes;
         $scope['totalCantidadesTicketsRanking' + tipo + 'AlDia'] = categoria.Total;
@@ -1423,7 +1551,19 @@
                         beginAtZero: true
                     }
                 },
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                onClick: function (evt, item) {
+                    if (item.length > 0) {
+                        var index = item[0].index;
+                        var cliente = $scope['ticketRanking' + tipo + 'ChartAlDia'].data.labels[index];
+                        console.log(cliente);
+                        console.log(tipo2);
+
+                        $scope.$apply(function () {
+                            $scope.mostrarDetallesTicketsRanking(cliente, tipo2);
+                        });
+                    }
+                }
             },
             plugins: [ChartDataLabels]
         });
@@ -3063,5 +3203,75 @@
         const regex = /^[A-Z][a-z]{2}\s[A-Z][a-z]{2}\s\d{2}\s\d{4}\s\d{2}:\d{2}:\d{2}\sGMT[-+]\d{4}\s\(.*\)$/;
         return regex.test(dateString);
     }
+
+
+    $('#select-annos-indicadores-ind').select2({
+        placeholder: "Seleccione...",
+        allowClear: true, // Permite borrar la selección
+        maximumSelectionLength: 3,
+        language: {
+            maximumSelected: function (e) {
+                return "Solo puedes seleccionar " + e.maximum + " meses";
+            }
+        },
+        closeOnSelect: false,
+        theme: "classic",
+        width: '300px',
+        templateResult: formatResult // Función para formatear cómo se muestra cada opción
+    }).on('change', function (e) {
+        $scope.$apply(function () {
+            var selectedValues = $(e.target).val();
+            $scope.annosIndicadoresResultado = selectedValues ? selectedValues : [];
+        });
+    });
+
+    $('#select-meses-indicadores-ind').select2({
+        placeholder: "Seleccione...",
+        allowClear: true, // Permite borrar la selección
+        closeOnSelect: false,
+        width: '300px',
+        templateResult: formatResult // Función para formatear cómo se muestra cada opción
+    }).on('change', function (e) {
+        $scope.$apply(function () {
+            var selectedValues = $(e.target).val();
+            $scope.mesesIndicadoresResultado = selectedValues ? selectedValues : [];
+        });
+    });
+
+    $scope.buscarDatosIndicadores = function () {
+        if (!$scope.annosIndicadoresResultado && !$scope.mesesIndicadoresResultado) {
+            alert("Seleccione en los filtros");
+            return;
+        }
+
+        $scope.mostrarPanelGraficosIndicadoresResultado = true;
+
+        $scope.ResultadosIndicadores();
+
+    };
+
+    $scope.ResultadosIndicadores = function () {
+        $scope.loading.show();
+
+        var infoTicketsResultados = $http.post("indicadores/dar-resultados-indicadores/", {
+            annos: $scope.annosIndicadoresResultado,
+            meses: $scope.mesesIndicadoresResultado
+        });
+
+        infoTicketsResultados.success(function (resultado) {
+            $scope.loading.hide();
+            var data = resultado;
+
+            if (resultado) {
+                $scope.resultadosIndicadores = data; // Asegúrate de que data contiene 'resultado'
+                $scope.mostrarResultadosIngresoYAtencionCliente = true;
+            } else {
+                alert("Error al cargar los datos: " + data.msg);
+            }
+        }).catch(function (error) {
+            $scope.loading.hide();
+            console.error("Error en la solicitud:", error);
+        });
+    };
 
 }]);

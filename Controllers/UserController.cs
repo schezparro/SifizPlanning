@@ -39,6 +39,12 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using System.Diagnostics.Contracts;
 using System.Drawing.Imaging;
 using System.Drawing;
+using DocumentFormat.OpenXml.ExtendedProperties;
+using System.Data.Entity.Migrations;
+using System.Data.Entity.SqlServer;
+using System.Net.Http.Headers;
+using System.Diagnostics;
+using Hangfire;
 
 namespace SifizPlanning.Controllers
 {
@@ -64,6 +70,13 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "USER, ADMIN, RRHH")]
         public ActionResult DarUltimoLunes()
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo(
+                "Consulta Último Lunes",
+                $"Usuario: {emailUser}",
+                emailUser
+            );
+
             DateTime hoy = DateTime.Today;
             DayOfWeek diaSemana = hoy.DayOfWeek;
             DateTime lunes = hoy;
@@ -85,6 +98,13 @@ namespace SifizPlanning.Controllers
                 lunes = lunes.ToString("dd/MM/yyyy"),
                 hoy = hoy.ToString("dd/MM/yyyy")
             };
+
+            LoggerManager.LogInfo(
+                "Resultado Último Lunes",
+                $"Usuario: {emailUser}, Lunes: {lunes:dd/MM/yyyy}, Hoy: {hoy:dd/MM/yyyy}",
+                emailUser
+            );
+
             return Json(resp);
         }
 
@@ -92,6 +112,13 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "USER, ADMIN")]
         public ActionResult DarTareasUsuario(string fechaLunes = "", int semanas = 1, string json = "", bool coordinados = false)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo(
+                "Inicio Consulta Tareas",
+                $"Usuario: {emailUser}, Fecha: {fechaLunes}, Semanas: {semanas}, Coordinados: {coordinados}",
+                emailUser
+            );
+
             DateTime lunes = DateTime.Today;
             if (fechaLunes != "")
             {
@@ -154,7 +181,6 @@ namespace SifizPlanning.Controllers
                 }
             }
 
-            string emailUser = User.Identity.Name;
             Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
             Persona persona = user.persona;
             Colaborador colaborador = db.Colaborador.FirstOrDefault(x => x.persona.Secuencial == persona.Secuencial);
@@ -165,8 +191,13 @@ namespace SifizPlanning.Controllers
             {
                 colabSubordinados = (from cji in db.Colaborador_JefeInmediato
                                      where cji.SecuencialJefeInmediato == colaborador.Secuencial
-                                     select cji.SecuencialColaborador
-                                    ).ToList();
+                                     select cji.SecuencialColaborador).ToList();
+
+                LoggerManager.LogInfo(
+                    "Consulta Subordinados",
+                    $"Usuario: {emailUser}, Total subordinados: {colabSubordinados.Count}",
+                    emailUser
+                );
             }
             else
             {
@@ -571,6 +602,12 @@ namespace SifizPlanning.Controllers
             if (trabUser != null)
                 tareasProgramadores.Insert(0, trabUser);//Se pone el colaborador de primero
 
+            LoggerManager.LogInfo(
+                "Finaliza Consulta Tareas",
+                $"Usuario: {emailUser}, Total trabajadores: {tareasProgramadores.Count}",
+                emailUser
+            );
+
             var resp = new
             {
                 success = true,
@@ -581,7 +618,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult ActualizarTareaUsuario(int idTarea, int estado, bool publicar = false)
+        public async Task<ActionResult> ActualizarTareaUsuario(int idTarea, int estado, bool publicar = false)
         {
             try
             {
@@ -693,41 +730,6 @@ namespace SifizPlanning.Controllers
                                 db.TicketHistorico.Add(ticketHistorico);
 
                                 db.SaveChanges();//Salvando los cambios
-
-                                /*
-                                //Enviando el correo a los usuarios
-                                List<string> correosDestinos = Utiles.CorreoPorGrupoEmail("COORD");
-                                Persona personaCliente = ticket.persona_cliente.persona;
-                                string nombreCliente = personaCliente.Nombre1 + " " + personaCliente.Apellido1;
-                                string correoCliente = personaCliente.usuario.FirstOrDefault().Email;
-                                correosDestinos.Insert(0, emailUser);
-                                
-                                string textoEmail = "<div class=\"textoCuerpo\">Por medio del presente correo le informamos que la terminación de esta tarea dio por <b>'RESUELTO'</b> el ticket <b>" + string.Format("{0:000000}", ticket.Secuencial) + @"</b>.<br/>                                       
-                                      <b>Asunto del ticket: </b>" + ticket.Asunto + @"<br/>
-                                      Por favor comuníquese lo antes posible con el cliente.<br/>
-                                      Nombre del cliente: " + nombreCliente + @"<br/>
-                                      Correo del cliente: " + correoCliente + @"<br/></div>";
-
-                                //Borrar aqui
-                                string codigoCliente = ticket.persona_cliente.cliente.Codigo;
-                                Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmail, codigoCliente + " HESO " + string.Format("{0:000000}", ticket.Secuencial) + " - Ticket Resuelto (" + ticket.Asunto + ")", null, string.Format("{0:000000}", ticket.Secuencial));
-
-                                //adicionando el email a los historicos
-                                string destinos = String.Join(", ", correosDestinos.ToArray());
-                                string textoHistoricoCorreo = "<b>Correo de información, Ticket Resuelto</b><br/>";
-                                textoHistoricoCorreo += "<b>Destinos:</b> " + destinos + "<br/>";
-                                textoHistoricoCorreo += "<b>Asunto:</b> " + "Ticket Resuelto" + "<br/>";
-                                textoHistoricoCorreo += "<b>Texto del correo:</b> <br/>" + textoEmail;
-                                HistoricoInformacionTicket historicoCorreoTicket = new HistoricoInformacionTicket
-                                {
-                                    SecuencialTicketHistorico = ticketHistorico.SecuencialTicket,
-                                    VersionTicketHistorico = ticketHistorico.Version,
-                                    Fecha = DateTime.Now,
-                                    Texto = textoHistoricoCorreo
-                                };
-                                db.HistoricoInformacionTicket.Add(historicoCorreoTicket);
-                                db.SaveChanges();
-                                */
                             }
                         }
                     }
@@ -855,6 +857,9 @@ namespace SifizPlanning.Controllers
                             db.SaveChanges();
                         }
                     }
+
+                    var dap = db.DevopsAccesoProyectos.Where(s => s.SecuencialTarea.HasValue && s.SecuencialTarea.Value == tarea.Secuencial).FirstOrDefault();
+                    BackgroundJob.Enqueue(() => Devops.DarAccesoDevops(dap));
                 }
                 else if (estado == 5)//EN PAUSA
                 {
@@ -1235,6 +1240,7 @@ namespace SifizPlanning.Controllers
 
                     string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
                     string linkAceptar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO"));
+                    string linkAceptarPublicar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO_PUBLICA"));
                     string linkRechazar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":NOACEPTADO"));
                     //string linksConcatenados = linkAceptar + ", " + linkRechazar;
 
@@ -2657,6 +2663,11 @@ r in db.Rol on ur.rol equals r
         {
             try
             {
+                // Log para debugging de fechas
+                LoggerManager.LogInfo($"Solicitud de vacaciones recibida - Usuario: {User.Identity.Name}, " +
+                    $"FechaInicio: {solicitud.FechaInicioVacaciones:yyyy-MM-dd HH:mm:ss} (Kind: {solicitud.FechaInicioVacaciones.Kind}), " +
+                    $"FechaFin: {solicitud.FechaFinVacaciones:yyyy-MM-dd HH:mm:ss} (Kind: {solicitud.FechaFinVacaciones.Kind})");
+
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser && x.EstaActivo == 1);
                 Persona persona = user.persona;
@@ -2666,9 +2677,10 @@ r in db.Rol on ur.rol equals r
                 if (solicitud.ID == null)
                 {
                     solVacaciones.AlAnio = solicitud.AlAnio;
-                    solVacaciones.FechaInicioVacaciones = solicitud.FechaInicioVacaciones;
-                    solVacaciones.FechaFinVacaciones = solicitud.FechaFinVacaciones;
-                    solVacaciones.FechaPresentarseTrabajar = solicitud.FechaPresentarseTrabajar;
+                    // Normalizar fechas antes de guardar
+                    solVacaciones.FechaInicioVacaciones = Utiles.NormalizarFecha(solicitud.FechaInicioVacaciones);
+                    solVacaciones.FechaFinVacaciones = Utiles.NormalizarFecha(solicitud.FechaFinVacaciones);
+                    solVacaciones.FechaPresentarseTrabajar = Utiles.NormalizarFecha(solicitud.FechaPresentarseTrabajar);
                     solVacaciones.Cargo = solicitud.Cargo;
                     solVacaciones.Empresa = solicitud.Empresa;
                     solVacaciones.Cedula = solicitud.Cedula;
@@ -2677,8 +2689,8 @@ r in db.Rol on ur.rol equals r
                     solVacaciones.DiasCorresponden = solicitud.DiasCorresponden;
                     solVacaciones.DiasDisfrutar = solicitud.DiasDisfrutar;
                     solVacaciones.DiasPendientes = solicitud.DiasPendientes;
-                    solVacaciones.FechaIngresoInstitucion = solicitud.FechaPresentarseTrabajar; //No usar -> solicitud.FechaIngresoInstitucion;
-                    solVacaciones.FechaIngresoSolicitud = solicitud.FechaIngresoSolicitud;
+                    solVacaciones.FechaIngresoInstitucion = Utiles.NormalizarFecha(solicitud.FechaPresentarseTrabajar); //No usar -> solicitud.FechaIngresoInstitucion;
+                    solVacaciones.FechaIngresoSolicitud = Utiles.NormalizarFecha(solicitud.FechaIngresoSolicitud);
                     solVacaciones.Observaciones = solicitud.Observaciones;
                     solVacaciones.DelAnio = solicitud.DelAnio;
                     solVacaciones.Jefe = solicitud.Jefe;
@@ -2807,6 +2819,12 @@ r in db.Rol on ur.rol equals r
         {
             try
             {
+                // Log para debugging de fechas
+                LoggerManager.LogInfo($"Edición solicitud de vacaciones - Usuario: {User.Identity.Name}, " +
+                    $"ID: {solicitud.ID}, " +
+                    $"FechaInicio: {solicitud.FechaInicioVacaciones:yyyy-MM-dd HH:mm:ss} (Kind: {solicitud.FechaInicioVacaciones.Kind}), " +
+                    $"FechaFin: {solicitud.FechaFinVacaciones:yyyy-MM-dd HH:mm:ss} (Kind: {solicitud.FechaFinVacaciones.Kind})");
+
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser && x.EstaActivo == 1);
                 Persona persona = user.persona;
@@ -3556,25 +3574,55 @@ r in db.Rol on ur.rol equals r
                     throw new Exception("El recurso no se encuentra en el sistema");
                 }
 
-                var rec = (from r in db.Recursos
-                           join md in db.Modulo on r.SecuencialModulo equals md.Secuencial
-                           where r.Secuencial == secuencialRecurso
-                           select new
-                           {
-                               secuencial = r.Secuencial,
-                               titulo = r.Titulo,
-                               modulo = md.Descripcion,
-                               detalle = r.Detalle,
-                               adjunto = r.Adjunto,
-                               fecha = r.Fecha,
-                               tiempo = r.TiempoCapacitacion,
-                               Url = r.Url ?? ""
-                           }).FirstOrDefault();
+                var recu = (from r in db.Recursos
+                            join md in db.Modulo on r.SecuencialModulo equals md.Secuencial
+                            where r.Secuencial == secuencialRecurso
+                            select new
+                            {
+                                secuencial = r.Secuencial,
+                                titulo = r.Titulo,
+                                detalle = r.Detalle,
+                                modulo = md.Secuencial,
+                                fecha = r.Fecha,
+                                adjunto = r.Adjunto,
+                                horas = r.TiempoCapacitacion / 60,
+                                minutos = r.TiempoCapacitacion % 60,
+                                capacitor = r.SecuencialColaborador,
+                                url = r.Url ?? ""
+                            }).FirstOrDefault();
+
+                var rec = recu != null ? new
+                {
+                    secuencial = recu.secuencial,
+                    titulo = recu.titulo,
+                    detalle = recu.detalle,
+                    modulo = recu.modulo,
+                    fecha = recu.fecha.ToString("yyyy-MM-ddTHH:mm"),
+                    adjunto = recu.adjunto,
+                    horas = recu.horas,
+                    minutos = recu.minutos,
+                    capacitor = recu.capacitor,
+                    url = recu.url
+                } : null;
+
+                var asistenciaRecurso = (from ra in db.RecursosAsistencia
+                                         join r in db.Recursos on ra.SecuencialRecurso equals r.Secuencial
+                                         join c in db.Colaborador on ra.SecuencialColaborador equals c.Secuencial
+                                         where ra.SecuencialRecurso == secuencialRecurso
+                                         orderby c.persona.Nombre1, c.persona.Apellido1
+                                         select new
+                                         {
+                                             id = ra.Secuencial,
+                                             idColaborador = ra.SecuencialColaborador,
+                                             nombre = c.persona.Nombre1 + " " + c.persona.Apellido1,
+                                             asignado = ra.Convocado
+                                         }).ToList();
 
                 var result = new
                 {
                     success = true,
-                    recursoResult = rec
+                    recurso = rec,
+                    asistencia = asistenciaRecurso
                 };
                 return Json(result);
             }
@@ -4543,7 +4591,7 @@ r in db.Rol on ur.rol equals r
                 List<string> destinatarios = new List<string>();
                 destinatarios.Add("mbatista@sifizsoft.com");
                 destinatarios.Add("rlandave@sifizsoft.com");
-                destinatarios.Add("vhidalgo@sifizsoft.com");
+                // destinatarios.Add("vhidalgo@sifizsoft.com");
                 destinatarios.Add("operaciones@sifizsoft.com");
 
                 //string comercial = System.Configuration.ConfigurationManager.AppSettings["emailComercial"];
@@ -4781,6 +4829,7 @@ r in db.Rol on ur.rol equals r
                                            tiempo = rec.TiempoCapacitacion.ToString().Substring(0, 5),
                                            adjuntoAsistencia = rec.AdjuntoAsistencia,
                                            url = rec.Url ?? "",
+                                           pdf = rec.Pdf ?? "",
                                            darCertificado = db.RecursosAsistencia
                                                .Any(ra => ra.SecuencialRecurso == rec.Secuencial
                                                           && ra.SecuencialColaborador == colab
@@ -4821,7 +4870,7 @@ r in db.Rol on ur.rol equals r
                 var asistenciaRecurso = (from ra in db.RecursosAsistencia
                                          join r in db.Recursos on ra.SecuencialRecurso equals r.Secuencial
                                          join c in db.Colaborador on ra.SecuencialColaborador equals c.Secuencial
-                                         where ra.SecuencialRecurso == secuencialRecurso
+                                         where ra.SecuencialRecurso == secuencialRecurso && ra.Convocado == 1
                                          orderby c.persona.Nombre1, c.persona.Apellido1
                                          select new
                                          {
@@ -4832,6 +4881,47 @@ r in db.Rol on ur.rol equals r
                                              asistencia = ra.Asistencia == 1 ? true : false,
                                              puntuacion = ra.Puntuacion
                                          }).ToList();
+                var result = new
+                {
+                    success = true,
+                    datos = asistenciaRecurso
+                };
+                return Json(result);
+            }
+            catch (Exception e)
+            {
+                var result = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(result);
+            }
+        }
+
+        //RECURSOS DE LOS USUARIOS
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult ConvocadosRecurso(int secuencialRecurso)
+        {
+
+            try
+            {
+                var asistenciaRecurso = (from ra in db.RecursosAsistencia
+                                         join r in db.Recursos on ra.SecuencialRecurso equals r.Secuencial
+                                         join c in db.Colaborador on ra.SecuencialColaborador equals c.Secuencial
+                                         where ra.SecuencialRecurso == secuencialRecurso
+                                         orderby c.persona.Nombre1, c.persona.Apellido1
+                                         select new
+                                         {
+                                             id = ra.Secuencial,
+                                             idColaborador = ra.SecuencialColaborador,
+                                             nombre = c.persona.Nombre1 + " " + c.persona.Apellido1,
+                                             asignado = true,
+                                             asistencia = ra.Asistencia == 1 ? true : false,
+                                             puntuacion = ra.Puntuacion,
+                                             convocado = ra.Convocado == 1 ? true : false
+                                         }).Distinct().ToList();
                 var result = new
                 {
                     success = true,
@@ -4914,13 +5004,15 @@ r in db.Rol on ur.rol equals r
                             SecuencialRecurso = nuevoRecurso.Secuencial,
                             Asistencia = asistencia == true ? 1 : 0,
                             Puntuacion = puntuacion,
+                            Convocado = 1,
                             EstaActivo = 1
                         };
 
                         db.RecursosAsistencia.Add(ra);
                         db.SaveChanges();
                     }
-                };
+                }
+                ;
 
                 return Json(new
                 {
@@ -4940,38 +5032,51 @@ r in db.Rol on ur.rol equals r
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
-        public ActionResult GuardarPlanRecurso(string titulo, string detalle, string fecha, int modulo, int colaborador, int tiempo, string asistentesJson, string link = "")
+        public ActionResult GuardarPlanRecurso(string titulo, string detalle, string fecha, int modulo, int colaborador, int tiempo, string asistentesJson, string link = "", HttpPostedFileBase archivo = null)
         {
             try
             {
-                // Convertir la fecha
-                string[] fechas = fecha.Split(new Char[] { '/' });
-                int dia = Int32.Parse(fechas[0]);
-                int mes = Int32.Parse(fechas[1]);
-                int anno = Int32.Parse(fechas[2]);
-                DateTime fechaCapacitacion = new DateTime(anno, mes, dia);
+                // 1. Procesar el archivo adjunto
+                string newNameFile = "";
+                if (archivo != null && archivo.ContentLength > 0)
+                {
+                    // Validar tipo y tamaño (ejemplo: máximo 10MB)
+                    if (archivo.ContentLength > 10 * 1024 * 1024)
+                    {
+                        return Json(new { success = false, msg = "El archivo excede el tamaño máximo (10MB)" });
+                    }
 
-                // Decodificar la cadena JSON de asistentes
-                var serializer = new JavaScriptSerializer();
-                int[] asistentesIds = serializer.Deserialize<int[]>(asistentesJson);
+                    string extFile = Path.GetExtension(archivo.FileName);
+                    newNameFile = (archivo.FileName.Length > 15 ? archivo.FileName.Substring(0, 15) : archivo.FileName) + Path.GetExtension(archivo.FileName);
+                    //newNameFile = Utiles.RandomString(10) + extFile;
 
-                // Crear el nuevo recurso (plan)
+                    // Ruta de guardado (ajusta esta ruta según tu estructura)
+                    string rutaGuardado = Path.Combine(Server.MapPath("~/Web/resources/datoscapacitaciones"), newNameFile);
+                    archivo.SaveAs(rutaGuardado);
+                }
+
+                // 2. Crear el recurso
                 Recursos nuevoRecurso = new Recursos
                 {
                     Titulo = titulo,
                     Detalle = detalle,
-                    Fecha = fechaCapacitacion,
+                    Fecha = DateTime.Parse(fecha),
                     SecuencialModulo = modulo,
                     Adjunto = "",
-                    EsPlan = fechaCapacitacion.Date > DateTime.Now.Date ? 1 : 0,
+                    Pdf = "/resources/datoscapacitaciones/" + newNameFile, // Guardar el nombre del archivo
+                    EsPlan = 1,
                     SecuencialColaborador = colaborador,
                     TiempoCapacitacion = tiempo,
                     Url = link
                 };
+
                 db.Recursos.Add(nuevoRecurso);
                 db.SaveChanges();
 
-                List<string> usuariosDestinos = new List<string>();
+                // 3. Procesar asistentes (código existente)
+                var serializer = new JavaScriptSerializer();
+                int[] asistentesIds = serializer.Deserialize<int[]>(asistentesJson);
+
                 foreach (int asistenteId in asistentesIds)
                 {
                     RecursosAsistencia ra = new RecursosAsistencia
@@ -4980,51 +5085,193 @@ r in db.Rol on ur.rol equals r
                         SecuencialRecurso = nuevoRecurso.Secuencial,
                         Asistencia = 0,
                         Puntuacion = 0,
-                        EstaActivo = 1
+                        EstaActivo = 1,
+                        Convocado = 0
                     };
 
                     db.RecursosAsistencia.Add(ra);
-
-                    string email = db.Colaborador.FirstOrDefault(s => s.Secuencial == asistenteId).persona.usuario.FirstOrDefault().Email;
-                    usuariosDestinos.Add(email);
                 }
-
-
-                string textoEmail = @"<div class='textoCuerpo'>Estimado(a): ";
-                textoEmail += "<br>";
-                textoEmail += "Por medio del siguiente correo se establece la reunión programada con el siguiente detalle: ";
-                textoEmail += "<br/>";
-                textoEmail += "<strong>Tema: <strong/>" + titulo;
-                textoEmail += "<br/>";
-                textoEmail += "<strong>Fecha: <strong/>" + fecha;
-                textoEmail += "<br/>";
-                textoEmail += $"<strong>Duración: </strong>{tiempo / 60} horas y {tiempo % 60} minutos";
-                textoEmail += "<br/>";
-                textoEmail += "<strong>Modulador: <strong/>" + modulo;
-                textoEmail += "<br/>";
-                textoEmail += "<strong>Enlace de la reunión: <strong/>" + link;
-                textoEmail += "</div>";
-
-                string asuntoEmail = "Nueva Reunión/Capacitación";
-                Utiles.EnviarEmailSistema(usuariosDestinos.ToArray(), textoEmail, asuntoEmail);
 
                 db.SaveChanges();
 
-                return Json(new
-                {
-                    success = true,
-                    msg = "Se ha realizado la operación correctamente."
-                });
+                return Json(new { success = true, msg = "Plan guardado con archivo adjunto" });
             }
             catch (Exception e)
             {
-                return Json(new
-                {
-                    success = false,
-                    msg = e.Message
-                });
+                return Json(new { success = false, msg = "Error: " + e.Message });
             }
         }
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult EditarPlanRecursoCapacitacion(
+            int id, string titulo, string detalle, DateTime fecha, int modulo, int colaborador,
+            int tiempo, string asistentesJson, string link = "")
+        {
+            try
+            {
+                var serializer = new JavaScriptSerializer();
+                int[] asistentesIds = serializer.Deserialize<int[]>(asistentesJson);
+
+                // Buscar el recurso existente
+                var recurso = db.Recursos.FirstOrDefault(s => s.Secuencial == id);
+                if (recurso == null)
+                {
+                    return Json(new { success = false, msg = "El recurso especificado no existe." });
+                }
+
+                // Verificar si el recurso cambió
+                bool recursoCambio = recurso.Titulo != titulo ||
+                                     recurso.Detalle != detalle ||
+                                     recurso.Fecha != fecha ||
+                                     recurso.SecuencialModulo != modulo ||
+                                     recurso.TiempoCapacitacion != tiempo ||
+                                     recurso.Url != link;
+
+                // Actualizar el recurso
+                recurso.Titulo = titulo;
+                recurso.Detalle = detalle;
+                recurso.Fecha = fecha;
+                recurso.SecuencialModulo = modulo;
+                recurso.SecuencialColaborador = colaborador;
+                recurso.TiempoCapacitacion = tiempo;
+                recurso.Url = link;
+                recurso.EsPlan = 1;
+
+                // Obtener asistentes existentes
+                var asistentesExistentes = db.RecursosAsistencia
+                    .Where(ra => ra.SecuencialRecurso == id)
+                    .ToList();
+
+                // Notificación y reconfiguración de tareas si el recurso cambió
+                if (recursoCambio)
+                {
+                    var convocadosActuales = asistentesExistentes.Where(a => a.Convocado == 1 && asistentesIds.Contains(a.SecuencialColaborador)).ToList();
+                    var convocadosEliminados = asistentesExistentes.Where(a => a.Convocado == 1 && !asistentesIds.Contains(a.SecuencialColaborador)).ToList();
+
+                    foreach (var asistente in convocadosEliminados)
+                    {
+                        var tareaCap = db.TareaCapacitacion.FirstOrDefault(tc => tc.SecuencialCapacitacion == id && tc.tarea.SecuencialColaborador == asistente.SecuencialColaborador);
+                        if (tareaCap != null)
+                        {
+                            var tarea = db.Tarea.FirstOrDefault(t => t.Secuencial == tareaCap.SecuencialTarea);
+                            if (tarea != null)
+                            {
+                                tarea.SecuencialEstadoTarea = 4; // Anulada
+                            }
+                            db.TareaCapacitacion.Remove(tareaCap);
+                        }
+                    }
+
+                    List<string> emailsNotificar = new List<string>();
+                    foreach (var asistente in convocadosActuales)
+                    {
+                        // Anular tareas actuales
+                        var tareaCap = db.TareaCapacitacion.FirstOrDefault(tc => tc.SecuencialCapacitacion == id && tc.tarea.SecuencialColaborador == asistente.SecuencialColaborador);
+                        if (tareaCap != null)
+                        {
+                            var tarea = db.Tarea.FirstOrDefault(t => t.Secuencial == tareaCap.SecuencialTarea);
+                            if (tarea != null)
+                            {
+                                tarea.SecuencialEstadoTarea = 4; // Anulada
+                            }
+                            db.TareaCapacitacion.Remove(tareaCap);
+                        }
+
+                        // Crear nueva tarea
+                        var nuevaTarea = new Tarea
+                        {
+                            SecuencialColaborador = asistente.SecuencialColaborador,
+                            SecuencialActividad = 6,
+                            SecuencialModulo = modulo,
+                            SecuencialCliente = 78,
+                            SecuencialEstadoTarea = 1,
+                            SecuencialLugarTarea = 5,
+                            Detalle = $"{titulo}\n\nurl: <a href=\"{link}\" target=\"_blank\">{link}</a>",
+                            FechaInicio = fecha,
+                            FechaFin = fecha.AddMinutes((double)tiempo),
+                            HorasUtilizadas = 0,
+                            NumeroVerificador = 1,
+                        };
+                        Utiles.AgregarTareaConReubicacion(nuevaTarea, db);
+
+                        var nuevaTareaCap = new TareaCapacitacion
+                        {
+                            SecuencialCapacitacion = id,
+                            SecuencialTarea = nuevaTarea.Secuencial
+                        };
+                        db.TareaCapacitacion.Add(nuevaTareaCap);
+
+                        // Agregar email a la lista de notificación
+                        var email = db.Colaborador
+                            .FirstOrDefault(c => c.Secuencial == asistente.SecuencialColaborador)?
+                            .persona.usuario.FirstOrDefault()?.Email;
+
+                        if (!string.IsNullOrEmpty(email))
+                        {
+                            emailsNotificar.Add(email);
+                        }
+                    }
+
+                    // Enviar correos a convocados actuales
+                    if (emailsNotificar.Any())
+                    {
+                        string textoEmail = ConstruirTextoEmail(recurso);
+                        string asuntoEmail = "Actualización en la reunión/capacitación";
+                        Utiles.EnviarEmailSistema(emailsNotificar.ToArray(), textoEmail, asuntoEmail);
+                    }
+                }
+
+                var asistentesAEliminar = asistentesExistentes
+                    .Where(a => !asistentesIds.Contains(a.SecuencialColaborador))
+                    .ToList();
+
+                foreach (var a in asistentesAEliminar)
+                {
+                    var tareaCap = db.TareaCapacitacion.FirstOrDefault(tc => tc.SecuencialCapacitacion == id && tc.tarea.SecuencialColaborador == a.SecuencialColaborador);
+                    if (tareaCap != null)
+                    {
+                        var tarea = db.Tarea.FirstOrDefault(t => t.Secuencial == tareaCap.SecuencialTarea);
+                        if (tarea != null)
+                        {
+                            tarea.SecuencialEstadoTarea = 4; // Anulada
+                        }
+                        db.TareaCapacitacion.Remove(tareaCap);
+                        db.SaveChanges();
+                    }
+                }
+
+                db.RecursosAsistencia.RemoveRange(asistentesAEliminar);
+
+                foreach (int asistenteId in asistentesIds)
+                {
+                    var asistenteExistente = asistentesExistentes.FirstOrDefault(a => a.SecuencialColaborador == asistenteId);
+
+                    if (asistenteExistente == null)
+                    {
+                        var nuevoAsistente = new RecursosAsistencia
+                        {
+                            SecuencialColaborador = asistenteId,
+                            SecuencialRecurso = id,
+                            Asistencia = 0,
+                            Puntuacion = 0,
+                            EstaActivo = 1,
+                            Convocado = 0 // Por defecto, no convocado
+                        };
+                        db.RecursosAsistencia.Add(nuevoAsistente);
+                    }
+                }
+
+                db.SaveChanges();
+
+                return Json(new { success = true, msg = "El recurso ha sido actualizado correctamente." });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message });
+            }
+        }
+
 
         [HttpPost]
         [Authorize(Roles = "USER, ADMIN")]
@@ -5032,20 +5279,26 @@ r in db.Rol on ur.rol equals r
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+
+                Persona persona = user.persona;
+                Colaborador colab = persona.colaborador.FirstOrDefault();
+                string nombreColaborador = persona.Nombre1 + " " + persona.Apellido1 + " " + persona.Nombre2;
+
                 var r = (from rec in db.Recursos
-                                 join ra in db.RecursosAsistencia on rec.Secuencial equals ra.SecuencialRecurso
-                                 join c in db.Colaborador on ra.SecuencialColaborador equals c.Secuencial
-                                 where rec.Secuencial == secuencialRecurso && ra.Puntuacion == 1
-                                 select new
-                                 {
-                                     nombreColaborador = c.persona.Nombre1 + " " + c.persona.Apellido1,
-                                     titulo = rec.Titulo,
-                                     fecha = rec.Fecha,
-                                     minutos = rec.TiempoCapacitacion ?? 0
-                                 }).FirstOrDefault();
+                         join ra in db.RecursosAsistencia on rec.Secuencial equals ra.SecuencialRecurso
+                         join c in db.Colaborador on ra.SecuencialColaborador equals colab.Secuencial
+                         where rec.Secuencial == secuencialRecurso && ra.Puntuacion == 1
+                         select new
+                         {
+                             titulo = rec.Titulo,
+                             fecha = rec.Fecha,
+                             minutos = rec.TiempoCapacitacion ?? 0
+                         }).FirstOrDefault();
 
                 // Generar el certificado con los datos del colaborador
-                var certificadoPath = GenerarCert(r.nombreColaborador, r.titulo, r.minutos, r.fecha);
+                var certificadoPath = GenerarCert(nombreColaborador, r.titulo, r.minutos, r.fecha);
 
                 // Devolver la URL del certificado
                 return Json(new { success = true, url = Url.Content($"~/Certificados/{Path.GetFileName(certificadoPath)}") });
@@ -5143,26 +5396,19 @@ r in db.Rol on ur.rol equals r
                     {
                         int id = Convert.ToInt32(item["id"]);
                         bool asistencia = Convert.ToBoolean(item["asistencia"]);
-                        bool asignado = Convert.ToBoolean(item["asignado"]);
                         double puntuacion = Convert.ToDouble(item["puntuacion"]);
 
-                        if (asignado == true)
-                        {
-                            RecursosAsistencia ra = new RecursosAsistencia
-                            {
-                                SecuencialColaborador = id,
-                                SecuencialRecurso = idRecurso,
-                                Asistencia = asistencia == true ? 1 : 0,
-                                Puntuacion = puntuacion,
-                                EstaActivo = 1
-                            };
+                        RecursosAsistencia r = db.RecursosAsistencia.FirstOrDefault(ra => ra.Secuencial == id);
 
-                            db.RecursosAsistencia.Add(ra);
-                            db.SaveChanges();
-                        };
+                        r.Asistencia = (asistencia == true ? 1 : 0);
+                        r.Puntuacion = puntuacion;
+
+                        //db.SubmitChanges();
+                        db.SaveChanges();
 
                     }
-                };
+                }
+                ;
 
                 return Json(new
                 {
@@ -5180,6 +5426,276 @@ r in db.Rol on ur.rol equals r
             }
         }
 
+
+        [HttpPost]
+        [Authorize(Roles = "USER, ADMIN")]
+        public ActionResult GuardarConvocadosRecurso(int idRecurso, string adjuntoAsistencia = null)
+        {
+            if (idRecurso == 0 || string.IsNullOrEmpty(adjuntoAsistencia))
+            {
+                return Json(new { success = false, msg = "Datos inválidos" });
+            }
+
+            try
+            {
+                List<string> errors = new List<string>();
+                var asistentes = JsonConvert.DeserializeObject<List<dynamic>>(adjuntoAsistencia);
+
+                var recurso = db.Recursos.FirstOrDefault(c => c.Secuencial == idRecurso);
+                if (recurso == null)
+                {
+                    return Json(new { success = false, msg = "Recurso no encontrado" });
+                }
+
+                var capacitor = recurso.SecuencialColaborador;
+                string emailCapacitor = db.Colaborador
+                    .FirstOrDefault(c => c.Secuencial == capacitor)?
+                    .persona.usuario.FirstOrDefault()?.Email;
+
+                var tareaCapacitor = new Tarea
+                {
+                    SecuencialColaborador = capacitor ?? 0,
+                    SecuencialActividad = 6,
+                    SecuencialModulo = recurso.SecuencialModulo,
+                    SecuencialCliente = 78,
+                    SecuencialEstadoTarea = 1,
+                    SecuencialLugarTarea = 5,
+                    Detalle = $"{recurso.Titulo}\n\nurl: <a href=\"{recurso.Url}\" target=\"_blank\">{recurso.Url}</a>",
+                    FechaInicio = recurso.Fecha,
+                    FechaFin = recurso.Fecha.AddMinutes((double)recurso.TiempoCapacitacion),
+                    HorasUtilizadas = 0,
+                    NumeroVerificador = 1,
+                };
+
+                string textoEmail = ConstruirTextoEmail(recurso);
+                string asuntoEmail = "Nueva Reunión/Capacitación";
+
+                if (!string.IsNullOrEmpty(emailCapacitor))
+                {
+                    string[] emails = new string[] { emailCapacitor };
+                    BackgroundJob.Enqueue(() => Utiles.EnviarEmailSistema(emails, textoEmail, asuntoEmail, null, null));
+                }
+
+                Utiles.AgregarTareaConReubicacion(tareaCapacitor, db);
+
+                List<string> nuevosConvocadosEmails = new List<string>();
+
+                foreach (var asistente in asistentes)
+                {
+                    int colaboradorId = (int)asistente["idColaborador"];
+
+                    bool convocado = (bool)asistente["convocado"];
+
+                    RecursosAsistencia ra = db.RecursosAsistencia
+                         .Where(r => r.SecuencialRecurso == recurso.Secuencial && r.SecuencialColaborador == colaboradorId)
+                         .FirstOrDefault();
+
+                    if (convocado && ra.Convocado == 0)
+                    {
+                        ra.Convocado = 1;
+                        db.RecursosAsistencia.AddOrUpdate(ra);
+                        db.SaveChanges();
+
+                        var tarea = new Tarea
+                        {
+                            SecuencialColaborador = colaboradorId,
+                            SecuencialActividad = 6,
+                            SecuencialModulo = recurso.SecuencialModulo,
+                            SecuencialCliente = 78,
+                            SecuencialEstadoTarea = 1,
+                            SecuencialLugarTarea = 5,
+                            Detalle = $"{recurso.Titulo}\n\nurl: <a href=\"{recurso.Url}\" target=\"_blank\">{recurso.Url}</a>",
+                            FechaInicio = recurso.Fecha,
+                            FechaFin = recurso.Fecha.AddMinutes((double)recurso.TiempoCapacitacion),
+                            HorasUtilizadas = 0,
+                            NumeroVerificador = 1,
+                        };
+
+                        try
+                        {
+                            Utiles.AgregarTareaConReubicacion(tarea, db);
+                        }
+                        catch (Exception e)
+                        {
+                            errors.Add(e.Message);
+                        }
+                        db.SaveChanges();
+
+                        // Relación entre tarea y capacitación
+                        var tareaCapacitacion = new TareaCapacitacion
+                        {
+                            SecuencialCapacitacion = recurso.Secuencial,
+                            SecuencialTarea = tarea.Secuencial
+                        };
+                        db.TareaCapacitacion.Add(tareaCapacitacion);
+                        db.SaveChanges();
+
+                        // Obtener correo del colaborador
+                        string email = db.Colaborador
+                            .FirstOrDefault(c => c.Secuencial == colaboradorId)?
+                            .persona.usuario.FirstOrDefault()?.Email;
+
+                        if (!string.IsNullOrEmpty(email))
+                        {
+                            string[] emails = new string[] { email };
+                            BackgroundJob.Enqueue(() => Utiles.EnviarEmailSistema(emails, textoEmail, asuntoEmail, null, null));
+                        }
+                    }
+                    else if (!convocado && ra.Convocado == 1)
+                    {
+                        ra.Convocado = 0;
+                        db.RecursosAsistencia.AddOrUpdate(ra);
+                        db.SaveChanges();
+
+                        var tareaCap = db.TareaCapacitacion.FirstOrDefault(tc => tc.SecuencialCapacitacion == idRecurso && tc.tarea.SecuencialColaborador == colaboradorId);
+                        if (tareaCap != null)
+                        {
+                            var tarea = db.Tarea.FirstOrDefault(t => t.Secuencial == tareaCap.SecuencialTarea);
+                            if (tarea != null)
+                            {
+                                tarea.SecuencialEstadoTarea = 4; // Anulada
+                            }
+                            db.TareaCapacitacion.Remove(tareaCap);
+                            db.SaveChanges();
+                        }
+                    }
+                }
+
+                return Json(new { success = true, msg = "Operación realizada correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, msg = "Ocurrió un error: " + ex.Message });
+            }
+        }
+
+        private string ConstruirTextoEmail(Recursos recurso)
+        {
+            return $@"
+                    <div class='textoCuerpo'>
+                        <p>Estimado(a):</p>
+                        <p>Por medio del presente correo se establece la reunión programada con el siguiente detalle:</p>
+                        <strong>Tema:</strong> {recurso.Titulo}<br/>
+                        <strong>Fecha:</strong> {recurso.Fecha:dd/MM/yyyy HH:mm}<br/>
+                        <strong>Duración:</strong> {Math.Floor((double)recurso.TiempoCapacitacion / 60)} horas y {recurso.TiempoCapacitacion % 60} minutos<br/>
+                        <strong>Modulador:</strong> {recurso.SecuencialModulo}<br/>
+                        <strong>Enlace de la reunión:</strong> <a href='{recurso.Url}' target='_blank'>{recurso.Url}</a><br/>
+                    </div>";
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER,ADMIN")] // Rol ajustado para incluir USER
+        public ActionResult ObtenerProyectosPorClientePorTarea(int idTarea)
+        {
+            try
+            {
+                // PASO 1: Usar el idTarea para encontrar la tarea y el ID del cliente.
+                // IMPORTANTE: Confirma que tu tabla de Tareas se llama 'Tarea' en tu contexto (db.Tarea).
+                var tarea = db.Tarea.FirstOrDefault(t => t.Secuencial == idTarea);
+
+                // Si la tarea no se encuentra o no tiene un cliente, devolvemos una respuesta vacía pero exitosa.
+                if (tarea == null)
+                {
+                    return Json(new { success = true, proyectos = new List<object>(), nombreCliente = "Tarea no encontrada o sin cliente." });
+                }
+
+                // Obtenemos el ID del cliente para usarlo en las siguientes consultas.
+                int idCliente = tarea.SecuencialCliente;
+
+                // PASO 2: Obtenemos el nombre del cliente para devolverlo en la respuesta.
+                var nombreDelCliente = db.Cliente
+                                         .Where(c => c.Secuencial == idCliente)
+                                         .Select(c => c.Descripcion)
+                                         .FirstOrDefault();
+
+
+                // PASO 3: Ejecutar la consulta completa de proyectos, filtrando por el idCliente encontrado.
+                var proyectosQuery = (from ca in db.ClienteAuxiliar
+                                      join c in db.Cliente on ca.SecuencialCliente equals c.Secuencial
+
+                                      // LEFT JOINs para obtener las descripciones
+                                      join vd in db.VersionDesarrollo on ca.SecuencialVersionDesarrollo equals vd.Secuencial into vd_join
+                                      from vd in vd_join.DefaultIfEmpty()
+
+                                      join r in db.Repositorio on ca.SecuencialRepositorio equals r.Secuencial into r_join
+                                      from r in r_join.DefaultIfEmpty()
+
+                                      join rc in db.ResponsableProyectos on ca.SecuencialResponsableCodigo equals rc.Secuencial into rc_join
+                                      from rc in rc_join.DefaultIfEmpty()
+
+                                      join rp in db.ResponsableProyectos on ca.SecuencialResponsablePublicacion equals rp.Secuencial into rp_join
+                                      from rp in rp_join.DefaultIfEmpty()
+
+                                      join ri in db.ResponsableProyectos on ca.SecuencialResponsableAcceso equals ri.Secuencial into ri_join
+                                      from ri in ri_join.DefaultIfEmpty()
+
+                                      join lp in db.Colaborador on ca.SecuencialLiderProyecto equals lp.Secuencial into lp_join
+                                      from lp in lp_join.DefaultIfEmpty()
+
+                                          // JOIN para Ubicacion
+                                      join ru in db.ResponsableProyectos on ca.SecuencialUbicacion equals ru.Secuencial into ru_join
+                                      from ru in ru_join.DefaultIfEmpty()
+
+                                          // JOIN para Version de Base de Datos
+                                      join vbd in db.VersionBaseDatos on ca.SecuencialVersionBaseDatos equals vbd.Secuencial into vbd_join
+                                      from vbd in vbd_join.DefaultIfEmpty()
+
+                                      where ca.SecuencialCliente == idCliente && c.EstaActivo == 1
+
+                                      select new
+                                      {
+                                          id = ca.Secuencial,
+                                          cooperativa = c.Descripcion,
+                                          codificacion = c.Codigo,
+                                          version = ca.VersionFBS ?? "",
+                                          visual = vd.Descripcion ?? "",
+                                          repositorio = r.Descripcion ?? "",
+                                          admCod = rc.Nombre ?? "",
+                                          publicacion = rp.Nombre ?? "",
+                                          integracion = ri.Nombre ?? "",
+                                          solucion = ca.TieneCodigoFuente == 1 ? "Si" : "No",
+                                          pathFuentesFinDia = ca.PathFuentes,
+                                          fechaSalida = (DateTime?)ca.FechaProduccion, // Convertido a Nullable para seguridad
+                                          ubicacion = ru.Nombre ?? "",
+                                          versionBd = vbd.Descripcion ?? "",
+                                          liderProyecto = (lp.persona.Nombre1 ?? "") + " " + (lp.persona.Apellido1 ?? ""),
+                                          contactoCliente = c.persona_cliente.FirstOrDefault().persona.usuario.FirstOrDefault().Email ?? "",
+                                          correoContactoCliente = c.persona_cliente.FirstOrDefault().persona.usuario.FirstOrDefault().Email ?? "",
+                                          gestorServicio = c.gestorServicios.FirstOrDefault().colaborador.persona.Nombre1 + " " + c.gestorServicios.FirstOrDefault().colaborador.persona.Apellido1,
+                                          correoGestorServicio = c.gestorServicios.FirstOrDefault().colaborador.persona.usuario.FirstOrDefault().Email ?? ""
+                                      });
+
+                var proyectos = proyectosQuery.ToList().Select(p => new
+                {
+                    p.id,
+                    p.cooperativa,
+                    p.codificacion,
+                    p.version,
+                    p.visual,
+                    p.repositorio,
+                    p.admCod,
+                    p.publicacion,
+                    p.integracion,
+                    p.solucion,
+                    p.pathFuentesFinDia,
+                    fechaSalida = p.fechaSalida.HasValue ? p.fechaSalida.Value.ToString("dd/MM/yyyy") : "N/A",
+                    p.ubicacion,
+                    p.versionBd,
+                    liderProyecto = p.liderProyecto.Trim(),
+                    p.contactoCliente,
+                    p.correoContactoCliente,
+                    p.gestorServicio,
+                    p.correoGestorServicio
+                }).ToList();
+
+                // PASO 4: Devolver el JSON con los proyectos y el nombre del cliente.
+                return Json(new { success = true, proyectos = proyectos, nombreCliente = nombreDelCliente });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = "Error al leer los proyectos: " + e.Message });
+            }
+        }
 
         //ESTIMACIONES DE LOS USUARIOS
         [HttpPost]
@@ -6298,7 +6814,8 @@ r in db.Rol on ur.rol equals r
                 if (!rgx.IsMatch(destinatariosEmailTicket))
                 {
                     throw new Exception("Debe ingresar una lista de correos válida separados por punto y coma(;)");
-                };
+                }
+                ;
                 string[] emails = destinatariosEmailTicket.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var email in emails)
                 {
@@ -6969,6 +7486,7 @@ r in db.Rol on ur.rol equals r
                         string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
 
                         string linkAceptar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO"));
+                        string linkAceptarPublicar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO_PUBLICA"));
                         string linkRechazar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":NOACEPTADO"));
                         string textoEmailCliente = textoEmail + @"<br/><div style='font-size: 11pt; font-family: sans-serif; color: #1F497D;'>
 			                                                <span style='color:#128812'>
@@ -6976,6 +7494,13 @@ r in db.Rol on ur.rol equals r
 			                                                </span><br/>                                                            
 			                                                <a href='" + linkAceptar + @"'>
                                                                 <i>" + linkAceptar + @"</i>
+			                                                </a>			
+			                                                <br/><br/>
+			                                                <span style='color:#1F7B1F'>
+				                                                Si usted <b>ACEPTA Y DESEA PUBLICAR</b> en producción, presione el siguiente link:
+			                                                </span><br/>                                                            
+			                                                <a href='" + linkAceptarPublicar + @"'>
+                                                                <i>" + linkAceptarPublicar + @"</i>
 			                                                </a>			
 			                                                <br/><br/>
 			                                                <span style='color:#EE1212'>Si por el contrario <b>NO ACEPTA</b> este requerimiento por favor presione el siguiente link:</span><br/>
@@ -7096,6 +7621,7 @@ r in db.Rol on ur.rol equals r
                     string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
 
                     string linkAceptar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO"));
+                    string linkAceptarPublicar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO_PUBLICA"));
                     string linkRechazar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":NOACEPTADO"));
                     string textoEmailCliente = textoEmail + @"<br/><div style='font-size: 11pt; font-family: sans-serif; color: #1F497D;'>
 			                                                <span style='color:#128812'>
@@ -7103,6 +7629,13 @@ r in db.Rol on ur.rol equals r
 			                                                </span><br/>                                                            
 			                                                <a href='" + linkAceptar + @"'>
                                                                 <i>" + linkAceptar + @"</i>
+			                                                </a>			
+			                                                <br/><br/>
+			                                                <span style='color:#1F7B1F'>
+				                                                Si usted <b>ACEPTA Y DESEA PUBLICAR</b> en producción, presione el siguiente link:
+			                                                </span><br/>                                                            
+			                                                <a href='" + linkAceptarPublicar + @"'>
+                                                                <i>" + linkAceptarPublicar + @"</i>
 			                                                </a>			
 			                                                <br/><br/>
 			                                                <span style='color:#EE1212'>Si por el contrario <b>NO ACEPTA</b> este requerimiento por favor presione el siguiente link:</span><br/>
@@ -7154,6 +7687,138 @@ r in db.Rol on ur.rol equals r
                 var resp = new
                 {
                     success = true
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMINTFS, ADMIN")]
+        public ActionResult PublicacionesCliente()
+        {
+            try
+            {
+                var data = (from pc in db.PublicacionesCliente
+                            join t in db.Ticket on pc.SecuencialTicket equals t.Secuencial
+                            join pcli in db.Persona_Cliente on pc.SecuencialCliente equals pcli.SecuencialCliente
+                            join p in db.Persona on pcli.SecuencialPersona equals p.Secuencial
+                            join col in db.Colaborador on pc.SecuencialColaborador equals col.Secuencial into colLeft
+                            from col in colLeft.DefaultIfEmpty()
+                            join pCol in db.Persona on col.SecuencialPersona equals pCol.Secuencial into pColLeft
+                            from pCol in pColLeft.DefaultIfEmpty()
+                            orderby pc.FechaSolicitud descending
+                            select new
+                            {
+                                secuencial = pc.Secuencial,
+                                numeroTicket = t.Secuencial,
+                                nombreCliente = p.Nombre1 + " " + p.Apellido1,
+                                asuntoTicket = t.Asunto,
+                                fechaSolicitud = pc.FechaSolicitud,
+                                estaPublicado = pc.EstaPublicado,
+                                fechaPublicacion = pc.FechaPublicacion,
+                                colaborador = pCol != null ? (pCol.Nombre1 + " " + pCol.Apellido1) : ""
+                            }).ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    publicacionesCliente = data
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMINTFS, ADMIN")]
+        public ActionResult MarcarPublicacionCliente(int id)
+        {
+            try
+            {
+                string emailUser = User.Identity.Name;
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+                Persona persona = user.persona;
+                Colaborador colaborador = db.Colaborador.FirstOrDefault(x => x.persona.Secuencial == persona.Secuencial);
+                
+                PublicacionesCliente publicacion = db.PublicacionesCliente.Find(id);
+                if (publicacion == null)
+                {
+                    throw new Exception("No se encontró la publicación cliente");
+                }
+
+                publicacion.EstaPublicado = true;
+                publicacion.FechaPublicacion = DateTime.Now;
+                publicacion.SecuencialColaborador = colaborador.Secuencial;
+
+                db.SaveChanges();
+
+                // Obtener información para enviar emails
+                Ticket ticket = publicacion.ticket;
+                Cliente cliente = db.Cliente.Find(publicacion.SecuencialCliente);
+                
+                // Obtener email de la persona cliente
+                Persona_Cliente personaClienteEntity = db.Set<Persona_Cliente>().FirstOrDefault(x => x.SecuencialCliente == cliente.Secuencial);
+                Persona personaCliente = personaClienteEntity.persona;
+                string emailCliente = personaCliente.usuario.FirstOrDefault().Email;
+
+                // Email al cliente
+                string asunto = "Publicación completada - Ticket #" + string.Format("{0:000000}", ticket.Secuencial);
+                string texto = @"<div class='textoCuerpo'><br/>
+                    Estimado(a):<br/><br/>
+                    Le informamos que su solicitud de publicación ha sido completada.<br/><br/>
+                    <b>Detalles:</b><br/>
+                    Ticket: #" + string.Format("{0:000000}", ticket.Secuencial) + @"<br/>
+                    Asunto: " + ticket.Asunto + @"<br/>
+                    Fecha de Publicación: " + publicacion.FechaPublicacion.Value.ToString("dd/MM/yyyy HH:mm") + @"<br/>
+                    Publicado por: " + persona.Nombre1 + " " + persona.Apellido1 + @"<br/><br/>
+                    Cualquier duda, por favor contáctenos.<br/><br/>
+                    Saludos cordiales.<br/>
+                    </div>";
+
+                Utiles.EnviarEmailSistema(new string[] { emailCliente }, texto, asunto);
+
+                // Email a operaciones
+                string asuntoOps = "Publicación completada - Ticket #" + string.Format("{0:000000}", ticket.Secuencial);
+                string textoOps = @"<div class='textoCuerpo'><br/>
+                    Se ha marcado como completada la siguiente publicación cliente:<br/><br/>
+                    <b>Detalles:</b><br/>
+                    Ticket: #" + string.Format("{0:000000}", ticket.Secuencial) + @"<br/>
+                    Cliente: " + cliente.Descripcion + @"<br/>
+                    Persona: " + personaCliente.Nombre1 + " " + personaCliente.Apellido1 + @"<br/>
+                    Asunto: " + ticket.Asunto + @"<br/>
+                    Fecha de Solicitud: " + publicacion.FechaSolicitud.ToString("dd/MM/yyyy HH:mm") + @"<br/>
+                    Fecha de Publicación: " + publicacion.FechaPublicacion.Value.ToString("dd/MM/yyyy HH:mm") + @"<br/>
+                    Publicado por: " + persona.Nombre1 + " " + persona.Apellido1 + @"<br/><br/>
+                    </div>";
+
+                List<string> correosOps = Utiles.CorreoPorGrupoEmail("OPERACIONES");
+                correosOps.AddRange(Utiles.CorreoPorGrupoEmail("DEVOPS"));
+                if (correosOps.Count > 0)
+                {
+                    Utiles.EnviarEmailSistema(correosOps.ToArray(), textoOps, asuntoOps);
+                }
+
+                var resp = new
+                {
+                    success = true,
+                    msg = "Publicación marcada como completada"
                 };
                 return Json(resp);
             }
@@ -7524,7 +8189,7 @@ r in db.Rol on ur.rol equals r
             try
             {
                 string emailUser = User.Identity.Name;
-                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser && x.EstaActivo == 1);
 
                 Colaborador colab = user.persona.colaborador.FirstOrDefault();
                 if (colab == null)
@@ -8444,5 +9109,572 @@ r in db.Rol on ur.rol equals r
                 return Json(resp);
             }
         }
+
+        private JsonResult CrearNuevaTareaCapacitacion(NuevaTareaDTO tareaDTO)
+        {
+            try
+            {
+                Usuario user = ObtenerUsuarioActual();
+                DateTime horaCapacitacion = tareaDTO.Fecha;
+                DateTime finCapacitacion = horaCapacitacion.AddHours(tareaDTO.Horas).AddMinutes(tareaDTO.Minutos);
+
+                var tareasExistentes = db.Tarea
+                    .Where(t => t.SecuencialColaborador == tareaDTO.IdTrabajador &&
+                                ((t.FechaInicio < finCapacitacion && t.FechaInicio >= horaCapacitacion) ||
+                                 (t.FechaFin > horaCapacitacion && t.FechaFin <= finCapacitacion) ||
+                                 (t.FechaInicio < horaCapacitacion && t.FechaFin > finCapacitacion)))
+                    .ToList();
+
+                foreach (var tarea in tareasExistentes)
+                {
+                    if (tarea.FechaInicio < horaCapacitacion)
+                    {
+                        var tareaAntes = CrearNuevaTareaDesdeExistente(tarea, tarea.FechaInicio, horaCapacitacion);
+                        db.Tarea.Add(tareaAntes);
+                    }
+
+                    if (tarea.FechaFin > finCapacitacion)
+                    {
+                        var tareaDespues = CrearNuevaTareaDesdeExistente(tarea, finCapacitacion, tarea.FechaFin);
+
+                        DateTime nuevaFechaInicio = BuscarHuecoDespuesDeLasCinco(tareaDTO.IdTrabajador, finCapacitacion.Date.AddHours(17.5), tareaDespues.FechaFin);
+                        tareaDespues.FechaInicio = nuevaFechaInicio;
+                        tareaDespues.FechaFin = nuevaFechaInicio.AddMinutes((tarea.FechaFin - finCapacitacion).TotalMinutes);
+
+                        db.Tarea.Add(tareaDespues);
+                    }
+
+                    db.Tarea.Remove(tarea);
+                }
+
+                Tarea nuevaCapacitacion = CrearTareaBase(tareaDTO, horaCapacitacion);
+
+                AgregarCoordinadorSiExiste(nuevaCapacitacion, tareaDTO.Coordinador);
+                AgregarHistoricoEstado(nuevaCapacitacion, user);
+
+                db.Tarea.Add(nuevaCapacitacion);
+                db.SaveChanges();
+
+                return Json(new { success = true, msg = "Capacitación creada correctamente" });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message });
+            }
+        }
+
+        private Tarea CrearNuevaTareaDesdeExistente(Tarea tareaOriginal, DateTime nuevaFechaInicio, DateTime nuevaFechaFin)
+        {
+            return new Tarea
+            {
+                SecuencialColaborador = tareaOriginal.SecuencialColaborador,
+                SecuencialActividad = tareaOriginal.SecuencialActividad,
+                SecuencialModulo = tareaOriginal.SecuencialModulo,
+                SecuencialCliente = tareaOriginal.SecuencialCliente,
+                SecuencialEstadoTarea = tareaOriginal.SecuencialEstadoTarea,
+                SecuencialLugarTarea = tareaOriginal.SecuencialLugarTarea,
+                Detalle = tareaOriginal.Detalle,
+                FechaInicio = nuevaFechaInicio,
+                FechaFin = nuevaFechaFin,
+                HorasUtilizadas = tareaOriginal.HorasUtilizadas,
+                NumeroVerificador = tareaOriginal.NumeroVerificador,
+                TiempoEstimacion = tareaOriginal.TiempoEstimacion,
+                EsReproceso = tareaOriginal.EsReproceso
+            };
+        }
+
+        private DateTime BuscarHuecoDespuesDeLasCinco(int idTrabajador, DateTime fechaInicio, DateTime fechaFin)
+        {
+            var tareasDespuesDeCinco = db.Tarea
+                .Where(t => t.SecuencialColaborador == idTrabajador &&
+                            t.FechaInicio >= fechaInicio)
+                .OrderBy(t => t.FechaInicio)
+                .ToList();
+
+            foreach (var tarea in tareasDespuesDeCinco)
+            {
+                if (fechaInicio < tarea.FechaInicio)
+                {
+                    var hueco = tarea.FechaInicio - fechaInicio;
+                    if (hueco >= (fechaFin - fechaInicio))
+                    {
+                        return fechaInicio;
+                    }
+                }
+                fechaInicio = tarea.FechaFin;
+            }
+
+            return fechaInicio;
+        }
+
+        private Usuario ObtenerUsuarioActual()
+        {
+            string emailUser = User.Identity.Name;
+            return db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+        }
+
+        private DateTime ParsearFecha(string fecha)
+        {
+            return DateTime.ParseExact(fecha, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+        }
+
+        private Tarea CrearTareaBase(NuevaTareaDTO tareaDTO, DateTime diaTarea)
+        {
+            DateTime fechaInicio, fechaFin;
+            CalcularHorasTarea(diaTarea, tareaDTO, out fechaInicio, out fechaFin);
+
+            return new Tarea
+            {
+                SecuencialColaborador = tareaDTO.IdTrabajador,
+                SecuencialActividad = tareaDTO.Actividad,
+                SecuencialModulo = tareaDTO.Modulo,
+                SecuencialCliente = tareaDTO.Cliente,
+                SecuencialEstadoTarea = 1,
+                SecuencialLugarTarea = tareaDTO.Ubicacion,
+                Detalle = tareaDTO.Detalle.ToUpper(),
+                FechaInicio = fechaInicio,
+                FechaFin = fechaFin,
+                HorasUtilizadas = 0,
+                NumeroVerificador = 1,
+                TiempoEstimacion = new TimeSpan(tareaDTO.HorasEstimadas, tareaDTO.MinutosEstimados, 0),
+                EsReproceso = tareaDTO.EsReproceso ? 1 : 0
+            };
+        }
+
+        private void CalcularHorasTarea(DateTime diaTarea, NuevaTareaDTO tareaDTO, out DateTime fechaInicio, out DateTime fechaFin)
+        {
+            DateTime fechaInicioTareas = CalcularFechaInicioTareas(diaTarea, tareaDTO.Extraordinaria);
+            var tareasDia = ObtenerTareasDia(tareaDTO.IdTrabajador, fechaInicioTareas, diaTarea.AddDays(1));
+
+            int tiempoUsado = CalcularTiempoUsado(tareasDia);
+            fechaInicio = fechaInicioTareas.AddMinutes(tiempoUsado);
+            fechaFin = fechaInicio.AddHours(tareaDTO.Horas).AddMinutes(tareaDTO.Minutos);
+
+            AjustarPorAlmuerzo(ref fechaInicio, ref fechaFin);
+        }
+
+        private DateTime CalcularFechaInicioTareas(DateTime diaTarea, bool esExtraordinaria)
+        {
+            return esExtraordinaria ? diaTarea.AddMinutes(90) : diaTarea.AddMinutes(510);
+        }
+
+        private List<dynamic> ObtenerTareasDia(int idTrabajador, DateTime fechaInicio, DateTime fechaFin)
+        {
+            return db.Tarea
+                .Where(t => t.SecuencialColaborador == idTrabajador &&
+                            t.FechaInicio >= fechaInicio &&
+                            t.FechaInicio < fechaFin &&
+                            t.SecuencialEstadoTarea != 4)
+                .Select(t => new { t.FechaInicio, t.FechaFin })
+                .ToList<dynamic>();
+        }
+
+        private int CalcularTiempoUsado(List<dynamic> tareasDia)
+        {
+            return (int)tareasDia.Sum(t => ((DateTime)t.FechaFin - (DateTime)t.FechaInicio).TotalMinutes);
+        }
+
+        private void AjustarPorAlmuerzo(ref DateTime fechaInicio, ref DateTime fechaFin)
+        {
+            if (fechaInicio.Hour < 13 && fechaFin.Hour > 13)
+            {
+                fechaFin = fechaFin.AddHours(1);
+            }
+            else if (fechaInicio.Hour == 13)
+            {
+                fechaInicio = fechaInicio.AddHours(1);
+                fechaFin = fechaFin.AddHours(1);
+            }
+        }
+
+        private void AgregarCoordinadorSiExiste(Tarea tarea, int coordinadorId)
+        {
+            if (coordinadorId != 0)
+            {
+                db.Tarea_Coordinador.Add(new Tarea_Coordinador
+                {
+                    tarea = tarea,
+                    SecuencialColaborador = coordinadorId,
+                    EstaActivo = 1,
+                    NumeroVerificador = 1
+                });
+            }
+        }
+
+        private void AgregarHistoricoEstado(Tarea tarea, Usuario user)
+        {
+            db.HistoricoTareaEstado.Add(new HistoricoTareaEstado
+            {
+                tarea = tarea,
+                SecuencialEstadoTarea = 1,
+                FechaOperacion = DateTime.Now,
+                usuario = user
+            });
+        }
+
+        [HttpPost]
+        [Authorize]
+        public ActionResult ObtenerPropuestasPorAnno(string anno)
+        {
+            try
+            {
+                string emailUser = User.Identity.Name;
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+
+                if (user == null)
+                {
+                    return Json(new { success = false, msg = "Usuario no encontrado." });
+                }
+
+                if (!int.TryParse(anno, out int annoInt))
+                {
+                    return Json(new { success = false, msg = "Año inválido." });
+                }
+
+                // Obtener propuestas de vacaciones con los días feriados integrados
+                var propuestasPorMes = (from u in db.Usuario
+                                        join p in db.Persona on u.SecuencialPersona equals p.Secuencial
+                                        join c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
+                                        join pv in db.PropuestaVacaciones on c.Secuencial equals pv.SecuencialColaborador
+                                        where u.Secuencial == user.Secuencial && pv.Fecha.Year == annoInt
+                                        group pv by new
+                                        {
+                                            Mes = pv.Fecha.Month,
+                                            Anno = pv.Fecha.Year
+                                        } into g
+                                        select new
+                                        {
+                                            Mes = g.Key.Mes,
+                                            Anno = g.Key.Anno,
+                                            DiasDeVacaciones = g.Select(v => v.Fecha.Day).Distinct().ToList(),
+                                            DiasFeriados = db.Feriados
+                                                .Where(f => f.Fecha.Year == g.Key.Anno && f.Fecha.Month == g.Key.Mes)
+                                                .Select(f => f.Fecha.Day)
+                                                .Distinct()
+                                                .ToList()
+                                        }).ToList();
+
+                return Json(new { success = true, propuestas = propuestasPorMes });
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error en ObtenerPropuestasPorAnno: {e.Message}");
+                return Json(new { success = false, msg = e.Message });
+            }
+        }
+
+
+
+        [HttpPost]
+        [Authorize]
+        public ActionResult DarDatosColaboradorDiasVacaciones(bool usuario, string anno, string mes)
+        {
+            try
+            {
+                string emailUser = User.Identity.Name;
+                var datosColaborador = new Object();
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+                int annoInt = int.Parse(anno);
+                int mesInt = int.Parse(mes);
+
+                if (usuario == true)
+                {
+                    datosColaborador = (from u in db.Usuario
+                                        join p in db.Persona on u.SecuencialPersona equals p.Secuencial
+                                        join c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
+                                        join ddv in db.DiasDisponiblesVacaciones on c.Secuencial equals ddv.SecuencialColaborador into ddvGroup
+                                        from ddv in ddvGroup.DefaultIfEmpty() // LEFT JOIN para DiasDisponiblesVacaciones
+                                        join pv in db.PropuestaVacaciones on c.Secuencial equals pv.SecuencialColaborador into pvGroup
+                                        from pv in pvGroup.DefaultIfEmpty() // LEFT JOIN para PropuestaVacaciones
+                                        where u.Secuencial == user.Secuencial
+                                        group pv by new
+                                        {
+                                            c.Secuencial,
+                                            NombreCompleto = p.Nombre1 + " " + p.Apellido1 + " " + p.Apellido2,
+                                            DiasDisponibles = ddv != null ? ddv.DiasDisponibles : 0 // Usar 0 si no hay días disponibles
+                                        } into g
+                                        select new
+                                        {
+                                            id = g.Key.Secuencial,
+                                            nombre = g.Key.NombreCompleto,
+                                            diasDisponibles = g.Key.DiasDisponibles,
+                                            diasDeVacaciones = g
+                                                .Where(v => v != null && v.Fecha.Year == annoInt && v.Fecha.Month == mesInt) // Filtrar por mes y año
+                                                .Select(v => v.Fecha.Day)
+                                                .Distinct()
+                                                .ToList(),
+                                            diasMarcadosCount = g
+                                                .Count(v => v != null && v.Fecha.Year == annoInt && v.Fecha.Month == mesInt) // Contar solo registros del mes/año
+                                        }).ToList();
+
+                }
+                else
+                {
+                    datosColaborador = (from p in db.Persona
+                                        join c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
+                                        join ddv in db.DiasDisponiblesVacaciones on c.Secuencial equals ddv.SecuencialColaborador into ddvGroup
+                                        from ddv in ddvGroup.DefaultIfEmpty() // LEFT JOIN para DiasDisponiblesVacaciones
+                                        join pv in db.PropuestaVacaciones on c.Secuencial equals pv.SecuencialColaborador into pvGroup
+                                        from pv in pvGroup.DefaultIfEmpty() // LEFT JOIN para PropuestaVacaciones
+                                        where
+                                            ( // Mostrar si cumple al menos una de estas condiciones:
+                                                (ddv != null && ddv.DiasDisponibles > 0) || // Tiene días disponibles
+                                                (pv != null && pv.Fecha.Year == annoInt && pv.Fecha.Month == mesInt) // Tiene días seleccionados en el mes y año
+                                            )
+                                        group pv by new
+                                        {
+                                            c.Secuencial,
+                                            NombreCompleto = p.Nombre1 + " " + p.Apellido1 + " " + p.Apellido2,
+                                            DiasDisponibles = ddv != null ? ddv.DiasDisponibles : 0
+                                        } into g
+                                        select new
+                                        {
+                                            id = g.Key.Secuencial,
+                                            nombre = g.Key.NombreCompleto,
+                                            diasDisponibles = g.Key.DiasDisponibles,
+                                            diasDeVacaciones = g
+                                                .Where(v => v != null && v.Fecha.Year == annoInt && v.Fecha.Month == mesInt) // Filtrar por mes y año
+                                                .Select(v => v.Fecha.Day)
+                                                .Distinct() // Eliminar duplicados
+                                                .ToList(),
+                                            diasMarcadosCount = g
+                                                .Count(v => v != null && v.Fecha.Year == annoInt && v.Fecha.Month == mesInt) // Contar solo los días del mes y año seleccionados
+                                        }).ToList();
+
+                }
+
+                var resp = new
+                {
+                    success = true,
+                    datosColaborador = datosColaborador
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, RRHH, USER")]
+        public ActionResult DarFeriadosPorMes(int anno, int mes)
+        {
+            try
+            {
+                var feriados = db.Feriados
+                    .Where(f => f.Fecha.Year == anno && f.Fecha.Month == mes) // Filtrar por año y mes
+                    .AsEnumerable() // Ejecutar la consulta y traer los datos a memoria
+                    .Select(f => f.Fecha.Day) // Convertir a string con formato
+                    .ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    diasFeriados = feriados
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, RRHH, USER")]
+        public ActionResult DarFeriadosPorAnno(int anno)
+        {
+            try
+            {
+                // Consultar los feriados para el año especificado
+                var feriados = db.Feriados
+                    .Where(f => f.Fecha.Year == anno) // Filtrar por el año
+                    .Select(f => new
+                    {
+                        Dia = f.Fecha.Day,
+                        Mes = f.Fecha.Month,
+                        FechaCompleta = f.Fecha
+                    })
+                    .ToList();
+
+                // Preparar la respuesta
+                var resp = new
+                {
+                    success = true,
+                    diasFeriados = feriados
+                };
+
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                // Manejo de errores
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, RRHH, USER")]
+        public ActionResult DarAnnosMesPropuestaVacaciones()
+        {
+            try
+            {
+                string emailUser = User.Identity.Name;
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+
+                var propuestaVacacionesData = (from u in db.Usuario
+                                               join p in db.Persona on u.SecuencialPersona equals p.Secuencial
+                                               join c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
+                                               join pv in db.PropuestaVacaciones on c.Secuencial equals pv.SecuencialColaborador
+                                               where u.Secuencial == user.Secuencial
+                                               select new
+                                               {
+                                                   Mes = pv.Fecha.Month,
+                                                   Anno = pv.Fecha.Year
+                                               })
+                               .Distinct()
+                               .GroupBy(x => x.Anno)
+                               .Select(g => new
+                               {
+                                   anno = g.Key,
+                                   meses = g.Select(x => x.Mes).OrderBy(m => m).ToList()
+                               })
+                               .OrderBy(x => x.anno)
+                               .ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    propuestaVacacionesData = propuestaVacacionesData
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, RRHH, USER")]
+        public ActionResult ActualizarDatosPropuestaVacaciones(int idColaborador, List<int> days, int mes, int anno)
+        {
+            try
+            {
+                foreach (var day in days)
+                {
+                    DateTime fecha = new DateTime(anno, mes, day);
+
+                    // Validar fines de semana
+                    if (fecha.DayOfWeek == DayOfWeek.Saturday || fecha.DayOfWeek == DayOfWeek.Sunday)
+                    {
+                        throw new Exception("No se pueden seleccionar fines de semana (Sábados y Domingos).");
+                    }
+
+                    // Validar feriados
+                    bool isFeriado = db.Feriados.Any(f => f.Fecha.Year == anno && f.Fecha.Month == mes && f.Fecha.Day == day);
+                    if (isFeriado)
+                    {
+                        throw new Exception("No se pueden seleccionar días feriados/festivos.");
+                    }
+
+                    // Prevenir doble inserción y concurrencia
+                    var existe = db.PropuestaVacaciones.FirstOrDefault(p => p.SecuencialColaborador == idColaborador && p.Fecha == fecha);
+                    if (existe != null) continue;
+
+                    var ddv = db.DiasDisponiblesVacaciones.FirstOrDefault(d => d.SecuencialColaborador == idColaborador);
+                    if (ddv != null)
+                    {
+                        if (ddv.DiasDisponibles <= 0)
+                        {
+                            throw new Exception("No tiene días disponibles suficientes.");
+                        }
+                        ddv.DiasDisponibles--;
+                    }
+
+                    db.PropuestaVacaciones.Add(new PropuestaVacaciones
+                    {
+                        SecuencialColaborador = idColaborador,
+                        Fecha = fecha
+                    });
+                }
+                db.SaveChanges();
+
+                return Json(new { success = true });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message });
+            }
+        }
+
+        [HttpPost]
+        [Authorize]
+        public ActionResult EliminarPropuestaVacaciones(int idColaborador, List<int> days, int mes, int anno)
+        {
+            try
+            {
+                foreach (var day in days)
+                {
+                    DateTime fecha = new DateTime(anno, mes, day);
+                    var propuesta = db.PropuestaVacaciones.FirstOrDefault(p => p.SecuencialColaborador == idColaborador && p.Fecha == fecha);
+                    if (propuesta != null) 
+                    {
+                        db.PropuestaVacaciones.Remove(propuesta);
+
+                        var ddv = db.DiasDisponiblesVacaciones.FirstOrDefault(d => d.SecuencialColaborador == idColaborador);
+                        if (ddv != null) ddv.DiasDisponibles++;
+                    }
+                }
+                db.SaveChanges();
+
+                return Json(new { success = true });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message });
+            }
+        }
+
+    }
+    public class NuevaTareaDTO
+    {
+        public int IdTrabajador { get; set; }
+        public int Actividad { get; set; }
+        public int Modulo { get; set; }
+        public int Cliente { get; set; }
+        public int Ubicacion { get; set; }
+        public string Detalle { get; set; }
+        public int HorasEstimadas { get; set; }
+        public int MinutosEstimados { get; set; }
+        public bool EsReproceso { get; set; }
+        public bool Extraordinaria { get; set; }
+        public int Horas { get; set; }
+        public int Minutos { get; set; }
+        public DateTime Fecha { get; set; }
+        public int Coordinador { get; set; }
     }
 }

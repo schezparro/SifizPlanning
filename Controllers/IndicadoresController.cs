@@ -681,6 +681,15 @@ namespace SifizPlanning.Controllers
 
         //*******************************************************************************TICKETS AL DIA********************************************************************************
 
+        // Función para obtener el número de semana
+        Func<DateTime, int> GetWeekNumber = (date) =>
+        {
+            return CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
+                date,
+                CalendarWeekRule.FirstFourDayWeek,
+                DayOfWeek.Monday);
+        };
+
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
         public ActionResult DarTicketsEnGestionAlDia(int cliente)
@@ -696,42 +705,42 @@ namespace SifizPlanning.Controllers
                     nombreCliente = (from cli in db.Cliente where cli.Secuencial == cliente select cli.Descripcion).FirstOrDefault();
                 }
 
-                var ticketsQueryTEGAD = (from ticket in db.InfoTickets
-                                         where ticket.FechaIngreso != null
-                                            && ticket.FechaIngreso.Value <= fActual
-                                            && ticket.Estado != "CERRADO"
-                                            && ticket.Estado != "ANULADO"
-                                            && ticket.Estado != "RECHAZADO"
-                                            && (ticket.Cliente == nombreCliente || nombreCliente == "")
+                var ticketsQueryTEGAD = (from ticket in db.Ticket
+                                         join et in db.EstadoTicket on ticket.SecuencialEstadoTicket equals et.Secuencial
+                                         join pc in db.Persona_Cliente on ticket.SecuencialPersona_Cliente equals pc.SecuencialPersona
+                                         join c in db.Cliente on pc.SecuencialCliente equals c.Secuencial
+                                         where ticket.FechaCreado != null
+                                            && ticket.FechaCreado <= fActual
+                                            && et.Codigo != "CERRADO"
+                                            && et.Codigo != "ANULADO"
+                                            && et.Codigo != "RECHAZADO"
+                                            && (c.Descripcion == nombreCliente || nombreCliente == "")
                                          select ticket).ToList();
 
-                List<InfoTickets> ticketsListTEGAD = ticketsQueryTEGAD.ToList();
+                List<Ticket> ticketsListTEGAD = ticketsQueryTEGAD.ToList();
 
                 // Encontrar la fecha más antigua y la más reciente en los tickets
-                var fechaInicial = ticketsQueryTEGAD.Min(t => t.FechaIngreso.Value);
-
-                // Función para obtener el número de semana
-                Func<DateTime, int> GetWeekNumber = (date) =>
-                {
-                    return CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
-                        date,
-                        CalendarWeekRule.FirstFourDayWeek,
-                        DayOfWeek.Monday);
-                };
+                var fechaInicial = ticketsQueryTEGAD.Min(t => t.FechaCreado);
 
                 // Agrupar los tickets por año y semana
                 var groupedTickets = ticketsQueryTEGAD
                     .GroupBy(ticket => new
                     {
-                        Year = ticket.FechaIngreso.Value.Year,
-                        Week = GetWeekNumber(ticket.FechaIngreso.Value)
+                        Year = ticket.FechaCreado.Year,
+                        Week = GetWeekNumber(ticket.FechaCreado)
                     })
                     .Select(g => new
                     {
                         g.Key.Year,
                         g.Key.Week,
                         Cantidad = g.Count(),
-                        UltimaFecha = g.Max(t => t.FechaIngreso.Value)
+                        UltimaFecha = g.Max(t => t.FechaCreado),
+                        Tickets = g.Select(t => new
+                        {
+                            FechaCreado = t.FechaCreado.ToString("dd/MM/yyyy"), // Format the date here
+                            t.Secuencial,
+                            t.Detalle
+                        }).ToList()
                     })
                     .ToList();
 
@@ -749,26 +758,32 @@ namespace SifizPlanning.Controllers
 
                 // Combinar todas las semanas con los tickets agrupados
                 var groupedTicketsTEGAD = allWeeks
-                    .GroupJoin(groupedTickets,
-                        aw => new { aw.Year, aw.Week },
-                        gt => new { gt.Year, gt.Week },
-                        (aw, gt) => new
-                        {
-                            aw.Year,
-                            aw.Week,
-                            Cantidad = gt.Sum(x => x.Cantidad),
-                            UltimaFecha = gt.Any() ? gt.Max(x => x.UltimaFecha) : aw.Date.AddDays(6)
-                        })
-                    .Where(x => x.Cantidad > 0) // Excluir semanas con cantidad 0
-                    .OrderByDescending(x => x.Year)
-                    .ThenByDescending(x => x.Week)
-                    .Select(x => new
+                .GroupJoin(groupedTickets,
+                    aw => new { aw.Year, aw.Week },
+                    gt => new { gt.Year, gt.Week },
+                    (aw, gt) => new
                     {
-                        Semana = x.Week,
-                        Cantidad = x.Cantidad,
-                        Descripcion = $"AL {x.UltimaFecha:dd/MM/yyyy}"
+                        aw.Year,
+                        aw.Week,
+                        WeekIdentifier = $"{aw.Week}/{aw.Year}", // Create a unique identifier
+                        Cantidad = gt.Sum(x => x.Cantidad),
+                        UltimaFecha = gt.Any() ? gt.Max(x => x.UltimaFecha) : aw.Date.AddDays(6),
+                        Tickets = gt.SelectMany(x => x.Tickets).ToList()
                     })
-                    .ToList();
+                .Where(x => x.Cantidad > 0) // Exclude weeks with quantity 0
+                .OrderByDescending(x => x.Cantidad)
+                .ThenByDescending(x => x.Cantidad)
+                .Select(x => new
+                {
+                    Semana = x.Week,
+                    Anno = x.Year,
+                    WeekIdentifier = x.WeekIdentifier, // Include the unique identifier
+                    Cantidad = x.Cantidad,
+                    Descripcion = $"AL {x.UltimaFecha:dd/MM/yyyy}",
+                    Tickets = x.Tickets
+                })
+                .ToList();
+
 
                 var totalCantidadesTEGAD = groupedTicketsTEGAD.Sum(ticket => ticket.Cantidad);
 
@@ -791,6 +806,7 @@ namespace SifizPlanning.Controllers
             }
         }
 
+
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
         public ActionResult DarTicketsPorCategoriasAlDia(int cliente)
@@ -805,24 +821,41 @@ namespace SifizPlanning.Controllers
                     nombreCliente = (from cli in db.Cliente where cli.Secuencial == cliente select cli.Descripcion).FirstOrDefault();
                 }
 
-                var ticketsQueryPCAD = (from ticket in db.InfoTickets
-                                        where ticket.FechaIngreso != null
-                                           && ticket.FechaIngreso.Value <= fActual
-                                           && ticket.Estado != "CERRADO"
-                                            && ticket.Estado != "ANULADO"
-                                            && ticket.Estado != "RECHAZADO"
-                                            && (ticket.Cliente == nombreCliente || nombreCliente == "")
-                                        select ticket).ToList();
+                var ticketsQueryPCAD = (from ticket in db.Ticket
+                                        join et in db.EstadoTicket on ticket.SecuencialEstadoTicket equals et.Secuencial
+                                        join pc in db.Persona_Cliente on ticket.SecuencialPersona_Cliente equals pc.SecuencialPersona
+                                        join c in db.Cliente on pc.SecuencialCliente equals c.Secuencial
+                                        join ca in db.CategoriaTicket on ticket.SecuencialCategoriaTicket equals ca.Secuencial
+                                        where ticket.FechaCreado != null
+                                           && ticket.FechaCreado <= fActual
+                                           && et.Codigo != "CERRADO"
+                                           && et.Codigo != "ANULADO"
+                                           && et.Codigo != "RECHAZADO"
+                                           && (c.Descripcion == nombreCliente || nombreCliente == "")
+                                        select new
+                                        {
+                                            Ticket = ticket,
+                                            Tipo = ca.Codigo
+                                        }).ToList();
 
+                var ticketsListPCAD = ticketsQueryPCAD.ToList();
 
-                List<InfoTickets> ticketsListPCAD = ticketsQueryPCAD.ToList();
+                // Encontrar la fecha más antigua y la más reciente en los tickets
+                var fechaInicial = ticketsListPCAD.Min(t => t.Ticket.FechaCreado);
 
+                // Agrupar los tickets por tipo
                 var groupedTicketsPCAD = ticketsListPCAD
                    .GroupBy(t => t.Tipo)
                    .Select(g => new
                    {
                        Tipo = g.Key,
-                       Cantidad = g.Count()
+                       Cantidad = g.Count(),
+                       Tickets = g.Select(t => new
+                       {
+                           FechaCreado = t.Ticket.FechaCreado.ToString("dd/MM/yyyy"), // Format the date here
+                           t.Ticket.Secuencial,
+                           t.Ticket.Detalle
+                       }).ToList()
                    })
                    .OrderBy(x => x.Tipo)
                    .ToList();
@@ -833,7 +866,8 @@ namespace SifizPlanning.Controllers
                 {
                     Categoria = g.Tipo,
                     Cantidad = g.Cantidad,
-                    Porcentaje = CalcularPorcentage(g.Cantidad, totalCantidades)
+                    Porcentaje = CalcularPorcentage(g.Cantidad, totalCantidades),
+                    Tickets = g.Tickets
                 }).ToList();
 
                 var resp = new
@@ -855,6 +889,7 @@ namespace SifizPlanning.Controllers
             }
         }
 
+
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
         public ActionResult DarTicketsPorEstadosAlDia(int cliente)
@@ -869,24 +904,37 @@ namespace SifizPlanning.Controllers
                     nombreCliente = (from cli in db.Cliente where cli.Secuencial == cliente select cli.Descripcion).FirstOrDefault();
                 }
 
-                var ticketsQueryPEAD = (from ticket in db.InfoTickets
-                                        where ticket.FechaIngreso != null
-                                           && ticket.FechaIngreso.Value <= fActual
-                                            && ticket.Estado != "CERRADO"
-                                            && ticket.Estado != "ANULADO"
-                                            && ticket.Estado != "RECHAZADO"
-                                            && (ticket.Cliente == nombreCliente || nombreCliente == "")
-                                        select ticket).ToList();
+                var ticketsQueryPEAD = (from ticket in db.Ticket
+                                        join et in db.EstadoTicket on ticket.SecuencialEstadoTicket equals et.Secuencial
+                                        join pc in db.Persona_Cliente on ticket.SecuencialPersona_Cliente equals pc.SecuencialPersona
+                                        join c in db.Cliente on pc.SecuencialCliente equals c.Secuencial
+                                        where ticket.FechaCreado != null
+                                           && ticket.FechaCreado <= fActual
+                                           && et.Codigo != "CERRADO"
+                                           && et.Codigo != "ANULADO"
+                                           && et.Codigo != "RECHAZADO"
+                                           && (c.Descripcion == nombreCliente || nombreCliente == "")
+                                        select new
+                                        {
+                                            Ticket = ticket,
+                                            Estado = et.Codigo
+                                        }).ToList();
 
 
-                List<InfoTickets> ticketsListPEAD = ticketsQueryPEAD.ToList();
+                var ticketsListPEAD = ticketsQueryPEAD;
 
                 var groupedTicketsPEAD = ticketsListPEAD
                    .GroupBy(t => t.Estado)
                    .Select(g => new
                    {
                        Estado = g.Key,
-                       Cantidad = g.Count()
+                       Cantidad = g.Count(),
+                       Tickets = g.Select(t => new
+                       {
+                           FechaCreado = t.Ticket.FechaCreado.ToString("dd/MM/yyyy"), // Format the date here
+                           t.Ticket.Secuencial,
+                           t.Ticket.Detalle
+                       })
                    })
                    .OrderBy(x => x.Estado)
                    .ToList();
@@ -897,7 +945,8 @@ namespace SifizPlanning.Controllers
                 {
                     Estado = g.Estado,
                     Cantidad = g.Cantidad,
-                    Porcentaje = CalcularPorcentage(g.Cantidad, totalCantidades)
+                    Porcentaje = CalcularPorcentage(g.Cantidad, totalCantidades),
+                    Tickets = g.Tickets
                 }).ToList();
 
                 var resp = new
@@ -933,16 +982,24 @@ namespace SifizPlanning.Controllers
                     nombreCliente = (from cli in db.Cliente where cli.Secuencial == cliente select cli.Descripcion).FirstOrDefault();
                 }
 
-                var ticketsQueryPCEAD = (from ticket in db.InfoTickets
-                                         where ticket.FechaIngreso != null
-                                            && ticket.FechaIngreso.Value <= fActual
-                                            && ticket.Estado != "CERRADO"
-                                            && ticket.Estado != "ANULADO"
-                                            && ticket.Estado != "RECHAZADO"
-                                            && (ticket.Cliente == nombreCliente || nombreCliente == "")
-                                         select ticket).ToList();
+                var ticketsQueryPCEAD = (from ticket in db.Ticket
+                                         join et in db.EstadoTicket on ticket.SecuencialEstadoTicket equals et.Secuencial
+                                         join pc in db.Persona_Cliente on ticket.SecuencialPersona_Cliente equals pc.SecuencialPersona
+                                         join c in db.Cliente on pc.SecuencialCliente equals c.Secuencial
+                                         where ticket.FechaCreado != null
+                                            && ticket.FechaCreado <= fActual
+                                            && et.Codigo != "CERRADO"
+                                            && et.Codigo != "ANULADO"
+                                            && et.Codigo != "RECHAZADO"
+                                            && (c.Descripcion == nombreCliente || nombreCliente == "")
+                                         select new
+                                         {
+                                             Ticket = ticket,
+                                             Cliente = c.Descripcion,
+                                             Estado = et.Codigo
+                                         }).ToList();
 
-                List<InfoTickets> ticketsListPCEAD = ticketsQueryPCEAD.ToList();
+                var ticketsListPCEAD = ticketsQueryPCEAD;
 
                 var groupedTicketsPCEAD = ticketsListPCEAD
                     .GroupBy(ticket => new { ticket.Cliente, ticket.Estado })
@@ -950,7 +1007,13 @@ namespace SifizPlanning.Controllers
                     {
                         Cliente = group.Key.Cliente,
                         Estado = group.Key.Estado,
-                        Cantidad = group.Count()
+                        Cantidad = group.Count(),
+                        Tickets = group.Select(t => new
+                        {
+                            FechaCreado = t.Ticket.FechaCreado.ToString("dd/MM/yyyy"), // Format the date here
+                            t.Ticket.Secuencial,
+                            t.Ticket.Detalle
+                        })
                     }).Distinct()
                     .ToList();
 
@@ -989,23 +1052,37 @@ namespace SifizPlanning.Controllers
                     nombreCliente = (from cli in db.Cliente where cli.Secuencial == cliente select cli.Descripcion).FirstOrDefault();
                 }
 
-                var ticketsQueryTPAD = (from ticket in db.InfoTickets
-                                        where ticket.FechaIngreso != null
-                                           && ticket.FechaIngreso.Value <= fActual
-                                           && ticket.Estado != "CERRADO"
-                                           && ticket.Estado != "ANULADO"
-                                           && ticket.Estado != "RECHAZADO"
-                                           && (ticket.Cliente == nombreCliente || nombreCliente == "")
-                                        select ticket).ToList();
+                var ticketsQueryTPAD = (from ticket in db.Ticket
+                                        join et in db.EstadoTicket on ticket.SecuencialEstadoTicket equals et.Secuencial
+                                        join pc in db.Persona_Cliente on ticket.SecuencialPersona_Cliente equals pc.SecuencialPersona
+                                        join c in db.Cliente on pc.SecuencialCliente equals c.Secuencial
+                                        join tvc in db.TicketVersionCliente on ticket.SecuencialTicketVersionCliente equals tvc.Secuencial
+                                        where ticket.FechaCreado != null
+                                           && ticket.FechaCreado <= fActual
+                                           && et.Codigo != "CERRADO"
+                                           && et.Codigo != "ANULADO"
+                                           && et.Codigo != "RECHAZADO"
+                                           && (c.Descripcion == nombreCliente || nombreCliente == "")
+                                        select new
+                                        {
+                                            Ticket = ticket,
+                                            AplicaA = tvc.Descripcion
+                                        }).ToList();
 
-                List<InfoTickets> ticketsListTPAD = ticketsQueryTPAD.ToList();
+                var ticketsListTPAD = ticketsQueryTPAD;
 
                 var groupedTicketsTPAD = ticketsListTPAD
                    .GroupBy(t => t.AplicaA) // Agrupa los tickets por Tipo
                    .Select(g => new
                    {
                        Aplica = g.Key, // Obtiene el Tipo como clave del grupo
-                       Cantidad = g.Count() // Cuenta la cantidad de tickets en cada grupo
+                       Cantidad = g.Count(), // Cuenta la cantidad de tickets en cada grupo
+                       Tickets = g.Select(t => new
+                       {
+                           FechaCreado = t.Ticket.FechaCreado.ToString("dd/MM/yyyy"), // Format the date here
+                           t.Ticket.Secuencial,
+                           t.Ticket.Detalle
+                       })
                    })
                    .OrderBy(x => x.Aplica) // Ordena por Tipo (opcional, dependiendo de tus necesidades)
                    .ToList();
@@ -1016,7 +1093,8 @@ namespace SifizPlanning.Controllers
                 {
                     Aplica = g.Aplica,
                     Cantidad = g.Cantidad,
-                    Porcentaje = CalcularPorcentage(g.Cantidad, totalCantidadesTPAD)
+                    Porcentaje = CalcularPorcentage(g.Cantidad, totalCantidadesTPAD),
+                    Tickets = g.Tickets
                 }).ToList();
 
                 var resp = new
@@ -1048,12 +1126,22 @@ namespace SifizPlanning.Controllers
                 DateTime fActual = DateTime.Today;
 
                 // Consulta base
-                var ticketsQuery = db.InfoTickets.Where(t => t.FechaIngreso <= fActual
-                && t.Estado != "CERRADO" && t.Estado != "ANULADO" && t.Estado != "RECHAZADO").Select(t => new
-                {
-                    Tipo = t.Tipo,
-                    Cliente = t.Cliente
-                });
+                var ticketsQuery = (from ticket in db.Ticket
+                                    join et in db.EstadoTicket on ticket.SecuencialEstadoTicket equals et.Secuencial
+                                    join pc in db.Persona_Cliente on ticket.SecuencialPersona_Cliente equals pc.SecuencialPersona
+                                    join c in db.Cliente on pc.SecuencialCliente equals c.Secuencial
+                                    join ca in db.CategoriaTicket on ticket.SecuencialCategoriaTicket equals ca.Secuencial
+                                    where ticket.FechaCreado != null
+                                       && ticket.FechaCreado <= fActual
+                                       && et.Codigo != "CERRADO"
+                                       && et.Codigo != "ANULADO"
+                                       && et.Codigo != "RECHAZADO"
+                                    select new
+                                    {
+                                        Ticket = ticket,
+                                        Tipo = ca.Codigo,
+                                        Cliente = c.Descripcion
+                                    }).ToList();
 
                 // Ejecutar la consulta
                 var ticketsList = ticketsQuery.ToList();
@@ -1064,7 +1152,13 @@ namespace SifizPlanning.Controllers
             {
                 Tipo = g.Key.Tipo,
                 Cliente = g.Key.Cliente,
-                Cantidad = g.Count()
+                Cantidad = g.Count(),
+                Tickets = g.Select(t => new
+                {
+                    FechaCreado = t.Ticket.FechaCreado.ToString("dd/MM/yyyy"), // Format the date here
+                    t.Ticket.Secuencial,
+                    t.Ticket.Detalle
+                })
             })
             .GroupBy(x => x.Tipo)
             .Select(g => new
@@ -1075,7 +1169,8 @@ namespace SifizPlanning.Controllers
                                .Select(x => new
                                {
                                    Cliente = x.Cliente,
-                                   Cantidad = x.Cantidad
+                                   Cantidad = x.Cantidad,
+                                   Tickets = x.Tickets
                                })
                                .ToList(),
                 Total = g.Sum(x => x.Cantidad)
@@ -1799,6 +1894,235 @@ namespace SifizPlanning.Controllers
             }
         }
 
+        private IQueryable<EstadoTicketInfo> ObtenerUltimoEstadoTicketsAntesDeFecha(DateTime fechaLimite)
+{
+            var latestStatusQuery =
+                from th in db.TicketHistorico
+                join maxDate in
+                    (from thSub in db.TicketHistorico
+                     where thSub.FechaOperacion <= fechaLimite
+                     group thSub by thSub.SecuencialTicket into grouped
+                     select new
+                     {
+                         SecuencialTicket = grouped.Key,
+                         MaxFechaOperacion = grouped.Max(g => g.FechaOperacion)
+                     })
+                on new { th.SecuencialTicket, th.FechaOperacion } equals new { maxDate.SecuencialTicket, FechaOperacion = maxDate.MaxFechaOperacion }
+                join et in db.EstadoTicket
+                    on th.SecuencialEstadoTicket equals et.Secuencial
+                select new EstadoTicketInfo
+                {
+                    SecuencialTicket = th.SecuencialTicket,
+                    CodigoEstado = et.Codigo, // Incluye el Código desde la tabla EstadoTicket
+                    FechaOperacion = th.FechaOperacion, // Incluye la fecha de operación
+                    FechaCreado = th.FechaCreado
+                };
+
+            return latestStatusQuery;
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, INDICADORES")]
+        public ActionResult DarTicketsIndicadoresResultado(List<string> annos, List<string> meses)
+        {
+            try
+            {
+                db.Database.CommandTimeout = 180;
+                var annosInt = new List<int>();
+                var mesesInt = new List<int>();
+
+                if (annos == null || !annos.Any())
+                {
+                    annosInt.Add(2024);
+                }
+                else
+                {
+                    annosInt = annos.Select(int.Parse).OrderBy(a => a).ToList();
+                }
+
+                if (meses == null || !meses.Any())
+                {
+                    mesesInt = Enumerable.Range(1, 12).ToList();
+                }
+                else
+                {
+                    mesesInt = meses.Select(int.Parse).OrderBy(m => m).ToList();
+
+                }
+
+                var resultado = new List<dynamic>();
+                var mesesProcesados = new List<string>();
+
+                foreach (var anno in annosInt)
+                {
+                    foreach (var mes in mesesInt)
+                    {
+                        int mesAnterior = mes - 1;
+                        int annoAnterior = anno;
+                        if (mesAnterior == 0)
+                        {
+                            mesAnterior = 12;
+                            annoAnterior -= 1;
+                        }
+
+                        DateTime fActual = new DateTime(anno, mes, DateTime.DaysInMonth(anno, mes), 23, 59, 59, 999);
+
+                        // Generar fechas de fin de mes para el cálculo
+                        DateTime fechaFinMesAnterior = new DateTime(annoAnterior, mesAnterior, DateTime.DaysInMonth(annoAnterior, mesAnterior), 23, 59, 59, 999);
+                        var idMesAnterior = CrearIdentificadorMes(mesAnterior, annoAnterior);
+                        var saldoMesAnterior = 0;
+
+                        if (!mesesProcesados.Contains(idMesAnterior))
+                        {
+                            var latestStatusQuery = ObtenerUltimoEstadoTicketsAntesDeFecha(fechaFinMesAnterior);
+
+                            saldoMesAnterior = (from ls in latestStatusQuery
+                                                    where !new[] { "CERRADO", "ANULADO", "RECHAZADO" }.Contains(ls.CodigoEstado)
+                                                    select ls.SecuencialTicket)
+                                                   .Distinct()
+                                                   .Count();
+                            mesesProcesados.Add(idMesAnterior);
+                        }
+                        else
+                        {
+                            if (resultado != null && resultado.Any())
+                            {
+                                 saldoMesAnterior = resultado
+                                .Where(t => t.Mes == idMesAnterior)
+                                .Select(t => t.TicketsPendientesMesSiguiente)
+                                .FirstOrDefault() ?? 0;
+                            }
+                            else
+                            {
+                                saldoMesAnterior = 0;
+                            }
+                        };
+
+                        // Tickets ingresados en el mismo mes
+                        var ticketsIngresadosMes = db.Ticket
+                            .Where(t => t.FechaCreado.Year == anno &&
+                                        t.FechaCreado.Month == mes)
+                            .Count();
+
+                        // Total de tickets para atender en el mes
+                        var ticketsParaAtender = saldoMesAnterior + ticketsIngresadosMes;
+
+                        // Generar fecha de fin del mes actual
+                        DateTime fechaFinMesActual = new DateTime(anno, mes, DateTime.DaysInMonth(anno, mes), 23, 59, 59, 999);
+                        var idMesActual = CrearIdentificadorMes(mes, anno);
+                        mesesProcesados.Add(idMesActual);
+
+                        // Subconsulta: Obtener el último estado de cada ticket antes de la fecha límite (fin del mes actual)
+                        var latestStatusQuery2 = ObtenerUltimoEstadoTicketsAntesDeFecha(fechaFinMesActual);
+                           
+                        // Consulta principal: Filtrar los tickets cerrados en el mes y año actuales
+                        var ticketsCerradosMismoMes = (from ls in latestStatusQuery2
+                             join t in db.Ticket
+                                 on ls.SecuencialTicket equals t.Secuencial
+                             where ls.CodigoEstado == "CERRADO" &&
+                                   t.FechaCreado.Year == anno &&
+                                   t.FechaCreado.Month == mes
+                             select ls.SecuencialTicket)
+                            .Distinct()
+                            .Count();
+
+                        // Filtrar tickets anulados o rechazados en el mes actual
+                        var ticketsAnuladosRechazados = (from ls in latestStatusQuery2
+                             join t in db.Ticket
+                                 on ls.SecuencialTicket equals t.Secuencial
+                             where (ls.CodigoEstado == "ANULADO" || ls.CodigoEstado == "RECHAZADO") &&
+                                   t.FechaCreado.Year == anno &&
+                                   t.FechaCreado.Month == mes
+                             select ls.SecuencialTicket)
+                            .Distinct()
+                            .Count();
+
+                        // Filtrar tickets cerrados en el mes actual pero creados en meses anteriores
+                        var ticketsCerradosDeMesesAnteriores = (from ls in latestStatusQuery2
+                             join t in db.Ticket
+                                 on ls.SecuencialTicket equals t.Secuencial
+                             where ls.CodigoEstado == "CERRADO" &&
+                                   t.FechaCreado < new DateTime(anno, mes, 1) && 
+                                   ls.FechaOperacion.Month == mes && ls.FechaOperacion.Year == anno
+                                   select ls.SecuencialTicket)
+                            .Distinct()
+                            .Count();
+
+                        // Obtener los días de resolución de los tickets cerrados en el mes
+                        var diasResolucionTickets = (from ls in latestStatusQuery2
+                                                     join t in db.Ticket
+                                                         on ls.SecuencialTicket equals t.Secuencial
+                                                     where ls.CodigoEstado == "CERRADO" &&
+                                                           ls.FechaOperacion.Year == anno &&
+                                                           ls.FechaOperacion.Month == mes
+                                                     select DbFunctions.DiffDays(t.FechaCreado, ls.FechaOperacion))
+                                                     .ToList();
+
+                        // Sumar los días de resolución
+                        int totalDiasResolucion = diasResolucionTickets.Sum() ?? 0;
+
+                        // Cantidad de tickets cerrados
+                        int cantidadTicketsCerrados = diasResolucionTickets.Count();
+
+                        // Calcular el promedio de días de resolución
+                        int promedioResolucionDias = cantidadTicketsCerrados > 0
+     ? (int)Math.Round((double)totalDiasResolucion / cantidadTicketsCerrados) // Redondear al entero más cercano
+     : 0;
+
+
+                        // Tickets pendientes para el siguiente mes
+                        var ticketsPendientesSiguienteMes = ticketsParaAtender - (ticketsCerradosMismoMes + ticketsAnuladosRechazados + ticketsCerradosDeMesesAnteriores);
+                        var ticketsCerradosAtendidos = (ticketsCerradosMismoMes + ticketsAnuladosRechazados + ticketsCerradosDeMesesAnteriores);
+                        // Indicador de resolución de tickets total
+                        var indicadorResolucion = ticketsParaAtender > 0 ?
+                            (ticketsCerradosAtendidos * 100 / ticketsParaAtender) : 0;
+
+                        // Indicador de resolución de tickets total
+                        var indicadorResolucionCerrados = ticketsIngresadosMes > 0 ?
+                            (ticketsCerradosAtendidos * 100 / ticketsIngresadosMes) : 0;
+
+                        // Indicador de resolución de tickets total
+                        var indicadorResolucionPendientes = ticketsCerradosAtendidos > 0 ?
+                            (ticketsPendientesSiguienteMes * 100 / ticketsParaAtender) : 0;
+
+                        resultado.Add(new
+                        {
+                            Mes = $"{(mes)}/{anno}",
+                            SaldoMesAnterior = saldoMesAnterior,
+                            TicketsIngresadosMes = ticketsIngresadosMes,
+                            TicketsParaAtender = ticketsParaAtender,
+                            TicketsCerradosAtendidos = ticketsCerradosAtendidos,
+                            AnuladosORechazados = ticketsAnuladosRechazados,
+                            CerradosEnMismoMes = ticketsCerradosMismoMes,
+                            TicketsCerradosMesesAnteriores = ticketsCerradosDeMesesAnteriores,
+                            TicketsPendientesMesSiguiente = ticketsPendientesSiguienteMes,
+                            IndicadorResolucion = indicadorResolucion,
+                            IndicadorResolucionCerrados = indicadorResolucionCerrados,
+                            IndicadorResolucionPendientes = indicadorResolucionPendientes,
+                            PromedioResolucionDias = promedioResolucionDias
+                        });
+                        
+                    }
+                }
+
+                return Json(resultado, JsonRequestBehavior.AllowGet);
+
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        string CrearIdentificadorMes(int mes, int anno)
+        {
+            return $"{mes}/{anno}"; // Formato "MM/AAAA" (ejemplo: "01/2024")
+        }
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, INDICADORES")]
@@ -1967,4 +2291,14 @@ namespace SifizPlanning.Controllers
         public Dictionary<int, int> TicketsPorMes { get; set; }
         public int Total { get; set; }
     }
+
+    public class EstadoTicketInfo
+    {
+        public int SecuencialTicket { get; set; }
+        public string CodigoEstado { get; set; }
+        public DateTime FechaOperacion { get; set; }
+        public DateTime FechaCreado { get; set; }
+    }
+
+
 }

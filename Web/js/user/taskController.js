@@ -1,4 +1,4 @@
-﻿devApp.controller("taskController", [
+devApp.controller("taskController", [
     "$scope",
     "$http",
     function ($scope, $http) {
@@ -14,6 +14,11 @@
         $scope.diasActividadTarea = [];
         $scope.diasActividad = [];
         $scope.diasActividadCord = [];
+
+        $scope.proyectosDelCliente = [];
+        $scope.clienteSeleccionado = '';
+        $scope.cargandoProyectos = false;
+
         //Cargando los dias de tareas desde el negocio
         var ajaxDiasDeTareas = $http.post("task/dias-actividades-tareas", {});
         ajaxDiasDeTareas.success(function (data) {
@@ -1474,6 +1479,55 @@
                     messageDialog.show("Información", data.msg);
                 }
             });
+        };
+
+        angular.element(document).on("click", ".btn-ver-proyecto", function (e) {
+            e.stopPropagation(); // Evita que el popover se cierre y vuelva a abrir.
+
+            var obj = this; // 'this' es el icono del ojo en el que se hizo clic.
+
+            $scope.$apply(function () {
+                var tareaId = angular.element(obj).data('id-tarea');
+                // Llamamos a la función que creamos en el Paso 1
+                console.log(tareaId);
+                $scope.mostrarInfoProyecto(tareaId);
+            });
+
+            // Opcional: Ocultamos todos los popovers después de la acción.
+            angular.element('[data-toggle="popover"]').popover("hide");
+        });
+
+        // ========================================================================
+        // MÉTODO SIMPLIFICADO Y CORRECTO
+        // ========================================================================
+        $scope.mostrarInfoProyecto = function (tareaId) {
+            console.log("Pidiendo al backend proyectos para la tarea con ID:", tareaId);
+
+            // Prepara y muestra el modal inmediatamente. El título se actualizará después.
+            $scope.clienteSeleccionado = 'Cargando...';
+            $scope.cargandoProyectos = true;
+            $scope.proyectosDelCliente = [];
+            $('#modalVerProyectos').modal('show');
+
+            // Llama al backend pasándole únicamente el idTarea.
+            $http.post("user/ObtenerProyectosPorClientePorTarea", { idTarea: tareaId })
+                .success(function (data) {
+                    if (data.success) {
+                        // El backend nos devuelve todo lo que necesitamos.
+                        $scope.proyectosDelCliente = data.proyectos;
+                        $scope.clienteSeleccionado = data.nombreCliente; // Actualizamos el título del modal.
+                    } else {
+                        alert("Error al cargar los proyectos: " + data.msg);
+                        $scope.proyectosDelCliente = [];
+                        $scope.clienteSeleccionado = 'Error';
+                    }
+                    $scope.cargandoProyectos = false;
+                })
+                .error(function () {
+                    alert("Ocurrió un error de comunicación con el servidor.");
+                    $scope.cargandoProyectos = false;
+                    $scope.clienteSeleccionado = 'Error de conexión';
+                });
         };
 
         $scope.publicarDatos = function () {

@@ -31,6 +31,7 @@ namespace SifizPlanning.Models
             this.TICKETMANTENIMIENTOBORAR = new HashSet<TicketMantenimientoBorar>();
             this.ENTREGABLETICKET = new HashSet<EntregableTicket>();
             this.CALIFICACIONTICKETCLIENTE = new HashSet<CalificacionTicketCliente>();
+            this.PUBLICACIONESCLIENTE = new HashSet<PublicacionesCliente>();
         }
     
         public int Secuencial { get; set; }
@@ -95,5 +96,6 @@ namespace SifizPlanning.Models
         public virtual TicketVersionCliente ticketVersionClliente { get; set; }
         public virtual Modulo MODULO { get; set; }
         public virtual ICollection<CalificacionTicketCliente> CALIFICACIONTICKETCLIENTE { get; set; }
+        public virtual ICollection<PublicacionesCliente> PUBLICACIONESCLIENTE { get; set; }
     }
 }

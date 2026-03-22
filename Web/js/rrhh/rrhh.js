@@ -1,4 +1,4 @@
-﻿var rrhhApp = angular.module('rrhh', []);
+var rrhhApp = angular.module('rrhh', []);
 
 rrhhApp.config(function ($provide, $httpProvider) {
 
@@ -55,6 +55,7 @@ rrhhApp.controller('rrhhController', ['$scope', '$http', function ($scope, $http
         angular.element("#panel-permisos").addClass('invisible');
         angular.element("#panel-feriados").addClass('invisible');
         angular.element("#panel-incidencias").addClass('invisible');
+        angular.element("#panel-dias-vacaciones").addClass('invisible');
     };
 
     $scope.IrVacacionesPermisos = function () {
@@ -115,6 +116,17 @@ rrhhApp.controller('rrhhController', ['$scope', '$http', function ($scope, $http
         ocultar();
         angular.element("#panel-incidencias").removeClass('invisible');
         $scope.funcionalidad = 'GESTIÓN DE INCIDENCIAS';
+    };
+    $scope.IrDiasDisponiblesVacaciones = function () {
+        ocultar();
+        angular.element("#panel-dias-vacaciones").removeClass('invisible');
+        $scope.funcionalidad = 'GESTIÓN DE DIAS DE VACACIONES';
+    };
+
+    $scope.IrPlanificacionVacaciones = function () {
+        ocultar();
+        angular.element("#panel-planificacion-vacaciones").removeClass('invisible');
+        $scope.funcionalidad = 'PLANIFICACION DE VACACIONES';
     };
 
     $scope.loadingAjax = function () {
@@ -281,7 +293,6 @@ rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $
             motivo: $scope.motivoPermiso
         });
         ajaxPermisos.success(function (data) {
-            console.log(data);
             if (data.success === true) {
                 $scope.aprobarPermisoColaborador(data.idPermiso);
             }
@@ -383,7 +394,6 @@ rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $
     $scope.panelDiaVacaciones = function (e, idDia) {
         if (idDia !== undefined) {
             $scope.idDiaEliminar = idDia;
-            console.log($scope.idDiaEliminar);
 
             angular.element("#menu-opciones").hide(0);
             var opcionesMenu = angular.element("#menu-opciones li");
@@ -437,7 +447,6 @@ rrhhApp.controller('vacacionesPermisos', ['$scope', '$http', function ($scope, $
                     var altoDiv = angular.element('#id-datos-colaboradores').height();
                     var anchoDiv = (ancho - 10) / data.cantDias;
 
-                    console.log(altoDiv);
                     var semanas = $scope.cantDias / 7;
                     var anchoSemana = (ancho - 10) / semanas;
                     angular.element('#div-semanas-disponibilidad').css({ width: anchoTotal });
@@ -838,12 +847,12 @@ rrhhApp.controller('incidenciasController', ['$scope', '$http', function ($scope
         $scope.loading.show();
         //Cargando las Incidencias
         var ajaxIncidencias = $http.post("rrhh/incidencias-colaborador/", {
-            start: start,       
+            start: start,
             filtro: filtro
         });
         ajaxIncidencias.success(function (data) {
             if (data.success === true) {
-                $scope.incidencias = data.incidencias;              
+                $scope.incidencias = data.incidencias;
             }
             else {
                 messageDialog.show('Información', "Error en el acceso a los datos.");
@@ -868,7 +877,7 @@ rrhhApp.controller('incidenciasController', ['$scope', '$http', function ($scope
     //ABRIR MODAL NUEVA INCIDENCIA
     $scope.modalNuevaIncidencia = function () {
         $scope.estaActivo = true;
-        angular.element("#modal-agregar-incidencias").modal('show');        
+        angular.element("#modal-agregar-incidencias").modal('show');
     };
 
     var ajaxColaboradores = $http.post("rrhh/dar-colaboradores-modal-incidencias", {});
@@ -881,7 +890,7 @@ rrhhApp.controller('incidenciasController', ['$scope', '$http', function ($scope
 
     $scope.GuardarIncidenciasColaboradores = function () {
 
-        
+
         waitingDialog.show('Guardando las incidencias...', { dialogSize: 'sm', progressType: 'success' });
         var ajaxIncidencias = $http.post("rrhh/guardar-incidencias-colaborador/", {
             idColaborador: $scope.colaboradorSeleccionado,
@@ -906,7 +915,7 @@ rrhhApp.controller('incidenciasController', ['$scope', '$http', function ($scope
         });
     };
 
-    
+
     //Filter de angular para las fechas
     rrhhApp.filter("strDateToStr", function () {
         return function (textDate) {
@@ -947,7 +956,419 @@ rrhhApp.controller('incidenciasController', ['$scope', '$http', function ($scope
 }]);
 
 
+/*******************************DIAS VACACIONES*******************************************/
+
+rrhhApp.controller('diasVacacionesController', ['$scope', '$http', function ($scope, $http) {
+
+    //Funciones de carga de datos
+    $scope.cargarDiasVacasiones = function (start, filtro) {
+        $scope.loading.show();
+        //Cargando las Incidencias
+        var ajaxIncidencias = $http.post("rrhh/dias-vacaciones-colaborador/", {
+            start: start,
+            filtro: filtro
+        });
+        ajaxIncidencias.success(function (data) {
+            if (data.success === true) {
+                $scope.diasVacacionesColaboradores = data.diasVacacionesColaboradores;
+            }
+            else {
+                messageDialog.show('Información', "Error en el acceso a los datos.");
+            }
+        });
+        $scope.loading.hide();
+
+    };
+    $scope.cargarDiasVacasiones(0);
+
+    //filtrando las Incidencias
+    $scope.filtrarColaboradoresDiasVacaciones = function () {
+        $scope.cargarDiasVacasiones(0, $scope.filtroColaboradoresDiasVacaciones);
+    };
+    $scope.guardarDiasColaboradores = function (secuencial, cantidad) {
+
+        waitingDialog.show('Guardando los días...', { dialogSize: 'sm', progressType: 'success' });
+        var ajaxDiasVacaciones = $http.post("rrhh/guardar-dias-vacaciones-colaborador/", {
+            idColaborador: secuencial,
+            cantidad: cantidad
+        });
+        ajaxDiasVacaciones.success(function (data) {
+            waitingDialog.hide();
+            if (data.success === true) {
+                $scope.cargarDiasVacasiones(0);
+            }
+            else {
+                messageDialog.show('Información', data.msg);
+            }
+        });
+    };
 
 
+    //Filter de angular para las fechas
+    rrhhApp.filter("strDateToStr", function () {
+        return function (textDate) {
+            if (textDate !== undefined) {
+                var fecha = new Date(parseInt(textDate.replace('/Date(', '')));
+                return dateToStr(fecha);
+            }
+            return "";
+        }
+    });
+    function dateToStr(dateObj, format, separator) {
+        /**
+         * Convert a date object to a string
+         * @argument dateObj {Date} A date object
+         * @argument format {string} An string representation of the date format. Default: dd-mm-yyyy. More could be added as necessary
+         * @argument separator {string} Character used for join the parts of the date
+         * @returns {string} An string representation of a Date
+         */
+        var year = dateObj.getFullYear().toString();
+        var month = dateObj.getMonth() + 1;
+        var month = (month < 10) ? '0' + month : month;
+        var day = dateObj.getDate();
+        var day = (day < 10) ? '0' + day : day;
+        var sep = (separator) ? separator : '/';
+        switch (format) {
+            case 'mm/dd/yyyy':
+                var out = [month, day, year];
+                break;
+            case 'yyyy/mm/dd':
+                var out = [year, month, day];
+                break;
+            default: //dd/mm/yyyy
+                var out = [day, month, year];
+        }
+        return out.join(sep);
+    };
+
+}]);
 
 
+/*******************************PLANIFICACION VACACIONES*******************************************/
+
+rrhhApp.controller('planificacionVacacionesController', ['$scope', '$http', function ($scope, $http) {
+
+    // Días feriados
+    $scope.ObtenerFeriados = function (anno, mes) {
+        var ajaxObtenerFeriados = $http.post("user/dar-feriados-mes",
+            {
+                anno: anno,
+                mes: mes
+            });
+
+        ajaxObtenerFeriados.success(function (data) {
+            if (data.success === true) {
+                $scope.diasFeriados = data.diasFeriados;
+                $scope.getDaysOfMonth(anno, mes);
+            }
+        });
+    };
+
+    // Variable para manejar la selección
+    $scope.isSelecting = false;
+
+    // Función para obtener los días del mes
+    $scope.getDaysOfMonth = function (anno, mes) {
+        let days = [];
+        let firstDay = new Date(anno, mes - 1, 1);
+        let lastDay = new Date(anno, mes, 0);
+
+        // Generar los días del mes
+        for (let i = 1; i <= lastDay.getDate(); i++) {
+            let currentDay = new Date(anno, mes - 1, i);
+            let dayOfWeek = currentDay.getDay();
+            days.push({
+                dayNumber: i,
+                day: ['D', 'L', 'M', 'M', 'J', 'V', 'S'][dayOfWeek],
+                isHoliday: $scope.diasFeriados.includes(i),
+                isWeekend: dayOfWeek === 0 || dayOfWeek === 6
+            });
+        }
+
+        $scope.daysOfMonth = days; // Guardar en el scope para la tabla
+    };
+
+
+    $scope.verTabla = false;
+
+    $scope.ObtenerPropuesta = function (anno, mes) {
+        var ajaxObtenerPropuestaVac = $http.post("user/dar-datos-dias-vacaciones",
+            {
+                usuario: false,
+                anno: anno,
+                mes: mes
+            });
+
+        ajaxObtenerPropuestaVac.success(function (data) {
+            if (data.success === true) {
+                $scope.verTabla = true;
+                $scope.colaboradores = data.datosColaborador;
+            }
+            else {
+                waitingDialog.hide();
+                messageDialog.show('Información', data.msg);
+            }
+        });
+    };
+
+    // Función que se ejecuta al cambiar el mes
+    $scope.onChangeMes = function (mes) {
+        let anno = $scope.annos;
+        $scope.ObtenerFeriados(anno, mes);
+        $scope.ObtenerPropuesta(anno, mes);
+
+    };
+
+    // Variables para rastrear la operación
+    $scope.isSelecting = false;
+    $scope.isDeselecting = false;
+    $scope.activeColaboradorId = null;
+
+    // Función para iniciar la selección
+    $scope.startSelection = function (colaborador, day) {
+        let isCurrentlySelected = false;
+        if (colaborador.diasDeVacaciones) {
+            isCurrentlySelected = (colaborador.diasDeVacaciones.includes(day.dayNumber) || (colaborador.tempSelectedDays && colaborador.tempSelectedDays.includes(day.dayNumber))) && !(colaborador.tempDeselectedDays && colaborador.tempDeselectedDays.includes(day.dayNumber));
+        }
+
+        // Validación de reglas de negocio
+        if ((day.isHoliday || day.isWeekend) && !isCurrentlySelected) return;
+
+        $scope.activeColaboradorId = colaborador.id;
+        if (!colaborador.tempSelectedDays) colaborador.tempSelectedDays = [];
+        if (!colaborador.tempDeselectedDays) colaborador.tempDeselectedDays = [];
+
+        colaborador.tempSelectedDays = [];
+        colaborador.tempDeselectedDays = [];
+
+        if (colaborador.diasDeVacaciones && colaborador.diasDeVacaciones.includes(day.dayNumber))
+            day.isSelected = true;
+        else
+            day.isSelected = false;
+
+        // Determina si es una operación de selección o deselección
+        $scope.isSelecting = !day.isSelected && colaborador.diasDisponibles > 0;
+        $scope.isDeselecting = day.isSelected;
+
+        // Limpia listas temporales
+        $scope.selectedDays = [];
+        $scope.deselectedDays = [];
+
+        // Marca el primer día
+        if ($scope.isSelecting && (colaborador.diasDisponibles - colaborador.tempSelectedDays.length) > 0) {
+            $scope.markDay(colaborador, day);
+        } else if ($scope.isDeselecting) {
+            $scope.unmarkDay(colaborador, day);
+        }
+    };
+
+    // Función para arrastrar la selección
+    $scope.dragSelection = function (colaborador, day) {
+        if ($scope.activeColaboradorId !== colaborador.id) return;
+        
+        let isCurrentlySelected = (colaborador.diasDeVacaciones && colaborador.diasDeVacaciones.includes(day.dayNumber) || colaborador.tempSelectedDays.includes(day.dayNumber)) && !colaborador.tempDeselectedDays.includes(day.dayNumber);
+
+        if ((day.isHoliday || day.isWeekend) && !isCurrentlySelected) return;
+
+        if ($scope.isSelecting && !isCurrentlySelected && (colaborador.diasDisponibles - colaborador.tempSelectedDays.length) > 0) {
+            $scope.markDay(colaborador, day);
+        } else if ($scope.isDeselecting && isCurrentlySelected) {
+            $scope.unmarkDay(colaborador, day);
+        }
+    };
+
+    // Función para finalizar la selección
+    $scope.endSelection = function (colaborador) {
+        if ($scope.activeColaboradorId !== colaborador.id) return;
+
+        let daysToProcessSelect = colaborador.tempSelectedDays.length > 0 ? [...colaborador.tempSelectedDays] : [];
+        let daysToProcessDeselect = colaborador.tempDeselectedDays.length > 0 ? [...colaborador.tempDeselectedDays] : [];
+        
+        // Procesa las selecciones en bloque
+        if (daysToProcessSelect.length > 0) {
+            $http.post("user/actualizar-propuesta-vacaciones", {
+                idColaborador: colaborador.id,
+                days: daysToProcessSelect,
+                mes: $scope.mes,
+                anno: $scope.annos
+            }).success(function (data) {
+                if (!data.success) {
+                    alert("Error al guardar las vacaciones: " + data.msg);
+                } else {
+                    if (!colaborador.diasDeVacaciones) colaborador.diasDeVacaciones = [];
+                    colaborador.diasDeVacaciones.push(...daysToProcessSelect);
+                    colaborador.diasMarcadosCount += daysToProcessSelect.length;
+                    colaborador.diasDisponibles -= daysToProcessSelect.length;
+                }
+                colaborador.tempSelectedDays = [];
+            }).error(function () {
+                alert("Error al conectar con el servidor.");
+                colaborador.tempSelectedDays = [];
+            });
+        }
+
+        // Procesa las deselecciones en bloque
+        if (daysToProcessDeselect.length > 0) {
+            $http.post("user/eliminar-propuesta-vacaciones", {
+                idColaborador: colaborador.id,
+                days: daysToProcessDeselect,
+                mes: $scope.mes,
+                anno: $scope.annos
+            }).success(function (data) {
+                if (!data.success) {
+                    alert("Error al eliminar las vacaciones: " + data.msg);
+                } else {
+                    daysToProcessDeselect.forEach(d => {
+                        const index = colaborador.diasDeVacaciones.indexOf(d);
+                        if (index > -1) colaborador.diasDeVacaciones.splice(index, 1);
+                    });
+                    colaborador.diasMarcadosCount -= daysToProcessDeselect.length;
+                    colaborador.diasDisponibles += daysToProcessDeselect.length;
+                }
+                colaborador.tempDeselectedDays = [];
+            }).error(function () {
+                alert("Error al conectar con el servidor.");
+                colaborador.tempDeselectedDays = [];
+            });
+        }
+
+        // Reinicia las variables de estado
+        $scope.isSelecting = false;
+        $scope.isDeselecting = false;
+        $scope.selectedDays = [];
+        $scope.deselectedDays = [];
+        $scope.activeColaboradorId = null;
+    };
+
+    // Marca un día como seleccionado visualmente
+    $scope.markDay = function (colaborador, day) {
+        if (!colaborador.tempSelectedDays.includes(day.dayNumber)) {
+            colaborador.tempSelectedDays.push(day.dayNumber);
+        }
+    };
+
+    // Marca un día como deseleccionado visualmente
+    $scope.unmarkDay = function (colaborador, day) {
+        if (!colaborador.tempDeselectedDays.includes(day.dayNumber)) {
+            colaborador.tempDeselectedDays.push(day.dayNumber);
+        }
+    };
+
+    //$scope.toggleSelection = function (colaborador, day) {
+    //    let anno = $scope.annos;
+    //    let mes = $scope.mes;
+
+    //    // Prevenir selección de días festivos
+    //    if (day.isHoliday) {
+    //        return;
+    //    }
+
+    //    // Asegurar que el colaborador tenga una lista de días seleccionados
+    //    if (!colaborador.diasDeVacaciones) {
+    //        colaborador.diasDeVacaciones = [];
+    //    }
+
+    //    // Convertir day.dayNumber a número
+    //    const dayNumber = Number(day.dayNumber);
+    //    console.log(dayNumber);
+    //    console.log(colaborador.diasDeVacaciones);
+
+    //    // Verificar si el día está en los días de vacaciones
+    //    const estaSeleccionado = colaborador.diasDeVacaciones.includes(dayNumber);
+    //    console.log(estaSeleccionado);
+
+    //    if (estaSeleccionado == true) {
+    //        // Si el día ya está seleccionado, eliminar
+    //        $http.post("user/eliminar-propuesta-vacaciones", {
+    //            idColaborador: colaborador.id,
+    //            days: [dayNumber],
+    //            mes: mes,
+    //            anno: anno
+    //        }).then(function (response) {
+    //            if (response.data.success === true) {
+    //                // Eliminar el día de vacaciones
+    //                colaborador.diasDeVacaciones = colaborador.diasDeVacaciones.filter(dia => dia !== dayNumber);
+    //                day.isSelected = false;
+    //                colaborador.diasMarcadosCount--;
+    //                colaborador.diasDisponibles++;
+    //                $scope.onChangeMes(mes);
+    //            } else {
+    //                alert("Error al eliminar la propuesta de vacaciones: " + response.data.msg);
+    //            }
+    //        }, function () {
+    //            alert("Error en la conexión al servidor. Intenta nuevamente.");
+    //        });
+    //    } else if (estaSeleccionado == false) {
+    //        // Si el día no está seleccionado y hay días disponibles, marcar
+    //        if (colaborador.diasDisponibles > 0) {
+    //            $http.post("user/actualizar-propuesta-vacaciones", {
+    //                idColaborador: colaborador.id,
+    //                days: [dayNumber],
+    //                mes: mes,
+    //                anno: anno
+    //            }).then(function (response) {
+    //                if (response.data.success === true) {
+    //                    // Añadir el día de vacaciones si no existe
+    //                    if (!colaborador.diasDeVacaciones.includes(dayNumber)) {
+    //                        colaborador.diasDeVacaciones.push(dayNumber);
+    //                    }
+    //                    day.isSelected = true;
+    //                    colaborador.diasMarcadosCount++;
+    //                    colaborador.diasDisponibles--;
+    //                    $scope.onChangeMes(mes);
+    //                } else {
+    //                    alert("Error al guardar la propuesta de vacaciones: " + response.data.msg);
+    //                }
+    //            }, function () {
+    //                alert("Error en la conexión al servidor. Intenta nuevamente.");
+    //            });
+    //        } else {
+    //            alert("No puedes seleccionar más días de los disponibles.");
+    //        }
+    //    }
+    //};
+
+
+    // Inicializar con el mes y año por defecto
+    $scope.annos = '2025';
+    $scope.mes = '0'; // Enero
+
+
+    //Filter de angular para las fechas
+    rrhhApp.filter("strDateToStr", function () {
+        return function (textDate) {
+            if (textDate !== undefined) {
+                var fecha = new Date(parseInt(textDate.replace('/Date(', '')));
+                return dateToStr(fecha);
+            }
+            return "";
+        }
+    });
+    function dateToStr(dateObj, format, separator) {
+        /**
+         * Convert a date object to a string
+         * @argument dateObj {Date} A date object
+         * @argument format {string} An string representation of the date format. Default: dd-mm-yyyy. More could be added as necessary
+         * @argument separator {string} Character used for join the parts of the date
+         * @returns {string} An string representation of a Date
+         */
+        var year = dateObj.getFullYear().toString();
+        var month = dateObj.getMonth() + 1;
+        var month = (month < 10) ? '0' + month : month;
+        var day = dateObj.getDate();
+        var day = (day < 10) ? '0' + day : day;
+        var sep = (separator) ? separator : '/';
+        switch (format) {
+            case 'mm/dd/yyyy':
+                var out = [month, day, year];
+                break;
+            case 'yyyy/mm/dd':
+                var out = [year, month, day];
+                break;
+            default: //dd/mm/yyyy
+                var out = [day, month, year];
+        }
+        return out.join(sep);
+    };
+
+}]);

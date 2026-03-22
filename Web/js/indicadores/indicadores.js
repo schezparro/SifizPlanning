@@ -44,6 +44,7 @@ indicadoresApp.controller('indicadoresController', ['$scope', '$http', function 
     function ocultar() {
         angular.element("#panel-indicadores-tickets").addClass('invisible');
         angular.element("#panel-indicadores-gestores").addClass('invisible');
+        angular.element("#panel-indicadores-ofertas").addClass('invisible');
     };
 
     $scope.IrIndicadoresTickets = function () {
@@ -56,6 +57,12 @@ indicadoresApp.controller('indicadoresController', ['$scope', '$http', function 
         ocultar();
         angular.element("#panel-indicadores-gestores").removeClass('invisible');
         $scope.funcionalidad = 'INDICADORES GESTORES';
+    };
+
+    $scope.IrIndicadoresOfertas = function () {
+        ocultar();
+        angular.element("#panel-indicadores-ofertas").removeClass('invisible');
+        $scope.funcionalidad = 'INDICADORES OFERTAS';
     };
     $scope.loadingAjax = function () {
         this.show = function (target) {

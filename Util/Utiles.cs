@@ -66,27 +66,19 @@ namespace SifizPlanning.Util
 
         public static bool EnviarEmailSistema(string[] emailsDestinos, string emailBody, string asunto = "Información", string[] adjuntos = null, string qr = null)
         {
-            string nameQr = Guid.NewGuid().ToString() + ".png";
-            //string pathImagen = System.Web.HttpContext.Current.Server.MapPath("~/Web/images/email") + "/" + nameQr;
-            string pathImagen = HostingEnvironment.MapPath("~/Web/images/email") + "/" + nameQr;
-            if (qr != null)
-            {
-                QRCodeGenerator qrGenerator = new QRCodeGenerator();
-                QRCodeData qrCodeData = qrGenerator.CreateQrCode(qr, QRCodeGenerator.ECCLevel.Q);
-                BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);
-                byte[] qrCodeImage = qrCode.GetGraphic(2);
-                File.WriteAllBytes(pathImagen, qrCodeImage);
-            }
+            // Usar la imagen corporativa fija en lugar del QR dinámico
+            string logoCorporativo = "sifizsoft.png";
+            string pathImagen = HostingEnvironment.MapPath("~/Web/images/email") + "/" + logoCorporativo;
 
             string htmlCss = @"<style>
                                            .textoCuerpo{
-                                                font-size: 11pt;
-                                                font-family: ""Calibri"", sans-serif;
-                                                color: #1F497D;
+                                                font-size: 12pt;
+                                                font-family: ""Century Gothic"", sans-serif;
+                                                color: #353535;
                                            }
                                            .cabecera{
                                                 font-size: 8pt;
-                                                font-family: ""Calibri"", sans-serif;
+                                                font-family: ""Century Gothic"", sans-serif;
                                                 border-bottom: 1px solid #222;
                                            }                                                                              
                                            table td{
@@ -97,14 +89,14 @@ namespace SifizPlanning.Util
                                                 border-collapse: collapse;
                                                 font-size: 8pt;
                                                 background: #aaa;
-                                                font-family: ""Calibri"", sans-serif;
+                                                font-family: ""Century Gothic"", sans-serif;
                                            }
                                            table, td {
                                                 border: 1px solid black;
                                                 border-collapse: collapse;
                                                 font-size: 8pt;
                                                 background: #ccc;
-                                                font-family: ""Calibri"", sans-serif;
+                                                font-family: ""Century Gothic"", sans-serif;
                                                 vertical-align: top;
                                             }
                                             th, td {
@@ -113,24 +105,15 @@ namespace SifizPlanning.Util
 
                                             /* Font Definitions */
                                             @font-face
-	                                            {font-family:""Cambria Math"";
-	                                            panose-1:2 4 5 3 5 4 6 3 2 4;}
-                                            @font-face
-	                                            {font-family:Calibri;
-	                                            panose-1:2 15 5 2 2 2 4 3 2 4;}
-                                            @font-face
-	                                            {font-family:Verdana;
-	                                            panose-1:2 11 6 4 3 5 4 4 2 4;}
-                                            @font-face
-	                                            {font-family:""Palatino Linotype"";
-	                                            panose-1:2 4 5 2 5 5 5 3 3 4;}
+	                                            {font-family:""Century Gothic"";
+	                                            panose-1:2 11 5 2 2 2 2 2 2 4;}
                                             /* Style Definitions */
                                             p.MsoNormal, li.MsoNormal, div.MsoNormal
 	                                            {margin:0cm;
 	                                            margin-bottom:.0001pt;
-	                                            font-size:11.0pt;
-	                                            font-family:""Calibri"",sans-serif;
-	                                            mso-fareast-language:EN-US;}
+	                                            font-size:12.0pt;
+	                                            font-family:""Century Gothic"",sans-serif;
+	                                            color:#353535;}
                                             a:link, span.MsoHyperlink
 	                                            {mso-style-priority:99;
 	                                            color:#0563C1;
@@ -141,49 +124,64 @@ namespace SifizPlanning.Util
 	                                            text-decoration:underline;}
                                             span.EstiloCorreo17
 	                                            {mso-style-type:personal-compose;
-	                                            font-family:""Calibri"",sans-serif;
-	                                            color:windowtext;}
+	                                            font-family:""Century Gothic"",sans-serif;
+	                                            color:#353535;}
                                             .MsoChpDefault
 	                                            {mso-style-type:export-only;
-	                                            font-family:""Calibri"",sans-serif;
-	                                            mso-fareast-language:EN-US;}
+	                                            font-family:""Century Gothic"",sans-serif;}
                                             @page WordSection1
 	                                            {size:612.0pt 792.0pt;
 	                                            margin:70.85pt 3.0cm 70.85pt 3.0cm;}
                                             div.WordSection1
 	                                            {page:WordSection1;}
+                                            .firma-principal {
+                                                font-family: ""Century Gothic"", sans-serif;
+                                                font-size: 12pt;
+                                                color: #353535;
+                                                text-align: left;
+                                            }
+                                            .firma-copyright {
+                                                font-family: ""Century Gothic"", sans-serif;
+                                                font-size: 9pt;
+                                                color: #000035;
+                                                text-align: center;
+                                            }
                                        </style>";
 
             string htmlfirma = @"<div class=WordSection1>
-                                    <p class=MsoNormal><o:p>&nbsp;</o:p></p><p class=MsoNormal><o:p>&nbsp;</o:p></p><p class=MsoNormal><span lang=ES-EC style='font-size:12.0pt;font-family:""Times New Roman"",serif;color:#1F497D;mso-fareast-language:ES-EC'>Atentamente,<o:p></o:p></span></p><p class=MsoNormal><i><span style='font-size:12.0pt;font-family:""Times New Roman"",serif;color:#1F497D;mso-fareast-language:ES-EC'>"
-                            +
-                            "Sifizplanning"
-                            +
-                            @"<o:p></o:p></span></i></p><p class=MsoNormal><span style='font-size:12.0pt;font-family:""Times New Roman"",serif;color:#1F497D;mso-fareast-language:ES-EC'>"
-                            +
-                            "Sistema Planificador Integral SifizSoft s.a."
-                            +
-                            @"<br> 
-                            <b style='color:#1F497D !important;'>
-                                <i>
-                                    02-450-4616 <br/>
-                                    Quito - Ecuador
-                                </i>
-                            </b>";
-            if (qr != null)
-            {
-                htmlfirma += "<br/><img style='width: 25px !important; height: 25px !important;'  src='cid:" + nameQr + "'><br/>";
-            }
+                                    <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                                    <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                                    <p class=MsoNormal>
+                                        <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>Atentamente,<o:p></o:p></span>
+                                    </p>
+                                    <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                                    <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                                    <p class=MsoNormal>
+                                        <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>Sifizplanning<o:p></o:p></span>
+                                    </p>
+                                    <p class=MsoNormal>
+                                        <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>SISTEMA PLANIFICADOR INTEGRAL SIFIZSOFT S.A.<o:p></o:p></span>
+                                    </p>
+                                    <p class=MsoNormal>
+                                        <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>Telf. (593) 2-450-4616<o:p></o:p></span>
+                                    </p>
+                                    <p class=MsoNormal>
+                                        <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>Quito - Ecuador<o:p></o:p></span>
+                                    </p>";
+            
+            // Siempre incluir el logo corporativo
+            htmlfirma += "<p class=MsoNormal align=center style='text-align:center'><img style='max-width: 100%; height: auto !important;'  src='cid:" + logoCorporativo + "'></p>";
 
-            htmlfirma += @"</span>                              
-                              <span lang=IT style='font-size:12.0pt;font-family:'Times New Roman',serif;color:#203864;mso-fareast-language:ES'><o:p></o:p></span></p><div class=MsoNormal align=center style='text-align:center'><span lang=EN style='font-size:9.0pt;font-family:'Verdana',sans-serif;color:#1F497D;mso-fareast-language:ES-EC'><hr size=3 width='100%' align=center></span></div><p class=MsoNormal><b><span lang=ES style='color:#1F497D;mso-fareast-language:ES-EC'>Somos líderes en la producción de software financiero-contable de última tecnología. </span></b><b><span lang=ES style='font-family:'Times New Roman',serif;color:#1F497D;mso-fareast-language:ES'><o:p></o:p></span></b></p><p class=MsoNormal><a href='http://www.sifizsoft.com/'><span style='font-size:12.0pt;color:#1F497D;position:relative;top:2.0pt;mso-text-raise:-2.0pt;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=129 height=49 id='Imagen_x0020_2' src='cid:sifizsoft.jpg' alt='cid:image001.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp;&nbsp;&nbsp;<span style='position:relative;top:-3.0pt;mso-text-raise:3.0pt'>&nbsp;</span></span><span lang=EN-US style='font-size:9.0pt;color:#1F497D;position:relative;top:-18.0pt;mso-text-raise:18.0pt;letter-spacing:.2pt;mso-fareast-language:ES-EC'>Like us in</span><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp; </span><a href='http://www.facebook.com/pages/SifizSoft/287494208026463?sk=app_129982580378550'><span style='font-size:12.0pt;color:#1F497D;position:relative;top:-8.0pt;mso-text-raise:8.0pt;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=41 height=41 id='Imagen_x0020_3' src='cid:fb.jpg' alt='cid:image002.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp;&nbsp;</span><span lang=EN-US style='font-size:9.0pt;color:#1F497D;position:relative;top:-18.0pt;mso-text-raise:18.0pt;mso-fareast-language:ES-EC'>and Follow us on</span><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'> </span><a href='https://twitter.com/SifizSoftSA'><span style='font-size:12.0pt;color:#1F497D;position:relative;top:-8.0pt;mso-text-raise:8.0pt;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=41 height=41 id='Imagen_x0020_4' src='cid:tw.jpg' alt='cid:image003.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp;&nbsp;</span><a href='http://lnkd.in/GYc2-s'><span style='font-size:12.0pt;color:#1F497D;position:relative;top:-8.0pt;mso-text-raise:8.0pt;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=106 height=41 id='Imagen_x0020_5' src='cid:linkedin.jpg' alt='cid:image004.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp; &nbsp;</span><a href='http://www.efqm.org/en/'><span style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=101 height=55 id='Imagen_x0020_6' src='cid:efqm.jpg' alt='cid:image005.png@01D244E9.77AAB2B0'></span></a><span style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'> </span><a href='http://www.openkm.com/en/'><span style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=109 height=53 id='Imagen_x0020_7' src='cid:openkm.jpg' alt='cid:image006.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'><o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=EN-US style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'><o:p>&nbsp;</o:p></span></p><p class=MsoNormal align=center style='text-align:center;line-height:17.0pt;mso-line-height-rule:exactly;text-autospace:none'><span style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>OFICINA QUITO: Rumipamba E2-214 y Av. República, edificio Signature, piso 09, oficina 901</span><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>.&nbsp; Teléfonos&nbsp; </span><span style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>02-351-7729, &nbsp;02-351-8919, 02-450-4616, 02-450-4727, </span><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>desde USA 1(407)255 8532<o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>OFICINA AMBATO: Av. Atahualpa y Pasaje Arajuno S/N a una cuadra del nuevo municipio.&nbsp; Teléfono 03-241-6586&nbsp; 03-241-9127<o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>PO&nbsp; BOX 780066&nbsp;Orlando, FL 32878-0066 Toll free (800) 793-8369<o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'><o:p>&nbsp;</o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>Este correo electrónico es solo para uso del destinatario y puede contener información confidencial. Cualquier distribución uso o lectura de este material está expresamente prohibido. Si usted no es el destinatario o si usted ha recibido este correo electrónico por error por favor contacte al remitente y destruya todas las copias y el mensaje original.</span><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES'><o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'><o:p>&nbsp;</o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=EN-US style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>This E-mail message is for the sole use of the intended recipient(s) and may contain confidential and privileged information. Any unauthorized review, use, disclosure or distribution is prohibited. If you are not the intended recipient, please contact the sender by reply E-mail and destroy all copies of the original message.<o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=EN-US style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>Copyrights ©SifizSoft&nbsp;2004-2016 carefully reserved and preserved</span><span lang=EN-US style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES'><o:p></o:p></span></p><p class=MsoNormal><o:p>&nbsp;</o:p></p></div></body></html>";
+            htmlfirma += @"<p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                              <p class=MsoNormal align=center style='text-align:center'>
+                                  <span style='font-family:""Century Gothic"",sans-serif;font-size:9.0pt;color:#000035;'>Copyrights ©SifizSoft 2004-2026 carefully reserved and preserved<o:p></o:p></span>
+                              </p>
+                              <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                          </div>";
 
+            // Siempre incluir el logo corporativo
             List<string> listImagenes = new List<string>();
-            listImagenes.AddRange(new string[] { "sifizsoft.jpg", "fb.jpg", "tw.jpg", "linkedin.jpg", "efqm.jpg", "openkm.jpg" });
-            if (qr != null)
-            {
-                listImagenes.Add(nameQr);
-            }
+            listImagenes.Add(logoCorporativo);
             string[] imagenes = listImagenes.ToArray();
             try
             {
@@ -191,39 +189,7 @@ namespace SifizPlanning.Util
                 string password = System.Configuration.ConfigurationManager.AppSettings["passwordEmailApp"];
                 string htmlMail = htmlCss + emailBody + htmlfirma;
 
-                // Obtener la última hora en que se ejecutó una tarea finalizada
-                //    var monitoringApi = JobStorage.Current.GetMonitoringApi();
-                //    var jobDetails = monitoringApi.SucceededJobs(0, 1);
-                //    var jobRunningDetails = monitoringApi.ProcessingJobs(0, 1);
-
-                //    if (jobRunningDetails.Count == 0)
-                //    {
-                //        if (jobDetails.Count > 0)
-                //        {
-                //            var lastJob = jobDetails.Last();
-                //            var lastExecutionTime = (lastJob.Value.SucceededAt.HasValue ? lastJob.Value.SucceededAt.Value : DateTime.Now).AddHours(-4);
-                //            var waitTime = TimeSpan.FromMinutes(5) - (DateTime.Now - lastExecutionTime);
-                //            if (waitTime > TimeSpan.Zero)
-                //            {
-                //                // Programa la siguiente tarea para ejecutarse después del tiempo de espera calculado
-                //                BackgroundJob.Schedule(() => Utiles.EnviarEmail(email, emailsDestinos, htmlMail, asunto, password, true, imagenes, adjuntos, -1), waitTime);
-                //            }
-                //            else
-                //            {
-                //                // Ejecuta la siguiente tarea inmediatamente
-                //                BackgroundJob.Enqueue(() => Utiles.EnviarEmail(email, emailsDestinos, htmlMail, asunto, password, true, imagenes, adjuntos, -1));
-                //            }
-                //        }
-                //        else
-                //        {
-                //            // Ejecuta la siguiente tarea inmediatamente
-                //            BackgroundJob.Enqueue(() => Utiles.EnviarEmail(email, emailsDestinos, htmlMail, asunto, password, true, imagenes, adjuntos, -1));
-                //        }
-                //    }
-                //    else
-                //    {
-                //        BackgroundJob.Schedule(() => Utiles.EnviarEmail(email, emailsDestinos, htmlMail, asunto, password, true, imagenes, adjuntos, -1), TimeSpan.FromMinutes(5));
-                //    }
+                // Siempre adjuntar la imagen corporativa
                 Utiles.EnviarEmail(email, emailsDestinos, htmlMail, asunto, password, true, imagenes, adjuntos, -1);
             }
             catch (Exception)
@@ -236,54 +202,68 @@ namespace SifizPlanning.Util
 
         public static bool EnviarEmailSistemaPersonalizadoAsync(string[] emailsDestinos, string emailBody, string emailCSS, string asunto = "Información", string[] adjuntos = null, string qr = null)
         {
-            string nameQr = Guid.NewGuid().ToString() + ".png";
-            string pathImagen = HostingEnvironment.MapPath("~/Web/images/email") + "/" + nameQr;
-            if (qr != null)
-            {
-                QRCodeGenerator qrGenerator = new QRCodeGenerator();
-                QRCodeData qrCodeData = qrGenerator.CreateQrCode(qr, QRCodeGenerator.ECCLevel.Q);
-                BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);
-                byte[] qrCodeImage = qrCode.GetGraphic(2);
-                File.WriteAllBytes(pathImagen, qrCodeImage);
-            }
-            string htmlCss = emailCSS;
+            // Usar la imagen corporativa fija en lugar del QR dinámico
+            string logoCorporativo = "sifizsoft.png";
+            string pathImagen = HostingEnvironment.MapPath("~/Web/images/email") + "/" + logoCorporativo;
+
+            // Combinar CSS personalizado con CSS base corporativo
+            string htmlCss = @"<style>
+                                            body {
+                                                font-family: ""Century Gothic"", sans-serif;
+                                                font-size: 12pt;
+                                                color: #353535;
+                                                text-align: left;
+                                            }
+                                            .firma-copyright {
+                                                font-family: ""Century Gothic"", sans-serif;
+                                                font-size: 9pt;
+                                                color: #000035;
+                                                text-align: center;
+                                            }
+                                       </style>" + emailCSS;
             string htmlfirma = @"<div class=WordSection1>
-                                    <p class=MsoNormal><o:p>&nbsp;</o:p></p><p class=MsoNormal><o:p>&nbsp;</o:p></p><p class=MsoNormal><span lang=ES-EC style='font-size:12.0pt;font-family:""Times New Roman"",serif;color:#1F497D;mso-fareast-language:ES-EC'>Atentamente,<o:p></o:p></span></p><p class=MsoNormal><i><span style='font-size:12.0pt;font-family:""Times New Roman"",serif;color:#1F497D;mso-fareast-language:ES-EC'>"
-                            +
-                            "Sifizplanning"
-                            +
-                            @"<o:p></o:p></span></i></p><p class=MsoNormal><span style='font-size:12.0pt;font-family:""Times New Roman"",serif;color:#1F497D;mso-fareast-language:ES-EC'>"
-                            +
-                            "Sistema Planificador Integral SifizSoft s.a."
-                            +
-                            @"<br> 
-                            <b style='color:#1F497D !important;'>
-                                <i>
-                                    02-450-4616 <br/>
-                                    Quito - Ecuador
-                                </i>
-                            </b>";
-            if (qr != null)
-            {
-                htmlfirma += "<br/><img style='width: 25px !important; height: 25px !important;'  src='cid:" + nameQr + "'><br/>";
-            }
+                                    <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                                    <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                                    <p class=MsoNormal>
+                                        <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>Atentamente,<o:p></o:p></span>
+                                    </p>
+                                    <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                                    <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                                    <p class=MsoNormal>
+                                        <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>Sifizplanning<o:p></o:p></span>
+                                    </p>
+                                    <p class=MsoNormal>
+                                        <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>SISTEMA PLANIFICADOR INTEGRAL SIFIZSOFT S.A.<o:p></o:p></span>
+                                    </p>
+                                    <p class=MsoNormal>
+                                        <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>Telf. (593) 2-450-4616<o:p></o:p></span>
+                                    </p>
+                                    <p class=MsoNormal>
+                                        <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>Quito - Ecuador<o:p></o:p></span>
+                                    </p>";
+            
+            // Siempre incluir el logo corporativo
+            htmlfirma += "<p class=MsoNormal align=center style='text-align:center'><img style='max-width: 100%; height: auto !important;'  src='cid:" + logoCorporativo + "'></p>";
 
-            htmlfirma += @"</span>                              
-                              <span lang=IT style='font-size:12.0pt;font-family:'Times New Roman',serif;color:#203864;mso-fareast-language:ES'><o:p></o:p></span></p><div class=MsoNormal align=center style='text-align:center'><span lang=EN style='font-size:9.0pt;font-family:'Verdana',sans-serif;color:#1F497D;mso-fareast-language:ES-EC'><hr size=3 width='100%' align=center></span></div><p class=MsoNormal><b><span lang=ES style='color:#1F497D;mso-fareast-language:ES-EC'>Somos líderes en la producción de software financiero-contable de última tecnología. </span></b><b><span lang=ES style='font-family:'Times New Roman',serif;color:#1F497D;mso-fareast-language:ES'><o:p></o:p></span></b></p><p class=MsoNormal><a href='http://www.sifizsoft.com/'><span style='font-size:12.0pt;color:#1F497D;position:relative;top:2.0pt;mso-text-raise:-2.0pt;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=129 height=49 id='Imagen_x0020_2' src='cid:sifizsoft.jpg' alt='cid:image001.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp;&nbsp;&nbsp;<span style='position:relative;top:-3.0pt;mso-text-raise:3.0pt'>&nbsp;</span></span><span lang=EN-US style='font-size:9.0pt;color:#1F497D;position:relative;top:-18.0pt;mso-text-raise:18.0pt;letter-spacing:.2pt;mso-fareast-language:ES-EC'>Like us in</span><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp; </span><a href='http://www.facebook.com/pages/SifizSoft/287494208026463?sk=app_129982580378550'><span style='font-size:12.0pt;color:#1F497D;position:relative;top:-8.0pt;mso-text-raise:8.0pt;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=41 height=41 id='Imagen_x0020_3' src='cid:fb.jpg' alt='cid:image002.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp;&nbsp;</span><span lang=EN-US style='font-size:9.0pt;color:#1F497D;position:relative;top:-18.0pt;mso-text-raise:18.0pt;mso-fareast-language:ES-EC'>and Follow us on</span><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'> </span><a href='https://twitter.com/SifizSoftSA'><span style='font-size:12.0pt;color:#1F497D;position:relative;top:-8.0pt;mso-text-raise:8.0pt;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=41 height=41 id='Imagen_x0020_4' src='cid:tw.jpg' alt='cid:image003.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp;&nbsp;</span><a href='http://lnkd.in/GYc2-s'><span style='font-size:12.0pt;color:#1F497D;position:relative;top:-8.0pt;mso-text-raise:8.0pt;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=106 height=41 id='Imagen_x0020_5' src='cid:linkedin.jpg' alt='cid:image004.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp; &nbsp;</span><a href='http://www.efqm.org/en/'><span style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=101 height=55 id='Imagen_x0020_6' src='cid:efqm.jpg' alt='cid:image005.png@01D244E9.77AAB2B0'></span></a><span style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'> </span><a href='http://www.openkm.com/en/'><span style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=109 height=53 id='Imagen_x0020_7' src='cid:openkm.jpg' alt='cid:image006.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'><o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=EN-US style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'><o:p>&nbsp;</o:p></span></p><p class=MsoNormal align=center style='text-align:center;line-height:17.0pt;mso-line-height-rule:exactly;text-autospace:none'><span style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>OFICINA QUITO: Rumipamba E2-214 y Av. República, edificio Signature, piso 09, oficina 901</span><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>.&nbsp; Teléfonos&nbsp; </span><span style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>02-351-7729, &nbsp;02-351-8919, 02-450-4616, 02-450-4727, </span><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>desde USA 1(407)255 8532<o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>OFICINA AMBATO: Av. Atahualpa y Pasaje Arajuno S/N a una cuadra del nuevo municipio.&nbsp; Teléfono 03-241-6586&nbsp; 03-241-9127<o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>PO&nbsp; BOX 780066&nbsp;Orlando, FL 32878-0066 Toll free (800) 793-8369<o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'><o:p>&nbsp;</o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>Este correo electrónico es solo para uso del destinatario y puede contener información confidencial. Cualquier distribución uso o lectura de este material está expresamente prohibido. Si usted no es el destinatario o si usted ha recibido este correo electrónico por error por favor contacte al remitente y destruya todas las copias y el mensaje original.</span><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES'><o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'><o:p>&nbsp;</o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=EN-US style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>This E-mail message is for the sole use of the intended recipient(s) and may contain confidential and privileged information. Any unauthorized review, use, disclosure or distribution is prohibited. If you are not the intended recipient, please contact the sender by reply E-mail and destroy all copies of the original message.<o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=EN-US style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>Copyrights ©SifizSoft&nbsp;2004-2016 carefully reserved and preserved</span><span lang=EN-US style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES'><o:p></o:p></span></p><p class=MsoNormal><o:p>&nbsp;</o:p></p></div></body></html>";
+            htmlfirma += @"<p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                              <p class=MsoNormal align=center style='text-align:center'>
+                                  <span style='font-family:""Century Gothic"",sans-serif;font-size:9.0pt;color:#000035;'>Copyrights ©SifizSoft 2004-2026 carefully reserved and preserved<o:p></o:p></span>
+                              </p>
+                              <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                          </div>";
 
+            // Siempre incluir el logo corporativo
             List<string> listImagenes = new List<string>();
-            listImagenes.AddRange(new string[] { "sifizsoft.jpg", "fb.jpg", "tw.jpg", "linkedin.jpg", "efqm.jpg", "openkm.jpg" });
-            if (qr != null)
-            {
-                listImagenes.Add(nameQr);
-            }
+            listImagenes.Add(logoCorporativo);
             string[] imagenes = listImagenes.ToArray();
             try
             {
                 string email = System.Configuration.ConfigurationManager.AppSettings["emailApp"];
                 string password = System.Configuration.ConfigurationManager.AppSettings["passwordEmailApp"];
                 string htmlMail = htmlCss + emailBody + htmlfirma;
-                EnviarEmail(email, emailsDestinos, htmlMail, asunto, password, true, imagenes, adjuntos);
+
+                // Siempre adjuntar la imagen corporativa con el parámetro -1
+                Utiles.EnviarEmail(email, emailsDestinos, htmlMail, asunto, password, true, imagenes, adjuntos, -1);
             }
             catch (Exception e)
             {
@@ -307,19 +287,21 @@ namespace SifizPlanning.Util
 #pragma warning restore CS0618 // Type or member is obsolete
             }
             var builder = new BodyBuilder();
-            if (adjuntarimagen)
+            builder.HtmlBody = emailBody; // Siempre asignar el HTML body primero
+            
+            if (adjuntarimagen && imagenes != null && imagenes.Length > 0)
             {
                 foreach (string imagen in imagenes)
                 {
                     string[] path = new string[2] { HostingEnvironment.MapPath("~/Web/images/email"), imagen };
                     string imagePath = Path.Combine(path);
-                    builder.HtmlBody = emailBody;
-                    builder.Attachments.Add(imagePath);
+                    if (File.Exists(imagePath))
+                    {
+                        // Usar LinkedResources para embebidas (cid:) en lugar de Attachments
+                        var linkedResource = builder.LinkedResources.Add(imagePath);
+                        linkedResource.ContentId = imagen; // Esto permite usar cid:imagen en el HTML
+                    }
                 }
-            }
-            else
-            {
-                builder.HtmlBody = emailBody;
             }
             if (adjuntos != null && adjuntos.Length > 0)
             {
@@ -737,6 +719,244 @@ namespace SifizPlanning.Util
             db1.SaveChanges();
         }
 
+        public static void AgregarTareaConReubicacion(Tarea nuevaTarea, SifizPlanningEntidades db1 = null)
+        {
+            try
+            {
+                if (db1 == null)
+                {
+                    db1 = db;
+                }
+                // Obtener el inicio y fin del día para la fecha de la nueva tarea
+                DateTime inicioDelDia = nuevaTarea.FechaInicio.Date;
+                DateTime finDelDia = inicioDelDia.AddDays(1).AddSeconds(-1);
+
+                // Modificar la consulta
+                DateTime finUltimaTarea = db1.Tarea
+                    .Where(t => t.SecuencialColaborador == nuevaTarea.SecuencialColaborador &&
+                                t.FechaInicio >= inicioDelDia &&
+                                t.FechaInicio < finDelDia)
+                    .OrderByDescending(t => t.FechaFin)
+                    .FirstOrDefault()?.FechaFin ?? inicioDelDia.AddHours(17.5);
+
+                // Buscar tareas existentes del colaborador que se solapen con la nueva tarea
+                var tareasSolapadas = (from t in db1.Tarea
+                                       where t.SecuencialColaborador == nuevaTarea.SecuencialColaborador &&
+                                             t.SecuencialEstadoTarea != 4 && // Excluir tareas anuladas
+                                             t.FechaInicio < nuevaTarea.FechaFin && t.FechaFin > nuevaTarea.FechaInicio
+                                       select t).ToList();
+
+                foreach (var tarea in tareasSolapadas)
+                {
+                    // Caso 1: Solapamiento Total
+                    if (tarea.FechaInicio >= nuevaTarea.FechaInicio && tarea.FechaFin <= nuevaTarea.FechaFin)
+                    {
+                        Tarea tareaReubicada = ClonarSinSecuencial(tarea);
+                        tareaReubicada.FechaInicio = finUltimaTarea;
+                        tareaReubicada.FechaFin = finUltimaTarea.Add(tarea.FechaFin - tarea.FechaInicio);
+
+                        db1.Tarea.Add(tareaReubicada);
+                        finUltimaTarea = tareaReubicada.FechaFin;
+                    }
+                    // Caso 2: Solapamiento Parcial al Inicio
+                    else if (tarea.FechaInicio < nuevaTarea.FechaInicio && tarea.FechaFin > nuevaTarea.FechaInicio && tarea.FechaFin <= nuevaTarea.FechaFin)
+                    {
+                        // Parte antes del solapamiento
+                        Tarea tareaAntes = ClonarSinSecuencial(tarea);
+                        tareaAntes.FechaInicio = tarea.FechaInicio;
+                        tareaAntes.FechaFin = nuevaTarea.FechaInicio;
+                        db1.Tarea.Add(tareaAntes);
+
+                        // Parte dentro del solapamiento reubicada
+                        Tarea tareaReubicada = ClonarSinSecuencial(tarea);
+                        tareaReubicada.FechaInicio = finUltimaTarea;
+                        tareaReubicada.FechaFin = finUltimaTarea.Add(tarea.FechaFin - nuevaTarea.FechaInicio);
+                        db1.Tarea.Add(tareaReubicada);
+                        finUltimaTarea = tareaReubicada.FechaFin;
+                    }
+                    // Caso 3: Solapamiento Parcial al Final
+                    else if (tarea.FechaInicio >= nuevaTarea.FechaInicio && tarea.FechaInicio < nuevaTarea.FechaFin && tarea.FechaFin > nuevaTarea.FechaFin)
+                    {
+                        // Parte solapada al inicio
+                        Tarea tareaReubicada = ClonarSinSecuencial(tarea);
+                        tareaReubicada.FechaInicio = finUltimaTarea;
+                        tareaReubicada.FechaFin = finUltimaTarea.Add(nuevaTarea.FechaFin - tarea.FechaInicio);
+                        db1.Tarea.Add(tareaReubicada);
+                        finUltimaTarea = tareaReubicada.FechaFin;
+
+                        // Parte posterior al solapamiento
+                        Tarea tareaDespues = ClonarSinSecuencial(tarea);
+                        tareaDespues.FechaInicio = nuevaTarea.FechaFin;
+                        tareaDespues.FechaFin = tarea.FechaFin;
+                        db1.Tarea.Add(tareaDespues);
+                    }
+                    // Caso 4: Solapamiento Completamente Cubierto
+                    else if (tarea.FechaInicio < nuevaTarea.FechaInicio && tarea.FechaFin > nuevaTarea.FechaFin)
+                    {
+                        // Parte antes del solapamiento
+                        Tarea tareaAntes = ClonarSinSecuencial(tarea);
+                        tareaAntes.FechaInicio = tarea.FechaInicio;
+                        tareaAntes.FechaFin = nuevaTarea.FechaInicio;
+                        db1.Tarea.Add(tareaAntes);
+
+                        // Parte coincidente reubicada
+                        Tarea tareaReubicada = ClonarSinSecuencial(tarea);
+                        tareaReubicada.FechaInicio = finUltimaTarea;
+                        tareaReubicada.FechaFin = finUltimaTarea.Add(nuevaTarea.FechaFin - nuevaTarea.FechaInicio);
+                        db1.Tarea.Add(tareaReubicada);
+                        finUltimaTarea = tareaReubicada.FechaFin;
+
+                        // Parte después del solapamiento
+                        Tarea tareaDespues = ClonarSinSecuencial(tarea);
+                        tareaDespues.FechaInicio = nuevaTarea.FechaFin;
+                        tareaDespues.FechaFin = tarea.FechaFin;
+                        db1.Tarea.Add(tareaDespues);
+                    }
+
+                    // Marcar la tarea original como anulada
+                    tarea.SecuencialEstadoTarea = 4;
+                }
+
+                // Agregar la nueva tarea
+                db1.Tarea.Add(nuevaTarea);
+
+                // Guardar todos los cambios en la base de datos
+                db1.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+
+        //public static void AgregarTareaConReubicacion(Tarea nuevaTarea, SifizPlanningEntidades db1 = null)
+        //{
+        //    try
+        //    {
+        //        if (db1 == null)
+        //        {
+        //            db1 = db;
+        //        }
+        //        // Obtener el inicio y fin del día para la fecha de la nueva tarea
+        //        DateTime inicioDelDia = nuevaTarea.FechaInicio.Date;
+        //        DateTime finDelDia = inicioDelDia.AddDays(1).AddSeconds(-1);
+
+        //        // Modificar la consulta
+        //        DateTime finUltimaTarea = db1.Tarea
+        //            .Where(t => t.SecuencialColaborador == nuevaTarea.SecuencialColaborador &&
+        //                        t.FechaInicio >= inicioDelDia &&
+        //                        t.FechaInicio < finDelDia)
+        //            .OrderByDescending(t => t.FechaFin)
+        //            .FirstOrDefault()?.FechaFin ?? inicioDelDia.AddHours(17.5);
+
+        //        // Buscar tareas existentes del colaborador que se solapen con la nueva tarea
+        //        var tareasSolapadas = (from t in db1.Tarea
+        //                               where t.SecuencialColaborador == nuevaTarea.SecuencialColaborador &&
+        //                                     t.SecuencialEstadoTarea != 4 && // Excluir tareas anuladas
+        //                                     t.FechaInicio < nuevaTarea.FechaFin && t.FechaFin > nuevaTarea.FechaInicio
+        //                               select t).ToList();
+
+        //        foreach (var tarea in tareasSolapadas)
+        //        {
+        //            // Caso 1: Solapamiento Total
+        //            if (tarea.FechaInicio >= nuevaTarea.FechaInicio && tarea.FechaFin <= nuevaTarea.FechaFin)
+        //            {
+        //                Tarea tareaReubicada = new Tarea();
+        //                tareaReubicada = tarea;
+        //                tareaReubicada.Secuencial = 0;
+        //                tareaReubicada.FechaInicio = finUltimaTarea;
+        //                tareaReubicada.FechaFin = finUltimaTarea.Add(tarea.FechaFin - tarea.FechaInicio);
+
+        //                db1.Tarea.Add(tareaReubicada);
+        //                finUltimaTarea = tareaReubicada.FechaFin;
+        //            }
+        //            // Caso 2: Solapamiento Parcial al Inicio
+        //            else if (tarea.FechaInicio < nuevaTarea.FechaInicio && tarea.FechaFin > nuevaTarea.FechaInicio && tarea.FechaFin <= nuevaTarea.FechaFin)
+        //            {
+        //                // Parte antes del solapamiento
+        //                Tarea tareaAntes = new Tarea();
+        //                tareaAntes = tarea;
+        //                tareaAntes.Secuencial = 0;
+        //                tareaAntes.FechaInicio = tarea.FechaInicio;
+        //                tareaAntes.FechaFin = nuevaTarea.FechaInicio;
+        //                db1.Tarea.Add(tareaAntes);
+
+        //                // Parte dentro del solapamiento reubicada
+        //                Tarea tareaReubicada = new Tarea();
+        //                tareaReubicada = tarea;
+        //                tareaReubicada.Secuencial = 0;
+        //                tareaReubicada.FechaInicio = finUltimaTarea;
+        //                tareaReubicada.FechaFin = finUltimaTarea.Add(tarea.FechaFin - nuevaTarea.FechaInicio);
+        //                db1.Tarea.Add(tareaReubicada);
+        //                finUltimaTarea = tareaReubicada.FechaFin;
+        //            }
+        //            // Caso 3: Solapamiento Parcial al Final
+        //            else if (tarea.FechaInicio >= nuevaTarea.FechaInicio && tarea.FechaInicio < nuevaTarea.FechaFin && tarea.FechaFin > nuevaTarea.FechaFin)
+        //            {
+        //                // Parte solapada al inicio
+        //                Tarea tareaReubicada = new Tarea();
+        //                tareaReubicada = tarea;
+        //                tareaReubicada.Secuencial = 0;
+        //                tareaReubicada.FechaInicio = finUltimaTarea;
+        //                tareaReubicada.FechaFin = finUltimaTarea.Add(nuevaTarea.FechaFin - tarea.FechaInicio);
+        //                db1.Tarea.Add(tareaReubicada);
+        //                finUltimaTarea = tareaReubicada.FechaFin;
+
+        //                // Parte posterior al solapamiento
+        //                Tarea tareaDespues = new Tarea();
+        //                tareaDespues = tarea;
+        //                tareaDespues.Secuencial = 0;
+        //                tareaDespues.FechaInicio = nuevaTarea.FechaFin;
+        //                tareaDespues.FechaFin = tarea.FechaFin;
+        //                db1.Tarea.Add(tareaDespues);
+        //            }
+        //            // Caso 4: Solapamiento Completamente Cubierto
+        //            else if (tarea.FechaInicio < nuevaTarea.FechaInicio && tarea.FechaFin > nuevaTarea.FechaFin)
+        //            {
+        //                // Parte antes del solapamiento
+        //                Tarea tareaAntes = new Tarea();
+        //                tareaAntes = tarea;
+        //                tareaAntes.Secuencial = 0;
+        //                tareaAntes.FechaInicio = tarea.FechaInicio;
+        //                tareaAntes.FechaFin = nuevaTarea.FechaInicio;
+        //                db1.Tarea.Add(tareaAntes);
+
+        //                // Parte coincidente reubicada
+        //                Tarea tareaReubicada = new Tarea();
+        //                tareaReubicada = tarea;
+        //                tareaReubicada.Secuencial = 0;
+        //                tareaReubicada.FechaInicio = finUltimaTarea;
+        //                tareaReubicada.FechaFin = finUltimaTarea.Add(nuevaTarea.FechaFin - nuevaTarea.FechaInicio);
+        //                db1.Tarea.Add(tareaReubicada);
+        //                finUltimaTarea = tareaReubicada.FechaFin;
+
+        //                // Parte después del solapamiento
+        //                Tarea tareaDespues = new Tarea();
+        //                tareaDespues = tarea;
+        //                tareaDespues.Secuencial = 0;
+        //                tareaDespues.FechaInicio = nuevaTarea.FechaFin;
+        //                tareaDespues.FechaFin = tarea.FechaFin;
+        //                db1.Tarea.Add(tareaDespues);
+        //            }
+
+        //            // Marcar la tarea original como anulada
+        //            tarea.SecuencialEstadoTarea = 4;
+        //        }
+
+        //        // Agregar la nueva tarea
+        //        db1.Tarea.Add(nuevaTarea);
+
+        //        // Guardar todos los cambios en la base de datos
+        //        db1.SaveChanges();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(ex.Message);
+        //    }
+        //}
+
+
         public static List<string> CorreoPorGrupoEmail(string codigoGrupoEmail)
         {
             var correos = (from p in db.Persona
@@ -884,6 +1104,64 @@ namespace SifizPlanning.Util
 
             // Retornar la representación de texto de los datos descifrados
             return Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount);
+        }
+
+        private static Tarea ClonarSinSecuencial(Tarea t)
+        {
+            // Clona la instancia actual sin el Secuencial y sin relaciones
+            Tarea clon = new Tarea
+            {
+                SecuencialColaborador = t.SecuencialColaborador,
+                SecuencialActividad = t.SecuencialActividad,
+                SecuencialLugarTarea = t.SecuencialLugarTarea,
+                SecuencialEstadoTarea = t.SecuencialEstadoTarea,
+                SecuencialModulo = t.SecuencialModulo,
+                SecuencialCliente = t.SecuencialCliente,
+                Detalle = t.Detalle,
+                FechaInicio = t.FechaInicio,
+                FechaFin = t.FechaFin,
+                HorasUtilizadas = t.HorasUtilizadas,
+                NumeroVerificador = t.NumeroVerificador,
+                TiempoEstimacion = t.TiempoEstimacion,
+                EsReproceso = t.EsReproceso
+            };
+
+            return clon;
+        }
+
+        /// <summary>
+        /// Normaliza una fecha para evitar problemas de zona horaria
+        /// Convierte cualquier fecha a la zona horaria del servidor (Ecuador)
+        /// </summary>
+        /// <param name="fecha">Fecha a normalizar</param>
+        /// <returns>Fecha normalizada en zona horaria del servidor</returns>
+        public static DateTime NormalizarFecha(DateTime fecha)
+        {
+            // Si la fecha tiene información de zona horaria, convertir a local
+            if (fecha.Kind == DateTimeKind.Utc)
+            {
+                return fecha.ToLocalTime().Date;
+            }
+            else if (fecha.Kind == DateTimeKind.Unspecified)
+            {
+                // Asumir que es una fecha local y tomar solo la parte de fecha
+                return fecha.Date;
+            }
+            else
+            {
+                // Ya es local, tomar solo la parte de fecha
+                return fecha.Date;
+            }
+        }
+
+        /// <summary>
+        /// Normaliza una fecha nullable para evitar problemas de zona horaria
+        /// </summary>
+        /// <param name="fecha">Fecha nullable a normalizar</param>
+        /// <returns>Fecha normalizada en zona horaria del servidor o null</returns>
+        public static DateTime? NormalizarFecha(DateTime? fecha)
+        {
+            return fecha.HasValue ? NormalizarFecha(fecha.Value) : (DateTime?)null;
         }
     }
 }

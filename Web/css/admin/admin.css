@@ -82,6 +82,47 @@
     width: 280px;
 }
 
+/* ================================================================== */
+/* NUEVO CSS PARA TABLA COMPACTA Y CON SCROLL (MÉTODO MODERNO)   */
+/* ================================================================== */
+
+/* 1. Estilos para que la tabla sea compacta */
+#tabla-proyectos-excel th,
+#tabla-proyectos-excel td {
+    padding: 0.4rem;      /* Espaciado interno reducido */
+    font-size: 13px;        /* Tamaño de fuente legible pero pequeño */
+    vertical-align: middle;
+    white-space: nowrap;  /* Evita que el texto largo se parta en varias líneas */
+}
+
+#tabla-proyectos-excel .form-control {
+    height: 28px;
+    font-size: 13px;
+    padding: 2px 6px;
+}
+
+#tabla-proyectos-excel .btn {
+    padding: 2px 6px;
+    font-size: 12px;
+}
+
+
+/* 2. Lógica para el Scroll (Método del Contenedor) */
+.table-container {
+    height: 60vh; /* Altura del 60% de la ventana. AJUSTA ESTE VALOR A TU GUSTO */
+    overflow-y: auto; /* Activa el scroll vertical solo cuando es necesario */
+}
+
+/* 3. Lógica para la Cabecera Fija (Sticky Header) */
+#tabla-proyectos-excel thead th {
+    position: -webkit-sticky; /* Para compatibilidad con Safari */
+    position: sticky;
+    top: 0; /* Se "pega" en la parte superior del contenedor con scroll */
+    z-index: 2; /* Se asegura que la cabecera esté por encima del contenido del cuerpo */
+    background-color: #f8f9fa; /* Color de fondo para que no se vea el texto de abajo al hacer scroll */
+    box-shadow: inset 0 -2px 0 #dee2e6; /* Una línea sutil para separar la cabecera del cuerpo */
+}
+
 .left {
     float: left;
 }
