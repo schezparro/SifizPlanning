@@ -32,9 +32,10 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult RequerimientosComercial(int start, int lenght, string filtro = "")
         {
-
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[RequerimientosComercial] Usuario {emailUser} solicitó la lista de requerimientos comerciales con filtro: '{filtro}'");
                 var requerimientosComercial = (from or in db.OFERTAREQUERIMIENTO
                                                join r in db.Requerimiento on or.SecuencialRequerimiento equals r.Secuencial
                                                join cli in db.Cliente on or.SecuencialCLiente equals cli.Secuencial
@@ -80,10 +81,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[RequerimientosComercial] Error al obtener requerimientos comerciales: {e.Message}");
                 var result = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener requerimientos comerciales."
                 };
                 return Json(result);
             }
@@ -93,8 +95,10 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult DarDatosRequerimiento(int secuencialRequerimiento)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[DarDatosRequerimiento] Usuario {emailUser} solicitó los datos del requerimiento con ID {secuencialRequerimiento}");
                 OfertaRequerimiento o = db.OFERTAREQUERIMIENTO.Find(secuencialRequerimiento);
                 if (o == null)
                 {
@@ -132,10 +136,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarDatosRequerimiento] Error al obtener datos del requerimiento con ID {secuencialRequerimiento}: {e.Message}");
                 var result = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener datos del requerimiento."
                 };
                 return Json(result);
             }
@@ -145,6 +150,8 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult GuardarRequerimiento(int cliente, int requerimiento, string ticket, string detalle, string fechaPedidoCliente, int? colaborador)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[GuardarRequerimiento] El usuario {emailUser} está registrando un nuevo requerimiento comercial para el cliente {cliente}.");
             try
             {
                 OfertaRequerimiento nuevaOfertaRequerimiento = new OfertaRequerimiento();
@@ -209,6 +216,11 @@ namespace SifizPlanning.Controllers
 
                 db.OFERTAREQUERIMIENTO.Add(nuevaOfertaRequerimiento);
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Creación de requerimiento",
+                    $"El usuario {emailUser} creó un requerimiento comercial para el cliente {cliente}, requerimiento {requerimiento}, ticket {ticket}.",
+                    emailUser
+                );
 
                 return Json(new
                 {
@@ -218,6 +230,7 @@ namespace SifizPlanning.Controllers
             }
             catch (DbEntityValidationException ex)
             {
+                LoggerManager.LogError(ex, $"[GuardarRequerimiento] Error de validación al registrar requerimiento: {ex.Message}");
                 var errorMessages = ex.EntityValidationErrors
                     .SelectMany(e => e.ValidationErrors)
                     .Select(e => $"{e.PropertyName}: {e.ErrorMessage}");
@@ -233,6 +246,7 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[GuardarRequerimiento] Error inesperado al registrar requerimiento: {e.Message}");
                 return Json(new
                 {
                     success = false,
@@ -246,6 +260,8 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult EditarRequerimiento(int id, int cliente, int requerimiento, string ticket, string detalle, string fechaPedidoCliente, int? colaborador)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[EditarRequerimiento] El usuario {emailUser} está editando el requerimiento con ID {id}.");
             try
             {
                 var nuevaOfertaRequerimiento = db.OFERTAREQUERIMIENTO.FirstOrDefault(s => s.Secuencial == id);
@@ -293,6 +309,11 @@ namespace SifizPlanning.Controllers
                 nuevaOfertaRequerimiento.SecuencialColaborador = colaborador;
 
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Edición de requerimiento",
+                    $"El usuario {emailUser} actualizó el requerimiento con ID {id} para el cliente {cliente}, requerimiento {requerimiento}, ticket {ticket}.",
+                    emailUser
+                );
 
                 return Json(new
                 {
@@ -302,6 +323,7 @@ namespace SifizPlanning.Controllers
             }
             catch (DbEntityValidationException ex)
             {
+                LoggerManager.LogError(ex, $"[EditarRequerimiento] Error de validación al editar el requerimiento con ID {id}: {ex.Message}");
                 var errorMessages = ex.EntityValidationErrors
                     .SelectMany(e => e.ValidationErrors)
                     .Select(e => $"{e.PropertyName}: {e.ErrorMessage}");
@@ -317,6 +339,7 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EditarRequerimiento] Error inesperado al editar el requerimiento con ID {id}: {e.Message}");
                 return Json(new
                 {
                     success = false,
@@ -329,6 +352,8 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult EliminarRequerimiento(int id)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[EliminarRequerimiento] El usuario {emailUser} está intentando eliminar el requerimiento con ID {id}.");
             try
             {
                 var ofertaRequerimiento = db.OFERTAREQUERIMIENTO.Find(id);
@@ -344,6 +369,11 @@ namespace SifizPlanning.Controllers
 
                 db.OFERTAREQUERIMIENTO.Remove(ofertaRequerimiento);
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Eliminación de requerimiento",
+                    $"El usuario {emailUser} eliminó el requerimiento con ID {id}.",
+                    emailUser
+                );
 
                 return Json(new
                 {
@@ -353,6 +383,7 @@ namespace SifizPlanning.Controllers
             }
             catch (DbEntityValidationException ex)
             {
+                LoggerManager.LogError(ex, $"[EliminarRequerimiento] Error de validación al eliminar el requerimiento con ID {id}: {ex.Message}");
                 var errorMessages = ex.EntityValidationErrors
                     .SelectMany(e => e.ValidationErrors)
                     .Select(e => $"{e.PropertyName}: {e.ErrorMessage}");
@@ -368,10 +399,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EliminarRequerimiento] Error inesperado al eliminar el requerimiento con ID {id}: {e.Message}");
                 return Json(new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error inesperado al eliminar el requerimiento."
                 });
             }
         }
@@ -459,6 +491,8 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult DarCatalogoRequerimientos()
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[DarCatalogoRequerimientos] El usuario {emailUser} solicitó el catálogo de requerimientos.");
             try
             {
                 var requerimientos = (from r in db.Requerimiento
@@ -477,10 +511,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarCatalogoRequerimientos] Error al obtener el catálogo de requerimientos: {e.Message}");
                 var result = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener el catálogo de requerimientos."
                 };
                 return Json(result);
             }
@@ -490,6 +525,8 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult OfertasComercial(int start, int lenght, string filtro = "", string filtrosColumna = null)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[OfertasComercial] El usuario {emailUser} consultó la lista de ofertas comerciales con filtro '{filtro}' y paginación desde {start} con longitud {lenght}.");
             try
             {
                 var filtros = new Dictionary<string, string>();
@@ -609,7 +646,13 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
-                return Json(new { success = false, msg = e.Message });
+                LoggerManager.LogError(e, $"[OfertasComercial] Error al obtener las ofertas comerciales para el usuario {emailUser}: {e.Message}");
+                var result = new
+                {
+                    success = false,
+                    msg = "Error al obtener las ofertas comerciales,"
+                };
+                return Json(result);
             }
         }
 
@@ -617,6 +660,8 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult DarDatosOferta(string codigo)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[DarDatosOferta] El usuario {emailUser} solicitó los datos de la oferta con código {codigo}.");
             try
             {
                 OfertaOferta o = db.OfertaOferta.Where(d => d.Codigo.ToString() == codigo).FirstOrDefault();
@@ -650,10 +695,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarDatosOferta] Error al obtener la oferta con código {codigo} para el usuario {emailUser}: {e.Message}");
                 var result = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener la oferta."
                 };
                 return Json(result);
             }
@@ -664,6 +710,8 @@ namespace SifizPlanning.Controllers
         public ActionResult GuardarOferta(string OfertaRequerimiento, string codigo, string fechaEstimacion, string fechaRevision, string fechaEnvioOferta,
             string fechaGeneracion, string fechaAprobacionGerencia, string fechaVencimiento, decimal? precio, string formaPago, string descuento, string estado, string tipo, string tema)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[GuardarOferta] El usuario {emailUser} inició el guardado de una nueva oferta con código: {codigo}.");
             try
             {
                 int idRequerimiento;
@@ -747,10 +795,21 @@ namespace SifizPlanning.Controllers
                 // Tema se guarda en el requerimiento, no en la oferta
                 db.OfertaOferta.Add(nuevaOferta);
                 db.SaveChanges();
-                return Json(new { success = true, msg = "Se ha realizado la operación correctamente." });
+                LoggerManager.LogSensitiveOperation(
+                    "Creación de oferta",
+                    $"El usuario {emailUser} creó una nueva oferta con código {codigo} y requerimiento {OfertaRequerimiento}.",
+                    emailUser
+                );
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
             }
             catch (DbEntityValidationException ex)
             {
+                LoggerManager.LogError(ex, $"[GuardarOferta] Error de validación al guardar oferta por el usuario {emailUser}: {ex.Message}");
                 var errorMessages = ex.EntityValidationErrors
                     .SelectMany(e => e.ValidationErrors)
                     .Select(e => $"{e.PropertyName}: {e.ErrorMessage}");
@@ -760,7 +819,12 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
-                return Json(new { success = false, msg = e.Message });
+                LoggerManager.LogError(e, $"[GuardarOferta] Error al guardar la oferta para el usuario {emailUser}: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = " Error al guardar la oferta."
+                });
             }
         }
 
@@ -780,6 +844,8 @@ namespace SifizPlanning.Controllers
         public ActionResult EditarOferta(int id, string ofertaRequerimiento, string fechaEstimacion, string fechaRevision, string fechaEnvioOferta,
             string fechaGeneracion, string fechaAprobacionGerencia, string fechaVencimiento, decimal? precio, string formaPago, string descuento, string estado, string tipo, string tema)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[EditarOferta] El usuario {emailUser} inició la edición de la oferta con ID: {id}.");
             try
             {
                 var oferta = db.OfertaOferta.FirstOrDefault(s => s.Secuencial == id);
@@ -818,10 +884,21 @@ namespace SifizPlanning.Controllers
                 oferta.Tipo = tipo;
                 // Tema se guarda en el requerimiento, no en la oferta
                 db.SaveChanges();
-                return Json(new { success = true, msg = "Se ha realizado la operación correctamente." });
+                LoggerManager.LogSensitiveOperation(
+                    "Edición de oferta",
+                    $"El usuario {emailUser} actualizó la oferta con ID {id} y requerimiento {ofertaRequerimiento}.",
+                    emailUser
+                );
+
+                return Json(new
+                {
+                    success = true,
+                    msg = "Se ha realizado la operación correctamente."
+                });
             }
             catch (DbEntityValidationException ex)
             {
+                LoggerManager.LogError(ex, $"[EditarOferta] Error de validación al editar oferta con ID {id} por el usuario {emailUser}: {ex.Message}");
                 var errorMessages = ex.EntityValidationErrors
                     .SelectMany(e => e.ValidationErrors)
                     .Select(e => $"{e.PropertyName}: {e.ErrorMessage}");
@@ -831,7 +908,12 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
-                return Json(new { success = false, msg = e.Message });
+                LoggerManager.LogError(e, $"[EditarOferta] Error al editar la oferta con ID {id} para el usuario {emailUser}: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error al editar la oferta."
+                });
             }
         }
 
@@ -851,6 +933,8 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult EliminarOferta(string codigo)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[EliminarOferta] Usuario {emailUser} intentando eliminar oferta {codigo}");
             try
             {
                 var oferta = db.OfertaOferta.Where(d => d.Codigo == codigo).FirstOrDefault();
@@ -866,6 +950,11 @@ namespace SifizPlanning.Controllers
 
                 db.OfertaOferta.Remove(oferta);
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Eliminación de oferta",
+                    $"Usuario {emailUser} eliminó oferta {codigo} (ID: {oferta.Secuencial})",
+                    emailUser
+                );
 
                 return Json(new
                 {
@@ -890,10 +979,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EliminarOferta] Error al eliminar oferta {codigo}");
                 return Json(new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al eliminar oferta."
                 });
             }
         }
@@ -902,6 +992,8 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult DarRequerimientosOfertas()
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[DarRequerimientosOfertas] Usuario {emailUser} solicitando requerimientos");
             try
             {
                 string emailUser = User.Identity.Name;
@@ -961,10 +1053,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarRequerimientosOfertas] Error al obtener requerimientos");
                 return Json(new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener requerimientos."
                 });
             }
         }
@@ -973,6 +1066,8 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult GenerarCodigoOferta()
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[GenerarCodigoOferta] Usuario {emailUser} generando nuevo código de oferta");
             string annoActual = DateTime.Now.Year.ToString().Substring(2, 2);
 
             // Obtener el último código de la tabla OfertaOferta
@@ -980,6 +1075,7 @@ namespace SifizPlanning.Controllers
                                  .OrderByDescending(o => o.Codigo)
                                  .Select(o => o.Codigo)
                                  .FirstOrDefault();
+            LoggerManager.LogInfo($"[GenerarCodigoOferta] Último código encontrado: {ultimoCodigo ?? "Ninguno"}");
 
             int nuevoNumero = 1; // Número inicial si no hay códigos previos
 
@@ -998,6 +1094,7 @@ namespace SifizPlanning.Controllers
 
             // Concatenar el año actual con el nuevo número
             string nuevoCodigo = $"{annoActual}{nuevoNumeroStr}";
+            LoggerManager.LogInfo($"[GenerarCodigoOferta] Nuevo código generado: {nuevoCodigo} para usuario {emailUser}");
 
             return Json(new
             {
@@ -1011,6 +1108,8 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult DarEstadoOfertaComercial()
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[DarEstadoOfertaComercial] Usuario {emailUser} solicitando estados de oferta");
             try
             {
                 var ofr = (from or in db.EstadoOferta
@@ -1029,6 +1128,7 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarEstadoOfertaComercial] Error al obtener estados de oferta para usuario {User.Identity.Name}");
                 var result = new
                 {
                     success = false,
@@ -1066,7 +1166,8 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult FormalizacionComercial(int start, int lenght, string filtro = "")
         {
-
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[FormalizacionComercial] Usuario {emailUser} solicitando listado de formalizaciones (inicio: {start}, longitud: {lenght}, filtro: '{filtro}')");
             try
             {
                 var formalizacionComercial = (from f in db.FormalizacionOfertas
@@ -1145,10 +1246,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[FormalizacionComercial] Error al obtener listado de formalizaciones para usuario {User.Identity.Name}");
                 var result = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener listado de formalizaciones."
                 };
                 return Json(result);
             }
@@ -1158,6 +1260,8 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult DarDatosFormalizacion(string secuencial)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[DarDatosFormalizacion] Usuario {emailUser} solicitando datos de formalización {secuencial}");
             try
             {
                 var sec = int.Parse(secuencial);
@@ -1202,10 +1306,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarDatosFormalizacion] Error al obtener datos de formalización {secuencial} para usuario {User.Identity.Name}");
                 var result = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener datos de formalización."
                 };
                 return Json(result);
             }
@@ -1217,6 +1322,8 @@ namespace SifizPlanning.Controllers
     string seguimientoContrato, string valorAnticipo, string fechaFacturacionAnticipo, string ordenFacturacionAnticipo, string valorEntrega,
     string ordenFacturacionEntrega, string valorFacturacionProgramada, string ordenFacturacionProgramada)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[GuardarFormalizacion] Usuario {emailUser} iniciando guardado de formalización para oferta {secuencialOferta}");
             try
             {
                 FormalizacionOfertas nuevaFormalizacion = new FormalizacionOfertas();
@@ -1259,6 +1366,11 @@ namespace SifizPlanning.Controllers
 
                 db.FormalizacionOfertas.Add(nuevaFormalizacion);
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Creación de formalización",
+                    $"Usuario {emailUser} creó formalización ID {nuevaFormalizacion.Secuencial} para oferta {secuencialOferta} (Valor: {valor}, Contrato: {noContrato})",
+                    emailUser
+                );
 
                 return Json(new
                 {
@@ -1268,6 +1380,7 @@ namespace SifizPlanning.Controllers
             }
             catch (DbEntityValidationException ex)
             {
+                LoggerManager.LogError(ex,$"[GuardarFormalizacion] Error de validación al guardar formalización: {ex.Message}");
                 var errorMessages = ex.EntityValidationErrors
                     .SelectMany(e => e.ValidationErrors)
                     .Select(e => $"{e.PropertyName}: {e.ErrorMessage}");
@@ -1277,7 +1390,12 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
-                return Json(new { success = false, msg = e.Message });
+                LoggerManager.LogError(e, $"[GuardarFormalizacion] Error al guardar formalización para oferta {secuencialOferta} por {emailUser}");
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
             }
         }
 
@@ -1287,6 +1405,8 @@ namespace SifizPlanning.Controllers
     string seguimientoContrato, string valorAnticipo, string fechaFacturacionAnticipo, string ordenFacturacionAnticipo, string valorEntrega,
     string ordenFacturacionEntrega, string valorFacturacionProgramada, string ordenFacturacionProgramada)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[EditarFormalizacion] Usuario {emailUser} editando formalización {secuencial}");
             try
             {
                 var formalizacion = db.FormalizacionOfertas.FirstOrDefault(s => s.Secuencial == secuencial);
@@ -1347,6 +1467,11 @@ namespace SifizPlanning.Controllers
                 formalizacion.NoOrdenFacturacionProgramada = ordenFacturacionProgramada;
 
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Edición de formalización",
+                    $"Usuario {emailUser} editó formalización ID {secuencial} (Oferta: {secuencialOferta}, Estado: {estadoSecuencial}, Contrato: {noContrato})",
+                    emailUser
+                );
 
                 return Json(new
                 {
@@ -1356,6 +1481,7 @@ namespace SifizPlanning.Controllers
             }
             catch (DbEntityValidationException ex)
             {
+                LoggerManager.LogError(ex,$"[EditarFormalizacion] Error de validación al editar formalización {secuencial}: {ex.Message}");
                 var errorMessages = ex.EntityValidationErrors
                     .SelectMany(e => e.ValidationErrors)
                     .Select(e => $"{e.PropertyName}: {e.ErrorMessage}");
@@ -1371,10 +1497,12 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EditarFormalizacion] Error al editar formalización {secuencial} por {emailUser}");
+
                 return Json(new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al editar formalización."
                 });
             }
         }
@@ -1383,6 +1511,8 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult EliminarFormalizacion(string secuencial)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[EliminarFormalizacion] Usuario {emailUser} intentando eliminar formalización {secuencial}");
             try
             {
                 var sec = int.Parse(secuencial);
@@ -1399,6 +1529,12 @@ namespace SifizPlanning.Controllers
 
                 db.FormalizacionOfertas.Remove(formalizacion);
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Eliminación de formalización",
+                    $"Usuario {emailUser} eliminó formalización ID {secuencial} (Oferta asociada: {formalizacion.SecuencialOferta})",
+                    emailUser
+                );
+
 
                 return Json(new
                 {
@@ -1408,6 +1544,8 @@ namespace SifizPlanning.Controllers
             }
             catch (DbEntityValidationException ex)
             {
+                LoggerManager.LogError(ex,$"[EliminarFormalizacion] Error de validación al eliminar formalización {secuencial}: {ex.Message}");
+
                 var errorMessages = ex.EntityValidationErrors
                     .SelectMany(e => e.ValidationErrors)
                     .Select(e => $"{e.PropertyName}: {e.ErrorMessage}");
@@ -1423,10 +1561,12 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EliminarFormalizacion] Error al eliminar formalización {secuencial} por {emailUser}");
+
                 return Json(new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al eliminar formalización."
                 });
             }
         }
@@ -1435,6 +1575,8 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult DarOfertasOfertas()
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[DarOfertasOfertas] Usuario {emailUser} solicitando listado de ofertas");
             try
             {
                 var ofertasComercial = (from or in db.OfertaOferta
@@ -1459,10 +1601,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarOfertasOfertas] Error al obtener ofertas por {emailUser}");
                 return Json(new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener ofertas."
                 });
             }
         }
@@ -1471,6 +1614,9 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult GenerarCodigoFormalizacion()
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[GenerarCodigoFormalizacion] Usuario {emailUser} generando nuevo código");
+
             string annoActual = DateTime.Now.Year.ToString().Substring(2, 2);
 
             // Obtener el último código de la tabla OfertaOferta
@@ -1478,6 +1624,7 @@ namespace SifizPlanning.Controllers
                                  .OrderByDescending(o => o.Secuencial)
                                  .Select(o => o.Secuencial)
                                  .FirstOrDefault();
+            LoggerManager.LogInfo($"[GenerarCodigoFormalizacion] Último código encontrado: {ultimoCodigo}");
 
             int nuevoNumero = 1; // Número inicial si no hay códigos previos
 
@@ -1492,6 +1639,7 @@ namespace SifizPlanning.Controllers
 
             // Concatenar el año actual con el nuevo número
             string nuevoCodigo = $"{annoActual}-{nuevoNumeroStr}";
+            LoggerManager.LogInfo($"[GenerarCodigoFormalizacion] Nuevo código generado: {nuevoCodigo}");
 
             return Json(new
             {
@@ -1499,7 +1647,7 @@ namespace SifizPlanning.Controllers
                 nuevoCodigo = nuevoCodigo
             });
 
-        }
+        }   
 
     }
 

@@ -540,8 +540,9 @@ namespace SifizPlanning.Controllers
                     datos = data
                 });
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarModulosReportes] Error al devolrver modulos reportes: {e.Message}");
                 return Json(new
                 {
                     success = false,
@@ -570,8 +571,9 @@ namespace SifizPlanning.Controllers
                     datos = data
                 });
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarReportes] Error al devolver reportes: {e.Message}");
                 return Json(new
                 {
                     success = false,
@@ -587,33 +589,44 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN")]
         public ActionResult DarCorreosNoEnviados(string fIni = "", string fFin = "")
         {
-
-            var correosNoEnviados = (from c in db.CorreoNoEnviado
-                                     where c.EstaActivo == true
-                                     orderby c.FechaHora descending
-                                     select new
-                                     {
-                                         idcorreo = c.Secuencial,
-                                         fechahora = c.FechaHora.ToString().Substring(0, 19),
-                                         emailFuente = c.EmailEnvia,
-                                         emailsDestinos = c.EmailDestinos,
-                                         asunto = c.MensajeError,
-                                         emailBody = c.Texto,
-                                         password = c.Password,
-                                         adjuntarimagen = c.AdjuntarImagen,
-                                         imagenes = c.Imagenes,
-                                         adjuntos = c.Adjuntos
-                                     }
-                            ).ToList();
-
-            correosNoEnviados = correosNoEnviados.Take(200).ToList();
-
-            var resp = new
+            try
             {
-                success = true,
-                correosNoEnviados = correosNoEnviados
-            };
-            return Json(resp);
+                var correosNoEnviados = (from c in db.CorreoNoEnviado
+                                         where c.EstaActivo == true
+                                         orderby c.FechaHora descending
+                                         select new
+                                         {
+                                             idcorreo = c.Secuencial,
+                                             fechahora = c.FechaHora.ToString().Substring(0, 19),
+                                             emailFuente = c.EmailEnvia,
+                                             emailsDestinos = c.EmailDestinos,
+                                             asunto = c.MensajeError,
+                                             emailBody = c.Texto,
+                                             password = c.Password,
+                                             adjuntarimagen = c.AdjuntarImagen,
+                                             imagenes = c.Imagenes,
+                                             adjuntos = c.Adjuntos
+                                         }
+                                ).ToList();
+
+                correosNoEnviados = correosNoEnviados.Take(200).ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    correosNoEnviados = correosNoEnviados
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarCorreosNoEnviados] Error al devolver correos no enviados: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    datos = new { }
+                });
+            }
         }
 
         [HttpPost]
@@ -654,10 +667,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[ReenviarCorreo] Error al reenviar correo: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al reenviar correo."
                 };
                 return Json(resp);
             }
@@ -685,10 +699,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[ReenviarCorreo] Error al desactivar correo: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al desactivar correo."
                 };
                 return Json(resp);
             }
@@ -700,178 +715,204 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, RRHH")]
         public ActionResult DarTrabajadores(int start = 0, int limit = 0, string filtro = "", string filtroColumna = "")
         {
-            var stemp = new JavaScriptSerializer();
-            var jsonObj = stemp.Deserialize<dynamic>(filtroColumna);
-            string filtroNombre = "";
-            string filtroEmail = "";
-            string filtroDepartamento = "";
-            string filtroCargo = "";
-            string filtroSede = "";
-            string filtroUsuario = "";
-            string filtroPublicacionesDosCinco = "";
-            if (jsonObj != null)
+            try
             {
-                filtroNombre = jsonObj["nombre"];
-                filtroEmail = jsonObj["email"];
-                filtroDepartamento = jsonObj["departamento"];
-                filtroCargo = jsonObj["cargo"];
-                filtroSede = jsonObj["sede"];
-                filtroUsuario = jsonObj["usuario"];
-                filtroPublicacionesDosCinco = jsonObj["publicacionesDosCinco"];
-            }
 
-            var trabajadores = (from p in db.Persona
-                                join
-                u in db.Usuario on p equals u.persona
-                                join t in db.Colaborador on p equals t.persona
-                                join c in db.Cargo on t.cargo equals c
-                                join s in db.Sede on t.sede equals s
-                                join f in db.FotoColaborador on t equals f.colaborador
-                                join d in db.Departamento on t.departamento equals d
-                                orderby p.Apellido1, p.Apellido2, p.Nombre1, p.Nombre2
-                                select new
-                                {
-                                    idtrabajador = t.Secuencial,
-                                    url = f.Url,
-                                    nombre = p.Apellido1 + " " + p.Apellido2 + " " + p.Nombre1 + " " + p.Nombre2,
-                                    email = u.Email,
-                                    userAct = u.EstaActivo == 1 ? "SI" : "NO",
-                                    cargo = c.Descripcion,
-                                    sede = s.Descripcion,
-                                    publicacionesDosCinco = t.PublicacionesDosCinco.HasValue ? t.PublicacionesDosCinco.Value == true ? "SI" : "NO" : "NO",
-                                    departamento = d.Descripcion
-                                }
-                                 ).ToList();
+                var stemp = new JavaScriptSerializer();
+                var jsonObj = stemp.Deserialize<dynamic>(filtroColumna);
+                string filtroNombre = "";
+                string filtroEmail = "";
+                string filtroDepartamento = "";
+                string filtroCargo = "";
+                string filtroSede = "";
+                string filtroUsuario = "";
+                string filtroPublicacionesDosCinco = "";
+                if (jsonObj != null)
+                {
+                    filtroNombre = jsonObj["nombre"];
+                    filtroEmail = jsonObj["email"];
+                    filtroDepartamento = jsonObj["departamento"];
+                    filtroCargo = jsonObj["cargo"];
+                    filtroSede = jsonObj["sede"];
+                    filtroUsuario = jsonObj["usuario"];
+                    filtroPublicacionesDosCinco = jsonObj["publicacionesDosCinco"];
+                }
 
-            if (filtro != "")
-            {
-                trabajadores = (from p in db.Persona
-                                join
-                                    u in db.Usuario on p equals u.persona
-                                join
-                                    t in db.Colaborador on p equals t.persona
-                                join
-                                    c in db.Cargo on t.cargo equals c
-                                join
-                                    s in db.Sede on t.sede equals s
-                                join
-                                    f in db.FotoColaborador on t equals f.colaborador
-                                join
-                                    d in db.Departamento on t.departamento equals d
-                                where p.Nombre1.ToString().Contains(filtro) ||
-                                      p.Nombre2.ToString().Contains(filtro) ||
-                                      p.Apellido1.ToString().Contains(filtro) ||
-                                      p.Apellido2.ToString().Contains(filtro) ||
-                                      u.Email.ToString().Contains(filtro) ||
-                                      c.Descripcion.ToString().Contains(filtro) ||
-                                      d.Descripcion.ToString().Contains(filtro) ||
-                                      s.Descripcion.ToString().Contains(filtro)
-                                orderby p.Apellido1, p.Apellido2, p.Nombre1, p.Nombre2
-                                select new
-                                {
-                                    idtrabajador = t.Secuencial,
-                                    url = f.Url,
-                                    nombre = p.Apellido1 + " " + p.Apellido2 + " " + p.Nombre1 + " " + p.Nombre2,
-                                    email = u.Email,
-                                    userAct = u.EstaActivo == 1 ? "SI" : "NO",
-                                    cargo = c.Descripcion,
-                                    sede = s.Descripcion,
-                                    publicacionesDosCinco = t.PublicacionesDosCinco.HasValue ? t.PublicacionesDosCinco.Value == true ? "SI" : "NO" : "NO",
-                                    departamento = d.Descripcion
-                                }
-                                ).ToList();
-            }
+                var trabajadores = (from p in db.Persona
+                                    join
+                    u in db.Usuario on p equals u.persona
+                                    join t in db.Colaborador on p equals t.persona
+                                    join c in db.Cargo on t.cargo equals c
+                                    join s in db.Sede on t.sede equals s
+                                    join f in db.FotoColaborador on t equals f.colaborador
+                                    join d in db.Departamento on t.departamento equals d
+                                    orderby p.Apellido1, p.Apellido2, p.Nombre1, p.Nombre2
+                                    select new
+                                    {
+                                        idtrabajador = t.Secuencial,
+                                        url = f.Url,
+                                        nombre = p.Apellido1 + " " + p.Apellido2 + " " + p.Nombre1 + " " + p.Nombre2,
+                                        email = u.Email,
+                                        userAct = u.EstaActivo == 1 ? "SI" : "NO",
+                                        cargo = c.Descripcion,
+                                        sede = s.Descripcion,
+                                        publicacionesDosCinco = t.PublicacionesDosCinco.HasValue ? t.PublicacionesDosCinco.Value == true ? "SI" : "NO" : "NO",
+                                        departamento = d.Descripcion
+                                    }
+                                     ).ToList();
 
-            if (filtroNombre != "")
-            {
-                trabajadores = (from c in trabajadores
-                                where c.nombre.ToString().ToLower().Contains(filtroNombre.ToLower())
-                                select c).ToList();
-            }
+                if (filtro != "")
+                {
+                    trabajadores = (from p in db.Persona
+                                    join
+                                        u in db.Usuario on p equals u.persona
+                                    join
+                                        t in db.Colaborador on p equals t.persona
+                                    join
+                                        c in db.Cargo on t.cargo equals c
+                                    join
+                                        s in db.Sede on t.sede equals s
+                                    join
+                                        f in db.FotoColaborador on t equals f.colaborador
+                                    join
+                                        d in db.Departamento on t.departamento equals d
+                                    where p.Nombre1.ToString().Contains(filtro) ||
+                                          p.Nombre2.ToString().Contains(filtro) ||
+                                          p.Apellido1.ToString().Contains(filtro) ||
+                                          p.Apellido2.ToString().Contains(filtro) ||
+                                          u.Email.ToString().Contains(filtro) ||
+                                          c.Descripcion.ToString().Contains(filtro) ||
+                                          d.Descripcion.ToString().Contains(filtro) ||
+                                          s.Descripcion.ToString().Contains(filtro)
+                                    orderby p.Apellido1, p.Apellido2, p.Nombre1, p.Nombre2
+                                    select new
+                                    {
+                                        idtrabajador = t.Secuencial,
+                                        url = f.Url,
+                                        nombre = p.Apellido1 + " " + p.Apellido2 + " " + p.Nombre1 + " " + p.Nombre2,
+                                        email = u.Email,
+                                        userAct = u.EstaActivo == 1 ? "SI" : "NO",
+                                        cargo = c.Descripcion,
+                                        sede = s.Descripcion,
+                                        publicacionesDosCinco = t.PublicacionesDosCinco.HasValue ? t.PublicacionesDosCinco.Value == true ? "SI" : "NO" : "NO",
+                                        departamento = d.Descripcion
+                                    }
+                                    ).ToList();
+                }
 
-            if (filtroEmail != "")
-            {
-                trabajadores = (from c in trabajadores
-                                where c.email.ToString().ToLower().Contains(filtroEmail.ToLower())
-                                select c).ToList();
-            }
-            if (filtroDepartamento != "")
-            {
-                trabajadores = (from c in trabajadores
-                                where c.departamento.ToString().ToLower().Contains(filtroDepartamento.ToLower())
-                                select c).ToList();
-            }
-            if (filtroCargo != "")
-            {
-                trabajadores = (from c in trabajadores
-                                where c.cargo.ToString().ToLower().Contains(filtroCargo.ToLower())
-                                select c).ToList();
-            }
-            if (filtroSede != "")
-            {
-                trabajadores = (from c in trabajadores
-                                where c.sede.ToString().ToUpper().Contains(filtroSede.ToUpper())
-                                select c).ToList();
-            }
-            if (filtroUsuario != "")
-            {
-                trabajadores = (from c in trabajadores
-                                where c.userAct.ToString().ToLower().Contains(filtroUsuario.ToLower())
-                                select c).ToList();
-            }
+                if (filtroNombre != "")
+                {
+                    trabajadores = (from c in trabajadores
+                                    where c.nombre.ToString().ToLower().Contains(filtroNombre.ToLower())
+                                    select c).ToList();
+                }
 
-            if (filtroPublicacionesDosCinco != "")
-            {
-                trabajadores = (from c in trabajadores
-                                where c.publicacionesDosCinco.ToString().ToLower().Contains(filtroPublicacionesDosCinco.ToLower())
-                                select c).ToList();
-            }
+                if (filtroEmail != "")
+                {
+                    trabajadores = (from c in trabajadores
+                                    where c.email.ToString().ToLower().Contains(filtroEmail.ToLower())
+                                    select c).ToList();
+                }
+                if (filtroDepartamento != "")
+                {
+                    trabajadores = (from c in trabajadores
+                                    where c.departamento.ToString().ToLower().Contains(filtroDepartamento.ToLower())
+                                    select c).ToList();
+                }
+                if (filtroCargo != "")
+                {
+                    trabajadores = (from c in trabajadores
+                                    where c.cargo.ToString().ToLower().Contains(filtroCargo.ToLower())
+                                    select c).ToList();
+                }
+                if (filtroSede != "")
+                {
+                    trabajadores = (from c in trabajadores
+                                    where c.sede.ToString().ToUpper().Contains(filtroSede.ToUpper())
+                                    select c).ToList();
+                }
+                if (filtroUsuario != "")
+                {
+                    trabajadores = (from c in trabajadores
+                                    where c.userAct.ToString().ToLower().Contains(filtroUsuario.ToLower())
+                                    select c).ToList();
+                }
 
-            var resp = new
+                if (filtroPublicacionesDosCinco != "")
+                {
+                    trabajadores = (from c in trabajadores
+                                    where c.publicacionesDosCinco.ToString().ToLower().Contains(filtroPublicacionesDosCinco.ToLower())
+                                    select c).ToList();
+                }
+
+                var resp = new
+                {
+                    success = true,
+                    trabajadores = trabajadores
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
             {
-                success = true,
-                trabajadores = trabajadores
-            };
-            return Json(resp);
+                LoggerManager.LogError(e, $"[DarTrabajadores] Error al dar trabajadores: {e.Message}");
+                var resp = new
+                {
+                    success = false,
+                    msg = "Error al dar trabajadores."
+                };
+                return Json(resp);
+            }
         }
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
         public ActionResult DarRolTrabajador(int idTrabajador)
         {
-            //Buscando el usuario por el idtrabajador
-            var roles = (from t in db.Colaborador
-                         join
-                             p in db.Persona on t.persona equals p
-                         join
-                             u in db.Usuario on p equals u.persona
-                         join
-                             ur in db.UsuarioRol on u.Secuencial equals ur.SecuencialUsuario
-                         join
-                            catrol in db.Rol on ur.SecuencialRol equals catrol.Secuencial
-                         where t.Secuencial == idTrabajador
-                         select new
-                         {
-                             id = catrol.Secuencial,
-                             rol = catrol.Codigo
-                         }).ToList();
-
-            DateTime ahora = DateTime.Now;
-            UsuarioTFS usuarioTFS = db.UsuarioTFS.Where(x => x.SecuencialColaborador == idTrabajador && x.FechaInicio <= ahora && x.FechaFin >= ahora).FirstOrDefault();
-            string userTfs = "";
-            if (usuarioTFS != null)
+            try
             {
-                userTfs = usuarioTFS.Usuario;
+
+                //Buscando el usuario por el idtrabajador
+                var roles = (from t in db.Colaborador
+                             join
+                                 p in db.Persona on t.persona equals p
+                             join
+                                 u in db.Usuario on p equals u.persona
+                             join
+                                 ur in db.UsuarioRol on u.Secuencial equals ur.SecuencialUsuario
+                             join
+                                catrol in db.Rol on ur.SecuencialRol equals catrol.Secuencial
+                             where t.Secuencial == idTrabajador
+                             select new
+                             {
+                                 id = catrol.Secuencial,
+                                 rol = catrol.Codigo
+                             }).ToList();
+
+                DateTime ahora = DateTime.Now;
+                UsuarioTFS usuarioTFS = db.UsuarioTFS.Where(x => x.SecuencialColaborador == idTrabajador && x.FechaInicio <= ahora && x.FechaFin >= ahora).FirstOrDefault();
+                string userTfs = "";
+                if (usuarioTFS != null)
+                {
+                    userTfs = usuarioTFS.Usuario;
+                }
+                var resp = new
+                {
+                    success = true,
+                    roles = roles,
+                    usuarioTFS = userTfs
+                };
+                return Json(resp);
             }
-
-
-            var resp = new
+            catch (Exception e)
             {
-                success = true,
-                roles = roles,
-                usuarioTFS = userTfs
-            };
-            return Json(resp);
+                LoggerManager.LogError(e, $"[DarRolTrabajador] Error al dar rol de trabajadores: {e.Message}");
+                var resp = new
+                {
+                    success = false,
+                    msg = "Error al dar rol de trabajadores."
+                };
+                return Json(resp);
+            }
         }
 
         [HttpPost]
@@ -1027,25 +1068,26 @@ namespace SifizPlanning.Controllers
                     };
                     return Json(resp);
                 }
-
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[NuevoTrabajador] Error al dar nuevo trabajador: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
-                    //msg = "Hay errores en los datos por favor verifíquelos"
+                    msg = "Error al dar nuevo trabajador."
                 };
                 return Json(resp);
             }
-
         }
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
         public ActionResult EditarUsuario(int idTrabajador, int activo, string jsonRoles = "", string passw1 = "", string passw2 = "", string usuarioTFS = "")
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[EditarUsuario] Usuario {emailUser} solicitó editar usuario.");
+
             if (passw1 != passw2)
             {
                 var resp1 = new
@@ -1071,10 +1113,8 @@ namespace SifizPlanning.Controllers
 
                 //Buscando el usuario por el idtrabajador
                 var usuario = (from t in db.Colaborador
-                               join
-           p in db.Persona on t.persona equals p
-                               join
-u in db.Usuario on p equals u.persona
+                               join p in db.Persona on t.persona equals p
+                               join u in db.Usuario on p equals u.persona
                                where t.Secuencial == idTrabajador
                                select u).SingleOrDefault();
 
@@ -1165,6 +1205,11 @@ u in db.Usuario on p equals u.persona
                 }
 
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Editar usuaruio",
+                    $"El usuario {emailUser} editó un usuario.",
+                    emailUser
+                );
                 var resp = new
                 {
                     success = true,
@@ -1174,10 +1219,11 @@ u in db.Usuario on p equals u.persona
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EditarUsuario] Error al editar usuario: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = " Error al editar usuario."
                 };
                 return Json(resp);
             }
@@ -1189,6 +1235,8 @@ u in db.Usuario on p equals u.persona
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[EditarUsuario] Usuario {emailUser} solicitó eliminar trabajador.");
                 //Borrando los jefes inmediatos 
                 var jefesInmediatos = (from cji in db.Colaborador_JefeInmediato
                                        where cji.SecuencialColaborador == idTrabajador || cji.SecuencialJefeInmediato == idTrabajador
@@ -1256,6 +1304,11 @@ u in db.Usuario on p equals u.persona
                 db.Persona.Remove(persona);
 
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Eliminar trabajador",
+                    $"El usuario {emailUser} eliminó un trabajador.",
+                    emailUser
+                );
                 var resp = new
                 {
                     success = true,
@@ -1265,11 +1318,11 @@ u in db.Usuario on p equals u.persona
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EditarUsuario] Error al eliminar un trabajador: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
-                    //msg = "No se realizó la operación, existen errores."
+                    msg = "Error al eliminar un trabajador."
                 };
                 return Json(resp);
             }
@@ -1279,75 +1332,101 @@ u in db.Usuario on p equals u.persona
         [Authorize(Roles = "ADMIN")]
         public ActionResult DatosTrabajador(int idTrabajador)
         {
-            var trabajador = (from t in db.Colaborador
-                              join
-          p in db.Persona on t.persona equals p
-                              join
-u in db.Usuario on p equals u.persona
-                              join
-f in db.FotoColaborador on t equals f.colaborador
-                              where t.Secuencial == idTrabajador
-                              select new
-                              {
-                                  nombre1 = p.Nombre1,
-                                  nombre2 = p.Nombre2,
-                                  apellido1 = p.Apellido1,
-                                  apellido2 = p.Apellido2,
-                                  sexo = p.Sexo,
-                                  nacionalidad = p.SecuencialPais,
-                                  fn = p.FechaNac,
-                                  sede = t.SecuencialSede,
-                                  publicacionesDosCinco = t.PublicacionesDosCinco,
-                                  cargo = t.SecuencialCargo,
-                                  email = u.Email,
-                                  departamento = t.SecuencialDepartamento,
-                                  fi = t.FechaIngreso,
-                                  foto = f.Url
-                              }).FirstOrDefault();
-
-            var resp = new
+            try
             {
-                success = true,
-                trabajador = trabajador,
-                fechaNac = trabajador.fn.ToString("dd/MM/yyyy"),
-            };
-            return Json(resp);
+                var trabajador = (from t in db.Colaborador
+                                  join
+              p in db.Persona on t.persona equals p
+                                  join
+    u in db.Usuario on p equals u.persona
+                                  join
+    f in db.FotoColaborador on t equals f.colaborador
+                                  where t.Secuencial == idTrabajador
+                                  select new
+                                  {
+                                      nombre1 = p.Nombre1,
+                                      nombre2 = p.Nombre2,
+                                      apellido1 = p.Apellido1,
+                                      apellido2 = p.Apellido2,
+                                      sexo = p.Sexo,
+                                      nacionalidad = p.SecuencialPais,
+                                      fn = p.FechaNac,
+                                      sede = t.SecuencialSede,
+                                      publicacionesDosCinco = t.PublicacionesDosCinco,
+                                      cargo = t.SecuencialCargo,
+                                      email = u.Email,
+                                      departamento = t.SecuencialDepartamento,
+                                      fi = t.FechaIngreso,
+                                      foto = f.Url
+                                  }).FirstOrDefault();
+
+                var resp = new
+                {
+                    success = true,
+                    trabajador = trabajador,
+                    fechaNac = trabajador.fn.ToString("dd/MM/yyyy"),
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DatosTrabajador] Error al dar datos trabajador: {e.Message}");
+                var resp = new
+                {
+                    success = false,
+                    msg = "Error al dar datos trabajador."
+                };
+                return Json(resp);
+            }
         }
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
         public ActionResult FuncionesTrabajador(int idTrabajador)
         {
-            var funciones = (from e in db.Especialidad
-                             where e.EstaActiva == 1
-                             select new
-                             {
-                                 id = e.Secuencial,
-                                 especialidad = e.Descripcion,
-                                 activa = (from ce in db.ColaboradorEspecialidad
-                                           where ce.SecuencialColaborador == idTrabajador &&
-                                                 ce.SecuencialEspecialidad == e.Secuencial
-                                           select ce).Count() > 0 ? 1 : 0
-                             });
-            var colaboradores = (from c in db.Colaborador
-                                 join
-             p in db.Persona on c.persona equals p
+            try
+            {
+                var funciones = (from e in db.Especialidad
+                                 where e.EstaActiva == 1
                                  select new
                                  {
-                                     id = c.Secuencial,
-                                     nombre = p.Nombre1 + " " + p.Apellido1,
-                                     jefe = (from cj in db.Colaborador_JefeInmediato
-                                             where cj.SecuencialColaborador == idTrabajador &&
-                                                   cj.SecuencialJefeInmediato == c.Secuencial
-                                             select cj).Count() > 0 ? 1 : 0
+                                     id = e.Secuencial,
+                                     especialidad = e.Descripcion,
+                                     activa = (from ce in db.ColaboradorEspecialidad
+                                               where ce.SecuencialColaborador == idTrabajador &&
+                                                     ce.SecuencialEspecialidad == e.Secuencial
+                                               select ce).Count() > 0 ? 1 : 0
                                  });
-            var resp = new
+                var colaboradores = (from c in db.Colaborador
+                                     join
+                 p in db.Persona on c.persona equals p
+                                     select new
+                                     {
+                                         id = c.Secuencial,
+                                         nombre = p.Nombre1 + " " + p.Apellido1,
+                                         jefe = (from cj in db.Colaborador_JefeInmediato
+                                                 where cj.SecuencialColaborador == idTrabajador &&
+                                                       cj.SecuencialJefeInmediato == c.Secuencial
+                                                 select cj).Count() > 0 ? 1 : 0
+                                     });
+                var resp = new
+                {
+                    success = true,
+                    funciones = funciones,
+                    colaboradores = colaboradores
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
             {
-                success = true,
-                funciones = funciones,
-                colaboradores = colaboradores
-            };
-            return Json(resp);
+                LoggerManager.LogError(e, $"[FuncionesTrabajador] Error al dar funciones del trabajador: {e.Message}");
+                var resp = new
+                {
+                    success = false,
+                    msg = "Error al dar funciones del trabajador."
+                };
+                return Json(resp);
+            }
         }
 
         [HttpPost]
@@ -1356,6 +1435,8 @@ f in db.FotoColaborador on t equals f.colaborador
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[GuardarFuncionesTrabajador] Usuario {emailUser} solicitó guardar funciones trabajador.");
                 if (idJefe != 0)
                 {
                     //Guardando el Jefe Inmediato
@@ -1418,7 +1499,11 @@ f in db.FotoColaborador on t equals f.colaborador
                 }
 
                 db.SaveChanges();
-
+                LoggerManager.LogSensitiveOperation(
+                    "Guardar Funciones Trabajador",
+                    $"El usuario {emailUser} guardó funciones del trabajador.",
+                    emailUser
+                );
                 var resp = new
                 {
                     success = true,
@@ -1428,11 +1513,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[GuardarFuncionesTrabajador] Error al guardar funciones del trabajador: {e.Message}");
                 var resp = new
                 {
                     success = true,
-                    //msg = "Error, no se ha podido realizar la operación"
-                    msg = e.Message
+                    msg = "Error al guardar funciones del trabajador."
                 };
                 return Json(resp);
             }
@@ -1475,6 +1560,7 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarNivelesModuloColaborador] Error al dar niveles módulo trabajador: {e.Message}");
                 var resp = new
                 {
                     success = false,
@@ -1490,6 +1576,8 @@ f in db.FotoColaborador on t equals f.colaborador
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[EstablecerNivelModuloColaborador] Usuario {emailUser} solicitó establecer nivel modulo trabajador.");
                 //Buscando si ya existe
                 NivelColaboradorModulo nivelColaborador = db.NivelColaboradorModulo.Where(x =>
                                                             x.SecuencialColaborador == idColaborador &&
@@ -1511,7 +1599,11 @@ f in db.FotoColaborador on t equals f.colaborador
                 }
 
                 db.SaveChanges();
-
+                LoggerManager.LogSensitiveOperation(
+                    "Establecer Nivel Modulo Colaborador",
+                    $"El usuario {emailUser} estableció nivel para colaborador.",
+                    emailUser
+                );
                 var resp = new
                 {
                     success = true
@@ -1520,10 +1612,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EstablecerNivelModuloColaborador] Error al establecer nivel en colaborador: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = " Error al establecer nivel en colaborador."
                 };
                 return Json(resp);
             }
@@ -1607,10 +1700,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarNivelesCompetenciasColaborador] Error al dar niveles de competencias en colaborador: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al dar niveles de competencias,"
                 };
                 return Json(resp);
             }
@@ -1622,6 +1716,8 @@ f in db.FotoColaborador on t equals f.colaborador
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[EstablecerNivelCompetenciaColaborador] Usuario {emailUser} solicitó establecer nivel competencia modulo trabajador.");
                 //Buscando si ya existe una competencia
                 ColaboradorNivelCompetencia nivelColaborador = db.ColaboradorNivelCompetencia.Where(
                                                                 x => x.SecuencialColaborador == idColaborador &&
@@ -1642,7 +1738,11 @@ f in db.FotoColaborador on t equals f.colaborador
                     db.ColaboradorNivelCompetencia.Add(nivelColaborador);
                 }
                 db.SaveChanges();
-
+                LoggerManager.LogSensitiveOperation(
+                   "Establecer Nivel Competencia Modulo Colaborador",
+                   $"El usuario {emailUser} estableció nivel de competencia para colaborador.",
+                   emailUser
+               );
                 var resp = new
                 {
                     success = true
@@ -1651,10 +1751,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EstablecerNivelCompetenciaColaborador] Error al establecer nivel de competencia en colaborador: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al establecer nivel de competencia en colaborador."
                 };
                 return Json(resp);
             }
@@ -1697,10 +1798,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarNivelesTecnologiaColaborador] Error al establecer nivel de tegnologías en colaborador: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al establecer nivel de tegnologías en colaborador."
                 };
                 return Json(resp);
             }
@@ -1712,7 +1814,8 @@ f in db.FotoColaborador on t equals f.colaborador
         {
             try
             {
-                //Buscando si ya existe
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[EstablecerNivelTecnologiaColaborador] Usuario {emailUser} solicitó establecer nivel tegnología modulo trabajador.");
                 NivelColaboradorTecnologia nivelColaborador = db.NivelColaboradorTecnologia.Where(x =>
                                                             x.SecuencialColaborador == idColaborador &&
                                                             x.SecuencialTecnologia == idTecnologia).FirstOrDefault();
@@ -1733,7 +1836,11 @@ f in db.FotoColaborador on t equals f.colaborador
                 }
 
                 db.SaveChanges();
-
+                LoggerManager.LogSensitiveOperation(
+                   "Establecer Nivel Tegnoligía Modulo Colaborador",
+                   $"El usuario {emailUser} estableció nivel de tegnología para colaborador.",
+                   emailUser
+               );
                 var resp = new
                 {
                     success = true
@@ -1742,10 +1849,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EstablecerNivelTecnologiaColaborador] Error al establecer nivel de tegnología en colaborador: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al establecer nivel de tegnología en colaborador."
                 };
                 return Json(resp);
             }
@@ -1838,10 +1946,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarUsuariosClientes] Error al dar usuarios clientes: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al dar usuarios clientes."
                 };
                 return Json(resp);
             }
@@ -1853,6 +1962,8 @@ f in db.FotoColaborador on t equals f.colaborador
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[GuardarUsuarioCliente] Usuario {emailUser} solicitó guardar usuario.");
                 string[] fechas = fechaNac.Split(new Char[] { '/' });
                 int dia = Int32.Parse(fechas[0]);
                 int mes = Int32.Parse(fechas[1]);
@@ -1961,6 +2072,11 @@ f in db.FotoColaborador on t equals f.colaborador
                     }
 
                     db.SaveChanges();
+                    LoggerManager.LogSensitiveOperation(
+                           "Guardar usuario cliente",
+                           $"El usuario {emailUser} guardó un usuario.",
+                           emailUser
+                       );
                 }
 
                 var resp = new
@@ -1972,10 +2088,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[GuardarUsuarioCliente] Error al guardar usuario: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al guardar usuario."
                 };
                 return Json(resp);
             }
@@ -1987,6 +2104,8 @@ f in db.FotoColaborador on t equals f.colaborador
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[EliminarUsuarioCliente] Usuario {emailUser} solicitó eliminar usuario.");
                 Usuario user = db.Usuario.Find(idUsuarioCliente);
                 List<UsuarioRol> usuarioRol = user.usuarioRol.ToList();
                 //Persona persona = user.persona;
@@ -2000,6 +2119,11 @@ f in db.FotoColaborador on t equals f.colaborador
                 //db.Usuario.Remove(user);
                 //db.Persona.Remove(persona);
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                           "Eliminar usuario cliente",
+                           $"El usuario {emailUser} eliminó un usuario.",
+                           emailUser
+                       );
 
                 var resp = new
                 {
@@ -2010,10 +2134,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EliminarUsuarioCliente] Error al eliminar usuario: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = " Error al eliminar usuario."
                 };
                 return Json(resp);
             }
@@ -2026,6 +2151,8 @@ f in db.FotoColaborador on t equals f.colaborador
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[DarContratosCliente] El usuario {emailUser} está consultando contratos para el cliente ID {idCliente} con filtro '{filtro}'.");
                 List<object> contratos = new List<object>();
 
                 if (filtro != "")
@@ -2074,10 +2201,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarContratosCliente] Error inesperado al consultar contratos del cliente: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error inesperado al consultar contratos del cliente."
                 };
                 return Json(resp);
             }
@@ -2087,50 +2215,67 @@ f in db.FotoColaborador on t equals f.colaborador
         [Authorize(Roles = "ADMIN")]
         public ActionResult ModulosFuncionalidades()
         {
-            List<object> modulos = new List<object>();
-            modulos = (from m in db.Modulo
-                       where m.EstaActivo == 1 &&
-                             m.funcionalidad.Count > 0 //Que muestre si tiene funcionalidades
-                       select new
-                       {
-                           id = m.Secuencial,
-                           type = "group",
-                           name = m.Codigo + " ( " + m.Descripcion + " )",
-                           editable = false,
-                           children = (from f in db.Funcionalidad
-                                       where f.SecuencialModulo == m.Secuencial && f.EstaActiva == 1
-                                       select f.Secuencial).ToList()
-
-                       }).ToList<object>();
-
-            var allSystem = new
+            try
             {
-                id = 0,
-                name = "Todo el Sistema",
-                editable = false,
-                children = new object[0],
-                subGroups = (from m in db.Modulo
-                             where m.EstaActivo == 1 && m.funcionalidad.Count > 0
-                             select m.Secuencial).ToList()
-            };
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[ModulosFuncionalidades] El usuario {emailUser} está consultando los módulos y funcionalidades del sistema.");
+                List<object> modulos = new List<object>();
+                modulos = (from m in db.Modulo
+                           where m.EstaActivo == 1 &&
+                                 m.funcionalidad.Count > 0 //Que muestre si tiene funcionalidades
+                           select new
+                           {
+                               id = m.Secuencial,
+                               type = "group",
+                               name = m.Codigo + " ( " + m.Descripcion + " )",
+                               editable = false,
+                               children = (from f in db.Funcionalidad
+                                           where f.SecuencialModulo == m.Secuencial && f.EstaActiva == 1
+                                           select f.Secuencial).ToList()
 
-            modulos.Insert(0, allSystem);
+                           }).ToList<object>();
 
-            var funcionalidades = (from f in db.Funcionalidad
-                                   where f.EstaActiva == 1
-                                   select new
-                                   {
-                                       id = f.Secuencial,
-                                       name = f.Descripcion
-                                   }).ToList();
+                var allSystem = new
+                {
+                    id = 0,
+                    name = "Todo el Sistema",
+                    editable = false,
+                    children = new object[0],
+                    subGroups = (from m in db.Modulo
+                                 where m.EstaActivo == 1 && m.funcionalidad.Count > 0
+                                 select m.Secuencial).ToList()
+                };
 
-            var treeObj = new
+                modulos.Insert(0, allSystem);
+
+                var funcionalidades = (from f in db.Funcionalidad
+                                       where f.EstaActiva == 1
+                                       select new
+                                       {
+                                           id = f.Secuencial,
+                                           name = f.Descripcion
+                                       }).ToList();
+
+                var treeObj = new
+                {
+                    modulos = modulos,
+                    funcionalidades = funcionalidades
+                };
+
+                return Json(treeObj, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
             {
-                modulos = modulos,
-                funcionalidades = funcionalidades
-            };
+                LoggerManager.LogError(e, $"[ModulosFuncionalidades] Error inesperado al consultar módulos y funcionalidades: {e.Message}");
 
-            return Json(treeObj, JsonRequestBehavior.AllowGet);
+                var resp = new
+                {
+                    success = false,
+                    msg = "Error inesperado al consultar módulos y funcionalidades."
+                };
+                return Json(resp);
+            }
+
         }
 
         [HttpPost]
@@ -2139,6 +2284,17 @@ f in db.FotoColaborador on t equals f.colaborador
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                string clienteNombre = db.Cliente.Find(cliente)?.Descripcion ?? cliente.ToString();
+                if (idContratoCliente != 0)
+                {
+                    LoggerManager.LogInfo($"[NuevoContratoCliente] El usuario {emailUser} está modificando el contrato ID {idContratoCliente} del cliente {clienteNombre}.");
+                }
+                else
+                {
+                    LoggerManager.LogInfo($"[NuevoContratoCliente] El usuario {emailUser} está creando un nuevo contrato para el cliente {clienteNombre}.");
+                }
+
                 string[] fechas = fechaInicio.Split(new Char[] { '/' });
                 int dia = Int32.Parse(fechas[0]);
                 int mes = Int32.Parse(fechas[1]);
@@ -2351,8 +2507,24 @@ f in db.FotoColaborador on t equals f.colaborador
                         }
                     }
                 }
-
+                if (idContratoCliente != 0)
+                {
+                    LoggerManager.LogSensitiveOperation(
+                        "Modificación de contrato",
+                        $"El usuario {emailUser} modificó el contrato ID {idContratoCliente} del cliente {clienteNombre}, descripción: {descripcion}, tipo: {tipoContrato}.",
+                        emailUser
+                    );
+                }
+                else
+                {
+                    LoggerManager.LogSensitiveOperation(
+                        "Creación de contrato",
+                        $"El usuario {emailUser} creó un nuevo contrato para el cliente {clienteNombre}, descripción: {descripcion}, tipo: {tipoContrato}.",
+                        emailUser
+                    );
+                }
                 db.SaveChanges();
+
                 var resp = new
                 {
                     success = true,
@@ -2362,10 +2534,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[NuevoContratoCliente] Error inesperado al procesar contrato del cliente: {e.Message}");
                 var resp = new
                 {
-                    success = true,
-                    msg = e.Message
+                    success = false,
+                    msg = "Error inesperado al procesar contrato del cliente."
                 };
                 return Json(resp);
             }
@@ -2375,46 +2548,62 @@ f in db.FotoColaborador on t equals f.colaborador
         [Authorize(Roles = "ADMIN")]
         public ActionResult DarDatosContratosClientes(int idContrato)
         {
-            var contrato = (from ct in db.ContratoCliente
-                            join
-   tc in db.TipoContratoCliente on ct.tipoContratoCliente equals tc
-                            where ct.Secuencial == idContrato
-                            select new
-                            {
-                                id = ct.Secuencial,
-                                idCliente = ct.SecuencialCliente,
-                                idTipoContrato = ct.SecuencialTipoContratoCliente,
-                                tipoContrato = tc.Descripcion,
-                                descripcion = ct.Descripcion,
-                                fechaInicio = ct.FechaInicio,
-                                fechaFin = ct.FechaFin,
-                                verificador = ct.NumeroVerificador,
-                                adjuntos = (from cAdj in db.ContratoAdjunto
-                                            where cAdj.SecuencialContratoCliente == idContrato
-                                            select new
-                                            {
-                                                idAdj = cAdj.Secuencial,
-                                                desc = cAdj.Descripcion,
-                                                url = cAdj.Url
-                                            }).ToList(),
-                                horas = (from ctMant in db.ContratoMantenimiento
-                                         where ctMant.SecuencialContratoCliente == idContrato
-                                         select ctMant.HorasMensuales).FirstOrDefault(),
-                                funcionalidades = (from cdFun in db.ContratoDesarrolloFunc
-                                                   join func in db.Funcionalidad
-           on cdFun.funcionalidad equals func
-                                                   where cdFun.SecuencialContratoCliente == idContrato
-                                                   select new
-                                                   {
-                                                       idFunc = func.Secuencial
-                                                   }).ToList()
-                            }).FirstOrDefault();
-            var resp = new
+            try
             {
-                success = true,
-                contrato = contrato
-            };
-            return Json(resp);
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[DarDatosContratosClientes] El usuario {emailUser} está consultando los datos del contrato ID {idContrato}.");
+                var contrato = (from ct in db.ContratoCliente
+                                join
+       tc in db.TipoContratoCliente on ct.tipoContratoCliente equals tc
+                                where ct.Secuencial == idContrato
+                                select new
+                                {
+                                    id = ct.Secuencial,
+                                    idCliente = ct.SecuencialCliente,
+                                    idTipoContrato = ct.SecuencialTipoContratoCliente,
+                                    tipoContrato = tc.Descripcion,
+                                    descripcion = ct.Descripcion,
+                                    fechaInicio = ct.FechaInicio,
+                                    fechaFin = ct.FechaFin,
+                                    verificador = ct.NumeroVerificador,
+                                    adjuntos = (from cAdj in db.ContratoAdjunto
+                                                where cAdj.SecuencialContratoCliente == idContrato
+                                                select new
+                                                {
+                                                    idAdj = cAdj.Secuencial,
+                                                    desc = cAdj.Descripcion,
+                                                    url = cAdj.Url
+                                                }).ToList(),
+                                    horas = (from ctMant in db.ContratoMantenimiento
+                                             where ctMant.SecuencialContratoCliente == idContrato
+                                             select ctMant.HorasMensuales).FirstOrDefault(),
+                                    funcionalidades = (from cdFun in db.ContratoDesarrolloFunc
+                                                       join func in db.Funcionalidad
+               on cdFun.funcionalidad equals func
+                                                       where cdFun.SecuencialContratoCliente == idContrato
+                                                       select new
+                                                       {
+                                                           idFunc = func.Secuencial
+                                                       }).ToList()
+                                }).FirstOrDefault();
+                var resp = new
+                {
+                    success = true,
+                    contrato = contrato
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarDatosContratosClientes] Error inesperado al consultar datos del contrato: {e.Message}");
+
+                var resp = new
+                {
+                    success = false,
+                    msg = "Error inesperado al consultar datos del contrato."
+                };
+                return Json(resp);
+            }
         }
 
         [HttpPost]
@@ -2423,6 +2612,8 @@ f in db.FotoColaborador on t equals f.colaborador
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[EliminarAdjuntoContratoCliente] El usuario {emailUser} está eliminando el adjunto ID {idAdjunto}.");
                 string msg = "Operacion realizada correctamente";
                 bool success = true;
                 var contratoAdj = db.ContratoAdjunto.Find(idAdjunto);
@@ -2443,6 +2634,11 @@ f in db.FotoColaborador on t equals f.colaborador
                     int idContrato = contratoAdj.SecuencialContratoCliente;
 
                     db.ContratoAdjunto.Remove(contratoAdj);
+                    LoggerManager.LogSensitiveOperation(
+                        "Eliminación de adjunto de contrato",
+                        $"El usuario {emailUser} eliminó el adjunto ID {idAdjunto} del contrato ID {idContrato}, archivo: {contratoAdj.Descripcion}.",
+                        emailUser
+                    );
                     db.SaveChanges();
 
                     adjuntos = (from cAdj in db.ContratoAdjunto
@@ -2470,10 +2666,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EliminarAdjuntoContratoCliente] Error inesperado al eliminar adjunto del contrato: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error inesperado al eliminar adjunto del contrato."
                 };
                 return Json(resp);
             }
@@ -2486,6 +2683,8 @@ f in db.FotoColaborador on t equals f.colaborador
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[DarDatosTabla] El usuario {emailUser} está consultando datos de la tabla '{nombreTabla}' (ID: {idTabla}) con filtro: '{filtro}'.");
                 var campos = (from cc in db.CampoCatalogo
                               join
                                   tc in db.TipoCampo on cc.tipoCampo equals tc
@@ -2704,10 +2903,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarDatosTabla] Error inesperado al consultar datos de la tabla '{nombreTabla}': {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error inesperado al consultar datos de la tabla '{nombreTabla}'."
                 };
                 return Json(resp);
             }
@@ -2719,6 +2919,8 @@ f in db.FotoColaborador on t equals f.colaborador
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[DarVerificadorCatalogo] El usuario {emailUser} está consultando el verificador de la tabla '{tabla}' para el ID {id}.");
                 int verificador = 0;
 
                 /*Tratando de hacerlo dinámico*/
@@ -2754,10 +2956,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarVerificadorCatalogo] Error inesperado al consultar verificador de catálogo: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error inesperado al consultar verificador de catálogo."
                 };
                 return Json(resp);
             }
@@ -2769,6 +2972,15 @@ f in db.FotoColaborador on t equals f.colaborador
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                if (actividad.Equals(""))
+                {
+                    LoggerManager.LogInfo($"[DatosActividadesRealizadas] El usuario {emailUser} está consultando todas las actividades realizadas.");
+                }
+                else
+                {
+                    LoggerManager.LogInfo($"[DatosActividadesRealizadas] El usuario {emailUser} está consultando actividades realizadas para la actividad '{actividad}'.");
+                }
                 if (actividad.Equals(""))
                 {
                     var actividadesRealizadas = (from ar in db.ActividadRealizada
@@ -2829,10 +3041,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DatosActividadesRealizadas] Error inesperado al consultar actividades realizadas: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    message = e.Message
+                    message = "Error inesperado al consultar actividades realizadas."
                 };
 
                 return Json(resp);
@@ -2847,6 +3060,8 @@ f in db.FotoColaborador on t equals f.colaborador
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[DatosDescripcionCatalogo] El usuario {emailUser} está consultando descripciones del catálogo para la tabla ID {idTabla} en posición {pos}.");
                 string nombreTabla = (from t in db.TablaCatalogo
                                       where t.Secuencial == idTabla
                                       select t.NombreMostrar).FirstOrDefault();
@@ -2958,10 +3173,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DatosDescripcionCatalogo] Error inesperado al consultar descripciones del catálogo: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error inesperado al consultar descripciones del catálogo."
                 };
                 return Json(resp);
             }
@@ -2973,6 +3189,8 @@ f in db.FotoColaborador on t equals f.colaborador
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[GuardarDatosCatalogo] El usuario {emailUser} está iniciando una operación en el catálogo de datos.");
                 //variables auxiliares para una insercion en el catalogo ACTIVIDAD
                 string nombreActividad = "";
                 string codigoActividad = "";
@@ -3150,6 +3368,12 @@ f in db.FotoColaborador on t equals f.colaborador
                     }
                 }
                 //type.getMethod("Add").Invoke(dbSetTable, new object[] { newObj })
+                LoggerManager.LogSensitiveOperation(
+                    "Creación de registro en catálogo",
+                    $"El usuario {emailUser} creó un nuevo registro en la tabla {tabla} ({nombreNegocioTabla}).",
+                    emailUser
+                );
+
                 db.SaveChanges();
                 return Json(new
                 {
@@ -3162,10 +3386,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[GuardarDatosCatalogo] Error inesperado al procesar datos del catálogo para el usuario: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error inesperado al procesar datos del catálogo."
                 };
                 return Json(resp);
             }
@@ -3176,16 +3401,99 @@ f in db.FotoColaborador on t equals f.colaborador
         [Authorize(Roles = "ADMIN")]
         public ActionResult GuardarActividadesRealizadas(int idActividad, string actividad, string codigo, bool actividadNueva, string datos)
         {
-            if (actividadNueva)
+            try
             {
-                //Si se esta ingresando una nueva actividad se debe buscar en la BD el secuencial de la actividad creada 
-                idActividad = (from a in db.Actividad
-                               where a.Descripcion == actividad && a.Codigo.ToString() == codigo
-                               select a.Secuencial).ToList()[0];
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[GuardarActividadesRealizadas] El usuario {emailUser} está guardando actividades realizadas para la actividad {actividad} (código: {codigo}), ID: {idActividad}.");
+                if (actividadNueva)
+                {
+                    //Si se esta ingresando una nueva actividad se debe buscar en la BD el secuencial de la actividad creada 
+                    idActividad = (from a in db.Actividad
+                                   where a.Descripcion == actividad && a.Codigo.ToString() == codigo
+                                   select a.Secuencial).ToList()[0];
+                }
+                else
+                {
+                    //Si se esta editando una actividad, se borran sus actividades realizadas actuales para ingresar las nuevas
+                    Type typeAccesoDatos = db.GetType();
+                    PropertyInfo propertyTabla = typeAccesoDatos.GetProperty("ActividadActividadRealizada");
+                    MethodInfo methodPropertyTabla = propertyTabla.GetMethod;
+                    object dbSetTable = methodPropertyTabla.Invoke(db, new object[] { });
+                    Type typePropertyTabla = dbSetTable.GetType();//Esto es un tipo dbSet 
+
+                    var actividadesBorrar = db.ActividadActividadRealizada.Where(x => x.SecuencialActividad == idActividad).ToList();
+
+                    MethodInfo metodoRemove = typePropertyTabla.GetMethod("Remove");
+
+                    foreach (var act in actividadesBorrar)
+                    {
+                        object newObj = metodoRemove.Invoke(dbSetTable, new object[1] { act });
+                        db.SaveChanges();
+                    }
+                }
+
+                string[] actividadesRealizadas = datos.Split('|');
+                actividadesRealizadas = actividadesRealizadas.Skip(1).ToArray();
+
+
+                foreach (var act in actividadesRealizadas)
+                {
+                    object[] actividadRealizada = act.Split(':');
+                    int idActividadRealizada = int.Parse((string)actividadRealizada[1]);
+                    string descripcionActividadRealizada = (string)actividadRealizada[0];
+
+                    Type typeAccesoDatos = db.GetType();
+                    PropertyInfo propertyTabla = typeAccesoDatos.GetProperty("ActividadActividadRealizada");
+                    MethodInfo methodPropertyTabla = propertyTabla.GetMethod;
+                    object dbSetTable = methodPropertyTabla.Invoke(db, new object[] { });
+                    Type typePropertyTabla = dbSetTable.GetType();//Esto es un tipo dbSet  
+
+
+                    Type typeNewObj = Type.GetType("SifizPlanning.Models.ActividadActividadRealizada");
+                    object newObj = Activator.CreateInstance(typeNewObj);
+
+                    typeNewObj.GetProperty("SecuencialActividad").SetValue(newObj, idActividad);
+                    typeNewObj.GetProperty("SecuencialActividadRealizada").SetValue(newObj, idActividadRealizada);
+                    typeNewObj.GetProperty("EstaActiva").SetValue(newObj, decimal.Parse("1"));
+                    typeNewObj.GetProperty("NumeroVerificador").SetValue(newObj, 1);
+
+                    MethodInfo metodoAdd = typePropertyTabla.GetMethod("Add");
+                    metodoAdd.Invoke(dbSetTable, new object[] { newObj });
+
+                    db.SaveChanges();
+                    LoggerManager.LogSensitiveOperation(
+                    "Creación de actividad realizada",
+                    $"El usuario {emailUser} creó una nueva actividad realizada '{descripcionActividadRealizada}' para la actividad {actividad} (ID: {idActividad}).",
+                    emailUser
+                );
+
+                }
+                return Json(new
+                {
+                    success = true
+                });
             }
-            else
+            catch (Exception e)
             {
-                //Si se esta editando una actividad, se borran sus actividades realizadas actuales para ingresar las nuevas
+                LoggerManager.LogError(e, $"[GuardarActividadesRealizadas] Error inesperado al guardar actividades realizadas para el usuario: {e.Message}");
+
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al guardar actividades."
+                });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN")]
+        public ActionResult EliminarTuplasActividadesRealizadas(int idActividad)
+        {
+            try
+            {
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[EliminarTuplasActividadesRealizadas] El usuario {emailUser} está eliminando actividades realizadas para la actividad con ID: {idActividad}.");
+                //Obteniendo el dbSet de la tabla
                 Type typeAccesoDatos = db.GetType();
                 PropertyInfo propertyTabla = typeAccesoDatos.GetProperty("ActividadActividadRealizada");
                 MethodInfo methodPropertyTabla = propertyTabla.GetMethod;
@@ -3200,75 +3508,29 @@ f in db.FotoColaborador on t equals f.colaborador
                 {
                     object newObj = metodoRemove.Invoke(dbSetTable, new object[1] { act });
                     db.SaveChanges();
+                    LoggerManager.LogSensitiveOperation(
+                    "Eliminación de actividad realizada",
+                    $"El usuario {emailUser} eliminó una actividad realizada de la actividad con ID: {idActividad}.",
+                    emailUser
+                );
                 }
+
+                return Json(new
+                {
+                    success = true
+                });
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[EliminarTuplasActividadesRealizadas] Error inesperado al eliminar actividades realizadas: {e.Message}");
+
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al eliminar actividades."
+                });
             }
 
-            string[] actividadesRealizadas = datos.Split('|');
-            actividadesRealizadas = actividadesRealizadas.Skip(1).ToArray();
-
-
-            foreach (var act in actividadesRealizadas)
-            {
-                object[] actividadRealizada = act.Split(':');
-                int idActividadRealizada = int.Parse((string)actividadRealizada[1]);
-                string descripcionActividadRealizada = (string)actividadRealizada[0];
-
-                Type typeAccesoDatos = db.GetType();
-                PropertyInfo propertyTabla = typeAccesoDatos.GetProperty("ActividadActividadRealizada");
-                MethodInfo methodPropertyTabla = propertyTabla.GetMethod;
-                object dbSetTable = methodPropertyTabla.Invoke(db, new object[] { });
-                Type typePropertyTabla = dbSetTable.GetType();//Esto es un tipo dbSet  
-
-
-                Type typeNewObj = Type.GetType("SifizPlanning.Models.ActividadActividadRealizada");
-                object newObj = Activator.CreateInstance(typeNewObj);
-
-                typeNewObj.GetProperty("SecuencialActividad").SetValue(newObj, idActividad);
-                typeNewObj.GetProperty("SecuencialActividadRealizada").SetValue(newObj, idActividadRealizada);
-                typeNewObj.GetProperty("EstaActiva").SetValue(newObj, decimal.Parse("1"));
-                typeNewObj.GetProperty("NumeroVerificador").SetValue(newObj, 1);
-
-                MethodInfo metodoAdd = typePropertyTabla.GetMethod("Add");
-                metodoAdd.Invoke(dbSetTable, new object[] { newObj });
-
-                db.SaveChanges();
-            }
-
-
-
-            return Json(new
-            {
-                success = true
-            });
-
-        }
-
-        [HttpPost]
-        [Authorize(Roles = "ADMIN")]
-        public ActionResult EliminarTuplasActividadesRealizadas(int idActividad)
-        {
-
-            //Obteniendo el dbSet de la tabla
-            Type typeAccesoDatos = db.GetType();
-            PropertyInfo propertyTabla = typeAccesoDatos.GetProperty("ActividadActividadRealizada");
-            MethodInfo methodPropertyTabla = propertyTabla.GetMethod;
-            object dbSetTable = methodPropertyTabla.Invoke(db, new object[] { });
-            Type typePropertyTabla = dbSetTable.GetType();//Esto es un tipo dbSet 
-
-            var actividadesBorrar = db.ActividadActividadRealizada.Where(x => x.SecuencialActividad == idActividad).ToList();
-
-            MethodInfo metodoRemove = typePropertyTabla.GetMethod("Remove");
-
-            foreach (var act in actividadesBorrar)
-            {
-                object newObj = metodoRemove.Invoke(dbSetTable, new object[1] { act });
-                db.SaveChanges();
-            }
-
-            return Json(new
-            {
-                success = true
-            });
         }
 
         [HttpPost]
@@ -3277,6 +3539,8 @@ f in db.FotoColaborador on t equals f.colaborador
         {
             try
             {
+                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[EliminarTuplaCatalogos] El usuario {emailUser} está eliminando un registro de la tabla {tabla} con ID: {id}.");
                 /*Tratando de hacer dinámico el eliminar*/
                 string nombreNegocioTabla = db.TablaCatalogo.Where(x => x.NombreMostrar == tabla && x.EstaActivo == 1).Select(x => x.NombreNegocio).FirstOrDefault();
 
@@ -3296,6 +3560,11 @@ f in db.FotoColaborador on t equals f.colaborador
                 MethodInfo metodoRemove = typePropertyTabla.GetMethod("Remove");
                 object newObj = metodoRemove.Invoke(dbSetTable, new object[1] { findObj });
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Eliminación de registro en catálogo",
+                    $"El usuario {emailUser} eliminó el registro con ID {id} de la tabla {tabla} ({nombreNegocioTabla}).",
+                    emailUser
+                );
 
                 var respD = new
                 {
@@ -3307,10 +3576,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EliminarTuplaCatalogos] Error inesperado al eliminar registro de catálogo: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error inesperado al eliminar registro de catálogo."
                 };
                 return Json(resp);
             }
@@ -3321,81 +3591,133 @@ f in db.FotoColaborador on t equals f.colaborador
         [Authorize]
         public ActionResult DarPaises()
         {
-            var paises = (from p in db.Pais
-                          where p.EstaActivo == 1
-                          select new
-                          {
-                              id = p.Secuencial,
-                              nombre = p.Descripcion
-                          }
-                          ).ToList();
-            var resp = new
+            try
             {
-                success = true,
-                paises = paises
-            };
-            return Json(resp);
+                var paises = (from p in db.Pais
+                              where p.EstaActivo == 1
+                              select new
+                              {
+                                  id = p.Secuencial,
+                                  nombre = p.Descripcion
+                              }
+                              ).ToList();
+                var resp = new
+                {
+                    success = true,
+                    paises = paises
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarPaises] Error inesperado al obtener datos de paises: {e.Message}");
+                var resp = new
+                {
+                    success = false,
+                    msg = "rror inesperado al obtener datos de paises."
+                };
+                return Json(resp);
+            }
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarCargos()
         {
-            var cargos = (from p in db.Cargo
-                          where p.EstaActivo == 1
-                          select new
-                          {
-                              id = p.Secuencial,
-                              nombre = p.Descripcion
-                          }
-                          ).ToList();
-            var resp = new
+            try
             {
-                success = true,
-                cargos = cargos
-            };
-            return Json(resp);
+                var cargos = (from p in db.Cargo
+                              where p.EstaActivo == 1
+                              select new
+                              {
+                                  id = p.Secuencial,
+                                  nombre = p.Descripcion
+                              }
+                              ).ToList();
+                var resp = new
+                {
+                    success = true,
+                    cargos = cargos
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarCargos] Error inesperado al obtener datos de los cargos: {e.Message}");
+                var resp = new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener datos de los cargos."
+                };
+                return Json(resp);
+            }
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarSedes()
         {
-            var sedes = (from p in db.Sede
-                         where p.EstaActivo == 1
-                         orderby p.Descripcion
-                         select new
-                         {
-                             id = p.Secuencial,
-                             nombre = p.Descripcion
-                         }
-                          ).ToList();
-            var resp = new
+            try
             {
-                success = true,
-                sedes = sedes
-            };
-            return Json(resp);
+                var sedes = (from p in db.Sede
+                             where p.EstaActivo == 1
+                             orderby p.Descripcion
+                             select new
+                             {
+                                 id = p.Secuencial,
+                                 nombre = p.Descripcion
+                             }
+                              ).ToList();
+                var resp = new
+                {
+                    success = true,
+                    sedes = sedes
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarSedes] Error inesperado al obtener datos de las sedes: {e.Message}");
+                var resp = new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener datos de las sedes."
+                };
+                return Json(resp);
+            }
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarRoles()
         {
-            var roles = (from r in db.Rol
-                         where r.EstaActivo == 1
-                         select new
-                         {
-                             id = r.Secuencial,
-                             nombre = r.Codigo
-                         }
-                          ).ToList();
-            var resp = new
+            try
             {
-                success = true,
-                roles = roles
-            };
-            return Json(resp);
+                var roles = (from r in db.Rol
+                             where r.EstaActivo == 1
+                             select new
+                             {
+                                 id = r.Secuencial,
+                                 nombre = r.Codigo
+                             }
+                              ).ToList();
+                var resp = new
+                {
+                    success = true,
+                    roles = roles
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarRoles] Error inesperado al obtener los roles: {e.Message}");
+                var resp = new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener los roles."
+                };
+                return Json(resp);
+            }
         }
 
         [HttpPost]
@@ -3418,14 +3740,13 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarTiposModulosSistema] Error inesperado al obtener los tipos de módulos del sistema: {e.Message}");
                 return Json(new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error inesperado al obtener los tipos de módulos del sistema."
                 });
             }
-
-
         }
 
         [HttpPost]
@@ -3443,36 +3764,49 @@ f in db.FotoColaborador on t equals f.colaborador
                     datos = data
                 });
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarModulosSistema] Error inesperado al obtener los módulos del sistema: {e.Message}");
                 return Json(new
                 {
-                    success = false
+                    success = false,
+                    msg = "Error inesperado al obtener los módulos del sistema."
                 });
             }
-
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarModulos()
         {
-            var modulos = (from m in db.Modulo
-                           where m.EstaActivo == 1
-                           orderby m.Codigo, m.Descripcion
-                           select new
-                           {
-                               id = m.Secuencial,
-                               nombre = m.Codigo.ToUpper() + "-" + m.Descripcion.ToUpper(),
-                               descripcion = m.Descripcion.ToUpper(),
-                           }
-                          ).ToList();
-            var resp = new
+            try
             {
-                success = true,
-                modulos = modulos
-            };
-            return Json(resp);
+                var modulos = (from m in db.Modulo
+                               where m.EstaActivo == 1
+                               orderby m.Codigo, m.Descripcion
+                               select new
+                               {
+                                   id = m.Secuencial,
+                                   nombre = m.Codigo.ToUpper() + "-" + m.Descripcion.ToUpper(),
+                                   descripcion = m.Descripcion.ToUpper(),
+                               }
+                              ).ToList();
+                var resp = new
+                {
+                    success = true,
+                    modulos = modulos
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarModulos] Error inesperado al obtener los módulos: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener los módulos."
+                });
+            }
         }
 
         [HttpPost]
@@ -3503,105 +3837,148 @@ f in db.FotoColaborador on t equals f.colaborador
         [Authorize]
         public ActionResult DarTecnologias()
         {
-            var tecnologias = (from tec in db.TecnologiasYProcesos
-                               where tec.EstaActivo == 1
-                               orderby tec.Codigo, tec.Descripcion
-                               select new
-                               {
-                                   id = tec.Secuencial,
-                                   nombre = tec.Codigo.ToUpper() + "-" + tec.Descripcion.ToUpper(),
-                                   descripcion = tec.Descripcion.ToUpper(),
-                               }
-                          ).ToList();
-            var resp = new
+            try
             {
-                success = true,
-                tecnologias = tecnologias
-            };
-            return Json(resp);
+                var tecnologias = (from tec in db.TecnologiasYProcesos
+                                   where tec.EstaActivo == 1
+                                   orderby tec.Codigo, tec.Descripcion
+                                   select new
+                                   {
+                                       id = tec.Secuencial,
+                                       nombre = tec.Codigo.ToUpper() + "-" + tec.Descripcion.ToUpper(),
+                                       descripcion = tec.Descripcion.ToUpper(),
+                                   }
+                              ).ToList();
+                var resp = new
+                {
+                    success = true,
+                    tecnologias = tecnologias
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarTecnologias] Error inesperado al obtener las tecnologías: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener las tecnologías."
+                });
+            }
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarEstadosTickets()
         {
-            var estados = (from e in db.EstadoTicket
-                           where e.EstaActivo == 1
-                           orderby e.Codigo, e.Descripcion
-                           select new
-                           {
-                               id = e.Secuencial,
-                               codigo = e.Codigo.ToUpper(),
-                               descripcion = e.Descripcion.ToUpper(),
-                           }
-                          ).ToList();
-            var resp = new
+            try
             {
-                success = true,
-                estados = estados
-            };
-            return Json(resp);
+                var estados = (from e in db.EstadoTicket
+                               where e.EstaActivo == 1
+                               orderby e.Codigo, e.Descripcion
+                               select new
+                               {
+                                   id = e.Secuencial,
+                                   codigo = e.Codigo.ToUpper(),
+                                   descripcion = e.Descripcion.ToUpper(),
+                               }
+                              ).ToList();
+                var resp = new
+                {
+                    success = true,
+                    estados = estados
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarEstadosTickets] Error inesperado al obtener los estados de ticket: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener los estados de ticket."
+                });
+            }
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarTicketVersionCliente()
         {
-            var ticketVersionClientes = (from tvc in db.TicketVersionCliente
-                                         where tvc.EstaActivo == 1
-                                         select new
-                                         {
-                                             id = tvc.Secuencial,
-                                             codigo = tvc.Codigo,
-                                             nombre = tvc.Descripcion
-                                         });
-
-            var resp = new
+            try
             {
-                success = true,
-                ticketVersionClientes = ticketVersionClientes
-            };
-            return Json(resp);
+                var ticketVersionClientes = (from tvc in db.TicketVersionCliente
+                                             where tvc.EstaActivo == 1
+                                             select new
+                                             {
+                                                 id = tvc.Secuencial,
+                                                 codigo = tvc.Codigo,
+                                                 nombre = tvc.Descripcion
+                                             });
+                var resp = new
+                {
+                    success = true,
+                    ticketVersionClientes = ticketVersionClientes
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarTicketVersionCliente] Error inesperado al obtener los ticket versión cliente: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener los ticket versión cliente."
+                });
+            }
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarClientes(string filtro = "")
         {
-            List<object> clientes = new List<object>();
-            if (filtro != "")
+            try
             {
-                clientes = (from c in db.Cliente
-                            where c.EstaActivo == 1 &&
-                                  (c.Descripcion.Contains(filtro) || c.Codigo.Contains(filtro))
-                            orderby c.Codigo, c.Descripcion
-                            select new
-                            {
-                                id = c.Secuencial,
-                                nombre = c.Codigo.ToUpper() + "-" + c.Descripcion.ToUpper()
-                            }
-                          ).ToList<object>();
+                List<object> clientes = new List<object>();
+                if (filtro != "")
+                {
+                    clientes = (from c in db.Cliente
+                                where c.EstaActivo == 1 &&
+                                      (c.Descripcion.Contains(filtro) || c.Codigo.Contains(filtro))
+                                orderby c.Codigo, c.Descripcion
+                                select new
+                                {
+                                    id = c.Secuencial,
+                                    nombre = c.Codigo.ToUpper() + "-" + c.Descripcion.ToUpper()
+                                }).ToList<object>();
+                }
+                else
+                {
+                    clientes = (from c in db.Cliente
+                                where c.EstaActivo == 1
+                                orderby c.Codigo, c.Descripcion
+                                select new
+                                {
+                                    id = c.Secuencial,
+                                    nombre = c.Codigo.ToUpper() + "-" + c.Descripcion.ToUpper()
+                                }).ToList<object>();
+                }
+                var resp = new
+                {
+                    success = true,
+                    clientes = clientes
+                };
+                return Json(resp);
             }
-            else
+            catch (Exception e)
             {
-                clientes = (from c in db.Cliente
-                            where c.EstaActivo == 1
-                            orderby c.Codigo, c.Descripcion
-                            select new
-                            {
-                                id = c.Secuencial,
-                                nombre = c.Codigo.ToUpper() + "-" + c.Descripcion.ToUpper()
-                            }
-                          ).ToList<object>();
+                LoggerManager.LogError(e, $"[DarClientes] Error inesperado al obtener los clientes: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener los clientes."
+                });
             }
-
-
-            var resp = new
-            {
-                success = true,
-                clientes = clientes
-            };
-            return Json(resp);
         }
 
         [HttpPost]
@@ -3655,173 +4032,204 @@ f in db.FotoColaborador on t equals f.colaborador
         [Authorize]
         public ActionResult DarEstadosContrato(string filtro = "")
         {
-            List<object> estadosContrato = new List<object>();
-            if (filtro != "")
+            try
             {
-                estadosContrato = (from e in db.EstadoContrato
-                                   where e.EstaActivo == 1 &&
-                                         (e.Descripcion.Contains(filtro) || e.Codigo.Contains(filtro))
-                                   orderby e.Codigo
-                                   select new
-                                   {
-                                       id = e.Secuencial,
-                                       nombre = e.Codigo.ToUpper()
-                                   }
-                          ).ToList<object>();
+                List<object> estadosContrato = new List<object>();
+                if (filtro != "")
+                {
+                    estadosContrato = (from e in db.EstadoContrato
+                                       where e.EstaActivo == 1 &&
+                                             (e.Descripcion.Contains(filtro) || e.Codigo.Contains(filtro))
+                                       orderby e.Codigo
+                                       select new
+                                       {
+                                           id = e.Secuencial,
+                                           nombre = e.Codigo.ToUpper()
+                                       }).ToList<object>();
+                }
+                else
+                {
+                    estadosContrato = (from e in db.EstadoContrato
+                                       where e.EstaActivo == 1
+                                       orderby e.Codigo
+                                       select new
+                                       {
+                                           id = e.Secuencial,
+                                           nombre = e.Codigo.ToUpper()
+                                       }).ToList<object>();
+                }
+                var resp = new
+                {
+                    success = true,
+                    estadosContrato = estadosContrato
+                };
+                return Json(resp);
             }
-            else
+            catch (Exception e)
             {
-                estadosContrato = (from e in db.EstadoContrato
-                                   where e.EstaActivo == 1
-                                   orderby e.Codigo
-                                   select new
-                                   {
-                                       id = e.Secuencial,
-                                       nombre = e.Codigo.ToUpper()
-                                   }
-                          ).ToList<object>();
+                LoggerManager.LogError(e, $"[DarEstadosContrato] Error inesperado al obtener los estados contratos: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener los estados contratos."
+                });
             }
-
-
-            var resp = new
-            {
-                success = true,
-                estadosContrato = estadosContrato
-            };
-            return Json(resp);
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarTiposPlazo(string filtro = "")
         {
-            List<object> tiposPlazo = new List<object>();
-            if (filtro != "")
+            try
             {
-                tiposPlazo = (from e in db.TipoPlazo
-                              where e.EstaActivo == 1 &&
-                                    (e.Descripcion.Contains(filtro) || e.Codigo.Contains(filtro))
-                              orderby e.Codigo
-                              select new
-                              {
-                                  id = e.Secuencial,
-                                  nombre = e.Codigo.ToUpper()
-                              }
-                          ).ToList<object>();
+                List<object> tiposPlazo = new List<object>();
+                if (filtro != "")
+                {
+                    tiposPlazo = (from e in db.TipoPlazo
+                                  where e.EstaActivo == 1 &&
+                                        (e.Descripcion.Contains(filtro) || e.Codigo.Contains(filtro))
+                                  orderby e.Codigo
+                                  select new
+                                  {
+                                      id = e.Secuencial,
+                                      nombre = e.Codigo.ToUpper()
+                                  }).ToList<object>();
+                }
+                else
+                {
+                    tiposPlazo = (from e in db.TipoPlazo
+                                  where e.EstaActivo == 1
+                                  orderby e.Codigo
+                                  select new
+                                  {
+                                      id = e.Secuencial,
+                                      nombre = e.Codigo.ToUpper()
+                                  }).ToList<object>();
+                }
+                var resp = new
+                {
+                    success = true,
+                    tiposPlazo = tiposPlazo
+                };
+                return Json(resp);
             }
-            else
+            catch (Exception e)
             {
-                tiposPlazo = (from e in db.TipoPlazo
-                              where e.EstaActivo == 1
-                              orderby e.Codigo
-                              select new
-                              {
-                                  id = e.Secuencial,
-                                  nombre = e.Codigo.ToUpper()
-                              }
-                          ).ToList<object>();
+                LoggerManager.LogError(e, $"[DarTiposPlazo] Error inesperado al obtener los tipos de plazos: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener los tipos de plazos:."
+                });
             }
-
-
-            var resp = new
-            {
-                success = true,
-                tiposPlazo = tiposPlazo
-            };
-            return Json(resp);
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarFasesContrato(string filtro = "")
         {
-            List<object> fasesContrato = new List<object>();
-            if (filtro != "")
+            try
             {
-                fasesContrato = (from e in db.FaseContrato
-                                 where e.EstaActivo == 1 &&
-                                       (e.Descripcion.Contains(filtro) || e.Codigo.Contains(filtro))
-                                 orderby e.Codigo
-                                 select new
-                                 {
-                                     id = e.Secuencial,
-                                     nombre = e.Codigo.ToUpper()
-                                 }
-                          ).ToList<object>();
+                List<object> fasesContrato = new List<object>();
+                if (filtro != "")
+                {
+                    fasesContrato = (from e in db.FaseContrato
+                                     where e.EstaActivo == 1 &&
+                                           (e.Descripcion.Contains(filtro) || e.Codigo.Contains(filtro))
+                                     orderby e.Codigo
+                                     select new
+                                     {
+                                         id = e.Secuencial,
+                                         nombre = e.Codigo.ToUpper()
+                                     }).ToList<object>();
+                }
+                else
+                {
+                    fasesContrato = (from e in db.FaseContrato
+                                     where e.EstaActivo == 1
+                                     orderby e.Codigo
+                                     select new
+                                     {
+                                         id = e.Secuencial,
+                                         nombre = e.Codigo.ToUpper()
+                                     }).ToList<object>();
+                }
+                var resp = new
+                {
+                    success = true,
+                    fasesContrato = fasesContrato
+                };
+                return Json(resp);
             }
-            else
+            catch (Exception e)
             {
-                fasesContrato = (from e in db.FaseContrato
-                                 where e.EstaActivo == 1
-                                 orderby e.Codigo
-                                 select new
-                                 {
-                                     id = e.Secuencial,
-                                     nombre = e.Codigo.ToUpper()
-                                 }
-                          ).ToList<object>();
+                LoggerManager.LogError(e, $"[DarFasesContrato] Error inesperado al obtener las fases del contrato: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener las fases del contrato."
+                });
             }
-
-
-            var resp = new
-            {
-                success = true,
-                fasesContrato = fasesContrato
-            };
-            return Json(resp);
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarTiposMotivoTrabajo(string filtro = "")
         {
-            List<object> tipoMotivoTrabajo = new List<object>();
-            if (filtro != "")
+            try
             {
-                if (filtro == "SOPORTE Y MANTENIMIENTO")
+                List<object> tipoMotivoTrabajo = new List<object>();
+                if (filtro != "")
                 {
-                    filtro = "PENDIENTES";
+                    if (filtro == "SOPORTE Y MANTENIMIENTO")
+                    {
+                        filtro = "PENDIENTES";
+                    }
+                    tipoMotivoTrabajo = (from t in db.TipoMotivoTrabajo
+                                         where t.EstaActivo == 1 &&
+                                               (t.Descripcion.Contains(filtro) || t.Codigo.Contains(filtro))
+                                         orderby t.Codigo
+                                         select new
+                                         {
+                                             id = t.Secuencial,
+                                             codigo = t.Codigo.ToUpper() != "PENDIENTES" ? t.Codigo.ToUpper() : "SOPORTE Y MANTENIMIENTO",
+                                             descripcion = t.Descripcion
+                                         }).ToList<object>();
                 }
-                tipoMotivoTrabajo = (from t in db.TipoMotivoTrabajo
-                                     where t.EstaActivo == 1 &&
-                                           (t.Descripcion.Contains(filtro) || t.Codigo.Contains(filtro))
-                                     orderby t.Codigo
-                                     select new
-                                     {
-                                         id = t.Secuencial,
-                                         codigo = t.Codigo.ToUpper() != "PENDIENTES" ? t.Codigo.ToUpper() : "SOPORTE Y MANTENIMIENTO",
-                                         descripcion = t.Descripcion
-                                     }
-                          ).ToList<object>();
+                else
+                {
+                    tipoMotivoTrabajo = (from t in db.TipoMotivoTrabajo
+                                         where t.EstaActivo == 1
+                                         orderby t.Codigo
+                                         select new
+                                         {
+                                             id = t.Secuencial,
+                                             codigo = t.Codigo.ToUpper() != "PENDIENTES" ? t.Codigo.ToUpper() : "SOPORTE Y MANTENIMIENTO",
+                                             descripcion = t.Descripcion
+                                         }).ToList<object>();
+                }
+                var resp = new
+                {
+                    success = true,
+                    tipoMotivoTrabajo = tipoMotivoTrabajo
+                };
+                return Json(resp);
             }
-            else
+            catch (Exception e)
             {
-                tipoMotivoTrabajo = (from t in db.TipoMotivoTrabajo
-                                     where t.EstaActivo == 1
-                                     orderby t.Codigo
-                                     select new
-                                     {
-                                         id = t.Secuencial,
-                                         codigo = t.Codigo.ToUpper() != "PENDIENTES" ? t.Codigo.ToUpper() : "SOPORTE Y MANTENIMIENTO",
-                                         descripcion = t.Descripcion
-                                     }
-                          ).ToList<object>();
+                LoggerManager.LogError(e, $"[DarTiposMotivoTrabajo] Error inesperado al obtener los tipos motivo de trabajo: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener los tipos motivo de trabajo."
+                });
             }
-
-
-            var resp = new
-            {
-                success = true,
-                tipoMotivoTrabajo = tipoMotivoTrabajo
-            };
-            return Json(resp);
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarNombresClientes(string filtro = "")
         {
-
             try
             {
                 var clientes = (from c in db.Cliente
@@ -3832,7 +4240,6 @@ f in db.FotoColaborador on t equals f.colaborador
                                     id = c.Secuencial,
                                     nombre = c.Descripcion.ToUpper()
                                 }).ToList();
-
                 return Json(new
                 {
                     success = true,
@@ -3841,275 +4248,390 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarNombresClientes] Error inesperado al obtener los nombre de los clientes: {e.Message}");
                 return Json(new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error inesperado al obtener los nombre de los clientes."
                 });
             }
-
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarLugarTareas()
         {
-            var lugares = (from l in db.LugarTarea
-                           where l.EstaActivo == 1
-                           orderby l.Codigo, l.Descripcion
-                           select new
-                           {
-                               id = l.Secuencial,
-                               nombre = l.Codigo.ToUpper() + "-" + l.Descripcion.ToUpper()
-                           }
-                          ).ToList();
-            var resp = new
+            try
             {
-                success = true,
-                lugares = lugares
-            };
-            return Json(resp);
+                var lugares = (from l in db.LugarTarea
+                               where l.EstaActivo == 1
+                               orderby l.Codigo, l.Descripcion
+                               select new
+                               {
+                                   id = l.Secuencial,
+                                   nombre = l.Codigo.ToUpper() + "-" + l.Descripcion.ToUpper()
+                               }
+              ).ToList();
+                var resp = new
+                {
+                    success = true,
+                    lugares = lugares
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarLugarTareas] Error inesperado al obtener los lugares de las tareas: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener los lugares de las tareas."
+                });
+            }
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarActividades()
         {
-            var actividades = (from a in db.Actividad
-                               where a.EstaActiva == 1
-                               orderby a.Codigo, a.Descripcion
-                               select new
-                               {
-                                   id = a.Secuencial,
-                                   nombre = a.Codigo.ToUpper() + "-" + a.Descripcion.ToUpper()
-                               }
-                          ).ToList();
-            var resp = new
+            try
             {
-                success = true,
-                actividades = actividades
-            };
-            return Json(resp);
+                var actividades = (from a in db.Actividad
+                                   where a.EstaActiva == 1
+                                   orderby a.Codigo, a.Descripcion
+                                   select new
+                                   {
+                                       id = a.Secuencial,
+                                       nombre = a.Codigo.ToUpper() + "-" + a.Descripcion.ToUpper()
+                                   }).ToList();
+                var resp = new
+                {
+                    success = true,
+                    actividades = actividades
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarActividades] Error inesperado al obtener las actividades: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener las actividades."
+                });
+            }
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarCoordinadores()
         {
-
-            var coordinadores = (from t in db.Colaborador
-                                 join
-             p in db.Persona on t.persona equals p
-                                 join
-                                 us in db.Usuario on p.Secuencial equals us.SecuencialPersona
-                                 where us.EstaActivo == 1 && us.Email != "canulado@sifizsoft.com" && us.Email != "sifizplanning@sifizsoft.com"
-                                 select new
-                                 {
-                                     id = t.Secuencial,
-                                     nombre = p.Nombre1 + " " + p.Apellido1
-                                 }
-                                ).ToList();
-
-            coordinadores.Sort((x1, x2) => String.Compare(x1.nombre, x2.nombre));
-
-            var resp = new
+            try
             {
-                success = true,
-                coordinadores = coordinadores
-            };
+                var coordinadores = (from t in db.Colaborador
+                                     join
+                 p in db.Persona on t.persona equals p
+                                     join
+                                     us in db.Usuario on p.Secuencial equals us.SecuencialPersona
+                                     where us.EstaActivo == 1 && us.Email != "canulado@sifizsoft.com" && us.Email != "sifizplanning@sifizsoft.com"
+                                     select new
+                                     {
+                                         id = t.Secuencial,
+                                         nombre = p.Nombre1 + " " + p.Apellido1
+                                     }
+                                   ).ToList();
 
-            return Json(resp);
+                coordinadores.Sort((x1, x2) => String.Compare(x1.nombre, x2.nombre));
+
+                var resp = new
+                {
+                    success = true,
+                    coordinadores = coordinadores
+                };
+
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarCoordinadores] Error inesperado al obtener los cordinadores: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener los cordinadores."
+                });
+            }
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarRepositorios()
         {
-            var repositorios = (from t in db.Repositorio
-                                where t.EstaActivo == 1
-                                select new
-                                {
-                                    id = t.Secuencial,
-                                    nombre = t.Descripcion
-                                }
-                                ).ToList();
-
-            var resp = new
+            try
             {
-                success = true,
-                repositorios = repositorios
-            };
-
-            return Json(resp);
+                var repositorios = (from t in db.Repositorio
+                                    where t.EstaActivo == 1
+                                    select new
+                                    {
+                                        id = t.Secuencial,
+                                        nombre = t.Descripcion
+                                    }).ToList();
+                var resp = new
+                {
+                    success = true,
+                    repositorios = repositorios
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarRepositorios] Error inesperado al obtener los repositorios: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener los repositorios."
+                });
+            }
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarResponsablesProyecto(bool esTecnico, bool todos)
         {
-            var responsables = db.ResponsableProyectos.Select(s => s).AsQueryable();
-            if (!todos && esTecnico)
+            try
             {
-                responsables = responsables.Where(s => s.EsTecnico == 1);
+                var responsables = db.ResponsableProyectos.Select(s => s).AsQueryable();
+                if (!todos && esTecnico)
+                {
+                    responsables = responsables.Where(s => s.EsTecnico == 1);
+                }
+                if (!todos && !esTecnico)
+                {
+                    responsables = responsables.Where(s => s.EsTecnico == 0);
+                }
+                var result = responsables.Select(s => new { id = s.Secuencial, nombre = s.Nombre }).ToList();
+                var resp = new
+                {
+                    success = true,
+                    responsables = result
+                };
+                return Json(resp);
             }
-            if (!todos && !esTecnico)
+            catch (Exception e)
             {
-                responsables = responsables.Where(s => s.EsTecnico == 0);
+                LoggerManager.LogError(e, $"[DarResponsablesProyecto] Error inesperado al obtener los responsables de proyectos: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener los responsables de proyectos."
+                });
             }
-            var result = responsables.Select(s => new { id = s.Secuencial, nombre = s.Nombre }).ToList();
-
-            var resp = new
-            {
-                success = true,
-                responsables = result
-            };
-
-            return Json(resp);
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarVersionesDesarrollo()
         {
-            var versionesDesarrollo = (from t in db.VersionDesarrollo
-                                       where t.EstaActivo == 1
-                                       select new
-                                       {
-                                           id = t.Secuencial,
-                                           nombre = t.Descripcion
-                                       }
-                                ).ToList();
-
-            var resp = new
+            try
             {
-                success = true,
-                versionesDesarrollo = versionesDesarrollo
-            };
+                var versionesDesarrollo = (from t in db.VersionDesarrollo
+                                           where t.EstaActivo == 1
+                                           select new
+                                           {
+                                               id = t.Secuencial,
+                                               nombre = t.Descripcion
+                                           }).ToList();
 
-            return Json(resp);
+                var resp = new
+                {
+                    success = true,
+                    versionesDesarrollo = versionesDesarrollo
+                };
+
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarVersionesDesarrollo] Error inesperado al obtener las versiones de desarrollo: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener las versiones de desarrollos."
+                });
+            }
         }
+
         [HttpPost]
         [Authorize]
         public ActionResult DarVersionesBaseDatos()
         {
-            var versionesBaseDatos = (from t in db.VersionBaseDatos
-                                      where t.EstaActivo == 1
-                                      select new
-                                      {
-                                          id = t.Secuencial,
-                                          nombre = t.Descripcion
-                                      }
-                                ).ToList();
-
-            var resp = new
+            try
             {
-                success = true,
-                versionesBaseDatos = versionesBaseDatos
-            };
-
-            return Json(resp);
+                var versionesBaseDatos = (from t in db.VersionBaseDatos
+                                          where t.EstaActivo == 1
+                                          select new
+                                          {
+                                              id = t.Secuencial,
+                                              nombre = t.Descripcion
+                                          }).ToList();
+                var resp = new
+                {
+                    success = true,
+                    versionesBaseDatos = versionesBaseDatos
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarVersionesBaseDatos] Error inesperado al obtener las versiones de base de datos: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener las versiones de base de datos."
+                });
+            }
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarMotivosDevolucionTicket()
         {
-            var motivos = (from m in db.MotivoDevolucionTicket
-                           where m.EstaActivo == 1
-                           orderby m.Codigo, m.Descripcion
-                           select new
-                           {
-                               id = m.Secuencial,
-                               nombre = m.Codigo.ToUpper()/* + "-" + m.Descripcion.ToUpper()*/,
-                               descripcion = m.Descripcion.ToUpper()
-                           }
-                          ).ToList();
-            var resp = new
+            try
             {
-                success = true,
-                motivos = motivos
-            };
-            return Json(resp);
+                var motivos = (from m in db.MotivoDevolucionTicket
+                               where m.EstaActivo == 1
+                               orderby m.Codigo, m.Descripcion
+                               select new
+                               {
+                                   id = m.Secuencial,
+                                   nombre = m.Codigo.ToUpper()/* + "-" + m.Descripcion.ToUpper()*/,
+                                   descripcion = m.Descripcion.ToUpper()
+                               }).ToList();
+                var resp = new
+                {
+                    success = true,
+                    motivos = motivos
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarMotivosDevolucionTicket] Error inesperado al obtener los motivos devolución ticket: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener los motivos devolución ticket."
+                });
+            }
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarCatalogos(string filtro = "")
         {
-            List<object> catalogos = new List<object>();
-            if (filtro != "")
+            try
             {
-                catalogos = (from tc in db.TablaCatalogo
-                             where tc.EstaActivo == 1 &&
-                                 (tc.Descripcion.Contains(filtro) || tc.NombreMostrar.Contains(filtro))
-                             orderby tc.NombreMostrar
-                             select new
-                             {
-                                 id = tc.Secuencial,
-                                 nombre = tc.NombreMostrar
-                             }
-                            ).ToList<object>();
+                List<object> catalogos = new List<object>();
+                if (filtro != "")
+                {
+                    catalogos = (from tc in db.TablaCatalogo
+                                 where tc.EstaActivo == 1 &&
+                                     (tc.Descripcion.Contains(filtro) || tc.NombreMostrar.Contains(filtro))
+                                 orderby tc.NombreMostrar
+                                 select new
+                                 {
+                                     id = tc.Secuencial,
+                                     nombre = tc.NombreMostrar
+                                 }).ToList<object>();
+                }
+                else
+                {
+                    catalogos = (from tc in db.TablaCatalogo
+                                 where tc.EstaActivo == 1
+                                 orderby tc.NombreMostrar
+                                 select new
+                                 {
+                                     id = tc.Secuencial,
+                                     nombre = tc.NombreMostrar
+                                 }).ToList<object>();
+                }
+                var resp = new
+                {
+                    success = true,
+                    catalogos = catalogos
+                };
+                return Json(resp);
             }
-            else
+            catch (Exception e)
             {
-                catalogos = (from tc in db.TablaCatalogo
-                             where tc.EstaActivo == 1
-                             orderby tc.NombreMostrar
-                             select new
-                             {
-                                 id = tc.Secuencial,
-                                 nombre = tc.NombreMostrar
-                             }
-                            ).ToList<object>();
+                LoggerManager.LogError(e, $"[DarCatalogos] Error inesperado al obtener los catálogos: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener los catálogos."
+                });
             }
-
-            var resp = new
-            {
-                success = true,
-                catalogos = catalogos
-            };
-            return Json(resp);
-
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarDepartamentos()
         {
-            var departamentos = (from tc in db.Departamento
-                                 where tc.EstaActivo == 1
-                                 select new
-                                 {
-                                     id = tc.Secuencial,
-                                     nombre = tc.Descripcion
-                                 }
-                            ).ToList();
-            var resp = new
+            try
             {
-                success = true,
-                departamentos = departamentos
-            };
-            return Json(resp);
+                var departamentos = (from tc in db.Departamento
+                                     where tc.EstaActivo == 1
+                                     select new
+                                     {
+                                         id = tc.Secuencial,
+                                         nombre = tc.Descripcion
+                                     }).ToList();
+                var resp = new
+                {
+                    success = true,
+                    departamentos = departamentos
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarDepartamentos] Error inesperado al obtener los departamentos: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener los departamentos."
+                });
+            }
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarTiposContratosCliente()
         {
-            var tiposContrato = (from tc in db.TipoContratoCliente
-                                 where tc.EstaActivo == 1
-                                 select new
-                                 {
-                                     id = tc.Secuencial,
-                                     nombre = tc.Descripcion
-                                 }
-                            ).ToList();
-            var resp = new
+            try
             {
-                success = true,
-                tiposContrato = tiposContrato
-            };
-            return Json(resp);
+                var tiposContrato = (from tc in db.TipoContratoCliente
+                                     where tc.EstaActivo == 1
+                                     select new
+                                     {
+                                         id = tc.Secuencial,
+                                         nombre = tc.Descripcion
+                                     }).ToList();
+                var resp = new
+                {
+                    success = true,
+                    tiposContrato = tiposContrato
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarTiposContratosCliente] Error inesperado al obtener los tipos de contratos: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener los tipos de contratos."
+                });
+            }
         }
 
         [HttpPost]
@@ -4126,7 +4648,6 @@ f in db.FotoColaborador on t equals f.colaborador
                                            id = fn.Secuencial,
                                            nombre = fn.Descripcion
                                        }).ToList();
-
                 return Json(new
                 {
                     success = true,
@@ -4135,10 +4656,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarNombresFuncionalidades] Error inesperado al obtener los nombres de funcionalidades: {e.Message}");
                 return Json(new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error inesperado al obtener los nombres de funcionalidades."
                 });
             }
         }
@@ -4158,7 +4680,6 @@ f in db.FotoColaborador on t equals f.colaborador
                                          id = colab.Secuencial,
                                          nombre = colab.persona.Nombre1 + " " + colab.persona.Apellido1
                                      }).ToList();
-
                 return Json(new
                 {
                     success = true,
@@ -4167,10 +4688,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarColaboradores] Error inesperado al obtener los colaboradores: {e.Message}");
                 return Json(new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error inesperado al obtener los colaboradores."
                 });
             }
         }
@@ -4190,7 +4712,6 @@ f in db.FotoColaborador on t equals f.colaborador
                                          id = colab.Secuencial,
                                          nombre = colab.persona.Nombre1 + " " + colab.persona.Apellido1
                                      }).ToList();
-
                 return Json(new
                 {
                     success = true,
@@ -4199,10 +4720,11 @@ f in db.FotoColaborador on t equals f.colaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarFullColaboradores] Error inesperado al obtener los todos los colaboradores: {e.Message}");
                 return Json(new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error inesperado al obtener los todos los colaboradores."
                 });
             }
         }
@@ -4211,126 +4733,176 @@ f in db.FotoColaborador on t equals f.colaborador
         [Authorize]
         public ActionResult DarFuncionalidades(string filtro = "")
         {
-            List<object> tiposContrato = new List<object>();
-            if (filtro != "")
+            try
             {
-                tiposContrato = (from tc in db.Funcionalidad//todo
-                                 where tc.EstaActiva == 1
-                                 select new
-                                 {
-                                     id = tc.Secuencial,
-                                     nombre = tc.Descripcion
-                                 }
-                                ).ToList<object>();
+                List<object> tiposContrato = new List<object>();
+                if (filtro != "")
+                {
+                    tiposContrato = (from tc in db.Funcionalidad//todo
+                                     where tc.EstaActiva == 1
+                                     select new
+                                     {
+                                         id = tc.Secuencial,
+                                         nombre = tc.Descripcion
+                                     }).ToList<object>();
+                }
+                else
+                {
+                    tiposContrato = (from tc in db.Funcionalidad
+                                     where tc.EstaActiva == 1
+                                     select new
+                                     {
+                                         id = tc.Secuencial,
+                                         nombre = tc.Descripcion
+                                     }).ToList<object>();
+                }
+                var resp = new
+                {
+                    success = true,
+                    tiposContrato = tiposContrato
+                };
+                return Json(resp);
             }
-            else
+            catch (Exception e)
             {
-                tiposContrato = (from tc in db.Funcionalidad
-                                 where tc.EstaActiva == 1
-                                 select new
-                                 {
-                                     id = tc.Secuencial,
-                                     nombre = tc.Descripcion
-                                 }
-                                ).ToList<object>();
+                LoggerManager.LogError(e, $"[DarFuncionalidades] Error inesperado al obtener las funcionalidades: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener las funcionalidades."
+                });
             }
-
-            var resp = new
-            {
-                success = true,
-                tiposContrato = tiposContrato
-            };
-            return Json(resp);
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarPrioridadesTicket()
         {
-            var prioridadesTicket = (from tc in db.PrioridadTicket
-                                     where tc.EstaActiva == 1
-                                     select new
-                                     {
-                                         id = tc.Secuencial,
-                                         codigo = tc.Codigo,
-                                         nombre = tc.Codigo + " - " + tc.Descripcion
-                                     }
-                                    ).ToList();
-            var resp = new
+            try
             {
-                success = true,
-                prioridades = prioridadesTicket
-            };
-            return Json(resp);
+                var prioridadesTicket = (from tc in db.PrioridadTicket
+                                         where tc.EstaActiva == 1
+                                         select new
+                                         {
+                                             id = tc.Secuencial,
+                                             codigo = tc.Codigo,
+                                             nombre = tc.Codigo + " - " + tc.Descripcion
+                                         }).ToList();
+                var resp = new
+                {
+                    success = true,
+                    prioridades = prioridadesTicket
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarPrioridadesTicket] Error inesperado al obtener las prioridades: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener las prioridades."
+                });
+            }
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarActividadRealizada()
         {
-            var actividadesRealizadas = (from tc in db.ActividadRealizada
-                                         where tc.EstaActiva == 1
-                                         orderby tc.Descripcion
-                                         select new
-                                         {
-                                             id = tc.Secuencial,
-                                             nombre = tc.Descripcion
-                                         }
-                                        ).ToList();
-            var resp = new
+            try
             {
-                success = true,
-                actividadesRealizadas = actividadesRealizadas
-            };
-            return Json(resp);
+                var actividadesRealizadas = (from tc in db.ActividadRealizada
+                                             where tc.EstaActiva == 1
+                                             orderby tc.Descripcion
+                                             select new
+                                             {
+                                                 id = tc.Secuencial,
+                                                 nombre = tc.Descripcion
+                                             }).ToList();
+                var resp = new
+                {
+                    success = true,
+                    actividadesRealizadas = actividadesRealizadas
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarActividadRealizada] Error inesperado al obtener actividad realizada: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener actividad realizada."
+                });
+            }
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarImplicacionErrorPuntos()
         {
-            var implicacionesError = (from tc in db.ImplicacionError
-                                      where tc.EstaActivo == 1
-                                      orderby tc.NivelGravedad
-                                      select new
-                                      {
-                                          id = tc.Secuencial,
-                                          nombre = tc.Descripcion,
-                                          nivel = tc.NivelGravedad
-                                      }
-                                        ).ToList();
-            var resp = new
+            try
             {
-                success = true,
-                implicacionesError = implicacionesError
-            };
-            return Json(resp);
+                var implicacionesError = (from tc in db.ImplicacionError
+                                          where tc.EstaActivo == 1
+                                          orderby tc.NivelGravedad
+                                          select new
+                                          {
+                                              id = tc.Secuencial,
+                                              nombre = tc.Descripcion,
+                                              nivel = tc.NivelGravedad
+                                          }).ToList();
+                var resp = new
+                {
+                    success = true,
+                    implicacionesError = implicacionesError
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                LoggerManager.LogError(e, $"[DarImplicacionErrorPuntos] Error inesperado al obtener implicación error puntos: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener implicación error puntos."
+                });
+            }
         }
 
         [HttpPost]
         [Authorize]
         public ActionResult DarImplicacionErrorPorTipoError(int idTipoError)
         {
-            var implicacionError = (
-                                        from ie in db.ImplicacionError
-                                        join
-             tei in db.TipoErrorImplicacion on ie.Secuencial equals tei.SecuencialImplicacionError
-                                        join
-te in db.TipoError on tei.tipoError equals te
+            try
+            {
+                var implicacionError = (from ie in db.ImplicacionError
+                                        join tei in db.TipoErrorImplicacion on ie.Secuencial equals tei.SecuencialImplicacionError
+                                        join te in db.TipoError on tei.tipoError equals te
                                         where ie.EstaActivo == 1 && tei.EstaActivo == 1 && te.EstaActivo == 1 && te.Secuencial == idTipoError
                                         select new
                                         {
                                             id = ie.Secuencial,
                                             codigo = ie.Codigo,
                                             nivel = ie.NivelGravedad
-                                        }
-                                     ).FirstOrDefault();
-            var resp = new
+                                        }).FirstOrDefault();
+                var resp = new
+                {
+                    success = true,
+                    implicacionError = implicacionError
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
             {
-                success = true,
-                implicacionError = implicacionError
-            };
-            return Json(resp);
+                LoggerManager.LogError(e, $"[DarImplicacionErrorPorTipoError] Error inesperado al obtener implicación error por tipo error: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = "Error inesperado al obtener implicación error por tipo error."
+                });
+            }
         }
 
         [HttpPost]
@@ -4388,7 +4960,6 @@ te in db.TipoError on tei.tipoError equals te
                                 id = clase.GetProperty("Secuencial").GetValue(data),
                                 nombre = metodoGet.GetValue(data)
                             };
-
                             datosCatalogo.Add(dato);
                         }
                     }
@@ -4402,11 +4973,9 @@ te in db.TipoError on tei.tipoError equals te
                             id = clase.GetProperty("Secuencial").GetValue(data),
                             nombre = metodoGet.GetValue(data)
                         };
-
                         datosCatalogo.Add(dato);
                     }
                 }
-
                 var resp = new
                 {
                     success = true,
@@ -4416,10 +4985,11 @@ te in db.TipoError on tei.tipoError equals te
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarDatosCatalogo] Error inesperado al obtener datos de catálogos: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error inesperado al obtener datos de catálogos."
                 };
                 return Json(resp);
             }
@@ -4438,8 +5008,7 @@ te in db.TipoError on tei.tipoError equals te
                                              {
                                                  id = tc.Secuencial,
                                                  nombre = tc.Descripcion
-                                             }
-                                        ).ToList();
+                                             }).ToList();
                 var resp = new
                 {
                     success = true,
@@ -4449,10 +5018,11 @@ te in db.TipoError on tei.tipoError equals te
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarActividadPropuesta] Error inesperado al obtener actividad propuesta: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error inesperado al obtener actividad propuesta."
                 };
                 return Json(resp);
             }
@@ -4471,8 +5041,7 @@ te in db.TipoError on tei.tipoError equals te
                                 {
                                     id = tc.Secuencial,
                                     nombre = tc.Descripcion
-                                }
-                                        ).ToList();
+                                }).ToList();
                 var resp = new
                 {
                     success = true,
@@ -4482,10 +5051,12 @@ te in db.TipoError on tei.tipoError equals te
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarCausasNoTerminacion] Error inesperado al obtener causas no terminación: {e.Message}");
+
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error inesperado al obtener causas no terminación."
                 };
                 return Json(resp);
             }
@@ -4502,13 +5073,11 @@ te in db.TipoError on tei.tipoError equals te
                             {
                                 s.colaborador.Secuencial,
                                 Nombre = s.colaborador.persona.Nombre1 + " " + s.colaborador.persona.Apellido1
-                            })
-                            .Select(g => new
+                            }).Select(g => new
                             {
                                 idColaborador = g.Key.Secuencial,
                                 nombre = g.Key.Nombre
                             }).ToList();
-
                 var resp = new
                 {
                     success = true,
@@ -4518,10 +5087,11 @@ te in db.TipoError on tei.tipoError equals te
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarGestores] Error inesperado al obtener los gestores: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error inesperado al obtener los gestores."
                 };
                 return Json(resp);
             }
@@ -4545,3 +5115,5 @@ te in db.TipoError on tei.tipoError equals te
         public string versionBd { get; set; }
     }
 }
+
+

@@ -17,6 +17,7 @@ using System.Data.Entity;
 using System.Globalization;
 using System.Transactions;
 using Hangfire;
+using static System.Windows.Forms.MonthCalendar;
 
 namespace SifizPlanning.Controllers
 {
@@ -289,6 +290,7 @@ namespace SifizPlanning.Controllers
         {
             if (file != null)
             {
+                var emailUser = User.Identity.Name;
                 try
                 {
                     //Para que la funcionalidad de excel continue funcionando, debe existir la carpeta Tareas en el disco D: del servidor, o cambiar la ubicacion donde se va a subir y leer
@@ -297,7 +299,11 @@ namespace SifizPlanning.Controllers
                     //string ruta = "D:/Tareas/IngresarTareas.xlsx";
 
                     file.SaveAs(ruta);
-
+                    LoggerManager.LogSensitiveOperation(
+                        "Archivo Excel Guardado",
+                        $"Usuario {emailUser} subió exitosamente el archivo: {file.FileName}. Ruta: {ruta}",
+                        emailUser
+                    );
                     return Json(new
                     {
                         success = true,
@@ -306,10 +312,11 @@ namespace SifizPlanning.Controllers
                 }
                 catch (Exception e)
                 {
+                    LoggerManager.LogError(e, $"[SubirExcel] Error al subir archivo. Usuario: {emailUser}, Archivo: {file?.FileName}. Error: {e.Message}");
                     return Json(new
                     {
                         success = false,
-                        msg = e.Message
+                        msg = "Error al subir archivo."
                     });
                 }
             }
@@ -323,11 +330,11 @@ namespace SifizPlanning.Controllers
             }
         }
 
-
         [HttpPost]
         [Authorize(Roles = "ADMIN, REC")]
         public ActionResult LeerExcel()
         {
+            var emailUser = User.Identity.Name;
             try
             {
                 string formato = "IngresarTareas.xlsx";
@@ -335,11 +342,15 @@ namespace SifizPlanning.Controllers
                 //string ruta = "D:/Tareas/IngresarTareas.xlsx";
 
                 SLDocument sl = new SLDocument(ruta);
-
+                LoggerManager.LogSensitiveOperation(
+                    "Procesamiento de Excel",
+                    $"Usuario {emailUser} inició procesamiento de archivo Excel. Ruta: {ruta}",
+                    emailUser
+                );
                 List<object> datos = new List<object>();
 
                 int fila = 2;
-
+                LoggerManager.LogInfo($"[LeerExcel] Iniciando lectura de archivo Excel. Ruta: {ruta}");
                 while (!string.IsNullOrEmpty(sl.GetCellValueAsString(fila, 1)))
                 {
                     string colaborador = sl.GetCellValueAsString(fila, 1).ToUpper();
@@ -550,6 +561,11 @@ namespace SifizPlanning.Controllers
                         });
                     }
                 }
+                LoggerManager.LogSensitiveOperation(
+                    "Procesamiento Completo",
+                    $"Usuario {emailUser} procesó exitosamente {datos.Count} tareas desde Excel",
+                    emailUser
+                );
 
                 return Json(new
                 {
@@ -560,63 +576,31 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[LeerExcel] Error durante procesamiento de Excel. Usuario: {emailUser}. Error: {e.Message}");
                 return Json(new
                 {
                     success = false,
-                    msg = e.Message
-                    //Rafael Vinueza programó aqui :v
+                    msg = "Error durante procesamiento de Excel."
                 });
             }
-
         }
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, REC")]
         public ActionResult DarUltimoLunes()
         {
-            DateTime hoy = DateTime.Today;
-            DayOfWeek diaSemana = hoy.DayOfWeek;
-            DateTime lunes = hoy;
-            if ((int)diaSemana == 0)//Domingo
-            {
-                lunes = hoy.AddDays(-6);
-            }
-            else
-            {
-                long tiempo = (int)diaSemana;
-                TimeSpan time = new TimeSpan(tiempo * 864000000000);
-                DateTime domingo = hoy.Subtract(time);
-                lunes = domingo.AddDays(1);
-            }
+            var emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[DarUltimoLunes] Usuario {emailUser} solicitó cálculo del último lunes. Fecha actual: {DateTime.Today.ToString("dd/MM/yyyy")}");
 
-            var resp = new
-            {
-                success = true,
-                lunes = lunes.ToString("dd/MM/yyyy"),
-                hoy = hoy.ToString("dd/MM/yyyy")
-            };
-            return Json(resp);
-        }
-
-        [HttpPost]
-        [Authorize(Roles = "ADMIN, REC")]
-        public ActionResult DarTareasTrabajadores(string fechaLunes = "", int semanas = 1, string json = "", bool coordinados = false)
-        {
-            db.Database.CommandTimeout = 240;
-            DateTime lunes = DateTime.Today;
-            if (fechaLunes != "")
-            {
-                string[] fechas = fechaLunes.Split(new Char[] { '/' });
-                int dia = Int32.Parse(fechas[0]);
-                int mes = Int32.Parse(fechas[1]);
-                int anno = Int32.Parse(fechas[2]);
-                lunes = new System.DateTime(anno, mes, dia);
-            }
-            else
+            try
             {
                 DateTime hoy = DateTime.Today;
                 DayOfWeek diaSemana = hoy.DayOfWeek;
-                if ((int)diaSemana == 0)//Domingo
+                DateTime lunes = hoy;
+
+                LoggerManager.LogDebug($"[DarUltimoLunes] Cálculo en progreso. Día de semana actual: {diaSemana.ToString()}");
+
+                if ((int)diaSemana == 0) // Domingo
                 {
                     lunes = hoy.AddDays(-6);
                 }
@@ -627,362 +611,445 @@ namespace SifizPlanning.Controllers
                     DateTime domingo = hoy.Subtract(time);
                     lunes = domingo.AddDays(1);
                 }
+
+                LoggerManager.LogDebug($"[DarUltimoLunes] Fecha calculada del último lunes: {lunes.ToString("dd/MM/yyyy")}");
+
+                var resp = new
+                {
+                    success = true,
+                    lunes = lunes.ToString("dd/MM/yyyy"),
+                    hoy = hoy.ToString("dd/MM/yyyy")
+                };
+
+                LoggerManager.LogInfo($"[DarUltimoLunes] Retornando fechas: Lunes={resp.lunes}, Hoy={resp.hoy} para usuario {emailUser}");
+
+                return Json(resp);
             }
-
-            List<int> idColaboradores = new List<int>();
-            List<int> idClientes = new List<int>();
-            List<int> idEstados = new List<int>();
-            List<int> idLugares = new List<int>();
-            List<int> idModulos = new List<int>();
-            List<int> idSedes = new List<int>();
-            List<int> idDepartamentos = new List<int>();
-            if (json != "")
+            catch (Exception ex)
             {
-                var s = new JavaScriptSerializer();
-                var jsonObj = s.Deserialize<dynamic>(json);
-                for (int i = 0; i < jsonObj["colaboradores"].Length; i++)
+                LoggerManager.LogError(ex, $"[DarUltimoLunes] Error al calcular el último lunes. Usuario: {emailUser}. Error: {ex.Message}");
+
+                var respError = new
                 {
-                    idColaboradores.Add(int.Parse(jsonObj["colaboradores"][i]["id"]));
-                }
-                for (int i = 0; i < jsonObj["clientes"].Length; i++)
-                {
-                    idClientes.Add(int.Parse(jsonObj["clientes"][i]["id"]));
-                }
-                for (int i = 0; i < jsonObj["estadoTarea"].Length; i++)
-                {
-                    idEstados.Add(int.Parse(jsonObj["estadoTarea"][i]["id"]));
-                }
-                for (int i = 0; i < jsonObj["lugarTarea"].Length; i++)
-                {
-                    idLugares.Add(int.Parse(jsonObj["lugarTarea"][i]["id"]));
-                }
-                for (int i = 0; i < jsonObj["modulo"].Length; i++)
-                {
-                    idModulos.Add(int.Parse(jsonObj["modulo"][i]["id"]));
-                }
-                for (int i = 0; i < jsonObj["sede"].Length; i++)
-                {
-                    idSedes.Add(int.Parse(jsonObj["sede"][i]["id"]));
-                }
-                for (int i = 0; i < jsonObj["departamento"].Length; i++)
-                {
-                    idDepartamentos.Add(int.Parse(jsonObj["departamento"][i]["id"]));
-                }
+                    success = false,
+                    msg = "Ocurrió un error al procesar la solicitud"
+                };
+                return Json(respError);
             }
+        }
 
-            DateTime fechaFin = lunes.AddDays((7 * semanas));
-            var datos = (from t in db.Tarea
-                         join
-                             c in db.Colaborador on t.colaborador equals c
-                         join
-                             p in db.Persona on c.persona equals p
-                         join
-                             u in db.Usuario on p.Secuencial equals u.SecuencialPersona
-                         join
-                             f in db.FotoColaborador on c.Secuencial equals f.SecuencialColaborador
-                         join
-                             s in db.Sede on c.sede equals s
-                         join
-                             m in db.Modulo on t.modulo equals m
-                         join
-                             cl in db.Cliente on t.cliente equals cl
-                         join
-                             a in db.Actividad on t.actividad equals a
-                         join
-                             e in db.EstadoTarea on t.estadoTarea equals e
-                         join
-                             l in db.LugarTarea on t.lugarTarea equals l
-                         join d in db.Departamento on c.departamento equals d
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, REC")]
+        public ActionResult DarTareasTrabajadores(string fechaLunes = "", int semanas = 1, string json = "", bool coordinados = false)
+        {
+            var emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[DarTareasTrabajadores] Usuario {emailUser} solicitó tareas de trabajadores. Parámetros: fechaLunes={fechaLunes}, semanas={semanas}, coordinados={coordinados}");
 
-                         where u.EstaActivo == 1 &&
-                               d.Asignable == 1 &&
-                               t.FechaInicio >= lunes && t.FechaInicio < fechaFin && //Entre las dos fechas
-                               t.SecuencialEstadoTarea != 4//Es cuando están anuladas
-                         orderby t.FechaInicio, p.Nombre1, p.Apellido1
-                         select new
-                         {
-                             idColaborador = c.Secuencial,
-                             nombre = p.Nombre1 + " " + p.Apellido1,
-                             email = u.Email.ToUpper(),
-                             sede = s.Codigo,
-                             url = f.Url,
-                             idTarea = t.Secuencial,
-                             sdetalle = t.Detalle.Substring(0, 20) + "...",
-                             detalle = t.Detalle,
-                             finicio = t.FechaInicio,
-                             ffin = t.FechaFin,
-                             modulo = m.Codigo,
-                             dModulo = m.Descripcion.ToUpper(),
-                             idModulo = m.Secuencial,
-                             cliente = cl.Codigo,
-                             idCliente = cl.Secuencial,
-                             dCliente = cl.Descripcion.ToUpper(),
-                             actividad = a.Codigo,
-                             dActividad = a.Descripcion.ToUpper(),
-                             estado = e.Codigo,
-                             idEstado = e.Secuencial,
-                             lugar = l.Codigo,
-                             dLugar = l.Descripcion.ToUpper(),
-                             idLugar = l.Secuencial,
-                             departamento = d.Codigo,
-                             dDepartamento = d.Descripcion.ToUpper(),
-                             idDepartamento = d.Secuencial,
-                             clase = (t.SecuencialEstadoTarea == 1 ? "new" : (t.SecuencialEstadoTarea == 2) ? "dev" : (t.SecuencialEstadoTarea == 3) ? "finish" : (t.SecuencialEstadoTarea == 5) ? "pause" : (t.SecuencialEstadoTarea == 6) ? "preassigned" : "no-concluida"),
-                             coordinador = (from tc in db.Tarea_Coordinador
-                                            join
-                                                co in db.Colaborador on tc.colaborador equals co
-                                            join
-                                                pe in db.Persona on co.persona equals pe
-
-                                            where tc.SecuencialTarea == t.Secuencial && tc.EstaActivo == 1
-                                            select (pe.Nombre1 + " " + pe.Apellido1)).FirstOrDefault(),
-                             compensatoria = (t.tareaCompensatoria.FirstOrDefault() != null
-                                              && t.tareaCompensatoria.FirstOrDefault().EstaActiva == 1
-                                             ) ? "compensatoria" : "no-compensatoria"
-                         }).ToList();
-
-            var trabajadores = (from t in db.Colaborador
-                                join
-                                    p in db.Persona on t.persona equals p
-                                join
-                                    f in db.FotoColaborador on t.Secuencial equals f.SecuencialColaborador
-                                join
-                                    s in db.Sede on t.sede equals s
-                                join
-                                    u in db.Usuario on p.Secuencial equals u.SecuencialPersona
-                                join d in db.Departamento on t.departamento equals d
-
-                                where u.EstaActivo == 1 && (d.Asignable == 1)
-                                orderby u.Email
-
-                                select new
-                                {
-                                    id = t.Secuencial,
-                                    nombre = p.Nombre1 + " " + p.Apellido1,
-                                    email = u.Email.ToUpper(),
-                                    idSede = s.Secuencial,
-                                    sede = s.Codigo,
-                                    dSede = s.Descripcion.ToUpper(),
-                                    url = f.Url
-                                }).ToList();
-
-            if (idSedes.Count() > 0)
+            try
             {
-                trabajadores = trabajadores.Where(x => idSedes.Contains(x.idSede)).ToList();
-            }
-
-            if (idColaboradores.Count() > 0)
-            {
-                datos = datos.Where(x => idColaboradores.Contains(x.idColaborador)).ToList();
-                trabajadores = trabajadores.Where(x => idColaboradores.Contains(x.id)).ToList();
-            }
-
-            //Buscando los colaboradores independientes
-            List<int> idColaboradoresFiltrados = trabajadores.Select(x => x.id).ToList();
-            //Buscando las vacaciones en la fecha para cada uno de los trabajadores           
-            var vacaciones = (from vac in db.Vacaciones
-                              where vac.Fecha >= lunes && vac.Fecha <= fechaFin &&
-                                   idColaboradoresFiltrados.Contains(vac.SecuencialColaborador)
-                              select new
-                              {
-                                  id = vac.Secuencial,
-                                  fecha = vac.Fecha,
-                                  idColaborador = vac.SecuencialColaborador
-                              }).ToList();
-
-            //Permisos de todos los colaboradores
-            var permisos = (from per in db.Permiso
-                            where per.FechaInicio >= lunes && per.FechaInicio < fechaFin &&
-                                  per.SecuencialEstadoPermiso != 3 && per.SecuencialEstadoPermiso != 4 && idColaboradoresFiltrados.Contains(per.SecuencialColaborador)
-                            select new
-                            {
-                                id = per.Secuencial,
-                                idColaborador = per.SecuencialColaborador,
-                                smotivo = per.Motivo.Substring(0, 20) + "...",
-                                motivo = per.Motivo,
-                                finicio = per.FechaInicio,
-                                ffin = per.FechaFin,
-                                clase = (per.SecuencialEstadoPermiso == 1) ? "permiso-solicitado" : "permiso-aprobado"
-                            }).ToList();
-            //Buscando los dias feriados en en intervalo de tiempo
-            List<DateTime> diasFeriados = db.Feriados.Where(x => x.Fecha >= lunes && x.Fecha < fechaFin).Select(x => x.Fecha).ToList<DateTime>();
-
-            List<Object> tareasProgramadores = new List<Object>();
-            int cant = trabajadores.Count();
-
-            trabajadores.Sort((x1, x2) => String.Compare(x1.nombre, x2.nombre));
-
-            for (int i = 0; i < cant; i++)
-            {
-                int idTrabajador = trabajadores[i].id;
-                List<Object> tareasPorDia = new List<Object>();
-                int countTareas = 0;
-                for (int j = 0; j < 7 * semanas; j++)//son 7 Días los de la semana
+                db.Database.CommandTimeout = 240;
+                DateTime lunes = DateTime.Today;
+                if (fechaLunes != "")
                 {
-                    DateTime fecha = lunes.AddDays(j);
-                    DateTime fechaDespues = lunes.AddDays(j + 1);
-                    List<DataTarea> tareas = new List<DataTarea>();
-                    tareas = (from d in datos
-                              where d.idColaborador == idTrabajador &&
-                                  d.finicio >= fecha && d.finicio < fechaDespues
-                              select new DataTarea
-                              {
-                                  id = d.idTarea,
-                                  sdetalle = d.sdetalle,
-                                  detalle = d.detalle,
-                                  dateFechaInicio = d.finicio,
-                                  finicio = d.finicio.ToString("t"),
-                                  ffin = d.ffin.ToString("t"),
-                                  horas = Utiles.CalcularHorasTarea(d.finicio, d.ffin),
-                                  modulo = d.modulo,
-                                  dModulo = d.dModulo,
-                                  idModulo = d.idModulo,
-                                  cliente = d.cliente,
-                                  idCliente = d.idCliente,
-                                  dCliente = d.dCliente,
-                                  actividad = d.actividad,
-                                  dActividad = d.dActividad,
-                                  estado = d.estado,
-                                  idEstado = d.idEstado,
-                                  lugar = d.lugar,
-                                  dLugar = d.dLugar,
-                                  idLugar = d.idLugar,
-                                  departamento = d.departamento,
-                                  dDepartamento = d.dDepartamento,
-                                  idDepartamento = d.idDepartamento,
-                                  clase = d.clase,
-                                  coordinador = d.coordinador,
-                                  tipo = "t",
-                                  compensatoria = d.compensatoria
-                              }).ToList<DataTarea>();
-
-                    //Sobre los permisos
-                    List<DataTarea> lPermisos = new List<DataTarea>();
-                    lPermisos = (from per in permisos
-                                 where per.idColaborador == idTrabajador &&
-                                       per.finicio.Date <= fecha.Date && per.ffin.Date >= fecha.Date
-                                 select new DataTarea
-                                 {
-                                     id = per.id,
-                                     sdetalle = per.smotivo,
-                                     detalle = per.motivo,
-                                     dateFechaInicio = per.finicio,
-                                     finicio = per.finicio.ToString("t"),
-                                     ffin = per.ffin.ToString("t"),
-                                     horas = Utiles.CalcularHorasTarea(per.finicio, per.ffin),
-                                     modulo = "",
-                                     dModulo = "",
-                                     idModulo = 0,
-                                     cliente = "PERMISO",
-                                     idCliente = 0,
-                                     dCliente = "PERMISO",
-                                     actividad = "",
-                                     dActividad = "",
-                                     estado = "",
-                                     idEstado = 0,
-                                     lugar = "",
-                                     dLugar = "",
-                                     idLugar = 0,
-                                     departamento = "",
-                                     dDepartamento = "",
-                                     idDepartamento = 0,
-                                     clase = per.clase,
-                                     coordinador = null,
-                                     tipo = "p",
-                                     compensatoria = "no-compensatoria"
-                                 }).ToList<DataTarea>();
-                    tareas.AddRange(lPermisos);
-
-                    if (idClientes.Count() > 0)
-                    {
-                        tareas = tareas.Where(x => idClientes.Contains(x.idCliente)).ToList();
-                    }
-                    if (idEstados.Count() > 0)
-                    {
-                        tareas = tareas.Where(x => idEstados.Contains(x.idEstado)).ToList();
-                    }
-                    if (idLugares.Count() > 0)
-                    {
-                        tareas = tareas.Where(x => idLugares.Contains(x.idLugar)).ToList();
-                    }
-                    if (idDepartamentos.Count() > 0)
-                    {
-                        tareas = tareas.Where(x => idDepartamentos.Contains(x.idDepartamento)).ToList();
-                    }
-                    if (idModulos.Count() > 0)
-                    {
-                        tareas = tareas.Where(x => idModulos.Contains(x.idModulo)).ToList();
-                    }
-                    //Ordenando los permisos
-                    tareas.Sort();
-
-                    countTareas += tareas.Count();
-
-                    string claseDia = "dia-normal";
-                    long diaSemana = (int)fecha.DayOfWeek;
-                    int hayVacaciones = vacaciones.Where(x => x.idColaborador == idTrabajador &&
-                                                        x.fecha.Date == fecha.Date).Count();
-                    if (hayVacaciones > 0)
-                    {
-                        claseDia = "dia-vacaciones";
-                    }
-                    else if (diasFeriados.Contains(fecha.Date))
-                    {
-                        claseDia = "dia-feriado";
-                    }
-                    else if (fecha == DateTime.Today)
-                    {
-                        claseDia = "dia-hoy";
-                    }
-                    else if (diaSemana == 0 || diaSemana == 6)
-                    {
-                        claseDia = "fin-semana";
-                    }
-
-                    tareasPorDia.Add(
-                        new
-                        {
-                            tareas = tareas,
-                            claseDia = claseDia
-                        }
-                    );
+                    LoggerManager.LogDebug($"[DarTareasTrabajadores] Procesando fecha lunes proporcionada: {fechaLunes}");
+                    string[] fechas = fechaLunes.Split(new Char[] { '/' });
+                    int dia = Int32.Parse(fechas[0]);
+                    int mes = Int32.Parse(fechas[1]);
+                    int anno = Int32.Parse(fechas[2]);
+                    lunes = new System.DateTime(anno, mes, dia);
                 }
-
-                if (json == "" || countTareas > 0 || idColaboradores.Contains(idTrabajador) || idSedes.Contains(trabajadores[i].idSede))
+                else
                 {
-                    var trab = new
+                    LoggerManager.LogDebug("[DarTareasTrabajadores] Calculando fecha lunes automáticamente");
+                    DateTime hoy = DateTime.Today;
+                    DayOfWeek diaSemana = hoy.DayOfWeek;
+                    if ((int)diaSemana == 0)//Domingo
                     {
-                        trab = trabajadores[i],
-                        tareasPorDia = tareasPorDia
-                    };
-
-                    //Aquí la lógica de si la vista es de ver los coordinados                                        
-                    if (coordinados == true && idTrabajador == idColaboradores.First())
-                    {
-                        tareasProgramadores.Insert(0, trab);
+                        lunes = hoy.AddDays(-6);
                     }
                     else
                     {
-                        tareasProgramadores.Add(trab);
+                        long tiempo = (int)diaSemana;
+                        TimeSpan time = new TimeSpan(tiempo * 864000000000);
+                        DateTime domingo = hoy.Subtract(time);
+                        lunes = domingo.AddDays(1);
                     }
                 }
-            }
 
-            var respx = new
+                List<int> idColaboradores = new List<int>();
+                List<int> idClientes = new List<int>();
+                List<int> idEstados = new List<int>();
+                List<int> idLugares = new List<int>();
+                List<int> idModulos = new List<int>();
+                List<int> idSedes = new List<int>();
+                List<int> idDepartamentos = new List<int>();
+                if (json != "")
+                {
+                    LoggerManager.LogDebug($"[DarTareasTrabajadores] Procesando filtros JSON: {json}");
+
+                    var s = new JavaScriptSerializer();
+                    var jsonObj = s.Deserialize<dynamic>(json);
+                    for (int i = 0; i < jsonObj["colaboradores"].Length; i++)
+                    {
+                        idColaboradores.Add(int.Parse(jsonObj["colaboradores"][i]["id"]));
+                    }
+                    for (int i = 0; i < jsonObj["clientes"].Length; i++)
+                    {
+                        idClientes.Add(int.Parse(jsonObj["clientes"][i]["id"]));
+                    }
+                    for (int i = 0; i < jsonObj["estadoTarea"].Length; i++)
+                    {
+                        idEstados.Add(int.Parse(jsonObj["estadoTarea"][i]["id"]));
+                    }
+                    for (int i = 0; i < jsonObj["lugarTarea"].Length; i++)
+                    {
+                        idLugares.Add(int.Parse(jsonObj["lugarTarea"][i]["id"]));
+                    }
+                    for (int i = 0; i < jsonObj["modulo"].Length; i++)
+                    {
+                        idModulos.Add(int.Parse(jsonObj["modulo"][i]["id"]));
+                    }
+                    for (int i = 0; i < jsonObj["sede"].Length; i++)
+                    {
+                        idSedes.Add(int.Parse(jsonObj["sede"][i]["id"]));
+                    }
+                    for (int i = 0; i < jsonObj["departamento"].Length; i++)
+                    {
+                        idDepartamentos.Add(int.Parse(jsonObj["departamento"][i]["id"]));
+                    }
+                }
+
+                DateTime fechaFin = lunes.AddDays((7 * semanas));
+                var datos = (from t in db.Tarea
+                             join
+                                 c in db.Colaborador on t.colaborador equals c
+                             join
+                                 p in db.Persona on c.persona equals p
+                             join
+                                 u in db.Usuario on p.Secuencial equals u.SecuencialPersona
+                             join
+                                 f in db.FotoColaborador on c.Secuencial equals f.SecuencialColaborador
+                             join
+                                 s in db.Sede on c.sede equals s
+                             join
+                                 m in db.Modulo on t.modulo equals m
+                             join
+                                 cl in db.Cliente on t.cliente equals cl
+                             join
+                                 a in db.Actividad on t.actividad equals a
+                             join
+                                 e in db.EstadoTarea on t.estadoTarea equals e
+                             join
+                                 l in db.LugarTarea on t.lugarTarea equals l
+                             join d in db.Departamento on c.departamento equals d
+
+                             where u.EstaActivo == 1 &&
+                                   d.Asignable == 1 &&
+                                   t.FechaInicio >= lunes && t.FechaInicio < fechaFin && //Entre las dos fechas
+                                   t.SecuencialEstadoTarea != 4//Es cuando están anuladas
+                             orderby t.FechaInicio, p.Nombre1, p.Apellido1
+                             select new
+                             {
+                                 idColaborador = c.Secuencial,
+                                 nombre = p.Nombre1 + " " + p.Apellido1,
+                                 email = u.Email.ToUpper(),
+                                 sede = s.Codigo,
+                                 url = f.Url,
+                                 idTarea = t.Secuencial,
+                                 sdetalle = t.Detalle.Substring(0, 20) + "...",
+                                 detalle = t.Detalle,
+                                 finicio = t.FechaInicio,
+                                 ffin = t.FechaFin,
+                                 modulo = m.Codigo,
+                                 dModulo = m.Descripcion.ToUpper(),
+                                 idModulo = m.Secuencial,
+                                 cliente = cl.Codigo,
+                                 idCliente = cl.Secuencial,
+                                 dCliente = cl.Descripcion.ToUpper(),
+                                 actividad = a.Codigo,
+                                 dActividad = a.Descripcion.ToUpper(),
+                                 estado = e.Codigo,
+                                 idEstado = e.Secuencial,
+                                 lugar = l.Codigo,
+                                 dLugar = l.Descripcion.ToUpper(),
+                                 idLugar = l.Secuencial,
+                                 departamento = d.Codigo,
+                                 dDepartamento = d.Descripcion.ToUpper(),
+                                 idDepartamento = d.Secuencial,
+                                 clase = (t.SecuencialEstadoTarea == 1 ? "new" : (t.SecuencialEstadoTarea == 2) ? "dev" : (t.SecuencialEstadoTarea == 3) ? "finish" : (t.SecuencialEstadoTarea == 5) ? "pause" : (t.SecuencialEstadoTarea == 6) ? "preassigned" : "no-concluida"),
+                                 coordinador = (from tc in db.Tarea_Coordinador
+                                                join
+                                                    co in db.Colaborador on tc.colaborador equals co
+                                                join
+                                                    pe in db.Persona on co.persona equals pe
+
+                                                where tc.SecuencialTarea == t.Secuencial && tc.EstaActivo == 1
+                                                select (pe.Nombre1 + " " + pe.Apellido1)).FirstOrDefault(),
+                                 compensatoria = (t.tareaCompensatoria.FirstOrDefault() != null
+                                                  && t.tareaCompensatoria.FirstOrDefault().EstaActiva == 1
+                                                 ) ? "compensatoria" : "no-compensatoria"
+                             }).ToList();
+
+                var trabajadores = (from t in db.Colaborador
+                                    join
+                                        p in db.Persona on t.persona equals p
+                                    join
+                                        f in db.FotoColaborador on t.Secuencial equals f.SecuencialColaborador
+                                    join
+                                        s in db.Sede on t.sede equals s
+                                    join
+                                        u in db.Usuario on p.Secuencial equals u.SecuencialPersona
+                                    join d in db.Departamento on t.departamento equals d
+
+                                    where u.EstaActivo == 1 && (d.Asignable == 1)
+                                    orderby u.Email
+
+                                    select new
+                                    {
+                                        id = t.Secuencial,
+                                        nombre = p.Nombre1 + " " + p.Apellido1,
+                                        email = u.Email.ToUpper(),
+                                        idSede = s.Secuencial,
+                                        sede = s.Codigo,
+                                        dSede = s.Descripcion.ToUpper(),
+                                        url = f.Url
+                                    }).ToList();
+
+                if (idSedes.Count() > 0)
+                {
+                    trabajadores = trabajadores.Where(x => idSedes.Contains(x.idSede)).ToList();
+                }
+
+                if (idColaboradores.Count() > 0)
+                {
+                    datos = datos.Where(x => idColaboradores.Contains(x.idColaborador)).ToList();
+                    trabajadores = trabajadores.Where(x => idColaboradores.Contains(x.id)).ToList();
+                }
+
+                //Buscando los colaboradores independientes
+                List<int> idColaboradoresFiltrados = trabajadores.Select(x => x.id).ToList();
+                //Buscando las vacaciones en la fecha para cada uno de los trabajadores           
+                var vacaciones = (from vac in db.Vacaciones
+                                  where vac.Fecha >= lunes && vac.Fecha <= fechaFin &&
+                                       idColaboradoresFiltrados.Contains(vac.SecuencialColaborador)
+                                  select new
+                                  {
+                                      id = vac.Secuencial,
+                                      fecha = vac.Fecha,
+                                      idColaborador = vac.SecuencialColaborador
+                                  }).ToList();
+
+                //Permisos de todos los colaboradores
+                var permisos = (from per in db.Permiso
+                                where per.FechaInicio >= lunes && per.FechaInicio < fechaFin &&
+                                      per.SecuencialEstadoPermiso != 3 && per.SecuencialEstadoPermiso != 4 && idColaboradoresFiltrados.Contains(per.SecuencialColaborador)
+                                select new
+                                {
+                                    id = per.Secuencial,
+                                    idColaborador = per.SecuencialColaborador,
+                                    smotivo = per.Motivo.Substring(0, 20) + "...",
+                                    motivo = per.Motivo,
+                                    finicio = per.FechaInicio,
+                                    ffin = per.FechaFin,
+                                    clase = (per.SecuencialEstadoPermiso == 1) ? "permiso-solicitado" : "permiso-aprobado"
+                                }).ToList();
+                //Buscando los dias feriados en en intervalo de tiempo
+                List<DateTime> diasFeriados = db.Feriados.Where(x => x.Fecha >= lunes && x.Fecha < fechaFin).Select(x => x.Fecha).ToList<DateTime>();
+
+                List<Object> tareasProgramadores = new List<Object>();
+                int cant = trabajadores.Count();
+
+                trabajadores.Sort((x1, x2) => String.Compare(x1.nombre, x2.nombre));
+
+                for (int i = 0; i < cant; i++)
+                {
+                    int idTrabajador = trabajadores[i].id;
+                    List<Object> tareasPorDia = new List<Object>();
+                    int countTareas = 0;
+                    for (int j = 0; j < 7 * semanas; j++)//son 7 Días los de la semana
+                    {
+                        DateTime fecha = lunes.AddDays(j);
+                        DateTime fechaDespues = lunes.AddDays(j + 1);
+                        List<DataTarea> tareas = new List<DataTarea>();
+                        tareas = (from d in datos
+                                  where d.idColaborador == idTrabajador &&
+                                      d.finicio >= fecha && d.finicio < fechaDespues
+                                  select new DataTarea
+                                  {
+                                      id = d.idTarea,
+                                      sdetalle = d.sdetalle,
+                                      detalle = d.detalle,
+                                      dateFechaInicio = d.finicio,
+                                      finicio = d.finicio.ToString("t"),
+                                      ffin = d.ffin.ToString("t"),
+                                      horas = Utiles.CalcularHorasTarea(d.finicio, d.ffin),
+                                      modulo = d.modulo,
+                                      dModulo = d.dModulo,
+                                      idModulo = d.idModulo,
+                                      cliente = d.cliente,
+                                      idCliente = d.idCliente,
+                                      dCliente = d.dCliente,
+                                      actividad = d.actividad,
+                                      dActividad = d.dActividad,
+                                      estado = d.estado,
+                                      idEstado = d.idEstado,
+                                      lugar = d.lugar,
+                                      dLugar = d.dLugar,
+                                      idLugar = d.idLugar,
+                                      departamento = d.departamento,
+                                      dDepartamento = d.dDepartamento,
+                                      idDepartamento = d.idDepartamento,
+                                      clase = d.clase,
+                                      coordinador = d.coordinador,
+                                      tipo = "t",
+                                      compensatoria = d.compensatoria
+                                  }).ToList<DataTarea>();
+
+                        //Sobre los permisos
+                        List<DataTarea> lPermisos = new List<DataTarea>();
+                        lPermisos = (from per in permisos
+                                     where per.idColaborador == idTrabajador &&
+                                           per.finicio.Date <= fecha.Date && per.ffin.Date >= fecha.Date
+                                     select new DataTarea
+                                     {
+                                         id = per.id,
+                                         sdetalle = per.smotivo,
+                                         detalle = per.motivo,
+                                         dateFechaInicio = per.finicio,
+                                         finicio = per.finicio.ToString("t"),
+                                         ffin = per.ffin.ToString("t"),
+                                         horas = Utiles.CalcularHorasTarea(per.finicio, per.ffin),
+                                         modulo = "",
+                                         dModulo = "",
+                                         idModulo = 0,
+                                         cliente = "PERMISO",
+                                         idCliente = 0,
+                                         dCliente = "PERMISO",
+                                         actividad = "",
+                                         dActividad = "",
+                                         estado = "",
+                                         idEstado = 0,
+                                         lugar = "",
+                                         dLugar = "",
+                                         idLugar = 0,
+                                         departamento = "",
+                                         dDepartamento = "",
+                                         idDepartamento = 0,
+                                         clase = per.clase,
+                                         coordinador = null,
+                                         tipo = "p",
+                                         compensatoria = "no-compensatoria"
+                                     }).ToList<DataTarea>();
+                        tareas.AddRange(lPermisos);
+
+                        if (idClientes.Count() > 0)
+                        {
+                            tareas = tareas.Where(x => idClientes.Contains(x.idCliente)).ToList();
+                        }
+                        if (idEstados.Count() > 0)
+                        {
+                            tareas = tareas.Where(x => idEstados.Contains(x.idEstado)).ToList();
+                        }
+                        if (idLugares.Count() > 0)
+                        {
+                            tareas = tareas.Where(x => idLugares.Contains(x.idLugar)).ToList();
+                        }
+                        if (idDepartamentos.Count() > 0)
+                        {
+                            tareas = tareas.Where(x => idDepartamentos.Contains(x.idDepartamento)).ToList();
+                        }
+                        if (idModulos.Count() > 0)
+                        {
+                            tareas = tareas.Where(x => idModulos.Contains(x.idModulo)).ToList();
+                        }
+                        //Ordenando los permisos
+                        tareas.Sort();
+
+                        countTareas += tareas.Count();
+
+                        string claseDia = "dia-normal";
+                        long diaSemana = (int)fecha.DayOfWeek;
+                        int hayVacaciones = vacaciones.Where(x => x.idColaborador == idTrabajador &&
+                                                            x.fecha.Date == fecha.Date).Count();
+                        if (hayVacaciones > 0)
+                        {
+                            claseDia = "dia-vacaciones";
+                        }
+                        else if (diasFeriados.Contains(fecha.Date))
+                        {
+                            claseDia = "dia-feriado";
+                        }
+                        else if (fecha == DateTime.Today)
+                        {
+                            claseDia = "dia-hoy";
+                        }
+                        else if (diaSemana == 0 || diaSemana == 6)
+                        {
+                            claseDia = "fin-semana";
+                        }
+
+                        tareasPorDia.Add(
+                            new
+                            {
+                                tareas = tareas,
+                                claseDia = claseDia
+                            }
+                        );
+                    }
+
+                    if (json == "" || countTareas > 0 || idColaboradores.Contains(idTrabajador) || idSedes.Contains(trabajadores[i].idSede))
+                    {
+                        var trab = new
+                        {
+                            trab = trabajadores[i],
+                            tareasPorDia = tareasPorDia
+                        };
+
+                        //Aquí la lógica de si la vista es de ver los coordinados                                        
+                        if (coordinados == true && idTrabajador == idColaboradores.First())
+                        {
+                            tareasProgramadores.Insert(0, trab);
+                        }
+                        else
+                        {
+                            tareasProgramadores.Add(trab);
+                        }
+                    }
+                }
+                LoggerManager.LogInfo($"[DarTareasTrabajadores] Consulta completada. {tareasProgramadores.Count} trabajadores encontrados");
+
+                var respx = new
+                {
+                    success = true,
+                    trabajadores = tareasProgramadores
+                };
+                return Json(respx);
+            }
+            catch (Exception ex)
             {
-                success = true,
-                trabajadores = tareasProgramadores
-            };
-            return Json(respx);
+                LoggerManager.LogError(ex, $"[DarTareasTrabajadores] Error al obtener tareas de trabajadores. Usuario: {emailUser}, Parámetros: fechaLunes={fechaLunes}, semanas={semanas}, json={json}, coordinados={coordinados}. Error: {ex.Message}");
+
+                var respError = new
+                {
+                    success = false,
+                    msg = "Error al obtener tareas de trabajadores."
+                };
+                return Json(respError);
+            }
         }
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
         public JsonResult NuevaTareaExcel(int idTrabajador, string fecha, int cliente, int ubicacion, int modulo, int actividad, int horas, string detalle, int referencia = 0, int coordinador = 0, string repetir = "", int finSemana = 0, int repetirTipoFin = 0, int numVeces = 0, string fechaHasta = "", int idTarea = 0, int verificador = 0, int idEstado = 2)
         {
+            string emailUser = User.Identity.Name;
             try
             {
-                string emailUser = User.Identity.Name;
+                LoggerManager.LogSensitiveOperation(
+                    "Creación de Tarea",
+                    $"Usuario {emailUser} inició creación de tarea. Trabajador: {idTrabajador}, Fecha: {fecha}, Horas: {horas}",
+                    emailUser
+                );
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 string[] fechas = fecha.Split(new Char[] { '/' });
@@ -1460,6 +1527,11 @@ namespace SifizPlanning.Controllers
                 }
 
                 db.SaveChanges();//Salvando los cambios   
+                LoggerManager.LogSensitiveOperation(
+                    "Tarea Creada",
+                    $"Usuario {emailUser} creó tarea ID: {tar.Secuencial} para trabajador {idTrabajador}",
+                    emailUser
+                );
 
                 //Actualizando las fechas de los dias que existieron los cambios y en las fechas
                 foreach (DiaColaborador diaColab in listaDiaColaborador)
@@ -1480,11 +1552,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[NuevaTareaExcel] Error al crear tarea. Usuario: {emailUser}, Parámetros: Trabajador={idTrabajador}, Fecha={fecha}, Error: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
-                    //msg = "Hay errores en los datos por favor verifíquelos"
+                    msg = "Error al crear tarea en el Excel."
                 };
                 return Json(resp);
             }
@@ -1495,9 +1567,15 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN")]
         public JsonResult NuevaTarea(int idTrabajador, string fecha, int cliente, int ubicacion, int modulo, int actividad, int horas, int minutos, int horasEstimadas, int minutosEstimados, string detalle, int referencia = 0, int coordinador = 0, string repetir = "", int finSemana = 0, int repetirTipoFin = 0, int numVeces = 0, string fechaHasta = "", bool extraordinaria = false, int ticketTarea = 0, int idTarea = 0, int verificador = 0, bool esReproceso = false, bool esProyecto = false)
         {
+            string emailUser = User.Identity.Name;
             try
             {
-                string emailUser = User.Identity.Name;
+                LoggerManager.LogSensitiveOperation(
+                    "Gestión de Tarea",
+                    $"Usuario {emailUser} inició operación de tarea. Tipo: {(idTarea != 0 ? "Actualización" : "Creación")}",
+                    emailUser
+                );
+
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 string[] fechas = fecha.Split(new Char[] { '/' });
@@ -2065,6 +2143,7 @@ namespace SifizPlanning.Controllers
                     }
                     db.SaveChanges();
                     tareaPrincipal = tar;
+                    LoggerManager.LogInfo($"[NuevaTarea] Cambios guardados exitosamente");
                 }
 
                 //Ver si se repite la tarea
@@ -2459,19 +2538,27 @@ namespace SifizPlanning.Controllers
                 }
                 ActualizarTDTarea(listaCambiosTareas);
 
+                LoggerManager.LogSensitiveOperation(
+                    "Tarea Completada",
+                    $"Usuario {emailUser} {(idTarea != 0 ? "actualizó" : "creó")} tarea ID: {tareaPrincipal?.Secuencial}",
+                    emailUser
+                );
+
                 var respOk = new
                 {
                     success = true,
-                    msg = msg
+                    msg = idTarea != 0 ? "Tarea actualizada correctamente" : "Tarea creada correctamente"
                 };
                 return Json(respOk);
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[NuevaTarea] Error al procesar tarea. Usuario: {emailUser}, Parámetros: " +
+                                 $"Trabajador={idTrabajador}, Fecha={fecha}, Actividad={actividad}, Error: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al procesar tarea."
                 };
                 return Json(resp);
             }
@@ -2481,11 +2568,12 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN")]
         public JsonResult EmailNuevaTarea(int idTrabajador, string fecha, int cliente, int ubicacion, int modulo, int actividad, int horas, int minutos, string detalle, int referencia = 0, int coordinador = 0, string repetir = "", int finSemana = 0, int repetirTipoFin = 0, int numVeces = 0, string fechaHasta = "", bool extraordinaria = false, int ticketTarea = 0, int idTarea = 0, int verificador = 0)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"Usuario {emailUser} inició EmailNuevaTarea con referencia={referencia}, idTrabajador={idTrabajador}, cliente={cliente}, fecha={fecha}");
             try
             {
                 if (referencia != 0)
                 {
-                    string emailUser = User.Identity.Name;
                     Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                     var colaboradorTarea = db.Colaborador.Find(idTrabajador);
@@ -2506,6 +2594,12 @@ namespace SifizPlanning.Controllers
 
                     string asuntoEmail = "Solicitud Acceso";
                     Utiles.EnviarEmailSistema(correosDestinos.ToArray(), textoEmail, asuntoEmail);
+
+                    LoggerManager.LogSensitiveOperation(
+                        "Solicitud de Acceso enviada",
+                        $"Usuario {emailUser} envió correo solicitando acceso para el colaborador {colaboradorTarea.persona.Nombre1} {colaboradorTarea.persona.Apellido1} del cliente {clienteTarea.Descripcion}.",
+                        emailUser
+                    );
                 }
 
                 var respOk = new
@@ -2513,15 +2607,16 @@ namespace SifizPlanning.Controllers
                     success = true,
                     msg = "EMAIL ENVIADO"
                 };
+                LoggerManager.LogInfo($"Usuario {emailUser} finalizó correctamente EmailNuevaTarea.");
                 return Json(respOk);
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EmailNuevaTarea] Error al enviar correo. Usuario: {emailUser}. Error: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
-                    //msg = "Hay errores en los datos por favor verifíquelos"
+                    msg = "Error al enviar correo nueva tarea."
                 };
                 return Json(resp);
             }
@@ -2531,8 +2626,11 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN")]
         public ActionResult AnularTarea(int idTarea, int tipoAnulacion = 0)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"Usuario {emailUser} inició proceso de anulación de tarea. ID: {idTarea}, Tipo de anulación: {tipoAnulacion}");
+
                 //para la actualizacion de los permisos y las tareas
                 List<DiaColaborador> listaDiaColaborador = new List<DiaColaborador>();
                 List<DiaColaborador> listaCambiosTareas = new List<DiaColaborador>();
@@ -2573,7 +2671,6 @@ namespace SifizPlanning.Controllers
                 tarea.SecuencialEstadoTarea = 4;//Anulada
                 tarea.SecuencialColaborador = db.Colaborador.Where(s => s.persona.usuario.FirstOrDefault().Email == "canulado@sifizsoft.com").FirstOrDefault().Secuencial;
 
-                string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
                 HistoricoTareaEstado histET = new HistoricoTareaEstado
                 {
@@ -2776,6 +2873,11 @@ namespace SifizPlanning.Controllers
 
                 //Actualizando cambios en la interfaz de usuario                
                 ActualizarTDTarea(listaCambiosTareas);
+                LoggerManager.LogSensitiveOperation(
+                    "Anulación de Serie de Tareas",
+                    $"Usuario {emailUser} anuló una serie de tareas asociadas a la tarea {idTarea}",
+                    emailUser
+                );
 
                 var resp = new
                 {
@@ -2786,11 +2888,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[AnularTarea] Error al anular tarea. Usuario: {emailUser}. Error: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
-                    //msg = "Ha ocurrido un error en la operación"
+                    msg = "Error al anular tarea."
                 };
                 return Json(resp);
             }
@@ -2800,6 +2902,7 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN")]
         public ActionResult ActualizarTareaUsuario(int idTarea, int estado)
         {
+            string emailUser = User.Identity.Name;
             try
             {
                 Tarea tarea = db.Tarea.FirstOrDefault(x => x.Secuencial == idTarea);
@@ -2825,7 +2928,7 @@ namespace SifizPlanning.Controllers
 
                 tarea.SecuencialEstadoTarea = estado;
 
-                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[ActualizarTareaUsuario] Usuario {emailUser} inició el proceso para actualizar el estado de la tarea con ID {idTarea} al estado {estado}.");
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
                 HistoricoTareaEstado histET = new HistoricoTareaEstado
                 {
@@ -3037,6 +3140,7 @@ namespace SifizPlanning.Controllers
                             string codigoCliente = ticket.persona_cliente.cliente.Codigo;
                             string asuntoEmail = codigoCliente + " HESO " + string.Format("{0:000000}", ticket.Secuencial) + " - Asignación del requerimiento (" + ticket.Asunto + ")";
                             Utiles.EnviarEmailSistema(destinatarioCorreos.ToArray(), textoEmail, asuntoEmail, null, string.Format("{0:000000}", ticket.Secuencial));
+                            LoggerManager.LogSensitiveOperation("Envío de correo", $"Usuario {emailUser} envió correo notificando cambio de estado del ticket ID {idTicket} relacionado a la tarea {idTarea}.", emailUser);
 
                             //adicionando email a los historicos
                             string destinos = String.Join(", ", destinatarioCorreos.ToArray());
@@ -3056,6 +3160,7 @@ namespace SifizPlanning.Controllers
                         }
                     }
                 }
+                LoggerManager.LogSensitiveOperation("Actualización de estado de tarea", $"Usuario {emailUser} cambió el estado de la tarea ID {idTarea} al estado {estado}.", emailUser);
 
                 var result = new
                 {
@@ -3066,10 +3171,12 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[ActualizarTareaUsuario] Error al actualizar la tarea con ID {idTarea}. Usuario: {emailUser}. Error: {e.Message}");
+
                 var result = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al actualizar la tarea."
                 };
                 return Json(result);
             }
@@ -3079,6 +3186,8 @@ namespace SifizPlanning.Controllers
         [Authorize]
         public ActionResult DarDiasActividadesTareas()
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[DarDiasActividadesTareas] Usuario {emailUser} solicitó los días de actividades y tareas.");
             try
             {
                 int cantDias = 2;
@@ -3098,7 +3207,7 @@ namespace SifizPlanning.Controllers
                 {
                     diasCord.Add(DateTime.Today.AddDays(i).ToString("dd/MM/yyyy"));
                 }
-
+                LoggerManager.LogInfo($"[DarDiasActividadesTareas] Usuario {emailUser} recibió correctamente los días calculados.");
                 var resp = new
                 {
                     success = true,
@@ -3109,10 +3218,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarDiasActividadesTareas] Error al obtener los días. Usuario: {emailUser}. Error: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener los días de actividades de tareas."
                 };
                 return Json(resp);
             }
@@ -3122,6 +3232,8 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN")]
         public ActionResult AdicionarActividadTarea(int idTarea, int tipoTarea, string fecha, string horaInicio, string horaFin)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[AdicionarActividadTarea] Usuario {emailUser} inició el proceso para adicionar actividad a la tarea {idTarea}.");
             try
             {
                 Tarea tar = db.Tarea.Find(idTarea);
@@ -3176,7 +3288,6 @@ namespace SifizPlanning.Controllers
                     throw new Exception("No puede adicionar la actividad, ya que las horas de esta se solapan con las de otra actividad.");
                 }
 
-                string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 TareaActividadRealizada tareaActividadRealizada = new TareaActividadRealizada
@@ -3191,6 +3302,11 @@ namespace SifizPlanning.Controllers
                 };
                 db.TareaActividadRealizada.Add(tareaActividadRealizada);
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Adicionar actividad a tarea",
+                    $"Se agregó actividad de tipo {tipoTarea} a la tarea {idTarea} en fecha {fecha} desde {horaInicio} hasta {horaFin}",
+                    emailUser
+                );
 
                 int minutosUtilizados = 0;
                 var actividadesRealizadas = tar.tareaActividadRealizada.ToList();
@@ -3202,6 +3318,11 @@ namespace SifizPlanning.Controllers
 
                 tar.HorasUtilizadas = (decimal)Math.Round(((double)minutosUtilizados / 60), 2);
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Actualización de horas utilizadas en tarea",
+                    $"Se actualizó horas utilizadas en tarea {idTarea} a {tar.HorasUtilizadas} horas",
+                    emailUser
+                );
 
                 var actividadesTarea = (from tActRel in db.TareaActividadRealizada
                                         where tActRel.SecuencialTarea == tar.Secuencial
@@ -3244,7 +3365,7 @@ namespace SifizPlanning.Controllers
                 string strMinutosRestaTarea = minutosRestaTarea.ToString();
                 if (minutosRestaTarea < 10)
                     strMinutosRestaTarea = "0" + strMinutosRestaTarea;
-
+                LoggerManager.LogInfo($"[AdicionarActividadTarea] Usuario {emailUser} finalizó correctamente el proceso para tarea {idTarea}.");
                 var resp = new
                 {
                     success = true,
@@ -3255,10 +3376,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[AdicionarActividadTarea] Error para usuario {emailUser} al adicionar actividad a la tarea {idTarea}. Detalles: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al adicionar actividad a la tarea."
                 };
                 return Json(resp);
             }
@@ -3268,8 +3390,10 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "USER, ADMIN")]
         public ActionResult ActualizarHoraActividadTarea(int idActividadTarea, string horaInicio, string horaFin)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"Inicio de actualización de hora de actividad tarea: {idActividadTarea} por el usuario {emailUser}");
                 var actividadTarea = db.TareaActividadRealizada.Find(idActividadTarea);
                 if (actividadTarea == null)
                     throw new Exception("No se encontró la actividad");
@@ -3298,7 +3422,6 @@ namespace SifizPlanning.Controllers
                 }
 
                 //Verificando que las horas ya hayan ocurrido, si es del mismo usuario
-                string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
                 if (tar.colaborador.Secuencial == user.persona.colaborador.FirstOrDefault().Secuencial)
                 {
@@ -3327,6 +3450,12 @@ namespace SifizPlanning.Controllers
                 actividadTarea.HoraFin = dateHoraFin;
 
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Actualización de horas actividad tarea",
+                    $"Se actualizaron las horas de la actividad {idActividadTarea}: inicio {dateHoraInicio}, fin {dateHoraFin}",
+                    emailUser
+                );
+
 
                 int minutosUtilizados = 0;
 
@@ -3381,7 +3510,7 @@ namespace SifizPlanning.Controllers
                 string strMinutosRestaTarea = minutosRestaTarea.ToString();
                 if (minutosRestaTarea < 10)
                     strMinutosRestaTarea = "0" + strMinutosRestaTarea;
-
+                LoggerManager.LogInfo($"Actividad tarea {idActividadTarea} actualizada correctamente por el usuario {emailUser}");
                 var resp = new
                 {
                     success = true,
@@ -3393,10 +3522,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[ActualizarHoraActividadTarea] Error al actualizar hora actividad tarea {idActividadTarea} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al actualizar hora actividad tarea."
                 };
                 return Json(resp);
             }
@@ -3406,11 +3536,12 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN")]
         public ActionResult DarActividadesTarea(int idTarea)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[DarActividadesTarea] Solicitud de actividades para la tarea {idTarea} por el usuario {emailUser}");
                 var tar = db.Tarea.Find(idTarea);
 
-                string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
                 bool tareaPropia = false;//Para saber si la tarea es propia o de un subordinado o coordinado
                 if (tar.colaborador.Secuencial == user.persona.colaborador.FirstOrDefault().Secuencial)
@@ -3471,10 +3602,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarActividadesTarea] Error al obtener actividades de la tarea {idTarea} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener actividades de la tarea."
                 };
                 return Json(resp);
             }
@@ -3484,8 +3616,10 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, REC")]
         public ActionResult EliminarActividadesTarea(int idActividadTarea)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[EliminarActividadesTarea] Solicitud de eliminación de actividad {idActividadTarea} por el usuario {emailUser}");
                 TareaActividadRealizada tarActividadRealizada = db.TareaActividadRealizada.Find(idActividadTarea);
                 if (tarActividadRealizada == null)
                 {
@@ -3493,7 +3627,6 @@ namespace SifizPlanning.Controllers
                 }
                 Tarea tar = tarActividadRealizada.tarea;
 
-                string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
                 Persona persona = user.persona;
 
@@ -3513,6 +3646,12 @@ namespace SifizPlanning.Controllers
                 db.TareaActividadRealizada.Remove(tarActividadRealizada);
                 db.SaveChanges();
 
+                LoggerManager.LogSensitiveOperation(
+                    "Eliminación de actividad",
+                    $"El usuario {emailUser} eliminó la actividad {idActividadTarea} de la tarea {tar.Secuencial}",
+                    emailUser
+                );
+
                 int minutosUtilizados = 0;
                 var actividadesRealizadas = tar.tareaActividadRealizada.ToList();
                 foreach (var actividad in actividadesRealizadas)
@@ -3531,10 +3670,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EliminarActividadesTarea] Error al eliminar la actividad {idActividadTarea} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al eliminar la actividad"
                 };
                 return Json(resp);
             }
@@ -3544,8 +3684,10 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN")]
         public ActionResult DarComentariosActividad(int idActividad)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[DarComentariosActividad] Solicitud de comentarios de la actividad {idActividad} por el usuario {emailUser}");
                 TareaActividadRealizada tareaActividad = db.TareaActividadRealizada.Find(idActividad);
                 if (tareaActividad == null)
                 {
@@ -3574,10 +3716,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarComentariosActividad] Error al consultar comentarios de la actividad {idActividad} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error  al consultar comentarios de la actividad."
                 };
                 return Json(resp);
             }
@@ -3587,15 +3730,16 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN")]
         public ActionResult AdicionarComentarioActividad(int idActividad, string descripcion, string importancia = "Normal")
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[AdicionarComentarioActividad] El usuario {emailUser} está intentando adicionar un comentario a la actividad {idActividad}");
                 TareaActividadRealizada tareaActividad = db.TareaActividadRealizada.Find(idActividad);
                 if (tareaActividad == null)
                 {
                     throw new Exception("No se encontró la actividad.");
                 }
 
-                string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
                 ComentarioTarea comentario = new ComentarioTarea
                 {
@@ -3608,6 +3752,12 @@ namespace SifizPlanning.Controllers
                 };
                 db.ComentarioTarea.Add(comentario);
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Adición de comentario en actividad",
+                    $"El usuario {emailUser} agregó un comentario a la actividad {idActividad}",
+                    emailUser
+                );
+
 
                 List<object> comentarios = (from c in db.ComentarioTarea
                                             join
@@ -3632,10 +3782,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[AdicionarComentarioActividad] Error al adicionar comentario en la actividad {idActividad} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al adicionar comentario en la actividad."
                 };
                 return Json(resp);
             }
@@ -3645,8 +3796,10 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN")]
         public ActionResult EliminarComentarioActividad(int idComentario)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[EliminarComentarioActividad] El usuario {emailUser} está intentando eliminar el comentario {idComentario}");
                 ComentarioTarea comentario = db.ComentarioTarea.Find(idComentario);
                 if (comentario == null)
                 {
@@ -3654,7 +3807,6 @@ namespace SifizPlanning.Controllers
                 }
                 int idActividad = comentario.SecuencialTareaActividad;
 
-                string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 //Comprovando que el usuario es el mismo que entró el comentario
@@ -3665,6 +3817,12 @@ namespace SifizPlanning.Controllers
 
                 comentario.EstaActivo = 0;
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Eliminación de comentario de actividad",
+                    $"El usuario {emailUser} eliminó (desactivó) el comentario {idComentario} en la actividad {idActividad}",
+                    emailUser
+                );
+
 
                 List<object> comentarios = (from c in db.ComentarioTarea
                                             join
@@ -3689,10 +3847,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EliminarComentarioActividad] Error al eliminar comentario {idComentario} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al eliminar comentario."
                 };
                 return Json(resp);
             }
@@ -3702,8 +3861,10 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN")]
         public ActionResult MoverTarea(int idTarea, int idColaborador, string fecha)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[MoverTarea] Usuario {emailUser} intenta mover la tarea {idTarea} al colaborador {idColaborador} en la fecha {fecha}");
                 bool success = true;
                 string msg = "Se ha movido correctamente la tarea";
 
@@ -3899,7 +4060,6 @@ namespace SifizPlanning.Controllers
 
                 db.SaveChanges();
 
-                string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
                 //Actualizando las fechas de los dias que existieron los cambios y en las fechas
                 foreach (DiaColaborador diaColab in listaDiaColaborador)
@@ -3910,6 +4070,16 @@ namespace SifizPlanning.Controllers
                 //Actualizando cambios en la interfaz de usuario                
                 ActualizarTDTarea(listaCambiosTareas);
 
+                if (success)
+                {
+                    LoggerManager.LogSensitiveOperation(
+                        "Movimiento de tarea",
+                        $"El usuario {emailUser} movió la tarea {idTarea} al colaborador {idColaborador} en la fecha {fecha}",
+                        emailUser
+                    );
+                }
+
+
                 var resp = new
                 {
                     success = success,
@@ -3919,10 +4089,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[MoverTarea] Error al mover tarea {idTarea} al colaborador {idColaborador} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al mover tarea."
                 };
                 return Json(resp);
             }
@@ -3932,8 +4103,10 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN")]
         public ActionResult OrdenarTareas(string idOrden)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[OrdenarTareas] Usuario {emailUser} intenta ordenar las tareas con IDs: {idOrden}");
                 var s = new JavaScriptSerializer();
                 var arrayId = s.Deserialize<dynamic>(idOrden);
                 int idTarea1 = int.Parse(arrayId[0]);
@@ -3976,7 +4149,6 @@ namespace SifizPlanning.Controllers
 
                 db.SaveChanges();
 
-                string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
                 //Actualizando las fechas de los dias que existieron los cambios y en las fechas
                 Utiles.OrdenarTareasPermisos(fecha, tar.SecuencialColaborador, user, db);
@@ -3998,10 +4170,11 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[OrdenarTareas] Error al ordenar tareas por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al ordenar tareas."
                 };
                 return Json(resp);
             }
@@ -4011,70 +4184,87 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN")]
         public ActionResult DarDatosTarea(int idTarea)
         {
-            var tarea = (from t in db.Tarea
-                         join
-                             c in db.Colaborador on t.colaborador equals c
-                         join
-                             p in db.Persona on c.persona equals p
-                         where t.Secuencial == idTarea
-                         select new
-                         {
-                             id = t.Secuencial,
-                             idTrabajador = t.SecuencialColaborador,
-                             nombre = p.Nombre1 + " " + p.Apellido1,
-                             sede = c.sede.Codigo,
-                             detalle = t.Detalle,
-                             referencia = (t.entregableMotivoTrabajo != null) ? t.entregableMotivoTrabajo.Secuencial : 0,
-                             finicio = t.FechaInicio,
-                             ffin = t.FechaFin,
-                             horasEstimadas = t.TiempoEstimacion.HasValue ? t.TiempoEstimacion.Value.Hours : 0,
-                             minutosEstimados = t.TiempoEstimacion.HasValue ? t.TiempoEstimacion.Value.Minutes : 0,
-                             modulo = t.SecuencialModulo,
-                             cliente = t.SecuencialCliente,
-                             actividad = t.SecuencialActividad,
-                             estado = t.SecuencialEstadoTarea,
-                             verificador = t.NumeroVerificador,
-                             ubicacion = t.SecuencialLugarTarea,
-                             esReproceso = t.EsReproceso == 1 ? true : false,
-                             coordinador = (from tc in db.Tarea_Coordinador
-                                            where tc.SecuencialTarea == t.Secuencial && tc.EstaActivo == 1
-                                            select tc.SecuencialColaborador).FirstOrDefault()
-                         }).First();
-
-            DateTime horaInicioTareas = tarea.finicio.Date;
-            horaInicioTareas = horaInicioTareas.AddHours(8).AddMinutes(30);
-
-            TicketTarea tt = db.TicketTarea.Where(s => s.SecuencialTarea == tarea.id && s.EstaActiva == 1).FirstOrDefault();
-
-            TimeSpan tiempoTarea = tarea.ffin - tarea.finicio;
-            int horas = tiempoTarea.Hours;
-            int minutos = tiempoTarea.Minutes;
-
-            if (tarea.finicio.Hour < 13 && tarea.ffin.Hour > 13)
+            string emailUser = User.Identity.Name;
+            try
             {
-                horas--;
+                LoggerManager.LogInfo($"[DarDatosTarea] Usuario {emailUser} solicitó los datos de la tarea ID: {idTarea}");
+                var tarea = (from t in db.Tarea
+                             join
+                                 c in db.Colaborador on t.colaborador equals c
+                             join
+                                 p in db.Persona on c.persona equals p
+                             where t.Secuencial == idTarea
+                             select new
+                             {
+                                 id = t.Secuencial,
+                                 idTrabajador = t.SecuencialColaborador,
+                                 nombre = p.Nombre1 + " " + p.Apellido1,
+                                 sede = c.sede.Codigo,
+                                 detalle = t.Detalle,
+                                 referencia = (t.entregableMotivoTrabajo != null) ? t.entregableMotivoTrabajo.Secuencial : 0,
+                                 finicio = t.FechaInicio,
+                                 ffin = t.FechaFin,
+                                 horasEstimadas = t.TiempoEstimacion.HasValue ? t.TiempoEstimacion.Value.Hours : 0,
+                                 minutosEstimados = t.TiempoEstimacion.HasValue ? t.TiempoEstimacion.Value.Minutes : 0,
+                                 modulo = t.SecuencialModulo,
+                                 cliente = t.SecuencialCliente,
+                                 actividad = t.SecuencialActividad,
+                                 estado = t.SecuencialEstadoTarea,
+                                 verificador = t.NumeroVerificador,
+                                 ubicacion = t.SecuencialLugarTarea,
+                                 esReproceso = t.EsReproceso == 1 ? true : false,
+                                 coordinador = (from tc in db.Tarea_Coordinador
+                                                where tc.SecuencialTarea == t.Secuencial && tc.EstaActivo == 1
+                                                select tc.SecuencialColaborador).FirstOrDefault()
+                             }).First();
+
+                DateTime horaInicioTareas = tarea.finicio.Date;
+                horaInicioTareas = horaInicioTareas.AddHours(8).AddMinutes(30);
+
+                TicketTarea tt = db.TicketTarea.Where(s => s.SecuencialTarea == tarea.id && s.EstaActiva == 1).FirstOrDefault();
+
+                TimeSpan tiempoTarea = tarea.ffin - tarea.finicio;
+                int horas = tiempoTarea.Hours;
+                int minutos = tiempoTarea.Minutes;
+
+                if (tarea.finicio.Hour < 13 && tarea.ffin.Hour > 13)
+                {
+                    horas--;
+                }
+
+                var resp = new
+                {
+                    success = true,
+                    tarea = tarea,
+                    fecha = tarea.finicio.ToString("dd/MM/yyyy"),
+                    horas = horas,
+                    minutos = minutos,
+                    extraordinaria = DateTime.Compare(tarea.finicio, horaInicioTareas) < 0,
+                    ticketTarea = tt != null ? tt.SecuencialTicket : 0
+                };
+                return Json(resp);
             }
-
-            var resp = new
+            catch (Exception e)
             {
-                success = true,
-                tarea = tarea,
-                fecha = tarea.finicio.ToString("dd/MM/yyyy"),
-                horas = horas,
-                minutos = minutos,
-                extraordinaria = DateTime.Compare(tarea.finicio, horaInicioTareas) < 0,
-                ticketTarea = tt != null ? tt.SecuencialTicket : 0
-            };
-            return Json(resp);
+                LoggerManager.LogError(e, $"[DarDatosTarea] Error al obtener datos de la tarea ID {idTarea} por el usuario {emailUser}: {e.Message}");
+
+                var resp = new
+                {
+                    success = false,
+                    msg = "Error al obtener datos de la tarea."
+                };
+                return Json(resp);
+            }
         }
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
         public ActionResult SolicitudAccesoTFS(int idCliente, int idColaborador)
         {
+            string emailUser = User.Identity.Name;
             try
             {
-                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[SolicitudAccesoTFS] Usuario {emailUser} inició solicitud de acceso TFS para ClienteID: {idCliente}, ColaboradorID: {idColaborador}");
                 var clienteTarea = db.Cliente.Find(idCliente);
                 var colaboradorTarea = db.Colaborador.Find(idColaborador);
                 List<string> correosDestinos = new List<string>();
@@ -4102,6 +4292,7 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[SolicitudAccesoTFS] Error en solicitud acceso TFS para ClienteID {idCliente}, ColaboradorID {idColaborador} por usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
@@ -4115,7 +4306,8 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN")]
         public ActionResult AsignacionesPersona(int idTrabajador, string password = "", string fechaLunes = "", string jsonCC = "")
         {
-
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[AsignacionesPersona] Usuario {emailUser} inició solicitud de acceso Asignaciones Persona");
             DateTime lunes = DateTime.Today;
             if (fechaLunes != "")
             {
@@ -4306,7 +4498,6 @@ namespace SifizPlanning.Controllers
 	                                                {page:WordSection1;}
                                            </style>";
 
-                string emailUser = User.Identity.Name;
                 var envia = (from t in db.Colaborador
                              join
                                  p in db.Persona on t.persona equals p
@@ -4558,6 +4749,7 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[AsignacionesPersona] Error en solicitud de asiganaciones personas por usuario {emailUser}: {e.Message}");
                 var resp3 = new
                 {
                     success = false,
@@ -4571,8 +4763,10 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
         [Authorize(Roles = "ADMIN")]
         public ActionResult DarCoordinadosColaborador(int idTrabajador, string fechaLunes, int semanas)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[DarCoordinadosColaborador] El usuario {emailUser} está solicitando los coordinados del colaborador {idTrabajador} para {semanas} semana(s) desde {fechaLunes}");
                 DateTime lunes = DateTime.Today;
                 if (fechaLunes != "")
                 {
@@ -4671,10 +4865,11 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarCoordinadosColaborador] Error al consultar coordinados para el trabajador {idTrabajador} por el usuario {User.Identity.Name}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al consultar coordinados para el trabajador."
                 };
                 return Json(resp);
             }
@@ -4684,15 +4879,16 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
         [Authorize(Roles = "ADMIN, RRHH")]
         public ActionResult AprobarPermiso(int idPermiso)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[AprobarPermiso] El usuario {emailUser} está intentando aprobar el permiso {idPermiso}");
                 Permiso permiso = db.Permiso.Find(idPermiso);
                 if (permiso == null)
                 {
                     throw new Exception("Error, no se encontró el permiso");
                 }
 
-                string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 permiso.SecuencialEstadoPermiso = 2;
@@ -4709,6 +4905,12 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
                 db.GestionPermiso.Add(gestion);
 
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Aprobación de permiso",
+                    $"El usuario {emailUser} aprobó el permiso {idPermiso} para el colaborador {permiso.SecuencialColaborador}",
+                    emailUser
+                );
+
 
                 Utiles.OrdenarTareasPermisos(permiso.FechaInicio.Date, permiso.SecuencialColaborador, user, db);
 
@@ -4741,6 +4943,7 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[AprobarPermiso] Error al aprobar permiso {idPermiso} por el usuario {User.Identity.Name}: {e.Message}");
                 var resp = new
                 {
                     success = false,
@@ -4754,14 +4957,15 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
         [Authorize(Roles = "ADMIN")]
         public ActionResult MoverPermiso(int idPermiso, int idColaborador, string fecha)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[AprobarPermiso] El usuario {emailUser} está intentando aprobar el permiso {idPermiso}");
                 Permiso permiso = db.Permiso.Find(idPermiso);
                 if (permiso == null)
                 {
                     throw new Exception("No se encontró el permiso");
                 }
-                string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 string[] fechas = fecha.Split(new Char[] { '/' });
@@ -4790,6 +4994,11 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
                     permiso.SecuencialColaborador = idColaborador;
 
                     db.SaveChanges();
+                    LoggerManager.LogSensitiveOperation(
+                        "Aprobación de permiso",
+                        $"El usuario {emailUser} aprobó el permiso {idPermiso} del colaborador {permiso.SecuencialColaborador}",
+                        emailUser
+                    );
 
                     Utiles.OrdenarTareasPermisos(fechaInicialPermiso, idColaboradorInicial, user, db);
                     Utiles.OrdenarTareasPermisos(newFechaPermiso, idColaborador, user, db);
@@ -4818,6 +5027,7 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[AprobarPermiso] Error al aprobar el permiso {idPermiso} por el usuario {User.Identity.Name}: {e.Message}");
                 var resp = new
                 {
                     success = false,
@@ -4831,11 +5041,15 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
         [Authorize(Roles = "ADMIN")]
         public ActionResult GestionarFeriado(string fecha)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[GestionarFeriado] El usuario {emailUser} está gestionando el feriado para la fecha {fecha}");
                 DateTime diaFeriado = Utiles.strToDateTime(fecha);
 
                 DiaInactivo diaInactivo = db.DiaInactivo.Where(x => x.Fecha == diaFeriado).FirstOrDefault();
+                string operacionRealizada;
+
                 if (diaInactivo == null)//Adicionarlo
                 {
                     diaInactivo = new DiaInactivo
@@ -4846,13 +5060,20 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
                         NumeroVerificador = 1
                     };
                     db.DiaInactivo.Add(diaInactivo);
+                    operacionRealizada = "creado y activado";
                 }
                 else//Hacerle un toogle
                 {
                     diaInactivo.EstaActivo = 1 - diaInactivo.EstaActivo;
+                    operacionRealizada = diaInactivo.EstaActivo == 1 ? "activado" : "desactivado";
                 }
 
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Gestión de día feriado",
+                    $"El usuario {emailUser} ha {operacionRealizada} el día feriado correspondiente al {fecha}",
+                    emailUser
+                );
 
                 var resp = new
                 {
@@ -4862,10 +5083,11 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[GestionarFeriado] Error al gestionar feriado para la fecha {fecha} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al gestionar feriado para la fecha {fecha}."
                 };
                 return Json(resp);
             }
@@ -4875,14 +5097,16 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
         [Authorize(Roles = "ADMIN")]
         public ActionResult RepetirTareasVerticales(int idTarea, string idColaboradores)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[RepetirTareasVerticales] Usuario {emailUser} está intentando repetir la tarea {idTarea} para los colaboradores {idColaboradores}");
+
                 //para la actualizacion de los permisos y las tareas
                 List<DiaColaborador> listaDiaColaborador = new List<DiaColaborador>();
                 //Para la actualizacion de los cambios en IU en los TD de la tabla
                 List<DiaColaborador> listaCambiosTareas = new List<DiaColaborador>();
 
-                string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 Tarea task = db.Tarea.Find(idTarea);
@@ -4990,6 +5214,11 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
                     };
 
                     db.HistoricoTareaEstado.Add(histET);
+                    LoggerManager.LogSensitiveOperation(
+                        "Repetición de tarea",
+                        $"Usuario {emailUser} ha repetido la tarea {idTarea} para el colaborador {idColaborador} en fecha {fechaInicio.ToString("yyyy-MM-dd HH:mm")}",
+                        emailUser
+                    );
                 }
 
                 db.SaveChanges();
@@ -5011,10 +5240,11 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[RepetirTareasVerticales] Error al repetir tarea {idTarea} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al repetir la(s) tarea(s)."
                 };
                 return Json(resp);
             }
@@ -5024,13 +5254,14 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
         [Authorize(Roles = "ADMIN")]
         public ActionResult EstablecerQuitarTareaCompensatoria(int idTarea)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[EstablecerQuitarTareaCompensatoria] Usuario {emailUser} está intentando establecer/quitar tarea compensatoria con id {idTarea}");
                 Tarea tarea = db.Tarea.Find(idTarea);
                 if (tarea == null)
                     throw new Exception("Error, no se encontró la tarea.");
 
-                string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 //Para la actualizacion de los cambios en IU en los TD de la tabla
@@ -5063,6 +5294,12 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
                 listaCambiosTareas.Add(new DiaColaborador { Fecha = tarea.FechaInicio.Date, IdColaborador = tarea.SecuencialColaborador });
 
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Gestión de tarea compensatoria",
+                    $"El usuario {emailUser} gestionó la tarea compensatoria para la tarea {idTarea}",
+                    emailUser
+                );
+
 
                 //Actualizando cambios en la interfaz de usuario
                 ActualizarTDTarea(listaCambiosTareas);
@@ -5075,10 +5312,11 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EstablecerQuitarTareaCompensatoria] Error al procesar la tarea compensatoria {idTarea} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al procesar la tarea compensatoria."
                 };
                 return Json(resp);
             }
@@ -5088,207 +5326,210 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
         [Authorize(Roles = "ADMIN")]
         public ActionResult DatosDiaTarea(string fecha, int idColaborador, string json = "")
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[DatosDiaTarea] Usuario {emailUser} solicitó datos para colaborador {idColaborador} en fecha {fecha} con filtros JSON: {json}");
+
             List<int> idColaboradores = new List<int>();
             List<int> idClientes = new List<int>();
             List<int> idEstados = new List<int>();
             List<int> idLugares = new List<int>();
             List<int> idModulos = new List<int>();
             List<int> idSedes = new List<int>();
-            if (json != "")
-            {
-                var s = new JavaScriptSerializer();
-                var jsonObj = s.Deserialize<dynamic>(json);
-                for (int i = 0; i < jsonObj["colaboradores"].Length; i++)
-                {
-                    idColaboradores.Add(int.Parse(jsonObj["colaboradores"][i]["id"]));
-                }
-                for (int i = 0; i < jsonObj["clientes"].Length; i++)
-                {
-                    idClientes.Add(int.Parse(jsonObj["clientes"][i]["id"]));
-                }
-                for (int i = 0; i < jsonObj["estadoTarea"].Length; i++)
-                {
-                    idEstados.Add(int.Parse(jsonObj["estadoTarea"][i]["id"]));
-                }
-                for (int i = 0; i < jsonObj["lugarTarea"].Length; i++)
-                {
-                    idLugares.Add(int.Parse(jsonObj["lugarTarea"][i]["id"]));
-                }
-                for (int i = 0; i < jsonObj["modulo"].Length; i++)
-                {
-                    idModulos.Add(int.Parse(jsonObj["modulo"][i]["id"]));
-                }
-                for (int i = 0; i < jsonObj["sede"].Length; i++)
-                {
-                    idSedes.Add(int.Parse(jsonObj["sede"][i]["id"]));
-                }
-            }
-
-            DateTime diaTarea = Utiles.strToDateTime(fecha);
-            DateTime diaSiguiente = diaTarea.AddDays(1);
-            var datosTareas = (from t in db.Tarea
-                               join
-                                  c in db.Colaborador on t.colaborador equals c
-                               join
-                                  p in db.Persona on c.persona equals p
-                               join
-                                  u in db.Usuario on p.Secuencial equals u.SecuencialPersona
-                               join
-                                  f in db.FotoColaborador on c.Secuencial equals f.SecuencialColaborador
-                               join
-                                  s in db.Sede on c.sede equals s
-                               join
-                                  m in db.Modulo on t.modulo equals m
-                               join
-                                  cl in db.Cliente on t.cliente equals cl
-                               join
-                                  a in db.Actividad on t.actividad equals a
-                               join
-                                  e in db.EstadoTarea on t.estadoTarea equals e
-                               join
-                                  l in db.LugarTarea on t.lugarTarea equals l
-                               join d in db.Departamento on c.departamento equals d
-                               where c.Secuencial == idColaborador &&
-                                     u.EstaActivo == 1 &&
-                                     d.Asignable == 1 &&
-                                     t.FechaInicio >= diaTarea && t.FechaInicio < diaSiguiente && //Entre las dos fechas
-                                     t.SecuencialEstadoTarea != 4//Es cuando están anuladas
-                               orderby t.FechaInicio
-                               select new
-                               {
-                                   idColaborador = c.Secuencial,
-                                   nombre = p.Nombre1 + " " + p.Apellido1,
-                                   email = u.Email.ToUpper(),
-                                   sede = s.Codigo,
-                                   url = f.Url,
-                                   idTarea = t.Secuencial,
-                                   sdetalle = t.Detalle.Substring(0, 20) + "...",
-                                   detalle = t.Detalle,
-                                   finicio = t.FechaInicio,
-                                   ffin = t.FechaFin,
-                                   modulo = m.Codigo,
-                                   dModulo = m.Descripcion.ToUpper(),
-                                   idModulo = m.Secuencial,
-                                   cliente = cl.Codigo,
-                                   idCliente = cl.Secuencial,
-                                   dCliente = cl.Descripcion.ToUpper(),
-                                   actividad = a.Codigo,
-                                   dActividad = a.Descripcion.ToUpper(),
-                                   estado = e.Codigo,
-                                   idEstado = e.Secuencial,
-                                   lugar = l.Codigo,
-                                   dLugar = l.Descripcion.ToUpper(),
-                                   idLugar = l.Secuencial,
-                                   clase = (t.SecuencialEstadoTarea == 1 ? "new" : (t.SecuencialEstadoTarea == 2) ? "dev" : (t.SecuencialEstadoTarea == 3) ? "finish" : (t.SecuencialEstadoTarea == 5) ? "pause" : (t.SecuencialEstadoTarea == 6) ? "preassigned" : "no-concluida"),
-                                   coordinador = (from tc in db.Tarea_Coordinador
-                                                  join
-                                                      co in db.Colaborador on tc.colaborador equals co
-                                                  join
-                                                      pe in db.Persona on co.persona equals pe
-                                                  where tc.SecuencialTarea == t.Secuencial && tc.EstaActivo == 1
-                                                  select (pe.Nombre1 + " " + pe.Apellido1)).FirstOrDefault(),
-                                   compensatoria = (t.tareaCompensatoria.FirstOrDefault() != null
-                                               && t.tareaCompensatoria.FirstOrDefault().EstaActiva == 1
-                                              ) ? "compensatoria" : "no-compensatoria"
-                               }).ToList();
-
-            //Permisos del colaborador en la fecha
-            var permisos = (from per in db.Permiso
-                            where per.FechaInicio >= diaTarea && per.FechaInicio < diaSiguiente &&
-                                  per.SecuencialEstadoPermiso != 3 && per.SecuencialEstadoPermiso != 4 && per.SecuencialColaborador == idColaborador
-                            select new
-                            {
-                                id = per.Secuencial,
-                                idColaborador = per.SecuencialColaborador,
-                                smotivo = per.Motivo.Substring(0, 20) + "...",
-                                motivo = per.Motivo,
-                                finicio = per.FechaInicio,
-                                ffin = per.FechaFin,
-                                clase = (per.SecuencialEstadoPermiso == 1) ? "permiso-solicitado" : "permiso-aprobado"
-                            }).ToList();
-
-            var tareasTD = (from d in datosTareas
-                            select new DataTarea
-                            {
-                                id = d.idTarea,
-                                idColaborador = d.idColaborador,
-                                sdetalle = d.sdetalle,
-                                detalle = d.detalle,
-                                dateFechaInicio = d.finicio,
-                                finicio = d.finicio.ToString("t"),
-                                ffin = d.ffin.ToString("t"),
-                                horas = Utiles.CalcularHorasTarea(d.finicio, d.ffin),
-                                modulo = d.modulo,
-                                dModulo = d.dModulo,
-                                idModulo = d.idModulo,
-                                cliente = d.cliente,
-                                idCliente = d.idCliente,
-                                dCliente = d.dCliente,
-                                actividad = d.actividad,
-                                dActividad = d.dActividad,
-                                estado = d.estado,
-                                idEstado = d.idEstado,
-                                lugar = d.lugar,
-                                dLugar = d.dLugar,
-                                idLugar = d.idLugar,
-                                clase = d.clase,
-                                coordinador = d.coordinador,
-                                tipo = "t",
-                                compensatoria = d.compensatoria
-                            }).ToList<DataTarea>();
-
-            var lPermisos = (from per in permisos
-                             select new DataTarea
-                             {
-                                 id = per.id,
-                                 idColaborador = per.idColaborador,
-                                 sdetalle = per.smotivo,
-                                 detalle = per.motivo,
-                                 dateFechaInicio = per.finicio,
-                                 finicio = per.finicio.ToString("t"),
-                                 ffin = per.ffin.ToString("t"),
-                                 horas = Utiles.CalcularHorasTarea(per.finicio, per.ffin),
-                                 modulo = "",
-                                 dModulo = "",
-                                 idModulo = 0,
-                                 cliente = "PERMISO",
-                                 idCliente = 0,
-                                 dCliente = "PERMISO",
-                                 actividad = "",
-                                 dActividad = "",
-                                 estado = "",
-                                 idEstado = 0,
-                                 lugar = "",
-                                 dLugar = "",
-                                 idLugar = 0,
-                                 clase = per.clase,
-                                 coordinador = null,
-                                 tipo = "p",
-                                 compensatoria = "no-compensatoria"
-                             }).ToList<DataTarea>();
-            tareasTD.AddRange(lPermisos);
-
-            if (idClientes.Count() > 0)
-            {
-                tareasTD = tareasTD.Where(x => idClientes.Contains(x.idCliente)).ToList();
-            }
-            if (idEstados.Count() > 0)
-            {
-                tareasTD = tareasTD.Where(x => idEstados.Contains(x.idEstado)).ToList();
-            }
-            if (idLugares.Count() > 0)
-            {
-                tareasTD = tareasTD.Where(x => idLugares.Contains(x.idLugar)).ToList();
-            }
-            if (idModulos.Count() > 0)
-            {
-                tareasTD = tareasTD.Where(x => idModulos.Contains(x.idModulo)).ToList();
-            }
-
-            tareasTD.Sort();
-
             try
             {
+                if (json != "")
+                {
+                    var s = new JavaScriptSerializer();
+                    var jsonObj = s.Deserialize<dynamic>(json);
+                    for (int i = 0; i < jsonObj["colaboradores"].Length; i++)
+                    {
+                        idColaboradores.Add(int.Parse(jsonObj["colaboradores"][i]["id"]));
+                    }
+                    for (int i = 0; i < jsonObj["clientes"].Length; i++)
+                    {
+                        idClientes.Add(int.Parse(jsonObj["clientes"][i]["id"]));
+                    }
+                    for (int i = 0; i < jsonObj["estadoTarea"].Length; i++)
+                    {
+                        idEstados.Add(int.Parse(jsonObj["estadoTarea"][i]["id"]));
+                    }
+                    for (int i = 0; i < jsonObj["lugarTarea"].Length; i++)
+                    {
+                        idLugares.Add(int.Parse(jsonObj["lugarTarea"][i]["id"]));
+                    }
+                    for (int i = 0; i < jsonObj["modulo"].Length; i++)
+                    {
+                        idModulos.Add(int.Parse(jsonObj["modulo"][i]["id"]));
+                    }
+                    for (int i = 0; i < jsonObj["sede"].Length; i++)
+                    {
+                        idSedes.Add(int.Parse(jsonObj["sede"][i]["id"]));
+                    }
+                }
+
+                DateTime diaTarea = Utiles.strToDateTime(fecha);
+                DateTime diaSiguiente = diaTarea.AddDays(1);
+                var datosTareas = (from t in db.Tarea
+                                   join
+                                      c in db.Colaborador on t.colaborador equals c
+                                   join
+                                      p in db.Persona on c.persona equals p
+                                   join
+                                      u in db.Usuario on p.Secuencial equals u.SecuencialPersona
+                                   join
+                                      f in db.FotoColaborador on c.Secuencial equals f.SecuencialColaborador
+                                   join
+                                      s in db.Sede on c.sede equals s
+                                   join
+                                      m in db.Modulo on t.modulo equals m
+                                   join
+                                      cl in db.Cliente on t.cliente equals cl
+                                   join
+                                      a in db.Actividad on t.actividad equals a
+                                   join
+                                      e in db.EstadoTarea on t.estadoTarea equals e
+                                   join
+                                      l in db.LugarTarea on t.lugarTarea equals l
+                                   join d in db.Departamento on c.departamento equals d
+                                   where c.Secuencial == idColaborador &&
+                                         u.EstaActivo == 1 &&
+                                         d.Asignable == 1 &&
+                                         t.FechaInicio >= diaTarea && t.FechaInicio < diaSiguiente && //Entre las dos fechas
+                                         t.SecuencialEstadoTarea != 4//Es cuando están anuladas
+                                   orderby t.FechaInicio
+                                   select new
+                                   {
+                                       idColaborador = c.Secuencial,
+                                       nombre = p.Nombre1 + " " + p.Apellido1,
+                                       email = u.Email.ToUpper(),
+                                       sede = s.Codigo,
+                                       url = f.Url,
+                                       idTarea = t.Secuencial,
+                                       sdetalle = t.Detalle.Substring(0, 20) + "...",
+                                       detalle = t.Detalle,
+                                       finicio = t.FechaInicio,
+                                       ffin = t.FechaFin,
+                                       modulo = m.Codigo,
+                                       dModulo = m.Descripcion.ToUpper(),
+                                       idModulo = m.Secuencial,
+                                       cliente = cl.Codigo,
+                                       idCliente = cl.Secuencial,
+                                       dCliente = cl.Descripcion.ToUpper(),
+                                       actividad = a.Codigo,
+                                       dActividad = a.Descripcion.ToUpper(),
+                                       estado = e.Codigo,
+                                       idEstado = e.Secuencial,
+                                       lugar = l.Codigo,
+                                       dLugar = l.Descripcion.ToUpper(),
+                                       idLugar = l.Secuencial,
+                                       clase = (t.SecuencialEstadoTarea == 1 ? "new" : (t.SecuencialEstadoTarea == 2) ? "dev" : (t.SecuencialEstadoTarea == 3) ? "finish" : (t.SecuencialEstadoTarea == 5) ? "pause" : (t.SecuencialEstadoTarea == 6) ? "preassigned" : "no-concluida"),
+                                       coordinador = (from tc in db.Tarea_Coordinador
+                                                      join
+                                                          co in db.Colaborador on tc.colaborador equals co
+                                                      join
+                                                          pe in db.Persona on co.persona equals pe
+                                                      where tc.SecuencialTarea == t.Secuencial && tc.EstaActivo == 1
+                                                      select (pe.Nombre1 + " " + pe.Apellido1)).FirstOrDefault(),
+                                       compensatoria = (t.tareaCompensatoria.FirstOrDefault() != null
+                                                   && t.tareaCompensatoria.FirstOrDefault().EstaActiva == 1
+                                                  ) ? "compensatoria" : "no-compensatoria"
+                                   }).ToList();
+
+                //Permisos del colaborador en la fecha
+                var permisos = (from per in db.Permiso
+                                where per.FechaInicio >= diaTarea && per.FechaInicio < diaSiguiente &&
+                                      per.SecuencialEstadoPermiso != 3 && per.SecuencialEstadoPermiso != 4 && per.SecuencialColaborador == idColaborador
+                                select new
+                                {
+                                    id = per.Secuencial,
+                                    idColaborador = per.SecuencialColaborador,
+                                    smotivo = per.Motivo.Substring(0, 20) + "...",
+                                    motivo = per.Motivo,
+                                    finicio = per.FechaInicio,
+                                    ffin = per.FechaFin,
+                                    clase = (per.SecuencialEstadoPermiso == 1) ? "permiso-solicitado" : "permiso-aprobado"
+                                }).ToList();
+
+                var tareasTD = (from d in datosTareas
+                                select new DataTarea
+                                {
+                                    id = d.idTarea,
+                                    idColaborador = d.idColaborador,
+                                    sdetalle = d.sdetalle,
+                                    detalle = d.detalle,
+                                    dateFechaInicio = d.finicio,
+                                    finicio = d.finicio.ToString("t"),
+                                    ffin = d.ffin.ToString("t"),
+                                    horas = Utiles.CalcularHorasTarea(d.finicio, d.ffin),
+                                    modulo = d.modulo,
+                                    dModulo = d.dModulo,
+                                    idModulo = d.idModulo,
+                                    cliente = d.cliente,
+                                    idCliente = d.idCliente,
+                                    dCliente = d.dCliente,
+                                    actividad = d.actividad,
+                                    dActividad = d.dActividad,
+                                    estado = d.estado,
+                                    idEstado = d.idEstado,
+                                    lugar = d.lugar,
+                                    dLugar = d.dLugar,
+                                    idLugar = d.idLugar,
+                                    clase = d.clase,
+                                    coordinador = d.coordinador,
+                                    tipo = "t",
+                                    compensatoria = d.compensatoria
+                                }).ToList<DataTarea>();
+
+                var lPermisos = (from per in permisos
+                                 select new DataTarea
+                                 {
+                                     id = per.id,
+                                     idColaborador = per.idColaborador,
+                                     sdetalle = per.smotivo,
+                                     detalle = per.motivo,
+                                     dateFechaInicio = per.finicio,
+                                     finicio = per.finicio.ToString("t"),
+                                     ffin = per.ffin.ToString("t"),
+                                     horas = Utiles.CalcularHorasTarea(per.finicio, per.ffin),
+                                     modulo = "",
+                                     dModulo = "",
+                                     idModulo = 0,
+                                     cliente = "PERMISO",
+                                     idCliente = 0,
+                                     dCliente = "PERMISO",
+                                     actividad = "",
+                                     dActividad = "",
+                                     estado = "",
+                                     idEstado = 0,
+                                     lugar = "",
+                                     dLugar = "",
+                                     idLugar = 0,
+                                     clase = per.clase,
+                                     coordinador = null,
+                                     tipo = "p",
+                                     compensatoria = "no-compensatoria"
+                                 }).ToList<DataTarea>();
+                tareasTD.AddRange(lPermisos);
+
+                if (idClientes.Count() > 0)
+                {
+                    tareasTD = tareasTD.Where(x => idClientes.Contains(x.idCliente)).ToList();
+                }
+                if (idEstados.Count() > 0)
+                {
+                    tareasTD = tareasTD.Where(x => idEstados.Contains(x.idEstado)).ToList();
+                }
+                if (idLugares.Count() > 0)
+                {
+                    tareasTD = tareasTD.Where(x => idLugares.Contains(x.idLugar)).ToList();
+                }
+                if (idModulos.Count() > 0)
+                {
+                    tareasTD = tareasTD.Where(x => idModulos.Contains(x.idModulo)).ToList();
+                }
+
+                tareasTD.Sort();
+
                 var resp = new
                 {
                     success = true,
@@ -5298,10 +5539,11 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DatosDiaTarea] Error al obtener datos días tarea para colaborador {idColaborador} en fecha {fecha} solicitado por usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener datos días tarea para colaborador."
                 };
                 return Json(resp);
             }
@@ -5323,6 +5565,8 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
         [Authorize(Roles = "ADMIN")]
         public ActionResult DatosNivelColaboradorModulo(string filtro)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[DatosNivelColaboradorModulo] Usuario {emailUser} inició la consulta con filtro: {filtro}");
             try
             {
                 var colaboradores = (from c in db.Colaborador
@@ -5364,10 +5608,11 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DatosNivelColaboradorModulo] Error durante consulta a nivel colaborador realizada por usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error durante consulta a nivel colaborador."
                 };
                 return Json(resp);
             }
@@ -5377,13 +5622,13 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
         [Authorize(Roles = "ADMIN")]
         public ActionResult DarConocimientosNivelColaboradores(int modulo = 0, int tecnologia = 0, int nivel = 0)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[DarConocimientosNivelColaboradores] Usuario {emailUser} inició consulta conocimientos nivel colaborador con filtros - modulo: {modulo}, tecnologia: {tecnologia}, nivel: {nivel}");
             try
             {
                 var competencias = (from ncm in db.NivelColaboradorModulo
-                                    join
-  c in db.Colaborador on ncm.colaborador equals c
-                                    join
-p in db.Persona on c.persona equals p
+                                    join c in db.Colaborador on ncm.colaborador equals c
+                                    join p in db.Persona on c.persona equals p
                                     where p.usuario.FirstOrDefault().EstaActivo == 1 &&
                                        ncm.Nivel > 0
                                     select new
@@ -5441,10 +5686,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarConocimientosNivelColaboradores] Error al procesar consulta conocimientos nivel colaborador del usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = " Error al procesar consulta conocimientos nivel colaborador."
                 };
                 return Json(resp);
             }
@@ -5455,6 +5701,8 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN")]
         public ActionResult DarSolicitudesTareas(bool mostrarTodas = false, string filtro = "", int start = 0, int length = 10)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[DarSolicitudesTareas] Usuario {emailUser} inició consulta. mostrarTodas={mostrarTodas}, filtro='{filtro}', start={start}, length={length}");
             try
             {
                 List<object> solicitudes = new List<object>();
@@ -5533,10 +5781,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarSolicitudesTareas] Error al consultar solicitudes de tareas del usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = " al consultar solicitudes de tareas"
                 };
                 return Json(resp);
             }
@@ -5546,6 +5795,8 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN")]
         public ActionResult AceptarSolicitudTarea(int idSolicitud)
         {
+            string emailUser = User.Identity.Name;
+            LoggerManager.LogInfo($"[AceptarSolicitudTarea] Usuario {emailUser} intenta aceptar solicitud ID={idSolicitud}");
             try
             {
                 SolicitudTarea solicitud = db.SolicitudTarea.Find(idSolicitud);
@@ -5558,7 +5809,6 @@ p in db.Persona on c.persona equals p
                     throw new Exception("Ya se ha gestionado la solicitud");
                 }
 
-                string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 solicitud.Aceptada = 1;
@@ -5573,6 +5823,7 @@ p in db.Persona on c.persona equals p
                 db.Gestion_SolicitudTarea.Add(gestionSolicitud);
 
                 db.SaveChanges();
+                LoggerManager.LogInfo($"[AceptarSolicitudTarea] Solicitud ID={idSolicitud} aceptada por {emailUser}");
 
                 //Enviando el email de solicitud rechazada
                 string personaSolicita = solicitud.colaborador.persona.Nombre1 + " " + solicitud.colaborador.persona.Apellido1;
@@ -5596,10 +5847,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[AceptarSolicitudTarea] Error al aceptar solicitud tarea ID={idSolicitud} por {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al aceptar solicitud tarea."
                 };
                 return Json(resp);
             }
@@ -5609,9 +5861,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN")]
         public ActionResult NuevaTareasPorSolicitud(int idTrabajador, int idSolicitud, string fecha, int cliente, int ubicacion, int modulo, int actividad, int horas, string detalle, int referencia = 0, int coordinador = 0, string repetir = "", int finSemana = 0, int repetirTipoFin = 0, int numVeces = 0, string fechaHasta = "")
         {
+            string emailUser = User.Identity.Name;
             try
             {
-                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[NuevaTareasPorSolicitud] El usuario {emailUser} está creando tareas para la solicitud {idSolicitud}");
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 SolicitudTarea solicitud = db.SolicitudTarea.Find(idSolicitud);
@@ -6081,7 +6334,11 @@ p in db.Persona on c.persona equals p
 
                 //Actualizando la IU en la actualizacion de la tarea                
                 ActualizarTDTarea(listaCambiosTareas);
-
+                LoggerManager.LogSensitiveOperation(
+                    "Creación de tareas por solicitud",
+                    $"El usuario {emailUser} ha creado {numVeces + 1} tarea(s) para la solicitud {idSolicitud}",
+                    emailUser
+                );
                 var resp = new
                 {
                     success = true
@@ -6090,10 +6347,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[NuevaTareasPorSolicitud] Error al crear tareas para la solicitud {idSolicitud} por {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al crear tareas para la solicitud."
                 };
                 return Json(resp);
             }
@@ -6103,8 +6361,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN")]
         public ActionResult RechazarSolicitudTarea(int idSolicitud)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[RechazarSolicitudTarea] El usuario {emailUser} está procesando el rechazo de la solicitud {idSolicitud}");
                 SolicitudTarea solicitud = db.SolicitudTarea.Find(idSolicitud);
                 if (solicitud == null)
                 {
@@ -6115,7 +6375,6 @@ p in db.Persona on c.persona equals p
                     throw new Exception("Ya se ha gestionado la solicitud");
                 }
 
-                string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 solicitud.Rechazada = 1;
@@ -6130,6 +6389,11 @@ p in db.Persona on c.persona equals p
                 db.Gestion_SolicitudTarea.Add(gestionSolicitud);
 
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Rechazo de solicitud de tarea",
+                    $"El usuario {emailUser} ha rechazado la solicitud {idSolicitud} del colaborador {solicitud.colaborador.persona.Nombre1}",
+                    emailUser
+                );
 
                 //Enviando el email de solicitud rechazada
                 string personaSolicita = solicitud.colaborador.persona.Nombre1 + " " + solicitud.colaborador.persona.Apellido1;
@@ -6153,10 +6417,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[RechazarSolicitudTarea] Error al rechazar la solicitud {idSolicitud} por {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al rechazar la solicitud."
                 };
                 return Json(resp);
             }
@@ -6167,8 +6432,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN, REC")]
         public ActionResult VerConsolidacionTarea(int varSemanas = 0, string filtro = "")
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[VerConsolidacionTarea] El usuario {emailUser} está consultando la consolidación de tareas (semanas: {varSemanas}, filtro: '{filtro}')");
                 int cantSemanas = 14;
                 DateTime hoy = DateTime.Now.Date;
                 DateTime lunes = hoy;
@@ -6525,10 +6792,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[VerConsolidacionTarea] Error al consultar consolidación de tareas por {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al consultar consolidación de tareas."
                 };
                 return Json(resp);
             }
@@ -6538,8 +6806,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN")]
         public ActionResult EliminarAdenda(int idAdenda)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[EliminarAdenda] El usuario {emailUser} está intentando eliminar la adenda {idAdenda}");
                 Adenda adenda = db.Adenda.Find(idAdenda);
                 if (adenda == null)
                 {
@@ -6548,6 +6818,11 @@ p in db.Persona on c.persona equals p
 
                 adenda.EstaActivo = 0;
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Eliminación de adenda",
+                    $"El usuario {emailUser} ha eliminado la adenda {idAdenda}",
+                    emailUser
+                );
 
                 var resp = new
                 {
@@ -6557,10 +6832,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EliminarAdenda] Error al eliminar adenda {idAdenda} por {emailUser}: {e.Message}");
                 var resp = new
                 {
-                    success = true,
-                    resp = e.Message
+                    success = false,
+                    resp = "Error al eliminar adenda."
                 };
                 return Json(resp);
             }
@@ -6570,9 +6846,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN, GESTOR")]
         public ActionResult GuardarSeguimientoContrato(string datosNuevos, string datosEliminar, string datosEditar, int secuencialMotivo)
         {
+            string emailUser = User.Identity.Name;
             try
             {
-                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[GuardarSeguimientoContrato] El usuario {emailUser} está intentando guardar seguimientos para el motivo {secuencialMotivo}");
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 var serNuevos = new JavaScriptSerializer();
@@ -6625,6 +6902,11 @@ p in db.Persona on c.persona equals p
                     }
                 }
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Guardado de seguimiento de contrato",
+                    $"El usuario {emailUser} guardó {jsonObjNuevos.Length} nuevos, editó {jsonObjEditar.Length} y eliminó {jsonObjEliminar.Length} seguimientos para el motivo {secuencialMotivo}",
+                    emailUser
+                );
                 var resp = new
                 {
                     success = true,
@@ -6634,10 +6916,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[GuardarSeguimientoContrato] Error al guardar seguimientos para el motivo {secuencialMotivo} por {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al guardar seguimientos para el motivo {secuencialMotivo}."
                 };
                 return Json(resp);
             }
@@ -6648,9 +6931,11 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN, GESTOR, ACTA")]
         public ActionResult GuardarUnSeguimientoContrato(int secuencialMotivo, string pendiente, string enProceso, string realizado, string fecha)
         {
+            string emailUser = User.Identity.Name;
             try
             {
-                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[GuardarUnSeguimientoContrato] El usuario {emailUser} está guardando un seguimiento de contrato para la fecha {fecha}");
+
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 MotivoTrabajoSeguimiento motivoTrabajoSeguimiento = new MotivoTrabajoSeguimiento();
@@ -6666,6 +6951,12 @@ p in db.Persona on c.persona equals p
                 db.MotivoTrabajoSeguimiento.Add(motivoTrabajoSeguimiento);
 
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Registro de seguimiento de contrato",
+                    $"El usuario {emailUser} ha registrado un seguimiento de contrato para la fecha {fecha}",
+                    emailUser
+                );
+
                 var resp = new
                 {
                     success = true,
@@ -6675,10 +6966,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[GuardarUnSeguimientoContrato] Error al guardar seguimiento para la fecha {fecha} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al guardar seguimiento para la fecha."
                 };
                 return Json(resp);
             }
@@ -6689,8 +6981,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN, GESTOR")]
         public ActionResult GuardarAdendasContrato(string datosNuevos, string datosEliminar, int secuencialMotivo)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[GuardarAdendasContrato] El usuario {emailUser} está guardando adendas para el motivo con secuencial {secuencialMotivo}");
                 var serNuevos = new JavaScriptSerializer();
                 var jsonObjNuevos = serNuevos.Deserialize<dynamic>(datosNuevos);
                 var serEliminar = new JavaScriptSerializer();
@@ -6717,6 +7011,11 @@ p in db.Persona on c.persona equals p
                     }
                 }
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Gestión de adendas de contrato",
+                    $"El usuario {emailUser} ha registrado y/o eliminado adendas para el motivo con secuencial {secuencialMotivo}",
+                    emailUser
+                );
                 var resp = new
                 {
                     success = true,
@@ -6726,10 +7025,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[GuardarAdendasContrato] Error al guardar adendas para el motivo con secuencial {secuencialMotivo} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = " Error al guardar adendas para el motivo."
                 };
                 return Json(resp);
             }
@@ -6740,8 +7040,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN, GESTOR")]
         public ActionResult GuardarMotivoTrabajoInformacionAdicional(bool tieneCronograma, bool pagado, int secuencialFase, int estimacion, int estadoContrato, bool aceptaNormativos, string linkOpenKm, string fechaActa, string fechaProduccion, int diasGarantia, int secuencialMotivoTrabajo = 0, int colaborador = 0, int numeroVerificador = 0, string fechaEstimadaCierre = "")
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[GuardarMotivoTrabajoInformacionAdicional] El usuario {emailUser} está guardando información adicional para el motivo {secuencialMotivoTrabajo}");
                 string msg = "Se ha ingresado correctamente la nueva información";
 
                 MotivoTrabajoInformacionAdicional motivoDetalle = db.MotivoTrabajoInformacionAdicional.Find(secuencialMotivoTrabajo);
@@ -6856,6 +7158,11 @@ p in db.Persona on c.persona equals p
                 }
 
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Gestión de información adicional de motivo de trabajo",
+                    $"El usuario {emailUser} ha guardado o actualizado la información adicional del motivo {secuencialMotivoTrabajo}",
+                    emailUser
+                );
 
                 var resp = new
                 {
@@ -6866,10 +7173,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[GuardarMotivoTrabajoInformacionAdicional] Error al guardar información adicional para el motivo {secuencialMotivoTrabajo} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al guardar información adicional para el motivo de trabajo."
                 };
                 return Json(resp);
             }
@@ -6880,8 +7188,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN")]
         public ActionResult NuevoMotivoTrabajo(int tipo, string codigo, int cliente, string nombre, string descripcion, string fechaInicio, string fechaFin, int horasMes, string nombreTipoMotivoTrabajo, HttpPostedFileBase[] adjuntos = null, int estadoContrato = 0, int colaborador = 0, int tipoPlazo = 0, int diasPlazo = 0, int idMotivoTrabajo = 0, int numeroVerificador = 0)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[NuevoMotivoTrabajo] El usuario {emailUser} está gestionando el motivo de trabajo con código {codigo} para el cliente {cliente}");
                 string[] fechas = fechaInicio.Split(new Char[] { '/' });
                 int dia = Int32.Parse(fechas[0]);
                 int mes = Int32.Parse(fechas[1]);
@@ -7033,6 +7343,11 @@ p in db.Persona on c.persona equals p
 
                 db.SaveChanges();
 
+                LoggerManager.LogSensitiveOperation(
+                    "Gestión de motivo de trabajo",
+                    $"El usuario {emailUser} ha {(idMotivoTrabajo == 0 ? "creado" : "actualizado")} un motivo de trabajo con código {codigo}, cliente {cliente}, nombre {nombre}",
+                    emailUser
+                );
                 var resp = new
                 {
                     success = true,
@@ -7056,8 +7371,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN")]
         public ActionResult EliminarAdjuntoContrato(int idAdjunto)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[EliminarAdjuntoContrato] El usuario {emailUser} está intentando eliminar el adjunto con ID: {idAdjunto}");
                 string msg = "Operacion realizada correctamente";
                 bool success = true;
                 var contratoAdj = db.AdjuntoContrato.Find(idAdjunto);
@@ -7094,6 +7411,11 @@ p in db.Persona on c.persona equals p
                     msg = "No se encontró adjunto en la base de datos";
                     success = false;
                 }
+                LoggerManager.LogSensitiveOperation(
+                    "Gestión de Adjunto de Contrato",
+                    $"El usuario {emailUser} ha eliminado el adjunto de contrato con ID: {idAdjunto} (Archivo: {contratoAdj.Url})",
+                    emailUser
+                );
 
                 var resp = new
                 {
@@ -7105,10 +7427,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EliminarAdjuntoContrato] Error al intentar eliminar el adjunto con ID: {idAdjunto} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al intentar eliminar el adjunto."
                 };
                 return Json(resp);
             }
@@ -7118,8 +7441,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN")]
         public ActionResult NuevoEntregableMotivoTrabajo(int motivo, string nombre, string descripcion, string fechaInicio, string fechaFin, string fechaProduccionEntregable, int avance = 0, int colaboradorMotivoTrabajo = 0, int idEntregable = 0, int numeroVerificador = 0)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[NuevoEntregableMotivoTrabajo] El usuario {emailUser} está gestionando un entregable para el motivo de trabajo ID: {motivo}. Entregable ID: {idEntregable}, Nombre: {nombre}");
                 string[] fechas = fechaInicio.Split(new Char[] { '/' });
                 int dia = Int32.Parse(fechas[0]);
                 int mes = Int32.Parse(fechas[1]);
@@ -7201,6 +7526,12 @@ p in db.Persona on c.persona equals p
                     newEntregable.EstaActivo = 1;
                     newEntregable.NumeroVerificador = 1;
                     db.EntregableMotivoTrabajo.Add(newEntregable);
+                    LoggerManager.LogSensitiveOperation(
+                        "Gestión de Entregable de Motivo de Trabajo",
+                        $"El usuario {emailUser} ha creado un nuevo entregable '{nombre}' para el motivo de trabajo ID: {motivo}.",
+                        emailUser
+                    );
+
                 }
 
                 MotivoTrabajo motivoTrabajo = db.MotivoTrabajo.Find(motivo);
@@ -7258,10 +7589,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[NuevoEntregableMotivoTrabajo] Error al gestionar el entregable para el motivo de trabajo ID: {motivo}, nombre: '{nombre}' por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al gestionar el entregable para el motivo de trabajo."
                 };
                 return Json(resp);
             }
@@ -7274,9 +7606,11 @@ p in db.Persona on c.persona equals p
         {
             var s = new JavaScriptSerializer();
             var jsonEntregables = s.Deserialize<dynamic>(entregables);
+            string emailUser = User.Identity.Name;
 
             try
             {
+                LoggerManager.LogInfo($"[GuardarListaEntregables] El usuario {emailUser} está intentando guardar una lista de entregables para el motivo: {motivo}.");
                 var motivoTrabajo = db.MotivoTrabajo.Where(m => m.Codigo == motivo && m.EstaActivo == 1).FirstOrDefault();
                 if (motivoTrabajo != null && jsonEntregables != null)
                 {
@@ -7361,6 +7695,11 @@ p in db.Persona on c.persona equals p
                 {
                     throw new Exception("Debe seleccionar al menos 1 entregable para añadir");
                 }
+                LoggerManager.LogSensitiveOperation(
+                    "Guardar Lista de Entregables",
+                    $"El usuario {emailUser} ha agregado la lista de entregables al motivo de trabajo '{motivo}'.",
+                    emailUser
+                );
 
                 var resp = new
                 {
@@ -7371,10 +7710,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[GuardarListaEntregables] Error al intentar guardar la lista de entregables para el motivo '{motivo}' por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al intentar guardar la lista de entregables para el motivo de trabajo."
                 };
                 return Json(resp);
             }
@@ -7384,9 +7724,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN, REC, ACTAS, GESTOR")]
         public ActionResult ObtenerContrato(string numeroContrato)
         {
+            string emailUser = User.Identity.Name;
             try
             {
-
+                LoggerManager.LogInfo($"[ObtenerContrato] El usuario {emailUser} está intentando obtener datos para el contrato número: {numeroContrato}.");
                 var datosContrato = (from mt in db.MotivoTrabajo
                                      join c in db.Cliente on mt.SecuencialCliente equals c.Secuencial
                                      where mt.Codigo == numeroContrato && mt.EstaActivo == 1
@@ -7406,6 +7747,7 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[ObtenerContrato] Error al intentar obtener datos del contrato número '{numeroContrato}' por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
@@ -7413,16 +7755,16 @@ p in db.Persona on c.persona equals p
                 };
                 return Json(resp);
             }
-
-
         }
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, REC, ACTAS")]
         public ActionResult EliminarActa(int secuencialActa)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[EliminarActa] El usuario {emailUser} está intentando eliminar el acta con Secuencial: {secuencialActa}.");
                 Type typeAccesoDatos = db.GetType();
                 PropertyInfo propertyTabla = typeAccesoDatos.GetProperty("Acta");
                 MethodInfo methodPropertyTabla = propertyTabla.GetMethod;
@@ -7434,6 +7776,11 @@ p in db.Persona on c.persona equals p
                 MethodInfo metodoRemove = typePropertyTabla.GetMethod("Remove");
                 object newObj = metodoRemove.Invoke(dbSetTable, new object[1] { actaEliminar });
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Eliminación de Acta",
+                    $"El usuario {emailUser} ha eliminado el acta con Secuencial: {secuencialActa}.",
+                    emailUser
+                );
 
                 return Json(new
                 {
@@ -7443,22 +7790,23 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EliminarActa] Error al intentar eliminar el acta con Secuencial {secuencialActa} por el usuario {emailUser}: {e.Message}");
                 return Json(new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al intentar eliminar el acta."
                 });
             }
         }
-
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, REC, ACTAS")]
         public ActionResult DarCodigoActa(string numeroContrato)
         {
+            string emailUser = User.Identity.Name;
             try
             {
-
+                LoggerManager.LogInfo($"[DarCodigoActa] El usuario {emailUser} está solicitando el siguiente código de acta para el contrato número: {numeroContrato}.");
                 var ultimaActa = (from ac in db.Acta
                                   join mt in db.MotivoTrabajo on ac.SecuencialContrato equals mt.Secuencial
                                   where mt.Codigo == numeroContrato
@@ -7489,21 +7837,23 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarCodigoActa] Error al intentar generar el código de acta para el contrato '{numeroContrato}' por el usuario {emailUser}: {e.Message}");
                 return Json(new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al intentar generar el código de acta para el contrato '{numeroContrato}'."
                 });
             }
-
         }
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, REC, ACTAS")]
         public ActionResult GuardarActa(string datos)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[GuardarActa] El usuario {emailUser} está intentando guardar datos de acta. Datos recibidos: {datos}");
                 var s = new JavaScriptSerializer();
                 var jsonObj = s.Deserialize<dynamic>(datos);
 
@@ -7570,7 +7920,6 @@ p in db.Persona on c.persona equals p
                     newObj = metodoFind.Invoke(dbSetTable, pId);
                 }
 
-
                 typeNewObj.GetProperty("SecuencialCliente").SetValue(newObj, secuencialCliente);
                 typeNewObj.GetProperty("SecuencialColaborador").SetValue(newObj, secuencialColaborador);
                 typeNewObj.GetProperty("SecuencialContrato").SetValue(newObj, secuencialContrato);
@@ -7596,7 +7945,6 @@ p in db.Persona on c.persona equals p
 
                 if (id == 0)
                 {
-                    string emailUser = User.Identity.Name;
                     Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                     MotivoTrabajoSeguimiento motivoTrabajoSeguimiento = new MotivoTrabajoSeguimiento();
@@ -7611,8 +7959,12 @@ p in db.Persona on c.persona equals p
                     db.MotivoTrabajoSeguimiento.Add(motivoTrabajoSeguimiento);
                 }
 
-
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Actualización de Acta",
+                    $"El usuario {emailUser} ha actualizado el Acta con ID: {id}, Código: {codigoActa}, Tipo: {tipo}, Estado: {estado}.",
+                    emailUser
+                );
 
                 return Json(new
                 {
@@ -7622,10 +7974,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[GuardarActa] Error al intentar guardar el acta por el usuario {emailUser}: {e.Message}. Datos del acta: {datos}");
                 return Json(new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al intentar guardar el acta."
                 });
             }
         }
@@ -7634,9 +7987,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN, REC, ACTAS")]
         public ActionResult ObtenerDatosActa(int secuencialActa)
         {
-
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[ObtenerDatosActa] El usuario {emailUser} está intentando obtener datos para el acta con Secuencial: {secuencialActa}.");
                 var datosActa = (from ac in db.Acta
                                  join mt in db.MotivoTrabajo on ac.SecuencialContrato equals mt.Secuencial
                                  join cl in db.Cliente on ac.SecuencialCliente equals cl.Secuencial
@@ -7676,6 +8030,7 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[ObtenerDatosActa] Error al intentar obtener datos del acta con Secuencial {secuencialActa} por el usuario {emailUser}: {e.Message}");
                 return Json(new
                 {
                     success = false,
@@ -7688,8 +8043,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN, REC, ACTAS")]
         public ActionResult ComprobarContrato(string codigoContrato)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[ComprobarContrato] El usuario {emailUser} está comprobando el tipo de contrato para el código: {codigoContrato}.");
                 string tipoMotivoTrabajo = db.MotivoTrabajo.Where(c => c.Codigo == codigoContrato && c.EstaActivo == 1).FirstOrDefault().tipoMotivoTrabajo.Codigo;
 
                 bool esProyecto = false;
@@ -7704,11 +8061,13 @@ p in db.Persona on c.persona equals p
                     esProyecto = esProyecto
                 });
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[ComprobarContrato] Error al comprobar el contrato '{codigoContrato}' para el usuario {emailUser}: {e.Message}");
                 return Json(new
                 {
-                    success = false
+                    success = false,
+                    msg = "Error al comprobar el contrato '{codigoContrato}'."
                 });
             }
         }
@@ -7730,10 +8089,12 @@ p in db.Persona on c.persona equals p
             string filtroEstado = jsonObj["estado"];
             string filtroDiasRestantes = jsonObj["diasRestantes"].ToString();
             string filtroResponsable = jsonObj["responsable"].ToString();
+            string emailUser = User.Identity.Name;
 
             try
             {
-                var contratos = (from mt in db.MotivoTrabajo
+                LoggerManager.LogInfo($"[CargarMotivosTrabajo] El usuario {emailUser} está solicitando la carga de motivos de trabajo con filtros: {filtro}, Todos: {todos}, TipoMotivoTrabajo: '{tipoMotivoTrabajo}'. Order: {order}, Asc: {asc}, Start: {start}, Length: {lenght}.");
+                var contratosList = (from mt in db.MotivoTrabajo
                                  join tt in db.TipoMotivoTrabajo on mt.SecuencialTipoMotivoTrabajo equals tt.Secuencial
                                  join cl in db.Cliente on mt.SecuencialCliente equals cl.Secuencial
                                  where mt.EstaActivo == 1
@@ -7778,25 +8139,46 @@ p in db.Persona on c.persona equals p
                                      semaforoActa = db.Acta.Where(a => a.EstaActivo == 1 && a.SecuencialContrato == mt.Secuencial && a.EstadoActa.Descripcion != "TERMINADA" && a.TipoActa.Descripcion == "ENTREGA-RECEPCION").Count() == 0 ? "WHITE" : db.Acta.Where(a => a.EstaActivo == 1 && a.SecuencialContrato == mt.Secuencial && a.EstadoActa.Descripcion != "TERMINADA" && a.TipoActa.Descripcion == "ENTREGA-RECEPCION").Count() > 1 ? "NARANJA" : "VERDE"
                                  }).ToList();
 
-                var contratosList = (from c in contratos
-                                     select new
-                                     {
-                                         secuencial = c.secuencial,
-                                         codigo = c.codigo,
-                                         cliente = c.cliente,
-                                         descripcion = c.descripcion,
-                                         fechaInicio = c.fechaInicio,
-                                         fechaVencimiento = c.fechaVencimiento,
-                                         estado = c.estado,
-                                         diasRestantes = c.diasRestantes,
-                                         formaPago = c.formaPago,
-                                         responsable = c.responsable,
-                                         tipoMotivoTrabajo = c.tipoMotivoTrabajo,
-                                         fechaFacturacionActa = c.fechaFacturacionActa,
-                                         diasFacturacionActa = c.diasFacturacionActa,
-                                         avance = c.avance,
-                                         semaforoActa = (c.semaforoActa != "WHITE" && c.semaforoActa != "NARANJA" && c.fechaFacturacionActa != (DateTime?)null) ? c.fechaFacturacionActa.AddDays(c.diasFacturacionActa) > fechaActual ? "VERDE" : c.fechaFacturacionActa.AddDays(c.diasFacturacionActa + 2) >= fechaActual ? "AMARILLO" : "ROJO" : c.semaforoActa
-                                     }).ToList();
+    //            var contratosList = contratos
+    //.Select(c =>
+    //{
+    //    int dr = 0;
+
+    //    if (c.diasRestantes > 0)
+    //    {
+    //        dr = ObtenerDiasLaborables(DateTime.Now, c.fechaVencimiento);
+    //    }
+    //    else if (c.diasRestantes < 0)
+    //    {
+    //        dr = 0 - ObtenerDiasLaborables(c.fechaInicio, DateTime.Now);
+    //    }
+
+    //    return new
+    //    {
+    //        secuencial = c.secuencial,
+    //        codigo = c.codigo,
+    //        cliente = c.cliente,
+    //        descripcion = c.descripcion,
+    //        fechaInicio = c.fechaInicio,
+    //        fechaVencimiento = c.fechaVencimiento,
+    //        estado = c.estado,
+    //        diasRestantes = dr,
+    //        formaPago = c.formaPago,
+    //        responsable = c.responsable,
+    //        tipoMotivoTrabajo = c.tipoMotivoTrabajo,
+    //        fechaFacturacionActa = c.fechaFacturacionActa,
+    //        diasFacturacionActa = c.diasFacturacionActa,
+    //        avance = c.avance,
+    //        semaforoActa = (c.semaforoActa != "WHITE" && c.semaforoActa != "NARANJA" && c.fechaFacturacionActa != (DateTime?)null)
+    //            ? (c.fechaFacturacionActa.AddDays(c.diasFacturacionActa) > fechaActual
+    //                ? "VERDE"
+    //                : c.fechaFacturacionActa.AddDays(c.diasFacturacionActa + 2) >= fechaActual
+    //                    ? "AMARILLO"
+    //                    : "ROJO")
+    //            : c.semaforoActa
+    //    };
+    //}).ToList();
+
 
                 if (todos == false)
                 {
@@ -8035,9 +8417,10 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[CargarMotivosTrabajo] Error al cargar motivos de trabajo por el usuario {emailUser}: {e.Message}");
                 return Json(new
                 {
-                    msg = e.Message,
+                    msg = "Error al cargar motivos de trabajo.",
                     success = false
                 });
             }
@@ -8058,9 +8441,10 @@ p in db.Persona on c.persona equals p
             string filtroFechaProduccion = jsonObj["fechaProduccion"];
             string filtroFechaVencimiento = jsonObj["fechaVencimiento"];
             string filtroDiasRestantes = jsonObj["diasRestantes"].ToString();
-
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[CargarGarantiasTrabajo] El usuario {emailUser} está solicitando la carga de garantías de trabajo con filtros: {filtro}, Todos: {todos}, TipoMotivoTrabajo: '{tipoMotivoTrabajo}'. Order: {order}, Asc: {asc}, Start: {start}, Length: {lenght}.");
                 var garantiasTemporal = (from mt in db.MotivoTrabajo
                                          join tt in db.TipoMotivoTrabajo on mt.SecuencialTipoMotivoTrabajo equals tt.Secuencial
                                          join cl in db.Cliente on mt.SecuencialCliente equals cl.Secuencial
@@ -8329,9 +8713,10 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[CargarGarantiasTrabajo] Error al cargar garantías: {e.Message}");
                 return Json(new
                 {
-                    msg = e.Message,
+                    msg = "Error al cargar garantías.",
                     success = false
                 });
             }
@@ -8341,8 +8726,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN, REC, GESTOR")]
         public ActionResult CargarSeguimientosTrabajo(int start, int lenght, string codigoContrato, string datosNuevos, string datosEliminar, string datosEditar)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[CargarSeguimientosTrabajo] El usuario {emailUser} inició la carga de seguimientos para el contrato {codigoContrato}");
                 var serNuevo = new JavaScriptSerializer();
                 var serEliminar = new JavaScriptSerializer();
                 var serEditar = new JavaScriptSerializer();
@@ -8443,9 +8830,10 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[CargarSeguimientosTrabajo] Error al cargar seguimientos para el contrato {codigoContrato} por el usuario {emailUser}: {e.Message}");
                 return Json(new
                 {
-                    msg = e.Message,
+                    msg = "Error al cargar seguimientos.",
                     success = false
                 });
             }
@@ -8468,9 +8856,11 @@ p in db.Persona on c.persona equals p
             string filtroEstado = jsonObj["estado"];
             string filtroNumeroContrato = jsonObj["numeroContrato"];
             string filtroContrato = jsonObj["contrato"];
+            string emailUser = User.Identity.Name;
 
             try
             {
+                LoggerManager.LogInfo($"[DarActas] El usuario {emailUser} está consultando actas con filtros aplicados.");
                 var actas = (from ac in db.Acta
                              join mt in db.MotivoTrabajo on ac.SecuencialContrato equals mt.Secuencial
                              join tt in db.TipoMotivoTrabajo on mt.SecuencialTipoMotivoTrabajo equals tt.Secuencial
@@ -8720,9 +9110,10 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarActas] Error al consultar actas por el usuario {emailUser}: {e.Message}");
                 return Json(new
                 {
-                    msg = e.Message,
+                    msg = "Error al consultar actas.",
                     success = false
                 });
             }
@@ -8768,8 +9159,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN, REC")]
         public ActionResult DarDatosMotivoTrabajo(int idMotivoTrabajo)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[DarDatosMotivoTrabajo] El usuario {emailUser} está consultando los datos del motivo de trabajo con ID {idMotivoTrabajo}.");
                 MotivoTrabajo motivo = db.MotivoTrabajo.Find(idMotivoTrabajo);
                 if (motivo == null)
                 {
@@ -8812,10 +9205,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarDatosMotivoTrabajo] Error al consultar motivo de trabajo con ID {idMotivoTrabajo} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    resp = e.Message
+                    resp = "Error al consultar motivo de trabajo."
                 };
                 return Json(resp);
             }
@@ -8825,6 +9219,7 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN, REC, GESTOR")]
         public ActionResult DarDetallesGarantia(string codigoContrato)
         {
+            string emailUser = User.Identity.Name;
             try
             {
                 var detallesContrato = (from mt in db.MotivoTrabajo
@@ -8882,10 +9277,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN, REC, GESTOR")]
         public ActionResult DarDetallesMotivoTrabajo(string codigoContrato)
         {
+            string emailUser = User.Identity.Name;
             try
             {
-                string emailUser = User.Identity.Name;
-
+                LoggerManager.LogInfo($"[DarDetallesGarantia] El usuario {emailUser} está consultando los detalles de garantía para el contrato {codigoContrato}.");
                 var detallesContrato = (from mt in db.MotivoTrabajo
                                         where mt.Codigo.ToUpper() == codigoContrato.ToUpper() && mt.EstaActivo == 1
                                         select new
@@ -8962,6 +9357,52 @@ p in db.Persona on c.persona equals p
                                                         select adjt.Url).ToList()
                                         }).First();
 
+               
+
+                var detallesContratoConDias = new Object();
+                if (detallesContrato.diasRestantes > 0)
+                {
+                    int diasRestantes = ObtenerDiasLaborables(DateTime.Now, detallesContrato.fechaFin);
+                    detallesContratoConDias = new
+                    {
+                        detallesContrato.secuencial,
+                        detallesContrato.codigo,
+                        detallesContrato.cliente,
+                        detallesContrato.idCliente,
+                        detallesContrato.descripcion,
+                        detallesContrato.avance,
+                        detallesContrato.entregables,
+                        detallesContrato.tipo,
+                        detallesContrato.estado,
+                        detallesContrato.estadoId,
+                        detallesContrato.fechaInicio,
+                        detallesContrato.fechaFin,
+                        detallesContrato.fechaInicioPlanificacion,
+                        detallesContrato.fechaFinPlanificacion,
+                        detallesContrato.nombre,
+                        detallesContrato.adendas,
+                        detallesContrato.fase,
+                        detallesContrato.estimacion,
+                        detallesContrato.isRossi,
+                        detallesContrato.cronograma,
+                        detallesContrato.pagado,
+                        detallesContrato.numeroVerificador,
+                        detallesContrato.fechaActa,
+                        detallesContrato.fechaProduccion,
+                        detallesContrato.fechaEstimadaCierre,
+                        detallesContrato.diasGarantia,
+                        diasRestantes,
+                        detallesContrato.formaPago,
+                        detallesContrato.linkOpenKm,
+                        detallesContrato.colaborador,
+                        detallesContrato.plazo,
+                        detallesContrato.tipoPlazo,
+                        detallesContrato.horasMes,
+                        detallesContrato.aceptaNormativos,
+                        detallesContrato.adjuntos
+                    };
+                }
+
                 var adendas = (from a in detallesContrato.adendas
                                select new
                                {
@@ -8981,7 +9422,7 @@ p in db.Persona on c.persona equals p
                 {
                     success = true,
                     adendas = adendas,
-                    datos = detallesContrato,
+                    datos = detallesContratoConDias,
                     fechaProduccion = detallesContrato.fechaProduccion.ToString("dd/MM/yyyy"),
                     fechaActa = detallesContrato.fechaActa.ToString("dd/MM/yyyy"),
                     fechaEstimadaCierre = detallesContrato.fechaEstimadaCierre?.ToString("dd/MM/yyyy") ?? "01/01/0001"
@@ -8990,10 +9431,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarDetallesGarantia] Error al consultar los detalles de garantía para el contrato {codigoContrato} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    resp = e.Message
+                    resp = "Error al consultar los detalles de garantía."
                 };
                 return Json(resp);
             }
@@ -9001,10 +9443,42 @@ p in db.Persona on c.persona equals p
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, REC")]
+        public int ObtenerDiasLaborables(DateTime desde, DateTime hasta)
+        {
+            int diasLaborables = 0;
+            DateTime actual = desde.Date;
+
+            // Obtener los feriados entre hoy y la fecha de fin
+            var diasFeriados = db.Feriados
+                .Where(f => f.Fecha >= DateTime.Today && f.Fecha <= hasta)
+                .Select(f => f.Fecha)
+                .ToList();
+
+            // Filtrar solo los feriados que caen en días no laborables (sábado o domingo, por ejemplo)
+            var feriadosLaborables = diasFeriados
+                .Where(f => f.DayOfWeek != DayOfWeek.Saturday || f.DayOfWeek != DayOfWeek.Sunday)
+                .ToList().Count();
+
+            while (actual <= hasta.Date)
+            {
+                if (actual.DayOfWeek != DayOfWeek.Saturday && actual.DayOfWeek != DayOfWeek.Sunday)
+                {
+                    diasLaborables++;
+                }
+                actual = actual.AddDays(1);
+            }
+
+            return diasLaborables - feriadosLaborables;
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMIN, REC")]
         public ActionResult DarDatosEntregableTrabajo(int idEntregableTrabajo)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[DarDatosEntregableTrabajo] El usuario {emailUser} está consultando los datos del entregable con ID {idEntregableTrabajo}.");
                 EntregableMotivoTrabajo entregable = db.EntregableMotivoTrabajo.Find(idEntregableTrabajo);
                 if (entregable == null)
                 {
@@ -9036,10 +9510,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarDatosEntregableTrabajo] Error al consultar entregable con ID {idEntregableTrabajo} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    resp = e.Message
+                    resp = "Error al consultar datos de entregable."
                 };
                 return Json(resp);
             }
@@ -9049,8 +9524,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN")]
         public ActionResult EliminarMotivoTrabajo(int idMotivoTrabajo)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[EliminarMotivoTrabajo] El usuario {emailUser} está intentando eliminar el motivo de trabajo con ID {idMotivoTrabajo}.");
                 MotivoTrabajo motivo = db.MotivoTrabajo.Find(idMotivoTrabajo);
                 if (motivo == null)
                 {
@@ -9059,6 +9536,11 @@ p in db.Persona on c.persona equals p
 
                 motivo.EstaActivo = 0;
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Eliminación de motivo de trabajo",
+                    $"El usuario {emailUser} eliminó el motivo de trabajo con ID {idMotivoTrabajo}",
+                    emailUser
+                );
 
                 var resp = new
                 {
@@ -9068,10 +9550,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EliminarMotivoTrabajo] Error al eliminar motivo de trabajo con ID {idMotivoTrabajo} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = true,
-                    resp = e.Message
+                    resp = "Error al eliminar motivo de trabajo."
                 };
                 return Json(resp);
             }
@@ -9081,8 +9564,11 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN")]
         public ActionResult EliminarEntregableTrabajo(int idEntregableTrabajo)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[EliminarEntregableTrabajo] El usuario {emailUser} está intentando eliminar el entregable con ID {idEntregableTrabajo}.");
+
                 EntregableMotivoTrabajo entregable = db.EntregableMotivoTrabajo.Find(idEntregableTrabajo);
                 if (entregable == null)
                 {
@@ -9150,6 +9636,11 @@ p in db.Persona on c.persona equals p
                     BackgroundJob.Enqueue(() => Devops.QuitarAccesoDevops(motivoTrabajo.Codigo));
                 }
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Eliminación de entregable de trabajo",
+                    $"El usuario {emailUser} eliminó el entregable con ID {idEntregableTrabajo} asociado al motivo de trabajo ID {motivoTrabajo.Secuencial}",
+                    emailUser
+                );
 
                 var resp = new
                 {
@@ -9159,10 +9650,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EliminarEntregableTrabajo] Error al eliminar entregable con ID {idEntregableTrabajo} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = true,
-                    resp = e.Message
+                    resp = "Error al eliminar entregable."
                 };
                 return Json(resp);
             }
@@ -9172,8 +9664,11 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN, GESTOR")]
         public ActionResult EditarPorcentajeEntregable(int idEntregableTrabajo, int porcentaje, int colaboradorID = 0, int? diasGarantia = 0, string codigoContrato = "")
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[EditarPorcentajeEntregable] El usuario {emailUser} está editando el porcentaje del entregable ID {idEntregableTrabajo} a {porcentaje}%.");
+
                 EntregableMotivoTrabajo entregable = db.EntregableMotivoTrabajo.Find(idEntregableTrabajo);
                 if (entregable == null)
                 {
@@ -9265,6 +9760,12 @@ p in db.Persona on c.persona equals p
                                    }).ToList();
 
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Edición porcentaje entregable",
+                    $"El usuario {emailUser} modificó el porcentaje del entregable ID {idEntregableTrabajo} a {porcentaje}%, colaboradorID {colaboradorID}, días garantía {diasGarantia}",
+                    emailUser
+                );
+
 
                 var resp = new
                 {
@@ -9280,10 +9781,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EditarPorcentajeEntregable] Error al editar porcentaje del entregable ID {idEntregableTrabajo}: {e.Message}");
                 var resp = new
                 {
                     success = true,
-                    resp = e.Message
+                    resp = "Error al editar porcentaje del entregable."
                 };
                 return Json(resp);
             }
@@ -9293,8 +9795,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN")]
         public ActionResult DarDatosNewTaskConsolidacion(int idEntregable, int semanaRelativa)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[DarDatosNewTaskConsolidacion] El usuario {emailUser} solicita datos de tarea nueva para entregable ID {idEntregable} y semana relativa {semanaRelativa}.");
                 DateTime hoy = DateTime.Today;
                 DateTime lunes = hoy;
                 int diaSemana = (int)hoy.DayOfWeek;
@@ -9333,10 +9837,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarDatosNewTaskConsolidacion] Error al obtener datos de tarea para entregable ID {idEntregable} y semana relativa {semanaRelativa}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener datos de tarea."
                 };
                 return Json(resp);
             }
@@ -9346,8 +9851,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN")]
         public ActionResult NuevaTareaConsolidacion(int idColaborador, string fechaLunes, int idLugar, int idActividad, int idModulo, string detalle, int idEntregable, string horasDias, int coordinador = 0)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[NuevaTareaConsolidacion] Usuario {emailUser} crea nueva tarea para colaborador {idColaborador}, entregable {idEntregable}, fecha inicio semana {fechaLunes}.");
                 string[] fechas = fechaLunes.Split(new Char[] { '/' });
                 int dia = Int32.Parse(fechas[0]);
                 int mes = Int32.Parse(fechas[1]);
@@ -9358,7 +9865,6 @@ p in db.Persona on c.persona equals p
                 List<DiaColaborador> listaDiaColaborador = new List<DiaColaborador>();
                 List<DiaColaborador> listaCambiosTareas = new List<DiaColaborador>();
 
-                string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 EntregableMotivoTrabajo entregable = db.EntregableMotivoTrabajo.Find(idEntregable);
@@ -9482,6 +9988,11 @@ p in db.Persona on c.persona equals p
                 }
 
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Nueva tarea consolidación",
+                    $"Usuario {emailUser} creó tareas para colaborador {idColaborador} en entregable {idEntregable} con detalle '{detalle}' para la semana que inicia {fechaLunes}.",
+                    emailUser
+                );
 
                 //Actualizando las fechas de los dias que existieron los cambios y en las fechas
                 foreach (DiaColaborador diaColab in listaDiaColaborador)
@@ -9500,10 +10011,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[NuevaTareaConsolidacion] Error al crear nueva tarea: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al crear nueva tarea."
                 };
                 return Json(resp);
             }
@@ -9513,8 +10025,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN")]
         public ActionResult DarProximosEntregables(int pagina = 1, int length = 10, string desde = "", string hasta = "", int cliente = 0)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[DarProximosEntregables] Usuario {emailUser} solicita entregables próximos página {pagina}, tamaño {length}, desde '{desde}', hasta '{hasta}', cliente {cliente}.");
                 int start = (pagina - 1) * length;
 
                 DateTime fechaDesde = new DateTime(1, 1, 1);
@@ -9574,10 +10088,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarProximosEntregables] Error al obtener entregables próximos: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener entregables próximos."
                 };
                 return Json(resp);
             }
@@ -9587,8 +10102,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN")]
         public ActionResult DarAsignacionesSemanaEntregable(int idColaborador, int posSemana, int idEntregable)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[DarAsignacionesSemanaEntregable] Usuario {emailUser} solicita asignaciones para colaborador {idColaborador}, semana {posSemana}, entregable {idEntregable}.");
                 DateTime hoy = DateTime.Today;
                 DateTime lunes = hoy;
                 int diaSemana = (int)hoy.DayOfWeek;
@@ -9679,10 +10196,11 @@ p in db.Persona on c.persona equals p
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarAsignacionesSemanaEntregable] Error al obtener asignaciones: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener asignaciones."
                 };
                 return Json(resp);
             }
@@ -9693,8 +10211,10 @@ p in db.Persona on c.persona equals p
         [Authorize(Roles = "ADMIN")]
         public ActionResult VerDisponibilidadRecursos(int varSemanas = 0, string filtro = "")
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[VerDisponibilidadRecursos] Usuario {emailUser} solicita disponibilidad recursos, desplazamiento semanas: {varSemanas}, filtro: '{filtro}'.");
                 int cantSemanas = 14;
                 DateTime hoy = DateTime.Now.Date;
                 DateTime lunes = hoy;
@@ -9911,10 +10431,11 @@ vac in db.Vacaciones on colab.Secuencial equals vac.SecuencialColaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[VerDisponibilidadRecursos] Error al obtener disponibilidad: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener disponibilidad recursos."
                 };
                 return Json(resp);
             }
@@ -9925,9 +10446,10 @@ vac in db.Vacaciones on colab.Secuencial equals vac.SecuencialColaborador
         [Authorize(Roles = "ADMIN")]
         public ActionResult InsertarIncidenciaColaborador(int idColaborador, string fecha, int cliente, int tipoError, int implicacion, string hecho, string justificacion, int idIncidencia = 0, int verificador = 0)
         {
+            string emailUser = User.Identity.Name;
             try
             {
-                string emailUser = User.Identity.Name;
+                LoggerManager.LogInfo($"[InsertarIncidenciaColaborador] El usuario {emailUser} está insertando/modificando la incidencia para el colaborador {idColaborador} en la fecha {fecha}");
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
 
                 if (idIncidencia != 0)
@@ -9974,6 +10496,12 @@ vac in db.Vacaciones on colab.Secuencial equals vac.SecuencialColaborador
                 }
 
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Creación de incidencia",
+                    $"El usuario {emailUser} ha creado una nueva incidencia para el colaborador {idColaborador} en la fecha {fecha}",
+                    emailUser
+                );
+
                 var resp = new
                 {
                     success = true
@@ -9982,10 +10510,11 @@ vac in db.Vacaciones on colab.Secuencial equals vac.SecuencialColaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[InsertarIncidenciaColaborador] Error al insertar/modificar incidencia para el colaborador {idColaborador} en la fecha {fecha} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al insertar/modificar incidencia para el colaborador."
                 };
                 return Json(resp);
             }
@@ -9995,8 +10524,10 @@ vac in db.Vacaciones on colab.Secuencial equals vac.SecuencialColaborador
         [Authorize(Roles = "ADMIN")]
         public ActionResult DarIncidenciasColaborador(int idColaborador, string fecha)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[DarIncidenciasColaborador] El usuario {emailUser} está consultando las incidencias del colaborador {idColaborador} para la fecha {fecha}");
                 DateTime fechaI = Utiles.strToDateTime(fecha);
                 var incidencias = (
                                     from inc in db.ColaboradorIncidencia
@@ -10025,10 +10556,11 @@ vac in db.Vacaciones on colab.Secuencial equals vac.SecuencialColaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarIncidenciasColaborador] Error al obtener incidencias para el colaborador {idColaborador} en la fecha {fecha} por el usuario {emailUser}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al obtener incidencias para el colaborador."
                 };
                 return Json(resp);
             }
@@ -10038,8 +10570,10 @@ vac in db.Vacaciones on colab.Secuencial equals vac.SecuencialColaborador
         [Authorize(Roles = "ADMIN")]
         public ActionResult EliminarIncidencia(int idIncidencia)
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[EliminarIncidencia] El usuario está eliminando la incidencia con ID {idIncidencia}");
                 ColaboradorIncidencia incidencia = db.ColaboradorIncidencia.Find(idIncidencia);
                 if (incidencia == null)
                 {
@@ -10047,6 +10581,12 @@ vac in db.Vacaciones on colab.Secuencial equals vac.SecuencialColaborador
                 }
                 incidencia.EstaActiva = 0;
                 db.SaveChanges();
+                LoggerManager.LogSensitiveOperation(
+                    "Eliminación de incidencia",
+                    $"Se eliminó la incidencia con ID {idIncidencia}",
+                    User.Identity.Name
+                );
+
                 var resp = new
                 {
                     success = true
@@ -10055,10 +10595,11 @@ vac in db.Vacaciones on colab.Secuencial equals vac.SecuencialColaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[EliminarIncidencia] Error al eliminar la incidencia con ID {idIncidencia}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al eliminar la incidencia."
                 };
                 return Json(resp);
             }
@@ -10068,8 +10609,11 @@ vac in db.Vacaciones on colab.Secuencial equals vac.SecuencialColaborador
         [Authorize(Roles = "ADMIN")]
         public ActionResult VerIncidenciasRecursos(int varSemanas = 0, string filtro = "")
         {
+            string emailUser = User.Identity.Name;
             try
             {
+                LoggerManager.LogInfo($"[VerIncidenciasRecursos] El usuario {emailUser} está consultando incidencias con filtro '{filtro}' y varSemanas = {varSemanas}");
+
                 //variables para los puntos
                 int totalPuntos = 30;
                 DateTime date11 = DateTime.Parse("01/01/" + DateTime.Now.Year.ToString());
@@ -10252,10 +10796,11 @@ vac in db.Vacaciones on colab.Secuencial equals vac.SecuencialColaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[VerIncidenciasRecursos] Error al consultar incidencias con filtro '{filtro}': {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al consultar incidencias."
                 };
                 return Json(resp);
             }
@@ -10267,6 +10812,7 @@ vac in db.Vacaciones on colab.Secuencial equals vac.SecuencialColaborador
         {
             try
             {
+                LoggerManager.LogInfo($"[DarIncidenciasDeDiaColaboradorPorIdIncidencia] Se está consultando la incidencia con ID {idIncidencia}");
                 ColaboradorIncidencia incidencia = db.ColaboradorIncidencia.Find(idIncidencia);
                 if (incidencia == null)
                 {
@@ -10305,10 +10851,11 @@ vac in db.Vacaciones on colab.Secuencial equals vac.SecuencialColaborador
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"[DarIncidenciasDeDiaColaboradorPorIdIncidencia] Error al consultar la incidencia con ID {idIncidencia}: {e.Message}");
                 var resp = new
                 {
                     success = false,
-                    msg = e.Message
+                    msg = "Error al consultar incidencias."
                 };
                 return Json(resp);
             }

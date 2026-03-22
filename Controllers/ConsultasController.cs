@@ -26,6 +26,7 @@ namespace SifizPlanning.Controllers
         // GET: Consultas
         public ActionResult Index()
         {
+            LoggerManager.LogInfo("Index method called in ConsultasController");
             return View();
         }
 
@@ -324,7 +325,7 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
         public ActionResult DarModulosClientes(int start, int lenght, string filtro = "", int order = 0, int asc = 1)
         {
-
+            LoggerManager.LogInfo($"DarModulosClientes called with start={start}, lenght={lenght}, filtro={filtro}, order={order}, asc={asc}");
             var s = new JavaScriptSerializer();
             var jsonObj = s.Deserialize<dynamic>(filtro);
 
@@ -335,7 +336,6 @@ namespace SifizPlanning.Controllers
 
             try
             {
-
                 var datos = (from pmc in db.ProyectoModuloCliente
                              join mo in db.Modulo on pmc.SecuencialModulo equals mo.Secuencial
                              join es in db.EstadoEntregable on pmc.SecuencialEstadoEntregable equals es.Secuencial
@@ -344,14 +344,12 @@ namespace SifizPlanning.Controllers
                              where pmc.EstaActivo == 1 && mo.EstaActivo == 1 && cl.EstaActivo == 1 && es.EstaActivo == 1
                              select new
                              {
-
                                  secuencial = pmc.Secuencial,
                                  cliente = cl.Descripcion,
                                  modulo = mo.Descripcion,
                                  ordenModulo = mo.Ordenar,
                                  estado = es.Descripcion,
                                  subMod = pmc.subModulo != null ? pmc.subModulo.Descripcion : "No Asignado"
-
                              }).ToList();
 
                 //Se aplican los filtros
@@ -381,14 +379,12 @@ namespace SifizPlanning.Controllers
                              select d).ToList();
                 }
 
-
                 //Se ordena
                 if (order > 0)
                 {
                     switch (order)
                     {
                         case 1:
-
                             if (asc == 1)
                             {
                                 datos = (from d in datos
@@ -401,11 +397,9 @@ namespace SifizPlanning.Controllers
                                          orderby d.cliente descending
                                          select d).ToList();
                             }
-
                             break;
 
                         case 2:
-
                             if (asc == 1)
                             {
                                 datos = (from d in datos
@@ -418,11 +412,9 @@ namespace SifizPlanning.Controllers
                                          orderby int.Parse(d.ordenModulo) descending
                                          select d).ToList();
                             }
-
                             break;
 
                         case 3:
-
                             if (asc == 1)
                             {
                                 datos = (from d in datos
@@ -435,11 +427,9 @@ namespace SifizPlanning.Controllers
                                          orderby d.subMod descending
                                          select d).ToList();
                             }
-
                             break;
 
                         case 4:
-
                             if (asc == 1)
                             {
                                 datos = (from d in datos
@@ -452,15 +442,15 @@ namespace SifizPlanning.Controllers
                                          orderby d.estado descending
                                          select d).ToList();
                             }
-
                             break;
-
                     }
                 }
 
                 var cantidad = datos.Count;
 
                 datos = datos.Skip(start).Take(lenght).ToList();
+
+                LoggerManager.LogInfo($"DarModulosClientes returning {datos.Count} records out of {cantidad}");
 
                 return Json(new
                 {
@@ -471,22 +461,22 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"Error in DarModulosClientes: {e.Message}");
                 return Json(new
                 {
                     success = false,
                     msg = e.Message
                 });
             }
-
         }
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, CLIENTE")]
         public ActionResult DarDatosModuloCliente(int secuencialModuloCliente)
         {
+            LoggerManager.LogInfo($"DarDatosModuloCliente called with secuencialModuloCliente={secuencialModuloCliente}");
             try
             {
-
                 var moduloCliente = (from pmc in db.ProyectoModuloCliente
                                      join mo in db.Modulo on pmc.SecuencialModulo equals mo.Secuencial
                                      join es in db.EstadoEntregable on pmc.SecuencialEstadoEntregable equals es.Secuencial
@@ -494,7 +484,6 @@ namespace SifizPlanning.Controllers
                                      where pmc.Secuencial == secuencialModuloCliente
                                      select new
                                      {
-
                                          secuencial = secuencialModuloCliente,
                                          secuencialModulo = mo.Secuencial,
                                          secuencialCliente = cl.Secuencial,
@@ -502,7 +491,6 @@ namespace SifizPlanning.Controllers
                                          modulo = mo.Descripcion,
                                          estado = es.Descripcion,
                                          subModulo = pmc.SecuencialSubModulo
-
                                      }).ToList();
 
                 int secuencialCliente = moduloCliente[0].secuencialCliente;
@@ -524,6 +512,8 @@ namespace SifizPlanning.Controllers
                                 nombre = fun.Descripcion
                             }).ToList();
 
+                LoggerManager.LogInfo($"DarDatosModuloCliente returning data for secuencialModuloCliente={secuencialModuloCliente}");
+
                 return Json(new
                 {
                     success = true,
@@ -534,6 +524,7 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"Error in DarDatosModuloCliente: {e.Message}");
                 return Json(new
                 {
                     success = false,
@@ -546,15 +537,16 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
         public ActionResult DarEstadosModuloCliente()
         {
-
-            var datos = (from es in db.EstadoEntregable
-                         select new
-                         {
-                             nombre = es.Descripcion
-                         }).ToList();
-
+            LoggerManager.LogInfo("DarEstadosModuloCliente called");
             try
             {
+                var datos = (from es in db.EstadoEntregable
+                             select new
+                             {
+                                 nombre = es.Descripcion
+                             }).ToList();
+
+                LoggerManager.LogInfo($"DarEstadosModuloCliente returning {datos.Count} records");
                 return Json(new
                 {
                     estados = datos,
@@ -563,6 +555,7 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"Error in DarEstadosModuloCliente: {e.Message}");
                 return Json(new
                 {
                     success = false,
@@ -576,9 +569,9 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, CLIENTE")]
         public ActionResult DarFuncionalidadesExtra(string[] funcionalidades, string modulo)
         {
+            LoggerManager.LogInfo($"DarFuncionalidadesExtra called with modulo={modulo} and funcionalidades count={(funcionalidades != null ? funcionalidades.Length : 0)}");
             try
             {
-
                 var secuencialModulo = (from mo in db.Modulo
                                         where mo.Descripcion == modulo
                                         select mo.Secuencial).ToList()[0];
@@ -612,6 +605,8 @@ namespace SifizPlanning.Controllers
                     }
                 }
 
+                LoggerManager.LogInfo($"DarFuncionalidadesExtra returning {funcionalidadesCompletas.Count} funcionalidades");
+
                 return Json(new
                 {
                     success = true,
@@ -620,6 +615,7 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"Error in DarFuncionalidadesExtra: {e.Message}");
                 return Json(new
                 {
                     success = false,
@@ -632,6 +628,7 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN")]
         public ActionResult GuardarDatos(int secuencialModuloCliente, string estado, string funcionalidades, int subModulo)
         {
+            LoggerManager.LogInfo($"GuardarDatos called with secuencialModuloCliente={secuencialModuloCliente}, estado={estado}, funcionalidades count={(funcionalidades != null ? funcionalidades.Split(',').Length : 0)}, subModulo={subModulo}");
             try
             {
                 var secuencialEstado = (from es in db.EstadoEntregable
@@ -734,295 +731,311 @@ namespace SifizPlanning.Controllers
         [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
         public ActionResult CargarGarantiaTickets(int start = 0, int lenght = 10, string filtro = "", int order = 0, int asc = 1, bool todos = false)
         {
-            var s = new JavaScriptSerializer();
-            var jsonObj = s.Deserialize<dynamic>(filtro);
+            LoggerManager.LogInfo($"CargarGarantiaTickets called with start={start}, lenght={lenght}, filtro={filtro}, order={order}, asc={asc}, todos={todos}");
+            try
+            {
+                var s = new JavaScriptSerializer();
+                var jsonObj = s.Deserialize<dynamic>(filtro);
 
-            string filtroNoTicket = jsonObj["noTicket"].ToString();
-            string filtroCliente = jsonObj["cliente"];
-            string filtroAsunto = jsonObj["asunto"];
-            string filtroAsignado = jsonObj["asignado"];
-            string filtroFecha = jsonObj["fecha"];
-            string filtroFechaVencimiento = jsonObj["fechaVencimiento"];
-            string filtroDiasRestantes = jsonObj["diasRestantes"].ToString();
+                string filtroNoTicket = jsonObj["noTicket"].ToString();
+                string filtroCliente = jsonObj["cliente"];
+                string filtroAsunto = jsonObj["asunto"];
+                string filtroAsignado = jsonObj["asignado"];
+                string filtroFecha = jsonObj["fecha"];
+                string filtroFechaVencimiento = jsonObj["fechaVencimiento"];
+                string filtroDiasRestantes = jsonObj["diasRestantes"].ToString();
 
-            var ticketsParcial = (from t in db.Ticket
-                                  join
-                                      et in db.EstadoTicket on t.SecuencialEstadoTicket equals et.Secuencial
-                                  join
-                                      pc in db.Persona_Cliente on t.persona_cliente equals pc
-                                  orderby t.Secuencial ascending
-                                  where et.Codigo == "CERRADO"
-                                  select new
-                                  {
-                                      numero = t.Secuencial,
-                                      cliente = pc.cliente.Descripcion,
-                                      asunto = t.Asunto,
-                                      asignado = "",
-                                      fecha = (from thi in t.ticketHistorico
-                                               where thi.estadoTicket.Codigo == "CERRADO" && db.TicketHistorico.Where(h => h.Version == thi.Version - 1 && h.SecuencialTicket == t.Secuencial).FirstOrDefault().estadoTicket.Codigo != "CERRADO"
-                                               orderby thi.Version descending
-                                               select thi.FechaOperacion
-                                             ).FirstOrDefault(),
-                                      fechaVencimiento = DateTime.Now,
-                                      diasRestantes = 0,
-                                      diasGarantia = t.DiasGarantia ?? 30
-                                  }).ToList();
+                var ticketsParcial = (from t in db.Ticket
+                                      join
+                                          et in db.EstadoTicket on t.SecuencialEstadoTicket equals et.Secuencial
+                                      join
+                                          pc in db.Persona_Cliente on t.persona_cliente equals pc
+                                      orderby t.Secuencial ascending
+                                      where et.Codigo == "CERRADO"
+                                      select new
+                                      {
+                                          numero = t.Secuencial,
+                                          cliente = pc.cliente.Descripcion,
+                                          asunto = t.Asunto,
+                                          asignado = "",
+                                          fecha = (from thi in t.ticketHistorico
+                                                   where thi.estadoTicket.Codigo == "CERRADO" && db.TicketHistorico.Where(h => h.Version == thi.Version - 1 && h.SecuencialTicket == t.Secuencial).FirstOrDefault().estadoTicket.Codigo != "CERRADO"
+                                                   orderby thi.Version descending
+                                                   select thi.FechaOperacion
+                                                 ).FirstOrDefault(),
+                                          fechaVencimiento = DateTime.Now,
+                                          diasRestantes = 0,
+                                          diasGarantia = t.DiasGarantia ?? 30
+                                      }).ToList();
 
-            var tickets = ticketsParcial;
+                var tickets = ticketsParcial;
 
-            var asignados = (from t in db.Ticket
-                             join ttar in db.TicketTarea on t.Secuencial equals ttar.SecuencialTicket
-                             join tar in db.Tarea on ttar.SecuencialTarea equals tar.Secuencial
-                             join c in db.Colaborador on tar.SecuencialColaborador equals c.Secuencial
-                             join p in db.Persona on c.SecuencialPersona equals p.Secuencial
-                             orderby tar.FechaInicio descending
-                             select new
-                             {
-                                 nombre = p.Nombre1 + " " + p.Apellido1,
-                                 numero = t.Secuencial
-                             }).ToList();
+                var asignados = (from t in db.Ticket
+                                 join ttar in db.TicketTarea on t.Secuencial equals ttar.SecuencialTicket
+                                 join tar in db.Tarea on ttar.SecuencialTarea equals tar.Secuencial
+                                 join c in db.Colaborador on tar.SecuencialColaborador equals c.Secuencial
+                                 join p in db.Persona on c.SecuencialPersona equals p.Secuencial
+                                 orderby tar.FechaInicio descending
+                                 select new
+                                 {
+                                     nombre = p.Nombre1 + " " + p.Apellido1,
+                                     numero = t.Secuencial
+                                 }).ToList();
 
-            if (todos == false)
-            {
-                //Se crea la variable tickets con su colaborador asignado
-                var ticketsSinAsignado = (from t in ticketsParcial
-                                          where (new DateTime(t.fecha.Year, t.fecha.Month, t.fecha.Day).AddDays(30) - new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day)).Days <= 30 && 0 <= (new DateTime(t.fecha.Year, t.fecha.Month, t.fecha.Day).AddDays(30) - new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day)).Days
-                                          select new
-                                          {
-                                              numero = t.numero,
-                                              cliente = t.cliente,
-                                              asunto = t.asunto,
-                                              asignado = t.asignado,
-                                              fecha = t.fecha,
-                                              fechaVencimiento = t.fecha.AddDays(t.diasGarantia),
-                                              diasRestantes = (new DateTime(t.fecha.Year, t.fecha.Month, t.fecha.Day).AddDays(t.diasGarantia) - new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day)).Days,
-                                              diasGarantia = t.diasGarantia
-                                          }).ToList();
-
-                tickets = (from t in ticketsSinAsignado
-                           select new
-                           {
-                               numero = t.numero,
-                               cliente = t.cliente,
-                               asunto = t.asunto,
-                               asignado = (
-                               db.TicketTarea.Where(x => x.SecuencialTicket == t.numero && x.EstaActiva == 1).Count() > 0
-                          ) ?
-                              asignados.Where(x => x.numero.ToString().Equals(t.numero.ToString())).FirstOrDefault().nombre.ToString()
-                            : "NO ASIGNADO",
-                               fecha = t.fecha,
-                               fechaVencimiento = t.fechaVencimiento,
-                               diasRestantes = t.diasRestantes,
-                               diasGarantia = t.diasGarantia
-                           }).ToList();
-            }
-            else
-            {
-                tickets = (from t in ticketsParcial
-                           select new
-                           {
-                               numero = t.numero,
-                               cliente = t.cliente,
-                               asunto = t.asunto,
-                               asignado = (
-                               db.TicketTarea.Where(x => x.SecuencialTicket == t.numero && x.EstaActiva == 1).Count() > 0
-                          ) ?
-                              asignados.Where(x => x.numero.ToString().Equals(t.numero.ToString())).FirstOrDefault().nombre.ToString()
-                            : "NO ASIGNADO",
-                               fecha = t.fecha,
-                               fechaVencimiento = t.fecha.AddDays(t.diasGarantia),
-                               diasRestantes = (new DateTime(t.fecha.Year, t.fecha.Month, t.fecha.Day) - new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day)).Days + t.diasGarantia,
-                               diasGarantia = t.diasGarantia
-                           }).ToList();
-            }
-
-            //Aplicando los filtros
-            if (filtroNoTicket != "")
-            {
-                tickets = (from t in tickets
-                           where t.numero.ToString().PadLeft(6, '0').Contains(filtroNoTicket)
-                           select t).ToList();
-            }
-            if (filtroCliente != "")
-            {
-                tickets = (from t in tickets
-                           where t.cliente.ToString().ToLower().Contains(filtroCliente.ToLower())
-                           select t).ToList();
-            }
-            if (filtroAsunto != "")
-            {
-                tickets = (from t in tickets
-                           where t.asunto.ToString().ToLower().Contains(filtroAsunto.ToLower())
-                           select t).ToList();
-            }
-            if (filtroAsignado != "")
-            {
-
-                tickets = (from t in tickets
-                           where t.asignado.ToString().ToUpper().Contains(filtroAsignado.ToUpper())
-                           select t).ToList();
-            }
-            if (filtroFecha != "")
-            {
-                tickets = (from t in tickets
-                           where t.fecha.ToString("dd/MM/yyyy").Contains(filtroFecha)
-                           select t).ToList();
-            }
-            if (filtroFechaVencimiento != "")
-            {
-                tickets = (from t in tickets
-                           where t.fechaVencimiento.ToString("dd/MM/yyyy").Contains(filtroFechaVencimiento)
-                           select t).ToList();
-            }
-            if (filtroDiasRestantes != "")
-            {
-                tickets = (from t in tickets
-                           where t.diasRestantes.ToString().ToUpper().Equals(filtroDiasRestantes.ToUpper())
-                           select t).ToList();
-            }
-            //Se Ordena
-            if (order > 0)
-            {
-                switch (order)
+                if (todos == false)
                 {
-                    case 1:
+                    //Se crea la variable tickets con su colaborador asignado
+                    var ticketsSinAsignado = (from t in ticketsParcial
+                                              where (new DateTime(t.fecha.Year, t.fecha.Month, t.fecha.Day).AddDays(30) - new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day)).Days <= 30 && 0 <= (new DateTime(t.fecha.Year, t.fecha.Month, t.fecha.Day).AddDays(30) - new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day)).Days
+                                              select new
+                                              {
+                                                  numero = t.numero,
+                                                  cliente = t.cliente,
+                                                  asunto = t.asunto,
+                                                  asignado = t.asignado,
+                                                  fecha = t.fecha,
+                                                  fechaVencimiento = t.fecha.AddDays(t.diasGarantia),
+                                                  diasRestantes = (new DateTime(t.fecha.Year, t.fecha.Month, t.fecha.Day).AddDays(t.diasGarantia) - new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day)).Days,
+                                                  diasGarantia = t.diasGarantia
+                                              }).ToList();
 
-                        if (asc == 1)
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.numero
-                                       select t).ToList();
-                        }
-                        else
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.numero descending
-                                       select t).ToList();
-                        }
-
-                        break;
-
-                    case 2:
-
-                        if (asc == 1)
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.cliente
-                                       select t).ToList();
-                        }
-                        else
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.cliente descending
-                                       select t).ToList();
-                        }
-
-                        break;
-
-                    case 3:
-
-                        if (asc == 1)
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.asunto
-                                       select t).ToList();
-                        }
-                        else
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.asunto descending
-                                       select t).ToList();
-                        }
-
-                        break;
-
-                    case 4:
-
-                        if (asc == 1)
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.asignado
-                                       select t).ToList();
-                        }
-                        else
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.asignado descending
-                                       select t).ToList();
-                        }
-
-                        break;
-
-                    case 5:
-
-                        if (asc == 1)
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.fecha
-                                       select t).ToList();
-                        }
-                        else
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.fecha descending
-                                       select t).ToList();
-                        }
-
-                        break;
-
-
-                    case 6:
-
-                        if (asc == 1)
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.fechaVencimiento
-                                       select t).ToList();
-                        }
-                        else
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.fechaVencimiento descending
-                                       select t).ToList();
-                        }
-
-                        break;
-
-                    case 7:
-
-                        if (asc == 1)
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.diasRestantes
-                                       select t).ToList();
-                        }
-                        else
-                        {
-                            tickets = (from t in tickets
-                                       orderby t.diasRestantes descending
-                                       select t).ToList();
-                        }
-
-                        break;
+                    tickets = (from t in ticketsSinAsignado
+                               select new
+                               {
+                                   numero = t.numero,
+                                   cliente = t.cliente,
+                                   asunto = t.asunto,
+                                   asignado = (
+                                   db.TicketTarea.Where(x => x.SecuencialTicket == t.numero && x.EstaActiva == 1).Count() > 0
+                              ) ?
+                                  asignados.Where(x => x.numero.ToString().Equals(t.numero.ToString())).FirstOrDefault().nombre.ToString()
+                                : "NO ASIGNADO",
+                                   fecha = t.fecha,
+                                   fechaVencimiento = t.fechaVencimiento,
+                                   diasRestantes = t.diasRestantes,
+                                   diasGarantia = t.diasGarantia
+                               }).ToList();
                 }
+                else
+                {
+                    tickets = (from t in ticketsParcial
+                               select new
+                               {
+                                   numero = t.numero,
+                                   cliente = t.cliente,
+                                   asunto = t.asunto,
+                                   asignado = (
+                                   db.TicketTarea.Where(x => x.SecuencialTicket == t.numero && x.EstaActiva == 1).Count() > 0
+                              ) ?
+                                  asignados.Where(x => x.numero.ToString().Equals(t.numero.ToString())).FirstOrDefault().nombre.ToString()
+                                : "NO ASIGNADO",
+                                   fecha = t.fecha,
+                                   fechaVencimiento = t.fecha.AddDays(t.diasGarantia),
+                                   diasRestantes = (new DateTime(t.fecha.Year, t.fecha.Month, t.fecha.Day) - new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day)).Days + t.diasGarantia,
+                                   diasGarantia = t.diasGarantia
+                               }).ToList();
+                }
+
+                //Aplicando los filtros
+                if (filtroNoTicket != "")
+                {
+                    tickets = (from t in tickets
+                               where t.numero.ToString().PadLeft(6, '0').Contains(filtroNoTicket)
+                               select t).ToList();
+                }
+                if (filtroCliente != "")
+                {
+                    tickets = (from t in tickets
+                               where t.cliente.ToString().ToLower().Contains(filtroCliente.ToLower())
+                               select t).ToList();
+                }
+                if (filtroAsunto != "")
+                {
+                    tickets = (from t in tickets
+                               where t.asunto.ToString().ToLower().Contains(filtroAsunto.ToLower())
+                               select t).ToList();
+                }
+                if (filtroAsignado != "")
+                {
+
+                    tickets = (from t in tickets
+                               where t.asignado.ToString().ToUpper().Contains(filtroAsignado.ToUpper())
+                               select t).ToList();
+                }
+                if (filtroFecha != "")
+                {
+                    tickets = (from t in tickets
+                               where t.fecha.ToString("dd/MM/yyyy").Contains(filtroFecha)
+                               select t).ToList();
+                }
+                if (filtroFechaVencimiento != "")
+                {
+                    tickets = (from t in tickets
+                               where t.fechaVencimiento.ToString("dd/MM/yyyy").Contains(filtroFechaVencimiento)
+                               select t).ToList();
+                }
+                if (filtroDiasRestantes != "")
+                {
+                    tickets = (from t in tickets
+                               where t.diasRestantes.ToString().ToUpper().Equals(filtroDiasRestantes.ToUpper())
+                               select t).ToList();
+                }
+                //Se Ordena
+                if (order > 0)
+                {
+                    switch (order)
+                    {
+                        case 1:
+
+                            if (asc == 1)
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.numero
+                                           select t).ToList();
+                            }
+                            else
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.numero descending
+                                           select t).ToList();
+                            }
+
+                            break;
+
+                        case 2:
+
+                            if (asc == 1)
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.cliente
+                                           select t).ToList();
+                            }
+                            else
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.cliente descending
+                                           select t).ToList();
+                            }
+
+                            break;
+
+                        case 3:
+
+                            if (asc == 1)
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.asunto
+                                           select t).ToList();
+                            }
+                            else
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.asunto descending
+                                           select t).ToList();
+                            }
+
+                            break;
+
+                        case 4:
+
+                            if (asc == 1)
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.asignado
+                                           select t).ToList();
+                            }
+                            else
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.asignado descending
+                                           select t).ToList();
+                            }
+
+                            break;
+
+                        case 5:
+
+                            if (asc == 1)
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.fecha
+                                           select t).ToList();
+                            }
+                            else
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.fecha descending
+                                           select t).ToList();
+                            }
+
+                            break;
+
+
+                        case 6:
+
+                            if (asc == 1)
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.fechaVencimiento
+                                           select t).ToList();
+                            }
+                            else
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.fechaVencimiento descending
+                                           select t).ToList();
+                            }
+
+                            break;
+
+                        case 7:
+
+                            if (asc == 1)
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.diasRestantes
+                                           select t).ToList();
+                            }
+                            else
+                            {
+                                tickets = (from t in tickets
+                                           orderby t.diasRestantes descending
+                                           select t).ToList();
+                            }
+
+                            break;
+                    }
+                }
+
+                int totalTickets = tickets.Count();
+                tickets = tickets.Skip(start).Take(lenght).ToList();
+
+                LoggerManager.LogInfo($"CargarGarantiaTickets returning {tickets.Count} tickets out of {totalTickets}");
+
+                var resp = new
+                {
+                    success = true,
+                    tickets = tickets,
+                    totalTickets = totalTickets
+                };
+                return Json(resp);
             }
-
-            int totalTickets = tickets.Count();
-            tickets = tickets.Skip(start).Take(lenght).ToList();
-
-            var resp = new
+            catch (Exception e)
             {
-                success = true,
-                tickets = tickets,
-                totalTickets = totalTickets
-            };
-            return Json(resp);
+                LoggerManager.LogError(e, $"Error in CargarGarantiaTickets: {e.Message}");
+                return Json(new
+                {
+                    success = false,
+                    msg = e.Message
+                });
+            }
         }
 
         [HttpPost]
         [Authorize(Roles = "ADMIN, CLIENTE, GESTOR")]
         public ActionResult DarOfertasTickets(int start, int length, string filtro = "")
         {
+            LoggerManager.LogInfo($"DarOfertasTickets called with start={start}, length={length}, filtro={filtro}");
             try
             {
                 var fechaHoy = DateTime.Now.Date;
@@ -1082,6 +1095,8 @@ namespace SifizPlanning.Controllers
                 var cantidad = ofertas?.Count;
                 ofertas = ofertas.Skip(start).Take(length).ToList();
 
+                LoggerManager.LogInfo($"DarOfertasTickets returning {ofertas.Count} records out of {cantidad}");
+
                 var resp = new
                 {
                     success = true,
@@ -1092,6 +1107,7 @@ namespace SifizPlanning.Controllers
             }
             catch (Exception e)
             {
+                LoggerManager.LogError(e, $"Error in DarOfertasTickets: {e.Message}");
                 return Json(new
                 {
                     success = false,

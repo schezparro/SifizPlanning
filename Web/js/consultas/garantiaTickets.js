@@ -229,6 +229,10 @@
 
             } else {
                 messageDialog.show("Información", data.msg);
+                setTimeout(function () {
+                    messageDialog.hide(); 
+                }, 3000);
+
             }
         });
     };
