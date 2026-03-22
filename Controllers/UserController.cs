@@ -9587,14 +9587,39 @@ r in db.Rol on ur.rol equals r
                 foreach (var day in days)
                 {
                     DateTime fecha = new DateTime(anno, mes, day);
+
+                    // Validar fines de semana
+                    if (fecha.DayOfWeek == DayOfWeek.Saturday || fecha.DayOfWeek == DayOfWeek.Sunday)
+                    {
+                        throw new Exception("No se pueden seleccionar fines de semana (Sábados y Domingos).");
+                    }
+
+                    // Validar feriados
+                    bool isFeriado = db.Feriados.Any(f => f.Fecha.Year == anno && f.Fecha.Month == mes && f.Fecha.Day == day);
+                    if (isFeriado)
+                    {
+                        throw new Exception("No se pueden seleccionar días feriados/festivos.");
+                    }
+
+                    // Prevenir doble inserción y concurrencia
+                    var existe = db.PropuestaVacaciones.FirstOrDefault(p => p.SecuencialColaborador == idColaborador && p.Fecha == fecha);
+                    if (existe != null) continue;
+
+                    var ddv = db.DiasDisponiblesVacaciones.FirstOrDefault(d => d.SecuencialColaborador == idColaborador);
+                    if (ddv != null)
+                    {
+                        if (ddv.DiasDisponibles <= 0)
+                        {
+                            throw new Exception("No tiene días disponibles suficientes.");
+                        }
+                        ddv.DiasDisponibles--;
+                    }
+
                     db.PropuestaVacaciones.Add(new PropuestaVacaciones
                     {
                         SecuencialColaborador = idColaborador,
                         Fecha = fecha
                     });
-
-                    var ddv = db.DiasDisponiblesVacaciones.FirstOrDefault(d => d.SecuencialColaborador == idColaborador);
-                    if (ddv != null) ddv.DiasDisponibles--;
                 }
                 db.SaveChanges();
 
@@ -9616,10 +9641,13 @@ r in db.Rol on ur.rol equals r
                 {
                     DateTime fecha = new DateTime(anno, mes, day);
                     var propuesta = db.PropuestaVacaciones.FirstOrDefault(p => p.SecuencialColaborador == idColaborador && p.Fecha == fecha);
-                    if (propuesta != null) db.PropuestaVacaciones.Remove(propuesta);
+                    if (propuesta != null) 
+                    {
+                        db.PropuestaVacaciones.Remove(propuesta);
 
-                    var ddv = db.DiasDisponiblesVacaciones.FirstOrDefault(d => d.SecuencialColaborador == idColaborador);
-                    if (ddv != null) ddv.DiasDisponibles++;
+                        var ddv = db.DiasDisponiblesVacaciones.FirstOrDefault(d => d.SecuencialColaborador == idColaborador);
+                        if (ddv != null) ddv.DiasDisponibles++;
+                    }
                 }
                 db.SaveChanges();
 
