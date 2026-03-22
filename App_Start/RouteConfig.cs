@@ -1,4 +1,4 @@
-﻿using SifizPlanning.Models;
+using SifizPlanning.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -178,12 +178,6 @@ namespace SifizPlanning
                 defaults: new { controller = "Admin", action = "EliminarAdjuntoContratoCliente", id = UrlParameter.Optional }
             );
 
-            routes.MapRoute(
-                name: "Admin",
-                url: "admin/{id}",
-                defaults: new { controller = "Admin", action = "Index", id = UrlParameter.Optional }
-            );
-
             //---------RUTAS DE AL ADMINISTRACION DE LOS CATALOGOS
             routes.MapRoute(
                 name: "DarDatosTabla",
@@ -295,6 +289,17 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "DarRequerimientos",
+                url: "catalogos/requerimientos/{id}",
+                defaults: new { controller = "Admin", action = "DarRequerimientos", id = UrlParameter.Optional }
+            );
+                routes.MapRoute(
+                    name: "DarEstadosGestionOferta",
+                    url: "catalogos/estados-gestion-oferta/{id}",
+                    defaults: new { controller = "Admin", action = "DarEstadosGestionOferta", id = UrlParameter.Optional }
+                );
+
+            routes.MapRoute(
                 name: "DarNombresClientes",
                 url: "catalogos/nombres-clientes/{id}",
                 defaults: new { controller = "Admin", action = "DarNombresClientes", id = UrlParameter.Optional }
@@ -367,12 +372,6 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
-                name: "DarVersionesBaseDatos",
-                url: "catalogos/versionesBaseDatos/{id}",
-                defaults: new { controller = "Admin", action = "DarVersionesBaseDatos", id = UrlParameter.Optional }
-            );
-
-            routes.MapRoute(
                 name: "DarMotivosDevolucionTicket",
                 url: "catalogos/motivos-devolucion-ticket/{id}",
                 defaults: new { controller = "Admin", action = "DarMotivosDevolucionTicket", id = UrlParameter.Optional }
@@ -436,6 +435,68 @@ namespace SifizPlanning
                 name: "DarDatosCatalogo",
                 url: "catalogos/datos-catalogos/{id}",
                 defaults: new { controller = "Admin", action = "DarDatosCatalogo", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "DarProyectosExcel",
+                url: "admin/DarProyectosExcel",
+                defaults: new { controller = "Admin", action = "DarProyectosExcel" }
+            );
+
+            routes.MapRoute(
+                name: "CrearProyecto",
+                url: "admin/CrearProyecto",
+                defaults: new { controller = "Admin", action = "CrearProyecto" }
+            );
+
+            routes.MapRoute(
+                name: "EliminarProyecto",
+                url: "admin/EliminarProyecto",
+                defaults: new { controller = "Admin", action = "EliminarProyecto" }
+            );
+
+            routes.MapRoute(
+                name: "ActualizarProyecto",
+                url: "admin/ActualizarProyecto",
+                defaults: new { controller = "Admin", action = "ActualizarProyecto" }
+            );
+
+            routes.MapRoute(
+                name: "GetClientes",
+                url: "admin/GetClientes",
+                defaults: new { controller = "Admin", action = "GetClientes" }
+            );
+            routes.MapRoute(
+                name: "GetVersionesDesarrollo",
+                url: "admin/GetVersionesDesarrollo",
+                defaults: new { controller = "Admin", action = "GetVersionesDesarrollo" }
+            );
+            routes.MapRoute(
+                name: "GetRepositorios",
+                url: "admin/GetRepositorios",
+                defaults: new { controller = "Admin", action = "GetRepositorios" }
+            );
+            routes.MapRoute(
+                name: "GetResponsablesProyectos",
+                url: "admin/GetResponsablesProyectos",
+                defaults: new { controller = "Admin", action = "GetResponsablesProyectos" }
+            );
+            routes.MapRoute(
+                name: "GetColaboradores",
+                url: "admin/GetColaboradores",
+                defaults: new { controller = "Admin", action = "GetColaboradores" }
+            );
+
+            routes.MapRoute(
+                name: "GetVersionesBaseDatos",
+                url: "admin/GetVersionesBaseDatos",
+                defaults: new { controller = "Admin", action = "GetVersionesBaseDatos", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "Admin",
+                url: "admin/{id}",
+                defaults: new { controller = "Admin", action = "Index", id = UrlParameter.Optional }
             );
 
             //RUTAS DE TASK----------GESTION DE TAREAS--------------------------------------------
@@ -971,6 +1032,12 @@ namespace SifizPlanning
             //---------------------- RUTAS DEL USUARIO -------------------------------
             //RUTAS DE LA EDICION DE LAS TAREAS POR EL USUARIO
             //
+
+            routes.MapRoute(
+                name: "ObtenerProyectosPorClientePorTarea",
+                url: "user/ObtenerProyectosPorClientePorTarea",
+                defaults: new { controller = "User", action = "ObtenerProyectosPorClientePorTarea", id = UrlParameter.Optional }
+            );
 
             routes.MapRoute(
                 name: "DarAnnosMesPropuestaVacaciones",
@@ -1580,6 +1647,18 @@ namespace SifizPlanning
             );
 
             routes.MapRoute(
+                name: "PublicacionesCliente",
+                url: "user/publicaciones-cliente/{id}",
+                defaults: new { controller = "User", action = "PublicacionesCliente", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "MarcarPublicacionCliente",
+                url: "user/marcar-publicacion-cliente/{id}",
+                defaults: new { controller = "User", action = "MarcarPublicacionCliente", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "guardarComentarioNoTerminacion",
                 url: "user/guardar-comentario-no-terminacion/{id}",
                 defaults: new { controller = "User", action = "guardarComentarioNoTerminacion", id = UrlParameter.Optional }
@@ -1763,6 +1842,12 @@ namespace SifizPlanning
                 name: "DarDatosTicketOfertas",
                 url: "tickets/dar-datos-ticket-ofertas/{id}",
                 defaults: new { controller = "Ticket", action = "DarDatosTicketOfertas", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "ContarTicketsUrgentesAbiertos",
+                url: "tickets/contar-tickets-urgentes-abiertos/{id}",
+                defaults: new { controller = "Ticket", action = "ContarTicketsUrgentesAbiertos", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(
@@ -2368,7 +2453,7 @@ namespace SifizPlanning
 
             routes.MapRoute(
                 name: "DarRequerimientosOfertas",
-                url: "comercial/requerimientos_ofertas/{id}",
+                url: "comercial/requerimientos-ofertas/{id}",
                 defaults: new { controller = "Comercial", action = "DarRequerimientosOfertas", id = UrlParameter.Optional }
             );
 
@@ -2376,6 +2461,13 @@ namespace SifizPlanning
                 name: "RequerimientosComercial",
                 url: "comercial/requerimientos-comercial/{id}",
                 defaults: new { controller = "Comercial", action = "RequerimientosComercial", id = UrlParameter.Optional }
+            );
+
+            // Ruta para detalle de oferta
+            routes.MapRoute(
+                name: "DetalleOferta",
+                url: "comercial/detalle-oferta/{id}",
+                defaults: new { controller = "Comercial", action = "DetalleOferta", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(
@@ -2394,6 +2486,11 @@ namespace SifizPlanning
                 name: "DarEstadoOfertaComercial",
                 url: "comercial/estado-oferta-comercial/{id}",
                 defaults: new { controller = "Comercial", action = "DarEstadoOfertaComercial", id = UrlParameter.Optional }
+            );
+            routes.MapRoute(
+                name: "ActualizarEstadoGestionOferta",
+                url: "comercial/actualizar-estado-gestion-oferta/{id}",
+                defaults: new { controller = "Comercial", action = "ActualizarEstadoGestionOferta", id = UrlParameter.Optional }
             );
 
             routes.MapRoute(
@@ -2713,6 +2810,7 @@ namespace SifizPlanning
             //------------- FIN DE LAS RUTAS DEL MODULO DE TFS --------------------------
 
             //RUTAS DEL MODULO CONSULTAS
+
 
             routes.MapRoute(
                 name: "Consultas",

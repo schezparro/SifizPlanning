@@ -17,7 +17,7 @@ namespace SifizPlanning.Models
         public ClienteAuxiliar()
         {
             this.etapasProyectoCliente = new HashSet<EtapasProyectoCliente>();
-            this.TIEMPOSPROYECTO = new HashSet<TiemposProyecto>();
+            this.tiemposProyecto = new HashSet<TiemposProyecto>();
         }
     
         public int Secuencial { get; set; }
@@ -26,7 +26,7 @@ namespace SifizPlanning.Models
         public int SecuencialCliente { get; set; }
         public int SecuencialVersionDesarrollo { get; set; }
         public int SecuencialRepositorio { get; set; }
-        public int SecuencialUbicacion { get; set; }
+        public Nullable<int> SecuencialUbicacion { get; set; }
         public decimal TieneCodigoFuente { get; set; }
         public int SecuencialResponsableAcceso { get; set; }
         public int SecuencialResponsableCodigo { get; set; }
@@ -35,8 +35,11 @@ namespace SifizPlanning.Models
         public int SecuencialLiderProyecto { get; set; }
         public decimal TieneSolucionProxies { get; set; }
         public System.DateTime FechaProduccion { get; set; }
+        public string PathFuentes { get; set; }
+        public string VersionFBS { get; set; }
     
-        public virtual Colaborador liderProyecto { get; set; }
+        public virtual Cliente cliente { get; set; }
+        public virtual Colaborador colaborador { get; set; }
         public virtual Repositorio repositorio { get; set; }
         public virtual ResponsableProyectos ubicacion { get; set; }
         public virtual ResponsableProyectos responsableAcceso { get; set; }
@@ -44,8 +47,7 @@ namespace SifizPlanning.Models
         public virtual ResponsableProyectos responsablePublicacion { get; set; }
         public virtual VersionBaseDatos versionBaseDatos { get; set; }
         public virtual VersionDesarrollo versionDesarrollo { get; set; }
-        public virtual Cliente cliente { get; set; }
         public virtual ICollection<EtapasProyectoCliente> etapasProyectoCliente { get; set; }
-        public virtual ICollection<TiemposProyecto> TIEMPOSPROYECTO { get; set; }
+        public virtual ICollection<TiemposProyecto> tiemposProyecto { get; set; }
     }
 }

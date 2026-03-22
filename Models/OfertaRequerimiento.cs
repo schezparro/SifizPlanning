@@ -25,6 +25,7 @@ namespace SifizPlanning.Models
         public Nullable<int> SecuencialTicketTarea { get; set; }
         public string Detalle { get; set; }
         public Nullable<System.DateTime> FechaPedidoCLiente { get; set; }
+        public Nullable<int> SecuencialColaborador { get; set; }
     
         public virtual ICollection<OfertaOferta> OFERTAOFERTA { get; set; }
     }

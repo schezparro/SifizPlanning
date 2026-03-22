@@ -1,0 +1,75 @@
+@{
+    ViewBag.Title = "KPIs de Ofertas - Indicadores";
+}
+
+
+
+<style>
+    #panel-indicadores-ofertas {
+        max-height: 95vh;
+        overflow-y: auto;
+        padding: 10px;
+    }
+    .kpi-panel {
+        min-width: 120px;
+        margin-bottom: 8px;
+        padding: 0 2px;
+    }
+    .kpi-panel .panel-body h2 {
+        font-size: 1.3em;
+        margin: 0;
+    }
+    .kpi-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+    .grafico-row {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin-bottom: 8px;
+        align-items: center;
+    }
+    .grafico-box {
+        width: 100%;
+        max-width: 700px;
+        min-width: 320px;
+        height: 270px;
+        background: #fff;
+        border-radius: 6px;
+        box-shadow: 0 1px 3px #0001;
+        padding: 8px 8px 0 8px;
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    /* El layout es 100% flexbox, sin media queries. Las cajas se adaptan automáticamente */
+</style>
+
+<div id="panel-indicadores-ofertas" ng-controller="indicadoresOfertasController">
+    <h4 class="text-center">KPIs de Ofertas</h4>
+    <div class="kpi-row">
+        <div class="panel panel-info kpi-panel"><div class="panel-heading">Total Ofertas</div><div class="panel-body text-center"><h2 ng-bind="kpis.total"></h2></div></div>
+        <div class="panel panel-success kpi-panel"><div class="panel-heading">Aceptadas</div><div class="panel-body text-center"><h2 ng-bind="kpis.aceptadas"></h2></div></div>
+        <div class="panel panel-danger kpi-panel"><div class="panel-heading">Rechazadas</div><div class="panel-body text-center"><h2 ng-bind="kpis.rechazadas"></h2></div></div>
+        <div class="panel panel-warning kpi-panel"><div class="panel-heading">Vencidas</div><div class="panel-body text-center"><h2 ng-bind="kpis.vencidas"></h2></div></div>
+        <div class="panel panel-primary kpi-panel"><div class="panel-heading">Monto Total</div><div class="panel-body text-center"><h2 ng-bind="kpis.montoTotal | currency"></h2></div></div>
+        <div class="panel panel-default kpi-panel"><div class="panel-heading">Promedio Oferta</div><div class="panel-body text-center"><h2 ng-bind="kpis.montoPromedio | currency"></h2></div></div>
+        <div class="panel panel-info kpi-panel"><div class="panel-heading">Ofertas Mes</div><div class="panel-body text-center"><h2 ng-bind="kpis.ofertasMes"></h2></div></div>
+        <div class="panel panel-success kpi-panel"><div class="panel-heading">Con Descuento</div><div class="panel-body text-center"><h2 ng-bind="kpis.conDescuento"></h2></div></div>
+        <div class="panel panel-warning kpi-panel"><div class="panel-heading">Próx. a Vencer</div><div class="panel-body text-center"><h2 ng-bind="kpis.proximasVencer"></h2></div></div>
+    </div>
+    <div class="grafico-row">
+        <div class="grafico-box"><div id="grafico-ofertas-estado" style="height: 100%; width:100%"></div></div>
+        <div class="grafico-box"><div id="grafico-ofertas-cliente" style="height: 100%; width:100%"></div></div>
+        <div class="grafico-box"><div id="grafico-ofertas-tipo" style="height: 100%; width:100%"></div></div>
+        <div class="grafico-box"><div id="grafico-ofertas-pago" style="height: 100%; width:100%"></div></div>
+        <div class="grafico-box"><div id="grafico-ofertas-actividad" style="height: 100%; width:100%"></div></div>
+        <div class="grafico-box"><div id="grafico-ofertas-mes" style="height: 100%; width:100%"></div></div>
+    </div>
+</div>
+
+<script type="text/javascript" src="~/Web/js/highcharts.js"></script>

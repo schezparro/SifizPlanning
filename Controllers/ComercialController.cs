@@ -1,4 +1,4 @@
-﻿using SifizPlanning.Models;
+using SifizPlanning.Models;
 using SifizPlanning.Security;
 using System;
 using System.Collections.Generic;
@@ -49,6 +49,12 @@ namespace SifizPlanning.Controllers
                                                    requerimientoId = or.SecuencialRequerimiento,
                                                    requerimiento = r.Descripcion,
                                                    fecha = or.FechaPedidoCLiente.HasValue ? or.FechaPedidoCLiente.Value.ToString() : "",
+                                                   colaborador = or.SecuencialColaborador.HasValue ? 
+                                                       (from col in db.Colaborador
+                                                        join p in db.Persona on col.SecuencialPersona equals p.Secuencial
+                                                        where col.Secuencial == or.SecuencialColaborador
+                                                        select p.Nombre1 + " " + p.Apellido1).FirstOrDefault() : "",
+                                                   colaboradorId = or.SecuencialColaborador
                                                }).ToList();
 
 
@@ -113,6 +119,12 @@ namespace SifizPlanning.Controllers
                                requerimientoId = or.SecuencialRequerimiento,
                                requerimiento = r.Descripcion,
                                fecha = or.FechaPedidoCLiente.HasValue ? or.FechaPedidoCLiente : null,
+                               colaboradorId = or.SecuencialColaborador,
+                               colaborador = or.SecuencialColaborador.HasValue ? 
+                                   (from col in db.Colaborador
+                                    join p in db.Persona on col.SecuencialPersona equals p.Secuencial
+                                    where col.Secuencial == or.SecuencialColaborador
+                                    select p.Nombre1 + " " + p.Apellido1).FirstOrDefault() : ""
                            }).FirstOrDefault();
 
                 var result = new
@@ -136,7 +148,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "COMERCIAL, ADMIN")]
-        public ActionResult GuardarRequerimiento(int cliente, int requerimiento, string ticket, string detalle, string fechaPedidoCliente)
+        public ActionResult GuardarRequerimiento(int cliente, int requerimiento, string ticket, string detalle, string fechaPedidoCliente, int? colaborador)
         {
             string emailUser = User.Identity.Name;
             LoggerManager.LogInfo($"[GuardarRequerimiento] El usuario {emailUser} está registrando un nuevo requerimiento comercial para el cliente {cliente}.");
@@ -163,7 +175,17 @@ namespace SifizPlanning.Controllers
                         nuevaOfertaRequerimiento.SecuencialCLiente = cliente;
                         nuevaOfertaRequerimiento.SecuencialRequerimiento = requerimiento;
                         nuevaOfertaRequerimiento.SecuencialTicketTarea = ticketNumerico;
-                        nuevaOfertaRequerimiento.Detalle = t.Detalle.Substring(0, 250);
+                        if (t.Detalle != null)
+                        {
+                            nuevaOfertaRequerimiento.Detalle = t.Detalle.Length > 100
+                                ? t.Detalle.Substring(0, 100)
+                                : t.Detalle;
+                        }
+                        else
+                        {
+                            nuevaOfertaRequerimiento.Detalle = null;
+                        }
+                        //nuevaOfertaRequerimiento.Detalle = t.Detalle.Substring(0, 100);
                         nuevaOfertaRequerimiento.FechaPedidoCLiente = t.FechaCreado;
                     }
                     else
@@ -188,6 +210,8 @@ namespace SifizPlanning.Controllers
                     nuevaOfertaRequerimiento.Detalle = detalle;
                     nuevaOfertaRequerimiento.FechaPedidoCLiente = fechaPC;
                 }
+                // Siempre asignar el colaborador si viene informado
+                nuevaOfertaRequerimiento.SecuencialColaborador = colaborador;
 
 
                 db.OFERTAREQUERIMIENTO.Add(nuevaOfertaRequerimiento);
@@ -234,7 +258,7 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "COMERCIAL, ADMIN")]
-        public ActionResult EditarRequerimiento(int id, int cliente, int requerimiento, string ticket, string detalle, string fechaPedidoCliente)
+        public ActionResult EditarRequerimiento(int id, int cliente, int requerimiento, string ticket, string detalle, string fechaPedidoCliente, int? colaborador)
         {
             string emailUser = User.Identity.Name;
             LoggerManager.LogInfo($"[EditarRequerimiento] El usuario {emailUser} está editando el requerimiento con ID {id}.");
@@ -282,6 +306,7 @@ namespace SifizPlanning.Controllers
                 nuevaOfertaRequerimiento.SecuencialRequerimiento = requerimiento;
                 nuevaOfertaRequerimiento.Detalle = detalle;
                 nuevaOfertaRequerimiento.FechaPedidoCLiente = fechaPC;
+                nuevaOfertaRequerimiento.SecuencialColaborador = colaborador;
 
                 db.SaveChanges();
                 LoggerManager.LogSensitiveOperation(
@@ -385,23 +410,102 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "COMERCIAL, ADMIN")]
+        public ActionResult DetalleOferta(int id)
+        {
+            try
+            {
+                // Buscar la oferta real y sus datos relacionados en una sola consulta
+                var oferta = (from or in db.OfertaOferta
+                              join r in db.OFERTAREQUERIMIENTO on or.SecuencialOfertaRequerimiento equals r.Secuencial
+                              join cli in db.Cliente on r.SecuencialCLiente equals cli.Secuencial
+                              where or.Secuencial == id
+                              select new
+                              {
+                                  secuencial = or.Secuencial,
+                                  codigo = or.Codigo,
+                                  precio = or.Precio,
+                                  formaPago = or.FormaPago,
+                                  descuento = (or.Descuento.HasValue && or.Descuento.Value) ? "SI" : "NO",
+                                  estado = or.Estado,
+                                  tipo = r.Secuencial + "-" + (r.Detalle.Length > 30 ? r.Detalle.Substring(0, 30) : r.Detalle),
+                                  tema = or.OfertaRequerimiento != null ? or.OfertaRequerimiento.Detalle : "",
+                                  cliente = cli.Descripcion,
+                                  ticket = r.SecuencialTicketTarea,
+                                  detalleRequerimiento = r.Detalle,
+                                  fechaGeneracion = or.FechaGeneracionOferta,
+                                  fechaVencimiento = or.FechaVencimientoOferta,
+                                  // Se optimiza trayendo todo el historial relevante en una lista
+                                  historicoTicket = db.TicketHistorico
+                                                      .Where(h => h.SecuencialTicket == r.SecuencialTicketTarea)
+                                                      .OrderByDescending(h => h.Version)
+                                                      .ToList()
+                              }).FirstOrDefault();
+
+                if (oferta == null)
+                {
+                    return Json(new { success = false, msg = "No se encontró la oferta con el ID proporcionado." });
+                }
+
+                // Extraer las fechas específicas y la próxima actividad de la lista en memoria
+                var fechas = new
+                {
+                    fechaEstimacion = oferta.historicoTicket.FirstOrDefault(h => h.SecuencialProximaActividad == 3)?.FechaOperacion,
+                    fechaRevision = oferta.historicoTicket.FirstOrDefault(h => h.SecuencialProximaActividad == 7)?.FechaOperacion,
+                    fechaAprobacionGerencia = oferta.historicoTicket.FirstOrDefault(h => h.SecuencialProximaActividad == 30)?.FechaOperacion,
+                    fechaEnvioOferta = oferta.historicoTicket.FirstOrDefault(h => h.SecuencialProximaActividad == 30)?.FechaOperacion,
+                    proximaActividad = oferta.historicoTicket.FirstOrDefault()?.proximaActividad?.Descripcion,
+                };
+
+                // Construir el objeto de respuesta final con fechas formateadas
+                var resultadoOferta = new
+                {
+                    oferta.secuencial,
+                    oferta.codigo,
+                    oferta.precio,
+                    oferta.formaPago,
+                    oferta.descuento,
+                    oferta.estado,
+                    oferta.tipo,
+                    oferta.tema,
+                    oferta.cliente,
+                    oferta.ticket,
+                    oferta.detalleRequerimiento,
+                    fechaEstimacion = fechas.fechaEstimacion?.ToString("dd/MM/yyyy"),
+                    fechaRevision = fechas.fechaRevision?.ToString("dd/MM/yyyy"),
+                    fechaAprobacionGerencia = fechas.fechaAprobacionGerencia?.ToString("dd/MM/yyyy"),
+                    fechaEnvioOferta = fechas.fechaEnvioOferta?.ToString("dd/MM/yyyy"),
+                    fechaGeneracion = oferta.fechaGeneracion?.ToString("dd/MM/yyyy"),
+                    fechaVencimiento = oferta.fechaVencimiento?.ToString("dd/MM/yyyy"),
+                    fechas.proximaActividad
+                };
+
+                return Json(new { success = true, detalle = resultadoOferta });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = "Ocurrió un error inesperado al obtener los detalles de la oferta. " + e.Message });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult DarCatalogoRequerimientos()
         {
             string emailUser = User.Identity.Name;
             LoggerManager.LogInfo($"[DarCatalogoRequerimientos] El usuario {emailUser} solicitó el catálogo de requerimientos.");
             try
             {
-                var ofr = (from or in db.Requerimiento
-                           select new
-                           {
-                               descripcion = or.Descripcion,
-                               id = or.Secuencial
-                           }).ToList();
+                var requerimientos = (from r in db.Requerimiento
+                                      select new
+                                      {
+                                          id = r.Secuencial,
+                                          descripcion = r.Descripcion
+                                      }).ToList();
 
                 var result = new
                 {
                     success = true,
-                    requerimientos = ofr
+                    requerimientos = requerimientos
                 };
                 return Json(result);
             }
@@ -419,65 +523,124 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "COMERCIAL, ADMIN")]
-        public ActionResult OfertasComercial(int start, int lenght, string filtro = "")
+        public ActionResult OfertasComercial(int start, int lenght, string filtro = "", string filtrosColumna = null)
         {
             string emailUser = User.Identity.Name;
             LoggerManager.LogInfo($"[OfertasComercial] El usuario {emailUser} consultó la lista de ofertas comerciales con filtro '{filtro}' y paginación desde {start} con longitud {lenght}.");
             try
             {
-                var ofertasComercial = (from or in db.OfertaOferta
-                                        join r in db.OFERTAREQUERIMIENTO on or.SecuencialOfertaRequerimiento equals r.Secuencial
-                                        select new
-                                        {
-                                            secuencial = or.Secuencial,
-                                            codigo = or.Codigo,
-                                            fechaEstimacion = or.FechaRecepcionEstimacion.HasValue ? or.FechaRecepcionEstimacion.Value : (DateTime?)null,
-                                            fechaRevision = or.FechaEnvioRevision.HasValue ? or.FechaEnvioRevision.Value : (DateTime?)null,
-                                            fechaEnvioOferta = or.FechaEnvioOfertaCliente.HasValue ? or.FechaEnvioOfertaCliente.Value : (DateTime?)null,
-                                            fechaGeneracion = or.FechaGeneracionOferta.HasValue ? or.FechaGeneracionOferta.Value : (DateTime?)null,
-                                            fechaAprobacionGerencia = or.FechaAprobacionOfertaGerencia.HasValue ? or.FechaAprobacionOfertaGerencia.Value : (DateTime?)null,
-                                            fechaVencimiento = or.FechaVencimientoOferta.HasValue ? or.FechaVencimientoOferta.Value : (DateTime?)null,
-                                            tipo = r.Secuencial + "-" + r.Detalle.Substring(0, 30),
-                                            idTipo = r.Secuencial
-                                        }).ToList();
-
-                var ofertas = (from oc in ofertasComercial
-                               select new
-                               {
-                                   secuencial = oc.secuencial,
-                                   codigo = oc.codigo,
-                                   fechaEstimacion = oc.fechaEstimacion.HasValue ? oc.fechaEstimacion.Value.ToString("dd/MM/yyyy") : null,
-                                   fechaRevision = oc.fechaRevision.HasValue ? oc.fechaRevision.Value.ToString("dd/MM/yyyy") : null,
-                                   fechaEnvioOferta = oc.fechaEnvioOferta.HasValue ? oc.fechaEnvioOferta.Value.ToString("dd/MM/yyyy") : null,
-                                   fechaGeneracion = oc.fechaGeneracion.HasValue ? oc.fechaGeneracion.Value.ToString("dd/MM/yyyy") : null,
-                                   fechaAprobacionGerencia = oc.fechaAprobacionGerencia.HasValue ? oc.fechaAprobacionGerencia.Value.ToString("dd/MM/yyyy") : null,
-                                   fechaVencimiento = oc.fechaVencimiento.HasValue ? oc.fechaVencimiento.Value.ToString("dd/MM/yyyy") : null,
-                                   tipo = oc.tipo,
-                                   idTipo = oc.idTipo
-                               }).ToList();
-
-
-                if (filtro != "")
+                var filtros = new Dictionary<string, string>();
+                if (!string.IsNullOrEmpty(filtrosColumna))
                 {
-                    ofertasComercial = ofertasComercial.Where(x =>
-                                            x.codigo.ToString().ToLower().Contains(filtro.ToLower()) ||
-                                            x.fechaEstimacion.ToString().ToLower().Contains(filtro.ToLower()) ||
-                                            x.fechaRevision.ToString().ToLower().Contains(filtro.ToLower()) ||
-                                            x.fechaAprobacionGerencia.ToString().ToLower().Contains(filtro.ToLower()) ||
-                                            x.fechaEnvioOferta.ToString().ToLower().Contains(filtro.ToLower()) ||
-                                            x.fechaGeneracion.ToString().ToLower().Contains(filtro.ToLower()) ||
-                                            x.fechaVencimiento.ToString().ToLower().Contains(filtro.ToLower())
-                                          ).ToList();
+                    filtros = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(filtrosColumna);
                 }
 
-                int total = ofertasComercial.Count();
-                ofertasComercial = ofertasComercial.Skip(start).Take(lenght).ToList();
+                // Crear una consulta LINQ que se ejecutará de forma diferida
+                var ofertasQuery = from or in db.OfertaOferta
+                                   join r in db.OFERTAREQUERIMIENTO on or.SecuencialOfertaRequerimiento equals r.Secuencial
+                                   join cli in db.Cliente on r.SecuencialCLiente equals cli.Secuencial
+                                   select new
+                                   {
+                                       secuencial = or.Secuencial,
+                                       codigo = or.Codigo,
+                                       secuencialEstadoGestion = or.SecuencialEstadoGestion,
+                                       observacion = or.Observacion,
+                                       secuencialRequerimiento = r.Secuencial,
+                                       fechaGeneracion = or.FechaGeneracionOferta,
+                                       fechaVencimiento = or.FechaVencimientoOferta,
+                                       tipo = r.Secuencial + "-" + (r.Detalle.Length > 50 ? r.Detalle.Substring(0, 50) : r.Detalle),
+                                       idTipo = r.Secuencial,
+                                       precio = or.Precio,
+                                       formaPago = or.FormaPago,
+                                       descuento = (or.Descuento.HasValue && or.Descuento.Value) ? "SI" : "NO",
+                                       estado = or.Estado,
+                                       tema = or.OfertaRequerimiento != null ? or.OfertaRequerimiento.Detalle : "",
+                                       cliente = cli.Descripcion,
+                                       ticket = r.SecuencialTicketTarea,
+                                   };
+
+                // Aplicar filtros a la consulta ANTES de la paginación y ejecución
+                if (!string.IsNullOrEmpty(filtro))
+                {
+                    var filtroLower = filtro.ToLower();
+                    ofertasQuery = ofertasQuery.Where(x =>
+                        (x.codigo != null && x.codigo.ToLower().Contains(filtroLower)) ||
+                        (x.cliente != null && x.cliente.ToLower().Contains(filtroLower)) ||
+                        (x.ticket != null && x.ticket.ToString().Contains(filtro)) ||
+                        (x.tema != null && x.tema.ToLower().Contains(filtroLower))
+                    );
+                }
+
+                if (filtros != null && filtros.Count > 0)
+                {
+                    if (filtros.ContainsKey("codigoOferta") && !string.IsNullOrEmpty(filtros["codigoOferta"]))
+                        ofertasQuery = ofertasQuery.Where(x => x.codigo != null && x.codigo.ToLower().Contains(filtros["codigoOferta"].ToLower()));
+
+                    if (filtros.ContainsKey("ticket") && !string.IsNullOrEmpty(filtros["ticket"]))
+                        ofertasQuery = ofertasQuery.Where(x => x.ticket != null && x.ticket.ToString().Contains(filtros["ticket"]));
+
+                    if (filtros.ContainsKey("cliente") && !string.IsNullOrEmpty(filtros["cliente"]))
+                        ofertasQuery = ofertasQuery.Where(x => x.cliente != null && x.cliente.ToLower().Contains(filtros["cliente"].ToLower()));
+
+                    if (filtros.ContainsKey("tema") && !string.IsNullOrEmpty(filtros["tema"]))
+                        ofertasQuery = ofertasQuery.Where(x => x.tema != null && x.tema.ToLower().Contains(filtros["tema"].ToLower()));
+
+                    if (filtros.ContainsKey("estadoGestion") && !string.IsNullOrEmpty(filtros["estadoGestion"]))
+                    {
+                        int idEstadoFiltro;
+                        if (int.TryParse(filtros["estadoGestion"], out idEstadoFiltro))
+                        {
+                            ofertasQuery = ofertasQuery.Where(x => x.secuencialEstadoGestion == idEstadoFiltro);
+                        }
+                    }
+
+                    if (filtros.ContainsKey("observacion") && !string.IsNullOrEmpty(filtros["observacion"]))
+                        ofertasQuery = ofertasQuery.Where(x => x.observacion != null && x.observacion.ToLower().Contains(filtros["observacion"].ToLower()));
+                }
+
+                int total = ofertasQuery.Count();
+
+                // Paginación y ejecución de la consulta
+                var pagedOfertas = ofertasQuery.OrderByDescending(o => o.secuencial).Skip(start).Take(lenght).ToList();
+
+                // Poblar fechas y próxima actividad en memoria para CADA oferta
+                var ofertasConFechas = pagedOfertas.Select(oferta =>
+                {
+                    var historicoTicket = (oferta.ticket.HasValue)
+                        ? db.TicketHistorico.Where(h => h.SecuencialTicket == oferta.ticket.Value).OrderByDescending(h => h.Version).ToList()
+                        : new List<TicketHistorico>();
+
+                    return new
+                    {
+                        oferta.secuencial,
+                        oferta.codigo,
+                        oferta.secuencialEstadoGestion,
+                        oferta.observacion,
+                        fechaEstimacion = historicoTicket.FirstOrDefault(h => h.SecuencialProximaActividad == 3)?.FechaOperacion,
+                        fechaRevision = historicoTicket.FirstOrDefault(h => h.SecuencialProximaActividad == 7)?.FechaOperacion,
+                        fechaAprobacionGerencia = historicoTicket.FirstOrDefault(h => h.SecuencialProximaActividad == 30)?.FechaOperacion,
+                        fechaEnvioOferta = historicoTicket.FirstOrDefault(h => h.SecuencialProximaActividad == 30)?.FechaOperacion,
+                        oferta.fechaGeneracion,
+                        oferta.fechaVencimiento,
+                        oferta.tipo,
+                        oferta.idTipo,
+                        oferta.precio,
+                        oferta.formaPago,
+                        oferta.descuento,
+                        oferta.estado,
+                        oferta.tema,
+                        oferta.cliente,
+                        oferta.ticket,
+                        oferta.secuencialRequerimiento,
+                        proximaActividad = historicoTicket.FirstOrDefault()?.proximaActividad?.Descripcion,
+                    };
+                }).ToList();
 
                 var result = new
                 {
                     success = true,
                     total = total,
-                    ofertasComercial = ofertasComercial
+                    ofertasComercial = ofertasConFechas
                 };
                 return Json(result);
             }
@@ -545,94 +708,91 @@ namespace SifizPlanning.Controllers
         [HttpPost]
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult GuardarOferta(string OfertaRequerimiento, string codigo, string fechaEstimacion, string fechaRevision, string fechaEnvioOferta,
-            string fechaGeneracion, string fechaAprobacionGerencia, string fechaVencimiento)
+            string fechaGeneracion, string fechaAprobacionGerencia, string fechaVencimiento, decimal? precio, string formaPago, string descuento, string estado, string tipo, string tema)
         {
             string emailUser = User.Identity.Name;
             LoggerManager.LogInfo($"[GuardarOferta] El usuario {emailUser} inició el guardado de una nueva oferta con código: {codigo}.");
             try
             {
+                int idRequerimiento;
+                bool esPedidoRequerimiento = false;
+                if (!int.TryParse(OfertaRequerimiento, out idRequerimiento))
+                {
+                    return Json(new { success = false, msg = "Identificador de requerimiento inválido." });
+                }
+
+                // Verificar si el idRequerimiento existe en OFERTAREQUERIMIENTO
+                var requerimientoExistente = db.OFERTAREQUERIMIENTO.Find(idRequerimiento);
+                if (requerimientoExistente == null)
+                {
+                    // No existe, entonces es un pedido/requerimiento que hay que crear
+                    esPedidoRequerimiento = true;
+                }
+
+                if (esPedidoRequerimiento)
+                {
+                    // Crear el requerimiento nuevo basado en el pedido/requerimiento recibido
+                    // Para esto, se necesita obtener datos del pedido/requerimiento, que no están en los parámetros
+                    // Asumiremos que el campo 'tipo' contiene el tipo de requerimiento a crear
+                    // Y que el 'codigo' contiene el número de ticket pendiente para obtener datos
+                    int numeroTicket;
+                    if (!int.TryParse(codigo, out numeroTicket))
+                    {
+                        return Json(new { success = false, msg = "Número de ticket inválido para crear requerimiento." });
+                    }
+
+                    Ticket ticket = db.Ticket.Find(numeroTicket);
+                    if (ticket == null)
+                    {
+                        return Json(new { success = false, msg = "No se encontró el ticket para crear el requerimiento." });
+                    }
+
+                    OfertaRequerimiento nuevoRequerimiento = new OfertaRequerimiento();
+                    nuevoRequerimiento.SecuencialCLiente = ticket.persona_cliente.SecuencialCliente;
+                    nuevoRequerimiento.SecuencialRequerimiento = idRequerimiento; // Aquí se usa el id recibido como tipo
+                    nuevoRequerimiento.SecuencialTicketTarea = numeroTicket;
+                    nuevoRequerimiento.Detalle = ticket.Detalle.Length > 250 ? ticket.Detalle.Substring(0, 250) : ticket.Detalle;
+                    nuevoRequerimiento.FechaPedidoCLiente = ticket.FechaCreado;
+
+                    db.OFERTAREQUERIMIENTO.Add(nuevoRequerimiento);
+                    db.SaveChanges();
+
+                    idRequerimiento = nuevoRequerimiento.Secuencial;
+                }
+
                 OfertaOferta nuevaOferta = new OfertaOferta();
-
-                //string[] fechaEst = fechaEstimacion.Split(new Char[] { '/' });
-                //int diaE = Int32.Parse(fechaEst[0]);
-                //int mesE = Int32.Parse(fechaEst[1]);
-                //int annoE = Int32.Parse(fechaEst[2]);
-                //DateTime fEstimacion = new DateTime(annoE, mesE, diaE);
-
-                //string[] fechaRev = fechaRevision.Split(new Char[] { '/' });
-                //int diaRev = Int32.Parse(fechaRev[0]);
-                //int mesRev = Int32.Parse(fechaRev[1]);
-                //int annoRev = Int32.Parse(fechaRev[2]);
-                //DateTime fRevision = new DateTime(annoRev, mesRev, diaRev);
-
-                //string[] fechaEO = fechaEnvioOferta.Split(new Char[] { '/' });
-                //int diaEO = Int32.Parse(fechaEO[0]);
-                //int mesEO = Int32.Parse(fechaEO[1]);
-                //int annoEO = Int32.Parse(fechaEO[2]);
-                //DateTime fEnvioOferta = new DateTime(annoEO, mesEO, diaEO);
-
-                //string[] fechaG = fechaGeneracion.Split(new Char[] { '/' });
-                //int diaG = Int32.Parse(fechaG[0]);
-                //int mesG = Int32.Parse(fechaG[1]);
-                //int annoG = Int32.Parse(fechaG[2]);
-                //DateTime fGeneracion = new DateTime(annoG, mesG, diaG);
-
-                //string[] fechaAprobacionG = fechaAprobacionGerencia.Split(new Char[] { '/' });
-                //int diaAG = Int32.Parse(fechaAprobacionG[0]);
-                //int mesAG = Int32.Parse(fechaAprobacionG[1]);
-                //int annoAG = Int32.Parse(fechaAprobacionG[2]);
-                //DateTime fAprobacionGerencia = new DateTime(annoAG, mesAG, diaAG);
-
-                //string[] fechaV = fechaVencimiento.Split(new Char[] { '/' });
-                //int diaV = Int32.Parse(fechaV[0]);
-                //int mesV = Int32.Parse(fechaV[1]);
-                //int annoV = Int32.Parse(fechaV[2]);
-                //DateTime fVencimiento = new DateTime(annoV, mesV, diaV);
-
-                nuevaOferta.Codigo = codigo;
-                //nuevaOferta.FechaRecepcionEstimacion = fEstimacion;
-                //nuevaOferta.FechaEnvioRevision = fRevision;
-                //nuevaOferta.FechaEnvioOfertaCliente = fEnvioOferta;
-                //nuevaOferta.FechaGeneracionOferta = fGeneracion;
-                //nuevaOferta.FechaAprobacionOfertaGerencia = fAprobacionGerencia;
-                //nuevaOferta.FechaVencimientoOferta = fVencimiento;
-
-                // Método auxiliar para convertir fechas, permitiendo nulos
+                // Para ofertas no mayores no asociadas a ticket, permitir código vacío
+                nuevaOferta.Codigo = string.IsNullOrEmpty(codigo) ? null : codigo;
                 DateTime? ConvertirFecha(string fecha)
                 {
                     if (DateTime.TryParse(fecha, out DateTime fechaConvertida))
-                    {
                         return fechaConvertida;
-                    }
-                    return null; // Retorna nulo si la fecha no es válida
+                    return null;
                 }
-
-                nuevaOferta.Codigo = codigo;
                 nuevaOferta.FechaRecepcionEstimacion = ConvertirFecha(fechaEstimacion);
                 nuevaOferta.FechaEnvioRevision = ConvertirFecha(fechaRevision);
                 nuevaOferta.FechaEnvioOfertaCliente = ConvertirFecha(fechaEnvioOferta);
                 nuevaOferta.FechaGeneracionOferta = ConvertirFecha(fechaGeneracion);
                 nuevaOferta.FechaAprobacionOfertaGerencia = ConvertirFecha(fechaAprobacionGerencia);
                 nuevaOferta.FechaVencimientoOferta = ConvertirFecha(fechaVencimiento);
-
-                int ofertaNumerico;
-
-                if (OfertaRequerimiento != "")
+                nuevaOferta.SecuencialOfertaRequerimiento = idRequerimiento;
+                nuevaOferta.Precio = precio;
+                nuevaOferta.FormaPago = formaPago;
+                // Conversión de descuento string a bool?
+                bool? descuentoBool = null;
+                if (descuento is string descuentoStr && !string.IsNullOrEmpty(descuentoStr))
                 {
-                    if (!int.TryParse(OfertaRequerimiento, out ofertaNumerico))
-                    {
-                        return Json(new
-                        {
-                            success = false,
-                            msg = "El ticket debe ser un valor numérico válido."
-                        });
-                    }
-                    else
-                    {
-                        nuevaOferta.SecuencialOfertaRequerimiento = ofertaNumerico;
-                    }
+                    if (descuentoStr.ToUpper() == "SI") descuentoBool = true;
+                    else descuentoBool = false;
                 }
-
+                else
+                {
+                    descuentoBool = false;
+                }
+                nuevaOferta.Descuento = descuentoBool;
+                nuevaOferta.Estado = estado;
+                nuevaOferta.Tipo = tipo;
+                // Tema se guarda en el requerimiento, no en la oferta
                 db.OfertaOferta.Add(nuevaOferta);
                 db.SaveChanges();
                 LoggerManager.LogSensitiveOperation(
@@ -653,15 +813,9 @@ namespace SifizPlanning.Controllers
                 var errorMessages = ex.EntityValidationErrors
                     .SelectMany(e => e.ValidationErrors)
                     .Select(e => $"{e.PropertyName}: {e.ErrorMessage}");
-
                 var fullErrorMessage = string.Join("; ", errorMessages);
                 var exceptionMessage = $"Error de validación: {fullErrorMessage}";
-
-                return Json(new
-                {
-                    success = false,
-                    msg = exceptionMessage
-                });
+                return Json(new { success = false, msg = exceptionMessage });
             }
             catch (Exception e)
             {
@@ -672,129 +826,63 @@ namespace SifizPlanning.Controllers
                     msg = " Error al guardar la oferta."
                 });
             }
+        }
 
+        [HttpPost]
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
+        public ActionResult GuardarOfertaModern(
+            string OfertaRequerimiento, string codigo, string fechaEstimacion, string fechaRevision, string fechaEnvioOferta,
+            string fechaGeneracion, string fechaAprobacionGerencia, string fechaVencimiento, decimal? precio, string formaPago, string descuento, string estado, string tipo, string tema)
+        {
+            // Reutiliza la lógica del método principal
+            return GuardarOferta(OfertaRequerimiento, codigo, fechaEstimacion, fechaRevision, fechaEnvioOferta,
+                fechaGeneracion, fechaAprobacionGerencia, fechaVencimiento, precio, formaPago, descuento, estado, tipo, tema);
         }
 
         [HttpPost]
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult EditarOferta(int id, string ofertaRequerimiento, string fechaEstimacion, string fechaRevision, string fechaEnvioOferta,
-            string fechaGeneracion, string fechaAprobacionGerencia, string fechaVencimiento)
+            string fechaGeneracion, string fechaAprobacionGerencia, string fechaVencimiento, decimal? precio, string formaPago, string descuento, string estado, string tipo, string tema)
         {
             string emailUser = User.Identity.Name;
             LoggerManager.LogInfo($"[EditarOferta] El usuario {emailUser} inició la edición de la oferta con ID: {id}.");
             try
             {
                 var oferta = db.OfertaOferta.FirstOrDefault(s => s.Secuencial == id);
-
-                string[] fechaEst = fechaEstimacion.Split(new Char[] { '/' });
-                int diaE = Int32.Parse(fechaEst[0]);
-                int mesE = Int32.Parse(fechaEst[1]);
-                int annoE = Int32.Parse(fechaEst[2]);
-                DateTime fEstimacion = new DateTime(annoE, mesE, diaE);
-
-                string[] fechaRev = fechaRevision.Split(new Char[] { '/' });
-                int diaRev = Int32.Parse(fechaRev[0]);
-                int mesRev = Int32.Parse(fechaRev[1]);
-                int annoRev = Int32.Parse(fechaRev[2]);
-                DateTime fRevision = new DateTime(annoRev, mesRev, diaRev);
-
-                string[] fechaEO = fechaEnvioOferta.Split(new Char[] { '/' });
-                int diaEO = Int32.Parse(fechaEO[0]);
-                int mesEO = Int32.Parse(fechaEO[1]);
-                int annoEO = Int32.Parse(fechaEO[2]);
-                DateTime fEnvioOferta = new DateTime(annoEO, mesEO, diaEO);
-
-                string[] fechaG = fechaGeneracion.Split(new Char[] { '/' });
-                int diaG = Int32.Parse(fechaG[0]);
-                int mesG = Int32.Parse(fechaG[1]);
-                int annoG = Int32.Parse(fechaG[2]);
-                DateTime fGeneracion = new DateTime(annoG, mesG, diaG);
-
-                string[] fechaAprobacionG = fechaAprobacionGerencia.Split(new Char[] { '/' });
-                int diaAG = Int32.Parse(fechaAprobacionG[0]);
-                int mesAG = Int32.Parse(fechaAprobacionG[1]);
-                int annoAG = Int32.Parse(fechaAprobacionG[2]);
-                DateTime fAprobacionGerencia = new DateTime(annoAG, mesAG, diaAG);
-
-                string[] fechaV = fechaVencimiento.Split(new Char[] { '/' });
-                int diaV = Int32.Parse(fechaV[0]);
-                int mesV = Int32.Parse(fechaV[1]);
-                int annoV = Int32.Parse(fechaV[2]);
-                DateTime fVencimiento = new DateTime(annoV, mesV, diaV);
-
-
-
-                //if (ofertaRequerimiento > 0)
-                //{
-                //    var ticket = (from r in db.OFERTAREQUERIMIENTO
-                //                  join t in db.Ticket on r.SecuencialTicketTarea equals t.Secuencial
-                //                  where r.Secuencial == ofertaRequerimiento
-                //                  select t).FirstOrDefault();
-
-                //    if (ticket != null)
-                //    {
-                //        var est = (from r in db.TicketHistorico
-                //                   join e in db.EstadoTicket on r.SecuencialEstadoTicket equals e.Secuencial
-                //                   where e.Codigo == "COTIZAR"
-                //                   select new
-                //                   {
-                //                       fechaEstimacion = r.FechaOperacion
-                //                   }).FirstOrDefault();
-
-                //        var aprobarcion = (from r in db.TicketHistorico
-                //                           join e in db.EstadoTicket on r.SecuencialEstadoTicket equals e.Secuencial
-                //                           where e.Codigo == "APROBADO"
-                //                           select new
-                //                           {
-                //                               fechaAprobado = r.FechaOperacion
-                //                           }).FirstOrDefault();
-
-                //    }
-                //};
-
                 if (oferta == null)
-                {
-                    return Json(new
-                    {
-                        success = false,
-                        msg = "La oferta especificada no existe."
-                    });
-                }
-
+                    return Json(new { success = false, msg = "La oferta especificada no existe." });
                 DateTime? ConvertirFecha(string fecha)
                 {
                     if (DateTime.TryParse(fecha, out DateTime fechaConvertida))
-                    {
                         return fechaConvertida;
-                    }
-                    return null; // Retorna nulo si la fecha no es válida
+                    return null;
                 }
-
                 oferta.FechaRecepcionEstimacion = ConvertirFecha(fechaEstimacion);
                 oferta.FechaEnvioRevision = ConvertirFecha(fechaRevision);
                 oferta.FechaEnvioOfertaCliente = ConvertirFecha(fechaEnvioOferta);
                 oferta.FechaGeneracionOferta = ConvertirFecha(fechaGeneracion);
                 oferta.FechaAprobacionOfertaGerencia = ConvertirFecha(fechaAprobacionGerencia);
                 oferta.FechaVencimientoOferta = ConvertirFecha(fechaVencimiento);
-
                 int ofertaNumerico;
-
-                if (ofertaRequerimiento != "")
+                if (!string.IsNullOrEmpty(ofertaRequerimiento) && int.TryParse(ofertaRequerimiento, out ofertaNumerico))
+                    oferta.SecuencialOfertaRequerimiento = ofertaNumerico;
+                oferta.Precio = precio;
+                oferta.FormaPago = formaPago;
+                // Conversión de descuento string a bool?
+                bool? descuentoBool = null;
+                if (descuento is string descuentoStr && !string.IsNullOrEmpty(descuentoStr))
                 {
-                    if (!int.TryParse(ofertaRequerimiento, out ofertaNumerico))
-                    {
-                        return Json(new
-                        {
-                            success = false,
-                            msg = "El ticket debe ser un valor numérico válido."
-                        });
-                    }
-                    else
-                    {
-                        oferta.SecuencialOfertaRequerimiento = ofertaNumerico;
-                    }
+                    if (descuentoStr.ToUpper() == "SI") descuentoBool = true;
+                    else descuentoBool = false;
                 }
-
+                else
+                {
+                    descuentoBool = false;
+                }
+                oferta.Descuento = descuentoBool;
+                oferta.Estado = estado;
+                oferta.Tipo = tipo;
+                // Tema se guarda en el requerimiento, no en la oferta
                 db.SaveChanges();
                 LoggerManager.LogSensitiveOperation(
                     "Edición de oferta",
@@ -814,15 +902,9 @@ namespace SifizPlanning.Controllers
                 var errorMessages = ex.EntityValidationErrors
                     .SelectMany(e => e.ValidationErrors)
                     .Select(e => $"{e.PropertyName}: {e.ErrorMessage}");
-
                 var fullErrorMessage = string.Join("; ", errorMessages);
                 var exceptionMessage = $"Error de validación: {fullErrorMessage}";
-
-                return Json(new
-                {
-                    success = false,
-                    msg = exceptionMessage
-                });
+                return Json(new { success = false, msg = exceptionMessage });
             }
             catch (Exception e)
             {
@@ -833,6 +915,18 @@ namespace SifizPlanning.Controllers
                     msg = "Error al editar la oferta."
                 });
             }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
+        [ActionName("editar-oferta")]
+        public ActionResult EditarOfertaModern(
+            int id, string ofertaRequerimiento, string fechaEstimacion, string fechaRevision, string fechaEnvioOferta,
+            string fechaGeneracion, string fechaAprobacionGerencia, string fechaVencimiento, decimal? precio, string formaPago, string descuento, string estado, string tipo, string tema)
+        {
+            // Reutiliza la lógica del método principal
+            return EditarOferta(id, ofertaRequerimiento, fechaEstimacion, fechaRevision, fechaEnvioOferta,
+                fechaGeneracion, fechaAprobacionGerencia, fechaVencimiento, precio, formaPago, descuento, estado, tipo, tema);
         }
 
         [HttpPost]
@@ -902,24 +996,59 @@ namespace SifizPlanning.Controllers
             LoggerManager.LogInfo($"[DarRequerimientosOfertas] Usuario {emailUser} solicitando requerimientos");
             try
             {
-                var requerimientosComercial = (from or in db.OFERTAREQUERIMIENTO
-                                               select new
-                                               {
-                                                   secuencial = or.Secuencial,
-                                                   detalle = or.Secuencial + "-" + or.Detalle.Substring(0, 30)
-                                               }).ToList();
+                string emailUser = User.Identity.Name;
+                
+                // Obtener el colaborador actual
+                var colaboradorActual = (from u in db.Usuario
+                                        join p in db.Persona on u.SecuencialPersona equals p.Secuencial
+                                        join c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
+                                        where u.Email == emailUser
+                                        select c).FirstOrDefault();
+
+                // Verificar si el usuario tiene rol ADMIN o ADMINCOMERCIAL
+                bool esAdmin = User.IsInRole("ADMIN") || User.IsInRole("ADMINCOMERCIAL");
+
+                IQueryable<dynamic> requerimientosQuery;
+
+                if (esAdmin)
+                {
+                    // Si es ADMIN o ADMINCOMERCIAL, mostrar todos los requerimientos
+                    requerimientosQuery = from orq in db.OFERTAREQUERIMIENTO
+                                         join cli in db.Cliente on orq.SecuencialCLiente equals cli.Secuencial
+                                         join req in db.Requerimiento on orq.SecuencialRequerimiento equals req.Secuencial
+                                         select new
+                                         {
+                                             id = orq.Secuencial,
+                                             descripcion = req.Descripcion,
+                                             cliente = cli.Descripcion,
+                                             ticket = orq.SecuencialTicketTarea,
+                                             detalle = orq.Detalle
+                                         };
+                }
+                else
+                {
+                    // Si no es admin, solo mostrar los requerimientos donde es responsable
+                    requerimientosQuery = from orq in db.OFERTAREQUERIMIENTO
+                                         join cli in db.Cliente on orq.SecuencialCLiente equals cli.Secuencial
+                                         join req in db.Requerimiento on orq.SecuencialRequerimiento equals req.Secuencial
+                                         where orq.SecuencialColaborador == colaboradorActual.Secuencial
+                                         select new
+                                         {
+                                             id = orq.Secuencial,
+                                             descripcion = req.Descripcion,
+                                             cliente = cli.Descripcion,
+                                             ticket = orq.SecuencialTicketTarea,
+                                             detalle = orq.Detalle
+                                         };
+                }
+
+                var requerimientos = requerimientosQuery.ToList();
+
                 return Json(new
                 {
                     success = true,
-                    requerimientosComercial = requerimientosComercial,
+                    requerimientos = requerimientos,
                     msg = "Se ha realizado la operación correctamente."
-                });
-            }
-            catch (DbEntityValidationException ex)
-            {
-                return Json(new
-                {
-                    success = false
                 });
             }
             catch (Exception e)
@@ -1011,6 +1140,30 @@ namespace SifizPlanning.Controllers
 
         [HttpPost]
         [Authorize(Roles = "COMERCIAL, ADMIN")]
+        public ActionResult ActualizarEstadoGestionOferta(int idOferta, int? idEstado, string observacion)
+        {
+            try
+            {
+                var oferta = db.OfertaOferta.FirstOrDefault(o => o.Secuencial == idOferta);
+                if (oferta == null)
+                {
+                    return Json(new { success = false, msg = "No se encontró la oferta especificada." });
+                }
+
+                oferta.SecuencialEstadoGestion = idEstado;
+                oferta.Observacion = observacion;
+                db.SaveChanges();
+
+                return Json(new { success = true });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = e.Message });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult FormalizacionComercial(int start, int lenght, string filtro = "")
         {
             string emailUser = User.Identity.Name;
@@ -1020,7 +1173,7 @@ namespace SifizPlanning.Controllers
                 var formalizacionComercial = (from f in db.FormalizacionOfertas
                                               join o in db.OfertaOferta on f.SecuencialOferta equals o.Secuencial
                                               join r in db.EstadoOferta on f.SecuencialEstadoOferta equals r.Secuencial into estadoJoin
-                                              from r in estadoJoin.DefaultIfEmpty() 
+                                              from r in estadoJoin.DefaultIfEmpty()
                                               select new
                                               {
                                                   secuencial = f.Secuencial,
@@ -1121,7 +1274,7 @@ namespace SifizPlanning.Controllers
                 var form = (from f in db.FormalizacionOfertas
                             join oo in db.OfertaOferta on f.SecuencialOferta equals oo.Secuencial
                             join r in db.EstadoOferta on f.SecuencialEstadoOferta equals r.Secuencial into estadoJoin
-                            from r in estadoJoin.DefaultIfEmpty() 
+                            from r in estadoJoin.DefaultIfEmpty()
                             where f.Secuencial == sec
                             select new
                             {
@@ -1231,15 +1384,9 @@ namespace SifizPlanning.Controllers
                 var errorMessages = ex.EntityValidationErrors
                     .SelectMany(e => e.ValidationErrors)
                     .Select(e => $"{e.PropertyName}: {e.ErrorMessage}");
-
                 var fullErrorMessage = string.Join("; ", errorMessages);
                 var exceptionMessage = $"Error de validación: {fullErrorMessage}";
-
-                return Json(new
-                {
-                    success = false,
-                    msg = exceptionMessage
-                });
+                return Json(new { success = false, msg = exceptionMessage });
             }
             catch (Exception e)
             {
@@ -1360,7 +1507,6 @@ namespace SifizPlanning.Controllers
             }
         }
 
-
         [HttpPost]
         [Authorize(Roles = "COMERCIAL, ADMIN")]
         public ActionResult EliminarFormalizacion(string secuencial)
@@ -1446,7 +1592,7 @@ namespace SifizPlanning.Controllers
                     msg = "Se ha realizado la operación correctamente."
                 });
             }
-            catch (DbEntityValidationException ex)
+            catch (DbEntityValidationException)
             {
                 return Json(new
                 {

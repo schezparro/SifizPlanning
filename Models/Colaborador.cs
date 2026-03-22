@@ -42,7 +42,6 @@ namespace SifizPlanning.Models
             this.entregableMotivoTrabajo = new HashSet<EntregableMotivoTrabajo>();
             this.motivoTrabajo = new HashSet<MotivoTrabajo>();
             this.gestorServicios = new HashSet<GestorServicios>();
-            this.clientesLider = new HashSet<ClienteAuxiliar>();
             this.ofertas = new HashSet<Ofertas>();
             this.NIVELCOLABORADORTECNOLOGIA = new HashSet<NivelColaboradorTecnologia>();
             this.incidencias = new HashSet<Incidencias>();
@@ -52,6 +51,8 @@ namespace SifizPlanning.Models
             this.recursos = new HashSet<Recursos>();
             this.DIASDISPONIBLESVACACIONES = new HashSet<DiasDisponiblesVacaciones>();
             this.PROPUESTAVACACIONES = new HashSet<PropuestaVacaciones>();
+            this.clienteAuxiliar = new HashSet<ClienteAuxiliar>();
+            this.PUBLICACIONESCLIENTE = new HashSet<PublicacionesCliente>();
         }
     
         public int Secuencial { get; set; }
@@ -94,7 +95,6 @@ namespace SifizPlanning.Models
         public virtual ICollection<EntregableMotivoTrabajo> entregableMotivoTrabajo { get; set; }
         public virtual ICollection<MotivoTrabajo> motivoTrabajo { get; set; }
         public virtual ICollection<GestorServicios> gestorServicios { get; set; }
-        public virtual ICollection<ClienteAuxiliar> clientesLider { get; set; }
         public virtual ICollection<Ofertas> ofertas { get; set; }
         public virtual ICollection<NivelColaboradorTecnologia> NIVELCOLABORADORTECNOLOGIA { get; set; }
         public virtual ICollection<Incidencias> incidencias { get; set; }
@@ -104,5 +104,7 @@ namespace SifizPlanning.Models
         public virtual ICollection<Recursos> recursos { get; set; }
         public virtual ICollection<DiasDisponiblesVacaciones> DIASDISPONIBLESVACACIONES { get; set; }
         public virtual ICollection<PropuestaVacaciones> PROPUESTAVACACIONES { get; set; }
+        public virtual ICollection<ClienteAuxiliar> clienteAuxiliar { get; set; }
+        public virtual ICollection<PublicacionesCliente> PUBLICACIONESCLIENTE { get; set; }
     }
 }

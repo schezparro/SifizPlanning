@@ -137,6 +137,7 @@
         $scope.url = '';
         $scope.moduloSeleccionado = '';
         $scope.link = '';
+        $scope.esPlan = false;
 
         angular.element("#modal-agregar-recursos").modal("show");
     };

@@ -76,7 +76,7 @@ namespace SifizPlanning.Controllers
                 $"Usuario: {emailUser}",
                 emailUser
             );
-        
+
             DateTime hoy = DateTime.Today;
             DayOfWeek diaSemana = hoy.DayOfWeek;
             DateTime lunes = hoy;
@@ -91,20 +91,20 @@ namespace SifizPlanning.Controllers
                 DateTime domingo = hoy.Subtract(time);
                 lunes = domingo.AddDays(1);
             }
-        
+
             var resp = new
             {
                 success = true,
                 lunes = lunes.ToString("dd/MM/yyyy"),
                 hoy = hoy.ToString("dd/MM/yyyy")
             };
-        
+
             LoggerManager.LogInfo(
                 "Resultado Último Lunes",
                 $"Usuario: {emailUser}, Lunes: {lunes:dd/MM/yyyy}, Hoy: {hoy:dd/MM/yyyy}",
                 emailUser
             );
-        
+
             return Json(resp);
         }
 
@@ -601,13 +601,13 @@ namespace SifizPlanning.Controllers
 
             if (trabUser != null)
                 tareasProgramadores.Insert(0, trabUser);//Se pone el colaborador de primero
-        
+
             LoggerManager.LogInfo(
                 "Finaliza Consulta Tareas",
                 $"Usuario: {emailUser}, Total trabajadores: {tareasProgramadores.Count}",
                 emailUser
             );
-        
+
             var resp = new
             {
                 success = true,
@@ -1240,6 +1240,7 @@ namespace SifizPlanning.Controllers
 
                     string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
                     string linkAceptar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO"));
+                    string linkAceptarPublicar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO_PUBLICA"));
                     string linkRechazar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":NOACEPTADO"));
                     //string linksConcatenados = linkAceptar + ", " + linkRechazar;
 
@@ -2662,6 +2663,11 @@ r in db.Rol on ur.rol equals r
         {
             try
             {
+                // Log para debugging de fechas
+                LoggerManager.LogInfo($"Solicitud de vacaciones recibida - Usuario: {User.Identity.Name}, " +
+                    $"FechaInicio: {solicitud.FechaInicioVacaciones:yyyy-MM-dd HH:mm:ss} (Kind: {solicitud.FechaInicioVacaciones.Kind}), " +
+                    $"FechaFin: {solicitud.FechaFinVacaciones:yyyy-MM-dd HH:mm:ss} (Kind: {solicitud.FechaFinVacaciones.Kind})");
+
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser && x.EstaActivo == 1);
                 Persona persona = user.persona;
@@ -2671,9 +2677,10 @@ r in db.Rol on ur.rol equals r
                 if (solicitud.ID == null)
                 {
                     solVacaciones.AlAnio = solicitud.AlAnio;
-                    solVacaciones.FechaInicioVacaciones = solicitud.FechaInicioVacaciones;
-                    solVacaciones.FechaFinVacaciones = solicitud.FechaFinVacaciones;
-                    solVacaciones.FechaPresentarseTrabajar = solicitud.FechaPresentarseTrabajar;
+                    // Normalizar fechas antes de guardar
+                    solVacaciones.FechaInicioVacaciones = Utiles.NormalizarFecha(solicitud.FechaInicioVacaciones);
+                    solVacaciones.FechaFinVacaciones = Utiles.NormalizarFecha(solicitud.FechaFinVacaciones);
+                    solVacaciones.FechaPresentarseTrabajar = Utiles.NormalizarFecha(solicitud.FechaPresentarseTrabajar);
                     solVacaciones.Cargo = solicitud.Cargo;
                     solVacaciones.Empresa = solicitud.Empresa;
                     solVacaciones.Cedula = solicitud.Cedula;
@@ -2682,8 +2689,8 @@ r in db.Rol on ur.rol equals r
                     solVacaciones.DiasCorresponden = solicitud.DiasCorresponden;
                     solVacaciones.DiasDisfrutar = solicitud.DiasDisfrutar;
                     solVacaciones.DiasPendientes = solicitud.DiasPendientes;
-                    solVacaciones.FechaIngresoInstitucion = solicitud.FechaPresentarseTrabajar; //No usar -> solicitud.FechaIngresoInstitucion;
-                    solVacaciones.FechaIngresoSolicitud = solicitud.FechaIngresoSolicitud;
+                    solVacaciones.FechaIngresoInstitucion = Utiles.NormalizarFecha(solicitud.FechaPresentarseTrabajar); //No usar -> solicitud.FechaIngresoInstitucion;
+                    solVacaciones.FechaIngresoSolicitud = Utiles.NormalizarFecha(solicitud.FechaIngresoSolicitud);
                     solVacaciones.Observaciones = solicitud.Observaciones;
                     solVacaciones.DelAnio = solicitud.DelAnio;
                     solVacaciones.Jefe = solicitud.Jefe;
@@ -2812,6 +2819,12 @@ r in db.Rol on ur.rol equals r
         {
             try
             {
+                // Log para debugging de fechas
+                LoggerManager.LogInfo($"Edición solicitud de vacaciones - Usuario: {User.Identity.Name}, " +
+                    $"ID: {solicitud.ID}, " +
+                    $"FechaInicio: {solicitud.FechaInicioVacaciones:yyyy-MM-dd HH:mm:ss} (Kind: {solicitud.FechaInicioVacaciones.Kind}), " +
+                    $"FechaFin: {solicitud.FechaFinVacaciones:yyyy-MM-dd HH:mm:ss} (Kind: {solicitud.FechaFinVacaciones.Kind})");
+
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser && x.EstaActivo == 1);
                 Persona persona = user.persona;
@@ -4578,7 +4591,7 @@ r in db.Rol on ur.rol equals r
                 List<string> destinatarios = new List<string>();
                 destinatarios.Add("mbatista@sifizsoft.com");
                 destinatarios.Add("rlandave@sifizsoft.com");
-                destinatarios.Add("vhidalgo@sifizsoft.com");
+                // destinatarios.Add("vhidalgo@sifizsoft.com");
                 destinatarios.Add("operaciones@sifizsoft.com");
 
                 //string comercial = System.Configuration.ConfigurationManager.AppSettings["emailComercial"];
@@ -4998,7 +5011,8 @@ r in db.Rol on ur.rol equals r
                         db.RecursosAsistencia.Add(ra);
                         db.SaveChanges();
                     }
-                };
+                }
+                ;
 
                 return Json(new
                 {
@@ -5393,7 +5407,8 @@ r in db.Rol on ur.rol equals r
                         db.SaveChanges();
 
                     }
-                };
+                }
+                ;
 
                 return Json(new
                 {
@@ -5566,6 +5581,120 @@ r in db.Rol on ur.rol equals r
                         <strong>Modulador:</strong> {recurso.SecuencialModulo}<br/>
                         <strong>Enlace de la reunión:</strong> <a href='{recurso.Url}' target='_blank'>{recurso.Url}</a><br/>
                     </div>";
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "USER,ADMIN")] // Rol ajustado para incluir USER
+        public ActionResult ObtenerProyectosPorClientePorTarea(int idTarea)
+        {
+            try
+            {
+                // PASO 1: Usar el idTarea para encontrar la tarea y el ID del cliente.
+                // IMPORTANTE: Confirma que tu tabla de Tareas se llama 'Tarea' en tu contexto (db.Tarea).
+                var tarea = db.Tarea.FirstOrDefault(t => t.Secuencial == idTarea);
+
+                // Si la tarea no se encuentra o no tiene un cliente, devolvemos una respuesta vacía pero exitosa.
+                if (tarea == null)
+                {
+                    return Json(new { success = true, proyectos = new List<object>(), nombreCliente = "Tarea no encontrada o sin cliente." });
+                }
+
+                // Obtenemos el ID del cliente para usarlo en las siguientes consultas.
+                int idCliente = tarea.SecuencialCliente;
+
+                // PASO 2: Obtenemos el nombre del cliente para devolverlo en la respuesta.
+                var nombreDelCliente = db.Cliente
+                                         .Where(c => c.Secuencial == idCliente)
+                                         .Select(c => c.Descripcion)
+                                         .FirstOrDefault();
+
+
+                // PASO 3: Ejecutar la consulta completa de proyectos, filtrando por el idCliente encontrado.
+                var proyectosQuery = (from ca in db.ClienteAuxiliar
+                                      join c in db.Cliente on ca.SecuencialCliente equals c.Secuencial
+
+                                      // LEFT JOINs para obtener las descripciones
+                                      join vd in db.VersionDesarrollo on ca.SecuencialVersionDesarrollo equals vd.Secuencial into vd_join
+                                      from vd in vd_join.DefaultIfEmpty()
+
+                                      join r in db.Repositorio on ca.SecuencialRepositorio equals r.Secuencial into r_join
+                                      from r in r_join.DefaultIfEmpty()
+
+                                      join rc in db.ResponsableProyectos on ca.SecuencialResponsableCodigo equals rc.Secuencial into rc_join
+                                      from rc in rc_join.DefaultIfEmpty()
+
+                                      join rp in db.ResponsableProyectos on ca.SecuencialResponsablePublicacion equals rp.Secuencial into rp_join
+                                      from rp in rp_join.DefaultIfEmpty()
+
+                                      join ri in db.ResponsableProyectos on ca.SecuencialResponsableAcceso equals ri.Secuencial into ri_join
+                                      from ri in ri_join.DefaultIfEmpty()
+
+                                      join lp in db.Colaborador on ca.SecuencialLiderProyecto equals lp.Secuencial into lp_join
+                                      from lp in lp_join.DefaultIfEmpty()
+
+                                          // JOIN para Ubicacion
+                                      join ru in db.ResponsableProyectos on ca.SecuencialUbicacion equals ru.Secuencial into ru_join
+                                      from ru in ru_join.DefaultIfEmpty()
+
+                                          // JOIN para Version de Base de Datos
+                                      join vbd in db.VersionBaseDatos on ca.SecuencialVersionBaseDatos equals vbd.Secuencial into vbd_join
+                                      from vbd in vbd_join.DefaultIfEmpty()
+
+                                      where ca.SecuencialCliente == idCliente && c.EstaActivo == 1
+
+                                      select new
+                                      {
+                                          id = ca.Secuencial,
+                                          cooperativa = c.Descripcion,
+                                          codificacion = c.Codigo,
+                                          version = ca.VersionFBS ?? "",
+                                          visual = vd.Descripcion ?? "",
+                                          repositorio = r.Descripcion ?? "",
+                                          admCod = rc.Nombre ?? "",
+                                          publicacion = rp.Nombre ?? "",
+                                          integracion = ri.Nombre ?? "",
+                                          solucion = ca.TieneCodigoFuente == 1 ? "Si" : "No",
+                                          pathFuentesFinDia = ca.PathFuentes,
+                                          fechaSalida = (DateTime?)ca.FechaProduccion, // Convertido a Nullable para seguridad
+                                          ubicacion = ru.Nombre ?? "",
+                                          versionBd = vbd.Descripcion ?? "",
+                                          liderProyecto = (lp.persona.Nombre1 ?? "") + " " + (lp.persona.Apellido1 ?? ""),
+                                          contactoCliente = c.persona_cliente.FirstOrDefault().persona.usuario.FirstOrDefault().Email ?? "",
+                                          correoContactoCliente = c.persona_cliente.FirstOrDefault().persona.usuario.FirstOrDefault().Email ?? "",
+                                          gestorServicio = c.gestorServicios.FirstOrDefault().colaborador.persona.Nombre1 + " " + c.gestorServicios.FirstOrDefault().colaborador.persona.Apellido1,
+                                          correoGestorServicio = c.gestorServicios.FirstOrDefault().colaborador.persona.usuario.FirstOrDefault().Email ?? ""
+                                      });
+
+                var proyectos = proyectosQuery.ToList().Select(p => new
+                {
+                    p.id,
+                    p.cooperativa,
+                    p.codificacion,
+                    p.version,
+                    p.visual,
+                    p.repositorio,
+                    p.admCod,
+                    p.publicacion,
+                    p.integracion,
+                    p.solucion,
+                    p.pathFuentesFinDia,
+                    fechaSalida = p.fechaSalida.HasValue ? p.fechaSalida.Value.ToString("dd/MM/yyyy") : "N/A",
+                    p.ubicacion,
+                    p.versionBd,
+                    liderProyecto = p.liderProyecto.Trim(),
+                    p.contactoCliente,
+                    p.correoContactoCliente,
+                    p.gestorServicio,
+                    p.correoGestorServicio
+                }).ToList();
+
+                // PASO 4: Devolver el JSON con los proyectos y el nombre del cliente.
+                return Json(new { success = true, proyectos = proyectos, nombreCliente = nombreDelCliente });
+            }
+            catch (Exception e)
+            {
+                return Json(new { success = false, msg = "Error al leer los proyectos: " + e.Message });
+            }
         }
 
         //ESTIMACIONES DE LOS USUARIOS
@@ -6685,7 +6814,8 @@ r in db.Rol on ur.rol equals r
                 if (!rgx.IsMatch(destinatariosEmailTicket))
                 {
                     throw new Exception("Debe ingresar una lista de correos válida separados por punto y coma(;)");
-                };
+                }
+                ;
                 string[] emails = destinatariosEmailTicket.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var email in emails)
                 {
@@ -7356,6 +7486,7 @@ r in db.Rol on ur.rol equals r
                         string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
 
                         string linkAceptar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO"));
+                        string linkAceptarPublicar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO_PUBLICA"));
                         string linkRechazar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":NOACEPTADO"));
                         string textoEmailCliente = textoEmail + @"<br/><div style='font-size: 11pt; font-family: sans-serif; color: #1F497D;'>
 			                                                <span style='color:#128812'>
@@ -7363,6 +7494,13 @@ r in db.Rol on ur.rol equals r
 			                                                </span><br/>                                                            
 			                                                <a href='" + linkAceptar + @"'>
                                                                 <i>" + linkAceptar + @"</i>
+			                                                </a>			
+			                                                <br/><br/>
+			                                                <span style='color:#1F7B1F'>
+				                                                Si usted <b>ACEPTA Y DESEA PUBLICAR</b> en producción, presione el siguiente link:
+			                                                </span><br/>                                                            
+			                                                <a href='" + linkAceptarPublicar + @"'>
+                                                                <i>" + linkAceptarPublicar + @"</i>
 			                                                </a>			
 			                                                <br/><br/>
 			                                                <span style='color:#EE1212'>Si por el contrario <b>NO ACEPTA</b> este requerimiento por favor presione el siguiente link:</span><br/>
@@ -7483,6 +7621,7 @@ r in db.Rol on ur.rol equals r
                     string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
 
                     string linkAceptar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO"));
+                    string linkAceptarPublicar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":ACEPTADO_PUBLICA"));
                     string linkRechazar = baseUrl + "/clientes/respuesta-resolucion?cod=" + Server.UrlEncode(Utiles.EncriptacionSimetrica(ticket.Secuencial + ":NOACEPTADO"));
                     string textoEmailCliente = textoEmail + @"<br/><div style='font-size: 11pt; font-family: sans-serif; color: #1F497D;'>
 			                                                <span style='color:#128812'>
@@ -7490,6 +7629,13 @@ r in db.Rol on ur.rol equals r
 			                                                </span><br/>                                                            
 			                                                <a href='" + linkAceptar + @"'>
                                                                 <i>" + linkAceptar + @"</i>
+			                                                </a>			
+			                                                <br/><br/>
+			                                                <span style='color:#1F7B1F'>
+				                                                Si usted <b>ACEPTA Y DESEA PUBLICAR</b> en producción, presione el siguiente link:
+			                                                </span><br/>                                                            
+			                                                <a href='" + linkAceptarPublicar + @"'>
+                                                                <i>" + linkAceptarPublicar + @"</i>
 			                                                </a>			
 			                                                <br/><br/>
 			                                                <span style='color:#EE1212'>Si por el contrario <b>NO ACEPTA</b> este requerimiento por favor presione el siguiente link:</span><br/>
@@ -7541,6 +7687,138 @@ r in db.Rol on ur.rol equals r
                 var resp = new
                 {
                     success = true
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMINTFS, ADMIN")]
+        public ActionResult PublicacionesCliente()
+        {
+            try
+            {
+                var data = (from pc in db.PublicacionesCliente
+                            join t in db.Ticket on pc.SecuencialTicket equals t.Secuencial
+                            join pcli in db.Persona_Cliente on pc.SecuencialCliente equals pcli.SecuencialCliente
+                            join p in db.Persona on pcli.SecuencialPersona equals p.Secuencial
+                            join col in db.Colaborador on pc.SecuencialColaborador equals col.Secuencial into colLeft
+                            from col in colLeft.DefaultIfEmpty()
+                            join pCol in db.Persona on col.SecuencialPersona equals pCol.Secuencial into pColLeft
+                            from pCol in pColLeft.DefaultIfEmpty()
+                            orderby pc.FechaSolicitud descending
+                            select new
+                            {
+                                secuencial = pc.Secuencial,
+                                numeroTicket = t.Secuencial,
+                                nombreCliente = p.Nombre1 + " " + p.Apellido1,
+                                asuntoTicket = t.Asunto,
+                                fechaSolicitud = pc.FechaSolicitud,
+                                estaPublicado = pc.EstaPublicado,
+                                fechaPublicacion = pc.FechaPublicacion,
+                                colaborador = pCol != null ? (pCol.Nombre1 + " " + pCol.Apellido1) : ""
+                            }).ToList();
+
+                var resp = new
+                {
+                    success = true,
+                    publicacionesCliente = data
+                };
+                return Json(resp);
+            }
+            catch (Exception e)
+            {
+                var resp = new
+                {
+                    success = false,
+                    msg = e.Message
+                };
+                return Json(resp);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ADMINTFS, ADMIN")]
+        public ActionResult MarcarPublicacionCliente(int id)
+        {
+            try
+            {
+                string emailUser = User.Identity.Name;
+                Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
+                Persona persona = user.persona;
+                Colaborador colaborador = db.Colaborador.FirstOrDefault(x => x.persona.Secuencial == persona.Secuencial);
+                
+                PublicacionesCliente publicacion = db.PublicacionesCliente.Find(id);
+                if (publicacion == null)
+                {
+                    throw new Exception("No se encontró la publicación cliente");
+                }
+
+                publicacion.EstaPublicado = true;
+                publicacion.FechaPublicacion = DateTime.Now;
+                publicacion.SecuencialColaborador = colaborador.Secuencial;
+
+                db.SaveChanges();
+
+                // Obtener información para enviar emails
+                Ticket ticket = publicacion.ticket;
+                Cliente cliente = db.Cliente.Find(publicacion.SecuencialCliente);
+                
+                // Obtener email de la persona cliente
+                Persona_Cliente personaClienteEntity = db.Set<Persona_Cliente>().FirstOrDefault(x => x.SecuencialCliente == cliente.Secuencial);
+                Persona personaCliente = personaClienteEntity.persona;
+                string emailCliente = personaCliente.usuario.FirstOrDefault().Email;
+
+                // Email al cliente
+                string asunto = "Publicación completada - Ticket #" + string.Format("{0:000000}", ticket.Secuencial);
+                string texto = @"<div class='textoCuerpo'><br/>
+                    Estimado(a):<br/><br/>
+                    Le informamos que su solicitud de publicación ha sido completada.<br/><br/>
+                    <b>Detalles:</b><br/>
+                    Ticket: #" + string.Format("{0:000000}", ticket.Secuencial) + @"<br/>
+                    Asunto: " + ticket.Asunto + @"<br/>
+                    Fecha de Publicación: " + publicacion.FechaPublicacion.Value.ToString("dd/MM/yyyy HH:mm") + @"<br/>
+                    Publicado por: " + persona.Nombre1 + " " + persona.Apellido1 + @"<br/><br/>
+                    Cualquier duda, por favor contáctenos.<br/><br/>
+                    Saludos cordiales.<br/>
+                    </div>";
+
+                Utiles.EnviarEmailSistema(new string[] { emailCliente }, texto, asunto);
+
+                // Email a operaciones
+                string asuntoOps = "Publicación completada - Ticket #" + string.Format("{0:000000}", ticket.Secuencial);
+                string textoOps = @"<div class='textoCuerpo'><br/>
+                    Se ha marcado como completada la siguiente publicación cliente:<br/><br/>
+                    <b>Detalles:</b><br/>
+                    Ticket: #" + string.Format("{0:000000}", ticket.Secuencial) + @"<br/>
+                    Cliente: " + cliente.Descripcion + @"<br/>
+                    Persona: " + personaCliente.Nombre1 + " " + personaCliente.Apellido1 + @"<br/>
+                    Asunto: " + ticket.Asunto + @"<br/>
+                    Fecha de Solicitud: " + publicacion.FechaSolicitud.ToString("dd/MM/yyyy HH:mm") + @"<br/>
+                    Fecha de Publicación: " + publicacion.FechaPublicacion.Value.ToString("dd/MM/yyyy HH:mm") + @"<br/>
+                    Publicado por: " + persona.Nombre1 + " " + persona.Apellido1 + @"<br/><br/>
+                    </div>";
+
+                List<string> correosOps = Utiles.CorreoPorGrupoEmail("OPERACIONES");
+                correosOps.AddRange(Utiles.CorreoPorGrupoEmail("DEVOPS"));
+                if (correosOps.Count > 0)
+                {
+                    Utiles.EnviarEmailSistema(correosOps.ToArray(), textoOps, asuntoOps);
+                }
+
+                var resp = new
+                {
+                    success = true,
+                    msg = "Publicación marcada como completada"
                 };
                 return Json(resp);
             }
@@ -9309,14 +9587,39 @@ r in db.Rol on ur.rol equals r
                 foreach (var day in days)
                 {
                     DateTime fecha = new DateTime(anno, mes, day);
+
+                    // Validar fines de semana
+                    if (fecha.DayOfWeek == DayOfWeek.Saturday || fecha.DayOfWeek == DayOfWeek.Sunday)
+                    {
+                        throw new Exception("No se pueden seleccionar fines de semana (Sábados y Domingos).");
+                    }
+
+                    // Validar feriados
+                    bool isFeriado = db.Feriados.Any(f => f.Fecha.Year == anno && f.Fecha.Month == mes && f.Fecha.Day == day);
+                    if (isFeriado)
+                    {
+                        throw new Exception("No se pueden seleccionar días feriados/festivos.");
+                    }
+
+                    // Prevenir doble inserción y concurrencia
+                    var existe = db.PropuestaVacaciones.FirstOrDefault(p => p.SecuencialColaborador == idColaborador && p.Fecha == fecha);
+                    if (existe != null) continue;
+
+                    var ddv = db.DiasDisponiblesVacaciones.FirstOrDefault(d => d.SecuencialColaborador == idColaborador);
+                    if (ddv != null)
+                    {
+                        if (ddv.DiasDisponibles <= 0)
+                        {
+                            throw new Exception("No tiene días disponibles suficientes.");
+                        }
+                        ddv.DiasDisponibles--;
+                    }
+
                     db.PropuestaVacaciones.Add(new PropuestaVacaciones
                     {
                         SecuencialColaborador = idColaborador,
                         Fecha = fecha
                     });
-
-                    var ddv = db.DiasDisponiblesVacaciones.FirstOrDefault(d => d.SecuencialColaborador == idColaborador);
-                    if (ddv != null) ddv.DiasDisponibles--;
                 }
                 db.SaveChanges();
 
@@ -9338,10 +9641,13 @@ r in db.Rol on ur.rol equals r
                 {
                     DateTime fecha = new DateTime(anno, mes, day);
                     var propuesta = db.PropuestaVacaciones.FirstOrDefault(p => p.SecuencialColaborador == idColaborador && p.Fecha == fecha);
-                    if (propuesta != null) db.PropuestaVacaciones.Remove(propuesta);
+                    if (propuesta != null) 
+                    {
+                        db.PropuestaVacaciones.Remove(propuesta);
 
-                    var ddv = db.DiasDisponiblesVacaciones.FirstOrDefault(d => d.SecuencialColaborador == idColaborador);
-                    if (ddv != null) ddv.DiasDisponibles++;
+                        var ddv = db.DiasDisponiblesVacaciones.FirstOrDefault(d => d.SecuencialColaborador == idColaborador);
+                        if (ddv != null) ddv.DiasDisponibles++;
+                    }
                 }
                 db.SaveChanges();
 

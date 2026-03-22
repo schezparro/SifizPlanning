@@ -52,6 +52,8 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
         angular.element("#panel-requerimientos").addClass('invisible');
         angular.element("#panel-ofertas").addClass('invisible');
         angular.element("#panel-formalizacion-ofertas").addClass('invisible');
+        angular.element("#panel-ofertas-excel").addClass('invisible');
+        angular.element("#panel-listado-versiones").addClass('invisible');
     };
 
     $scope.funcionalidad = 'REQUERIMIENTOS';
@@ -72,6 +74,25 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
         ocultar(); // Oculta ambos paneles
         $scope.funcionalidad = 'FORMALIZACION DE OFERTAS';
         angular.element("#panel-formalizacion-ofertas").removeClass('invisible');
+    };
+
+    $scope.IrOfertasExcel = function () {
+        ocultar(); // Oculta todos los paneles
+        $scope.funcionalidad = 'OFERTAS EXCEL';
+        angular.element("#panel-ofertas-excel").removeClass('invisible');
+        
+        // Load mock data for clients and developers
+        $scope.clients = ['Cliente A', 'Cliente B', 'Cliente C'];
+        $scope.developers = ['Dev 1', 'Dev 2', 'Dev 3'];
+    };
+    
+    // Panel SPA para Listado Versiones
+
+    $scope.IrListadoVersiones = function () {
+        ocultar(); // Oculta todos los paneles
+        $scope.funcionalidad = 'Listado Versiones de Fuentes';
+        angular.element("#panel-listado-versiones").removeClass('invisible');
+        // No sobreescribir el scope del panel, dejar que ListadoVersionesController maneje los datos y la búsqueda
     };
 
     $scope.IrRequerimientosComercial();
@@ -176,10 +197,27 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
         }
     });
 
-    var ajaxRequerimientos = $http.post("comercial/catalogo-requerimientos", {});
-    ajaxRequerimientos.success(function (data) {
+    // Cargar catálogo base de requerimientos para el modal de crear requerimientos
+    var ajaxCatalogoRequerimientos = $http.post("catalogos/requerimientos", {});
+    ajaxCatalogoRequerimientos.success(function (data) {
+        if (data.success === true) {
+            $scope.catalogoRequerimientos = data.requerimientos;
+        }
+    });
+
+    // Cargar requerimientos para ofertas (todos, asociados o no a tickets)
+    var ajaxRequerimientosOfertas = $http.post("comercial/darRequerimientosOfertas", {});
+    ajaxRequerimientosOfertas.success(function (data) {
         if (data.success === true) {
             $scope.requerimientos = data.requerimientos;
+        }
+    });
+
+    // Cargar colaboradores
+    var ajaxColaboradores = $http.post("catalogos/dar-colaboradores", {});
+    ajaxColaboradores.success(function (data) {
+        if (data.success === true) {
+            $scope.colaboradores = data.colaboradores;
         }
     });
     $scope.windowAgregarRequerimiento = function () {
@@ -327,7 +365,8 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
             requerimiento: $scope.pedReqSeleccionado,
             ticket: $scope.ticketSeleccionado,
             detalle: $scope.detalleSeleccionado,
-            fechaPedidoCliente: fechaSe
+            fechaPedidoCliente: fechaSe,
+            colaborador: $scope.colaboradorSeleccionado
         };
 
         var insertReq = $http.post("comercial/guardar-requerimiento",
@@ -372,6 +411,7 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
                 $scope.clienteSeleccionadoE = data.requerimientoResult.clienteId;
                 $scope.pedReqSeleccionadoE = data.requerimientoResult.requerimientoId;
                 $scope.detalleSeleccionadoE = data.requerimientoResult.detalle;
+                $scope.colaboradorEditar = data.requerimientoResult.colaboradorId;
 
                 $scope.fechaSeleccionadaE = $scope.convertirFecha(data.requerimientoResult.fecha);
                 angular.element('#fecha-editar-requerimiento').datepicker('setValue', new Date(data.requerimientoResult.fecha));
@@ -384,16 +424,16 @@ comercialApp.controller('comercialController', ['$scope', '$http', function ($sc
     };
 
     $scope.modificarRequerimiento = function () {
-
         waitingDialog.show('Guardando...', { dialogSize: 'sm', progressType: 'success' });
         var fechaSe = angular.element("#fecha-editar-requerimiento")[0].value;
         var datos = {
             id: $scope.secuencialRequerimiento,
-            cliente: $scope.clienteSeleccionadoE, // Usar el modelo Angular
+            cliente: $scope.clienteSeleccionadoE,
             requerimiento: $scope.pedReqSeleccionadoE,
             ticket: $scope.ticketSeleccionadoE,
             detalle: $scope.detalleSeleccionadoE,
-            fechaPedidoCliente: fechaSe
+            fechaPedidoCliente: fechaSe,
+            colaborador: $scope.colaboradorEditar
         };
 
         var insertReq = $http.post("comercial/editar-requerimiento",

@@ -1,0 +1,130 @@
+-- Script para poblar la tabla TAREAS.PUBLICACIONESCLIENTE con datos de prueba
+-- Este script crea registros de solicitudes de publicación de clientes
+
+USE [SifizPlanning]
+GO
+
+-- Limpiar datos existentes (opcional, comentar si no deseas borrar datos)
+-- DELETE FROM [TAREAS].[PUBLICACIONESCLIENTE]
+-- GO
+
+-- PASO 1: Obtener estado de tickets RESUELTOS (ajusta según tus estados reales)
+-- Si los tickets resueltos tienen otro estado, reemplaza 10 y 11 con los valores correctos
+DECLARE @EstadoResuelto INT = 10  -- RESUELTO
+DECLARE @EstadoCertificado INT = 11  -- CERTIFICADO
+
+-- Verificar que hay tickets en estos estados
+SELECT 'Verificando tickets disponibles...'
+SELECT COUNT(*) as TicketsDisponibles 
+FROM [TICKET].[TICKET] t
+WHERE t.[SECUENCIALESTADOTICKET] IN (@EstadoResuelto, @EstadoCertificado)
+GO
+
+-- 1. Publicaciones Cliente PENDIENTES (EstaPublicado = 0)
+INSERT INTO [TAREAS].[PUBLICACIONESCLIENTE] 
+    ([SECUENCIALTICKET], [SECUENCIALCLIENTE], [FECHASOLICITUD], [ESTAPUBLICADO], [FECHAPUBLICACION], [SECUENCIALCOLABORADOR])
+SELECT 
+    t.[SECUENCIAL],
+    pc.[SECUENCIALCLIENTE],
+    DATEADD(DAY, -ABS(CHECKSUM(NEWID())) % 30, GETDATE()) AS [FECHASOLICITUD],
+    0 AS [ESTAPUBLICADO],
+    NULL AS [FECHAPUBLICACION],
+    NULL AS [SECUENCIALCOLABORADOR]
+FROM 
+    [TICKET].[TICKET] t
+    INNER JOIN [TICKET].[PERSONA_CLIENTE] pc ON t.[SECUENCIALPERSONA_Cliente] = pc.[SECUENCIALPERSONA]
+WHERE 
+    t.[SECUENCIALESTADOTICKET] IN (10, 11) -- Ajusta si los códigos de estado son diferentes
+    AND NOT EXISTS (
+        SELECT 1 FROM [TAREAS].[PUBLICACIONESCLIENTE] pub
+        WHERE pub.[SECUENCIALTICKET] = t.[SECUENCIAL]
+    )
+    AND t.[SECUENCIAL] IN (
+        SELECT TOP 15 [SECUENCIAL] 
+        FROM [TICKET].[TICKET] 
+        WHERE [SECUENCIALESTADOTICKET] IN (10, 11)
+        ORDER BY [SECUENCIAL] DESC
+    )
+
+PRINT 'Se insertaron ' + CAST(@@ROWCOUNT AS VARCHAR(10)) + ' publicaciones PENDIENTES'
+GO
+
+-- 2. Publicaciones Cliente COMPLETADAS (EstaPublicado = 1)
+INSERT INTO [TAREAS].[PUBLICACIONESCLIENTE] 
+    ([SECUENCIALTICKET], [SECUENCIALCLIENTE], [FECHASOLICITUD], [ESTAPUBLICADO], [FECHAPUBLICACION], [SECUENCIALCOLABORADOR])
+SELECT 
+    t.[SECUENCIAL],
+    pc.[SECUENCIALCLIENTE],
+    DATEADD(DAY, -ABS(CHECKSUM(NEWID())) % 60, GETDATE()) AS [FECHASOLICITUD],
+    1 AS [ESTAPUBLICADO],
+    DATEADD(DAY, -ABS(CHECKSUM(NEWID())) % 20, GETDATE()) AS [FECHAPUBLICACION],
+    (SELECT TOP 1 c.[SECUENCIAL] 
+     FROM [TAREAS].[COLABORADOR] c
+     INNER JOIN [TAREAS].[PERSONA] p ON c.[SECUENCIALPERSONA] = p.[SECUENCIAL]
+     INNER JOIN [SEGURIDADES].[USUARIO] u ON p.[SECUENCIAL] = u.[SECUENCIALPERSONA]
+     WHERE u.[ESTAACTIVO] = 1 
+     ORDER BY NEWID()) AS [SECUENCIALCOLABORADOR]
+FROM 
+    [TICKET].[TICKET] t
+    INNER JOIN [TICKET].[PERSONA_CLIENTE] pc ON t.[SECUENCIALPERSONA_Cliente] = pc.[SECUENCIALPERSONA]
+WHERE 
+    t.[SECUENCIALESTADOTICKET] IN (10, 11)
+    AND NOT EXISTS (
+        SELECT 1 FROM [TAREAS].[PUBLICACIONESCLIENTE] pub
+        WHERE pub.[SECUENCIALTICKET] = t.[SECUENCIAL]
+    )
+    AND t.[SECUENCIAL] IN (
+        SELECT TOP 10 [SECUENCIAL] 
+        FROM [TICKET].[TICKET] 
+        WHERE [SECUENCIALESTADOTICKET] IN (10, 11)
+        ORDER BY [SECUENCIAL] ASC
+    )
+
+PRINT 'Se insertaron ' + CAST(@@ROWCOUNT AS VARCHAR(10)) + ' publicaciones COMPLETADAS'
+GO
+
+-- Verificar los datos insertados
+PRINT ''
+PRINT '===== DATOS INSERTADOS EN PUBLICACIONESCLIENTE ====='
+PRINT ''
+
+SELECT 
+    pc.[SECUENCIAL],
+    pc.[SECUENCIALTICKET],
+    t.[ASUNTO] AS [AsuntoTicket],
+    cli.[DESCRIPCION] AS [Cliente],
+    p.[NOMBRE1] + ' ' + p.[APELLIDO1] AS [PersonaCliente],
+    pc.[FECHASOLICITUD],
+    CASE WHEN pc.[ESTAPUBLICADO] = 1 THEN 'Publicado' ELSE 'Pendiente' END AS [Estado],
+    pc.[FECHAPUBLICACION],
+    CASE 
+        WHEN pc.[SECUENCIALCOLABORADOR] IS NOT NULL 
+        THEN (SELECT pCol.[NOMBRE1] + ' ' + pCol.[APELLIDO1] 
+              FROM [TAREAS].[COLABORADOR] col
+              INNER JOIN [TAREAS].[PERSONA] pCol ON col.[SECUENCIALPERSONA] = pCol.[SECUENCIAL]
+              WHERE col.[SECUENCIAL] = pc.[SECUENCIALCOLABORADOR])
+        ELSE 'N/A'
+    END AS [PublicadoPor]
+FROM 
+    [TAREAS].[PUBLICACIONESCLIENTE] pc
+    INNER JOIN [TICKET].[TICKET] t ON pc.[SECUENCIALTICKET] = t.[SECUENCIAL]
+    INNER JOIN [TAREAS].[CLIENTE] cli ON pc.[SECUENCIALCLIENTE] = cli.[SECUENCIAL]
+    INNER JOIN [TICKET].[PERSONA_CLIENTE] pcliente ON cli.[SECUENCIAL] = pcliente.[SECUENCIALCLIENTE] 
+                                                       AND pcliente.[SECUENCIALPERSONA] = t.[SECUENCIALPERSONA_Cliente]
+    INNER JOIN [TAREAS].[PERSONA] p ON pcliente.[SECUENCIALPERSONA] = p.[SECUENCIAL]
+ORDER BY 
+    pc.[FECHASOLICITUD] DESC
+GO
+
+-- Resumen de datos
+PRINT ''
+PRINT '===== RESUMEN ====='
+PRINT ''
+
+SELECT 
+    COUNT(*) AS [Total],
+    SUM(CASE WHEN pc.[ESTAPUBLICADO] = 0 THEN 1 ELSE 0 END) AS [Pendientes],
+    SUM(CASE WHEN pc.[ESTAPUBLICADO] = 1 THEN 1 ELSE 0 END) AS [Publicadas]
+FROM 
+    [TAREAS].[PUBLICACIONESCLIENTE] pc
+GO

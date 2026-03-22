@@ -1,4 +1,5 @@
-﻿@{
+﻿
+@{
     ViewBag.Title = "Bienvenido a la Gestión de INDICADORES de SifizPlanning";
 }
 
@@ -34,6 +35,7 @@
             <ul class="nav nav-pills">
                 <li role="presentation" class="active"><a href="#" ng-click="IrIndicadoresTickets()">Tickets</a></li>
                 <li role="presentation"><a href="#" ng-click="IrIndicadoresGestores()">Gestores</a></li>
+                <li role="presentation"><a href="#" ng-click="IrIndicadoresOfertas()">Ofertas</a></li>
 
                 <a href="cerrar/sesion/" class="right btn btn-danger"><span class="glyphicon glyphicon-off"></span>Cerrar Sesión</a>
                 <a href="main-menu" style="margin-right: 4px;" class="right btn btn-warning"><span class="glyphicon glyphicon-menu-hamburger"></span> Menú Principal</a>
@@ -43,12 +45,17 @@
         <div id="panel-principal" class="panel panel-default" ng-init="funcionalidad = 'INDICADORES DE TICKETS'">
 
             <div id="funcionalidad">
+
                 <div id="panel-indicadores-tickets" ng-controller="indicadoresTickets">
                     @{Html.RenderPartial("windowIndicadoresTickets");}
                 </div>
 
                 <div id="panel-indicadores-gestores" class="invisible" ng-controller="indicadoresGestores">
                     @{Html.RenderPartial("windowIndicadoresGestores");}
+                </div>
+
+                <div id="panel-indicadores-ofertas" class="invisible" ng-controller="indicadoresOfertasController">
+                    @{Html.RenderPartial("windowIndicadoresOfertas");}
                 </div>
 
                 <div id="loadingDiv">
@@ -117,6 +124,7 @@
     <script type="text/javascript" src="~/Web/js/indicadores/indicadores.js"></script>
     <script type="text/javascript" src="~/Web/js/indicadores/indicadoresTickets.js"></script>
     <script type="text/javascript" src="~/Web/js/indicadores/indicadoresGestores.js"></script>
+    <script type="text/javascript" src="~/Web/js/indicadores/indicadoresOfertas.js"></script>
     @*<script type="text/javascript" src="~/Web/js/chartjs-plugin-datalabels.js"></script>*@
     <script type="text/javascript" src="~/Web/js/chartjs-plugin-datalabels@latest.js"></script>
     <script type="text/javascript" src="~/Web/js/chart.js"></script>

@@ -28,11 +28,12 @@ namespace SifizPlanning.Models
             this.gestorServicios = new HashSet<GestorServicios>();
             this.comentarioHorasMantenimiento = new HashSet<ComentarioHorasMantenimiento>();
             this.comentarioTicketCliente = new HashSet<ComentarioTicketCliente>();
-            this.clienteAuxiliar = new HashSet<ClienteAuxiliar>();
             this.ofertas = new HashSet<Ofertas>();
             this.INCIDENCIAS = new HashSet<Incidencias>();
             this.TIEMPOCERRADOTICKET = new HashSet<TiempoCerradoTicket>();
             this.clienteReporteMantenimiento = new HashSet<ClienteReporteMantenimiento>();
+            this.clienteAuxiliar = new HashSet<ClienteAuxiliar>();
+            this.PUBLICACIONESCLIENTE = new HashSet<PublicacionesCliente>();
         }
     
         public int Secuencial { get; set; }
@@ -53,10 +54,11 @@ namespace SifizPlanning.Models
         public virtual ICollection<GestorServicios> gestorServicios { get; set; }
         public virtual ICollection<ComentarioHorasMantenimiento> comentarioHorasMantenimiento { get; set; }
         public virtual ICollection<ComentarioTicketCliente> comentarioTicketCliente { get; set; }
-        public virtual ICollection<ClienteAuxiliar> clienteAuxiliar { get; set; }
         public virtual ICollection<Ofertas> ofertas { get; set; }
         public virtual ICollection<Incidencias> INCIDENCIAS { get; set; }
         public virtual ICollection<TiempoCerradoTicket> TIEMPOCERRADOTICKET { get; set; }
         public virtual ICollection<ClienteReporteMantenimiento> clienteReporteMantenimiento { get; set; }
+        public virtual ICollection<ClienteAuxiliar> clienteAuxiliar { get; set; }
+        public virtual ICollection<PublicacionesCliente> PUBLICACIONESCLIENTE { get; set; }
     }
 }

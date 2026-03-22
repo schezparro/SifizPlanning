@@ -6,7 +6,6 @@
 
 <html ng-app="admin">
 <head>
-    <!--<meta name="viewport" content="width=device-width" />-->
     <title>@ViewBag.Title</title>
     <link href="~/Web/css/bootstrap.min.css" rel="stylesheet" />
     <link href="~/Web/css/bootstrap-theme.min.css" rel="stylesheet" />
@@ -31,7 +30,7 @@
 
         <div id="menu-principal">
             <ul class="nav nav-pills">
-                                
+                                 
                 <li role="presentation" class="active"><a href="#" ng-click="IrTrabajador()">Gestionar Colaboradores</a></li>
                 <li class="dropdown" role="presentation">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">Gestionar Clientes <span class="caret"></span></a>
@@ -42,14 +41,15 @@
                         <li>
                             <a href="#" ng-click="IrContratosClientes()">Contratos Clientes</a>
                         </li>
-                    </ul>
+            </ul>
                 </li>
                 <li role="presentation"><a href="#" ng-click="IrCatalogos()">Gestionar Catálogos</a></li>
                 <li role="presentation"><a href="#" ng-click="IrCorreosNoEnviados()">Gestionar Correos No Enviados</a></li>
-                
+                <li role="presentation"><a href="#" ng-click="IrProyectosExcel()">Proyectos</a></li>
+
                 <a href="cerrar/sesion/" class="right btn btn-danger"><span class="glyphicon glyphicon-off"></span> Cerrar Sesión</a>
                 <a href="main-menu" style="margin-right: 4px;" class="right btn btn-warning"><span class="glyphicon glyphicon-menu-hamburger"></span> Menú Principal</a>
-            </ul>            
+            </ul>             
         </div>
 
         <div id="panel-principal" class="panel panel-default" ng-init="funcionalidad = 'COLABORADORES'">
@@ -57,7 +57,7 @@
                 <h3 class="panel-title">{{ funcionalidad }}</h3>
             </div>
 
-            <div id="funcionalidad">                
+            <div id="funcionalidad">
 
                 <div id="panel_workers" ng-controller="workerController">
                     @{Html.RenderPartial("windowAddWorker");}
@@ -71,12 +71,17 @@
                     @{Html.RenderPartial("windowAddContratoClientes");}
                 </div>
 
-                <div id="panel_catalogos" class="invisible" ng-controller="catalogosController">                    
+                <div id="panel_catalogos" class="invisible" ng-controller="catalogosController">                      
                     @{Html.RenderPartial("windowAddCatalogos");}
                 </div>
 
                 <div id="panel_correosNoEnviados" class="invisible" ng-controller="correosNoEnviadosController">
                     @{Html.RenderPartial("windowAddCorreosNoEnviados");}
+                </div>
+
+
+                <div id="panel_proyectos_excel" ng-controller="proyectosExcelController" class="invisible">
+                    @{Html.RenderPartial("windowProyectosExcel");}
                 </div>
 
                 <div id="loadingDiv">
@@ -87,9 +92,8 @@
 
         </div>
 
-    </div> 
-    
-    <!-- CODIGO DEL CHAT -->
+    </div>
+
     <div id="sifiz-chat" style="display: none;">
         <div id="head-sifiz-chat" class="btns-chat">
             <div class="left nombre-usuario-local"></div>
@@ -135,18 +139,20 @@
     <audio id="audio-chat" controls="controls">
         <source src="~/Web/sounds/happy-ending.mp3" type="audio/mpeg" />
     </audio>
-    <!-- FIN DEL CODIGO DEL CHAT -->   
-        
     <script type="text/javascript" src="~/Web/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="~/Web/js/bootstrap-datepicker.js"></script>
     <script type="text/javascript" src="~/Web/js/jasny-bootstrap.min.js"></script>
     <script type="text/javascript" src="~/Web/js/highcharts.js"></script>
     <script type="text/javascript" src="~/Web/js/chat.js"></script>
     <script type="text/javascript" src="~/Web/js/waiting.js"></script>
+
+    <script type="text/javascript" src="~/Web/js/dirPagination.js"></script>
+
     <script type="text/javascript" src="~/Web/js/admin/admin.js"></script>
     <script type="text/javascript" src="~/Web/js/admin/workerController.js"></script>
     <script type="text/javascript" src="~/Web/js/admin/clientController.js"></script>
     <script type="text/javascript" src="~/Web/js/admin/catalogosController.js"></script>
     <script type="text/javascript" src="~/Web/js/admin/correosNoEnviadosController.js"></script>
+    <script type="text/javascript" src="~/Web/js/admin/proyectosExcel.js"></script>
 </body>
 </html>

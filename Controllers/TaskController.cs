@@ -4428,13 +4428,13 @@ namespace SifizPlanning.Controllers
 
                 string htmlCss = @"<style>
                                                .textoCuerpo{
-                                                    font-size: 11pt;
-                                                    font-family: ""Calibri"", sans-serif;
-                                                    color: #1F497D;
+                                                    font-size: 12pt;
+                                                    font-family: ""Century Gothic"", sans-serif;
+                                                    color: #353535;
                                                }
                                                .cabecera{
                                                     font-size: 8pt;
-                                                    font-family: ""Calibri"", sans-serif;
+                                                    font-family: ""Century Gothic"", sans-serif;
                                                     border-bottom: 1px solid #222;
                                                }                                                                              
                                                table td{
@@ -4445,14 +4445,14 @@ namespace SifizPlanning.Controllers
                                                     border-collapse: collapse;
                                                     font-size: 8pt;
                                                     background: #aaa;
-                                                    font-family: ""Calibri"", sans-serif;
+                                                    font-family: ""Century Gothic"", sans-serif;
                                                }
                                                table, td {
                                                     border: 1px solid black;
                                                     border-collapse: collapse;
                                                     font-size: 8pt;
                                                     background: #ccc;
-                                                    font-family: ""Calibri"", sans-serif;
+                                                    font-family: ""Century Gothic"", sans-serif;
                                                     vertical-align: top;
                                                 }
                                                 th, td {
@@ -4461,30 +4461,21 @@ namespace SifizPlanning.Controllers
                                                 .resaltar{
                                                     background: #FFFF00 !important;
                                                     font-size: 8pt;
-                                                    font-family: ""Calibri"", sans-serif;
+                                                    font-family: ""Century Gothic"", sans-serif;
                                                     border-bottom: 1px solid #222;
                                                 }
 
                                                 /* Font Definitions */
                                                 @font-face
-	                                                {font-family:""Cambria Math"";
-	                                                panose-1:2 4 5 3 5 4 6 3 2 4;}
-                                                @font-face
-	                                                {font-family:Calibri;
-	                                                panose-1:2 15 5 2 2 2 4 3 2 4;}
-                                                @font-face
-	                                                {font-family:Verdana;
-	                                                panose-1:2 11 6 4 3 5 4 4 2 4;}
-                                                @font-face
-	                                                {font-family:""Palatino Linotype"";
-	                                                panose-1:2 4 5 2 5 5 5 3 3 4;}
+	                                                {font-family:""Century Gothic"";
+	                                                panose-1:2 11 5 2 2 2 2 2 2 4;}
                                                 /* Style Definitions */
                                                 p.MsoNormal, li.MsoNormal, div.MsoNormal
 	                                                {margin:0cm;
 	                                                margin-bottom:.0001pt;
-	                                                font-size:11.0pt;
-	                                                font-family:""Calibri"",sans-serif;
-	                                                mso-fareast-language:EN-US;}
+	                                                font-size:12.0pt;
+	                                                font-family:""Century Gothic"",sans-serif;
+	                                                color:#353535;}
                                                 a:link, span.MsoHyperlink
 	                                                {mso-style-priority:99;
 	                                                color:#0563C1;
@@ -4495,12 +4486,11 @@ namespace SifizPlanning.Controllers
 	                                                text-decoration:underline;}
                                                 span.EstiloCorreo17
 	                                                {mso-style-type:personal-compose;
-	                                                font-family:""Calibri"",sans-serif;
-	                                                color:windowtext;}
+	                                                font-family:""Century Gothic"",sans-serif;
+	                                                color:#353535;}
                                                 .MsoChpDefault
 	                                                {mso-style-type:export-only;
-	                                                font-family:""Calibri"",sans-serif;
-	                                                mso-fareast-language:EN-US;}
+	                                                font-family:""Century Gothic"",sans-serif;}
                                                 @page WordSection1
 	                                                {size:612.0pt 792.0pt;
 	                                                margin:70.85pt 3.0cm 70.85pt 3.0cm;}
@@ -4523,22 +4513,43 @@ namespace SifizPlanning.Controllers
                                  cargo = c.Descripcion.ToLower()
                              }).FirstOrDefault();
                 string htmlfirma = @"<div class=WordSection1>
-                                        <p class=MsoNormal><o:p>&nbsp;</o:p></p><p class=MsoNormal><o:p>&nbsp;</o:p></p><p class=MsoNormal><span lang=ES-EC style='font-size:12.0pt;font-family:""Times New Roman"",serif;color:#1F497D;mso-fareast-language:ES-EC'>Atentamente,<o:p></o:p></span></p><p class=MsoNormal><i><span style='font-size:12.0pt;font-family:""Times New Roman"",serif;color:#1F497D;mso-fareast-language:ES-EC'>"
+                                        <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                                        <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                                        <p class=MsoNormal>
+                                            <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>Atentamente,<o:p></o:p></span>
+                                        </p>
+                                        <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                                        <p class=MsoNormal>
+                                            <i><span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>"
                                 +
                                 Utiles.UpperCamelCase(envia.nombre1) + " " + Utiles.UpperCamelCase(envia.apellido1)
                                 +
-                                @"<o:p></o:p></span></i></p><p class=MsoNormal><span style='font-size:12.0pt;font-family:""Times New Roman"",serif;color:#1F497D;mso-fareast-language:ES-EC'>"
+                                @"<o:p></o:p></span></i>
+                                        </p>
+                                        <p class=MsoNormal>
+                                            <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>"
                                 +
                                 Utiles.PrimeraMayuscula(envia.cargo)
                                 +
-                                @"<br> 
-                                <b style='color:#1F497D !important;'>
-                                    <i>
-                                        02-450-4616 <br/>
-                                        Quito - Ecuador
-                                    </i>
-                                </b></span><span lang=IT style='font-size:12.0pt;font-family:'Times New Roman',serif;color:#203864;mso-fareast-language:ES'><o:p></o:p></span></p><div class=MsoNormal align=center style='text-align:center'><span lang=EN style='font-size:9.0pt;font-family:'Verdana',sans-serif;color:#1F497D;mso-fareast-language:ES-EC'><hr size=3 width='100%' align=center></span></div><p class=MsoNormal><b><span lang=ES style='color:#1F497D;mso-fareast-language:ES-EC'>Somos líderes en la producción de software financiero-contable de última tecnología. </span></b><b><span lang=ES style='font-family:'Times New Roman',serif;color:#1F497D;mso-fareast-language:ES'><o:p></o:p></span></b></p><p class=MsoNormal><a href='http://www.sifizsoft.com/'><span style='font-size:12.0pt;color:#1F497D;position:relative;top:2.0pt;mso-text-raise:-2.0pt;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=129 height=49 id='Imagen_x0020_2' src='cid:sifizsoft.jpg' alt='cid:image001.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp;&nbsp;&nbsp;<span style='position:relative;top:-3.0pt;mso-text-raise:3.0pt'>&nbsp;</span></span><span lang=EN-US style='font-size:9.0pt;color:#1F497D;position:relative;top:-18.0pt;mso-text-raise:18.0pt;letter-spacing:.2pt;mso-fareast-language:ES-EC'>Like us in</span><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp; </span><a href='http://www.facebook.com/pages/SifizSoft/287494208026463?sk=app_129982580378550'><span style='font-size:12.0pt;color:#1F497D;position:relative;top:-8.0pt;mso-text-raise:8.0pt;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=41 height=41 id='Imagen_x0020_3' src='cid:fb.jpg' alt='cid:image002.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp;&nbsp;</span><span lang=EN-US style='font-size:9.0pt;color:#1F497D;position:relative;top:-18.0pt;mso-text-raise:18.0pt;mso-fareast-language:ES-EC'>and Follow us on</span><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'> </span><a href='https://twitter.com/SifizSoftSA'><span style='font-size:12.0pt;color:#1F497D;position:relative;top:-8.0pt;mso-text-raise:8.0pt;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=41 height=41 id='Imagen_x0020_4' src='cid:tw.jpg' alt='cid:image003.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp;&nbsp;</span><a href='http://lnkd.in/GYc2-s'><span style='font-size:12.0pt;color:#1F497D;position:relative;top:-8.0pt;mso-text-raise:8.0pt;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=106 height=41 id='Imagen_x0020_5' src='cid:linkedin.jpg' alt='cid:image004.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'>&nbsp; &nbsp;</span><a href='http://www.efqm.org/en/'><span style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=101 height=55 id='Imagen_x0020_6' src='cid:efqm.jpg' alt='cid:image005.png@01D244E9.77AAB2B0'></span></a><span style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'> </span><a href='http://www.openkm.com/en/'><span style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC;text-decoration:none'><img border=0 width=109 height=53 id='Imagen_x0020_7' src='cid:openkm.jpg' alt='cid:image006.jpg@01D244E9.77AAB2B0'></span></a><span lang=EN-US style='font-size:12.0pt;color:#1F497D;mso-fareast-language:ES-EC'><o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=EN-US style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'><o:p>&nbsp;</o:p></span></p><p class=MsoNormal align=center style='text-align:center;line-height:17.0pt;mso-line-height-rule:exactly;text-autospace:none'><span style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>OFICINA QUITO: Rumipamba E2-214 y Av. República, edificio Signature, piso 09, oficina 901</span><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>.&nbsp; Teléfonos&nbsp; </span><span style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>02-351-7729, &nbsp;02-351-8919, 02-450-4616, 02-450-4727, </span><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>desde USA 1(407)255 8532<o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>OFICINA AMBATO: Av. Atahualpa y Pasaje Arajuno S/N a una cuadra del nuevo municipio.&nbsp; Teléfono 03-241-6586&nbsp; 03-241-9127<o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>PO&nbsp; BOX 780066&nbsp;Orlando, FL 32878-0066 Toll free (800) 793-8369<o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'><o:p>&nbsp;</o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>Este correo electrónico es solo para uso del destinatario y puede contener información confidencial. Cualquier distribución uso o lectura de este material está expresamente prohibido. Si usted no es el destinatario o si usted ha recibido este correo electrónico por error por favor contacte al remitente y destruya todas las copias y el mensaje original.</span><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES'><o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=ES style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'><o:p>&nbsp;</o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=EN-US style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>This E-mail message is for the sole use of the intended recipient(s) and may contain confidential and privileged information. Any unauthorized review, use, disclosure or distribution is prohibited. If you are not the intended recipient, please contact the sender by reply E-mail and destroy all copies of the original message.<o:p></o:p></span></p><p class=MsoNormal align=center style='text-align:center'><span lang=EN-US style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES-EC'>Copyrights ©SifizSoft&nbsp;2004-2016 carefully reserved and preserved</span><span lang=EN-US style='font-size:10.0pt;color:#44546A;mso-fareast-language:ES'><o:p></o:p></span></p><p class=MsoNormal><o:p>&nbsp;</o:p></p></div></body></html>";
-                string[] imagenes = new string[6] { "sifizsoft.jpg", "fb.jpg", "tw.jpg", "linkedin.jpg", "efqm.jpg", "openkm.jpg" };
+                                @"<o:p></o:p></span>
+                                        </p>
+                                        <p class=MsoNormal>
+                                            <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>SISTEMA PLANIFICADOR INTEGRAL SIFIZSOFT S.A.<o:p></o:p></span>
+                                        </p>
+                                        <p class=MsoNormal>
+                                            <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>Telf. (593) 2-450-4616<o:p></o:p></span>
+                                        </p>
+                                        <p class=MsoNormal>
+                                            <span style='font-family:""Century Gothic"",sans-serif;font-size:12.0pt;color:#353535;'>Quito - Ecuador<o:p></o:p></span>
+                                        </p>
+                                        <p class=MsoNormal align=center style='text-align:center'><img style='max-width: 100%; height: auto !important;'  src='cid:sifizsoft.png'></p>
+                                        <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                                        <p class=MsoNormal align=center style='text-align:center'>
+                                            <span style='font-family:""Century Gothic"",sans-serif;font-size:9.0pt;color:#000035;'>Copyrights ©SifizSoft 2004-2026 carefully reserved and preserved<o:p></o:p></span>
+                                        </p>
+                                        <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+                                    </div>";
+                string[] imagenes = new string[1] { "sifizsoft.png" };
 
                 string[] dias = new string[7] { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo" };
 
@@ -4724,10 +4735,10 @@ c in db.Colaborador on p.Secuencial equals c.SecuencialPersona
                     htmlMailFinalV += htmlfirma;
                     string asuntoV = "Actualización de Asignaciones Semana " + lunes.ToString("dd/MM");
 
-                    Utiles.EnviarEmail(emailUser, emailsViaticos, htmlMailFinalV, asuntoV, password, true, imagenes);
+                    Utiles.EnviarEmail(emailUser, emailsViaticos, htmlMailFinalV, asuntoV, password, true, imagenes, null, -1);
                 }
 
-                Utiles.EnviarEmail(emailUser, emailDestinos, htmlMailFinal, asunto, password, true, imagenes);
+                Utiles.EnviarEmail(emailUser, emailDestinos, htmlMailFinal, asunto, password, true, imagenes, null, -1);
 
                 var resp1 = new
                 {

@@ -40,6 +40,18 @@ namespace SifizPlanning.Controllers
             LoggerManager.LogInfo("Index method called in TicketController");
             return View();
         }
+        [Authorize(Roles = "COORDINADOR, ADMIN, TICKET, GESTOR")]
+        public ActionResult ContarTicketsUrgentesAbiertos()
+        {
+            int cantidad = (from t in db.Ticket
+                            join et in db.EstadoTicket on t.estadoTicket equals et
+                            join pr in db.PrioridadTicket on t.prioridadTicket equals pr
+                            where et.Codigo == "ABIERTO" && pr.Codigo == "URGENTE"
+                            select t).Count();
+
+            return Json(new { success = true, cantidad = cantidad }, JsonRequestBehavior.AllowGet);
+        }
+
 
         [Authorize(Roles = "COORDINADOR, ADMIN, TICKET, GESTOR")]
         [HttpPost]
@@ -3500,7 +3512,7 @@ namespace SifizPlanning.Controllers
 
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
-                if (user != null && (user.Email == "vhidalgo@sifizsoft.com" || user.Email == "rsanchez@sifizsoft.com"))
+                if (user != null && (user.Email == "operaciones@sifizsoft.com" || user.Email == "rsanchez@sifizsoft.com"))
                     permitirValidar = true;
 
                 LoggerManager.LogInfo($"DetalleEstimacionTicket returning {estimacionesFinales.Count} estimaciones finales for idTicket={idTicket}. Tiempo total calculado: {tiempoTotal}.");

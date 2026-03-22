@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <style>
@@ -86,8 +86,8 @@
                     <td>{{ colaborador.nombre }}</td>
                     <td ng-repeat="day in daysOfMonth"
                         ng-class="{
-                        'bg-danger': day.isHoliday,
-                        'bg-primary': colaborador.diasDeVacaciones && colaborador.diasDeVacaciones.includes(day.dayNumber),
+                        'bg-danger': day.isHoliday || day.isWeekend,
+                        'bg-primary': ((colaborador.diasDeVacaciones && colaborador.diasDeVacaciones.includes(day.dayNumber)) || (colaborador.tempSelectedDays && colaborador.tempSelectedDays.includes(day.dayNumber))) && !(colaborador.tempDeselectedDays && colaborador.tempDeselectedDays.includes(day.dayNumber)),
                         'bg-warning': isSelecting && day.isHovering
                     }"
                         ng-click="endSelection(colaborador)"
