@@ -1230,12 +1230,14 @@ namespace SifizPlanning.Controllers
                     string destinosTecnico = String.Join(", ", notTec.ToArray());
 
                     string tituloP = "TCK-" + ticket.Secuencial;
-                    string ramaP = rama;
+                    string ramaP = string.IsNullOrWhiteSpace(rama) ? "main" : rama;
                     string requiereQAP = "NO";
                     string clienteP = personaCliente.cliente.Codigo;
                     string colaboradorP = user.persona.Nombre1 + " " + user.persona.Apellido1;
-                    string descripcionP = descripcion;
-                    string[] tagsP = JsonConvert.DeserializeObject<string[]>(tagsJson);
+                    string descripcionP = string.IsNullOrWhiteSpace(descripcion) ? "-" : descripcion;
+                    string[] tagsP = (!string.IsNullOrWhiteSpace(tagsJson) && tagsJson != "[]")
+                        ? JsonConvert.DeserializeObject<string[]>(tagsJson)
+                        : new string[] { "GENERAL" };
                     string key = ConfigurationManager.AppSettings.Get("Devops");
 
                     string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);

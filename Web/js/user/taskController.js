@@ -1168,7 +1168,7 @@ devApp.controller("taskController", [
                 tags.push("SERVIDOR");
                 descripcion +=
                     "Los servicios a publicar son: " +
-                    $scope.serviciosAActualizarNT +
+                    ($scope.serviciosAActualizarNT || "N/A") +
                     ". ";
             }
 
@@ -1305,7 +1305,7 @@ devApp.controller("taskController", [
                     tags.push("SERVIDOR");
                     descripcion +=
                         "Los servicios a publicar son: " +
-                        $scope.serviciosAActualizar +
+                        ($scope.serviciosAActualizar || "N/A") +
                         ". ";
                 }
 
