@@ -1286,7 +1286,9 @@ namespace SifizPlanning.Controllers
                     }
                     else
                     {
-                        var dataContent = await data.ReadAsStringAsync();
+                        var dataContent = response.Content != null
+                            ? await response.Content.ReadAsStringAsync()
+                            : string.Empty;
 
                         string textoEmailDevops = @"<div class='textoCuerpo'><br/>";
                         textoEmailDevops += @"<br/>";
@@ -1521,7 +1523,9 @@ namespace SifizPlanning.Controllers
                     }
                     else
                     {
-                        var dataContent = await data.ReadAsStringAsync();
+                        var dataContent = response.Content != null
+                            ? await response.Content.ReadAsStringAsync()
+                            : string.Empty;
 
                         string textoEmailDevops = @"<div class='textoCuerpo'><br/>";
                         textoEmailDevops += @"<br/>";
@@ -1768,7 +1772,9 @@ namespace SifizPlanning.Controllers
                     }
                     else
                     {
-                        var dataContent = await data.ReadAsStringAsync();
+                        var dataContent = response.Content != null
+                            ? await response.Content.ReadAsStringAsync()
+                            : string.Empty;
 
                         string textoEmailDevops = @"<div class='textoCuerpo'><br/>";
                         textoEmailDevops += @"<br/>";
