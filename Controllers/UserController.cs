@@ -6479,7 +6479,10 @@ r in db.Rol on ur.rol equals r
                         Persona personaEmail = usuarioEmail.persona;
 
                         List<string> destinatarios = new List<string>();
-                        destinatarios.Add("victor@sifizsoft.com");
+                        if (!string.IsNullOrWhiteSpace(usuarioEmail?.Email))
+                        {
+                            destinatarios.Add(usuarioEmail.Email);
+                        }
 
                         string asunto = ticket.persona_cliente.cliente.Codigo + " HESO " + String.Format("{0:000000}", ticket.Secuencial) + " - VALIDAR ESTIMACION (" + ticket.Asunto + ")";
 

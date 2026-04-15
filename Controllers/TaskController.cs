@@ -2571,7 +2571,7 @@ namespace SifizPlanning.Controllers
                 }
 
                 tarea.SecuencialEstadoTarea = 4;//Anulada
-                tarea.SecuencialColaborador = db.Colaborador.Where(s => s.persona.usuario.FirstOrDefault().Email == "canulado@sifizsoft.com").FirstOrDefault().Secuencial;
+                tarea.SecuencialColaborador = db.Colaborador.Where(s => s.persona.usuario.FirstOrDefault().Email == (System.Configuration.ConfigurationManager.AppSettings["ColaboradorDefault"] + "@sifizsoft.com")).FirstOrDefault().Secuencial;
 
                 string emailUser = User.Identity.Name;
                 Usuario user = db.Usuario.FirstOrDefault(x => x.Email == emailUser);
@@ -2709,7 +2709,7 @@ namespace SifizPlanning.Controllers
                     foreach (Tarea tar in tareas)
                     {
                         tar.SecuencialEstadoTarea = 4;//Anulada
-                        tarea.SecuencialColaborador = db.Colaborador.Where(s => s.persona.usuario.FirstOrDefault().Email == "canulado@sifizsoft.com").FirstOrDefault().Secuencial;
+                        tarea.SecuencialColaborador = db.Colaborador.Where(s => s.persona.usuario.FirstOrDefault().Email == (System.Configuration.ConfigurationManager.AppSettings["ColaboradorDefault"] + "@sifizsoft.com")).FirstOrDefault().Secuencial;
 
                         HistoricoTareaEstado histETI = new HistoricoTareaEstado
                         {
