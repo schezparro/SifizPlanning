@@ -4686,7 +4686,7 @@ namespace SifizPlanning.Controllers
 
                 TicketTarea ticketTarea = tarea.ticketTarea.FirstOrDefault();
                 tarea.SecuencialEstadoTarea = 4;
-                tarea.SecuencialColaborador = db.Colaborador.Where(s => s.persona.usuario.FirstOrDefault().Email == (System.Configuration.ConfigurationManager.AppSettings["ColaboradorDefault"] + "@sifizsoft.com")).FirstOrDefault().Secuencial;
+                tarea.SecuencialColaborador = db.Colaborador.Where(s => s.persona.usuario.FirstOrDefault().Email == "rsanchez@sifizsoft.com").FirstOrDefault().Secuencial;
 
                 db.SaveChanges();
 
